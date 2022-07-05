@@ -19,9 +19,19 @@ async function main() {
     const warbucks = await WarBucks.deploy(INITIAL_SUPPLY)
 
     await warbucks.deployed()
-    console.log(warbucks.address)
+    console.log(`WarBuks token deployed to ${warbucks.address}`)
 
-    // console.log("Greeter deployed to:", greeter.address);
+    const MetaNatonsGovToken = await hre.ethers.getContractFactory("MetaNationsGovToken")
+    const metanationsgvtoken = await MetaNatonsGovToken.deploy(INITIAL_SUPPLY)
+
+    await metanationsgvtoken.deployed()
+    console.log(`MetaNationsGovToken deployed to ${metanationsgvtoken.address}`)
+
+    const CountryFactory = await hre.ethers.getContractFactory("CountryFactory")
+    const countryfactory = await CountryFactory.deploy()
+
+    await countryfactory.deployed()
+    console.log(`CountryFactory deployed to ${countryfactory.address}`)
 }
 
 // We recommend this pattern to be able to use async/await everywhere
