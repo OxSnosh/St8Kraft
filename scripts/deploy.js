@@ -17,21 +17,30 @@ async function main() {
     // We get the contract to deploy
     const WarBucks = await hre.ethers.getContractFactory("WarBucks")
     const warbucks = await WarBucks.deploy(INITIAL_SUPPLY)
-
     await warbucks.deployed()
     console.log(`WarBuks token deployed to ${warbucks.address}`)
 
-    const MetaNatonsGovToken = await hre.ethers.getContractFactory("MetaNationsGovToken")
+    const MetaNatonsGovToken = await hre.ethers.getContractFactory(
+        "MetaNationsGovToken"
+    )
     const metanationsgvtoken = await MetaNatonsGovToken.deploy(INITIAL_SUPPLY)
-
     await metanationsgvtoken.deployed()
     console.log(`MetaNationsGovToken deployed to ${metanationsgvtoken.address}`)
 
     const CountryFactory = await hre.ethers.getContractFactory("CountryFactory")
     const countryfactory = await CountryFactory.deploy()
-
     await countryfactory.deployed()
     console.log(`CountryFactory deployed to ${countryfactory.address}`)
+
+    const CommodityMarketplace = await hre.ethers.getContractFactory(
+        "CommodityMarketplace"
+    )
+    const commoditymarketplace = await CommodityMarketplace.deploy(
+        warbucks.address,
+        countryfactory.address
+    )
+    await commoditymarketplace.deployed()
+    console.log(`Marketplace deployed to ${commoditymarketplace.address}`)
 }
 
 // We recommend this pattern to be able to use async/await everywhere
