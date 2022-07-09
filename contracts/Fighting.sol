@@ -3,5 +3,5 @@ pragma solidity 0.8.7;
 
 //contract for fighting another nation
 contract Fighting {
-
+    
 }

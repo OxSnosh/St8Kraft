@@ -12,7 +12,7 @@ async function main() {
     //
     // If this script is run directly using `node` you may want to call compile
     // manually to make sure everything is compiled
-    // await hre.run('compile');
+    await hre.run('compile');
 
     // We get the contract to deploy
     const WarBucks = await hre.ethers.getContractFactory("WarBucks")
@@ -28,7 +28,7 @@ async function main() {
     console.log(`MetaNationsGovToken deployed to ${metanationsgvtoken.address}`)
 
     const CountryFactory = await hre.ethers.getContractFactory("CountryFactory")
-    const countryfactory = await CountryFactory.deploy()
+    const countryfactory = await CountryFactory.deploy(warbucks.address)
     await countryfactory.deployed()
     console.log(`CountryFactory deployed to ${countryfactory.address}`)
 
@@ -40,7 +40,7 @@ async function main() {
         countryfactory.address
     )
     await commoditymarketplace.deployed()
-    console.log(`Marketplace deployed to ${commoditymarketplace.address}`)
+    await console.log(`Marketplace deployed to ${commoditymarketplace.address}`)
 }
 
 // We recommend this pattern to be able to use async/await everywhere
