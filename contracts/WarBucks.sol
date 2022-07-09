@@ -9,7 +9,7 @@ contract WarBucks is ERC20, Ownable {
         _mint(msg.sender, initialSupply);
     }
 
-        function mint(address account, uint256 amount) external {
-          _mint(account, amount);
+    function mint(address account, uint256 amount) external {
+        _mint(account, amount);
     }
 }

@@ -6,20 +6,22 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 // contract for buying commodities (land, infrastructure, tech)
 contract CommodityMarketplace {
+    address public warBucksAddress;
+    address public countryMinterAddress;
+    uint8 public tankCost = 100;
 
-    address public WARBUCKS_ADDRESS;
-    address public COUNTRY_FACTORY_ADDRESS;
-    uint8 public TANK_COST = 100;
-
-    constructor(address warBucksAddress, address countryFactoryAddress) {
-        WARBUCKS_ADDRESS = warBucksAddress;
-        COUNTRY_FACTORY_ADDRESS = countryFactoryAddress;
-    } 
+    constructor (address warBucksAddressImported, address countryFactoryAddressImported) {
+        warBucksAddress = warBucksAddressImported;
+        countryMinterAddress = countryFactoryAddressImported;
+    }
 
     function buyTank() public {
-        IERC20(WARBUCKS_ADDRESS).approve(msg.sender, TANK_COST);
-        IERC20(WARBUCKS_ADDRESS).transferFrom(msg.sender, address(this), TANK_COST);
-
+        IERC20(warBucksAddress).approve(msg.sender, tankCost);
+        IERC20(warBucksAddress).transferFrom(
+            msg.sender,
+            address(this),
+            tankCost
+        );
     }
 }
 

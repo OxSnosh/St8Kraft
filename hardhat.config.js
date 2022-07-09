@@ -5,6 +5,7 @@ require("solidity-coverage")
 require("hardhat-gas-reporter")
 require("hardhat-contract-sizer")
 require("dotenv").config()
+require("@nomiclabs/hardhat-solhint");
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
