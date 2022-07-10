@@ -20,6 +20,12 @@ contract CountryMinter is ERC721 {
     mapping(uint256 => CountryStruct5) public idToCountryStruct5;
     mapping(uint256 => address) public idToOwner;
 
+    event nationCreated(
+        address indexed countryOwner,
+        string indexed nationName,
+        string indexed ruler
+    );
+
     // Country[] public countriesArray;
 
     constructor(address warBucksAddressImport) ERC721("MetaNation", "MTA") {
@@ -49,7 +55,7 @@ contract CountryMinter is ERC721 {
     }
 
     struct CountryStruct3 {
-        uint256 areaOfInfluence;
+        // uint256 areaOfInfluence;
         string warPeacePreference;
         string resource1;
         string resource2;
@@ -57,12 +63,12 @@ contract CountryMinter is ERC721 {
         uint8 tradeSlotsUsed;
         string improvments;
         string nationalWonders;
-        uint16 environment;
-        uint256 nationRank;
+        // uint16 environment;
+        // uint256 nationRank;
         uint256 nationStrength;
-        uint256 efficiency;
-        uint8 defconLevel;
-        string threatLevel;
+        // uint256 efficiency;
+        // uint8 defconLevel;
+        // string threatLevel;
         uint256 numberOfSoldiers;
     }
 
@@ -77,10 +83,10 @@ contract CountryMinter is ERC721 {
         uint256 navyVessels;
         uint256 nuclearWeapons;
         uint256 numberOfSpies;
-        uint256 numberSoldiersLost;
-        uint8 casualtyRankPercentile;
+        // uint256 numberSoldiersLost;
+        // uint8 casualtyRankPercentile;
         uint256 population;
-        uint256 militaryPersonnel;
+        // uint256 militaryPersonnel;
         uint256 citizens;
     }
 
@@ -98,7 +104,12 @@ contract CountryMinter is ERC721 {
         uint256 balance;
     }
 
-    function generateCountry (string memory ruler, string memory nationName, string memory capitalCity, string memory nationSlogan) public payable {
+    function generateCountry(
+        string memory ruler,
+        string memory nationName,
+        string memory capitalCity,
+        string memory nationSlogan
+    ) public payable {
         IWarBucks(warBucksAddress).mint(address(this), seedMoney);
         generateCountryStruct1(ruler, nationName, capitalCity, nationSlogan);
         generateCountryStruct2();
@@ -106,10 +117,20 @@ contract CountryMinter is ERC721 {
         generateCountryStruct4();
         generateCountryStruct5();
         idToOwner[countryId] = msg.sender;
+        emit nationCreated(msg.sender, nationName, ruler);
         countryId++;
     }
 
-    function generateCountryStruct1 (string memory ruler, string memory nationName, string memory capitalCity, string memory nationSlogan) private {
+    // function generateStructs () private {
+
+    // }
+
+    function generateCountryStruct1(
+        string memory ruler,
+        string memory nationName,
+        string memory capitalCity,
+        string memory nationSlogan
+    ) internal {
         CountryStruct1 memory newCountryStruct1 = CountryStruct1(
             countryId,
             msg.sender,
@@ -123,7 +144,7 @@ contract CountryMinter is ERC721 {
         idToCountryStruct1[countryId] = newCountryStruct1;
     }
 
-    function generateCountryStruct2 () private {
+    function generateCountryStruct2() internal {
         CountryStruct2 memory newCountryStruct2 = CountryStruct2(
             "governmentType",
             "nationalReligion",
@@ -137,9 +158,9 @@ contract CountryMinter is ERC721 {
         idToCountryStruct2[countryId] = newCountryStruct2;
     }
 
-    function generateCountryStruct3 () private {
+    function generateCountryStruct3() internal {
         CountryStruct3 memory newCountryStruct3 = CountryStruct3(
-            0,
+            // 0,
             "warPeacePreference",
             "Resource 1",
             "Resource 2",
@@ -147,20 +168,19 @@ contract CountryMinter is ERC721 {
             0,
             "improvments",
             "nationalWonders",
+            // 0,
+            // 0,
             0,
-            0,
-            0,
-            0,
-            5,
-            "Low",
+            // 0,
+            // 5,
+            // "Low",
             0
         );
         idToCountryStruct3[countryId] = newCountryStruct3;
     }
 
-    function generateCountryStruct4 () private {
+    function generateCountryStruct4() internal {
         CountryStruct4 memory newCountryStruct4 = CountryStruct4(
-            0, 
             0,
             0,
             0,
@@ -171,15 +191,16 @@ contract CountryMinter is ERC721 {
             0,
             0,
             0,
+            // 0,
+            // 0,
             0,
-            0,
-            0,
+            // 0,
             0
         );
         idToCountryStruct4[countryId] = newCountryStruct4;
     }
 
-    function generateCountryStruct5 () private {
+    function generateCountryStruct5() internal {
         CountryStruct5 memory newCountryStruct5 = CountryStruct5(
             0,
             0,
@@ -196,8 +217,6 @@ contract CountryMinter is ERC721 {
         idToCountryStruct5[countryId] = newCountryStruct5;
     }
 
-
-
     //withdraw from nation
     //check that withdrawer is the owner of the nation/NFT
     function withdrawWarBucks(uint256 id, uint256 amount) public {
@@ -212,5 +231,4 @@ contract CountryMinter is ERC721 {
     // function viewCountry(uint256 id) public view returns (Country memory) {
     //     return idToCountry[id];
     // }
-
 }
