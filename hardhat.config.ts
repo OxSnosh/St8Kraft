@@ -1,11 +1,12 @@
-require("@nomiclabs/hardhat-waffle")
-require("@nomiclabs/hardhat-etherscan")
-require("hardhat-deploy")
-require("solidity-coverage")
-require("hardhat-gas-reporter")
-require("hardhat-contract-sizer")
-require("dotenv").config()
-require("@nomiclabs/hardhat-solhint");
+import "@nomiclabs/hardhat-waffle"
+import "@nomiclabs/hardhat-etherscan"
+import "hardhat-deploy"
+import "solidity-coverage"
+import "hardhat-gas-reporter"
+import "hardhat-contract-sizer"
+import "dotenv/config"
+import "@nomiclabs/hardhat-solhint"
+import "@typechain/hardhat"
 
 /**
  * @type import('hardhat/config').HardhatUserConfig

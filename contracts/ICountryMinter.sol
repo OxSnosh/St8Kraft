@@ -120,14 +120,7 @@ interface CountryStructLibrary {
         external
         view
         returns (
-            uint256 id,
-            address rulerAddress,
-            string memory rulerName,
-            string memory nationName,
-            uint256 lastTaxCollection,
-            string memory alliance,
-            string memory capitalCity,
-            string memory nationSlogan
+            CountryStruct1 memory
         );
 
     function getCountryStruct2(uint256 countryId)

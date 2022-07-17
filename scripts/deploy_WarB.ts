@@ -3,9 +3,9 @@
 //
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
-const { ethers } = require("hardhat")
-const hre = require("hardhat")
-const { INITIAL_SUPPLY } = require("../helper-hardhat-config")
+import { ethers } from "hardhat"
+import hre from "hardhat"
+import { INITIAL_SUPPLY } from "../helper-hardhat-config"
 
 async function main() {
     console.log(ethers)
