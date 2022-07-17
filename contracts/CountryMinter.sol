@@ -18,7 +18,11 @@ contract CountryMinter is ERC721 {
     mapping(uint256 => CountryStruct3) public idToCountryStruct3;
     mapping(uint256 => CountryStruct4) public idToCountryStruct4;
     mapping(uint256 => CountryStruct5) public idToCountryStruct5;
+    mapping(uint256 => CountryStruct6) public idToCountryStruct6;
+    mapping(uint256 => CountryStruct7) public idToCountryStruct7;
+    mapping(uint256 => CountryStruct8) public idToCountryStruct8;
     mapping(uint256 => address) public idToOwner;
+    mapping(address => uint) ownerCountryCount;
 
     event nationCreated(
         address indexed countryOwner,
@@ -28,7 +32,7 @@ contract CountryMinter is ERC721 {
 
     // Country[] public countriesArray;
 
-    constructor(address warBucksAddressImport) ERC721("MetaNation", "MTA") {
+    constructor(address warBucksAddressImport) ERC721("MetaNations", "MNS") {
         warBucksAddress = warBucksAddressImport;
     }
 
@@ -104,19 +108,59 @@ contract CountryMinter is ERC721 {
         uint256 balance;
     }
 
+    struct CountryStruct6 {
+        uint256 corvetteCount;
+        uint256 landingShipCount;
+        uint256 battleshipCount;
+        uint256 cruiserCount;
+        uint256 frigateCount;
+        uint256 destroyerCount;
+        uint256 submarintCount;
+        uint256 aircraftCarrierCount;
+    }
+
+    struct CountryStruct7 {
+        uint256 yak9Count;
+        uint256 p51MustangCount;
+        uint256 f86SabreCount;
+        uint256 mig15Count;
+        uint256 f100SuperSabreCount;
+        uint256 f35LightningCount;
+        uint256 f15EagleCount;
+        uint256 su30MkiCount;
+        uint256 f22RaptorCount;
+    }
+
+    struct CountryStruct8 {
+        uint256 ah1CobraCount;
+        uint256 ah64ApacheCount;
+        uint256 bristolBlenheimCount;
+        uint256 b52MitchellCount;
+        uint256 b17gFlyingFortressCount;
+        uint256 b52StratofortressCount;
+        uint256 b2SpiritCount;
+        uint256 b1bLancerCount;
+        uint256 tupolevTu160Count;
+    }
+
     function generateCountry(
         string memory ruler,
         string memory nationName,
         string memory capitalCity,
         string memory nationSlogan
     ) public payable {
+        require (ownerCountryCount[msg.sender] == 0, "Wallet already contains a country");
         IWarBucks(warBucksAddress).mint(address(this), seedMoney);
         generateCountryStruct1(ruler, nationName, capitalCity, nationSlogan);
         generateCountryStruct2();
         generateCountryStruct3();
         generateCountryStruct4();
         generateCountryStruct5();
+        generateCountryStruct6();
+        generateCountryStruct7();
+        generateCountryStruct8();
         idToOwner[countryId] = msg.sender;
+        ownerCountryCount[msg.sender]++;
         emit nationCreated(msg.sender, nationName, ruler);
         countryId++;
     }
@@ -216,6 +260,52 @@ contract CountryMinter is ERC721 {
         );
         idToCountryStruct5[countryId] = newCountryStruct5;
     }
+
+    function generateCountryStruct6() internal {
+        CountryStruct6 memory newCountryStruct6 = CountryStruct6(
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        );
+        idToCountryStruct6[countryId] = newCountryStruct6;
+    }
+
+    function generateCountryStruct7() internal {
+        CountryStruct7 memory newCountryStruct7 = CountryStruct7(
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        );
+    idToCountryStruct7[countryId] = newCountryStruct7;
+
+    }
+
+    function generateCountryStruct8() internal {
+        CountryStruct8 memory newCountryStruct8 = CountryStruct8(
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        );
+        idToCountryStruct8[countryId] = newCountryStruct8;
+    }
+
 
     //withdraw from nation
     //check that withdrawer is the owner of the nation/NFT

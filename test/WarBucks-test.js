@@ -64,6 +64,7 @@ describe("WarBucks", function () {
   describe("Transactions", function () {
     it("Should transfer tokens between accounts", async function () {
       // Transfer 50 tokens from owner to addr1
+      ////connect(addr2.address).
       await warbucks.transfer(addr1.address, 50);
       const addr1Balance = await warbucks.balanceOf(addr1.address);
       expect(addr1Balance).to.equal(50);

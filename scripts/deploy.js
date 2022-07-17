@@ -27,17 +27,22 @@ async function main() {
     await metanationsgvtoken.deployed()
     console.log(`MetaNationsGovToken deployed to ${metanationsgvtoken.address}`)
 
-    const CountryFactory = await hre.ethers.getContractFactory("CountryFactory")
-    const countryfactory = await CountryFactory.deploy(warbucks.address)
-    await countryfactory.deployed()
-    console.log(`CountryFactory deployed to ${countryfactory.address}`)
+    const CountryMinter = await hre.ethers.getContractFactory("CountryMinter")
+    const countryminter = await CountryMinter.deploy(warbucks.address)
+    await countryminter.deployed()
+    console.log(`CountryMinter deployed to ${countryminter.address}`)
+
+    const ICountryMinter = await hre.ethers.getContractFactory("ICountryMinter")
+    const icountryminter = await ICountryMinter.deploy()
+    await icountryminter.deployed()
+    console.log(`CountryMinter deployed to ${icountryminter.address}`)
 
     const CommodityMarketplace = await hre.ethers.getContractFactory(
         "CommodityMarketplace"
     )
     const commoditymarketplace = await CommodityMarketplace.deploy(
         warbucks.address,
-        countryfactory.address
+        countryminter.address
     )
     await commoditymarketplace.deployed()
     await console.log(`Marketplace deployed to ${commoditymarketplace.address}`)
