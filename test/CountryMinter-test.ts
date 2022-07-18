@@ -1,17 +1,12 @@
 import { expect } from "chai"
 import { ethers } from "hardhat"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
-import {
-    isCallTrace,
-} from "hardhat/internal/hardhat-network/stack-traces/message-trace"
 import { INITIAL_SUPPLY } from "../helper-hardhat-config"
-import {CountryMinter, WarBucks, WarBucks__factory} from "../typechain-types"
+import { CountryMinter, WarBucks } from "../typechain-types"
 
 describe("CountryMinter", function () {
-    let WarBucks: WarBucks
-    let warbucks    
+    let WarBucks: WarBucks  
     let CountryMinter: CountryMinter
-    let countryminter
     let owner
     let addr1: SignerWithAddress
     let addr2
