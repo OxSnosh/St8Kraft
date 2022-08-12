@@ -18,19 +18,19 @@ contract CommodityMarketplace {
         countryMinterAddress = countryMinterAddressImported;
     }
 
-    function buyTank(uint256 id, uint256 amount) public {
-        IERC20(warBucksAddress).approve(msg.sender, tankCost);
-        IERC20(warBucksAddress).transferFrom(
-            msg.sender,
-            address(this),
-            tankCost
-        );
-        (,,,uint256 numberOfTanks,,,,,) = CountryMinter(
-            countryMinterAddress
-        ).idToForces(id);
-        numberOfTanks += amount;
+    // function buyTank(uint256 id, uint256 amount) public {
+    //     IERC20(warBucksAddress).approve(msg.sender, tankCost);
+    //     IERC20(warBucksAddress).transferFrom(
+    //         msg.sender,
+    //         address(this),
+    //         tankCost
+    //     );
+    //     (,,,uint256 numberOfTanks,,,,,) = CountryMinter(
+    //         countryMinterAddress
+    //     ).idToForces(id);
+    //     numberOfTanks += amount;
         
-    }
+    // }
 }
 
 // contract for buing military (soldiers, tanks, planes, nukes)
