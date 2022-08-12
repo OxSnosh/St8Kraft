@@ -1,6 +1,6 @@
 import { expect } from "chai"
 import { ethers } from "hardhat"
-import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address"
 import { INITIAL_SUPPLY } from "../helper-hardhat-config"
 import { WarBucks } from "../typechain-types"
 

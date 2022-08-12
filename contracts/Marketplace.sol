@@ -3,15 +3,17 @@ pragma solidity 0.8.7;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "./ICountryMinter.sol";
+import "./CountryMinter.sol";
 
-// contract for buying commodities (land, infrastructure, tech)
 contract CommodityMarketplace {
     address public warBucksAddress;
     address public countryMinterAddress;
     uint8 public tankCost = 100;
 
-    constructor (address warBucksAddressImported, address countryMinterAddressImported) {
+    constructor(
+        address warBucksAddressImported,
+        address countryMinterAddressImported
+    ) {
         warBucksAddress = warBucksAddressImported;
         countryMinterAddress = countryMinterAddressImported;
     }
@@ -23,8 +25,11 @@ contract CommodityMarketplace {
             address(this),
             tankCost
         );
-        CountryStructLibrary.CountryStruct4 memory _countryStruct4 = CountryStructLibrary(countryMinterAddress).getCountryStruct4(id);
-        _countryStruct4.numberOfTanks+= amount;               
+        (,,,uint256 numberOfTanks,,,,,) = CountryMinter(
+            countryMinterAddress
+        ).idToForces(id);
+        numberOfTanks += amount;
+        
     }
 }
 

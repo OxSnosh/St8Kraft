@@ -24,7 +24,7 @@ describe("CountryMinter", function () {
         // icountryminter = await ICountryMinter.deploy(icountryminter.address);
     });
 
-    describe("Country Mint", function () {
+    describe("Country Minter", function () {
         it("Tests that the nation is set up correctly", async function () {
             await CountryMinter
                 .connect(addr1)
@@ -34,7 +34,7 @@ describe("CountryMinter", function () {
                     "TestCapitalCity",
                     "TestNationSlogan"
                 );
-            const { rulerName } = await CountryMinter.idToCountryStruct1(0);
+            const { rulerName } = await CountryMinter.idToCountryParameters(0);
             expect(rulerName).to.equal("TestRuler");
         });
     });

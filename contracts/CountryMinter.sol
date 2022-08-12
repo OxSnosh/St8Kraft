@@ -5,99 +5,76 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./IWarBucks.sol";
+import "./CountryParameters.sol";
 
-//minting countries
 contract CountryMinter is ERC721 {
-    //each wallet makes a country
     uint256 public countryId;
     address public warBucksAddress;
+    address public countryParametersContract;
     uint256 public seedMoney = 1000;
 
-    mapping(uint256 => CountryStruct1) public idToCountryStruct1;
-    mapping(uint256 => CountryStruct2) public idToCountryStruct2;
-    mapping(uint256 => CountryStruct3) public idToCountryStruct3;
-    mapping(uint256 => CountryStruct4) public idToCountryStruct4;
-    mapping(uint256 => CountryStruct5) public idToCountryStruct5;
-    mapping(uint256 => CountryStruct6) public idToCountryStruct6;
-    mapping(uint256 => CountryStruct7) public idToCountryStruct7;
-    mapping(uint256 => CountryStruct8) public idToCountryStruct8;
-    mapping(uint256 => address) public idToOwner;
-    mapping(address => uint) ownerCountryCount;
+    // struct CountryParameters {
+    //     uint256 id;
+    //     address rulerAddress;
+    //     string rulerName;
+    //     string nationName;
+    //     string capitalCity;
+    //     string nationSlogan;
+    // }
 
-    event nationCreated(
-        address indexed countryOwner,
-        string indexed nationName,
-        string indexed ruler
-    );
-
-    // Country[] public countriesArray;
-
-    constructor(address warBucksAddressImport) ERC721("MetaNations", "MNS") {
-        warBucksAddress = warBucksAddressImport;
-    }
-
-    struct CountryStruct1 {
-        uint256 id;
-        address rulerAddress;
-        string rulerName;
-        string nationName;
+    struct CountrySettings {
+        uint256 nationCreated;
         uint256 lastTaxCollection;
         string alliance;
-        string capitalCity;
-        string nationSlogan;
-    }
-
-    struct CountryStruct2 {
+        string nationTeam;
         string governmentType;
         string nationalReligion;
         string currencyType;
-        string nationTeam;
-        string nationCreated;
+    }
+
+    struct Infrastructure {
+        uint256 areaOfInfluence;
         uint256 technology;
         uint256 infrastructure;
         uint16 taxRate;
+        uint256 population;
+        uint256 citizens;
+        uint256 criminals;
+        uint16 populationHappiness;
+        uint16 crimeIndex;
     }
 
-    struct CountryStruct3 {
-        // uint256 areaOfInfluence;
-        string warPeacePreference;
+    struct Market {
         string resource1;
         string resource2;
         string bonusResources;
         uint8 tradeSlotsUsed;
         string improvments;
         string nationalWonders;
-        // uint16 environment;
-        // uint256 nationRank;
-        uint256 nationStrength;
-        // uint256 efficiency;
-        // uint8 defconLevel;
-        // string threatLevel;
-        uint256 numberOfSoldiers;
+        uint16 environment;
+        uint256 efficiency;
     }
 
-    struct CountryStruct4 {
+    struct Military {
+        uint8 defconLevel;
+        string threatLevel;
+        bool warPeacePreference;
+        uint256 nationStrength;
+    }
+
+    struct Forces {
+        uint256 numberOfSoldiers;
         uint256 defendingSoldiers;
         uint256 deployedSoldiers;
         uint256 numberOfTanks;
         uint256 defendingTanks;
         uint256 deployedTanks;
-        uint256 aircraft;
         uint256 cruiseMissiles;
-        uint256 navyVessels;
         uint256 nuclearWeapons;
         uint256 numberOfSpies;
-        // uint256 numberSoldiersLost;
-        // uint8 casualtyRankPercentile;
-        uint256 population;
-        // uint256 militaryPersonnel;
-        uint256 citizens;
     }
 
-    struct CountryStruct5 {
-        uint256 criminals;
-        uint16 populationHappiness;
-        uint16 crimeIndex;
+    struct Treasury {
         uint256 grossIncomePerCitizenPerDay;
         uint256 individualTaxableIncomePerDay;
         uint256 netDailyTaxesCollectable;
@@ -106,9 +83,11 @@ contract CountryMinter is ERC721 {
         uint256 billsPaid;
         uint256 purchasesOverTime;
         uint256 balance;
+        uint256 lockedBalance;
     }
 
-    struct CountryStruct6 {
+    struct Navy {
+        uint256 navyVessels;
         uint256 corvetteCount;
         uint256 landingShipCount;
         uint256 battleshipCount;
@@ -119,7 +98,8 @@ contract CountryMinter is ERC721 {
         uint256 aircraftCarrierCount;
     }
 
-    struct CountryStruct7 {
+    struct Fighters {
+        uint256 aircraft;
         uint256 yak9Count;
         uint256 p51MustangCount;
         uint256 f86SabreCount;
@@ -131,7 +111,7 @@ contract CountryMinter is ERC721 {
         uint256 f22RaptorCount;
     }
 
-    struct CountryStruct8 {
+    struct Bombers {
         uint256 ah1CobraCount;
         uint256 ah64ApacheCount;
         uint256 bristolBlenheimCount;
@@ -143,111 +123,89 @@ contract CountryMinter is ERC721 {
         uint256 tupolevTu160Count;
     }
 
+    // mapping(uint256 => CountryParameters) public idToCountryParameters;
+    mapping(uint256 => CountrySettings) public idToCountrySettings;
+    mapping(uint256 => Infrastructure) public idToInfrastructure;
+    mapping(uint256 => Market) public idToMarket;
+    mapping(uint256 => Military) public idToMilitary;
+    mapping(uint256 => Forces) public idToForces;
+    mapping(uint256 => Treasury) public idToTreasury;
+    mapping(uint256 => Navy) public idToNavy;
+    mapping(uint256 => Fighters) public idToFighters;
+    mapping(uint256 => Bombers) public idToBombers;
+    mapping(uint256 => address) public idToOwner;
+    mapping(address => uint256) public ownerCountryCount;
+
+    event nationCreated(
+        address indexed countryOwner,
+        string indexed nationName,
+        string indexed ruler
+    );
+
+    constructor(address _warBucksAddress, address _countryParametersContract) ERC721("MetaNations", "MNS") {
+        warBucksAddress = _warBucksAddress;
+        countryParametersContract = _countryParametersContract;
+    }
+
     function generateCountry(
         string memory ruler,
         string memory nationName,
         string memory capitalCity,
         string memory nationSlogan
     ) public payable {
-        require (ownerCountryCount[msg.sender] == 0, "Wallet already contains a country");
+        require(
+            ownerCountryCount[msg.sender] == 0,
+            "Wallet already contains a country"
+        );
         IWarBucks(warBucksAddress).mint(address(this), seedMoney);
-        generateCountryStruct1(ruler, nationName, capitalCity, nationSlogan);
-        generateCountryStruct2();
-        generateCountryStruct3();
-        generateCountryStruct4();
-        generateCountryStruct5();
-        generateCountryStruct6();
-        generateCountryStruct7();
-        generateCountryStruct8();
+        CountryParametersContract(countryParametersContract).generateCountryParameters(ruler, nationName, capitalCity, nationSlogan);
+        generateCountrySettings();
+        generateInfrastructure();
+        generateMarket();
+        generateMilitary();
+        generateForces();
+        generateTreasury();
+        generateNavy();
+        generateFighters();
+        generateBombers();
         idToOwner[countryId] = msg.sender;
         ownerCountryCount[msg.sender]++;
         emit nationCreated(msg.sender, nationName, ruler);
         countryId++;
     }
 
-    // function generateStructs () private {
-
+    // function generateCountryParameters(
+    //     string memory rulerName,
+    //     string memory nationName,
+    //     string memory capitalCity,
+    //     string memory nationSlogan
+    // ) internal {
+    //     CountryParameters memory newCountryParameters = CountryParameters(
+    //         countryId,
+    //         msg.sender,
+    //         rulerName,
+    //         nationName,
+    //         capitalCity,
+    //         nationSlogan
+    //     );
+    //     idToCountryParameters[countryId] = newCountryParameters;
     // }
 
-    function generateCountryStruct1(
-        string memory ruler,
-        string memory nationName,
-        string memory capitalCity,
-        string memory nationSlogan
-    ) internal {
-        CountryStruct1 memory newCountryStruct1 = CountryStruct1(
-            countryId,
-            msg.sender,
-            ruler,
-            nationName,
+    function generateCountrySettings() internal {
+        CountrySettings memory newCountrySettings = CountrySettings(
             0,
-            "No Alliance",
-            capitalCity,
-            nationSlogan
-        );
-        idToCountryStruct1[countryId] = newCountryStruct1;
-    }
-
-    function generateCountryStruct2() internal {
-        CountryStruct2 memory newCountryStruct2 = CountryStruct2(
-            "governmentType",
-            "nationalReligion",
-            "currencyType",
+            0,
+            "Alliance",
             "nationTeam",
-            "nationCreated",
-            0,
-            0,
-            0
+            "governmentType",
+            "Religion",
+            "Currency"
         );
-        idToCountryStruct2[countryId] = newCountryStruct2;
+        idToCountrySettings[countryId] = newCountrySettings;
     }
 
-    function generateCountryStruct3() internal {
-        CountryStruct3 memory newCountryStruct3 = CountryStruct3(
-            // 0,
-            "warPeacePreference",
-            "Resource 1",
-            "Resource 2",
-            "Bonus Resources",
-            0,
-            "improvments",
-            "nationalWonders",
-            // 0,
-            // 0,
-            0,
-            // 0,
-            // 5,
-            // "Low",
-            0
-        );
-        idToCountryStruct3[countryId] = newCountryStruct3;
-    }
-
-    function generateCountryStruct4() internal {
-        CountryStruct4 memory newCountryStruct4 = CountryStruct4(
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            // 0,
-            // 0,
-            0,
-            // 0,
-            0
-        );
-        idToCountryStruct4[countryId] = newCountryStruct4;
-    }
-
-    function generateCountryStruct5() internal {
-        CountryStruct5 memory newCountryStruct5 = CountryStruct5(
-            0,
-            0,
+    function generateInfrastructure() internal {
+        Infrastructure memory newInfrastrusture = Infrastructure(
             0,
             0,
             0,
@@ -258,67 +216,69 @@ contract CountryMinter is ERC721 {
             0,
             0
         );
-        idToCountryStruct5[countryId] = newCountryStruct5;
+        idToInfrastructure[countryId] = newInfrastrusture;
     }
 
-    function generateCountryStruct6() internal {
-        CountryStruct6 memory newCountryStruct6 = CountryStruct6(
+    function generateMarket() internal {
+        Market memory newMarket = Market(
+            "Resource1",
+            "Resource2",
+            "bonusResources",
             0,
-            0,
-            0,
-            0,
-            0,
-            0,
+            "Improvments",
+            "NationalWonders",
             0,
             0
         );
-        idToCountryStruct6[countryId] = newCountryStruct6;
+        idToMarket[countryId] = newMarket;
     }
 
-    function generateCountryStruct7() internal {
-        CountryStruct7 memory newCountryStruct7 = CountryStruct7(
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-        );
-    idToCountryStruct7[countryId] = newCountryStruct7;
-
+    function generateMilitary() internal {
+        Military memory newMilitary = Military(0, "ThreatLevel", false, 0);
+        idToMilitary[countryId] = newMilitary;
     }
 
-    function generateCountryStruct8() internal {
-        CountryStruct8 memory newCountryStruct8 = CountryStruct8(
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-        );
-        idToCountryStruct8[countryId] = newCountryStruct8;
+    function generateForces() internal {
+        Forces memory newForces = Forces(0, 0, 0, 0, 0, 0, 0, 0, 0);
+        idToForces[countryId] = newForces;
     }
 
+    function generateTreasury() internal {
+        Treasury memory newTreasury = Treasury(0, 0, 0, 0, 0, 0, 0, 0, 0);
+        idToTreasury[countryId] = newTreasury;
+    }
 
-    //withdraw from nation
-    //check that withdrawer is the owner of the nation/NFT
+    function generateNavy() internal {
+        Navy memory newNavy = Navy(0, 0, 0, 0, 0, 0, 0, 0, 0);
+        idToNavy[countryId] = newNavy;
+    }
+
+    function generateFighters() internal {
+        Fighters memory newFighters = Fighters(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        idToFighters[countryId] = newFighters;
+    }
+
+    function generateBombers() internal {
+        Bombers memory newBombers = Bombers(0, 0, 0, 0, 0, 0, 0, 0, 0);
+        idToBombers[countryId] = newBombers;
+    }
+
     function withdrawWarBucks(uint256 id, uint256 amount) public {
         require(idToOwner[id] == msg.sender, "Not the owner of this nation");
         IERC20(warBucksAddress).transfer(msg.sender, amount);
-        idToCountryStruct5[id].balance -= amount;
+        idToTreasury[id].balance -= amount;
     }
 
-    //taxes to collect = population * taxable earnings per day
-    //=+ taxes every night at midnight
+    // taxes to collect = population * taxable earnings per day
+    // =+ taxes every night at midnight
 
     // function viewCountry(uint256 id) public view returns (Country memory) {
     //     return idToCountry[id];
     // }
+
+    // function getForces(uint256 countryId)
+    //     external
+    //     view
+    //     virtual
+    //     returns (Forces memory);
 }
