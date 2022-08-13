@@ -40,6 +40,7 @@ contract TreasuryContract {
     }
 
     function spendBalance(uint id, uint cost) public {
+        //need a way to only allow the nation owner to do this
         uint balance = idToTreasury[id].balance;
         require(balance >= cost);
         idToTreasury[id].balance -= cost;
