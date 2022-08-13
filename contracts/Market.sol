@@ -33,4 +33,9 @@ contract MarketContract {
         marketId++;
     } 
 
+    //choose resources from a selection
+    //how to record bonus resources
+    //how to buy improvments from a selection
+    //how to buy national wonders from a selection
+    
 }

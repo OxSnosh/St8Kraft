@@ -16,10 +16,11 @@ contract CountrySettingsContract {
     }
 
     mapping(uint256 => CountrySettings) public idToCountrySettings;
+    mapping(uint256 => address) public idToOwnerSettings;
 
     function generateCountrySettings() public {
         CountrySettings memory newCountrySettings = CountrySettings(
-            0,
+            block.timestamp,
             0,
             "Alliance",
             "nationTeam",
@@ -28,7 +29,19 @@ contract CountrySettingsContract {
             "Currency"
         );
         idToCountrySettings[settingsId] = newCountrySettings;
+        idToOwnerSettings[settingsId] = msg.sender;
         settingsId++;
     } 
+
+    function setAlliance(string memory newAlliance, uint id) public {
+        require(idToOwnerSettings[id] == msg.sender, "You are not the nation ruler");
+        idToCountrySettings[id].alliance = newAlliance;
+    }
+
+    //collect taxes here?
+    //choose team from selection
+    //choose government type from selection
+    //choose religion from selection
+    //choose currency from selection
 
 }

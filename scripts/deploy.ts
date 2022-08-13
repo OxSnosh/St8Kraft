@@ -84,15 +84,6 @@ async function main() {
     await countryminter.deployed()
     console.log(`CountryMinter deployed to ${countryminter.address}`)
 
-    // const Marketplace = await hre.ethers.getContractFactory(
-    //     "CommodityMarketplace"
-    // )
-    // const marketplace = await Marketplace.deploy(
-    //     warbucks.address,
-    //     countryminter.address
-    // )
-    // await marketplace.deployed()
-    // await console.log(`Marketplace deployed to ${marketplace.address}`)
 }
 
 main().catch((error) => {
