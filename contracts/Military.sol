@@ -6,7 +6,7 @@ contract MilitaryContract {
     uint private militaryId;
 
     struct Military {
-        uint defconLevel;
+        uint256 defconLevel;
         string threatLevel;
         bool warPeacePreference;
         uint256 nationStrength;
@@ -16,7 +16,7 @@ contract MilitaryContract {
     mapping(uint256 => address) public idToOwnerMilitary;
 
     function generateMilitary() public {
-        Military memory newMilitary = Military(0, "ThreatLevel", false, 0);
+        Military memory newMilitary = Military(5, "ThreatLevel", false, 0);
         idToMilitary[militaryId] = newMilitary;
         idToOwnerMilitary[militaryId] = msg.sender;
         militaryId++;

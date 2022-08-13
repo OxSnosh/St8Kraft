@@ -38,10 +38,4 @@ contract CountrySettingsContract {
         idToCountrySettings[id].alliance = newAlliance;
     }
 
-    //collect taxes here?
-    //choose team from selection
-    //choose government type from selection
-    //choose religion from selection
-    //choose currency from selection
-
 }

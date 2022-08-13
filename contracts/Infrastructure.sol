@@ -6,7 +6,7 @@ contract InfrastructureContract {
     uint private infrastructureId;
 
     struct Infrastructure {
-        uint256 areaOfInfluence;
+        uint256 land;
         uint256 technology;
         uint256 infrastructure;
         uint16 taxRate;
@@ -34,4 +34,7 @@ contract InfrastructureContract {
         idToInfrastructure[infrastructureId] = newInfrastrusture;
         infrastructureId++;
     }
+
+    //how to graduate tech and infrastructure purchases
+
 }
