@@ -20,8 +20,6 @@ describe("CountryMinter", function () {
         [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
         CountryMinter = await CountryMinterFactory.deploy(WarBucks.address) as CountryMinter;
 
-        // ICountryMinter = await ethers.getContractFactory("ICountryMinter");
-        // icountryminter = await ICountryMinter.deploy(icountryminter.address);
     });
 
     describe("Country Minter", function () {
@@ -34,8 +32,8 @@ describe("CountryMinter", function () {
                     "TestCapitalCity",
                     "TestNationSlogan"
                 );
-            const { rulerName } = await CountryMinter.idToCountryParameters(0);
-            expect(rulerName).to.equal("TestRuler");
+            // const { rulerName } = await CountryMinter.idToCountryParameters(0);
+            // expect(rulerName).to.equal("TestRuler");
         });
     });
 });

@@ -21,7 +21,7 @@ contract CountrySettingsContract {
     function generateCountrySettings() public {
         CountrySettings memory newCountrySettings = CountrySettings(
             block.timestamp,
-            0,
+            block.timestamp,
             "Alliance",
             "nationTeam",
             "governmentType",

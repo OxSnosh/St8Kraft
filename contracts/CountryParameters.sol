@@ -2,8 +2,7 @@
 pragma solidity 0.8.7;
 
 contract CountryParametersContract {
-
-    uint private parametersId;
+    uint256 private parametersId;
 
     struct CountryParameters {
         uint256 id;
@@ -34,26 +33,41 @@ contract CountryParametersContract {
         idToCountryParameters[parametersId] = newCountryParameters;
         idToOwnerParameters[parametersId] = msg.sender;
         parametersId++;
-    }    
+    }
 
-    function updateRulerName(string memory newRulerName, uint id) public {
-        require(idToOwnerParameters[id] == msg.sender, "You are not the nation ruler");
+    function updateRulerName(string memory newRulerName, uint256 id) public {
+        require(
+            idToOwnerParameters[id] == msg.sender,
+            "You are not the nation ruler"
+        );
         idToCountryParameters[id].rulerName = newRulerName;
     }
 
-    function updateNationName(string memory newNationName, uint id) public {
-        require(idToOwnerParameters[id] == msg.sender, "You are not the nation ruler");
+    function updateNationName(string memory newNationName, uint256 id) public {
+        require(
+            idToOwnerParameters[id] == msg.sender,
+            "You are not the nation ruler"
+        );
         idToCountryParameters[id].nationName = newNationName;
     }
 
-    function updateCapitalCity(string memory newCapitalCity, uint id) public {
-        require(idToOwnerParameters[id] == msg.sender, "This account is not the nation ruler");
+    function updateCapitalCity(string memory newCapitalCity, uint256 id)
+        public
+    {
+        require(
+            idToOwnerParameters[id] == msg.sender,
+            "This account is not the nation ruler"
+        );
         idToCountryParameters[id].capitalCity = newCapitalCity;
     }
 
-    function updateNationSlogan(string memory newNationSlogan, uint id) public {
-        require(idToOwnerParameters[id] == msg.sender, "This account is not the nation ruler");
+    function updateNationSlogan(string memory newNationSlogan, uint256 id)
+        public
+    {
+        require(
+            idToOwnerParameters[id] == msg.sender,
+            "This account is not the nation ruler"
+        );
         idToCountryParameters[id].nationSlogan = newNationSlogan;
     }
-
 }

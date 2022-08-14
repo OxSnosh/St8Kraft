@@ -42,28 +42,28 @@ async function main() {
     await military.deployed()
     console.log(`Military deployed to ${military.address}`) 
 
-    const Forces = await hre.ethers.getContractFactory("ForcesContract")
-    const forces = await Forces.deploy()
-    await forces.deployed()
-    console.log(`Forces deployed to ${forces.address}`) 
-
     const Treasury = await hre.ethers.getContractFactory("TreasuryContract")
-    const treasury = await Treasury.deploy()
+    const treasury = await Treasury.deploy(warbucks.address)
     await treasury.deployed()
     console.log(`Treasury deployed to ${treasury.address}`) 
 
+    const Forces = await hre.ethers.getContractFactory("ForcesContract")
+    const forces = await Forces.deploy(treasury.address)
+    await forces.deployed()
+    console.log(`Forces deployed to ${forces.address}`) 
+
     const Navy = await hre.ethers.getContractFactory("NavyContract")
-    const navy = await Navy.deploy()
+    const navy = await Navy.deploy(treasury.address)
     await navy.deployed()
     console.log(`Navy deployed to ${navy.address}`) 
 
     const Fighters = await hre.ethers.getContractFactory("FightersContract")
-    const fighters = await Fighters.deploy()
+    const fighters = await Fighters.deploy(treasury.address)
     await fighters.deployed()
     console.log(`Fighters deployed to ${fighters.address}`) 
 
     const Bombers = await hre.ethers.getContractFactory("BombersContract")
-    const bombers = await Bombers.deploy()
+    const bombers = await Bombers.deploy(treasury.address, fighters.address)
     await bombers.deployed()
     console.log(`Bombers deployed to ${bombers.address}`) 
 
