@@ -1,18 +1,8 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.7;
 
-contract MarketContract {
-    uint256 private marketId;
-
-    struct Market {
-        string resource1;
-        string resource2;
-        string bonusResources;
-        uint256 tradeSlotsUsed;
-        string nationalWonders;
-        uint16 environment;
-        uint256 efficiency;
-    }
+contract ImprovementsContract {
+    uint256 private improvementsId;
 
     struct Improvements1 {
         //Airport
@@ -240,22 +230,12 @@ contract MarketContract {
         int256 universityCount;
     }
 
-    mapping(uint256 => Market) public idToMarket;
     mapping(uint256 => Improvements1) public idToImprovements1;
     mapping(uint256 => Improvements2) public idToImprovements2;
     mapping(uint256 => Improvements3) public idToImprovements3;
-    mapping(uint256 => address) public idToOwnerMarket;
+    mapping(uint256 => address) public idToOwnerImprovements;
 
-    function generateMarket() public {
-        Market memory newMarket = Market(
-            "Resource1",
-            "Resource2",
-            "bonusResources",
-            0,
-            "NationalWonders",
-            0,
-            0
-        );
+    function generateImprovements() public {
         Improvements1 memory newImprovements1 = Improvements1(
             0,
             0,
@@ -296,24 +276,10 @@ contract MarketContract {
             0,
             0
         );
-        idToMarket[marketId] = newMarket;
-        idToImprovements1[marketId] = newImprovements1;
-        idToImprovements2[marketId] = newImprovements2;
-        idToImprovements3[marketId] = newImprovements3;
-        idToOwnerMarket[marketId] = msg.sender;
-        marketId++;
+        idToImprovements1[improvementsId] = newImprovements1;
+        idToImprovements2[improvementsId] = newImprovements2;
+        idToImprovements3[improvementsId] = newImprovements3;
+        idToOwnerImprovements[improvementsId] = msg.sender;
+        improvementsId++;
     }
-
-    //improvments
-    //struct with count for each improvment
-    //functions to buy and sell
-    //buy increments count by 1
-    //sell decrement counts by 1
-
-    //other functions check count of struct
-
-    //choose resources from a selection
-    //how to record bonus resources
-    //how to buy improvments from a selection
-    //how to buy national wonders from a selection
 }

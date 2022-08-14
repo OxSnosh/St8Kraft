@@ -32,10 +32,20 @@ async function main() {
     await infrastructure.deployed()
     console.log(`Infrastructure deployed to ${infrastructure.address}`) 
 
-    const Market = await hre.ethers.getContractFactory("MarketContract")
-    const market = await Market.deploy()
-    await market.deployed()
-    console.log(`Market deployed to ${market.address}`) 
+    const Resources = await hre.ethers.getContractFactory("ResourcesContract")
+    const resources = await Resources.deploy()
+    await resources.deployed()
+    console.log(`Market deployed to ${resources.address}`) 
+
+    const Improvements = await hre.ethers.getContractFactory("ImprovementsContract")
+    const improvements = await Improvements.deploy()
+    await improvements.deployed()
+    console.log(`Market deployed to ${improvements.address}`) 
+
+    const Wonders = await hre.ethers.getContractFactory("WondersContract")
+    const wonders = await Wonders.deploy()
+    await wonders.deployed()
+    console.log(`Market deployed to ${wonders.address}`) 
 
     const Military = await hre.ethers.getContractFactory("MilitaryContract")
     const military = await Military.deploy()
@@ -73,7 +83,9 @@ async function main() {
         countryparameters.address, 
         countrysettings.address, 
         infrastructure.address, 
-        market.address,
+        resources.address,
+        improvements.address,
+        wonders.address,
         military.address,
         forces.address,
         treasury.address,

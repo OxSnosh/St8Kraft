@@ -8,7 +8,9 @@ import "./IWarBucks.sol";
 import "./CountryParameters.sol";
 import "./CountrySettings.sol";
 import "./Infrastructure.sol";
-import "./Market.sol";
+import "./Resources.sol";
+import "./Improvements.sol";
+import "./Wonders.sol";
 import "./Military.sol";
 import "./Forces.sol";
 import "./Treasury.sol";
@@ -22,7 +24,9 @@ contract CountryMinter is ERC721 {
     address public countryParametersAddress;
     address public countrySettingsAddress;
     address public infrastructureAddress;
-    address public marketAddress;
+    address public resourcesAddress;
+    address public improvementsAddress;
+    address public wondersAddress;
     address public militaryAddress;
     address public forcesAddress;
     address public treasuryAddress;
@@ -165,25 +169,29 @@ contract CountryMinter is ERC721 {
         address _countryParametersAddress,
         address _countrySettingsAddress,
         address _infrastructureAddress,
-        address _marketAddress,
+        address _resourcesAddress,
+        address _improvementsAddress,
+        address _wondersAddress,
         address _militaryAddress,
-        address _forcesAddress,
-        address _treasuryAddress,
-        address _navyAddress,
-        address _fightersAddress,
-        address _bombersAddress
+        address _forcesAddress
+        // address _treasuryAddress,
+        // address _navyAddress,
+        // address _fightersAddress,
+        // address _bombersAddress
     ) ERC721("MetaNations", "MNS") {
         warBucksAddress = _warBucksAddress;
         countryParametersAddress = _countryParametersAddress;
         countrySettingsAddress = _countrySettingsAddress;
         infrastructureAddress = _infrastructureAddress;
-        marketAddress = _marketAddress;
+        resourcesAddress = _resourcesAddress;
+        improvementsAddress = _improvementsAddress;
+        wondersAddress = _wondersAddress;
         militaryAddress = _militaryAddress;
         forcesAddress = _forcesAddress;
-        treasuryAddress = _treasuryAddress;
-        navyAddress = _navyAddress;
-        fightersAddress = _fightersAddress;
-        bombersAddress = _bombersAddress;
+        // treasuryAddress = _treasuryAddress;
+        // navyAddress = _navyAddress;
+        // fightersAddress = _fightersAddress;
+        // bombersAddress = _bombersAddress;
     }
 
     function generateCountry(
@@ -191,7 +199,7 @@ contract CountryMinter is ERC721 {
         string memory nationName,
         string memory capitalCity,
         string memory nationSlogan
-    ) public payable {
+    ) public {
         require(
             ownerCountryCount[msg.sender] == 0,
             "Wallet already contains a country"
@@ -207,17 +215,23 @@ contract CountryMinter is ERC721 {
         CountrySettingsContract(countrySettingsAddress)
             .generateCountrySettings();
         InfrastructureContract(infrastructureAddress).generateInfrastructure();
-        MarketContract(marketAddress).generateMarket();
-        MilitaryContract(militaryAddress).generateMilitary();
-        ForcesContract(forcesAddress).generateForces();
-        TreasuryContract(treasuryAddress).generateTreasury();
-        NavyContract(navyAddress).generateNavy();
-        FightersContract(fightersAddress).generateFighters();
-        BombersContract(bombersAddress).generateBombers();
+        ResourcesContract(resourcesAddress).generateResources();
+        ImprovementsContract(improvementsAddress).generateImprovements();
+        WondersContract(wondersAddress).generateWonders();
+        // TreasuryContract(treasuryAddress).generateTreasury();
+        generateCountryExtra();
         idToOwner[countryId] = msg.sender;
         ownerCountryCount[msg.sender]++;
         emit nationCreated(msg.sender, nationName, ruler);
         countryId++;
+    }
+
+    function generateCountryExtra() internal {
+        MilitaryContract(militaryAddress).generateMilitary();
+        ForcesContract(forcesAddress).generateForces();
+        // NavyContract(navyAddress).generateNavy();
+        // FightersContract(fightersAddress).generateFighters();
+        // BombersContract(bombersAddress).generateBombers();
     }
 
     // function generateCountryParameters(
