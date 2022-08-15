@@ -81,19 +81,20 @@ async function main() {
     const countryminter = await CountryMinter.deploy(
         warbucks.address, 
         countryparameters.address, 
-        countrysettings.address, 
+        treasury.address,
         infrastructure.address, 
         resources.address,
         improvements.address,
-        wonders.address,
+        wonders.address
+        )
+    await countryminter.deployed()
+    await countryminter.constructorContinued(        
         military.address,
         forces.address,
-        treasury.address,
         navy.address,
         fighters.address,
         bombers.address
         )
-    await countryminter.deployed()
     console.log(`CountryMinter deployed to ${countryminter.address}`)
 
 }

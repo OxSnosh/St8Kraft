@@ -52,7 +52,7 @@ contract MilitaryContract {
     //     require(newThreatLevel = "Low" || newThreatLevel = "Medium" || newThreatLevel = "High", "New threat level not either Low, Medium or High");
     // }
 
-    function updateWarPeacePreference(uint256 id) public {
+    function toggleWarPeacePreference(uint256 id) public {
         require(
             idToOwnerMilitary[id] == msg.sender,
             "You are not the nation ruler"

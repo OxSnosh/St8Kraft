@@ -13,7 +13,18 @@ contract CountryParametersContract {
         string nationSlogan;
     }
 
+    struct CountrySettings {
+        uint256 nationCreated;
+        uint256 lastTaxCollection;
+        string alliance;
+        string nationTeam;
+        string governmentType;
+        string nationalReligion;
+        string currencyType;
+    }
+
     mapping(uint256 => CountryParameters) public idToCountryParameters;
+    mapping(uint256 => CountrySettings) public idToCountrySettings;
     mapping(uint256 => address) public idToOwnerParameters;
 
     function generateCountryParameters(
@@ -30,7 +41,17 @@ contract CountryParametersContract {
             capitalCity,
             nationSlogan
         );
+        CountrySettings memory newCountrySettings = CountrySettings(
+            block.timestamp,
+            block.timestamp,
+            "Alliance",
+            "nationTeam",
+            "governmentType",
+            "Religion",
+            "Currency"
+        );
         idToCountryParameters[parametersId] = newCountryParameters;
+        idToCountrySettings[parametersId] = newCountrySettings;
         idToOwnerParameters[parametersId] = msg.sender;
         parametersId++;
     }
@@ -69,5 +90,10 @@ contract CountryParametersContract {
             "This account is not the nation ruler"
         );
         idToCountryParameters[id].nationSlogan = newNationSlogan;
+    }
+
+    function setAlliance(string memory newAlliance, uint id) public {
+        require(idToOwnerParameters[id] == msg.sender, "You are not the nation ruler");
+        idToCountrySettings[id].alliance = newAlliance;
     }
 }
