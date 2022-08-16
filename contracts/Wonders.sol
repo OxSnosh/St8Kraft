@@ -7,6 +7,48 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract WondersContract is Ownable {
     uint256 private wondersId;
     address public treasuryAddress;
+    uint256 public agricultureDevelopmentCost = 30000000;
+    uint256 public antiAirDefenseNetworkCost = 50000000;
+    uint256 public centralIntelligenceAgencyCost = 40000000;
+    uint256 public disasterReliefAgencyCost = 40000000;
+    uint256 public empWeaponizationCost = 200000000;
+    uint256 public falloutShelterSystemCost = 40000000;
+    uint256 public federalAidCommissionCost = 25000000;
+    uint256 public federalReserveCost = 100000000;
+    uint256 public foreignAirForceBaseCost = 35000000;
+    uint256 public foreignArmyBaseCost = 200000000;
+    uint256 public foreignNavalBaseCost = 200000000;
+    uint256 public greatMonumentCost = 35000000;
+    uint256 public greatTempleCost = 35000000;
+    uint256 public greatUniversityCost = 35000000;
+    uint256 public hiddenNuclearMissileSiloCost = 30000000;
+    uint256 public interceptorMissileSystemCost = 50000000;
+    uint256 public internetCost = 35000000;
+    uint256 public interstateSystemCost = 45000000;
+    uint256 public manhattanProjectCost = 100000000;
+    uint256 public marsBaseCost = 100000000;
+    uint256 public marsColonyCost = 100000000;
+    uint256 public marsMineCost = 100000000;
+    uint256 public miningIndustryConsortiumCost = 25000000;
+    uint256 public moonBaseCost = 50000000;
+    uint256 public moonColonyCost = 50000000;
+    uint256 public moonMineCost = 50000000;
+    uint256 public movieIndustryCost = 26000000;
+    uint256 public nationalCemetaryCost = 150000000;
+    uint256 public nationalEnvironmentOfficeCost = 100000000;
+    uint256 public nationalResearchLabCost = 35000000;
+    uint256 public nationalWarMemorialCost = 27000000;
+    uint256 public nuclearPowerPlantCost = 75000000;
+    uint256 public pentagonCost = 30000000;
+    uint256 public politicalLobbyistsCost = 50000000;
+    uint256 public scientificDevelopmentCenterCost = 150000000;
+    uint256 public socialSecuritySystemCost = 40000000;
+    uint256 public spaceProgramCost = 30000000;
+    uint256 public stockMarketCost = 30000000;
+    uint256 public strategicDefenseInitiativeCost = 75000000;
+    uint256 public superiorLogisticalSupportCost = 80000000;
+    uint256 public universalHealthcareCost = 100000000;
+    uint256 public weaponsResearchCenterCost = 150000000;
 
     struct Wonders1 {
         uint256 wonderCount;
@@ -56,7 +98,7 @@ contract WondersContract is Ownable {
         //Raises the cap on foreign money aid +50% provided that the foreign aid recipient also has a Federal Aid Commission wonder.
         //Allows two nations with the Federal Aid Commission wonder to send secret foreign aid.
         //Secret foreign aid costs the sender 200% the value of the items that are sent.
-        bool federalAidComission;
+        bool federalAidCommission;
         //Federal Reserve
         //$100,000,000 + (Nation Strength * 1,000)
         //Increases the number of banks that can be purchased +2.
