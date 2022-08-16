@@ -4,7 +4,7 @@ pragma solidity 0.8.7;
 import "./Treasury.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract ImprovementsContract {
+contract ImprovementsContract is Ownable {
     uint256 private improvementsId;
     address public treasuryAddress;
     uint256 public airportCost = 100000;
@@ -327,6 +327,142 @@ contract ImprovementsContract {
         improvementsId++;
     }
 
+    function updateAirportCost(uint256 newPrice) public onlyOwner {
+        airportCost = newPrice;
+    }
+
+    function updateBankCost(uint256 newPrice) public onlyOwner {
+        bankCost = newPrice;
+    }
+
+    function updateBarracksCost(uint256 newPrice) public onlyOwner {
+        airportCost = newPrice;
+    }
+
+    function updateBorderFortificationCost(uint256 newPrice) public onlyOwner {
+        borderFortificationCost = newPrice;
+    }
+
+    function updateaBorderWallCost(uint256 newPrice) public onlyOwner {
+        borderWallCost = newPrice;
+    }
+
+    function updateBunkerCost(uint256 newPrice) public onlyOwner {
+        bunkerCost = newPrice;
+    }
+
+    function updateCasinoCost(uint256 newPrice) public onlyOwner {
+        casinoCost = newPrice;
+    }
+
+    function updateChurchCost(uint256 newPrice) public onlyOwner {
+        churchCost = newPrice;
+    }
+
+    function updateClinicCost(uint256 newPrice) public onlyOwner {
+        clinicCost = newPrice;
+    }
+
+    function updateDrydockCost(uint256 newPrice) public onlyOwner {
+        drydockCost = newPrice;
+    }
+
+    function updateFactoryCost(uint256 newPrice) public onlyOwner {
+        factoryCost = newPrice;
+    }
+
+    function updateForeignMinistryCost(uint256 newPrice) public onlyOwner {
+        foreignMinistryCost = newPrice;
+    }
+
+    function updateforwardOperatingBaseCost(uint256 newPrice) public onlyOwner {
+        forwardOperatingBaseCost = newPrice;
+    }
+
+    function updateGuerillaCampCost(uint256 newPrice) public onlyOwner {
+        guerillaCampCost = newPrice;
+    }
+
+    function updateHarborCost(uint256 newPrice) public onlyOwner {
+        harborCost = newPrice;
+    }
+
+    function updateHospitalCost(uint256 newPrice) public onlyOwner {
+        hospitalCost = newPrice;
+    }
+
+    function updateIntelligenceAgencyCost(uint256 newPrice) public onlyOwner {
+        intelligenceAgencyCost = newPrice;
+    }
+
+    function updateJailCost(uint256 newPrice) public onlyOwner {
+        jailCost = newPrice;
+    }
+
+    function updateLaborCampCost(uint256 newPrice) public onlyOwner {
+        laborCampCost = newPrice;
+    }
+
+    function updateMissileDefenseCost(uint256 newPrice) public onlyOwner {
+        missileDefenseCost = newPrice;
+    }
+
+    function updateMunitionsFactoryCost(uint256 newPrice) public onlyOwner {
+        munitionsFactoryCost = newPrice;
+    }
+
+    function updateNavalAcademyCost(uint256 newPrice) public onlyOwner {
+        navalAcademyCost = newPrice;
+    }
+
+    function updateNavalConstructionYardCost(uint256 newPrice) public onlyOwner {
+        navalConstructionYardCost = newPrice;
+    }
+
+    function updateOfficeOfPropagandaCost(uint256 newPrice) public onlyOwner {
+        officeOfPropagandaCost = newPrice;
+    }
+
+    function updatePoliceHeadquartersCost(uint256 newPrice) public onlyOwner {
+        policeHeadquartersCost = newPrice;
+    }
+
+    function updatePrisonCost(uint256 newPrice) public onlyOwner {
+        prisonCost = newPrice;
+    }
+
+    function updateRadiationContainmentChamberCost(uint256 newPrice) public onlyOwner {
+        radiationContainmentChamberCost = newPrice;
+    }
+
+    function updateRedLightDistrictCost(uint256 newPrice) public onlyOwner {
+        redLightDistrictCost = newPrice;
+    }
+
+    function updateRehabilitationFacilityCost(uint256 newPrice) public onlyOwner {
+        rehabilitationFacilityCost = newPrice;
+    }
+
+    function updateSatteliteCost(uint256 newPrice) public onlyOwner {
+        satteliteCost = newPrice;
+    }
+
+    function updateSchoolCost(uint256 newPrice) public onlyOwner {
+        schoolCost = newPrice;
+    }
+
+    function updateShipyardCost(uint256 newPrice) public onlyOwner {
+        shipyardCost = newPrice;
+    }
+
+    function updateStadiumCost(uint256 newPrice) public onlyOwner {
+        stadiumCost = newPrice;
+    }
+
+    function updateUniversityCost(uint256 newPrice) public onlyOwner {
+        universityCost = newPrice;
+    }
+
     function buyAirport(uint256 amount, uint256 id) public {
         require(
             idToOwnerImprovements[id] == msg.sender,
@@ -336,7 +472,7 @@ contract ImprovementsContract {
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice, "Insufficient balance");
         uint256 existingCount = idToImprovements1[id].airportCount;
-        require(existingCount + amount <= 3, "Cannot own more than 3 airports");
+        require((existingCount + amount) <= 3, "Cannot own more than 3 airports");
         idToImprovements1[id].airportCount += amount;
         idToImprovements1[id].improvementCount += amount;
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
