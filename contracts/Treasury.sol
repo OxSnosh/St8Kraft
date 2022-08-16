@@ -2,11 +2,13 @@
 pragma solidity 0.8.7;
 
 import "./IWarBucks.sol";
+import "./WarBucks.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract TreasuryContract {
-
-    uint private treasuryId;
+contract TreasuryContract is Ownable {
+    uint256 private treasuryId;
     address public warBucksAddress;
+    uint256 private taxPercentage = 0;
 
     struct Treasury {
         uint256 grossIncomePerCitizenPerDay;
@@ -23,7 +25,7 @@ contract TreasuryContract {
     mapping(uint256 => Treasury) public idToTreasury;
     mapping(uint256 => address) public idToOwnerTreasury;
 
-    constructor (address _warBucksAddress) {
+    constructor(address _warBucksAddress) {
         warBucksAddress = _warBucksAddress;
     }
 
@@ -34,23 +36,47 @@ contract TreasuryContract {
         treasuryId++;
     }
 
-    function checkBalance(uint id) public view returns (uint countryBalance) {
-        uint balance = idToTreasury[id].balance;
+    function checkBalance(uint256 id)
+        public
+        view
+        returns (uint256 countryBalance)
+    {
+        uint256 balance = idToTreasury[id].balance;
         return balance;
     }
 
-    function spendBalance(uint id, uint cost) public {
+    function spendBalance(uint256 id, uint256 cost) public {
         //need a way to only allow the nation owner to do this
-        uint balance = idToTreasury[id].balance;
+        uint256 balance = idToTreasury[id].balance;
         require(balance >= cost);
         idToTreasury[id].balance -= cost;
+        //TAXES here
+        uint256 taxRate = (taxPercentage / 100);
+        uint256 taxLevied = cost * taxRate;
+        if (taxLevied > 0) {
+            IWarBucks(warBucksAddress).mint(address(this), taxLevied);
+        }
     }
 
-    function withdrawFunds(uint amount, uint id) public {
+    function withdrawFunds(uint256 amount, uint256 id) public {
         require(idToOwnerTreasury[id] == msg.sender);
-        uint balance = idToTreasury[id].balance;
+        uint256 balance = idToTreasury[id].balance;
         require(balance >= amount);
         IWarBucks(warBucksAddress).mint(msg.sender, amount);
     }
 
+    function addFunds(uint256 amount, uint256 id) public {
+        require(idToOwnerTreasury[id] == msg.sender);
+        idToTreasury[id].balance += amount;
+        IWarBucks(warBucksAddress).burn(msg.sender, amount);
+    }
+
+    function setTaxRate(uint256 newPercentage) public onlyOwner {
+        taxPercentage = newPercentage;
+    }
+
+    // function withdraw() public payable onlyOwner {
+    //     uint256 balance = IWarBucks(warBucksAddress)._balances(address(this));
+    //     IWarBucks(warBucksAddress).transfer(msg.sender, balance);
+    // }
 }
