@@ -399,4 +399,173 @@ contract WondersContract is Ownable {
         idToOwnerWonders[wondersId] = msg.sender;
         wondersId++;
     }
+
+    function updateAgricultureDevelopmentCost(uint256 newPrice) public onlyOwner {
+        agricultureDevelopmentCost = newPrice;
+    }
+
+    function updateAntiAirDefenseNetworkCost(uint256 newPrice) public onlyOwner {
+        antiAirDefenseNetworkCost = newPrice;
+    }
+
+    function updateCentralIntelligenceAgencyCost(uint256 newPrice) public onlyOwner {
+        centralIntelligenceAgencyCost = newPrice;
+    }
+
+    function updateDisasterReliefAgencyCost(uint256 newPrice) public onlyOwner {
+        disasterReliefAgencyCost = newPrice;
+    }
+
+    function updateEmpWeaponizationCost(uint256 newPrice) public onlyOwner {
+        empWeaponizationCost = newPrice;
+    }
+
+    function updateFalloutShelterSystemCost(uint256 newPrice) public onlyOwner {
+        falloutShelterSystemCost = newPrice;
+    }
+
+    function updateFederalAidCommissionCost(uint256 newPrice) public onlyOwner {
+        federalAidCommissionCost = newPrice;
+    }
+
+    function updateFederalReserveCost(uint256 newPrice) public onlyOwner {
+        federalReserveCost = newPrice;
+    }
+
+    function updateForeignAirForceBaseCost(uint256 newPrice) public onlyOwner {
+        foreignAirForceBaseCost = newPrice;
+    }
+
+    function updateForeignArmyBaseCost(uint256 newPrice) public onlyOwner {
+        foreignArmyBaseCost = newPrice;
+    }
+
+    function updateForeignNavalBaseCost(uint256 newPrice) public onlyOwner {
+        foreignNavalBaseCost = newPrice;
+    }
+
+    function updateGreatMonumentCost(uint256 newPrice) public onlyOwner {
+        greatMonumentCost = newPrice;
+    }
+
+    function updategreatTempleCost(uint256 newPrice) public onlyOwner {
+        greatTempleCost = newPrice;
+    }
+
+    function updateGreatUniversityCost(uint256 newPrice) public onlyOwner {
+        greatUniversityCost = newPrice;
+    }
+
+    function updateHiddenNuclearMissileSiloCost(uint256 newPrice) public onlyOwner {
+        hiddenNuclearMissileSiloCost = newPrice;
+    }
+
+    function updateInterceptorMissileSystemCost(uint256 newPrice) public onlyOwner {
+        interceptorMissileSystemCost = newPrice;
+    }
+
+    function updateInternetCost(uint256 newPrice) public onlyOwner {
+        internetCost = newPrice;
+    }
+
+    function updateInterstateSystemCost(uint256 newPrice) public onlyOwner {
+        interstateSystemCost = newPrice;
+    }
+
+    function updateManhattanProjectCost(uint256 newPrice) public onlyOwner {
+        manhattanProjectCost = newPrice;
+    }
+
+    function updateMarsBaseCost(uint256 newPrice) public onlyOwner {
+        marsBaseCost = newPrice;
+    }
+
+    function updateMarsColonyCost(uint256 newPrice) public onlyOwner {
+        marsColonyCost = newPrice;
+    }
+
+    function updateMarsMineCost(uint256 newPrice) public onlyOwner {
+        marsMineCost = newPrice;
+    }
+
+    function updateMiningIndustryConsortiumCost(uint256 newPrice) public onlyOwner {
+        miningIndustryConsortiumCost = newPrice;
+    }
+
+    function updateMoonBaseCost(uint256 newPrice) public onlyOwner {
+        moonBaseCost = newPrice;
+    }
+
+    function updateMoonColonyCost(uint256 newPrice) public onlyOwner {
+        moonColonyCost = newPrice;
+    }
+
+    function updateMoonMineCost(uint256 newPrice) public onlyOwner {
+        moonMineCost = newPrice;
+    }
+
+    function updateMovieIndustryCost(uint256 newPrice) public onlyOwner {
+        movieIndustryCost = newPrice;
+    }
+
+    function updateNationalCemetaryCost(uint256 newPrice) public onlyOwner {
+        nationalCemetaryCost = newPrice;
+    }
+
+    function updateNationalEnvironmentOfficeCost(uint256 newPrice) public onlyOwner {
+        nationalEnvironmentOfficeCost = newPrice;
+    }
+
+    function updateNationalResearchLabCost(uint256 newPrice) public onlyOwner {
+        nationalResearchLabCost = newPrice;
+    }
+
+    function updateNationalWarMemorialCost(uint256 newPrice) public onlyOwner {
+        nationalWarMemorialCost = newPrice;
+    }
+
+    function updateNuclearPowerPlantCost(uint256 newPrice) public onlyOwner {
+        nuclearPowerPlantCost = newPrice;
+    }
+
+    function updatePentagonCost(uint256 newPrice) public onlyOwner {
+        pentagonCost = newPrice;
+    }
+
+    function updatePoliticalLobbyistsCost(uint256 newPrice) public onlyOwner {
+        politicalLobbyistsCost = newPrice;
+    }
+
+    function updateScientificDevelopmentCenterCost(uint256 newPrice) public onlyOwner {
+        scientificDevelopmentCenterCost = newPrice;
+    }
+
+    function updateSocialSecuritySystemCost(uint256 newPrice) public onlyOwner {
+        socialSecuritySystemCost = newPrice;
+    }
+
+    function updateSpaceProgramCost(uint256 newPrice) public onlyOwner {
+        spaceProgramCost = newPrice;
+    }
+
+    function updateStockMarketCost(uint256 newPrice) public onlyOwner {
+        stockMarketCost = newPrice;
+    }
+
+    function updateStrategicDefenseInitiativeCost(uint256 newPrice) public onlyOwner {
+        strategicDefenseInitiativeCost = newPrice;
+    }
+
+    function updateSuperiorLogisticalSupportCost(uint256 newPrice) public onlyOwner {
+        superiorLogisticalSupportCost = newPrice;
+    }
+
+    function updateUniversalHealthcareCost(uint256 newPrice) public onlyOwner {
+        universalHealthcareCost = newPrice;
+    }
+
+    function updateWeaponsResearchCenterCost(uint256 newPrice) public onlyOwner {
+        weaponsResearchCenterCost = newPrice;
+    }
+
 }
