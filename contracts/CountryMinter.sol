@@ -23,7 +23,9 @@ contract CountryMinter is ERC721, Ownable {
     address public countryParameters;
     address public infrastructure;
     address public resources;
-    address public improvements;
+    address public improvements1;
+    address public improvements2;
+    address public improvements3;
     address public wonders;
     address public military;
     address public forces;
@@ -48,7 +50,9 @@ contract CountryMinter is ERC721, Ownable {
         address _treasury,
         address _infrastructure,
         address _resources,
-        address _improvements,
+        address _improvements1,
+        address _improvements2,
+        address _improvements3,
         address _wonders
     ) ERC721("MetaNations", "MNS") {
         warBucks = _warBucks;
@@ -56,7 +60,9 @@ contract CountryMinter is ERC721, Ownable {
         treasury = _treasury;
         infrastructure = _infrastructure;
         resources = _resources;
-        improvements = _improvements;
+        improvements1 = _improvements1;
+        improvements2 = _improvements2;
+        improvements3 = _improvements3;
         wonders = _wonders;
     }
 
@@ -93,7 +99,9 @@ contract CountryMinter is ERC721, Ownable {
         );
         InfrastructureContract(infrastructure).generateInfrastructure();
         ResourcesContract(resources).generateResources();
-        ImprovementsContract(improvements).generateImprovements();
+        ImprovementsContract1(improvements1).generateImprovements();
+        ImprovementsContract2(improvements2).generateImprovements();
+        ImprovementsContract3(improvements3).generateImprovements();
         WondersContract(wonders).generateWonders();
         TreasuryContract(treasury).generateTreasury();
         MilitaryContract(military).generateMilitary();
