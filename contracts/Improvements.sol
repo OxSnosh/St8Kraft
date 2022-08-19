@@ -204,302 +204,511 @@ contract ImprovementsContract1 is Ownable {
         idToImprovements1[id].improvementCount = newCount;
     }
 
-    //Airport
-    function buyAirport(uint256 amount, uint256 id) public {
+    function buyImprovement1(
+        uint256 amount,
+        uint256 countryId,
+        uint256 improvementId
+    ) public {
         require(
-            idToOwnerImprovements1[id] == msg.sender,
+            idToOwnerImprovements1[countryId] == msg.sender,
             "You are not the nation ruler"
         );
-        uint256 purchasePrice = airportCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements1[id].airportCount;
-        require((existingCount + amount) <= 3, "Cannot own more than 3");
-        idToImprovements1[id].airportCount += amount;
-        idToImprovements1[id].improvementCount += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+        require(improvementId <= 11, "Invalid improvement ID");
+        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(
+            countryId
+        );
+        if (improvementId == 1) {
+            uint256 purchasePrice = airportCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements1[countryId].airportCount;
+            require((existingCount + amount) <= 3, "Cannot own more than 3");
+            idToImprovements1[countryId].airportCount += amount;
+            idToImprovements1[countryId].improvementCount += amount;
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 2) {
+            uint256 purchasePrice = bankCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements1[countryId].bankCount;
+            require((existingCount + amount) <= 5, "Cannot own more than 5");
+            idToImprovements1[countryId].bankCount += amount;
+            idToImprovements1[countryId].improvementCount += amount;
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 3) {
+            uint256 purchasePrice = barracksCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements1[countryId].barracksCount;
+            require((existingCount + amount) <= 3, "Cannot own more than 3");
+            idToImprovements1[countryId].barracksCount += amount;
+            idToImprovements1[countryId].improvementCount += amount;
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 4) {
+            uint256 purchasePrice = borderFortificationCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements1[countryId]
+                .borderFortificationCount;
+            require((existingCount + amount) <= 5, "Cannot own more than 5");
+            idToImprovements1[countryId].borderFortificationCount += amount;
+            idToImprovements1[countryId].improvementCount += amount;
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 5) {
+            uint256 purchasePrice = borderWallCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements1[countryId]
+                .borderWallCount;
+            require((existingCount + amount) <= 5, "Cannot own more than 5");
+            idToImprovements1[countryId].borderWallCount += amount;
+            idToImprovements1[countryId].improvementCount += amount;
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 6) {
+            uint256 purchasePrice = bunkerCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements1[countryId].bunkerCount;
+            require((existingCount + amount) <= 5, "Cannot own more than 5");
+            idToImprovements1[countryId].bunkerCount += amount;
+            idToImprovements1[countryId].improvementCount += amount;
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 7) {
+            uint256 purchasePrice = casinoCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements1[countryId].casinoCount;
+            require((existingCount + amount) <= 2, "Cannot own more than 2");
+            idToImprovements1[countryId].casinoCount += amount;
+            idToImprovements1[countryId].improvementCount += amount;
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 8) {
+            uint256 purchasePrice = churchCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements1[countryId].churchCount;
+            require((existingCount + amount) <= 5, "Cannot own more than 5");
+            idToImprovements1[countryId].churchCount += amount;
+            idToImprovements1[countryId].improvementCount += amount;
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 9) {
+            uint256 purchasePrice = clinicCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements1[countryId].clinicCount;
+            require((existingCount + amount) <= 5, "Cannot own more than 5");
+            idToImprovements1[countryId].clinicCount += amount;
+            idToImprovements1[countryId].improvementCount += amount;
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 10) {
+            uint256 purchasePrice = drydockCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements1[countryId].drydockCount;
+            require((existingCount + amount) <= 5, "Cannot own more than 5");
+            idToImprovements1[countryId].drydockCount += amount;
+            idToImprovements1[countryId].improvementCount += amount;
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else {
+            uint256 purchasePrice = factoryCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements1[countryId].factoryCount;
+            require((existingCount + amount) <= 5, "Cannot own more than 5");
+            idToImprovements1[countryId].factoryCount += amount;
+            idToImprovements1[countryId].improvementCount += amount;
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        }
     }
 
-    function deleteAirport(uint256 amount, uint256 id) public {
+    function deleteImprovement1(
+        uint256 amount,
+        uint256 countryId,
+        uint256 improvementId
+    ) public {
         require(
-            idToOwnerImprovements1[id] == msg.sender,
+            idToOwnerImprovements1[countryId] == msg.sender,
             "You are not the nation ruler"
         );
-        uint256 existingCount = idToImprovements1[id].airportCount;
-        require((existingCount - amount) >= 0, "Cannot delete that many");
-        idToImprovements1[id].airportCount -= amount;
-        idToImprovements1[id].improvementCount -= amount;
+        require(improvementId <= 11, "Invalid improvement ID");
+        if (improvementId == 1) {
+            uint256 existingCount = idToImprovements1[countryId].airportCount;
+            require((existingCount - amount) >= 0, "Cannot delete that many");
+            idToImprovements1[countryId].airportCount -= amount;
+            idToImprovements1[countryId].improvementCount -= amount;
+        } else if (improvementId == 2) {
+            uint256 existingCount = idToImprovements1[countryId].bankCount;
+            require((existingCount - amount) >= 0, "Cannot delete that many");
+            idToImprovements1[countryId].bankCount -= amount;
+            idToImprovements1[countryId].improvementCount -= amount;
+        } else if (improvementId == 3) {
+            uint256 existingCount = idToImprovements1[countryId].barracksCount;
+            require((existingCount - amount) >= 0, "Cannot delete that many");
+            idToImprovements1[countryId].barracksCount -= amount;
+            idToImprovements1[countryId].improvementCount -= amount;
+        } else if (improvementId == 4) {
+            uint256 existingCount = idToImprovements1[countryId]
+                .borderFortificationCount;
+            require((existingCount - amount) >= 0, "Cannot delete that many");
+            idToImprovements1[countryId].borderFortificationCount -= amount;
+            idToImprovements1[countryId].improvementCount -= amount;
+        } else if (improvementId == 5) {
+            uint256 existingCount = idToImprovements1[countryId]
+                .borderWallCount;
+            require((existingCount - amount) >= 0, "Cannot delete that many");
+            idToImprovements1[countryId].borderWallCount -= amount;
+            idToImprovements1[countryId].improvementCount -= amount;
+        } else if (improvementId == 6) {
+            uint256 existingCount = idToImprovements1[countryId].bunkerCount;
+            require((existingCount - amount) >= 0, "Cannot delete that many");
+            idToImprovements1[countryId].bunkerCount -= amount;
+            idToImprovements1[countryId].improvementCount -= amount;
+        } else if (improvementId == 7) {
+            uint256 existingCount = idToImprovements1[countryId].casinoCount;
+            require((existingCount - amount) >= 0, "Cannot delete that many");
+            idToImprovements1[countryId].casinoCount -= amount;
+            idToImprovements1[countryId].improvementCount -= amount;
+        } else if (improvementId == 8) {
+            uint256 existingCount = idToImprovements1[countryId].churchCount;
+            require((existingCount - amount) >= 0, "Cannot delete that many");
+            idToImprovements1[countryId].churchCount -= amount;
+            idToImprovements1[countryId].improvementCount -= amount;
+        } else if (improvementId == 9) {
+            uint256 existingCount = idToImprovements1[countryId].clinicCount;
+            require((existingCount - amount) >= 0, "Cannot delete that many");
+            idToImprovements1[countryId].clinicCount -= amount;
+            idToImprovements1[countryId].improvementCount -= amount;
+        } else if (improvementId == 10) {
+            uint256 existingCount = idToImprovements1[countryId].drydockCount;
+            require((existingCount - amount) >= 0, "Cannot delete that many");
+            idToImprovements1[countryId].drydockCount -= amount;
+            idToImprovements1[countryId].improvementCount -= amount;
+        } else {
+            uint256 existingCount = idToImprovements1[countryId].factoryCount;
+            require((existingCount - amount) >= 0, "Cannot delete that many");
+            idToImprovements1[countryId].factoryCount -= amount;
+            idToImprovements1[countryId].improvementCount -= amount;
+        }
     }
+
+    //Airport
+    // function buyAirport(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = airportCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements1[id].airportCount;
+    //     require((existingCount + amount) <= 3, "Cannot own more than 3");
+    //     idToImprovements1[id].airportCount += amount;
+    //     idToImprovements1[id].improvementCount += amount;
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
+
+    // function deleteAirport(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 existingCount = idToImprovements1[id].airportCount;
+    //     require((existingCount - amount) >= 0, "Cannot delete that many");
+    //     idToImprovements1[id].airportCount -= amount;
+    //     idToImprovements1[id].improvementCount -= amount;
+    // }
 
     //Bank
-    function buyBank(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = bankCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements1[id].bankCount;
-        require((existingCount + amount) <= 5, "Cannot own more than 5");
-        idToImprovements1[id].bankCount += amount;
-        idToImprovements1[id].improvementCount += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyBank(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = bankCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements1[id].bankCount;
+    //     require((existingCount + amount) <= 5, "Cannot own more than 5");
+    //     idToImprovements1[id].bankCount += amount;
+    //     idToImprovements1[id].improvementCount += amount;
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
-    function deleteBank(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 existingCount = idToImprovements1[id].bankCount;
-        require((existingCount - amount) >= 0, "Cannot delete that many");
-        idToImprovements1[id].bankCount -= amount;
-        idToImprovements1[id].improvementCount -= amount;
-    }
+    // function deleteBank(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 existingCount = idToImprovements1[id].bankCount;
+    //     require((existingCount - amount) >= 0, "Cannot delete that many");
+    //     idToImprovements1[id].bankCount -= amount;
+    //     idToImprovements1[id].improvementCount -= amount;
+    // }
 
     //Barracks
-    function buyBarracks(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = barracksCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements1[id].barracksCount;
-        require((existingCount + amount) <= 3, "Cannot own more than 3");
-        idToImprovements1[id].barracksCount += amount;
-        idToImprovements1[id].improvementCount += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyBarracks(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = barracksCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements1[id].barracksCount;
+    //     require((existingCount + amount) <= 3, "Cannot own more than 3");
+    //     idToImprovements1[id].barracksCount += amount;
+    //     idToImprovements1[id].improvementCount += amount;
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
-    function deleteBarracks(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 existingCount = idToImprovements1[id].barracksCount;
-        require((existingCount - amount) >= 0, "Cannot delete that many");
-        idToImprovements1[id].barracksCount -= amount;
-        idToImprovements1[id].improvementCount -= amount;
-    }
+    // function deleteBarracks(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 existingCount = idToImprovements1[id].barracksCount;
+    //     require((existingCount - amount) >= 0, "Cannot delete that many");
+    //     idToImprovements1[id].barracksCount -= amount;
+    //     idToImprovements1[id].improvementCount -= amount;
+    // }
 
     //Border Fortification
-    function buyBorderFortification(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = borderFortificationCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements1[id].borderFortificationCount;
-        require((existingCount + amount) <= 5, "Cannot own more than 5");
-        idToImprovements1[id].borderFortificationCount += amount;
-        idToImprovements1[id].improvementCount += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyBorderFortification(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = borderFortificationCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements1[id].borderFortificationCount;
+    //     require((existingCount + amount) <= 5, "Cannot own more than 5");
+    //     idToImprovements1[id].borderFortificationCount += amount;
+    //     idToImprovements1[id].improvementCount += amount;
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
-    function deleteBorderFortification(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 existingCount = idToImprovements1[id].borderFortificationCount;
-        require((existingCount - amount) >= 0, "Cannot delete that many");
-        idToImprovements1[id].borderFortificationCount -= amount;
-        idToImprovements1[id].improvementCount -= amount;
-    }
+    // function deleteBorderFortification(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 existingCount = idToImprovements1[id].borderFortificationCount;
+    //     require((existingCount - amount) >= 0, "Cannot delete that many");
+    //     idToImprovements1[id].borderFortificationCount -= amount;
+    //     idToImprovements1[id].improvementCount -= amount;
+    // }
 
     //Border Wall
-    function buyBorderWall(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = borderWallCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements1[id].borderWallCount;
-        require((existingCount + amount) <= 5, "Cannot own more than 5");
-        idToImprovements1[id].borderWallCount += amount;
-        idToImprovements1[id].improvementCount += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyBorderWall(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = borderWallCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements1[id].borderWallCount;
+    //     require((existingCount + amount) <= 5, "Cannot own more than 5");
+    //     idToImprovements1[id].borderWallCount += amount;
+    //     idToImprovements1[id].improvementCount += amount;
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
-    function deleteBorderWall(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 existingCount = idToImprovements1[id].borderWallCount;
-        require((existingCount - amount) >= 0, "Cannot delete that many");
-        idToImprovements1[id].borderWallCount -= amount;
-        idToImprovements1[id].improvementCount -= amount;
-    }
+    // function deleteBorderWall(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 existingCount = idToImprovements1[id].borderWallCount;
+    //     require((existingCount - amount) >= 0, "Cannot delete that many");
+    //     idToImprovements1[id].borderWallCount -= amount;
+    //     idToImprovements1[id].improvementCount -= amount;
+    // }
 
     //Bunker
-    function buyBunker(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = bunkerCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements1[id].bunkerCount;
-        require((existingCount + amount) <= 5, "Cannot own more than 5");
-        idToImprovements1[id].bunkerCount += amount;
-        idToImprovements1[id].improvementCount += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyBunker(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = bunkerCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements1[id].bunkerCount;
+    //     require((existingCount + amount) <= 5, "Cannot own more than 5");
+    //     idToImprovements1[id].bunkerCount += amount;
+    //     idToImprovements1[id].improvementCount += amount;
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
-    function deleteBunker(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 existingCount = idToImprovements1[id].bunkerCount;
-        require((existingCount - amount) >= 0, "Cannot delete that many");
-        idToImprovements1[id].bunkerCount -= amount;
-        idToImprovements1[id].improvementCount -= amount;
-    }
+    // function deleteBunker(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 existingCount = idToImprovements1[id].bunkerCount;
+    //     require((existingCount - amount) >= 0, "Cannot delete that many");
+    //     idToImprovements1[id].bunkerCount -= amount;
+    //     idToImprovements1[id].improvementCount -= amount;
+    // }
 
     //Casino
-    function buyCasino(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = casinoCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements1[id].casinoCount;
-        require((existingCount + amount) <= 2, "Cannot own more than 2");
-        idToImprovements1[id].casinoCount += amount;
-        idToImprovements1[id].improvementCount += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyCasino(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = casinoCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements1[id].casinoCount;
+    //     require((existingCount + amount) <= 2, "Cannot own more than 2");
+    //     idToImprovements1[id].casinoCount += amount;
+    //     idToImprovements1[id].improvementCount += amount;
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
-    function deleteCasino(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 existingCount = idToImprovements1[id].casinoCount;
-        require((existingCount - amount) >= 0, "Cannot delete that many");
-        idToImprovements1[id].casinoCount -= amount;
-        idToImprovements1[id].improvementCount -= amount;
-    }
+    // function deleteCasino(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 existingCount = idToImprovements1[id].casinoCount;
+    //     require((existingCount - amount) >= 0, "Cannot delete that many");
+    //     idToImprovements1[id].casinoCount -= amount;
+    //     idToImprovements1[id].improvementCount -= amount;
+    // }
 
     //Church
-    function buyChurch(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = churchCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements1[id].churchCount;
-        require((existingCount + amount) <= 5, "Cannot own more than 5");
-        idToImprovements1[id].churchCount += amount;
-        idToImprovements1[id].improvementCount += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyChurch(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = churchCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements1[id].churchCount;
+    //     require((existingCount + amount) <= 5, "Cannot own more than 5");
+    //     idToImprovements1[id].churchCount += amount;
+    //     idToImprovements1[id].improvementCount += amount;
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
-    function deleteChurch(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 existingCount = idToImprovements1[id].churchCount;
-        require((existingCount - amount) >= 0, "Cannot delete that many");
-        idToImprovements1[id].churchCount -= amount;
-        idToImprovements1[id].improvementCount -= amount;
-    }
+    // function deleteChurch(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 existingCount = idToImprovements1[id].churchCount;
+    //     require((existingCount - amount) >= 0, "Cannot delete that many");
+    //     idToImprovements1[id].churchCount -= amount;
+    //     idToImprovements1[id].improvementCount -= amount;
+    // }
 
     //Clinic
-    function buyClinic(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = clinicCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements1[id].clinicCount;
-        require((existingCount + amount) <= 5, "Cannot own more than 5");
-        idToImprovements1[id].clinicCount += amount;
-        idToImprovements1[id].improvementCount += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyClinic(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = clinicCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements1[id].clinicCount;
+    //     require((existingCount + amount) <= 5, "Cannot own more than 5");
+    //     idToImprovements1[id].clinicCount += amount;
+    //     idToImprovements1[id].improvementCount += amount;
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
-    function deleteClinic(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 existingCount = idToImprovements1[id].clinicCount;
-        require((existingCount - amount) >= 0, "Cannot delete that many");
-        idToImprovements1[id].clinicCount -= amount;
-        idToImprovements1[id].improvementCount -= amount;
-    }
+    // function deleteClinic(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 existingCount = idToImprovements1[id].clinicCount;
+    //     require((existingCount - amount) >= 0, "Cannot delete that many");
+    //     idToImprovements1[id].clinicCount -= amount;
+    //     idToImprovements1[id].improvementCount -= amount;
+    // }
 
     //Drydock
-    function buyDrydock(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = drydockCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements1[id].drydockCount;
-        require((existingCount + amount) <= 5, "Cannot own more than 5");
-        idToImprovements1[id].drydockCount += amount;
-        idToImprovements1[id].improvementCount += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyDrydock(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = drydockCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements1[id].drydockCount;
+    //     require((existingCount + amount) <= 5, "Cannot own more than 5");
+    //     idToImprovements1[id].drydockCount += amount;
+    //     idToImprovements1[id].improvementCount += amount;
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
-    function deleteDrydock(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 existingCount = idToImprovements1[id].drydockCount;
-        require((existingCount - amount) >= 0, "Cannot delete that many");
-        idToImprovements1[id].drydockCount -= amount;
-        idToImprovements1[id].improvementCount -= amount;
-    }
+    // function deleteDrydock(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 existingCount = idToImprovements1[id].drydockCount;
+    //     require((existingCount - amount) >= 0, "Cannot delete that many");
+    //     idToImprovements1[id].drydockCount -= amount;
+    //     idToImprovements1[id].improvementCount -= amount;
+    // }
 
     //Factory
-    function buyFactory(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = factoryCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements1[id].factoryCount;
-        require((existingCount + amount) <= 5, "Cannot own more than 5");
-        idToImprovements1[id].factoryCount += amount;
-        idToImprovements1[id].improvementCount += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyFactory(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = factoryCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements1[id].factoryCount;
+    //     require((existingCount + amount) <= 5, "Cannot own more than 5");
+    //     idToImprovements1[id].factoryCount += amount;
+    //     idToImprovements1[id].improvementCount += amount;
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
-    function deleteFactory(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements1[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 existingCount = idToImprovements1[id].factoryCount;
-        require((existingCount - amount) >= 0, "Cannot delete that many");
-        idToImprovements1[id].factoryCount -= amount;
-        idToImprovements1[id].improvementCount -= amount;
-    }
+    // function deleteFactory(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements1[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 existingCount = idToImprovements1[id].factoryCount;
+    //     require((existingCount - amount) >= 0, "Cannot delete that many");
+    //     idToImprovements1[id].factoryCount -= amount;
+    //     idToImprovements1[id].improvementCount -= amount;
+    // }
 }
 
 contract ImprovementsContract2 is Ownable {
@@ -695,28 +904,312 @@ contract ImprovementsContract2 is Ownable {
         navalConstructionYardCost = newPrice;
     }
 
-    //Foreign Ministry
-    function buyForeignMinistry(uint256 amount, uint256 id) public {
+    function buyImprovement2(
+        uint256 amount,
+        uint256 countryId,
+        uint256 improvementId
+    ) public {
         require(
-            idToOwnerImprovements2[id] == msg.sender,
+            idToOwnerImprovements2[countryId] == msg.sender,
             "You are not the nation ruler"
         );
-        uint256 purchasePrice = foreignMinistryCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements2[id].foreignMinistryCount;
-        require((existingCount + amount) <= 1, "Cannot own more than 1");
-        idToImprovements2[id].foreignMinistryCount += amount;
-        uint256 existingImprovementTotal = ImprovementsContract1(
-            improvementsContract1Address
-        ).getImprovementCount(id);
-        uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
+        require(improvementId <= 11, "Invalid improvement ID");
+        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(
+            countryId
         );
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+        if (improvementId == 1) {
+            uint256 purchasePrice = foreignMinistryCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements2[countryId]
+                .foreignMinistryCount;
+            require((existingCount + amount) <= 1, "Cannot own more than 1");
+            idToImprovements2[countryId].foreignMinistryCount += amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal + amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 2) {
+            uint256 purchasePrice = forwardOperatingBaseCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements2[countryId]
+                .forwardOperatingBaseCount;
+            require((existingCount + amount) <= 2, "Cannot own more than 2");
+            idToImprovements2[countryId].forwardOperatingBaseCount += amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal + amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 3) {
+            uint256 purchasePrice = guerillaCampCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements2[countryId]
+                .guerillaCampCount;
+            require((existingCount + amount) <= 5, "Cannot own more than 5");
+            idToImprovements2[countryId].guerillaCampCount += amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal + amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 4) {
+            uint256 purchasePrice = harborCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements2[countryId].harborCount;
+            require((existingCount + amount) <= 1, "Cannot own more than 1");
+            idToImprovements2[countryId].harborCount += amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal + amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 5) {
+            uint256 purchasePrice = hospitalCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements2[countryId].hospitalCount;
+            require((existingCount + amount) <= 1, "Cannot own more than 1");
+            idToImprovements2[countryId].hospitalCount += amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal + amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 6) {
+            uint256 purchasePrice = intelligenceAgencyCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements2[countryId]
+                .intelligenceAgencyCount;
+            require((existingCount + amount) <= 5, "Cannot own more than 5");
+            idToImprovements2[countryId].intelligenceAgencyCount += amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal + amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 7) {
+            uint256 purchasePrice = jailCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements2[countryId].jailCount;
+            require((existingCount + amount) <= 5, "Cannot own more than 5");
+            idToImprovements2[countryId].jailCount += amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal + amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 8) {
+            uint256 purchasePrice = laborCampCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements2[countryId].laborCampCount;
+            require((existingCount + amount) <= 5, "Cannot own more than 5");
+            idToImprovements2[countryId].laborCampCount += amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal + amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 9) {
+            uint256 purchasePrice = missileDefenseCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements2[countryId]
+                .missileDefenseCount;
+            require((existingCount + amount) <= 5, "Cannot own more than 5");
+            idToImprovements2[countryId].missileDefenseCount += amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal + amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 10) {
+            uint256 purchasePrice = munitionsFactoryCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements2[countryId]
+                .munitionsFactorCount;
+            require((existingCount + amount) <= 5, "Cannot own more than 5");
+            idToImprovements2[countryId].munitionsFactorCount += amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal + amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 11) {
+            uint256 purchasePrice = navalAcademyCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements2[countryId]
+                .navalAcademyCount;
+            require((existingCount + amount) <= 2, "Cannot own more than 2");
+            idToImprovements2[countryId].navalAcademyCount += amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal + amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else {
+            uint256 purchasePrice = navalConstructionYardCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements2[countryId]
+                .navalConstructionYardCount;
+            require((existingCount + amount) <= 3, "Cannot own more than 3");
+            idToImprovements2[countryId].navalConstructionYardCount += amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal + amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        }
     }
+
+    // function deleteImprovement1(
+    //     uint256 amount,
+    //     uint256 countryId,
+    //     uint256 improvementId
+    // ) public {
+    //     require(
+    //         idToOwnerImprovements1[countryId] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     require(improvementId <= 11, "Invalid improvement ID");
+    //     if (improvementId == 1) {
+    //         uint256 existingCount = idToImprovements1[countryId].airportCount;
+    //         require((existingCount - amount) >= 0, "Cannot delete that many");
+    //         idToImprovements1[countryId].airportCount -= amount;
+    //         idToImprovements1[countryId].improvementCount -= amount;
+    //     } else if (improvementId == 2) {
+    //         uint256 existingCount = idToImprovements1[countryId].bankCount;
+    //         require((existingCount - amount) >= 0, "Cannot delete that many");
+    //         idToImprovements1[countryId].bankCount -= amount;
+    //         idToImprovements1[countryId].improvementCount -= amount;
+    //     } else if (improvementId == 3) {
+    //         uint256 existingCount = idToImprovements1[countryId].barracksCount;
+    //         require((existingCount - amount) >= 0, "Cannot delete that many");
+    //         idToImprovements1[countryId].barracksCount -= amount;
+    //         idToImprovements1[countryId].improvementCount -= amount;
+    //     } else if (improvementId == 4) {
+    //         uint256 existingCount = idToImprovements1[countryId]
+    //             .borderFortificationCount;
+    //         require((existingCount - amount) >= 0, "Cannot delete that many");
+    //         idToImprovements1[countryId].borderFortificationCount -= amount;
+    //         idToImprovements1[countryId].improvementCount -= amount;
+    //     } else if (improvementId == 5) {
+    //         uint256 existingCount = idToImprovements1[countryId]
+    //             .borderWallCount;
+    //         require((existingCount - amount) >= 0, "Cannot delete that many");
+    //         idToImprovements1[countryId].borderWallCount -= amount;
+    //         idToImprovements1[countryId].improvementCount -= amount;
+    //     } else if (improvementId == 6) {
+    //         uint256 existingCount = idToImprovements1[countryId].bunkerCount;
+    //         require((existingCount - amount) >= 0, "Cannot delete that many");
+    //         idToImprovements1[countryId].bunkerCount -= amount;
+    //         idToImprovements1[countryId].improvementCount -= amount;
+    //     } else if (improvementId == 7) {
+    //         uint256 existingCount = idToImprovements1[countryId].casinoCount;
+    //         require((existingCount - amount) >= 0, "Cannot delete that many");
+    //         idToImprovements1[countryId].casinoCount -= amount;
+    //         idToImprovements1[countryId].improvementCount -= amount;
+    //     } else if (improvementId == 8) {
+    //         uint256 existingCount = idToImprovements1[countryId].churchCount;
+    //         require((existingCount - amount) >= 0, "Cannot delete that many");
+    //         idToImprovements1[countryId].churchCount -= amount;
+    //         idToImprovements1[countryId].improvementCount -= amount;
+    //     } else if (improvementId == 9) {
+    //         uint256 existingCount = idToImprovements1[countryId].clinicCount;
+    //         require((existingCount - amount) >= 0, "Cannot delete that many");
+    //         idToImprovements1[countryId].clinicCount -= amount;
+    //         idToImprovements1[countryId].improvementCount -= amount;
+    //     } else if (improvementId == 10) {
+    //         uint256 existingCount = idToImprovements1[countryId].drydockCount;
+    //         require((existingCount - amount) >= 0, "Cannot delete that many");
+    //         idToImprovements1[countryId].drydockCount -= amount;
+    //         idToImprovements1[countryId].improvementCount -= amount;
+    //     } else {
+    //         uint256 existingCount = idToImprovements1[countryId].factoryCount;
+    //         require((existingCount - amount) >= 0, "Cannot delete that many");
+    //         idToImprovements1[countryId].factoryCount -= amount;
+    //         idToImprovements1[countryId].improvementCount -= amount;
+    //     }
+    // }
+
+    //Foreign Ministry
+    // function buyForeignMinistry(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements2[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = foreignMinistryCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements2[id].foreignMinistryCount;
+    //     require((existingCount + amount) <= 1, "Cannot own more than 1");
+    //     idToImprovements2[id].foreignMinistryCount += amount;
+    //     uint256 existingImprovementTotal = ImprovementsContract1(
+    //         improvementsContract1Address
+    //     ).getImprovementCount(id);
+    //     uint256 newImprovementTotal = existingImprovementTotal + amount;
+    //     ImprovementsContract1(improvementsContract1Address)
+    //         .updateImprovementCount(id, newImprovementTotal);
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
     function deleteForeignMinistry(uint256 amount, uint256 id) public {
         require(
@@ -730,34 +1223,30 @@ contract ImprovementsContract2 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //Forward Operating Base
-    function buyForwardOperatingBase(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements2[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = forwardOperatingBaseCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements2[id].forwardOperatingBaseCount;
-        require((existingCount + amount) <= 2, "Cannot own more than 2");
-        idToImprovements2[id].forwardOperatingBaseCount += amount;
-        uint256 existingImprovementTotal = ImprovementsContract1(
-            improvementsContract1Address
-        ).getImprovementCount(id);
-        uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyForwardOperatingBase(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements2[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = forwardOperatingBaseCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements2[id].forwardOperatingBaseCount;
+    //     require((existingCount + amount) <= 2, "Cannot own more than 2");
+    //     idToImprovements2[id].forwardOperatingBaseCount += amount;
+    //     uint256 existingImprovementTotal = ImprovementsContract1(
+    //         improvementsContract1Address
+    //     ).getImprovementCount(id);
+    //     uint256 newImprovementTotal = existingImprovementTotal + amount;
+    //     ImprovementsContract1(improvementsContract1Address)
+    //         .updateImprovementCount(id, newImprovementTotal);
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
     function deleteForwardOperatingBase(uint256 amount, uint256 id) public {
         require(
@@ -771,34 +1260,30 @@ contract ImprovementsContract2 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //Guerilla Camp
-    function buyGuerillaCamp(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements2[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = guerillaCampCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements2[id].guerillaCampCount;
-        require((existingCount + amount) <= 5, "Cannot own more than 5");
-        idToImprovements2[id].guerillaCampCount += amount;
-        uint256 existingImprovementTotal = ImprovementsContract1(
-            improvementsContract1Address
-        ).getImprovementCount(id);
-        uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyGuerillaCamp(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements2[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = guerillaCampCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements2[id].guerillaCampCount;
+    //     require((existingCount + amount) <= 5, "Cannot own more than 5");
+    //     idToImprovements2[id].guerillaCampCount += amount;
+    //     uint256 existingImprovementTotal = ImprovementsContract1(
+    //         improvementsContract1Address
+    //     ).getImprovementCount(id);
+    //     uint256 newImprovementTotal = existingImprovementTotal + amount;
+    //     ImprovementsContract1(improvementsContract1Address)
+    //         .updateImprovementCount(id, newImprovementTotal);
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
     function deleteGuerillaCamp(uint256 amount, uint256 id) public {
         require(
@@ -812,34 +1297,30 @@ contract ImprovementsContract2 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //Harbor
-    function buyHarbor(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements2[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = harborCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements2[id].harborCount;
-        require((existingCount + amount) <= 1, "Cannot own more than 1");
-        idToImprovements2[id].harborCount += amount;
-        uint256 existingImprovementTotal = ImprovementsContract1(
-            improvementsContract1Address
-        ).getImprovementCount(id);
-        uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyHarbor(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements2[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = harborCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements2[id].harborCount;
+    //     require((existingCount + amount) <= 1, "Cannot own more than 1");
+    //     idToImprovements2[id].harborCount += amount;
+    //     uint256 existingImprovementTotal = ImprovementsContract1(
+    //         improvementsContract1Address
+    //     ).getImprovementCount(id);
+    //     uint256 newImprovementTotal = existingImprovementTotal + amount;
+    //     ImprovementsContract1(improvementsContract1Address)
+    //         .updateImprovementCount(id, newImprovementTotal);
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
     function deleteHarbor(uint256 amount, uint256 id) public {
         require(
@@ -853,34 +1334,30 @@ contract ImprovementsContract2 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //Hospital
-    function buyHospital(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements2[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = hospitalCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements2[id].hospitalCount;
-        require((existingCount + amount) <= 1, "Cannot own more than 1");
-        idToImprovements2[id].hospitalCount += amount;
-        uint256 existingImprovementTotal = ImprovementsContract1(
-            improvementsContract1Address
-        ).getImprovementCount(id);
-        uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyHospital(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements2[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = hospitalCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements2[id].hospitalCount;
+    //     require((existingCount + amount) <= 1, "Cannot own more than 1");
+    //     idToImprovements2[id].hospitalCount += amount;
+    //     uint256 existingImprovementTotal = ImprovementsContract1(
+    //         improvementsContract1Address
+    //     ).getImprovementCount(id);
+    //     uint256 newImprovementTotal = existingImprovementTotal + amount;
+    //     ImprovementsContract1(improvementsContract1Address)
+    //         .updateImprovementCount(id, newImprovementTotal);
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
     function deleteHospital(uint256 amount, uint256 id) public {
         require(
@@ -894,34 +1371,30 @@ contract ImprovementsContract2 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //Intelligence Agency
-    function buyIntelligenceAgency(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements2[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = intelligenceAgencyCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements2[id].intelligenceAgencyCount;
-        require((existingCount + amount) <= 5, "Cannot own more than 5");
-        idToImprovements2[id].intelligenceAgencyCount += amount;
-        uint256 existingImprovementTotal = ImprovementsContract1(
-            improvementsContract1Address
-        ).getImprovementCount(id);
-        uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyIntelligenceAgency(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements2[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = intelligenceAgencyCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements2[id].intelligenceAgencyCount;
+    //     require((existingCount + amount) <= 5, "Cannot own more than 5");
+    //     idToImprovements2[id].intelligenceAgencyCount += amount;
+    //     uint256 existingImprovementTotal = ImprovementsContract1(
+    //         improvementsContract1Address
+    //     ).getImprovementCount(id);
+    //     uint256 newImprovementTotal = existingImprovementTotal + amount;
+    //     ImprovementsContract1(improvementsContract1Address)
+    //         .updateImprovementCount(id, newImprovementTotal);
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
     function deleteIntelligenceAgency(uint256 amount, uint256 id) public {
         require(
@@ -935,34 +1408,30 @@ contract ImprovementsContract2 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //Jail
-    function buyJail(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements2[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = jailCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements2[id].jailCount;
-        require((existingCount + amount) <= 5, "Cannot own more than 5");
-        idToImprovements2[id].jailCount += amount;
-        uint256 existingImprovementTotal = ImprovementsContract1(
-            improvementsContract1Address
-        ).getImprovementCount(id);
-        uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyJail(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements2[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = jailCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements2[id].jailCount;
+    //     require((existingCount + amount) <= 5, "Cannot own more than 5");
+    //     idToImprovements2[id].jailCount += amount;
+    //     uint256 existingImprovementTotal = ImprovementsContract1(
+    //         improvementsContract1Address
+    //     ).getImprovementCount(id);
+    //     uint256 newImprovementTotal = existingImprovementTotal + amount;
+    //     ImprovementsContract1(improvementsContract1Address)
+    //         .updateImprovementCount(id, newImprovementTotal);
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
     function deleteJail(uint256 amount, uint256 id) public {
         require(
@@ -976,34 +1445,30 @@ contract ImprovementsContract2 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //Labor Camp
-    function buyLaborCamp(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements2[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = laborCampCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements2[id].laborCampCount;
-        require((existingCount + amount) <= 5, "Cannot own more than 5");
-        idToImprovements2[id].laborCampCount += amount;
-        uint256 existingImprovementTotal = ImprovementsContract1(
-            improvementsContract1Address
-        ).getImprovementCount(id);
-        uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyLaborCamp(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements2[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = laborCampCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements2[id].laborCampCount;
+    //     require((existingCount + amount) <= 5, "Cannot own more than 5");
+    //     idToImprovements2[id].laborCampCount += amount;
+    //     uint256 existingImprovementTotal = ImprovementsContract1(
+    //         improvementsContract1Address
+    //     ).getImprovementCount(id);
+    //     uint256 newImprovementTotal = existingImprovementTotal + amount;
+    //     ImprovementsContract1(improvementsContract1Address)
+    //         .updateImprovementCount(id, newImprovementTotal);
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
     function deleteLaborCamp(uint256 amount, uint256 id) public {
         require(
@@ -1017,34 +1482,30 @@ contract ImprovementsContract2 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //Missile Defense
-    function buyMissileDefense(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements2[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = missileDefenseCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements2[id].missileDefenseCount;
-        require((existingCount + amount) <= 5, "Cannot own more than 5");
-        idToImprovements2[id].missileDefenseCount += amount;
-        uint256 existingImprovementTotal = ImprovementsContract1(
-            improvementsContract1Address
-        ).getImprovementCount(id);
-        uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyMissileDefense(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements2[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = missileDefenseCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements2[id].missileDefenseCount;
+    //     require((existingCount + amount) <= 5, "Cannot own more than 5");
+    //     idToImprovements2[id].missileDefenseCount += amount;
+    //     uint256 existingImprovementTotal = ImprovementsContract1(
+    //         improvementsContract1Address
+    //     ).getImprovementCount(id);
+    //     uint256 newImprovementTotal = existingImprovementTotal + amount;
+    //     ImprovementsContract1(improvementsContract1Address)
+    //         .updateImprovementCount(id, newImprovementTotal);
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
     function deleteMissileDefense(uint256 amount, uint256 id) public {
         require(
@@ -1058,34 +1519,30 @@ contract ImprovementsContract2 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //Munitions Factory
-    function buyMunitionsFactory(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements2[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = munitionsFactoryCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements2[id].munitionsFactorCount;
-        require((existingCount + amount) <= 5, "Cannot own more than 5");
-        idToImprovements2[id].munitionsFactorCount += amount;
-        uint256 existingImprovementTotal = ImprovementsContract1(
-            improvementsContract1Address
-        ).getImprovementCount(id);
-        uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyMunitionsFactory(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements2[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = munitionsFactoryCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements2[id].munitionsFactorCount;
+    //     require((existingCount + amount) <= 5, "Cannot own more than 5");
+    //     idToImprovements2[id].munitionsFactorCount += amount;
+    //     uint256 existingImprovementTotal = ImprovementsContract1(
+    //         improvementsContract1Address
+    //     ).getImprovementCount(id);
+    //     uint256 newImprovementTotal = existingImprovementTotal + amount;
+    //     ImprovementsContract1(improvementsContract1Address)
+    //         .updateImprovementCount(id, newImprovementTotal);
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
     function deleteMunitionsFactory(uint256 amount, uint256 id) public {
         require(
@@ -1099,34 +1556,30 @@ contract ImprovementsContract2 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //Naval Academy
-    function buyNavalAcademy(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements2[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = navalAcademyCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements2[id].navalAcademyCount;
-        require((existingCount + amount) <= 2, "Cannot own more than 2");
-        idToImprovements2[id].navalAcademyCount += amount;
-        uint256 existingImprovementTotal = ImprovementsContract1(
-            improvementsContract1Address
-        ).getImprovementCount(id);
-        uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyNavalAcademy(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements2[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = navalAcademyCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements2[id].navalAcademyCount;
+    //     require((existingCount + amount) <= 2, "Cannot own more than 2");
+    //     idToImprovements2[id].navalAcademyCount += amount;
+    //     uint256 existingImprovementTotal = ImprovementsContract1(
+    //         improvementsContract1Address
+    //     ).getImprovementCount(id);
+    //     uint256 newImprovementTotal = existingImprovementTotal + amount;
+    //     ImprovementsContract1(improvementsContract1Address)
+    //         .updateImprovementCount(id, newImprovementTotal);
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
     function deleteNavalAcademy(uint256 amount, uint256 id) public {
         require(
@@ -1140,35 +1593,31 @@ contract ImprovementsContract2 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //Naval Construction Yard
-    function buyNavalConstructionYard(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerImprovements2[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = navalConstructionYardCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "Insufficient balance");
-        uint256 existingCount = idToImprovements2[id]
-            .navalConstructionYardCount;
-        require((existingCount + amount) <= 3, "Cannot own more than 3");
-        idToImprovements2[id].navalConstructionYardCount += amount;
-        uint256 existingImprovementTotal = ImprovementsContract1(
-            improvementsContract1Address
-        ).getImprovementCount(id);
-        uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
+    // function buyNavalConstructionYard(uint256 amount, uint256 id) public {
+    //     require(
+    //         idToOwnerImprovements2[id] == msg.sender,
+    //         "You are not the nation ruler"
+    //     );
+    //     uint256 purchasePrice = navalConstructionYardCost * amount;
+    //     uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    //     require(balance >= purchasePrice, "Insufficient balance");
+    //     uint256 existingCount = idToImprovements2[id]
+    //         .navalConstructionYardCount;
+    //     require((existingCount + amount) <= 3, "Cannot own more than 3");
+    //     idToImprovements2[id].navalConstructionYardCount += amount;
+    //     uint256 existingImprovementTotal = ImprovementsContract1(
+    //         improvementsContract1Address
+    //     ).getImprovementCount(id);
+    //     uint256 newImprovementTotal = existingImprovementTotal + amount;
+    //     ImprovementsContract1(improvementsContract1Address)
+    //         .updateImprovementCount(id, newImprovementTotal);
+    //     TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    // }
 
     function deleteNavalConstructionYard(uint256 amount, uint256 id) public {
         require(
@@ -1183,10 +1632,8 @@ contract ImprovementsContract2 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 }
 
@@ -1383,10 +1830,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
@@ -1402,10 +1847,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //Police Headquarters
@@ -1424,10 +1867,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
@@ -1443,10 +1884,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //Prison
@@ -1465,10 +1904,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
@@ -1484,10 +1921,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //Radiation Containment Chamber
@@ -1507,10 +1942,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
@@ -1529,10 +1962,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //Red Light District
@@ -1551,10 +1982,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
@@ -1570,10 +1999,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //Rehabilitation Facility
@@ -1593,10 +2020,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
@@ -1613,10 +2038,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //Sattelite
@@ -1635,10 +2058,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
@@ -1654,10 +2075,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //School
@@ -1676,10 +2095,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
@@ -1695,10 +2112,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //Shipyard
@@ -1717,10 +2132,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
@@ -1736,10 +2149,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //Stadium
@@ -1758,10 +2169,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
@@ -1777,10 +2186,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 
     //University
@@ -1799,10 +2206,8 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal + amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
@@ -1818,9 +2223,7 @@ contract ImprovementsContract3 is Ownable {
             improvementsContract1Address
         ).getImprovementCount(id);
         uint256 newImprovementTotal = existingImprovementTotal -= amount;
-        ImprovementsContract1(improvementsContract1Address).updateImprovementCount(
-            id,
-            newImprovementTotal
-        );
+        ImprovementsContract1(improvementsContract1Address)
+            .updateImprovementCount(id, newImprovementTotal);
     }
 }

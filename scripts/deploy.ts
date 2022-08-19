@@ -35,17 +35,17 @@ async function main() {
     const Resources = await hre.ethers.getContractFactory("ResourcesContract")
     const resources = await Resources.deploy()
     await resources.deployed()
-    console.log(`Market deployed to ${resources.address}`) 
+    console.log(`Resources deployed to ${resources.address}`) 
 
     const Improvements = await hre.ethers.getContractFactory("ImprovementsContract")
     const improvements = await Improvements.deploy()
     await improvements.deployed()
-    console.log(`Market deployed to ${improvements.address}`) 
+    console.log(`Improvements deployed to ${improvements.address}`) 
 
     const Wonders = await hre.ethers.getContractFactory("WondersContract")
     const wonders = await Wonders.deploy()
     await wonders.deployed()
-    console.log(`Market deployed to ${wonders.address}`) 
+    console.log(`Wonders deployed to ${wonders.address}`) 
 
     const Military = await hre.ethers.getContractFactory("MilitaryContract")
     const military = await Military.deploy()

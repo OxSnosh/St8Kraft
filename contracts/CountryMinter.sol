@@ -33,7 +33,7 @@ contract CountryMinter is ERC721, Ownable {
     address public navy;
     address public fighters;
     address public bombers;
-    uint256 public seedMoney = 1000;
+    uint256 public seedMoney = 2000000;
 
     mapping(uint256 => address) public idToOwner;
     mapping(address => uint256) public ownerCountryCount;
