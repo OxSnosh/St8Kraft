@@ -26,6 +26,10 @@ contract CountryMinter is ERC721, Ownable {
     address public improvements1;
     address public improvements2;
     address public improvements3;
+    address public wonders1;
+    address public wonders2;
+    address public wonders3;
+    address public wonders4;
     address public wonders;
     address public military;
     address public forces;
@@ -50,34 +54,40 @@ contract CountryMinter is ERC721, Ownable {
         address _treasury,
         address _infrastructure,
         address _resources,
-        address _improvements1,
-        address _improvements2,
-        address _improvements3,
-        address _wonders
+        address _military,
+        address _forces,
+        address _navy,
+        address _fighters,
+        address _bombers
     ) ERC721("MetaNations", "MNS") {
         warBucks = _warBucks;
         countryParameters = _countryParameters;
         treasury = _treasury;
         infrastructure = _infrastructure;
         resources = _resources;
-        improvements1 = _improvements1;
-        improvements2 = _improvements2;
-        improvements3 = _improvements3;
-        wonders = _wonders;
-    }
-
-    function constructorContinued(
-        address _military,
-        address _forces,
-        address _navy,
-        address _fighters,
-        address _bombers
-    ) public onlyOwner {
         military = _military;
         forces = _forces;
         navy = _navy;
         fighters = _fighters;
         bombers = _bombers;
+    }
+
+    function constructorContinued(
+        address _improvements1,
+        address _improvements2,
+        address _improvements3,
+        address _wonders1,
+        address _wonders2,
+        address _wonders3,
+        address _wonders4
+    ) public onlyOwner {
+        improvements1 = _improvements1;
+        improvements2 = _improvements2;
+        improvements3 = _improvements3;
+        wonders1 = _wonders1;
+        wonders2 = _wonders2;
+        wonders3 = _wonders3;
+        wonders4 = _wonders4;
     }
 
     function generateCountry(
@@ -102,7 +112,10 @@ contract CountryMinter is ERC721, Ownable {
         ImprovementsContract1(improvements1).generateImprovements();
         ImprovementsContract2(improvements2).generateImprovements();
         ImprovementsContract3(improvements3).generateImprovements();
-        WondersContract(wonders).generateWonders();
+        WondersContract1(wonders1).generateWonders1();
+        WondersContract2(wonders2).generateWonders2();
+        WondersContract3(wonders3).generateWonders3();
+        WondersContract4(wonders4).generateWonders4();
         TreasuryContract(treasury).generateTreasury();
         MilitaryContract(military).generateMilitary();
         ForcesContract(forces).generateForces();

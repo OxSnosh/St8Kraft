@@ -4,8 +4,8 @@ pragma solidity 0.8.7;
 import "./Treasury.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract WondersContract is Ownable {
-    uint256 private wondersId;
+contract WondersContract1 is Ownable {
+    uint256 private wondersId1;
     address public treasuryAddress;
     uint256 public agricultureDevelopmentCost = 30000000;
     uint256 public antiAirDefenseNetworkCost = 50000000;
@@ -18,37 +18,6 @@ contract WondersContract is Ownable {
     uint256 public foreignAirForceBaseCost = 35000000;
     uint256 public foreignArmyBaseCost = 200000000;
     uint256 public foreignNavalBaseCost = 200000000;
-    uint256 public greatMonumentCost = 35000000;
-    uint256 public greatTempleCost = 35000000;
-    uint256 public greatUniversityCost = 35000000;
-    uint256 public hiddenNuclearMissileSiloCost = 30000000;
-    uint256 public interceptorMissileSystemCost = 50000000;
-    uint256 public internetCost = 35000000;
-    uint256 public interstateSystemCost = 45000000;
-    uint256 public manhattanProjectCost = 100000000;
-    uint256 public marsBaseCost = 100000000;
-    uint256 public marsColonyCost = 100000000;
-    uint256 public marsMineCost = 100000000;
-    uint256 public miningIndustryConsortiumCost = 25000000;
-    uint256 public moonBaseCost = 50000000;
-    uint256 public moonColonyCost = 50000000;
-    uint256 public moonMineCost = 50000000;
-    uint256 public movieIndustryCost = 26000000;
-    uint256 public nationalCemetaryCost = 150000000;
-    uint256 public nationalEnvironmentOfficeCost = 100000000;
-    uint256 public nationalResearchLabCost = 35000000;
-    uint256 public nationalWarMemorialCost = 27000000;
-    uint256 public nuclearPowerPlantCost = 75000000;
-    uint256 public pentagonCost = 30000000;
-    uint256 public politicalLobbyistsCost = 50000000;
-    uint256 public scientificDevelopmentCenterCost = 150000000;
-    uint256 public socialSecuritySystemCost = 40000000;
-    uint256 public spaceProgramCost = 30000000;
-    uint256 public stockMarketCost = 30000000;
-    uint256 public strategicDefenseInitiativeCost = 75000000;
-    uint256 public superiorLogisticalSupportCost = 80000000;
-    uint256 public universalHealthcareCost = 100000000;
-    uint256 public weaponsResearchCenterCost = 150000000;
 
     struct Wonders1 {
         uint256 wonderCount;
@@ -121,6 +90,103 @@ contract WondersContract is Ownable {
         //Requires 20,000 infrastructure.
         bool foreignNavalBase;
     }
+
+    mapping(uint256 => Wonders1) public idToWonders1;
+    mapping(uint256 => address) public idToOwnerWonders1;
+
+    constructor(address _treasuryAddress) {
+        treasuryAddress = _treasuryAddress;
+    }
+
+    function generateWonders1() public {
+        Wonders1 memory newWonders1 = Wonders1(
+            0,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+        );
+        idToWonders1[wondersId1] = newWonders1;
+        idToOwnerWonders1[wondersId1] = msg.sender;
+        wondersId1++;
+    }
+
+    function updateAgricultureDevelopmentCost(uint256 newPrice)
+        public
+        onlyOwner
+    {
+        agricultureDevelopmentCost = newPrice;
+    }
+
+    function updateAntiAirDefenseNetworkCost(uint256 newPrice)
+        public
+        onlyOwner
+    {
+        antiAirDefenseNetworkCost = newPrice;
+    }
+
+    function updateCentralIntelligenceAgencyCost(uint256 newPrice)
+        public
+        onlyOwner
+    {
+        centralIntelligenceAgencyCost = newPrice;
+    }
+
+    function updateDisasterReliefAgencyCost(uint256 newPrice) public onlyOwner {
+        disasterReliefAgencyCost = newPrice;
+    }
+
+    function updateEmpWeaponizationCost(uint256 newPrice) public onlyOwner {
+        empWeaponizationCost = newPrice;
+    }
+
+    function updateFalloutShelterSystemCost(uint256 newPrice) public onlyOwner {
+        falloutShelterSystemCost = newPrice;
+    }
+
+    function updateFederalAidCommissionCost(uint256 newPrice) public onlyOwner {
+        federalAidCommissionCost = newPrice;
+    }
+
+    function updateFederalReserveCost(uint256 newPrice) public onlyOwner {
+        federalReserveCost = newPrice;
+    }
+
+    function updateForeignAirForceBaseCost(uint256 newPrice) public onlyOwner {
+        foreignAirForceBaseCost = newPrice;
+    }
+
+    function updateForeignArmyBaseCost(uint256 newPrice) public onlyOwner {
+        foreignArmyBaseCost = newPrice;
+    }
+
+    function updateForeignNavalBaseCost(uint256 newPrice) public onlyOwner {
+        foreignNavalBaseCost = newPrice;
+    }
+}
+
+contract WondersContract2 is Ownable {
+    uint256 private wondersId2;
+    address public treasuryAddress;
+    uint256 public greatMonumentCost = 35000000;
+    uint256 public greatTempleCost = 35000000;
+    uint256 public greatUniversityCost = 35000000;
+    uint256 public hiddenNuclearMissileSiloCost = 30000000;
+    uint256 public interceptorMissileSystemCost = 50000000;
+    uint256 public internetCost = 35000000;
+    uint256 public interstateSystemCost = 45000000;
+    uint256 public manhattanProjectCost = 100000000;
+    uint256 public marsBaseCost = 100000000;
+    uint256 public marsColonyCost = 100000000;
+    uint256 public marsMineCost = 100000000;
+    uint256 public miningIndustryConsortiumCost = 25000000;
 
     struct Wonders2 {
         //Great Monument -
@@ -198,6 +264,103 @@ contract WondersContract is Ownable {
         //Requires 5,000 infrastructure, 3,000 land purchased, 1,000 technology.
         bool miningIndustryConsortium;
     }
+
+    mapping(uint256 => Wonders2) public idToWonders2;
+    mapping(uint256 => address) public idToOwnerWonders2;
+
+    function generateWonders2() public {
+        Wonders2 memory newWonders2 = Wonders2(
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+        );
+        idToWonders2[wondersId2] = newWonders2;
+        idToOwnerWonders2[wondersId2] = msg.sender;
+        wondersId2++;
+    }
+
+    function updateGreatMonumentCost(uint256 newPrice) public onlyOwner {
+        greatMonumentCost = newPrice;
+    }
+
+    function updategreatTempleCost(uint256 newPrice) public onlyOwner {
+        greatTempleCost = newPrice;
+    }
+
+    function updateGreatUniversityCost(uint256 newPrice) public onlyOwner {
+        greatUniversityCost = newPrice;
+    }
+
+    function updateHiddenNuclearMissileSiloCost(uint256 newPrice)
+        public
+        onlyOwner
+    {
+        hiddenNuclearMissileSiloCost = newPrice;
+    }
+
+    function updateInterceptorMissileSystemCost(uint256 newPrice)
+        public
+        onlyOwner
+    {
+        interceptorMissileSystemCost = newPrice;
+    }
+
+    function updateInternetCost(uint256 newPrice) public onlyOwner {
+        internetCost = newPrice;
+    }
+
+    function updateInterstateSystemCost(uint256 newPrice) public onlyOwner {
+        interstateSystemCost = newPrice;
+    }
+
+    function updateManhattanProjectCost(uint256 newPrice) public onlyOwner {
+        manhattanProjectCost = newPrice;
+    }
+
+    function updateMarsBaseCost(uint256 newPrice) public onlyOwner {
+        marsBaseCost = newPrice;
+    }
+
+    function updateMarsColonyCost(uint256 newPrice) public onlyOwner {
+        marsColonyCost = newPrice;
+    }
+
+    function updateMarsMineCost(uint256 newPrice) public onlyOwner {
+        marsMineCost = newPrice;
+    }
+
+    function updateMiningIndustryConsortiumCost(uint256 newPrice)
+        public
+        onlyOwner
+    {
+        miningIndustryConsortiumCost = newPrice;
+    }
+}
+
+contract WondersContract3 is Ownable {
+    uint256 private wondersId3;
+    address public treasuryAddress;
+    uint256 public moonBaseCost = 50000000;
+    uint256 public moonColonyCost = 50000000;
+    uint256 public moonMineCost = 50000000;
+    uint256 public movieIndustryCost = 26000000;
+    uint256 public nationalCemetaryCost = 150000000;
+    uint256 public nationalEnvironmentOfficeCost = 100000000;
+    uint256 public nationalResearchLabCost = 35000000;
+    uint256 public nationalWarMemorialCost = 27000000;
+    uint256 public nuclearPowerPlantCost = 75000000;
+    uint256 public pentagonCost = 30000000;
+    uint256 public politicalLobbyistsCost = 50000000;
+    uint256 public scientificDevelopmentCenterCost = 150000000;
 
     struct Wonders3 {
         //Moon Base -
@@ -285,6 +448,95 @@ contract WondersContract is Ownable {
         bool scientificDevelopmentCenter;
     }
 
+    mapping(uint256 => Wonders3) public idToWonders3;
+    mapping(uint256 => address) public idToOwnerWonders3;
+
+    function generateWonders3() public {
+        Wonders3 memory newWonders3 = Wonders3(
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+        );
+        idToWonders3[wondersId3] = newWonders3;
+        idToOwnerWonders3[wondersId3] = msg.sender;
+        wondersId3++;
+    }
+
+    function updateMoonBaseCost(uint256 newPrice) public onlyOwner {
+        moonBaseCost = newPrice;
+    }
+
+    function updateMoonColonyCost(uint256 newPrice) public onlyOwner {
+        moonColonyCost = newPrice;
+    }
+
+    function updateMoonMineCost(uint256 newPrice) public onlyOwner {
+        moonMineCost = newPrice;
+    }
+
+    function updateMovieIndustryCost(uint256 newPrice) public onlyOwner {
+        movieIndustryCost = newPrice;
+    }
+
+    function updateNationalCemetaryCost(uint256 newPrice) public onlyOwner {
+        nationalCemetaryCost = newPrice;
+    }
+
+    function updateNationalEnvironmentOfficeCost(uint256 newPrice)
+        public
+        onlyOwner
+    {
+        nationalEnvironmentOfficeCost = newPrice;
+    }
+
+    function updateNationalResearchLabCost(uint256 newPrice) public onlyOwner {
+        nationalResearchLabCost = newPrice;
+    }
+
+    function updateNationalWarMemorialCost(uint256 newPrice) public onlyOwner {
+        nationalWarMemorialCost = newPrice;
+    }
+
+    function updateNuclearPowerPlantCost(uint256 newPrice) public onlyOwner {
+        nuclearPowerPlantCost = newPrice;
+    }
+
+    function updatePentagonCost(uint256 newPrice) public onlyOwner {
+        pentagonCost = newPrice;
+    }
+
+    function updatePoliticalLobbyistsCost(uint256 newPrice) public onlyOwner {
+        politicalLobbyistsCost = newPrice;
+    }
+
+    function updateScientificDevelopmentCenterCost(uint256 newPrice)
+        public
+        onlyOwner
+    {
+        scientificDevelopmentCenterCost = newPrice;
+    }
+}
+
+contract WondersContract4 is Ownable {
+    uint256 private wondersId4;
+    address public treasuryAddress;
+    uint256 public socialSecuritySystemCost = 40000000;
+    uint256 public spaceProgramCost = 30000000;
+    uint256 public stockMarketCost = 30000000;
+    uint256 public strategicDefenseInitiativeCost = 75000000;
+    uint256 public superiorLogisticalSupportCost = 80000000;
+    uint256 public universalHealthcareCost = 100000000;
+    uint256 public weaponsResearchCenterCost = 150000000;
+
     struct Wonders4 {
         //Social Security System -
         //$40,000,000-
@@ -330,59 +582,10 @@ contract WondersContract is Ownable {
         bool weaponsResearchCenter;
     }
 
-    mapping(uint256 => Wonders1) public idToWonders1;
-    mapping(uint256 => Wonders2) public idToWonders2;
-    mapping(uint256 => Wonders3) public idToWonders3;
     mapping(uint256 => Wonders4) public idToWonders4;
-    mapping(uint256 => address) public idToOwnerWonders;
+    mapping(uint256 => address) public idToOwnerWonders4;
 
-    constructor(address _treasuryAddress) {
-        treasuryAddress = _treasuryAddress;
-    }
-
-    function generateWonders() public {
-        Wonders1 memory newWonders1 = Wonders1(
-            0,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
-        );
-        Wonders2 memory newWonders2 = Wonders2(
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
-        );
-        Wonders3 memory newWonders3 = Wonders3(
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
-        );
+    function generateWonders4() public {
         Wonders4 memory newWonders4 = Wonders4(
             false,
             false,
@@ -392,152 +595,9 @@ contract WondersContract is Ownable {
             false,
             false
         );
-        idToWonders1[wondersId] = newWonders1;
-        idToWonders2[wondersId] = newWonders2;
-        idToWonders3[wondersId] = newWonders3;
-        idToWonders4[wondersId] = newWonders4;
-        idToOwnerWonders[wondersId] = msg.sender;
-        wondersId++;
-    }
-
-    function updateAgricultureDevelopmentCost(uint256 newPrice) public onlyOwner {
-        agricultureDevelopmentCost = newPrice;
-    }
-
-    function updateAntiAirDefenseNetworkCost(uint256 newPrice) public onlyOwner {
-        antiAirDefenseNetworkCost = newPrice;
-    }
-
-    function updateCentralIntelligenceAgencyCost(uint256 newPrice) public onlyOwner {
-        centralIntelligenceAgencyCost = newPrice;
-    }
-
-    function updateDisasterReliefAgencyCost(uint256 newPrice) public onlyOwner {
-        disasterReliefAgencyCost = newPrice;
-    }
-
-    function updateEmpWeaponizationCost(uint256 newPrice) public onlyOwner {
-        empWeaponizationCost = newPrice;
-    }
-
-    function updateFalloutShelterSystemCost(uint256 newPrice) public onlyOwner {
-        falloutShelterSystemCost = newPrice;
-    }
-
-    function updateFederalAidCommissionCost(uint256 newPrice) public onlyOwner {
-        federalAidCommissionCost = newPrice;
-    }
-
-    function updateFederalReserveCost(uint256 newPrice) public onlyOwner {
-        federalReserveCost = newPrice;
-    }
-
-    function updateForeignAirForceBaseCost(uint256 newPrice) public onlyOwner {
-        foreignAirForceBaseCost = newPrice;
-    }
-
-    function updateForeignArmyBaseCost(uint256 newPrice) public onlyOwner {
-        foreignArmyBaseCost = newPrice;
-    }
-
-    function updateForeignNavalBaseCost(uint256 newPrice) public onlyOwner {
-        foreignNavalBaseCost = newPrice;
-    }
-
-    function updateGreatMonumentCost(uint256 newPrice) public onlyOwner {
-        greatMonumentCost = newPrice;
-    }
-
-    function updategreatTempleCost(uint256 newPrice) public onlyOwner {
-        greatTempleCost = newPrice;
-    }
-
-    function updateGreatUniversityCost(uint256 newPrice) public onlyOwner {
-        greatUniversityCost = newPrice;
-    }
-
-    function updateHiddenNuclearMissileSiloCost(uint256 newPrice) public onlyOwner {
-        hiddenNuclearMissileSiloCost = newPrice;
-    }
-
-    function updateInterceptorMissileSystemCost(uint256 newPrice) public onlyOwner {
-        interceptorMissileSystemCost = newPrice;
-    }
-
-    function updateInternetCost(uint256 newPrice) public onlyOwner {
-        internetCost = newPrice;
-    }
-
-    function updateInterstateSystemCost(uint256 newPrice) public onlyOwner {
-        interstateSystemCost = newPrice;
-    }
-
-    function updateManhattanProjectCost(uint256 newPrice) public onlyOwner {
-        manhattanProjectCost = newPrice;
-    }
-
-    function updateMarsBaseCost(uint256 newPrice) public onlyOwner {
-        marsBaseCost = newPrice;
-    }
-
-    function updateMarsColonyCost(uint256 newPrice) public onlyOwner {
-        marsColonyCost = newPrice;
-    }
-
-    function updateMarsMineCost(uint256 newPrice) public onlyOwner {
-        marsMineCost = newPrice;
-    }
-
-    function updateMiningIndustryConsortiumCost(uint256 newPrice) public onlyOwner {
-        miningIndustryConsortiumCost = newPrice;
-    }
-
-    function updateMoonBaseCost(uint256 newPrice) public onlyOwner {
-        moonBaseCost = newPrice;
-    }
-
-    function updateMoonColonyCost(uint256 newPrice) public onlyOwner {
-        moonColonyCost = newPrice;
-    }
-
-    function updateMoonMineCost(uint256 newPrice) public onlyOwner {
-        moonMineCost = newPrice;
-    }
-
-    function updateMovieIndustryCost(uint256 newPrice) public onlyOwner {
-        movieIndustryCost = newPrice;
-    }
-
-    function updateNationalCemetaryCost(uint256 newPrice) public onlyOwner {
-        nationalCemetaryCost = newPrice;
-    }
-
-    function updateNationalEnvironmentOfficeCost(uint256 newPrice) public onlyOwner {
-        nationalEnvironmentOfficeCost = newPrice;
-    }
-
-    function updateNationalResearchLabCost(uint256 newPrice) public onlyOwner {
-        nationalResearchLabCost = newPrice;
-    }
-
-    function updateNationalWarMemorialCost(uint256 newPrice) public onlyOwner {
-        nationalWarMemorialCost = newPrice;
-    }
-
-    function updateNuclearPowerPlantCost(uint256 newPrice) public onlyOwner {
-        nuclearPowerPlantCost = newPrice;
-    }
-
-    function updatePentagonCost(uint256 newPrice) public onlyOwner {
-        pentagonCost = newPrice;
-    }
-
-    function updatePoliticalLobbyistsCost(uint256 newPrice) public onlyOwner {
-        politicalLobbyistsCost = newPrice;
-    }
-
-    function updateScientificDevelopmentCenterCost(uint256 newPrice) public onlyOwner {
-        scientificDevelopmentCenterCost = newPrice;
+        idToWonders4[wondersId4] = newWonders4;
+        idToOwnerWonders4[wondersId4] = msg.sender;
+        wondersId4++;
     }
 
     function updateSocialSecuritySystemCost(uint256 newPrice) public onlyOwner {
@@ -552,11 +612,17 @@ contract WondersContract is Ownable {
         stockMarketCost = newPrice;
     }
 
-    function updateStrategicDefenseInitiativeCost(uint256 newPrice) public onlyOwner {
+    function updateStrategicDefenseInitiativeCost(uint256 newPrice)
+        public
+        onlyOwner
+    {
         strategicDefenseInitiativeCost = newPrice;
     }
 
-    function updateSuperiorLogisticalSupportCost(uint256 newPrice) public onlyOwner {
+    function updateSuperiorLogisticalSupportCost(uint256 newPrice)
+        public
+        onlyOwner
+    {
         superiorLogisticalSupportCost = newPrice;
     }
 
@@ -564,8 +630,10 @@ contract WondersContract is Ownable {
         universalHealthcareCost = newPrice;
     }
 
-    function updateWeaponsResearchCenterCost(uint256 newPrice) public onlyOwner {
+    function updateWeaponsResearchCenterCost(uint256 newPrice)
+        public
+        onlyOwner
+    {
         weaponsResearchCenterCost = newPrice;
     }
-
 }
