@@ -364,12 +364,12 @@ contract WondersContract1 is Ownable {
         }
     }
 
-    function deleteImprovement1(uint256 countryId, uint256 wonderId) public {
+    function deleteWonder1(uint256 countryId, uint256 wonderId) public {
         require(
             idToOwnerWonders1[countryId] == msg.sender,
             "You are not the nation ruler"
         );
-        require(wonderId <= 11, "Invalid improvement ID");
+        require(wonderId <= 11, "Invalid wonder ID");
         if (wonderId == 1) {
             bool existingWonder = idToWonders1[countryId]
                 .agricultureDevelopmentProgram;
@@ -664,8 +664,12 @@ contract WondersContract2 is Ownable {
                 greatUniversityCost
             );
         } else if (wonderId == 4) {
-            require(balance >= hiddenNuclearMissileSiloCost, "Insufficient balance");
-            bool existingWonder = idToWonders2[countryId].hiddenNuclearMissileSilo;
+            require(
+                balance >= hiddenNuclearMissileSiloCost,
+                "Insufficient balance"
+            );
+            bool existingWonder = idToWonders2[countryId]
+                .hiddenNuclearMissileSilo;
             require(existingWonder = false, "Already owned");
             idToWonders2[countryId].hiddenNuclearMissileSilo = true;
             WondersContract1(wonderContract1Address).addWonderCount(countryId);
@@ -674,8 +678,12 @@ contract WondersContract2 is Ownable {
                 hiddenNuclearMissileSiloCost
             );
         } else if (wonderId == 5) {
-            require(balance >= interceptorMissileSystemCost, "Insufficient balance");
-            bool existingWonder = idToWonders2[countryId].interceptorMissileSystem;
+            require(
+                balance >= interceptorMissileSystemCost,
+                "Insufficient balance"
+            );
+            bool existingWonder = idToWonders2[countryId]
+                .interceptorMissileSystem;
             require(existingWonder = false, "Already owned");
             idToWonders2[countryId].interceptorMissileSystem = true;
             WondersContract1(wonderContract1Address).addWonderCount(countryId);
@@ -744,8 +752,12 @@ contract WondersContract2 is Ownable {
                 marsMineCost
             );
         } else {
-            require(balance >= miningIndustryConsortiumCost, "Insufficient balance");
-            bool existingWonder = idToWonders2[countryId].miningIndustryConsortium;
+            require(
+                balance >= miningIndustryConsortiumCost,
+                "Insufficient balance"
+            );
+            bool existingWonder = idToWonders2[countryId]
+                .miningIndustryConsortium;
             require(existingWonder = false, "Already owned");
             idToWonders2[countryId].miningIndustryConsortium = true;
             WondersContract1(wonderContract1Address).addWonderCount(countryId);
@@ -756,74 +768,99 @@ contract WondersContract2 is Ownable {
         }
     }
 
-    function deleteImprovement2(uint256 countryId, uint256 wonderId) public {
+    function deleteWonder2(uint256 countryId, uint256 wonderId) public {
         require(
             idToOwnerWonders2[countryId] == msg.sender,
             "You are not the nation ruler"
         );
-        require(wonderId <= 12, "Invalid improvement ID");
+        require(wonderId <= 12, "Invalid wonder ID");
         if (wonderId == 1) {
-            bool existingWonder = idToWonders2[countryId]
-                .greatMonument;
+            bool existingWonder = idToWonders2[countryId].greatMonument;
             require(existingWonder = true, "No wonder to delete");
             idToWonders2[countryId].greatMonument = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 2) {
             bool existingWonder = idToWonders2[countryId].greatTemple;
             require(existingWonder = true, "No wonder to delete");
             idToWonders2[countryId].greatTemple = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 3) {
-            bool existingWonder = idToWonders2[countryId]
-                .greatUniversity;
+            bool existingWonder = idToWonders2[countryId].greatUniversity;
             require(existingWonder = true, "No wonder to delete");
             idToWonders2[countryId].greatUniversity = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 4) {
-            bool existingWonder = idToWonders2[countryId].hiddenNuclearMissileSilo;
+            bool existingWonder = idToWonders2[countryId]
+                .hiddenNuclearMissileSilo;
             require(existingWonder = true, "No wonder to delete");
             idToWonders2[countryId].hiddenNuclearMissileSilo = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 5) {
-            bool existingWonder = idToWonders2[countryId].interceptorMissileSystem;
+            bool existingWonder = idToWonders2[countryId]
+                .interceptorMissileSystem;
             require(existingWonder = true, "No wonder to delete");
             idToWonders2[countryId].interceptorMissileSystem = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 6) {
             bool existingWonder = idToWonders2[countryId].internet;
             require(existingWonder = true, "No wonder to delete");
             idToWonders2[countryId].internet = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 7) {
             bool existingWonder = idToWonders2[countryId].interstateSystem;
             require(existingWonder = true, "No wonder to delete");
             idToWonders2[countryId].interstateSystem = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 8) {
             bool existingWonder = idToWonders2[countryId].manhattanProject;
             require(existingWonder = true, "No wonder to delete");
             idToWonders2[countryId].manhattanProject = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 9) {
             bool existingWonder = idToWonders2[countryId].marsBase;
             require(existingWonder = true, "No wonder to delete");
             idToWonders2[countryId].marsBase = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 10) {
             bool existingWonder = idToWonders2[countryId].marsColony;
             require(existingWonder = true, "No wonder to delete");
             idToWonders2[countryId].marsColony = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 11) {
             bool existingWonder = idToWonders2[countryId].marsMine;
             require(existingWonder = true, "No wonder to delete");
             idToWonders2[countryId].marsMine = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else {
-            bool existingWonder = idToWonders2[countryId].miningIndustryConsortium;
+            bool existingWonder = idToWonders2[countryId]
+                .miningIndustryConsortium;
             require(existingWonder = true, "No wonder to delete");
             idToWonders2[countryId].miningIndustryConsortium = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         }
     }
 }
@@ -1087,8 +1124,12 @@ contract WondersContract3 is Ownable {
                 nationalCemetaryCost
             );
         } else if (wonderId == 6) {
-            require(balance >= nationalEnvironmentOfficeCost, "Insufficient balance");
-            bool existingWonder = idToWonders3[countryId].nationalEnvironmentOffice;
+            require(
+                balance >= nationalEnvironmentOfficeCost,
+                "Insufficient balance"
+            );
+            bool existingWonder = idToWonders3[countryId]
+                .nationalEnvironmentOffice;
             require(existingWonder = false, "Already owned");
             idToWonders3[countryId].nationalEnvironmentOffice = true;
             WondersContract1(wonderContract1Address).addWonderCount(countryId);
@@ -1147,8 +1188,12 @@ contract WondersContract3 is Ownable {
                 politicalLobbyistsCost
             );
         } else {
-            require(balance >= scientificDevelopmentCenterCost, "Insufficient balance");
-            bool existingWonder = idToWonders3[countryId].scientificDevelopmentCenter;
+            require(
+                balance >= scientificDevelopmentCenterCost,
+                "Insufficient balance"
+            );
+            bool existingWonder = idToWonders3[countryId]
+                .scientificDevelopmentCenter;
             require(existingWonder = false, "Already owned");
             idToWonders3[countryId].scientificDevelopmentCenter = true;
             WondersContract1(wonderContract1Address).addWonderCount(countryId);
@@ -1159,74 +1204,98 @@ contract WondersContract3 is Ownable {
         }
     }
 
-    function deleteImprovement3(uint256 countryId, uint256 wonderId) public {
+    function deleteWonder3(uint256 countryId, uint256 wonderId) public {
         require(
             idToOwnerWonders3[countryId] == msg.sender,
             "You are not the nation ruler"
         );
-        require(wonderId <= 12, "Invalid improvement ID");
+        require(wonderId <= 12, "Invalid wonder ID");
         if (wonderId == 1) {
-            bool existingWonder = idToWonders3[countryId]
-                .moonBase;
+            bool existingWonder = idToWonders3[countryId].moonBase;
             require(existingWonder = true, "No wonder to delete");
             idToWonders3[countryId].moonBase = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 2) {
             bool existingWonder = idToWonders3[countryId].moonColony;
             require(existingWonder = true, "No wonder to delete");
             idToWonders3[countryId].moonColony = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 3) {
-            bool existingWonder = idToWonders3[countryId]
-                .moonMine;
+            bool existingWonder = idToWonders3[countryId].moonMine;
             require(existingWonder = true, "No wonder to delete");
             idToWonders3[countryId].moonMine = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 4) {
             bool existingWonder = idToWonders3[countryId].movieIndustry;
             require(existingWonder = true, "No wonder to delete");
             idToWonders3[countryId].movieIndustry = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 5) {
             bool existingWonder = idToWonders3[countryId].nationalCemetary;
             require(existingWonder = true, "No wonder to delete");
             idToWonders3[countryId].nationalCemetary = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 6) {
-            bool existingWonder = idToWonders3[countryId].nationalEnvironmentOffice;
+            bool existingWonder = idToWonders3[countryId]
+                .nationalEnvironmentOffice;
             require(existingWonder = true, "No wonder to delete");
             idToWonders3[countryId].nationalEnvironmentOffice = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 7) {
             bool existingWonder = idToWonders3[countryId].nationalResearchLab;
             require(existingWonder = true, "No wonder to delete");
             idToWonders3[countryId].nationalResearchLab = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 8) {
             bool existingWonder = idToWonders3[countryId].nationalWarMemorial;
             require(existingWonder = true, "No wonder to delete");
             idToWonders3[countryId].nationalWarMemorial = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 9) {
             bool existingWonder = idToWonders3[countryId].nuclearPowerPlant;
             require(existingWonder = true, "No wonder to delete");
             idToWonders3[countryId].nuclearPowerPlant = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 10) {
             bool existingWonder = idToWonders3[countryId].pentagon;
             require(existingWonder = true, "No wonder to delete");
             idToWonders3[countryId].pentagon = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else if (wonderId == 11) {
             bool existingWonder = idToWonders3[countryId].politicalLobbyists;
             require(existingWonder = true, "No wonder to delete");
             idToWonders3[countryId].politicalLobbyists = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         } else {
-            bool existingWonder = idToWonders3[countryId].scientificDevelopmentCenter;
+            bool existingWonder = idToWonders3[countryId]
+                .scientificDevelopmentCenter;
             require(existingWonder = true, "No wonder to delete");
             idToWonders3[countryId].scientificDevelopmentCenter = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(countryId);
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
         }
     }
 }
@@ -1360,5 +1429,161 @@ contract WondersContract4 is Ownable {
         onlyOwner
     {
         weaponsResearchCenterCost = newPrice;
+    }
+
+    function buyWonder4(uint256 countryId, uint256 wonderId) public {
+        require(
+            idToOwnerWonders4[countryId] == msg.sender,
+            "You are not the nation ruler"
+        );
+        require(wonderId <= 7, "Invalid improvement ID");
+        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(
+            countryId
+        );
+        if (wonderId == 1) {
+            require(
+                balance >= socialSecuritySystemCost,
+                "Insufficient balance"
+            );
+            bool existingWonder = idToWonders4[countryId].socialSecuritySystem;
+            require(existingWonder = false, "Already owned");
+            idToWonders4[countryId].socialSecuritySystem = true;
+            WondersContract1(wonderContract1Address).addWonderCount(countryId);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                socialSecuritySystemCost
+            );
+        } else if (wonderId == 2) {
+            require(balance >= spaceProgramCost, "Insufficient balance");
+            bool existingWonder = idToWonders4[countryId].spaceProgram;
+            require(existingWonder = false, "Already owned");
+            idToWonders4[countryId].spaceProgram = true;
+            WondersContract1(wonderContract1Address).addWonderCount(countryId);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                spaceProgramCost
+            );
+        } else if (wonderId == 3) {
+            require(balance >= stockMarketCost, "Insufficient balance");
+            bool existingWonder = idToWonders4[countryId].stockMarket;
+            require(existingWonder = false, "Already owned");
+            idToWonders4[countryId].stockMarket = true;
+            WondersContract1(wonderContract1Address).addWonderCount(countryId);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                stockMarketCost
+            );
+        } else if (wonderId == 4) {
+            require(
+                balance >= strategicDefenseInitiativeCost,
+                "Insufficient balance"
+            );
+            bool existingWonder = idToWonders4[countryId]
+                .strategicDefenseInitiative;
+            require(existingWonder = false, "Already owned");
+            idToWonders4[countryId].strategicDefenseInitiative = true;
+            WondersContract1(wonderContract1Address).addWonderCount(countryId);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                strategicDefenseInitiativeCost
+            );
+        } else if (wonderId == 5) {
+            require(
+                balance >= superiorLogisticalSupportCost,
+                "Insufficient balance"
+            );
+            bool existingWonder = idToWonders4[countryId]
+                .superiorLogisticalSupport;
+            require(existingWonder = false, "Already owned");
+            idToWonders4[countryId].superiorLogisticalSupport = true;
+            WondersContract1(wonderContract1Address).addWonderCount(countryId);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                superiorLogisticalSupportCost
+            );
+        } else if (wonderId == 6) {
+            require(balance >= universalHealthcareCost, "Insufficient balance");
+            bool existingWonder = idToWonders4[countryId].universalHealthcare;
+            require(existingWonder = false, "Already owned");
+            idToWonders4[countryId].universalHealthcare = true;
+            WondersContract1(wonderContract1Address).addWonderCount(countryId);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                universalHealthcareCost
+            );
+        } else {
+            require(
+                balance >= weaponsResearchCenterCost,
+                "Insufficient balance"
+            );
+            bool existingWonder = idToWonders4[countryId].weaponsResearchCenter;
+            require(existingWonder = false, "Already owned");
+            idToWonders4[countryId].weaponsResearchCenter = true;
+            WondersContract1(wonderContract1Address).addWonderCount(countryId);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                weaponsResearchCenterCost
+            );
+        }
+    }
+
+    function deleteImprovement4(uint256 countryId, uint256 wonderId) public {
+        require(
+            idToOwnerWonders4[countryId] == msg.sender,
+            "You are not the nation ruler"
+        );
+        require(wonderId <= 7, "Invalid improvement ID");
+        if (wonderId == 1) {
+            bool existingWonder = idToWonders4[countryId].socialSecuritySystem;
+            require(existingWonder = true, "No wonder to delete");
+            idToWonders4[countryId].socialSecuritySystem = false;
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
+        } else if (wonderId == 2) {
+            bool existingWonder = idToWonders4[countryId].spaceProgram;
+            require(existingWonder = true, "No wonder to delete");
+            idToWonders4[countryId].spaceProgram = false;
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
+        } else if (wonderId == 3) {
+            bool existingWonder = idToWonders4[countryId].stockMarket;
+            require(existingWonder = true, "No wonder to delete");
+            idToWonders4[countryId].stockMarket = false;
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
+        } else if (wonderId == 4) {
+            bool existingWonder = idToWonders4[countryId]
+                .strategicDefenseInitiative;
+            require(existingWonder = true, "No wonder to delete");
+            idToWonders4[countryId].strategicDefenseInitiative = false;
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
+        } else if (wonderId == 5) {
+            bool existingWonder = idToWonders4[countryId]
+                .superiorLogisticalSupport;
+            require(existingWonder = true, "No wonder to delete");
+            idToWonders4[countryId].superiorLogisticalSupport = false;
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
+        } else if (wonderId == 6) {
+            bool existingWonder = idToWonders4[countryId].universalHealthcare;
+            require(existingWonder = true, "No wonder to delete");
+            idToWonders4[countryId].universalHealthcare = false;
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
+        } else {
+            bool existingWonder = idToWonders4[countryId].weaponsResearchCenter;
+            require(existingWonder = true, "No wonder to delete");
+            idToWonders4[countryId].weaponsResearchCenter = false;
+            WondersContract1(wonderContract1Address).subtractWonderCount(
+                countryId
+            );
+        }
     }
 }
