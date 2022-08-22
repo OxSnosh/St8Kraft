@@ -331,4 +331,13 @@ contract ForcesContract is Ownable {
     function decreaseSpyCount(uint256 amount, uint256 id) public {
         idToForces[id].numberOfSpies -= amount;
     }
+
+    function getSpyCount(uint256 countryId)
+        public
+        view
+        returns (uint256 count)
+    {
+        uint256 spyAmount = idToForces[countryId].numberOfSpies;
+        return spyAmount;
+    }
 }

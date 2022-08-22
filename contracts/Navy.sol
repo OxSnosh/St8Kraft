@@ -5,17 +5,16 @@ import "./Treasury.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract NavyContract is Ownable {
-
-    uint private navyId;
+    uint256 private navyId;
     address public treasuryAddress;
-    uint public corvetteCost;
-    uint public landingShipCost;
-    uint public battleshipCost;
-    uint public cruiserCost;
-    uint public frigateCost;
-    uint public destroyerCost;
-    uint public submarineCost;
-    uint public aircraftCarrierCost;
+    uint256 public corvetteCost;
+    uint256 public landingShipCost;
+    uint256 public battleshipCost;
+    uint256 public cruiserCost;
+    uint256 public frigateCost;
+    uint256 public destroyerCost;
+    uint256 public submarineCost;
+    uint256 public aircraftCarrierCost;
 
     struct Navy {
         uint256 navyVessels;
@@ -33,7 +32,7 @@ contract NavyContract is Ownable {
     mapping(uint256 => Navy) public idToNavy;
     mapping(uint256 => address) public idToOwnerNavy;
 
-    constructor (address _treasuryAddress) {
+    constructor(address _treasuryAddress) {
         treasuryAddress = _treasuryAddress;
         corvetteCost = 100;
         landingShipCost = 200;
@@ -52,244 +51,363 @@ contract NavyContract is Ownable {
         navyId++;
     }
 
-    function updateCorvetteCost(uint newPrice) public onlyOwner {
+    function updateCorvetteCost(uint256 newPrice) public onlyOwner {
         corvetteCost = newPrice;
     }
 
-    function updateLandingShipCost(uint newPrice) public onlyOwner {
+    function updateLandingShipCost(uint256 newPrice) public onlyOwner {
         landingShipCost = newPrice;
     }
 
-    function updateBattleshipCost(uint newPrice) public onlyOwner {
+    function updateBattleshipCost(uint256 newPrice) public onlyOwner {
         battleshipCost = newPrice;
     }
 
-    function updateCruiserCost(uint newPrice) public onlyOwner {
+    function updateCruiserCost(uint256 newPrice) public onlyOwner {
         cruiserCost = newPrice;
     }
 
-    function updateFrigateCost(uint newPrice) public onlyOwner {
+    function updateFrigateCost(uint256 newPrice) public onlyOwner {
         frigateCost = newPrice;
     }
 
-    function updateDestroyerCost(uint newPrice) public onlyOwner {
+    function updateDestroyerCost(uint256 newPrice) public onlyOwner {
         destroyerCost = newPrice;
     }
 
-    function updateSubmarineCost(uint newPrice) public onlyOwner {
+    function updateSubmarineCost(uint256 newPrice) public onlyOwner {
         submarineCost = newPrice;
     }
 
-    function updateAircraftCarrierCost(uint newPrice) public onlyOwner {
+    function updateAircraftCarrierCost(uint256 newPrice) public onlyOwner {
         aircraftCarrierCost = newPrice;
     }
 
-    function buyCorvette(uint amount, uint id) public {
-        require(idToOwnerNavy[id] == msg.sender, "You are not the nation ruler");
-        uint purchasePrice = corvetteCost * amount;
-        uint balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    function getVesselCountForDrydock(uint256 countryId)
+        public
+        view
+        returns (uint256 count)
+    {
+        uint256 corvetteAmount = idToNavy[countryId].corvetteCount;
+        uint256 battleshipAmount = idToNavy[countryId].battleshipCount;
+        uint256 cruiserAmount = idToNavy[countryId].cruiserCount;
+        uint256 destroyerAmount = idToNavy[countryId].destroyerCount;
+        uint256 shipCount = (corvetteAmount +
+            battleshipAmount +
+            cruiserAmount +
+            destroyerAmount);
+        return shipCount;
+    }
+
+    function buyCorvette(uint256 amount, uint256 id) public {
+        require(
+            idToOwnerNavy[id] == msg.sender,
+            "You are not the nation ruler"
+        );
+        uint256 purchasePrice = corvetteCost * amount;
+        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].corvetteCount += amount;
         idToNavy[id].navyVessels += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);        
+        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    function sendCorvette(uint amount, uint idSender, uint idReciever) public {
-        require(idToOwnerNavy[idSender] == msg.sender, "You are not the nation ruler");
-        require(idToNavy[idReciever].nationExists = true, "Destination nation does not exist");
+    function sendCorvette(
+        uint256 amount,
+        uint256 idSender,
+        uint256 idReciever
+    ) public {
+        require(
+            idToOwnerNavy[idSender] == msg.sender,
+            "You are not the nation ruler"
+        );
+        require(
+            idToNavy[idReciever].nationExists = true,
+            "Destination nation does not exist"
+        );
         idToNavy[idSender].corvetteCount -= amount;
         idToNavy[idSender].navyVessels -= amount;
         idToNavy[idReciever].corvetteCount += amount;
-        idToNavy[idReciever].navyVessels += amount;                
+        idToNavy[idReciever].navyVessels += amount;
     }
 
     //callable from fighting contract
     //needs modifier
-    function decreaseCorvetteCount(uint amount, uint id) public {
+    function decreaseCorvetteCount(uint256 amount, uint256 id) public {
         idToNavy[id].corvetteCount -= amount;
         idToNavy[id].navyVessels -= amount;
     }
 
-    function buyLandingShip(uint amount, uint id) public {
-        require(idToOwnerNavy[id] == msg.sender, "You are not the nation ruler");
-        uint purchasePrice = landingShipCost * amount;
-        uint balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    function buyLandingShip(uint256 amount, uint256 id) public {
+        require(
+            idToOwnerNavy[id] == msg.sender,
+            "You are not the nation ruler"
+        );
+        uint256 purchasePrice = landingShipCost * amount;
+        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].landingShipCount += amount;
         idToNavy[id].navyVessels += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);        
+        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    function sendLandingShip(uint amount, uint idSender, uint idReciever) public {
-        require(idToOwnerNavy[idSender] == msg.sender, "You are not the nation ruler");
-        require(idToNavy[idReciever].nationExists = true, "Destination nation does not exist");
+    function sendLandingShip(
+        uint256 amount,
+        uint256 idSender,
+        uint256 idReciever
+    ) public {
+        require(
+            idToOwnerNavy[idSender] == msg.sender,
+            "You are not the nation ruler"
+        );
+        require(
+            idToNavy[idReciever].nationExists = true,
+            "Destination nation does not exist"
+        );
         idToNavy[idSender].landingShipCount -= amount;
         idToNavy[idSender].navyVessels -= amount;
         idToNavy[idReciever].landingShipCount += amount;
-        idToNavy[idReciever].navyVessels += amount;                
+        idToNavy[idReciever].navyVessels += amount;
     }
 
     //callable from fighting contract
     //needs modifier
-    function decreaseLandingShipCount(uint amount, uint id) public {
+    function decreaseLandingShipCount(uint256 amount, uint256 id) public {
         idToNavy[id].landingShipCount -= amount;
         idToNavy[id].navyVessels -= amount;
     }
 
-    function buyBattleship(uint amount, uint id) public {
-        require(idToOwnerNavy[id] == msg.sender, "You are not the nation ruler");
-        uint purchasePrice = battleshipCost * amount;
-        uint balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    function buyBattleship(uint256 amount, uint256 id) public {
+        require(
+            idToOwnerNavy[id] == msg.sender,
+            "You are not the nation ruler"
+        );
+        uint256 purchasePrice = battleshipCost * amount;
+        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].battleshipCount += amount;
         idToNavy[id].navyVessels += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);        
+        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    function sendBattleship(uint amount, uint idSender, uint idReciever) public {
-        require(idToOwnerNavy[idSender] == msg.sender, "You are not the nation ruler");
-        require(idToNavy[idReciever].nationExists = true, "Destination nation does not exist");
+    function sendBattleship(
+        uint256 amount,
+        uint256 idSender,
+        uint256 idReciever
+    ) public {
+        require(
+            idToOwnerNavy[idSender] == msg.sender,
+            "You are not the nation ruler"
+        );
+        require(
+            idToNavy[idReciever].nationExists = true,
+            "Destination nation does not exist"
+        );
         idToNavy[idSender].battleshipCount -= amount;
         idToNavy[idSender].navyVessels -= amount;
         idToNavy[idReciever].battleshipCount += amount;
-        idToNavy[idReciever].navyVessels += amount;                
+        idToNavy[idReciever].navyVessels += amount;
     }
 
     //callable from fighting contract
     //needs modifier
-    function decreaseBatteshipCount(uint amount, uint id) public {
+    function decreaseBatteshipCount(uint256 amount, uint256 id) public {
         idToNavy[id].battleshipCount -= amount;
         idToNavy[id].navyVessels -= amount;
     }
 
-    function buyCruiser(uint amount, uint id) public {
-        require(idToOwnerNavy[id] == msg.sender, "You are not the nation ruler");
-        uint purchasePrice = cruiserCost * amount;
-        uint balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    function buyCruiser(uint256 amount, uint256 id) public {
+        require(
+            idToOwnerNavy[id] == msg.sender,
+            "You are not the nation ruler"
+        );
+        uint256 purchasePrice = cruiserCost * amount;
+        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].cruiserCount += amount;
         idToNavy[id].navyVessels += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);        
+        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    function sendCruiser(uint amount, uint idSender, uint idReciever) public {
-        require(idToOwnerNavy[idSender] == msg.sender, "You are not the nation ruler");
-        require(idToNavy[idReciever].nationExists = true, "Destination nation does not exist");
+    function sendCruiser(
+        uint256 amount,
+        uint256 idSender,
+        uint256 idReciever
+    ) public {
+        require(
+            idToOwnerNavy[idSender] == msg.sender,
+            "You are not the nation ruler"
+        );
+        require(
+            idToNavy[idReciever].nationExists = true,
+            "Destination nation does not exist"
+        );
         idToNavy[idSender].cruiserCount -= amount;
         idToNavy[idSender].navyVessels -= amount;
         idToNavy[idReciever].cruiserCount += amount;
-        idToNavy[idReciever].navyVessels += amount;                
+        idToNavy[idReciever].navyVessels += amount;
     }
 
     //callable from fighting contract
     //needs modifier
-    function decreaseCruiserCount(uint amount, uint id) public {
+    function decreaseCruiserCount(uint256 amount, uint256 id) public {
         idToNavy[id].cruiserCount -= amount;
         idToNavy[id].navyVessels -= amount;
     }
 
-    function buyFrigate(uint amount, uint id) public {
-        require(idToOwnerNavy[id] == msg.sender, "You are not the nation ruler");
-        uint purchasePrice = frigateCost * amount;
-        uint balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    function buyFrigate(uint256 amount, uint256 id) public {
+        require(
+            idToOwnerNavy[id] == msg.sender,
+            "You are not the nation ruler"
+        );
+        uint256 purchasePrice = frigateCost * amount;
+        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].frigateCount += amount;
         idToNavy[id].navyVessels += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);        
+        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    function sendFrigate(uint amount, uint idSender, uint idReciever) public {
-        require(idToOwnerNavy[idSender] == msg.sender, "You are not the nation ruler");
-        require(idToNavy[idReciever].nationExists = true, "Destination nation does not exist");
+    function sendFrigate(
+        uint256 amount,
+        uint256 idSender,
+        uint256 idReciever
+    ) public {
+        require(
+            idToOwnerNavy[idSender] == msg.sender,
+            "You are not the nation ruler"
+        );
+        require(
+            idToNavy[idReciever].nationExists = true,
+            "Destination nation does not exist"
+        );
         idToNavy[idSender].frigateCount -= amount;
         idToNavy[idSender].navyVessels -= amount;
         idToNavy[idReciever].frigateCount += amount;
-        idToNavy[idReciever].navyVessels += amount;                
+        idToNavy[idReciever].navyVessels += amount;
     }
 
     //callable from fighting contract
     //needs modifier
-    function decreaseFrigateCount(uint amount, uint id) public {
+    function decreaseFrigateCount(uint256 amount, uint256 id) public {
         idToNavy[id].frigateCount -= amount;
         idToNavy[id].navyVessels -= amount;
     }
 
-    function buyDestroyer(uint amount, uint id) public {
-        require(idToOwnerNavy[id] == msg.sender, "You are not the nation ruler");
-        uint purchasePrice = destroyerCost * amount;
-        uint balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    function buyDestroyer(uint256 amount, uint256 id) public {
+        require(
+            idToOwnerNavy[id] == msg.sender,
+            "You are not the nation ruler"
+        );
+        uint256 purchasePrice = destroyerCost * amount;
+        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].destroyerCount += amount;
         idToNavy[id].navyVessels += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);        
+        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    function sendDestroyer(uint amount, uint idSender, uint idReciever) public {
-        require(idToOwnerNavy[idSender] == msg.sender, "You are not the nation ruler");
-        require(idToNavy[idReciever].nationExists = true, "Destination nation does not exist");
+    function sendDestroyer(
+        uint256 amount,
+        uint256 idSender,
+        uint256 idReciever
+    ) public {
+        require(
+            idToOwnerNavy[idSender] == msg.sender,
+            "You are not the nation ruler"
+        );
+        require(
+            idToNavy[idReciever].nationExists = true,
+            "Destination nation does not exist"
+        );
         idToNavy[idSender].destroyerCount -= amount;
         idToNavy[idSender].navyVessels -= amount;
         idToNavy[idReciever].destroyerCount += amount;
-        idToNavy[idReciever].navyVessels += amount;                
+        idToNavy[idReciever].navyVessels += amount;
     }
 
     //callable from fighting contract
     //needs modifier
-    function decreaseDestroyerCount(uint amount, uint id) public {
+    function decreaseDestroyerCount(uint256 amount, uint256 id) public {
         idToNavy[id].destroyerCount -= amount;
         idToNavy[id].navyVessels -= amount;
     }
 
-    function buySubmarine(uint amount, uint id) public {
-        require(idToOwnerNavy[id] == msg.sender, "You are not the nation ruler");
-        uint purchasePrice = submarineCost * amount;
-        uint balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    function buySubmarine(uint256 amount, uint256 id) public {
+        require(
+            idToOwnerNavy[id] == msg.sender,
+            "You are not the nation ruler"
+        );
+        uint256 purchasePrice = submarineCost * amount;
+        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].submarintCount += amount;
         idToNavy[id].navyVessels += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);        
+        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    function sendSubmarine(uint amount, uint idSender, uint idReciever) public {
-        require(idToOwnerNavy[idSender] == msg.sender, "You are not the nation ruler");
-        require(idToNavy[idReciever].nationExists = true, "Destination nation does not exist");
+    function sendSubmarine(
+        uint256 amount,
+        uint256 idSender,
+        uint256 idReciever
+    ) public {
+        require(
+            idToOwnerNavy[idSender] == msg.sender,
+            "You are not the nation ruler"
+        );
+        require(
+            idToNavy[idReciever].nationExists = true,
+            "Destination nation does not exist"
+        );
         idToNavy[idSender].submarintCount -= amount;
         idToNavy[idSender].navyVessels -= amount;
         idToNavy[idReciever].submarintCount += amount;
-        idToNavy[idReciever].navyVessels += amount;                
+        idToNavy[idReciever].navyVessels += amount;
     }
 
     //callable from fighting contract
     //needs modifier
-    function decreaseSubmarineCount(uint amount, uint id) public {
+    function decreaseSubmarineCount(uint256 amount, uint256 id) public {
         idToNavy[id].submarintCount -= amount;
         idToNavy[id].navyVessels -= amount;
     }
 
-    function buyAircraftCarrier(uint amount, uint id) public {
-        require(idToOwnerNavy[id] == msg.sender, "You are not the nation ruler");
-        uint purchasePrice = aircraftCarrierCost * amount;
-        uint balance = TreasuryContract(treasuryAddress).checkBalance(id);
+    function buyAircraftCarrier(uint256 amount, uint256 id) public {
+        require(
+            idToOwnerNavy[id] == msg.sender,
+            "You are not the nation ruler"
+        );
+        uint256 purchasePrice = aircraftCarrierCost * amount;
+        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].aircraftCarrierCount += amount;
         idToNavy[id].navyVessels += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);        
+        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    function sendAircraftCarrier(uint amount, uint idSender, uint idReciever) public {
-        require(idToOwnerNavy[idSender] == msg.sender, "You are not the nation ruler");
-        require(idToNavy[idReciever].nationExists = true, "Destination nation does not exist");
+    function sendAircraftCarrier(
+        uint256 amount,
+        uint256 idSender,
+        uint256 idReciever
+    ) public {
+        require(
+            idToOwnerNavy[idSender] == msg.sender,
+            "You are not the nation ruler"
+        );
+        require(
+            idToNavy[idReciever].nationExists = true,
+            "Destination nation does not exist"
+        );
         idToNavy[idSender].aircraftCarrierCount -= amount;
         idToNavy[idSender].navyVessels -= amount;
         idToNavy[idReciever].aircraftCarrierCount += amount;
-        idToNavy[idReciever].navyVessels += amount;                
+        idToNavy[idReciever].navyVessels += amount;
     }
 
     //callable from fighting contract
     //needs modifier
-    function decreaseAircraftCarrierCount(uint amount, uint id) public {
+    function decreaseAircraftCarrierCount(uint256 amount, uint256 id) public {
         idToNavy[id].aircraftCarrierCount -= amount;
         idToNavy[id].navyVessels -= amount;
     }
-
 }
