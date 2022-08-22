@@ -528,9 +528,8 @@ contract WondersContract2 is Ownable {
     mapping(uint256 => Wonders2) public idToWonders2;
     mapping(uint256 => address) public idToOwnerWonders2;
 
-    constructor(address _treasuryAddress, address _wonderContract1Address) {
+    constructor(address _treasuryAddress) {
         treasuryAddress = _treasuryAddress;
-        wonderContract1Address = _wonderContract1Address;
     }
 
     function updateTreasuryAddress(address _newTreasuryAddress)
@@ -971,9 +970,8 @@ contract WondersContract3 is Ownable {
     mapping(uint256 => Wonders3) public idToWonders3;
     mapping(uint256 => address) public idToOwnerWonders3;
 
-    constructor(address _treasuryAddress, address _wonderContract1Address) {
+    constructor(address _treasuryAddress) {
         treasuryAddress = _treasuryAddress;
-        wonderContract1Address = _wonderContract1Address;
     }
 
     function updateTreasuryAddress(address _newTreasuryAddress)
@@ -1360,9 +1358,8 @@ contract WondersContract4 is Ownable {
     mapping(uint256 => Wonders4) public idToWonders4;
     mapping(uint256 => address) public idToOwnerWonders4;
 
-    constructor(address _treasuryAddress, address _wonderContract1Address) {
+    constructor(address _treasuryAddress) {
         treasuryAddress = _treasuryAddress;
-        wonderContract1Address = _wonderContract1Address;
     }
 
     function updateTreasuryAddress(address _newTreasuryAddress)

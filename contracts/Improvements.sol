@@ -124,6 +124,14 @@ contract ImprovementsContract1 is Ownable {
         treasuryAddress = _newTreasuryAddress;
     }
 
+    function updateImprovementContractAddresses(
+        address _improvementContract2Address,
+        address _improvementContract3Address
+    ) public onlyOwner {
+        improvementContract2Address = _improvementContract2Address;
+        improvementContract3Address = _improvementContract3Address;
+    }
+
     function generateImprovements() public {
         Improvements1 memory newImprovements1 = Improvements1(
             0,
@@ -814,10 +822,8 @@ contract ImprovementsContract2 is Ownable {
     mapping(uint256 => Improvements2) public idToImprovements2;
     mapping(uint256 => address) public idToOwnerImprovements2;
 
-    constructor(address _treasuryAddress, address _improvementsContract1Address)
-    {
+    constructor(address _treasuryAddress) {
         treasuryAddress = _treasuryAddress;
-        improvementsContract1Address = _improvementsContract1Address;
     }
 
     function updateTreasuryAddress(address _newTreasuryAddress)
@@ -1797,10 +1803,8 @@ contract ImprovementsContract3 is Ownable {
     mapping(uint256 => Improvements3) public idToImprovements3;
     mapping(uint256 => address) public idToOwnerImprovements3;
 
-    constructor(address _treasuryAddress, address _improvementsContract1Address)
-    {
+    constructor(address _treasuryAddress) {
         treasuryAddress = _treasuryAddress;
-        improvementsContract1Address = _improvementsContract1Address;
     }
 
     function updateTreasuryAddress(address _newTreasuryAddress)
@@ -2130,7 +2134,8 @@ contract ImprovementsContract3 is Ownable {
             uint256 existingCount = idToImprovements3[countryId]
                 .radiationContainmentChamberCount;
             require((existingCount - amount) >= 0, "Cannot delete that many");
-            idToImprovements3[countryId].radiationContainmentChamberCount -= amount;
+            idToImprovements3[countryId]
+                .radiationContainmentChamberCount -= amount;
             uint256 existingImprovementTotal = ImprovementsContract1(
                 improvementsContract1Address
             ).getImprovementCount(countryId);
@@ -2138,7 +2143,8 @@ contract ImprovementsContract3 is Ownable {
             ImprovementsContract1(improvementsContract1Address)
                 .updateImprovementCount(countryId, newImprovementTotal);
         } else if (improvementId == 5) {
-            uint256 existingCount = idToImprovements3[countryId].redLightDistrictCount;
+            uint256 existingCount = idToImprovements3[countryId]
+                .redLightDistrictCount;
             require((existingCount - amount) >= 0, "Cannot delete that many");
             idToImprovements3[countryId].redLightDistrictCount -= amount;
             uint256 existingImprovementTotal = ImprovementsContract1(
@@ -2199,7 +2205,8 @@ contract ImprovementsContract3 is Ownable {
             ImprovementsContract1(improvementsContract1Address)
                 .updateImprovementCount(countryId, newImprovementTotal);
         } else {
-            uint256 existingCount = idToImprovements3[countryId].universityCount;
+            uint256 existingCount = idToImprovements3[countryId]
+                .universityCount;
             require((existingCount - amount) >= 0, "Cannot delete that many");
             idToImprovements3[countryId].universityCount -= amount;
             uint256 existingImprovementTotal = ImprovementsContract1(
