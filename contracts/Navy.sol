@@ -24,7 +24,7 @@ contract NavyContract is Ownable {
         uint256 cruiserCount;
         uint256 frigateCount;
         uint256 destroyerCount;
-        uint256 submarintCount;
+        uint256 submarineCount;
         uint256 aircraftCarrierCount;
         bool nationExists;
     }
@@ -98,6 +98,24 @@ contract NavyContract is Ownable {
             destroyerAmount);
         return shipCount;
     }
+
+    function getVesselCountForShipyard(uint256 countryId)
+        public
+        view
+        returns (uint256 count)
+    {
+        uint256 landingShipAmount = idToNavy[countryId].landingShipCount;
+        uint256 frigateAmount = idToNavy[countryId].frigateCount;
+        uint256 submarineAmount = idToNavy[countryId].submarineCount;
+        uint256 aircraftCarrierAmount = idToNavy[countryId].aircraftCarrierCount;
+        uint256 shipCount = (landingShipAmount +
+            frigateAmount +
+            submarineAmount +
+            aircraftCarrierAmount);
+        return shipCount;
+    }
+
+
 
     function buyCorvette(uint256 amount, uint256 id) public {
         require(
@@ -341,7 +359,7 @@ contract NavyContract is Ownable {
         uint256 purchasePrice = submarineCost * amount;
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
-        idToNavy[id].submarintCount += amount;
+        idToNavy[id].submarineCount += amount;
         idToNavy[id].navyVessels += amount;
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
@@ -359,16 +377,16 @@ contract NavyContract is Ownable {
             idToNavy[idReciever].nationExists = true,
             "Destination nation does not exist"
         );
-        idToNavy[idSender].submarintCount -= amount;
+        idToNavy[idSender].submarineCount -= amount;
         idToNavy[idSender].navyVessels -= amount;
-        idToNavy[idReciever].submarintCount += amount;
+        idToNavy[idReciever].submarineCount += amount;
         idToNavy[idReciever].navyVessels += amount;
     }
 
     //callable from fighting contract
     //needs modifier
     function decreaseSubmarineCount(uint256 amount, uint256 id) public {
-        idToNavy[id].submarintCount -= amount;
+        idToNavy[id].submarineCount -= amount;
         idToNavy[id].navyVessels -= amount;
     }
 
