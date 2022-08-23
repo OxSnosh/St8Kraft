@@ -2,11 +2,14 @@
 pragma solidity 0.8.7;
 
 import "./Treasury.sol";
+import "./Improvements.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract NavyContract is Ownable {
     uint256 private navyId;
     address public treasuryAddress;
+    address public improvementsContract1Address;
+    address public improvementsContract3Address;
     uint256 public corvetteCost;
     uint256 public landingShipCost;
     uint256 public battleshipCost;
@@ -32,8 +35,14 @@ contract NavyContract is Ownable {
     mapping(uint256 => Navy) public idToNavy;
     mapping(uint256 => address) public idToOwnerNavy;
 
-    constructor(address _treasuryAddress) {
+    constructor(
+        address _treasuryAddress,
+        address _improvementsContract1Address,
+        address _improvementsContract3Address
+    ) {
         treasuryAddress = _treasuryAddress;
+        improvementsContract1Address = _improvementsContract1Address;
+        improvementsContract3Address = _improvementsContract3Address;
         corvetteCost = 100;
         landingShipCost = 200;
         battleshipCost = 300;
@@ -107,7 +116,8 @@ contract NavyContract is Ownable {
         uint256 landingShipAmount = idToNavy[countryId].landingShipCount;
         uint256 frigateAmount = idToNavy[countryId].frigateCount;
         uint256 submarineAmount = idToNavy[countryId].submarineCount;
-        uint256 aircraftCarrierAmount = idToNavy[countryId].aircraftCarrierCount;
+        uint256 aircraftCarrierAmount = idToNavy[countryId]
+            .aircraftCarrierCount;
         uint256 shipCount = (landingShipAmount +
             frigateAmount +
             submarineAmount +
@@ -115,13 +125,15 @@ contract NavyContract is Ownable {
         return shipCount;
     }
 
-
-
     function buyCorvette(uint256 amount, uint256 id) public {
         require(
             idToOwnerNavy[id] == msg.sender,
             "You are not the nation ruler"
         );
+        uint256 drydockAmount = ImprovementsContract1(
+            improvementsContract1Address
+        ).getDrydockCount(id);
+        require(drydockAmount > 0, "Must own a drydock to purchase");
         uint256 purchasePrice = corvetteCost * amount;
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
@@ -161,6 +173,10 @@ contract NavyContract is Ownable {
             idToOwnerNavy[id] == msg.sender,
             "You are not the nation ruler"
         );
+        uint256 shipyardAmount = ImprovementsContract3(
+            improvementsContract3Address
+        ).getShipyardCount(id);
+        require(shipyardAmount > 0, "Must own a shipyard to purchase");
         uint256 purchasePrice = landingShipCost * amount;
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
@@ -200,6 +216,10 @@ contract NavyContract is Ownable {
             idToOwnerNavy[id] == msg.sender,
             "You are not the nation ruler"
         );
+        uint256 drydockAmount = ImprovementsContract1(
+            improvementsContract1Address
+        ).getDrydockCount(id);
+        require(drydockAmount > 0, "Must own a drydock to purchase");
         uint256 purchasePrice = battleshipCost * amount;
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
@@ -239,6 +259,10 @@ contract NavyContract is Ownable {
             idToOwnerNavy[id] == msg.sender,
             "You are not the nation ruler"
         );
+        uint256 drydockAmount = ImprovementsContract1(
+            improvementsContract1Address
+        ).getDrydockCount(id);
+        require(drydockAmount > 0, "Must own a drydock to purchase");
         uint256 purchasePrice = cruiserCost * amount;
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
@@ -278,6 +302,10 @@ contract NavyContract is Ownable {
             idToOwnerNavy[id] == msg.sender,
             "You are not the nation ruler"
         );
+        uint256 shipyardAmount = ImprovementsContract3(
+            improvementsContract3Address
+        ).getShipyardCount(id);
+        require(shipyardAmount > 0, "Must own a shipyard to purchase");
         uint256 purchasePrice = frigateCost * amount;
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
@@ -317,6 +345,10 @@ contract NavyContract is Ownable {
             idToOwnerNavy[id] == msg.sender,
             "You are not the nation ruler"
         );
+        uint256 drydockAmount = ImprovementsContract1(
+            improvementsContract1Address
+        ).getDrydockCount(id);
+        require(drydockAmount > 0, "Must own a drydock to purchase");
         uint256 purchasePrice = destroyerCost * amount;
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
@@ -356,6 +388,10 @@ contract NavyContract is Ownable {
             idToOwnerNavy[id] == msg.sender,
             "You are not the nation ruler"
         );
+        uint256 shipyardAmount = ImprovementsContract3(
+            improvementsContract3Address
+        ).getShipyardCount(id);
+        require(shipyardAmount > 0, "Must own a shipyard to purchase");
         uint256 purchasePrice = submarineCost * amount;
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
@@ -395,6 +431,10 @@ contract NavyContract is Ownable {
             idToOwnerNavy[id] == msg.sender,
             "You are not the nation ruler"
         );
+        uint256 shipyardAmount = ImprovementsContract3(
+            improvementsContract3Address
+        ).getShipyardCount(id);
+        require(shipyardAmount > 0, "Must own a shipyard to purchase");
         uint256 purchasePrice = aircraftCarrierCost * amount;
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);

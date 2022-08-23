@@ -1713,4 +1713,13 @@ contract ImprovementsContract3 is Ownable {
         uint256 satelliteAmount = idToImprovements3[countryId].satelliteCount;
         return satelliteAmount;
     }
+
+    function getShipyardCount(uint256 countryId)
+        public
+        view
+        returns (uint256 count)
+    {
+        uint256 shipyardAmount = idToImprovements3[countryId].shipyardCount;
+        return shipyardAmount;
+    }
 }
