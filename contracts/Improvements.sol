@@ -1075,6 +1075,7 @@ contract ImprovementsContract2 is Ownable {
             uint256 existingCount = idToImprovements2[countryId]
                 .missileDefenseCount;
             require((existingCount - amount) >= 0, "Cannot delete that many");
+            //cannot delete below 3 if strategic defense init
             idToImprovements2[countryId].missileDefenseCount -= amount;
             uint256 existingImprovementTotal = ImprovementsContract1(
                 improvementsContract1Address
@@ -1154,6 +1155,15 @@ contract ImprovementsContract2 is Ownable {
     {
         uint256 hospitalAmount = idToImprovements2[countryId].hospitalCount;
         return hospitalAmount;
+    }
+
+    function getMissileDefenseCount(uint256 countryId)
+        public
+        view
+        returns (uint256 count)
+    {
+        uint256 missileDefenseAmount = idToImprovements2[countryId].missileDefenseCount;
+        return missileDefenseAmount;
     }
 }
 
@@ -1645,6 +1655,7 @@ contract ImprovementsContract3 is Ownable {
         } else if (improvementId == 7) {
             uint256 existingCount = idToImprovements3[countryId].satelliteCount;
             require((existingCount - amount) >= 0, "Cannot delete that many");
+            //cannot delete below 3 if strategic defense init
             idToImprovements3[countryId].satelliteCount -= amount;
             uint256 existingImprovementTotal = ImprovementsContract1(
                 improvementsContract1Address
