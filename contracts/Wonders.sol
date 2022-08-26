@@ -493,7 +493,10 @@ contract WondersContract1 is Ownable {
 contract WondersContract2 is Ownable {
     uint256 private wondersId2;
     address public treasuryAddress;
+    address public infrastructureAddress;
     address public wonderContract1Address;
+    address public wonderContract3Address;
+    address public wonderContract4Address;
     uint256 public greatMonumentCost = 35000000;
     uint256 public greatTempleCost = 35000000;
     uint256 public greatUniversityCost = 35000000;
@@ -587,8 +590,9 @@ contract WondersContract2 is Ownable {
     mapping(uint256 => Wonders2) public idToWonders2;
     mapping(uint256 => address) public idToOwnerWonders2;
 
-    constructor(address _treasuryAddress) {
+    constructor(address _treasuryAddress, address _infrastructureAddress) {
         treasuryAddress = _treasuryAddress;
+        infrastructureAddress = _infrastructureAddress;
     }
 
     function updateTreasuryAddress(address _newTreasuryAddress)
@@ -603,6 +607,27 @@ contract WondersContract2 is Ownable {
         onlyOwner
     {
         wonderContract1Address = _wonderContract1Address;
+    }
+
+    function updateWonderContract3Address(address _wonderContract3Address)
+        public
+        onlyOwner
+    {
+        wonderContract3Address = _wonderContract3Address;
+    }
+
+    function updateWonderContract4Address(address _wonderContract4Address)
+        public
+        onlyOwner
+    {
+        wonderContract4Address = _wonderContract4Address;
+    }
+
+    function updateInfrastructureAddress(address _infrastructureAddress)
+        public
+        onlyOwner
+    {
+        infrastructureAddress = _infrastructureAddress;
     }
 
     function generateWonders2() public {
@@ -743,6 +768,19 @@ contract WondersContract2 is Ownable {
             bool existingWonder = idToWonders2[countryId]
                 .interceptorMissileSystem;
             require(existingWonder = false, "Already owned");
+            bool strategicDefenseInitiative = WondersContract4(
+                wonderContract4Address
+            ).getStrategicDefenseInitiative(countryId);
+            require(
+                strategicDefenseInitiative = true,
+                "Strategic Defense Inititive required to purchase"
+            );
+            uint256 techAmount = InfrastructureContract(infrastructureAddress)
+                .getTechnologyCount(countryId);
+            require(
+                techAmount >= 5000,
+                "Must have 5000 Technology to purchase"
+            );
             idToWonders2[countryId].interceptorMissileSystem = true;
             WondersContract1(wonderContract1Address).addWonderCount(countryId);
             TreasuryContract(treasuryAddress).spendBalance(
@@ -773,6 +811,17 @@ contract WondersContract2 is Ownable {
             require(balance >= manhattanProjectCost, "Insufficient balance");
             bool existingWonder = idToWonders2[countryId].manhattanProject;
             require(existingWonder = false, "Already owned");
+            //require uranium
+            uint256 infrastructureAmount = InfrastructureContract(
+                infrastructureAddress
+            ).getInfrastructureCount(countryId);
+            require(
+                infrastructureAmount >= 3000,
+                "Requires 3000 infrastructure to purchase"
+            );
+            uint256 techAmount = InfrastructureContract(infrastructureAddress)
+                .getTechnologyCount(countryId);
+            require(techAmount >= 300, "Must have 300 Technology to purchase");
             idToWonders2[countryId].manhattanProject = true;
             WondersContract1(wonderContract1Address).addWonderCount(countryId);
             TreasuryContract(treasuryAddress).spendBalance(
@@ -783,6 +832,18 @@ contract WondersContract2 is Ownable {
             require(balance >= marsBaseCost, "Insufficient balance");
             bool existingWonder = idToWonders2[countryId].marsBase;
             require(existingWonder = false, "Already owned");
+            bool isSpaceProgram = WondersContract4(wonderContract4Address)
+                .getSpaceProgram(countryId);
+            require(
+                isSpaceProgram = true,
+                "Requires space program to purchase"
+            );
+            bool isMoonBase = WondersContract3(wonderContract3Address)
+                .getMoonBase(countryId);
+            require(
+                isMoonBase = false,
+                "Cannot purchase if moon wonders are owned"
+            );
             idToWonders2[countryId].marsBase = true;
             WondersContract1(wonderContract1Address).addWonderCount(countryId);
             TreasuryContract(treasuryAddress).spendBalance(
@@ -793,6 +854,14 @@ contract WondersContract2 is Ownable {
             require(balance >= marsColonyCost, "Insufficient balance");
             bool existingWonder = idToWonders2[countryId].marsColony;
             require(existingWonder = false, "Already owned");
+            bool isMoonBase = WondersContract3(wonderContract3Address)
+                .getMoonBase(countryId);
+            require(
+                isMoonBase = false,
+                "Cannot purchase if moon wonders are owned"
+            );
+            bool isMarsBase = idToWonders2[countryId].marsBase;
+            require(isMarsBase = true, "Must first own MarsBase to purchase");
             idToWonders2[countryId].marsColony = true;
             WondersContract1(wonderContract1Address).addWonderCount(countryId);
             TreasuryContract(treasuryAddress).spendBalance(
@@ -803,6 +872,14 @@ contract WondersContract2 is Ownable {
             require(balance >= marsMineCost, "Insufficient balance");
             bool existingWonder = idToWonders2[countryId].marsMine;
             require(existingWonder = false, "Already owned");
+            bool isMoonBase = WondersContract3(wonderContract3Address)
+                .getMoonBase(countryId);
+            require(
+                isMoonBase = false,
+                "Cannot purchase if moon wonders are owned"
+            );
+            bool isMarsBase = idToWonders2[countryId].marsBase;
+            require(isMarsBase = true, "Must first own MarsBase to purchase");
             idToWonders2[countryId].marsMine = true;
             WondersContract1(wonderContract1Address).addWonderCount(countryId);
             TreasuryContract(treasuryAddress).spendBalance(
@@ -817,6 +894,24 @@ contract WondersContract2 is Ownable {
             bool existingWonder = idToWonders2[countryId]
                 .miningIndustryConsortium;
             require(existingWonder = false, "Already owned");
+            uint256 techAmount = InfrastructureContract(infrastructureAddress)
+                .getTechnologyCount(countryId);
+            require(
+                techAmount >= 1000,
+                "Must have 1000 Technology to purchase"
+            );
+            uint256 infrastructureAmount = InfrastructureContract(infrastructureAddress)
+                .getInfrastructureCount(countryId);
+            require(
+                infrastructureAmount >= 5000,
+                "Must have 5000 Infrastructure to purchase"
+            );
+            uint256 landAmount = InfrastructureContract(infrastructureAddress)
+                .getLandCount(countryId);
+            require(
+                landAmount >= 3000,
+                "Must have 3000 Land to purchase"
+            );
             idToWonders2[countryId].miningIndustryConsortium = true;
             WondersContract1(wonderContract1Address).addWonderCount(countryId);
             TreasuryContract(treasuryAddress).spendBalance(
@@ -884,12 +979,13 @@ contract WondersContract2 is Ownable {
                 countryId
             );
         } else if (wonderId == 8) {
-            bool existingWonder = idToWonders2[countryId].manhattanProject;
-            require(existingWonder = true, "No wonder to delete");
-            idToWonders2[countryId].manhattanProject = false;
-            WondersContract1(wonderContract1Address).subtractWonderCount(
-                countryId
-            );
+            // unable to delete Manhattan Project once purchased
+            // bool existingWonder = idToWonders2[countryId].manhattanProject;
+            // require(existingWonder = true, "No wonder to delete");
+            // idToWonders2[countryId].manhattanProject = false;
+            // WondersContract1(wonderContract1Address).subtractWonderCount(
+            //     countryId
+            // );
         } else if (wonderId == 9) {
             bool existingWonder = idToWonders2[countryId].marsBase;
             require(existingWonder = true, "No wonder to delete");
@@ -921,12 +1017,23 @@ contract WondersContract2 is Ownable {
             );
         }
     }
+
+    function getMarsBase(uint256 countryId)
+        public
+        view
+        returns (bool isMarsBaseThere)
+    {
+        bool isMarsBase = idToWonders2[countryId].marsBase;
+        return isMarsBase;
+    }
 }
 
 contract WondersContract3 is Ownable {
     uint256 private wondersId3;
     address public treasuryAddress;
     address public wonderContract1Address;
+    address public wonderContract2Address;
+    address public wonderContract4Address;
     uint256 public moonBaseCost = 50000000;
     uint256 public moonColonyCost = 50000000;
     uint256 public moonMineCost = 50000000;
@@ -1047,6 +1154,20 @@ contract WondersContract3 is Ownable {
         wonderContract1Address = _wonderContract1Address;
     }
 
+    function updateWonderContract2Address(address _wonderContract2Address)
+        public
+        onlyOwner
+    {
+        wonderContract2Address = _wonderContract2Address;
+    }
+
+    function updateWonderContract4Address(address _wonderContract4Address)
+        public
+        onlyOwner
+    {
+        wonderContract4Address = _wonderContract4Address;
+    }
+
     function generateWonders3() public {
         Wonders3 memory newWonders3 = Wonders3(
             false,
@@ -1134,6 +1255,18 @@ contract WondersContract3 is Ownable {
             require(balance >= moonBaseCost, "Insufficient balance");
             bool existingWonder = idToWonders3[countryId].moonBase;
             require(existingWonder = false, "Already owned");
+            bool isSpaceProgram = WondersContract4(wonderContract4Address)
+                .getSpaceProgram(countryId);
+            require(
+                isSpaceProgram = true,
+                "Requires space program to purchase"
+            );
+            bool isMarsBase = WondersContract3(wonderContract3Address)
+                .getMarsBase(countryId);
+            require(
+                isMoonBase = false,
+                "Cannot purchase if moon wonders are owned"
+            );
             idToWonders3[countryId].moonBase = true;
             WondersContract1(wonderContract1Address).addWonderCount(countryId);
             TreasuryContract(treasuryAddress).spendBalance(
@@ -1354,6 +1487,15 @@ contract WondersContract3 is Ownable {
                 countryId
             );
         }
+    }
+
+    function getMoonBase(uint256 countryId)
+        public
+        view
+        returns (bool isMoonBaseThere)
+    {
+        bool isMoonBase = idToWonders3[countryId].moonBase;
+        return isMoonBase;
     }
 }
 
@@ -1659,5 +1801,24 @@ contract WondersContract4 is Ownable {
     {
         bool isStockMarket = idToWonders4[countryId].stockMarket;
         return isStockMarket;
+    }
+
+    function getStrategicDefenseInitiative(uint256 countryId)
+        public
+        view
+        returns (bool isSdiThere)
+    {
+        bool isStrategicDefenseInitiative = idToWonders4[countryId]
+            .strategicDefenseInitiative;
+        return isStrategicDefenseInitiative;
+    }
+
+    function getSpaceProgram(uint256 countryId)
+        public
+        view
+        returns (bool isSpaceProgramThere)
+    {
+        bool isSpaceProgram = idToWonders4[countryId].spaceProgram;
+        return isSpaceProgram;
     }
 }
