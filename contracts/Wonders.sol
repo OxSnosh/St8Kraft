@@ -2,6 +2,7 @@
 pragma solidity 0.8.7;
 
 import "./Treasury.sol";
+import "./Infrastructure.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract WondersContract1 is Ownable {
@@ -10,6 +11,7 @@ contract WondersContract1 is Ownable {
     address public wondersContract2Address;
     address public wondersContract3Address;
     address public wondersContract4Address;
+    address public infrastructureAddress;
     uint256 public agricultureDevelopmentCost = 30000000;
     uint256 public antiAirDefenseNetworkCost = 50000000;
     uint256 public centralIntelligenceAgencyCost = 40000000;
@@ -111,12 +113,14 @@ contract WondersContract1 is Ownable {
         address _treasuryAddress,
         address _wonderContract2Address,
         address _wonderContract3Address,
-        address _wonderContract4Address
+        address _wonderContract4Address,
+        address _infrastructureAddress
     ) {
         treasuryAddress = _treasuryAddress;
         wondersContract2Address = _wonderContract2Address;
         wondersContract3Address = _wonderContract3Address;
         wondersContract4Address = _wonderContract4Address;
+        infrastructureAddress = _infrastructureAddress;
     }
 
     function updateTreasuryAddress(address _newTreasuryAddress)
@@ -134,6 +138,13 @@ contract WondersContract1 is Ownable {
         wondersContract2Address = _wonderContract2Address;
         wondersContract3Address = _wonderContract3Address;
         wondersContract4Address = _wonderContract4Address;
+    }
+
+    function updateInfrastructureAddresses(address _infrastructureAddress)
+        public
+        onlyOwner
+    {
+        infrastructureAddress = _infrastructureAddress;
     }
 
     function getWonderCount(uint256 id) public view returns (uint256 count) {
@@ -239,6 +250,12 @@ contract WondersContract1 is Ownable {
             bool existingWonder = idToWonders1[countryId]
                 .agricultureDevelopmentProgram;
             require(existingWonder = false, "Already owned");
+            uint256 techAmount = InfrastructureContract(infrastructureAddress)
+                .getTechnologyCount(countryId);
+            require(techAmount >= 500, "Requires 500 Tech");
+            uint256 landAmount = InfrastructureContract(infrastructureAddress)
+                .getLandCount(countryId);
+            require(landAmount >= 3000, "Requires 3000 Land");
             idToWonders1[countryId].agricultureDevelopmentProgram = true;
             idToWonders1[countryId].wonderCount += 1;
             TreasuryContract(treasuryAddress).spendBalance(
@@ -289,6 +306,18 @@ contract WondersContract1 is Ownable {
             require(balance >= empWeaponizationCost, "Insufficient balance");
             bool existingWonder = idToWonders1[countryId].empWeaponization;
             require(existingWonder = false, "Already owned");
+            bool isWrcThere = WondersContract4(wondersContract4Address)
+                .getWeaponsResearchCenter(countryId);
+            require(
+                isWrcThere = true,
+                "Must own Weapons Research Center to purchase"
+            );
+            uint256 techAmount = InfrastructureContract(infrastructureAddress)
+                .getTechnologyCount(countryId);
+            require(
+                techAmount >= 5000,
+                "Must have 5000 Technology to purchase"
+            );
             idToWonders1[countryId].empWeaponization = true;
             idToWonders1[countryId].wonderCount += 1;
             TreasuryContract(treasuryAddress).spendBalance(
@@ -302,6 +331,17 @@ contract WondersContract1 is Ownable {
             );
             bool existingWonder = idToWonders1[countryId].falloutShelterSystem;
             require(existingWonder = false, "Already owned");
+            uint256 infrastructureAmount = InfrastructureContract(
+                infrastructureAddress
+            ).getInfrastructureCount(countryId);
+            require(
+                infrastructureAmount <= 6000,
+                "Requires 6000 Infrastructure to purchase"
+            );
+            uint256 technologyAmount = InfrastructureContract(
+                infrastructureAddress
+            ).getTechnologyCount(countryId);
+            require(technologyAmount >= 2000, "Requires 2000 Tech to purchase");
             idToWonders1[countryId].falloutShelterSystem = true;
             idToWonders1[countryId].wonderCount += 1;
             TreasuryContract(treasuryAddress).spendBalance(
@@ -325,6 +365,12 @@ contract WondersContract1 is Ownable {
             require(balance >= federalReserveCost, "Insufficient balance");
             bool existingWonder = idToWonders1[countryId].federalReserve;
             require(existingWonder = false, "Already owned");
+            bool isStockMarket = WondersContract4(wondersContract4Address)
+                .getStockMarket(countryId);
+            require(
+                isStockMarket = true,
+                "Required to own stock market to purchase"
+            );
             idToWonders1[countryId].federalReserve = true;
             idToWonders1[countryId].wonderCount += 1;
             TreasuryContract(treasuryAddress).spendBalance(
@@ -345,6 +391,12 @@ contract WondersContract1 is Ownable {
             require(balance >= foreignArmyBaseCost, "Insufficient balance");
             bool existingWonder = idToWonders1[countryId].foreignArmyBase;
             require(existingWonder = false, "Already owned");
+            uint256 techAmount = InfrastructureContract(infrastructureAddress)
+                .getTechnologyCount(countryId);
+            require(
+                techAmount >= 8000,
+                "Must have 8000 Technology to purchase"
+            );
             idToWonders1[countryId].foreignArmyBase = true;
             idToWonders1[countryId].wonderCount += 1;
             TreasuryContract(treasuryAddress).spendBalance(
@@ -355,6 +407,13 @@ contract WondersContract1 is Ownable {
             require(balance >= foreignNavalBaseCost, "Insufficient balance");
             bool existingWonder = idToWonders1[countryId].foreignNavalBase;
             require(existingWonder = false, "Already owned");
+            uint256 infrastructureAmount = InfrastructureContract(
+                infrastructureAddress
+            ).getInfrastructureCount(countryId);
+            require(
+                infrastructureAmount >= 20000,
+                "Requires 20000 infrastructure to purchase"
+            );
             idToWonders1[countryId].foreignNavalBase = true;
             idToWonders1[countryId].wonderCount += 1;
             TreasuryContract(treasuryAddress).spendBalance(
@@ -1582,5 +1641,23 @@ contract WondersContract4 is Ownable {
                 countryId
             );
         }
+    }
+
+    function getWeaponsResearchCenter(uint256 countryId)
+        public
+        view
+        returns (bool isWrcThere)
+    {
+        bool isWrc = idToWonders4[countryId].weaponsResearchCenter;
+        return isWrc;
+    }
+
+    function getStockMarket(uint256 countryId)
+        public
+        view
+        returns (bool isStockMarketThere)
+    {
+        bool isStockMarket = idToWonders4[countryId].stockMarket;
+        return isStockMarket;
     }
 }
