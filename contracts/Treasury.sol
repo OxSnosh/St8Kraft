@@ -8,7 +8,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract TreasuryContract is Ownable {
     uint256 private treasuryId;
     address public warBucksAddress;
-    uint256 private taxPercentage = 0;
+    uint256 private taxPercentage = 0;    
+    uint256 public seedMoney = 2000000;
 
     struct Treasury {
         uint256 grossIncomePerCitizenPerDay;
@@ -33,6 +34,7 @@ contract TreasuryContract is Ownable {
         Treasury memory newTreasury = Treasury(0, 0, 0, 0, 0, 0, 0, 0, 0);
         idToTreasury[treasuryId] = newTreasury;
         idToOwnerTreasury[treasuryId] = msg.sender;
+        idToTreasury[treasuryId].balance += seedMoney;
         treasuryId++;
     }
 

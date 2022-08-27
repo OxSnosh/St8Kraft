@@ -37,7 +37,6 @@ contract CountryMinter is ERC721, Ownable {
     address public navy;
     address public fighters;
     address public bombers;
-    uint256 public seedMoney = 2000000;
 
     mapping(uint256 => address) public idToOwner;
     mapping(address => uint256) public ownerCountryCount;
@@ -100,7 +99,6 @@ contract CountryMinter is ERC721, Ownable {
             ownerCountryCount[msg.sender] == 0,
             "Wallet already contains a country"
         );
-        IWarBucks(warBucks).mint(address(this), seedMoney);
         CountryParametersContract(countryParameters).generateCountryParameters(
             ruler,
             nationName,
