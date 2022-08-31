@@ -4,6 +4,7 @@ pragma solidity 0.8.7;
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "./Infrastructure.sol";
+import "./Improvements.sol";
 
 contract ResourcesContract is VRFConsumerBaseV2 {
     uint256 private resourcesId;
@@ -11,9 +12,12 @@ contract ResourcesContract is VRFConsumerBaseV2 {
     uint256 public resourcesLength = 21;
     uint256[] private s_randomWords;
     uint256[] public playerResources;
+    uint256[] public tradingPartners;
+    uint256[] public proposedTrades;
     uint256[] public trades;
     address public infrastructure;
-    
+    address public improvements;
+
     //Chainlik Variables
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
     uint64 private immutable i_subscriptionId;
@@ -51,13 +55,13 @@ contract ResourcesContract is VRFConsumerBaseV2 {
 
     struct BonusResources {
         bool beer;
-        //requires Water, Wheat, Lumber, Aluminium 
+        //requires Water, Wheat, Lumber, Aluminium
         bool steel;
-        //reduces infrastructure cost -2%. 
+        //reduces infrastructure cost -2%.
         //Lowers all vessel costs -15%
         //requires Coal and Iron
         bool construction;
-        //requires Lumber, Iron, Marble, Aluminium, tech > 5 
+        //requires Lumber, Iron, Marble, Aluminium, tech > 5
         bool fastFood;
         //requires Cattle, Sugar, Spices, Pigs
         bool fineJewelry;
@@ -77,7 +81,7 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         //lowers frigate, destroyer, submarine, aircraft carrier upkeep cost -10%
         //requires Gold, Lead, Oil, tech > 10
         bool radiationCleanup;
-        //reduces nuclear anarchy effects by 1 day 
+        //reduces nuclear anarchy effects by 1 day
         //Improves a nation's environment by 1
         //Resuces global radiation for oyur nation by 50%
         //requires Construction, Microchips, Steel and Technology > 15
@@ -103,6 +107,8 @@ contract ResourcesContract is VRFConsumerBaseV2 {
     mapping(uint256 => MoonResources) public idToMoonResources;
     mapping(uint256 => MarsResources) public idToMarsResources;
     mapping(uint256 => uint256[]) public idToPlayerResources;
+    mapping(uint256 => uint256[]) public idToTradingPartners;
+    mapping(uint256 => uint256[]) public idToProposedTradingPartners;
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
     mapping(uint256 => address) public idToOwnerResources;
@@ -113,13 +119,15 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
         uint32 callbackGasLimit,
-        address _infrastructure
+        address _infrastructure,
+        address _improvements
     ) VRFConsumerBaseV2(vrfCoordinatorV2) {
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
         infrastructure = _infrastructure;
+        improvements = _improvements;
     }
 
     function generateResources() public {
@@ -180,9 +188,8 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         idToMarsResources[resourcesId] = newMarsResources;
         idToOwnerResources[resourcesId] = msg.sender;
         fulfillRequest();
-        // resourcesId++;
+        resourcesId++;
     }
-
 
     function fulfillRequest() public {
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
@@ -197,29 +204,29 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         requestCounter += 1;
     }
 
-    function fulfillRandomWords(
-        uint256 requestId,
-        uint256[] memory randomWords
-    ) internal override {
+    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords)
+        internal
+        override
+    {
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
         s_requestIndexToRandomWords[requestNumber] = randomWords;
         s_randomWords = randomWords;
         uint256 randomResource1 = (s_randomWords[0] % 20);
         uint256 randomResource2 = (s_randomWords[1] % 20);
-        //handle 2 of the same randomly generated numbers?
-        // if (resource1 == resource2 && resource2 == 20) {
-        //     resource2 == 0;
-        // }
-        // if (resource1 == resource2) {
-        //     resource2 = resource2 + 1;   
-        // }
+        //handle 2 of the same randomly generated numbers
+        if (randomResource1 == randomResource2 && randomResource2 == 20) {
+            randomResource2 == 0;
+        }
+        if (randomResource1 == randomResource2) {
+            randomResource2 = randomResource2 + 1;
+        }
         playerResources = [randomResource1, randomResource2];
         idToPlayerResources[resourcesId] = playerResources;
         setResources(resourcesId);
         resourcesId++;
     }
 
-    function setResources(uint256 id) private {
+    function setResources(uint256 id) internal {
         idToResources1[id].aluminium = false;
         idToResources1[id].cattle = false;
         idToResources1[id].coal = false;
@@ -306,19 +313,86 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         if (resource1 == 20 || resource2 == 20) {
             idToResources2[id].wine = true;
         }
-        checkForTrades(id);
-    }
-        //need a formula that sets everything to false
-        //then loops over player resources and playertrades and sets those = true
-        //should player trades be a double mapping or an array with numbers
-        //how to add and remove a trade
-
-    function checkForTrades(uint256 id) internal {
-        checkForBonusResources(id);
+        setTrades(id);
     }
 
+    function setTrades(uint256 id) internal {
+        uint256[] memory activeTrades = idToTradingPartners[id];
+        uint256 i;
+        for (i = 0; i < activeTrades.length; i++) {
+            uint256 tradingPartner = i;
+            (
+                uint256 resource1,
+                uint256 resource2
+            ) = getResourcesFromTradingPartner(tradingPartner);
+            if (resource1 == 0 || resource2 == 0) {
+                idToResources1[id].aluminium = true;
+            }
+            if (resource1 == 1 || resource2 == 1) {
+                idToResources1[id].cattle = true;
+            }
+            if (resource1 == 2 || resource2 == 2) {
+                idToResources1[id].coal = true;
+            }
+            if (resource1 == 3 || resource2 == 3) {
+                idToResources1[id].fish = true;
+            }
+            if (resource1 == 4 || resource2 == 4) {
+                idToResources1[id].furs = true;
+            }
+            if (resource1 == 5 || resource2 == 5) {
+                idToResources1[id].gems = true;
+            }
+            if (resource1 == 6 || resource2 == 6) {
+                idToResources1[id].gold = true;
+            }
+            if (resource1 == 7 || resource2 == 7) {
+                idToResources1[id].iron = true;
+            }
+            if (resource1 == 8 || resource2 == 8) {
+                idToResources1[id].lead = true;
+            }
+            if (resource1 == 9 || resource2 == 9) {
+                idToResources1[id].lumber = true;
+            }
+            if (resource1 == 10 || resource2 == 10) {
+                idToResources1[id].marble = true;
+            }
+            if (resource1 == 11 || resource2 == 11) {
+                idToResources2[id].oil = true;
+            }
+            if (resource1 == 12 || resource2 == 12) {
+                idToResources2[id].pigs = true;
+            }
+            if (resource1 == 13 || resource2 == 13) {
+                idToResources2[id].rubber = true;
+            }
+            if (resource1 == 14 || resource2 == 14) {
+                idToResources2[id].silver = true;
+            }
+            if (resource1 == 15 || resource2 == 15) {
+                idToResources2[id].spices = true;
+            }
+            if (resource1 == 16 || resource2 == 16) {
+                idToResources2[id].sugar = true;
+            }
+            if (resource1 == 17 || resource2 == 17) {
+                idToResources2[id].uranium = true;
+            }
+            if (resource1 == 18 || resource2 == 18) {
+                idToResources2[id].water = true;
+            }
+            if (resource1 == 19 || resource2 == 19) {
+                idToResources2[id].wheat = true;
+            }
+            if (resource1 == 20 || resource2 == 20) {
+                idToResources2[id].wine = true;
+            }
+        }
+        setBonusResources(id);
+    }
 
-    function checkForBonusResources(uint256 id) public {
+    function setBonusResources(uint256 id) public {
         idToBonusResources[id].affluentPopulation = false;
         idToBonusResources[id].asphalt = false;
         idToBonusResources[id].automobiles = false;
@@ -336,14 +410,11 @@ contract ResourcesContract is VRFConsumerBaseV2 {
             idToResources1[id].lumber &&
             idToResources2[id].water &&
             idToResources2[id].wheat
-        ){
+        ) {
             idToBonusResources[id].beer = true;
         }
         //check for steel (coal, iron)
-        if (
-            idToResources1[id].coal &&
-            idToResources1[id].iron
-        ){
+        if (idToResources1[id].coal && idToResources1[id].iron) {
             idToBonusResources[id].steel = true;
         }
         //construction (lumber, iron, marble, aluminum)
@@ -352,7 +423,7 @@ contract ResourcesContract is VRFConsumerBaseV2 {
             idToResources1[id].iron &&
             idToResources1[id].lumber &&
             idToResources1[id].marble
-        ){
+        ) {
             idToBonusResources[id].construction = true;
         }
         //fast food (cattle sugar spices pigs)
@@ -361,7 +432,7 @@ contract ResourcesContract is VRFConsumerBaseV2 {
             idToResources2[id].pigs &&
             idToResources2[id].spices &&
             idToResources2[id].sugar
-        ){
+        ) {
             idToBonusResources[id].fastFood = true;
         }
         //fine jewelry (gold silver gems coal)
@@ -370,7 +441,7 @@ contract ResourcesContract is VRFConsumerBaseV2 {
             idToResources1[id].gold &&
             idToResources1[id].gems &&
             idToResources2[id].silver
-        ){
+        ) {
             idToBonusResources[id].fineJewelry = true;
         }
         //scholars (lumber, lead, literacy >90%)
@@ -379,7 +450,7 @@ contract ResourcesContract is VRFConsumerBaseV2 {
             literacyRate > 90 &&
             idToResources1[id].lumber &&
             idToResources1[id].lead
-        ){
+        ) {
             idToBonusResources[id].scholars = true;
         }
         //asphalt (construction, oil, rubber)
@@ -387,14 +458,11 @@ contract ResourcesContract is VRFConsumerBaseV2 {
             idToBonusResources[id].construction &&
             idToResources2[id].oil &&
             idToResources2[id].rubber
-        ){
+        ) {
             idToBonusResources[id].asphalt = true;
         }
         //automobiles (asphalt Steel)
-        if (
-            idToBonusResources[id].asphalt &&
-            idToBonusResources[id].steel
-        ){
+        if (idToBonusResources[id].asphalt && idToBonusResources[id].steel) {
             idToBonusResources[id].automobiles = true;
         }
         //affluent population (fine jewelry fish furs wine)
@@ -403,17 +471,18 @@ contract ResourcesContract is VRFConsumerBaseV2 {
             idToResources1[id].fish &&
             idToResources1[id].furs &&
             idToResources2[id].wine
-        ){  
+        ) {
             idToBonusResources[id].affluentPopulation = true;
         }
         //microchips (Gold, Lead, Oil, tech > 10)
-        uint256 techAmount = InfrastructureContract(infrastructure).getTechnologyCount(id);
+        uint256 techAmount = InfrastructureContract(infrastructure)
+            .getTechnologyCount(id);
         if (
             techAmount > 10 &&
             idToResources1[id].gold &&
             idToResources1[id].lead &&
             idToResources2[id].oil
-        ){
+        ) {
             idToBonusResources[id].microchips = true;
         }
         //radiation cleanup (Construction, Microchips, Steel and Technology > 15)
@@ -422,8 +491,192 @@ contract ResourcesContract is VRFConsumerBaseV2 {
             idToBonusResources[id].construction &&
             idToBonusResources[id].microchips &&
             idToBonusResources[id].steel
-        ){
+        ) {
             idToBonusResources[id].radiationCleanup = true;
         }
+    }
+
+    function proposeTrade(uint256 requestorId, uint256 recipientId) public {
+        require(
+            idToOwnerResources[requestorId] == msg.sender,
+            "requestor is not nation owner"
+        );
+        bool isPossibleRequestor = isTradePossibleForRequestor(requestorId);
+        bool isPossibleRecipient = isTradePossibleForRecipient(recipientId);
+        require(isPossibleRequestor = true, "trade is not possible");
+        require(isPossibleRecipient = true, "trade is not possible");
+        uint256[]
+            storage proposedTradesOfRecipient = idToProposedTradingPartners[
+                recipientId
+            ];
+        uint256[]
+            storage proposedTradesOfRequestor = idToProposedTradingPartners[
+                requestorId
+            ];
+        proposedTradesOfRecipient.push(requestorId);
+        proposedTradesOfRequestor.push(recipientId);
+        // pushProposals(requestorId, recipientId);
+    }
+
+    function isTradePossibleForRequestor(uint256 requestorId)
+        internal
+        view
+        returns (bool)
+    {
+        uint256[] memory requestorTradeAgreements = idToTradingPartners[
+            requestorId
+        ];
+        uint256[]
+            memory proposedTradesOfRequestor = idToProposedTradingPartners[
+                requestorId
+            ];
+        uint256 requestorTradesActive = requestorTradeAgreements.length;
+        uint256 requestorProposedTrades = proposedTradesOfRequestor.length;
+        uint256 requestorTotalTrades = requestorTradesActive +
+            requestorProposedTrades;
+        uint256 requestorHarborAmount = ImprovementsContract2(improvements)
+            .getHarborCount(requestorId);
+        uint256 requestorMaxTrades = 3;
+        if (requestorHarborAmount > 0) {
+            requestorMaxTrades = 4;
+        }
+        require(
+            requestorMaxTrades >= (requestorTotalTrades + 1),
+            "requestor has too many active and proposed trades"
+        );
+        return true;
+    }
+
+    function isTradePossibleForRecipient(uint256 recipientId)
+        internal
+        view
+        returns (bool)
+    {
+        uint256[] memory recipientTradeAgreements = idToTradingPartners[
+            recipientId
+        ];
+        uint256[]
+            memory proposedTradesOfRecipient = idToProposedTradingPartners[
+                recipientId
+            ];
+        uint256 recipientTradesActive = recipientTradeAgreements.length;
+        uint256 recipientProposedTrades = proposedTradesOfRecipient.length;
+        uint256 recipientTotalTrades = recipientTradesActive +
+            recipientProposedTrades;
+        uint256 recipientHarborAmount = ImprovementsContract2(improvements)
+            .getHarborCount(recipientId);
+        uint256 recipientMaxTrades = 4;
+        if (recipientHarborAmount > 0) {
+            recipientMaxTrades = 5;
+        }
+        require(
+            recipientMaxTrades >= (recipientTotalTrades + 1),
+            "recipient has too many active and proposed trades"
+        );
+        return true;
+    }
+
+    function fulfillTradingPartner(uint256 recipientId, uint256 requestorId)
+        public
+    {
+        require(
+            idToOwnerResources[recipientId] == msg.sender,
+            "you are not the nation owner of the request"
+        );
+        bool isProposed = isProposedTrade(recipientId, requestorId);
+        require(isProposed == true, "Not an active trade proposal");
+        uint256[]
+            storage proposedTradesOfRequestor = idToProposedTradingPartners[
+                requestorId
+            ];
+        for (uint256 i = 0; i < proposedTradesOfRequestor.length; i++) {
+            if (proposedTradesOfRequestor[i] == recipientId) {
+                delete proposedTradesOfRequestor[i];
+            }
+        }
+        uint256[]
+            storage proposedTradesOfRecipient = idToProposedTradingPartners[
+                recipientId
+            ];
+        for (uint256 i = 0; i < proposedTradesOfRecipient.length; i++) {
+            if (proposedTradesOfRecipient[i] == requestorId) {
+                delete proposedTradesOfRequestor[i];
+            }
+        }
+        uint256[] storage recipientTradeAgreements = idToTradingPartners[
+            recipientId
+        ];
+        recipientTradeAgreements.push(requestorId);
+        uint256[] storage requestorTradeAgreements = idToTradingPartners[
+            requestorId
+        ];
+        requestorTradeAgreements.push(recipientId);
+        setResources(recipientId);
+        setResources(requestorId);
+    }
+
+    function removeTradingPartner(uint256 nationId, uint256 partnerId) public {
+        require(
+            idToOwnerResources[nationId] == msg.sender,
+            "you are not the nation owner of the request"
+        );
+        bool isActive = isActiveTrade(nationId, partnerId);
+        require(isActive == true, "this is not an active trade");
+        uint256[] storage tradesOfNation = idToTradingPartners[nationId];
+        for (uint256 i = 0; i < tradesOfNation.length; i++) {
+            if (tradesOfNation[i] == partnerId) {
+                delete tradesOfNation[i];
+            }
+        }
+        uint256[] storage tradesOfPartner = idToTradingPartners[partnerId];
+        for (uint256 i = 0; i < tradesOfPartner.length; i++) {
+            if (tradesOfPartner[i] == nationId) {
+                delete tradesOfPartner[i];
+            }
+        }
+        setResources(nationId);
+        setResources(partnerId);
+    }
+
+    function isProposedTrade(uint256 recipientId, uint256 requestorId)
+        public
+        view
+        returns (bool isProposed)
+    {
+        uint256[]
+            memory proposedTradesOfRecipient = idToProposedTradingPartners[
+                recipientId
+            ];
+        for (uint256 i = 0; i < proposedTradesOfRecipient.length; i++) {
+            if (proposedTradesOfRecipient[i] == requestorId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function isActiveTrade(uint256 country1Id, uint256 country2Id)
+        public
+        view
+        returns (bool isActive)
+    {
+        uint256[] memory activeTrades = idToTradingPartners[country1Id];
+        for (uint256 i = 0; i < activeTrades.length; i++) {
+            if (activeTrades[i] == country2Id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function getResourcesFromTradingPartner(uint256 partnerId)
+        public
+        view
+        returns (uint256, uint256)
+    {
+        uint256[] memory partnerResources = idToPlayerResources[partnerId];
+        uint256 resource1 = partnerResources[0];
+        uint256 resource2 = partnerResources[1];
+        return (resource1, resource2);
     }
 }
