@@ -37,6 +37,11 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
+"@chainlink/contracts@^0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@chainlink/contracts/-/contracts-0.4.1.tgz#1c4f824920b89fbe5ff2294c35a86bca83c8253d"
+  integrity sha512-eC8biY6Ks8k9kZKVt5305veCP3z57yyiy6Os5aR6auta6Bp34xWQ/s4qvrifcW4FNgWw1HJPwMPXDGfiehcLjg==
+
 "@colors/colors@1.5.0":
   version "1.5.0"
   resolved "https://registry.npmjs.org/@colors/colors/-/colors-1.5.0.tgz"
@@ -799,17 +804,6 @@
     "@ethersproject/logger" "^5.5.0"
     "@ethersproject/properties" "^5.5.0"
     "@ethersproject/strings" "^5.5.0"
-
-"@fvictorio/tabtab@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@fvictorio/tabtab/-/tabtab-0.0.3.tgz#1b97981424386490fa2a5818706d2afd1f6e4659"
-  integrity sha512-bT/BSy8MJThrTebqTCjXRnGSgZWthHLigZ4k2AvfNtC79vPyBS1myaxw8gRU6RxIcdDD3HBtm7pOsOoyC086Zg==
-  dependencies:
-    debug "^4.1.1"
-    enquirer "^2.3.4"
-    minimist "^1.2.0"
-    mkdirp "^1.0.3"
-    untildify "^4.0.0"
 
 "@humanwhocodes/config-array@^0.5.0":
   version "0.5.0"
@@ -3880,7 +3874,7 @@ end-of-stream@^1.1.0:
   dependencies:
     once "^1.4.0"
 
-enquirer@^2.3.0, enquirer@^2.3.4, enquirer@^2.3.5, enquirer@^2.3.6:
+enquirer@^2.3.0, enquirer@^2.3.5, enquirer@^2.3.6:
   version "2.3.6"
   resolved "https://registry.npmjs.org/enquirer/-/enquirer-2.3.6.tgz"
   integrity sha512-yjNnPr315/FjS4zIsUxYguYUPP2e1NK4d7E7ZOLiyYCcbFBiTMyID+2wvm2w6+pZ/odMA7cRkjhsPbltwBOrLg==
@@ -5673,15 +5667,6 @@ hardhat-gas-reporter@^1.0.4:
     eth-gas-reporter "^0.2.24"
     sha1 "^1.1.1"
 
-hardhat-shorthand@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/hardhat-shorthand/-/hardhat-shorthand-1.0.0.tgz#ccc059c7e03115222b879c0347a18d20d0b31e3a"
-  integrity sha512-ixvUHrZBfGRXXrerBziNwGFmQZtz8iX43z2mJZTPnQasoaDbZ7oDZ4FqqI80EmZvP0hIml4wgpiQhrE3P/eqXQ==
-  dependencies:
-    "@fvictorio/tabtab" "^0.0.3"
-    debug "^4.1.1"
-    semver "^6.3.0"
-
 hardhat@^2.9.9:
   version "2.9.9"
   resolved "https://registry.npmjs.org/hardhat/-/hardhat-2.9.9.tgz"
@@ -7428,7 +7413,7 @@ mkdirp-promise@^5.0.1:
   dependencies:
     mkdirp "*"
 
-mkdirp@*, mkdirp@^1.0.3, mkdirp@^1.0.4:
+mkdirp@*, mkdirp@^1.0.4:
   version "1.0.4"
   resolved "https://registry.npmjs.org/mkdirp/-/mkdirp-1.0.4.tgz"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
@@ -10291,11 +10276,6 @@ unset-value@^1.0.0:
   dependencies:
     has-value "^0.3.1"
     isobject "^3.0.0"
-
-untildify@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/untildify/-/untildify-4.0.0.tgz#2bc947b953652487e4600949fb091e3ae8cd919b"
-  integrity sha512-KK8xQ1mkzZeg9inewmFVDNkg3l5LUhoq9kN6iWYB/CC9YMG8HA+c1Q8HwDe6dEX7kErrEVNVBO3fWsVq5iDgtw==
 
 upper-case-first@^1.1.0, upper-case-first@^1.1.2:
   version "1.1.2"

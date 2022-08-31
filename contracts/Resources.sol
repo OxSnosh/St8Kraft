@@ -1,11 +1,29 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.7;
 
-contract ResourcesContract {
+import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
+import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+import "./Infrastructure.sol";
+
+contract ResourcesContract is VRFConsumerBaseV2 {
     uint256 private resourcesId;
+    uint256 public requestCounter;
+    uint256 public resourcesLength = 21;
+    uint256[] private s_randomWords;
+    uint256[] public playerResources;
+    uint256[] public trades;
+    address public infrastructure;
+    
+    //Chainlik Variables
+    VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
+    uint64 private immutable i_subscriptionId;
+    bytes32 private immutable i_gasLane;
+    uint32 private immutable i_callbackGasLimit;
+    uint16 private constant REQUEST_CONFIRMATIONS = 3;
+    uint32 private constant NUM_WORDS = 2;
 
     struct Resources1 {
-        bool aluminum;
+        bool aluminium;
         bool cattle;
         bool coal;
         bool fish;
@@ -32,17 +50,37 @@ contract ResourcesContract {
     }
 
     struct BonusResources {
-        bool affluentPopulation;
-        bool asphalt;
-        bool automobiles;
         bool beer;
-        bool construction;
-        bool fastFood;
-        bool fineJewelry;
-        bool microchips;
-        bool radiationCleanup;
-        bool scholars;
+        //requires Water, Wheat, Lumber, Aluminium 
         bool steel;
+        //reduces infrastructure cost -2%. 
+        //Lowers all vessel costs -15%
+        //requires Coal and Iron
+        bool construction;
+        //requires Lumber, Iron, Marble, Aluminium, tech > 5 
+        bool fastFood;
+        //requires Cattle, Sugar, Spices, Pigs
+        bool fineJewelry;
+        //requires Gold, Silver, Gems, Coal
+        bool scholars;
+        //increases population income +$3.00
+        //requires literacy rate > 90%, lumber, lead
+        bool asphalt;
+        //requires Construction, Oil, Rubber
+        bool automobiles;
+        //requires Asphalt, Steel
+        bool affluentPopulation;
+        //requires fineJewelry, Fish, Furs, Wine
+        bool microchips;
+        //reduces tech cost -8%
+        //increases population happiness +2
+        //lowers frigate, destroyer, submarine, aircraft carrier upkeep cost -10%
+        //requires Gold, Lead, Oil, tech > 10
+        bool radiationCleanup;
+        //reduces nuclear anarchy effects by 1 day 
+        //Improves a nation's environment by 1
+        //Resuces global radiation for oyur nation by 50%
+        //requires Construction, Microchips, Steel and Technology > 15
     }
 
     struct MoonResources {
@@ -64,7 +102,25 @@ contract ResourcesContract {
     mapping(uint256 => BonusResources) public idToBonusResources;
     mapping(uint256 => MoonResources) public idToMoonResources;
     mapping(uint256 => MarsResources) public idToMarsResources;
+    mapping(uint256 => uint256[]) public idToPlayerResources;
+    mapping(uint256 => uint256) s_requestIdToRequestIndex;
+    mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
     mapping(uint256 => address) public idToOwnerResources;
+
+    /* Functions */
+    constructor(
+        address vrfCoordinatorV2,
+        uint64 subscriptionId,
+        bytes32 gasLane, // keyHash
+        uint32 callbackGasLimit,
+        address _infrastructure
+    ) VRFConsumerBaseV2(vrfCoordinatorV2) {
+        i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
+        i_gasLane = gasLane;
+        i_subscriptionId = subscriptionId;
+        i_callbackGasLimit = callbackGasLimit;
+        infrastructure = _infrastructure;
+    }
 
     function generateResources() public {
         Resources1 memory newResources1 = Resources1(
@@ -123,6 +179,251 @@ contract ResourcesContract {
         idToMoonResources[resourcesId] = newMoonResources;
         idToMarsResources[resourcesId] = newMarsResources;
         idToOwnerResources[resourcesId] = msg.sender;
+        fulfillRequest();
+        // resourcesId++;
+    }
+
+
+    function fulfillRequest() public {
+        uint256 requestId = i_vrfCoordinator.requestRandomWords(
+            i_gasLane,
+            i_subscriptionId,
+            REQUEST_CONFIRMATIONS,
+            i_callbackGasLimit,
+            NUM_WORDS
+        );
+        //should this be resourcesID?
+        s_requestIdToRequestIndex[requestId] = requestCounter;
+        requestCounter += 1;
+    }
+
+    function fulfillRandomWords(
+        uint256 requestId,
+        uint256[] memory randomWords
+    ) internal override {
+        uint256 requestNumber = s_requestIdToRequestIndex[requestId];
+        s_requestIndexToRandomWords[requestNumber] = randomWords;
+        s_randomWords = randomWords;
+        uint256 randomResource1 = (s_randomWords[0] % 20);
+        uint256 randomResource2 = (s_randomWords[1] % 20);
+        //handle 2 of the same randomly generated numbers?
+        // if (resource1 == resource2 && resource2 == 20) {
+        //     resource2 == 0;
+        // }
+        // if (resource1 == resource2) {
+        //     resource2 = resource2 + 1;   
+        // }
+        playerResources = [randomResource1, randomResource2];
+        idToPlayerResources[resourcesId] = playerResources;
+        setResources(resourcesId);
         resourcesId++;
+    }
+
+    function setResources(uint256 id) private {
+        idToResources1[id].aluminium = false;
+        idToResources1[id].cattle = false;
+        idToResources1[id].coal = false;
+        idToResources1[id].fish = false;
+        idToResources1[id].furs = false;
+        idToResources1[id].gems = false;
+        idToResources1[id].gold = false;
+        idToResources1[id].iron = false;
+        idToResources1[id].lead = false;
+        idToResources1[id].lumber = false;
+        idToResources1[id].marble = false;
+        idToResources2[id].oil = false;
+        idToResources2[id].pigs = false;
+        idToResources2[id].rubber = false;
+        idToResources2[id].silver = false;
+        idToResources2[id].spices = false;
+        idToResources2[id].sugar = false;
+        idToResources2[id].uranium = false;
+        idToResources2[id].water = false;
+        idToResources2[id].wheat = false;
+        idToResources2[id].wine = false;
+        uint256 resource1 = idToPlayerResources[id][0];
+        uint256 resource2 = idToPlayerResources[id][1];
+        if (resource1 == 0 || resource2 == 0) {
+            idToResources1[id].aluminium = true;
+        }
+        if (resource1 == 1 || resource2 == 1) {
+            idToResources1[id].cattle = true;
+        }
+        if (resource1 == 2 || resource2 == 2) {
+            idToResources1[id].coal = true;
+        }
+        if (resource1 == 3 || resource2 == 3) {
+            idToResources1[id].fish = true;
+        }
+        if (resource1 == 4 || resource2 == 4) {
+            idToResources1[id].furs = true;
+        }
+        if (resource1 == 5 || resource2 == 5) {
+            idToResources1[id].gems = true;
+        }
+        if (resource1 == 6 || resource2 == 6) {
+            idToResources1[id].gold = true;
+        }
+        if (resource1 == 7 || resource2 == 7) {
+            idToResources1[id].iron = true;
+        }
+        if (resource1 == 8 || resource2 == 8) {
+            idToResources1[id].lead = true;
+        }
+        if (resource1 == 9 || resource2 == 9) {
+            idToResources1[id].lumber = true;
+        }
+        if (resource1 == 10 || resource2 == 10) {
+            idToResources1[id].marble = true;
+        }
+        if (resource1 == 11 || resource2 == 11) {
+            idToResources2[id].oil = true;
+        }
+        if (resource1 == 12 || resource2 == 12) {
+            idToResources2[id].pigs = true;
+        }
+        if (resource1 == 13 || resource2 == 13) {
+            idToResources2[id].rubber = true;
+        }
+        if (resource1 == 14 || resource2 == 14) {
+            idToResources2[id].silver = true;
+        }
+        if (resource1 == 15 || resource2 == 15) {
+            idToResources2[id].spices = true;
+        }
+        if (resource1 == 16 || resource2 == 16) {
+            idToResources2[id].sugar = true;
+        }
+        if (resource1 == 17 || resource2 == 17) {
+            idToResources2[id].uranium = true;
+        }
+        if (resource1 == 18 || resource2 == 18) {
+            idToResources2[id].water = true;
+        }
+        if (resource1 == 19 || resource2 == 19) {
+            idToResources2[id].wheat = true;
+        }
+        if (resource1 == 20 || resource2 == 20) {
+            idToResources2[id].wine = true;
+        }
+        checkForTrades(id);
+    }
+        //need a formula that sets everything to false
+        //then loops over player resources and playertrades and sets those = true
+        //should player trades be a double mapping or an array with numbers
+        //how to add and remove a trade
+
+    function checkForTrades(uint256 id) internal {
+        checkForBonusResources(id);
+    }
+
+
+    function checkForBonusResources(uint256 id) public {
+        idToBonusResources[id].affluentPopulation = false;
+        idToBonusResources[id].asphalt = false;
+        idToBonusResources[id].automobiles = false;
+        idToBonusResources[id].beer = false;
+        idToBonusResources[id].construction = false;
+        idToBonusResources[id].fastFood = false;
+        idToBonusResources[id].fineJewelry = false;
+        idToBonusResources[id].microchips = false;
+        idToBonusResources[id].radiationCleanup = false;
+        idToBonusResources[id].scholars = false;
+        idToBonusResources[id].steel = false;
+        //check for beer (aluminium, luber, water, wheat)
+        if (
+            idToResources1[id].aluminium &&
+            idToResources1[id].lumber &&
+            idToResources2[id].water &&
+            idToResources2[id].wheat
+        ){
+            idToBonusResources[id].beer = true;
+        }
+        //check for steel (coal, iron)
+        if (
+            idToResources1[id].coal &&
+            idToResources1[id].iron
+        ){
+            idToBonusResources[id].steel = true;
+        }
+        //construction (lumber, iron, marble, aluminum)
+        if (
+            idToResources1[id].aluminium &&
+            idToResources1[id].iron &&
+            idToResources1[id].lumber &&
+            idToResources1[id].marble
+        ){
+            idToBonusResources[id].construction = true;
+        }
+        //fast food (cattle sugar spices pigs)
+        if (
+            idToResources1[id].cattle &&
+            idToResources2[id].pigs &&
+            idToResources2[id].spices &&
+            idToResources2[id].sugar
+        ){
+            idToBonusResources[id].fastFood = true;
+        }
+        //fine jewelry (gold silver gems coal)
+        if (
+            idToResources1[id].coal &&
+            idToResources1[id].gold &&
+            idToResources1[id].gems &&
+            idToResources2[id].silver
+        ){
+            idToBonusResources[id].fineJewelry = true;
+        }
+        //scholars (lumber, lead, literacy >90%)
+        uint256 literacyRate;
+        if (
+            literacyRate > 90 &&
+            idToResources1[id].lumber &&
+            idToResources1[id].lead
+        ){
+            idToBonusResources[id].scholars = true;
+        }
+        //asphalt (construction, oil, rubber)
+        if (
+            idToBonusResources[id].construction &&
+            idToResources2[id].oil &&
+            idToResources2[id].rubber
+        ){
+            idToBonusResources[id].asphalt = true;
+        }
+        //automobiles (asphalt Steel)
+        if (
+            idToBonusResources[id].asphalt &&
+            idToBonusResources[id].steel
+        ){
+            idToBonusResources[id].automobiles = true;
+        }
+        //affluent population (fine jewelry fish furs wine)
+        if (
+            idToBonusResources[id].fineJewelry &&
+            idToResources1[id].fish &&
+            idToResources1[id].furs &&
+            idToResources2[id].wine
+        ){  
+            idToBonusResources[id].affluentPopulation = true;
+        }
+        //microchips (Gold, Lead, Oil, tech > 10)
+        uint256 techAmount = InfrastructureContract(infrastructure).getTechnologyCount(id);
+        if (
+            techAmount > 10 &&
+            idToResources1[id].gold &&
+            idToResources1[id].lead &&
+            idToResources2[id].oil
+        ){
+            idToBonusResources[id].microchips = true;
+        }
+        //radiation cleanup (Construction, Microchips, Steel and Technology > 15)
+        if (
+            techAmount > 15 &&
+            idToBonusResources[id].construction &&
+            idToBonusResources[id].microchips &&
+            idToBonusResources[id].steel
+        ){
+            idToBonusResources[id].radiationCleanup = true;
+        }
     }
 }

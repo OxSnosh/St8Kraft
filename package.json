@@ -9,6 +9,7 @@
     "deploy": "yarn hardhat run scripts/deploy.ts"
   },
   "devDependencies": {
+    "@chainlink/contracts": "^0.4.1",
     "@nomiclabs/hardhat-ethers": "^2.0.0",
     "@nomiclabs/hardhat-etherscan": "^3.0.0",
     "@nomiclabs/hardhat-solhint": "^2.0.1",
