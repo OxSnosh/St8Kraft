@@ -188,7 +188,8 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         idToMarsResources[resourcesId] = newMarsResources;
         idToOwnerResources[resourcesId] = msg.sender;
         fulfillRequest();
-        resourcesId++;
+        //when to increment resources id
+        //resourcesId++
     }
 
     function fulfillRequest() public {

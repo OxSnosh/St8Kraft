@@ -6,7 +6,7 @@ contract MilitaryContract {
 
     struct Military {
         uint256 defconLevel;
-        string threatLevel;
+        uint256 threatLevel;
         bool warPeacePreference;
         uint256 nationStrength;
         uint16 environment;
@@ -17,14 +17,7 @@ contract MilitaryContract {
     mapping(uint256 => address) public idToOwnerMilitary;
 
     function generateMilitary() public {
-        Military memory newMilitary = Military(
-            5,
-            "ThreatLevel",
-            false,
-            0,
-            0,
-            0
-        );
+        Military memory newMilitary = Military(5, 1, false, 0, 0, 0);
         idToMilitary[militaryId] = newMilitary;
         idToOwnerMilitary[militaryId] = msg.sender;
         militaryId++;
@@ -46,11 +39,19 @@ contract MilitaryContract {
         idToMilitary[id].defconLevel = newDefcon;
     }
 
-    //HELP
-    // function updateThreatLevel(string memory newThreatLevel, uint id) public {
-    //     require(idToOwnerMilitary[id] == msg.sender, "You are not the nation ruler");
-    //     require(newThreatLevel = "Low" || newThreatLevel = "Medium" || newThreatLevel = "High", "New threat level not either Low, Medium or High");
-    // }
+    function updateThreatLevel(uint256 newThreatLevel, uint256 id) public {
+        require(
+            idToOwnerMilitary[id] == msg.sender,
+            "You are not the nation ruler"
+        );
+        require(
+            newThreatLevel == 1 || 
+            newThreatLevel == 2 ||
+            newThreatLevel == 3,
+            "Not a valid threat level"
+        );
+        idToMilitary[id].threatLevel = newThreatLevel;
+    }
 
     function toggleWarPeacePreference(uint256 id) public {
         require(
