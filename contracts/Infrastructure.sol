@@ -79,74 +79,73 @@ contract InfrastructureContract {
             "caller not the nation owner"
         );
         uint256 currentTechAmount = getTechnologyCount(id);
-        uint256 finalTechAmount = (currentTechAmount + amount);
-        uint256 baseCostPerTechLevel = getBaseTechCost(finalTechAmount);
+        uint256 baseCostPerTechLevel = getBaseTechCost(currentTechAmount);
         uint256 costMultiplier = getTechCostMultiplier(id);
         uint256 adjustedCostPerLevel = (baseCostPerTechLevel * costMultiplier);
         uint256 cost = amount * adjustedCostPerLevel;
         TreasuryContract(treasury).spendBalance(id, cost);
     }
 
-    function getBaseTechCost(uint256 finalTechAmount)
+    function getBaseTechCost(uint256 currentTechAmount)
         public
         pure
         returns (uint256)
     {
-        if (finalTechAmount < 5) {
+        if (currentTechAmount < 5) {
             return 100;
-        } else if (finalTechAmount < 8) {
+        } else if (currentTechAmount < 8) {
             return 120;
-        } else if (finalTechAmount < 10) {
+        } else if (currentTechAmount < 10) {
             return 130;
-        } else if (finalTechAmount < 15) {
+        } else if (currentTechAmount < 15) {
             return 140;
-        } else if (finalTechAmount < 30) {
+        } else if (currentTechAmount < 30) {
             return 160;
-        } else if (finalTechAmount < 50) {
+        } else if (currentTechAmount < 50) {
             return 180;
-        } else if (finalTechAmount < 75) {
+        } else if (currentTechAmount < 75) {
             return 200;
-        } else if (finalTechAmount < 100) {
+        } else if (currentTechAmount < 100) {
             return 220;
-        } else if (finalTechAmount < 150) {
+        } else if (currentTechAmount < 150) {
             return 240;
-        } else if (finalTechAmount < 200) {
+        } else if (currentTechAmount < 200) {
             return 260;
-        } else if (finalTechAmount < 250) {
+        } else if (currentTechAmount < 250) {
             return 300;
-        } else if (finalTechAmount < 300) {
+        } else if (currentTechAmount < 300) {
             return 400;
-        } else if (finalTechAmount < 400) {
+        } else if (currentTechAmount < 400) {
             return 500;
-        } else if (finalTechAmount < 500) {
+        } else if (currentTechAmount < 500) {
             return 600;
-        } else if (finalTechAmount < 600) {
+        } else if (currentTechAmount < 600) {
             return 700;
-        } else if (finalTechAmount < 700) {
+        } else if (currentTechAmount < 700) {
             return 800;
-        } else if (finalTechAmount < 1000) {
+        } else if (currentTechAmount < 1000) {
             return 1100;
-        } else if (finalTechAmount < 2000) {
+        } else if (currentTechAmount < 2000) {
             return 1600;
-        } else if (finalTechAmount < 3000) {
+        } else if (currentTechAmount < 3000) {
             return 2100;
-        } else if (finalTechAmount < 4000) {
+        } else if (currentTechAmount < 4000) {
             return 2600;
-        } else if (finalTechAmount < 5000) {
+        } else if (currentTechAmount < 5000) {
             return 3100;
-        } else if (finalTechAmount < 6000) {
+        } else if (currentTechAmount < 6000) {
             return 3600;
-        } else if (finalTechAmount < 7000) {
+        } else if (currentTechAmount < 7000) {
             return 4100;
-        } else if (finalTechAmount < 8000) {
+        } else if (currentTechAmount < 8000) {
             return 4600;
-        } else if (finalTechAmount < 9000) {
+        } else if (currentTechAmount < 9000) {
             return 5100;
-        } else if (finalTechAmount < 10000) {
+        } else if (currentTechAmount < 10000) {
             return 5600;
-        } else if (finalTechAmount < 15000) {
+        } else if (currentTechAmount < 15000) {
             return 6600;
-        } else if (finalTechAmount < 20000) {
+        } else if (currentTechAmount < 20000) {
             return 7600;
         } else {
             return 8600;
@@ -201,10 +200,8 @@ contract InfrastructureContract {
             "caller not the nation owner"
         );
         uint256 currentInfrastructureAmount = getInfrastructureCount(id);
-        uint256 finalInfrastructureAmount = (currentInfrastructureAmount +
-            buyAmount);
         uint256 grossCostPerLevel = getInfrastructureCostPerLevel(
-            finalInfrastructureAmount
+            currentInfrastructureAmount
         );
         uint256 costAdjustments1 = getInfrastructureCostMultiplier1(id);
         uint256 costAdjustments2 = getInfrastructureCostMultiplier2(id);
@@ -261,11 +258,9 @@ contract InfrastructureContract {
         uint256 lumberMultiplier = 0;
         uint256 ironMultiplier = 0;
         uint256 marbleMultiplier = 0;
-
         bool isLumber = ResourcesContract(resources).viewLumber(id);
         bool isIron = ResourcesContract(resources).viewIron(id);
         bool isMarble = ResourcesContract(resources).viewMarble(id);
-
         if (isLumber) {
             lumberMultiplier = 6;
         }
@@ -275,12 +270,10 @@ contract InfrastructureContract {
         if (isMarble) {
             marbleMultiplier = 6;
         }
-     
         uint256 sumOfAdjustments = 
             lumberMultiplier +
             ironMultiplier +
             marbleMultiplier;
-   
         return sumOfAdjustments;
     }
 
@@ -333,11 +326,9 @@ contract InfrastructureContract {
         uint256 aluminiumMultiplier = 0;
         uint256 coalMultiplier = 0;
         uint256 steelMultiplier = 0;
-
         bool isAluminium = ResourcesContract(resources).viewAluminium(id);
         bool isCoal = ResourcesContract(resources).viewCoal(id);
         bool isSteel = ResourcesContract(resources).viewSteel(id);
-
         if (isAluminium) {
             aluminiumMultiplier = 6;
         }
