@@ -1034,6 +1034,15 @@ contract WondersContract2 is Ownable {
         bool isGreatUniversity = idToWonders2[countryId].greatUniversity;
         return isGreatUniversity;
     }
+
+    function getInterstateSystem(uint256 countryId)
+        public
+        view
+        returns (bool)
+    {
+        bool isInterstateSystem = idToWonders2[countryId].interstateSystem;
+        return isInterstateSystem;
+    }
 }
 
 contract WondersContract3 is Ownable {

@@ -5,14 +5,18 @@ import "./Resources.sol";
 import "./Improvements.sol";
 import "./Wonders.sol";
 import "./Treasury.sol";
+import "./CountrySettings.sol";
 
 contract InfrastructureContract {
     uint256 private infrastructureId;
     address public resources;
+    address public improvements1;
     address public improvements3;
+    address public wonders2;
     address public wonders3;
     address public wonders4;
     address public treasury;
+    address public countrySettings;
 
     struct Infrastructure {
         uint256 landCount;
@@ -32,16 +36,22 @@ contract InfrastructureContract {
 
     constructor(
         address _resources,
+        address _improvements1,
         address _improvements3,
+        address _wonders2,
         address _wonders3,
         address _wonders4,
-        address _treasury
+        address _treasury,
+        address _countrySettings
     ) {
         resources = _resources;
+        improvements1 = _improvements1;
         improvements3 = _improvements3;
+        wonders2 = _wonders2;
         wonders3 = _wonders3;
         wonders4 = _wonders4;
         treasury = _treasury;
+        countrySettings = _countrySettings;
     }
 
     function generateInfrastructure() public {
@@ -70,12 +80,11 @@ contract InfrastructureContract {
         );
         uint256 currentTechAmount = getTechnologyCount(id);
         uint256 finalTechAmount = (currentTechAmount + amount);
-        uint256 baseCostPerLevel = getBaseTechCost(finalTechAmount);
-        uint256 costMultiplier = getCostMultiplier(id);
-        uint256 adjustedCostPerLevel = (baseCostPerLevel * costMultiplier);
+        uint256 baseCostPerTechLevel = getBaseTechCost(finalTechAmount);
+        uint256 costMultiplier = getTechCostMultiplier(id);
+        uint256 adjustedCostPerLevel = (baseCostPerTechLevel * costMultiplier);
         uint256 cost = amount * adjustedCostPerLevel;
         TreasuryContract(treasury).spendBalance(id, cost);
-
     }
 
     function getBaseTechCost(uint256 finalTechAmount)
@@ -144,7 +153,7 @@ contract InfrastructureContract {
         }
     }
 
-    function getCostMultiplier(uint256 id) public view returns (uint256) {
+    function getTechCostMultiplier(uint256 id) public view returns (uint256) {
         //gold -5%
         //microchips -8%
         //-10% per university
@@ -184,6 +193,185 @@ contract InfrastructureContract {
             spaceProgramMultiplier;
         uint256 multiplier = (100 - sumOfAdjustments);
         return multiplier;
+    }
+
+    function buyInfrastructure(uint256 id, uint256 buyAmount) public {
+        require(
+            idToOwnerInfrastructure[id] == msg.sender,
+            "caller not the nation owner"
+        );
+        uint256 currentInfrastructureAmount = getInfrastructureCount(id);
+        uint256 finalInfrastructureAmount = (currentInfrastructureAmount +
+            buyAmount);
+        uint256 grossCostPerLevel = getInfrastructureCostPerLevel(
+            finalInfrastructureAmount
+        );
+        uint256 costAdjustments1 = getInfrastructureCostMultiplier1(id);
+        uint256 costAdjustments2 = getInfrastructureCostMultiplier2(id);
+        uint256 costAdjustments3 = getInfrastructureCostMultiplier3(id);
+        uint256 adjustments = (costAdjustments1 + costAdjustments2 + costAdjustments3);
+        uint256 multiplier = (100 - adjustments);
+        uint256 adjustedCostPerLevel = (grossCostPerLevel * multiplier);
+        uint256 cost = buyAmount * adjustedCostPerLevel;
+        TreasuryContract(treasury).spendBalance(id, cost);
+    }
+
+    function getInfrastructureCostPerLevel(uint256 currentInfrastructureAmount)
+        public
+        pure
+        returns (uint256)
+    {
+        if (currentInfrastructureAmount < 20) {
+            return 500;
+        } else if (currentInfrastructureAmount < 100) {
+            uint256 grossCost = ((currentInfrastructureAmount * 12) + 500);
+            return grossCost;
+        } else if (currentInfrastructureAmount < 200) {
+            uint256 grossCost = ((currentInfrastructureAmount * 15) + 500);
+            return grossCost;
+        } else if (currentInfrastructureAmount < 1000) {
+            uint256 grossCost = ((currentInfrastructureAmount * 20) + 500);
+            return grossCost;
+        } else if (currentInfrastructureAmount < 3000) {
+            uint256 grossCost = ((currentInfrastructureAmount * 25) + 500);
+            return grossCost;
+        } else if (currentInfrastructureAmount < 4000) {
+            uint256 grossCost = ((currentInfrastructureAmount * 30) + 500);
+            return grossCost;
+        } else if (currentInfrastructureAmount < 5000) {
+            uint256 grossCost = ((currentInfrastructureAmount * 40) + 500);
+            return grossCost;
+        } else if (currentInfrastructureAmount < 8000) {
+            uint256 grossCost = ((currentInfrastructureAmount * 60) + 500);
+            return grossCost;
+        } else if (currentInfrastructureAmount < 15000) {
+            uint256 grossCost = ((currentInfrastructureAmount * 70) + 500);
+            return grossCost;
+        } else {
+            uint256 grossCost = ((currentInfrastructureAmount * 80) + 500);
+            return grossCost;
+        }
+    }
+
+    function getInfrastructureCostMultiplier1(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 lumberMultiplier = 0;
+        uint256 ironMultiplier = 0;
+        uint256 marbleMultiplier = 0;
+
+        bool isLumber = ResourcesContract(resources).viewLumber(id);
+        bool isIron = ResourcesContract(resources).viewIron(id);
+        bool isMarble = ResourcesContract(resources).viewMarble(id);
+
+        if (isLumber) {
+            lumberMultiplier = 6;
+        }
+        if (isIron) {
+            ironMultiplier = 6;
+        }
+        if (isMarble) {
+            marbleMultiplier = 6;
+        }
+     
+        uint256 sumOfAdjustments = 
+            lumberMultiplier +
+            ironMultiplier +
+            marbleMultiplier;
+   
+        return sumOfAdjustments;
+    }
+
+    function getInfrastructureCostMultiplier2(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 rubberMultiplier = 0;
+        uint256 constructionMultiplier = 0;
+        uint256 insterstateSystemMultiplier = 0;
+        uint256 accomodativeGovernmentMultiplier = 0;
+        uint256 factoryMultiplier = 0;
+        bool isRubber = ResourcesContract(resources).viewRubber(id);
+        bool isConstruction = ResourcesContract(resources).viewConstruction(id);
+        bool isInterstateSystem = WondersContract2(wonders2)
+            .getInterstateSystem(id);
+        bool isAccomodativeGovernment = checkAccomodativeGovernment(id);
+        uint256 factoryCount = ImprovementsContract1(improvements1)
+            .getFactoryCount(id);
+        if (isRubber) {
+            rubberMultiplier = 6;
+        }
+        if (isConstruction) {
+            constructionMultiplier = 6;
+        }
+        if (isInterstateSystem) {
+            insterstateSystemMultiplier = 6;
+        }
+        if (isAccomodativeGovernment) {
+            accomodativeGovernmentMultiplier = 5;
+        }
+        if (factoryCount > 0) {
+            factoryMultiplier = (factoryCount * 8);
+        }
+        uint256 sumOfAdjustments = 
+            rubberMultiplier +
+            constructionMultiplier +
+            insterstateSystemMultiplier +
+            accomodativeGovernmentMultiplier +
+            factoryMultiplier;
+        return sumOfAdjustments;
+    }
+
+    function getInfrastructureCostMultiplier3(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 aluminiumMultiplier = 0;
+        uint256 coalMultiplier = 0;
+        uint256 steelMultiplier = 0;
+
+        bool isAluminium = ResourcesContract(resources).viewAluminium(id);
+        bool isCoal = ResourcesContract(resources).viewCoal(id);
+        bool isSteel = ResourcesContract(resources).viewSteel(id);
+
+        if (isAluminium) {
+            aluminiumMultiplier = 6;
+        }
+        if (isCoal) {
+            coalMultiplier = 6;
+        }
+        if (isSteel) {
+            steelMultiplier = 6;
+        }
+        uint256 sumOfAdjustments = 
+            aluminiumMultiplier +
+            coalMultiplier +
+            steelMultiplier;
+        return sumOfAdjustments;
+    }
+
+    function checkAccomodativeGovernment(uint256 countryId)
+        public
+        view
+        returns (bool)
+    {
+        uint256 governmentType = CountrySettingsContract(countrySettings)
+            .getGovernmentType(countryId);
+        if (
+            governmentType == 2 ||
+            governmentType == 5 ||
+            governmentType == 6 ||
+            governmentType == 7 ||
+            governmentType == 8 ||
+            governmentType == 9
+        ) {
+            return true;
+        }
+        return false;
     }
 
     function getLandCount(uint256 countryId)

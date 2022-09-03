@@ -10,7 +10,7 @@ contract CountrySettingsContract {
         uint256 lastTaxCollection;
         string alliance;
         string nationTeam;
-        string governmentType;
+        uint256 governmentType;
         string nationalReligion;
         string currencyType;
     }
@@ -24,7 +24,7 @@ contract CountrySettingsContract {
             block.timestamp,
             "Alliance",
             "nationTeam",
-            "governmentType",
+            0,
             "Religion",
             "Currency"
         );
@@ -36,6 +36,11 @@ contract CountrySettingsContract {
     function setAlliance(string memory newAlliance, uint id) public {
         require(idToOwnerSettings[id] == msg.sender, "You are not the nation ruler");
         idToCountrySettings[id].alliance = newAlliance;
+    }
+
+    function getGovernmentType(uint256 countryId) public view returns (uint) {
+        uint256 governmentType = idToCountrySettings[countryId].governmentType;
+        return governmentType;
     }
 
 }

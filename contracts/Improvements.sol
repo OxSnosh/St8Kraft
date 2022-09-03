@@ -522,6 +522,15 @@ contract ImprovementsContract1 is Ownable {
         uint256 clinicAmount = idToImprovements1[countryId].clinicCount;
         return clinicAmount;
     }
+
+    function getFactoryCount(uint256 countryId)
+        public
+        view
+        returns (uint256 count)
+    {
+        uint256 factoryAmount = idToImprovements1[countryId].factoryCount;
+        return factoryAmount;
+    }
 }
 
 contract ImprovementsContract2 is Ownable {

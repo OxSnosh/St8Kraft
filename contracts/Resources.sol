@@ -685,8 +685,50 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         bool isGold = idToResources1[id].gold;
         return isGold;
     }
+
     function viewMicrochips(uint256 id) public view returns (bool) {
         bool isMicrochips = idToBonusResources[id].microchips;
         return isMicrochips;
     }
+
+    function viewLumber(uint256 id) public view returns (bool) {
+        bool isLumber = idToResources1[id].lumber;
+        return isLumber;
+    }
+
+    function viewIron(uint256 id) public view returns (bool) {
+        bool isIron = idToResources1[id].iron;
+        return isIron;
+    }
+
+    function viewMarble(uint256 id) public view returns (bool) {
+        bool isMarble = idToResources1[id].marble;
+        return isMarble;
+    }
+
+    function viewAluminium(uint256 id) public view returns (bool) {
+        bool isAluminium = idToResources1[id].aluminium;
+        return isAluminium;
+    }
+
+    function viewCoal(uint256 id) public view returns (bool) {
+        bool isCoal = idToResources1[id].coal;
+        return isCoal;
+    }
+
+    function viewRubber(uint256 id) public view returns (bool) {
+        bool isRubber = idToResources2[id].rubber;
+        return isRubber;
+    }
+
+    function viewConstruction(uint256 id) public view returns (bool) {
+        bool isConstruction = idToBonusResources[id].construction;
+        return isConstruction;
+    }
+
+    function viewSteel(uint256 id) public view returns (bool) {
+        bool isSteel = idToBonusResources[id].steel;
+        return isSteel;
+    }
+
 }
