@@ -680,4 +680,13 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         uint256 resource2 = partnerResources[1];
         return (resource1, resource2);
     }
+
+    function viewGold(uint256 id) public view returns (bool) {
+        bool isGold = idToResources1[id].gold;
+        return isGold;
+    }
+    function viewMicrochips(uint256 id) public view returns (bool) {
+        bool isMicrochips = idToBonusResources[id].microchips;
+        return isMicrochips;
+    }
 }

@@ -8,7 +8,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract TreasuryContract is Ownable {
     uint256 private treasuryId;
     address public warBucksAddress;
-    uint256 private taxPercentage = 0;    
+    uint256 public daysToInactive;
+    uint256 private taxPercentage = 0;
     uint256 public seedMoney = 2000000;
 
     struct Treasury {
@@ -16,13 +17,11 @@ contract TreasuryContract is Ownable {
         uint256 individualTaxableIncomePerDay;
         uint256 netDailyTaxesCollectable;
         uint256 netDailyBillsPayable;
-        uint256 daysSinceLastTaxCollection;
-        uint256 incomeTaxesCollectedOverTime;
-        uint256 expensesOverTime;
-        uint256 billsPaid;
-        uint256 purchasesOverTime;
-        uint256 balance;
         uint256 lockedBalance;
+        uint256 daysSinceLastBillPaid;
+        uint256 daysSinceLastTaxCollection;
+        uint256 balance;
+        bool inactive;
     }
 
     mapping(uint256 => Treasury) public idToTreasury;
@@ -30,23 +29,25 @@ contract TreasuryContract is Ownable {
 
     constructor(address _warBucksAddress) {
         warBucksAddress = _warBucksAddress;
+        daysToInactive = 20;
     }
 
     function generateTreasury() public {
-        Treasury memory newTreasury = Treasury(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        Treasury memory newTreasury = Treasury(
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            false
+        );
         idToTreasury[treasuryId] = newTreasury;
         idToOwnerTreasury[treasuryId] = msg.sender;
         idToTreasury[treasuryId].balance += seedMoney;
         treasuryId++;
-    }
-
-    function checkBalance(uint256 id)
-        public
-        view
-        returns (uint256 countryBalance)
-    {
-        uint256 balance = idToTreasury[id].balance;
-        return balance;
     }
 
     function spendBalance(uint256 id, uint256 cost) public {
@@ -66,6 +67,7 @@ contract TreasuryContract is Ownable {
         require(idToOwnerTreasury[id] == msg.sender);
         uint256 balance = idToTreasury[id].balance;
         require(balance >= amount);
+        idToTreasury[id].balance -= amount;
         IWarBucks(warBucksAddress).mint(msg.sender, amount);
     }
 
@@ -75,7 +77,32 @@ contract TreasuryContract is Ownable {
         IWarBucks(warBucksAddress).burn(msg.sender, amount);
     }
 
+    //need way for only chainlink keeper to call this
+    function incrementDaysSince() external {
+        uint256 i;
+        for(i=0; i < treasuryId; i++) {
+            idToTreasury[i].daysSinceLastBillPaid++;
+            idToTreasury[i].daysSinceLastTaxCollection++;
+        }
+        if(idToTreasury[i].daysSinceLastBillPaid > daysToInactive) {
+            idToTreasury[i].inactive = true;
+        }
+    }
+
     function setTaxRate(uint256 newPercentage) public onlyOwner {
         taxPercentage = newPercentage;
+    }
+
+    function setDaysToInactive(uint256 newDays) public onlyOwner {
+        daysToInactive = newDays;
+    }
+
+    function checkBalance(uint256 id)
+        public
+        view
+        returns (uint256 countryBalance)
+    {
+        uint256 balance = idToTreasury[id].balance;
+        return balance;
     }
 }

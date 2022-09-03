@@ -1733,4 +1733,13 @@ contract ImprovementsContract3 is Ownable {
         uint256 shipyardAmount = idToImprovements3[countryId].shipyardCount;
         return shipyardAmount;
     }
+
+    function getUniversityCount(uint256 countryId)
+        public
+        view
+        returns (uint256 count)
+    {
+        uint256 universityAmount = idToImprovements3[countryId].universityCount;
+        return universityAmount;
+    }
 }
