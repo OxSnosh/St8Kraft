@@ -30,6 +30,7 @@ contract TreasuryContract is Ownable {
         uint256 netDailyBillsPayable;
         uint256 lockedBalance;
         uint256 daysSinceLastBillPaid;
+        uint256 lastTaxCollection;
         uint256 daysSinceLastTaxCollection;
         uint256 balance;
         bool inactive;
@@ -58,7 +59,18 @@ contract TreasuryContract is Ownable {
     }
 
     function generateTreasury() public {
-        Treasury memory newTreasury = Treasury(0, 0, 0, 0, 0, 0, 0, 0, false);
+        Treasury memory newTreasury = Treasury(
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            false
+        );
         idToTreasury[treasuryId] = newTreasury;
         idToOwnerTreasury[treasuryId] = msg.sender;
         idToTreasury[treasuryId].balance += seedMoney;
@@ -198,7 +210,8 @@ contract TreasuryContract is Ownable {
         uint256 destroyerUpkeep = (destroyerCount * 20000);
         uint256 submarineCount = NavyContract(navy).getSubmarineCount(id);
         uint256 submarineUpkeep = (submarineCount * 25000);
-        uint256 aircraftCarrierCount = NavyContract(navy).getAircraftCarrierCount(id);
+        uint256 aircraftCarrierCount = NavyContract(navy)
+            .getAircraftCarrierCount(id);
         uint256 aircraftCarrierUpkeep = (aircraftCarrierCount * 30000);
         uint256 additionalNavyUpkeep = frigateUpkeep +
             destroyerUpkeep +

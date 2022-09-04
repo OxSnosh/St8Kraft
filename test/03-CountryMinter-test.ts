@@ -6,7 +6,6 @@ import {
     WarBucks, 
     MetaNationsGovToken, 
     CountryParametersContract, 
-    CountrySettingsContract, 
     TreasuryContract, 
     InfrastructureContract, 
     ResourcesContract, 
@@ -29,7 +28,6 @@ describe("CountryMinter", function () {
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
     let countryparameterscontract: CountryParametersContract
-    let countrysettingscontract: CountrySettingsContract
     let treasurycontract: TreasuryContract
     let infrastructurecontract: InfrastructureContract
     let resourcescontract: ResourcesContract
@@ -76,11 +74,6 @@ describe("CountryMinter", function () {
         countryparameterscontract = await CountryParameters.deploy() as CountryParametersContract
         await countryparameterscontract.deployed()
         // console.log(`CountryParameters deployed to ${countryparameterscontract.address}`)  
-        
-        const CountrySettings = await ethers.getContractFactory("CountrySettingsContract")
-        countrysettingscontract = await CountrySettings.deploy() as CountrySettingsContract
-        await countrysettingscontract.deployed()
-        // console.log(`CountrySettings deployed to ${countrysettings.address}`) 
     
         const Treasury = await ethers.getContractFactory("TreasuryContract")
         treasurycontract = await Treasury.deploy(warbucks.address) as TreasuryContract

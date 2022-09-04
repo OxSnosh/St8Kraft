@@ -5,9 +5,10 @@ import "./Resources.sol";
 import "./Improvements.sol";
 import "./Wonders.sol";
 import "./Treasury.sol";
-import "./CountrySettings.sol";
+import "./CountryParameters.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract InfrastructureContract {
+contract InfrastructureContract is Ownable {
     uint256 private infrastructureId;
     address public resources;
     address public improvements1;
@@ -16,10 +17,10 @@ contract InfrastructureContract {
     address public wonders3;
     address public wonders4;
     address public treasury;
-    address public countrySettings;
+    address public parameters;
 
     struct Infrastructure {
-        uint256 landCount;
+        uint256 landArea;
         uint256 technologyCount;
         uint256 infrastructureCount;
         uint256 nationStrength;
@@ -42,7 +43,7 @@ contract InfrastructureContract {
         address _wonders3,
         address _wonders4,
         address _treasury,
-        address _countrySettings
+        address _parameters
     ) {
         resources = _resources;
         improvements1 = _improvements1;
@@ -51,12 +52,12 @@ contract InfrastructureContract {
         wonders3 = _wonders3;
         wonders4 = _wonders4;
         treasury = _treasury;
-        countrySettings = _countrySettings;
+        parameters = _parameters;
     }
 
     function generateInfrastructure() public {
         Infrastructure memory newInfrastrusture = Infrastructure(
-            0,
+            20,
             0,
             20,
             0,
@@ -350,7 +351,7 @@ contract InfrastructureContract {
         view
         returns (bool)
     {
-        uint256 governmentType = CountrySettingsContract(countrySettings)
+        uint256 governmentType = CountryParametersContract(parameters)
             .getGovernmentType(countryId);
         if (
             governmentType == 2 ||
@@ -370,7 +371,7 @@ contract InfrastructureContract {
         view
         returns (uint256 count)
     {
-        uint256 landAmount = idToInfrastructure[countryId].landCount;
+        uint256 landAmount = idToInfrastructure[countryId].landArea;
         return landAmount;
     }
 
@@ -401,5 +402,74 @@ contract InfrastructureContract {
     {
         uint256 strength = idToInfrastructure[countryId].nationStrength;
         return strength;
+    }
+
+    function getHappiness(uint256 id) public view returns (int256) {
+        int256 compatabilityPoints = checkCompatability(id);
+        int256 densityPoints = getDensityPoints(id);
+        int256 taxRatePoints = getTaxRatePoints(id);
+
+
+
+
+
+    }
+
+    function checkCompatability(uint256 id) public view returns (int256 compatability) {
+        uint256 religion = CountryParametersContract(parameters).getReligionType(id);
+        uint256 govType = CountryParametersContract(parameters).getGovernmentType(id);
+        uint256 preferredReligion = CountryParametersContract(parameters).getReligionPreference(id);
+        uint256 preferredGovernment = CountryParametersContract(parameters).getGovernmentPreference(id);
+        int256 religionPoints;
+        int256 governmentPoints;
+        if(religion == preferredReligion) {
+            religionPoints = 1;
+        }
+        if(govType == preferredGovernment) {
+            governmentPoints = 1;
+        }
+        int256 compatabilityPoints = (religionPoints + governmentPoints);
+        return compatabilityPoints;
+    }
+
+    function checkPopulationDensity(uint256 id) public view returns (uint256) {
+        uint256 landArea = idToInfrastructure[id].landArea;
+        uint256 population = idToInfrastructure[id].populationCount;
+        uint256 populationDensity = (population / landArea);
+        return populationDensity;
+    }
+
+    function getDensityPoints(uint256 density) public pure returns (int256) {
+        int256 densityPoints = 0;
+        if(density < 70) {
+            densityPoints = 1;
+        }
+        return densityPoints;
+    }
+
+    function getTaxRatePoints(uint256 id) public view returns (int256) {
+        int256 taxPointsForHappiness;
+        uint256 taxRate = getTaxRate(id);
+        if (taxRate <= 16) {
+            taxPointsForHappiness = 0;
+        } else if (taxRate <= 20) {
+            taxPointsForHappiness = -1;
+        } else if (taxRate <= 23) {
+            taxPointsForHappiness = -3;
+        } else if (taxRate <= 25) {
+            taxPointsForHappiness = -5;
+        } else if (taxRate <= 30) {
+            taxPointsForHappiness = -7;
+        }
+        return taxPointsForHappiness;
+    }
+    
+    function getTaxRate(uint256 id) public view returns (uint256 taxPercentage) {
+        uint256 taxRate = idToInfrastructure[id].taxRate;
+        return taxRate;
+    }
+
+    function getHappinessFromWonders(uint256 id) public view returns (int256) {
+        
     }
 }

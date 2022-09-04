@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./IWarBucks.sol";
 import "./CountryParameters.sol";
-import "./CountrySettings.sol";
 import "./Infrastructure.sol";
 import "./Resources.sol";
 import "./Improvements.sol";

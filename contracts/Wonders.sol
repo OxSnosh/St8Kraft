@@ -489,6 +489,64 @@ contract WondersContract1 is Ownable {
             idToWonders1[countryId].wonderCount -= 1;
         }
     }
+
+    function getAgriculturalDevelopmentProgram(uint256 id)
+        public
+        view
+        returns (bool)
+    {
+        bool isWonder = idToWonders1[id].agricultureDevelopmentProgram;
+        return isWonder;
+    }
+
+    function getAntiAirDefenseNewtwork(uint256 id) public view returns (bool) {
+        bool isWonder = idToWonders1[id].antiAirDefenseNetwork;
+        return isWonder;
+    }
+
+    function getCentralIntelligenceAgency(uint256 id)
+        public
+        view
+        returns (bool)
+    {
+        bool isWonder = idToWonders1[id].centralIntelligenceAgency;
+        return isWonder;
+    }
+
+    function getEmpWeaponization(uint256 id) public view returns (bool) {
+        bool isWonder = idToWonders1[id].empWeaponization;
+        return isWonder;
+    }
+
+    function getFalloutShelterSystem(uint256 id) public view returns (bool) {
+        bool isWonder = idToWonders1[id].falloutShelterSystem;
+        return isWonder;
+    }
+
+    function getFederalAidComission(uint256 id) public view returns (bool) {
+        bool isWonder = idToWonders1[id].federalAidCommission;
+        return isWonder;
+    }
+
+    function getFederalReserve(uint256 id) public view returns (bool) {
+        bool isWonder = idToWonders1[id].federalReserve;
+        return isWonder;
+    }
+
+    function getForeignAirforceBase(uint256 id) public view returns (bool) {
+        bool isWonder = idToWonders1[id].foreignAirForceBase;
+        return isWonder;
+    }
+
+    function getForeignArmyBase(uint256 id) public view returns (bool) {
+        bool isWonder = idToWonders1[id].foreignArmyBase;
+        return isWonder;
+    }
+
+    function getNavyBase(uint256 id) public view returns (bool) {
+        bool isWonder = idToWonders1[id].foreignNavalBase;
+        return isWonder;
+    }
 }
 
 contract WondersContract2 is Ownable {
@@ -1017,31 +1075,58 @@ contract WondersContract2 is Ownable {
         }
     }
 
-    function getMarsBase(uint256 countryId)
-        public
-        view
-        returns (bool isMarsBaseThere)
-    {
-        bool isMarsBase = idToWonders2[countryId].marsBase;
-        return isMarsBase;
+    function getGreatMonument(uint256 id) public view returns (bool) {
+        bool isWonder = idToWonders2[id].greatMonument;
+        return isWonder;
     }
 
-    function getGreatUniversity(uint256 countryId)
-        public
-        view
-        returns (bool isGreatUniversityThere)
-    {
-        bool isGreatUniversity = idToWonders2[countryId].greatUniversity;
-        return isGreatUniversity;
+    function getGreatTemple(uint256 id) public view returns (bool) {
+        bool isWonder = idToWonders2[id].greatTemple;
+        return isWonder;
     }
 
-    function getInterstateSystem(uint256 countryId)
+    function getGreatUniversity(uint256 countryId) public view returns (bool) {
+        bool isWonder = idToWonders2[countryId].greatUniversity;
+        return isWonder;
+    }
+
+    function hiddenNuclearMissileSilo(uint256 countryId)
         public
         view
         returns (bool)
     {
-        bool isInterstateSystem = idToWonders2[countryId].interstateSystem;
-        return isInterstateSystem;
+        bool isWonder = idToWonders2[countryId].hiddenNuclearMissileSilo;
+        return isWonder;
+    }
+
+    function getInternet(uint256 countryId) public view returns (bool) {
+        bool isWonder = idToWonders2[countryId].internet;
+        return isWonder;
+    }
+
+    function getInterstateSystem(uint256 countryId) public view returns (bool) {
+        bool isWonder = idToWonders2[countryId].interstateSystem;
+        return isWonder;
+    }
+
+    function getManhattanProject(uint256 countryId) public view returns (bool) {
+        bool isWonder = idToWonders2[countryId].manhattanProject;
+        return isWonder;
+    }
+
+    function getMarsBase(uint256 countryId) public view returns (bool) {
+        bool isWonder = idToWonders2[countryId].marsBase;
+        return isWonder;
+    }
+
+    function getMarsColony(uint256 countryId) public view returns (bool) {
+        bool isWonder = idToWonders2[countryId].marsColony;
+        return isWonder;
+    }
+
+    function getMarsMine(uint256 countryId) public view returns (bool) {
+        bool isWonder = idToWonders2[countryId].marsMine;
+        return isWonder;
     }
 }
 
@@ -1585,31 +1670,88 @@ contract WondersContract3 is Ownable {
         }
     }
 
-    function getMoonBase(uint256 countryId)
-        public
-        view
-        returns (bool isMoonBaseThere)
-    {
-        bool isMoonBase = idToWonders3[countryId].moonBase;
-        return isMoonBase;
+    function getMoonBase(uint256 countryId) public view returns (bool) {
+        bool isWonder = idToWonders3[countryId].moonBase;
+        return isWonder;
     }
 
-    function getPentagon(uint256 countryId)
+    function getMoonColony(uint256 countryId) public view returns (bool) {
+        bool isWonder = idToWonders3[countryId].moonColony;
+        return isWonder;
+    }
+
+    function getMoonMine(uint256 countryId) public view returns (bool) {
+        bool isWonder = idToWonders3[countryId].moonMine;
+        return isWonder;
+    }
+
+    function getMovieIndustry(uint256 countryId) public view returns (bool) {
+        bool isWonder = idToWonders3[countryId].movieIndustry;
+        return isWonder;
+    }
+
+    function getNationalCemetary(uint256 countryId) public view returns (bool) {
+        bool isWonder = idToWonders3[countryId].nationalCemetary;
+        return isWonder;
+    }
+
+    function getNationalEnvironmentOffice(uint256 countryId)
         public
         view
-        returns (bool isPentagonThere)
+        returns (bool)
     {
-        bool isPentagon = idToWonders3[countryId].pentagon;
-        return isPentagon;
+        bool isWonder = idToWonders3[countryId].nationalEnvironmentOffice;
+        return isWonder;
     }
 
     function getNationalResearchLab(uint256 countryId)
         public
         view
-        returns (bool isResearchLabThere)
+        returns (bool)
     {
-        bool isResearchLab = idToWonders3[countryId].nationalResearchLab;
-        return isResearchLab;
+        bool isWonder = idToWonders3[countryId].nationalResearchLab;
+        return isWonder;
+    }
+
+    function getNationalWarMemorial(uint256 countryId)
+        public
+        view
+        returns (bool)
+    {
+        bool isWonder = idToWonders3[countryId].nationalWarMemorial;
+        return isWonder;
+    }
+
+    function getNuclearPowerPlant(uint256 countryId)
+        public
+        view
+        returns (bool)
+    {
+        bool isWonder = idToWonders3[countryId].nuclearPowerPlant;
+        return isWonder;
+    }
+
+    function getPentagon(uint256 countryId) public view returns (bool) {
+        bool isWonder = idToWonders3[countryId].pentagon;
+        return isWonder;
+    }
+
+    function getPoliticalLobbyists(uint256 countryId)
+        public
+        view
+        returns (bool)
+    {
+        bool isWonder = idToWonders3[countryId].politicalLobbyists;
+        return isWonder;
+    }
+
+    function getScientificDevelopmentCenter(uint256 countryId)
+        public
+        view
+        returns (bool)
+    {
+        bool isWonder = idToWonders3[countryId].scientificDevelopmentCenter;
+        return isWonder;
     }
 }
 
@@ -1998,40 +2140,58 @@ contract WondersContract4 is Ownable {
         }
     }
 
-    function getWeaponsResearchCenter(uint256 countryId)
+    function getSocialSecuritySystem(uint256 countryId)
         public
         view
-        returns (bool isWrcThere)
+        returns (bool)
     {
-        bool isWrc = idToWonders4[countryId].weaponsResearchCenter;
-        return isWrc;
+        bool isWonder = idToWonders4[countryId].socialSecuritySystem;
+        return isWonder;
     }
 
-    function getStockMarket(uint256 countryId)
-        public
-        view
-        returns (bool isStockMarketThere)
-    {
-        bool isStockMarket = idToWonders4[countryId].stockMarket;
-        return isStockMarket;
+    function getSpaceProgram(uint256 countryId) public view returns (bool) {
+        bool isSpaceProgram = idToWonders4[countryId].spaceProgram;
+        return isSpaceProgram;
+    }
+
+    function getStockMarket(uint256 countryId) public view returns (bool) {
+        bool isSpaceProgram = idToWonders4[countryId].spaceProgram;
+        return isSpaceProgram;
     }
 
     function getStrategicDefenseInitiative(uint256 countryId)
         public
         view
-        returns (bool isSdiThere)
+        returns (bool)
     {
-        bool isStrategicDefenseInitiative = idToWonders4[countryId]
-            .strategicDefenseInitiative;
-        return isStrategicDefenseInitiative;
+        bool isWonder = idToWonders4[countryId].strategicDefenseInitiative;
+        return isWonder;
     }
 
-    function getSpaceProgram(uint256 countryId)
+    function getSuperiorLogisticalSupport(uint256 countryId)
         public
         view
-        returns (bool isSpaceProgramThere)
+        returns (bool)
     {
-        bool isSpaceProgram = idToWonders4[countryId].spaceProgram;
-        return isSpaceProgram;
+        bool isWonder = idToWonders4[countryId].superiorLogisticalSupport;
+        return isWonder;
+    }
+
+    function getUniversalHealthcare(uint256 countryId)
+        public
+        view
+        returns (bool)
+    {
+        bool isWonder = idToWonders4[countryId].universalHealthcare;
+        return isWonder;
+    }
+
+    function getWeaponsResearchCenter(uint256 countryId)
+        public
+        view
+        returns (bool)
+    {
+        bool isWonder = idToWonders4[countryId].weaponsResearchCenter;
+        return isWonder;
     }
 }
