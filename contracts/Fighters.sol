@@ -102,6 +102,11 @@ contract FightersContract is Ownable {
         f22RaptorCost = newPrice;
     }
 
+    function getAircraftCount(uint256 id) public view returns (uint256 count) {
+        uint256 aircraftAmount = idToFighters[id].aircraft;
+        return aircraftAmount;
+    }
+
     //needs modifier
     function increaseAircraftCount(uint256 amount, uint256 id) public {
         idToFighters[id].aircraft += amount;

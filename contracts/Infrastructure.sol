@@ -58,7 +58,7 @@ contract InfrastructureContract {
         Infrastructure memory newInfrastrusture = Infrastructure(
             0,
             0,
-            0,
+            20,
             0,
             0,
             0,

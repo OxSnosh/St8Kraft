@@ -142,6 +142,11 @@ contract NavyContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
+    function getCorvetteCount(uint256 id) public view returns (uint256) {
+        uint256 corvetteAmount = idToNavy[id].corvetteCount;
+        return corvetteAmount;
+    }
+
     function sendCorvette(
         uint256 amount,
         uint256 idSender,
@@ -183,6 +188,11 @@ contract NavyContract is Ownable {
         idToNavy[id].landingShipCount += amount;
         idToNavy[id].navyVessels += amount;
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    }
+
+    function getLandingShipCount(uint256 id) public view returns (uint256) {
+        uint256 landingShipAmount = idToNavy[id].landingShipCount;
+        return landingShipAmount;
     }
 
     function sendLandingShip(
@@ -228,6 +238,11 @@ contract NavyContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
+    function getBattleshipCount(uint256 id) public view returns (uint256) {
+        uint256 battleshipAmount = idToNavy[id].battleshipCount;
+        return battleshipAmount;
+    }
+
     function sendBattleship(
         uint256 amount,
         uint256 idSender,
@@ -269,6 +284,11 @@ contract NavyContract is Ownable {
         idToNavy[id].cruiserCount += amount;
         idToNavy[id].navyVessels += amount;
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    }
+
+    function getCruiserCount(uint256 id) public view returns (uint256) {
+        uint256 cruiserAmount = idToNavy[id].cruiserCount;
+        return cruiserAmount;
     }
 
     function sendCruiser(
@@ -314,6 +334,11 @@ contract NavyContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
+    function getFrigateCount(uint256 id) public view returns (uint256) {
+        uint256 frigateAmount = idToNavy[id].frigateCount;
+        return frigateAmount;
+    }
+
     function sendFrigate(
         uint256 amount,
         uint256 idSender,
@@ -355,6 +380,11 @@ contract NavyContract is Ownable {
         idToNavy[id].destroyerCount += amount;
         idToNavy[id].navyVessels += amount;
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    }
+
+    function getDestroyerCount(uint256 id) public view returns (uint256) {
+        uint256 destroyerAmount = idToNavy[id].destroyerCount;
+        return destroyerAmount;
     }
 
     function sendDestroyer(
@@ -400,6 +430,11 @@ contract NavyContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
+    function getSubmarineCount(uint256 id) public view returns (uint256) {
+        uint256 submarineAmount = idToNavy[id].submarineCount;
+        return submarineAmount;
+    }
+
     function sendSubmarine(
         uint256 amount,
         uint256 idSender,
@@ -441,6 +476,11 @@ contract NavyContract is Ownable {
         idToNavy[id].aircraftCarrierCount += amount;
         idToNavy[id].navyVessels += amount;
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    }
+
+    function getAircraftCarrierCount(uint256 id) public view returns (uint256) {
+        uint256 aircraftCarrierAmount = idToNavy[id].aircraftCarrierCount;
+        return aircraftCarrierAmount;
     }
 
     function sendAircraftCarrier(

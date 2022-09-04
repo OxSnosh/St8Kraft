@@ -4,13 +4,21 @@ pragma solidity 0.8.7;
 import "./IWarBucks.sol";
 import "./WarBucks.sol";
 import "./Wonders.sol";
+import "./Infrastructure.sol";
+import "./Forces.sol";
+import "./Navy.sol";
+import "./Fighters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract TreasuryContract is Ownable {
     uint256 private treasuryId;
     address public wonders1;
     address public improvements1;
+    address public infrastructure;
+    address public navy;
+    address public fighters;
     address public warBucksAddress;
+    address public forces;
     uint256 public daysToInactive;
     uint256 private taxPercentage = 0;
     uint256 public seedMoney = 2000000;
@@ -33,11 +41,19 @@ contract TreasuryContract is Ownable {
     constructor(
         address _warBucksAddress,
         address _wonders1,
-        address _improvements1
+        address _improvements1,
+        address _infrastructure,
+        address _forces,
+        address _navy,
+        address _fighters
     ) {
         warBucksAddress = _warBucksAddress;
         wonders1 = _wonders1;
         improvements1 = _improvements1;
+        infrastructure = _infrastructure;
+        forces = _forces;
+        navy = _navy;
+        fighters = _fighters;
         daysToInactive = 20;
     }
 
@@ -53,7 +69,10 @@ contract TreasuryContract is Ownable {
         require(idToOwnerTreasury[id] == msg.sender, "!nation owner");
         uint256 availableFunds = idToTreasury[id].balance;
         uint256 billsPayable = getBillsPayable(id);
-        require(availableFunds >= billsPayable, "balance not high enough to pay bills");
+        require(
+            availableFunds >= billsPayable,
+            "balance not high enough to pay bills"
+        );
         idToTreasury[id].balance -= billsPayable;
         idToTreasury[id].inactive = false;
     }
@@ -64,7 +83,9 @@ contract TreasuryContract is Ownable {
                 id
             );
         uint256 militaryBillsPayable = calculateDailyBillsFromMilitary(id);
-        uint256 improvementBillsPayable = calculateDailyBillsFromImprovements(id);
+        uint256 improvementBillsPayable = calculateDailyBillsFromImprovements(
+            id
+        );
         uint256 wonderCount = WondersContract1(wonders1).getWonderCount(id);
         uint256 wonderBillsPayable = (wonderCount * 5000);
         uint256 dailyBillsPayable = infrastructureBillsPayable +
@@ -78,25 +99,141 @@ contract TreasuryContract is Ownable {
     function calculateDailyBillsFromInfrastructure(uint256 id)
         public
         view
-        returns (uint256)
+        returns (uint256 infrastructureBills)
     {
-        return 1;
+        uint256 infrastructureAmount = InfrastructureContract(infrastructure)
+            .getInfrastructureCount(id);
+        uint256 upkeep;
+        uint256 infrastructureCostPerLevel;
+        if (infrastructureAmount < 100) {
+            upkeep = ((400 * infrastructureAmount) + 20);
+            infrastructureCostPerLevel = (upkeep / 100);
+        } else if (infrastructureAmount < 200) {
+            upkeep = ((500 * infrastructureAmount) + 20);
+            infrastructureCostPerLevel = (upkeep / 100);
+        } else if (infrastructureAmount < 300) {
+            upkeep = ((600 * infrastructureAmount) + 20);
+            infrastructureCostPerLevel = (upkeep / 100);
+        } else if (infrastructureAmount < 500) {
+            upkeep = ((700 * infrastructureAmount) + 20);
+            infrastructureCostPerLevel = (upkeep / 100);
+        } else if (infrastructureAmount < 700) {
+            upkeep = ((800 * infrastructureAmount) + 20);
+            infrastructureCostPerLevel = (upkeep / 100);
+        } else if (infrastructureAmount < 1000) {
+            upkeep = ((900 * infrastructureAmount) + 20);
+            infrastructureCostPerLevel = (upkeep / 100);
+        } else if (infrastructureAmount < 2000) {
+            upkeep = ((110 * infrastructureAmount) + 20);
+            infrastructureCostPerLevel = (upkeep / 100);
+        } else if (infrastructureAmount < 3000) {
+            upkeep = ((130 * infrastructureAmount) + 20);
+            infrastructureCostPerLevel = (upkeep / 100);
+        } else if (infrastructureAmount < 4000) {
+            upkeep = ((150 * infrastructureAmount) + 20);
+            infrastructureCostPerLevel = (upkeep / 100);
+        } else if (infrastructureAmount < 5000) {
+            upkeep = ((170 * infrastructureAmount) + 20);
+            infrastructureCostPerLevel = (upkeep / 100);
+        } else if (infrastructureAmount < 8000) {
+            upkeep = ((1725 * infrastructureAmount) + 20);
+            infrastructureCostPerLevel = (upkeep / 1000);
+        } else if (infrastructureAmount < 15000) {
+            upkeep = ((175 * infrastructureAmount) + 20);
+            infrastructureCostPerLevel = (upkeep / 100);
+        } else {
+            upkeep = ((180 * infrastructureAmount) + 20);
+            infrastructureCostPerLevel = (upkeep / 100);
+        }
+        uint256 dailyInfrastructureBillsDue = infrastructureCostPerLevel *
+            infrastructureAmount;
+        return dailyInfrastructureBillsDue;
     }
 
     function calculateDailyBillsFromMilitary(uint256 id)
         public
         view
-        returns (uint256)
+        returns (uint256 militaryBills)
     {
-        return 1;
+        uint256 soldierCount = ForcesContract(forces).getSoldierCount(id);
+        uint256 soldierUpkeep = (soldierCount * 2);
+        uint256 tankCount = ForcesContract(forces).getTankCount(id);
+        uint256 tankUpkeep = (tankCount * 40);
+        uint256 aircraftCount = FightersContract(fighters).getAircraftCount(id);
+        uint256 aircraftUpkeep = (aircraftCount * 200);
+        uint256 navyUpkeep = getNavyUpkeep(id);
+        uint256 dailyMilitaryUpkeep = soldierUpkeep +
+            tankUpkeep +
+            aircraftUpkeep +
+            navyUpkeep;
+        return dailyMilitaryUpkeep;
+    }
+
+    function getNavyUpkeep(uint256 id)
+        public
+        view
+        returns (uint256 navyUpkeep)
+    {
+        uint256 corvetteCount = NavyContract(navy).getCorvetteCount(id);
+        uint256 corvetteUpkeep = (corvetteCount * 5000);
+        uint256 landingShipCount = NavyContract(navy).getLandingShipCount(id);
+        uint256 landingShipUpkeep = (landingShipCount * 10000);
+        uint256 battleshipCount = NavyContract(navy).getBattleshipCount(id);
+        uint256 battleshipUpkeep = (battleshipCount * 25000);
+        uint256 cruiserCount = NavyContract(navy).getCruiserCount(id);
+        uint256 cruiserUpkeep = (cruiserCount * 10000);
+        uint256 additionalNavyUpkeep = getNavyUpkeepAppended(id);
+        uint256 dailyNavyUpkeep = additionalNavyUpkeep +
+            corvetteUpkeep +
+            landingShipUpkeep +
+            battleshipUpkeep +
+            cruiserUpkeep;
+        return dailyNavyUpkeep;
+    }
+
+    function getNavyUpkeepAppended(uint256 id) internal view returns (uint256) {
+        uint256 frigateCount = NavyContract(navy).getFrigateCount(id);
+        uint256 frigateUpkeep = (frigateCount * 15000);
+        uint256 destroyerCount = NavyContract(navy).getDestroyerCount(id);
+        uint256 destroyerUpkeep = (destroyerCount * 20000);
+        uint256 submarineCount = NavyContract(navy).getSubmarineCount(id);
+        uint256 submarineUpkeep = (submarineCount * 25000);
+        uint256 aircraftCarrierCount = NavyContract(navy).getAircraftCarrierCount(id);
+        uint256 aircraftCarrierUpkeep = (aircraftCarrierCount * 30000);
+        uint256 additionalNavyUpkeep = frigateUpkeep +
+            destroyerUpkeep +
+            submarineUpkeep +
+            aircraftCarrierUpkeep;
+        return additionalNavyUpkeep;
     }
 
     function calculateDailyBillsFromImprovements(uint256 id)
         public
         view
-        returns (uint256)
+        returns (uint256 improvementBills)
     {
-        return 1;
+        uint256 improvementCount = ImprovementsContract1(improvements1)
+            .getImprovementCount(id);
+        uint256 upkeepPerLevel;
+        if (improvementCount < 5) {
+            upkeepPerLevel = 500;
+        } else if (improvementCount < 8) {
+            upkeepPerLevel = 600;
+        } else if (improvementCount < 15) {
+            upkeepPerLevel = 750;
+        } else if (improvementCount < 20) {
+            upkeepPerLevel = 950;
+        } else if (improvementCount < 30) {
+            upkeepPerLevel = 1200;
+        } else if (improvementCount < 40) {
+            upkeepPerLevel = 1500;
+        } else if (improvementCount < 50) {
+            upkeepPerLevel = 2000;
+        } else {
+            upkeepPerLevel = 3000;
+        }
+        uint256 dailyImprovementBillsDue = (improvementCount * upkeepPerLevel);
+        return dailyImprovementBillsDue;
     }
 
     function spendBalance(uint256 id, uint256 cost) public {
@@ -111,6 +248,8 @@ contract TreasuryContract is Ownable {
             IWarBucks(warBucksAddress).mint(address(this), taxLevied);
         }
     }
+
+    //NEED FUNCTION TO WITHDRAW TAXES
 
     function withdrawFunds(uint256 amount, uint256 id) public {
         require(idToOwnerTreasury[id] == msg.sender);

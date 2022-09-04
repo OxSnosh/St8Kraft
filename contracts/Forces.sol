@@ -138,6 +138,11 @@ contract ForcesContract is Ownable {
         idToForces[id].numberOfSoldiers -= amount;
     }
 
+    function getSoldierCount(uint256 id) public view returns (uint256 soldiers) {
+        uint256 soldierAmount = idToForces[id].numberOfSoldiers;
+        return soldierAmount;
+    }
+
     function buyTanks(uint256 amount, uint256 id) public {
         require(
             idToOwnerForces[id] == msg.sender,
@@ -209,6 +214,11 @@ contract ForcesContract is Ownable {
     function decreaseDeployedTankCount(uint256 amount, uint256 id) public {
         idToForces[id].deployedTanks -= amount;
         idToForces[id].numberOfTanks -= amount;
+    }
+
+    function getTankCount(uint256 id) public view returns (uint256 tanks) {
+        uint256 tankAmount = idToForces[id].numberOfTanks;
+        return tankAmount;
     }
 
     function buyCruiseMissiles(uint256 amount, uint256 id) public {
