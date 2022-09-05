@@ -20,7 +20,7 @@ contract TreasuryContract is Ownable {
     address public warBucksAddress;
     address public forces;
     uint256 public daysToInactive;
-    uint256 private taxPercentage = 0;
+    uint256 private gameTaxPercentage = 0;
     uint256 public seedMoney = 2000000;
 
     struct Treasury {
@@ -268,8 +268,7 @@ contract TreasuryContract is Ownable {
         require(balance >= cost);
         idToTreasury[id].balance -= cost;
         //TAXES here
-        uint256 taxRate = (taxPercentage / 100);
-        uint256 taxLevied = cost * taxRate;
+        uint256 taxLevied = ((cost * gameTaxPercentage) / 100);
         if (taxLevied > 0) {
             IWarBucks(warBucksAddress).mint(address(this), taxLevied);
         }
@@ -308,7 +307,11 @@ contract TreasuryContract is Ownable {
     }
 
     function setTaxRate(uint256 newPercentage) public onlyOwner {
-        taxPercentage = newPercentage;
+        gameTaxPercentage = newPercentage;
+    }
+
+    function getTaxRate() public view onlyOwner returns (uint256) {
+        return gameTaxPercentage;
     }
 
     function setDaysToInactive(uint256 newDays) public onlyOwner {
@@ -318,7 +321,7 @@ contract TreasuryContract is Ownable {
     function checkBalance(uint256 id)
         public
         view
-        returns (uint256 countryBalance)
+        returns (uint256)
     {
         uint256 balance = idToTreasury[id].balance;
         return balance;
