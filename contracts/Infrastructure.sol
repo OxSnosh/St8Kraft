@@ -410,32 +410,65 @@ contract InfrastructureContract is Ownable {
         return strength;
     }
 
-    function getHappiness(uint256 id) public view returns (int256) {
-        int256 compatabilityPoints = checkCompatability(id);
-        int256 densityPoints = getDensityPoints(id);
-        int256 taxRatePoints = getTaxRatePoints(id);
-        int256 wonderPoints = getHappinessFromWonders(id);
-        int256 technologyPoints = getTechnologyPoints(id);
-        int256 pointsFromAge = getPointsFromNationAge(id);
-        int256 pointsFromTrades = getPointsFromTrades(id);
-        int256 pointsFromStability = getPointsFromMilitary(id);
-        int256 happiness = (
+    function getDailyIncome(uint256 id) public view returns (uint256) {
+        uint256 happiness = getHappiness(id);
+        //incrementers (added)
+        uint256 banks = ImprovementsContract1(improvements1).getBankCount(id);
+        uint256 ministries = ImprovementsContract2(improvements1)
+            .getForeignMinistryCount(id);
+        uint256 harbors = ImprovementsContract2(improvements1).getHarborCount(
+            id
+        );
+        uint256 schools = ImprovementsContract3(improvements1).getSchoolCount(
+            id
+        );
+        uint256 universities = ImprovementsContract3(improvements1)
+            .getUniversityCount(id);
+        //detractors (subtracted)
+        uint256 casinos = ImprovementsContract1(improvements1).getCasinoCount(
+            id
+        );
+        uint256 guerillaCamp = ImprovementsContract2(improvements1)
+            .getGuerillaCampCount(id);
+        uint256 multipliers = (100 +
+            (banks * 7) +
+            (ministries * 1) +
+            (harbors * 1) +
+            (schools * 5) +
+            (universities * 8) -
+            (guerillaCamp * 8) -
+            (casinos * 1));
+        uint256 dailyIncomePerCitizen = ((32 + (2 * happiness)) * multipliers);
+        return dailyIncomePerCitizen;
+    }
+
+    //need to make sure happiness stays positive for overflow
+    function getHappiness(uint256 id) public view returns (uint256) {
+        uint256 compatabilityPoints = checkCompatability(id);
+        uint256 densityPoints = getDensityPoints(id);
+        uint256 wonderPoints = getHappinessFromWonders(id);
+        uint256 technologyPoints = getTechnologyPoints(id);
+        uint256 pointsFromAge = getPointsFromNationAge(id);
+        uint256 pointsFromTrades = getPointsFromTrades(id);
+        //below this gets subtracted
+        uint256 taxRatePoints = getTaxRatePoints(id);
+        uint256 pointsFromStability = getPointsFromMilitary(id);
+        uint256 happiness = (25 +
             compatabilityPoints +
             densityPoints +
-            taxRatePoints +
             wonderPoints +
             technologyPoints +
             pointsFromAge +
-            pointsFromTrades +
-            pointsFromStability
-        );
+            pointsFromTrades -
+            taxRatePoints -
+            pointsFromStability);
         return happiness;
     }
 
     function checkCompatability(uint256 id)
         public
         view
-        returns (int256 compatability)
+        returns (uint256 compatability)
     {
         uint256 religion = CountryParametersContract(parameters)
             .getReligionType(id);
@@ -445,15 +478,15 @@ contract InfrastructureContract is Ownable {
             .getReligionPreference(id);
         uint256 preferredGovernment = CountryParametersContract(parameters)
             .getGovernmentPreference(id);
-        int256 religionPoints;
-        int256 governmentPoints;
+        uint256 religionPoints;
+        uint256 governmentPoints;
         if (religion == preferredReligion) {
             religionPoints = 1;
         }
         if (govType == preferredGovernment) {
             governmentPoints = 1;
         }
-        int256 compatabilityPoints = (religionPoints + governmentPoints);
+        uint256 compatabilityPoints = (religionPoints + governmentPoints);
         return compatabilityPoints;
     }
 
@@ -464,29 +497,29 @@ contract InfrastructureContract is Ownable {
         return populationDensity;
     }
 
-    function getDensityPoints(uint256 density) public pure returns (int256) {
-        int256 densityPoints = 0;
+    function getDensityPoints(uint256 density) public pure returns (uint256) {
+        uint256 densityPoints = 0;
         if (density < 70) {
             densityPoints = 1;
         }
         return densityPoints;
     }
 
-    function getTaxRatePoints(uint256 id) public view returns (int256) {
-        int256 taxPointsForHappiness;
+    function getTaxRatePoints(uint256 id) public view returns (uint256) {
+        uint256 subtractTaxPoints;
         uint256 taxRate = getTaxRate(id);
         if (taxRate <= 16) {
-            taxPointsForHappiness = 0;
+            subtractTaxPoints = 0;
         } else if (taxRate <= 20) {
-            taxPointsForHappiness = -1;
+            subtractTaxPoints = 1;
         } else if (taxRate <= 23) {
-            taxPointsForHappiness = -3;
+            subtractTaxPoints = 3;
         } else if (taxRate <= 25) {
-            taxPointsForHappiness = -5;
+            subtractTaxPoints = 5;
         } else if (taxRate <= 30) {
-            taxPointsForHappiness = -7;
+            subtractTaxPoints = 7;
         }
-        return taxPointsForHappiness;
+        return subtractTaxPoints;
     }
 
     function getTaxRate(uint256 id)
@@ -501,7 +534,7 @@ contract InfrastructureContract is Ownable {
     function getHappinessFromWonders(uint256 id)
         public
         view
-        returns (int256 wonderPts)
+        returns (uint256 wonderPts)
     {
         (
             bool monument,
@@ -516,7 +549,7 @@ contract InfrastructureContract is Ownable {
             bool spaceProgram,
             bool universalHealthcare
         ) = wonderChecks2(id);
-        int256 wonderPoints = 0;
+        uint256 wonderPoints = 0;
         if (monument) {
             wonderPoints += 4;
         }
@@ -526,7 +559,7 @@ contract InfrastructureContract is Ownable {
         if (university) {
             uint256 tech = idToInfrastructure[id].technologyCount;
             uint256 techDivided = (tech / 1000);
-            int256 points;
+            uint256 points;
             if (techDivided == 0) {
                 points = 0;
             } else if (techDivided == 1) {
@@ -550,7 +583,7 @@ contract InfrastructureContract is Ownable {
         if (scientificDevCenter) {
             uint256 tech = idToInfrastructure[id].technologyCount;
             uint256 techDivided = (tech / 1000);
-            int256 points;
+            uint256 points;
             if (techDivided == 0) {
                 points = 0;
             } else if (techDivided == 1) {
@@ -627,11 +660,11 @@ contract InfrastructureContract is Ownable {
         );
     }
 
-    function getTechnologyPoints(uint256 id) public view returns (int256) {
-        int256 pointsFromTechnology;
+    function getTechnologyPoints(uint256 id) public view returns (uint256) {
+        uint256 pointsFromTechnology;
         uint256 tech = idToInfrastructure[id].technologyCount;
         if (tech == 0) {
-            pointsFromTechnology = -1;
+            pointsFromTechnology = 0;
         } else if (tech == 1) {
             pointsFromTechnology = 1;
         } else if (tech <= 3) {
@@ -662,9 +695,10 @@ contract InfrastructureContract is Ownable {
     }
 
     //check this
-    function getPointsFromNationAge(uint256 id) public view returns (int256) {
-        uint256 nationCreated = CountryParametersContract(parameters).getTimeCreated(id);
-        int256 agePoints = 0;
+    function getPointsFromNationAge(uint256 id) public view returns (uint256) {
+        uint256 nationCreated = CountryParametersContract(parameters)
+            .getTimeCreated(id);
+        uint256 agePoints = 0;
         if ((block.timestamp - nationCreated) <= 90 days) {
             agePoints = 0;
         } else if ((block.timestamp - nationCreated) <= 180 days) {
@@ -675,13 +709,21 @@ contract InfrastructureContract is Ownable {
         return agePoints;
     }
 
-    function getPointsFromTrades(uint256 callerId) public view returns (int256) {
-        uint256[] memory partners = ResourcesContract(resources).getTradingPartners(callerId);
-        int256 pointsFromTeamTrades = 0;
-        for (uint i = 0; i < partners.length; i++) {
+    function getPointsFromTrades(uint256 callerId)
+        public
+        view
+        returns (uint256)
+    {
+        uint256[] memory partners = ResourcesContract(resources)
+            .getTradingPartners(callerId);
+        uint256 pointsFromTeamTrades = 0;
+        for (uint256 i = 0; i < partners.length; i++) {
             uint256 partnerId = partners[i];
-            uint256 callerNationTeam = CountryParametersContract(parameters).getTeam(callerId);
-            uint256 partnerTeam = CountryParametersContract(parameters).getTeam(partnerId);
+            uint256 callerNationTeam = CountryParametersContract(parameters)
+                .getTeam(callerId);
+            uint256 partnerTeam = CountryParametersContract(parameters).getTeam(
+                partnerId
+            );
             if (callerNationTeam == partnerTeam) {
                 pointsFromTeamTrades++;
             }
@@ -689,24 +731,28 @@ contract InfrastructureContract is Ownable {
         return pointsFromTeamTrades;
     }
 
-    function getPointsFromMilitary(uint256 id) public view returns (int256) {
+    function getPointsFromMilitary(uint256 id) public view returns (uint256) {
         (uint256 ratio, ) = soldierToPopulationRatio(id);
-        int256 pointsFromMilitary;
+        uint256 pointsFromMilitaryToSubtract;
         if (ratio > 80) {
             //unsure about this number
-            pointsFromMilitary = -10;
+            pointsFromMilitaryToSubtract = 10;
         }
         if (ratio < 20) {
-            pointsFromMilitary = -5;
+            pointsFromMilitaryToSubtract = 5;
         }
         if (ratio < 10) {
-            pointsFromMilitary = -14;
+            pointsFromMilitaryToSubtract = 14;
         }
-        return pointsFromMilitary;
+        return pointsFromMilitaryToSubtract;
         //need to include recent casualties
     }
 
-    function soldierToPopulationRatio(uint256 id) public view returns (uint256, bool) {
+    function soldierToPopulationRatio(uint256 id)
+        public
+        view
+        returns (uint256, bool)
+    {
         uint256 soldierCount = ForcesContract(forces).getSoldierCount(id);
         uint256 populationCount = idToInfrastructure[id].populationCount;
         uint256 soldierPopulationRatio = (populationCount / soldierCount);

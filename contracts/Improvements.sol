@@ -496,6 +496,26 @@ contract ImprovementsContract1 is Ownable {
         return borderFortificationAmount;
     }
 
+    function getBankCount(uint256 countryId)
+        public
+        view
+        returns (uint256 )
+    {
+        uint256 count = idToImprovements1[countryId]
+            .bankCount;
+        return count;
+    }
+
+    function getCasinoCount(uint256 countryId)
+        public
+        view
+        returns (uint256 )
+    {
+        uint256 count = idToImprovements1[countryId]
+            .casinoCount;
+        return count;
+    }
+
     function getBunkerCount(uint256 countryId)
         public
         view
@@ -1138,6 +1158,16 @@ contract ImprovementsContract2 is Ownable {
         return fobCount;
     }
 
+    function getForeignMinistryCount(uint256 countryId)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 count = idToImprovements2[countryId]
+            .foreignMinistryCount;
+        return count;
+    }
+
     function getMunitionsFactoryCount(uint256 countryId)
         public
         view
@@ -1146,6 +1176,15 @@ contract ImprovementsContract2 is Ownable {
         uint256 munitionsFactoryAmount = idToImprovements2[countryId]
             .munitionsFactoryCount;
         return munitionsFactoryAmount;
+    }
+
+    function getGuerillaCampCount(uint256 countryId)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 count = idToImprovements2[countryId].guerillaCampCount;
+        return count;
     }
 
     function getHarborCount(uint256 countryId)
@@ -1732,6 +1771,15 @@ contract ImprovementsContract3 is Ownable {
     {
         uint256 satelliteAmount = idToImprovements3[countryId].satelliteCount;
         return satelliteAmount;
+    }
+
+    function getSchoolCount(uint256 countryId)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 count = idToImprovements3[countryId].schoolCount;
+        return count;
     }
 
     function getShipyardCount(uint256 countryId)
