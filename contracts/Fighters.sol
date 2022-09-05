@@ -64,6 +64,18 @@ contract FightersContract is Ownable {
         war = _war;
     }
 
+    function updateTreasuryAddress(address _newAddress) public onlyOwner {
+        treasuryAddress = _newAddress;
+    }
+
+    function updateWarAddress(address _newAddress) public onlyOwner {
+        war = _newAddress;
+    }
+    
+    function updateInfrastructureAddress(address _newAddress) public onlyOwner {
+        infrastructure = _newAddress;
+    }
+
     function generateFighters() public {
         Fighters memory newFighters = Fighters(
             0,
