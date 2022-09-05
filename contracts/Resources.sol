@@ -731,4 +731,8 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         return isSteel;
     }
 
+    function getTradingPartners(uint256 id) public view returns (uint256[] memory) {
+        uint256[] memory partners = idToTradingPartners[id];
+        return partners;
+    }
 }

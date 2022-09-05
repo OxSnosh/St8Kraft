@@ -18,6 +18,7 @@ import "./Bombers.sol";
 
 contract CountryMinter is ERC721, Ownable {
     uint256 public countryId;
+    uint256 public dayCounter;
     address public warBucks;
     address public countryParameters;
     address public infrastructure;

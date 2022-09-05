@@ -27,7 +27,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     }
 
     struct CountrySettings {
-        uint256 nationCreated;
+        uint256 timeCreated;
         string alliance;
         uint256 nationTeam;
         uint256 governmentType;
@@ -239,6 +239,11 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         return religion;
     }
 
+    function getTimeCreated(uint256 countryId) public view returns (uint256) {
+        uint256 timeCreated = idToCountrySettings[countryId].timeCreated;
+        return timeCreated;
+    }
+
     function getGovernmentPreference(uint256 id) public view returns (uint256 preference) {
         uint256 preferredGovernment = idToGovernmentPreference[id];
         return preferredGovernment;
@@ -248,5 +253,5 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         uint256 preferredReligion = idToReligionPreference[id];
         return preferredReligion;
     }
-    
+
 }
