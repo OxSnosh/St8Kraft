@@ -2,10 +2,12 @@
 pragma solidity 0.8.7;
 
 import "./Treasury.sol";
+import "./Infrastructure.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract FightersContract is Ownable {
     uint256 private fightersId;
+    address public bombers;
     address public treasuryAddress;
     address public infrastructure;
     address public war;
@@ -48,7 +50,6 @@ contract FightersContract is Ownable {
         uint256 f15EagleCount;
         uint256 su30MkiCount;
         uint256 f22RaptorCount;
-        bool nationExists;
     }
 
     mapping(uint256 => Fighters) public idToFighters;
@@ -57,10 +58,12 @@ contract FightersContract is Ownable {
     constructor(
         address _treasuryAddress,
         address _war,
-        address _infrastructure
+        address _infrastructure,
+        address _bombers
     ) {
         treasuryAddress = _treasuryAddress;
         infrastructure = _infrastructure;
+        bombers = _bombers;
         war = _war;
     }
 
@@ -71,25 +74,13 @@ contract FightersContract is Ownable {
     function updateWarAddress(address _newAddress) public onlyOwner {
         war = _newAddress;
     }
-    
+
     function updateInfrastructureAddress(address _newAddress) public onlyOwner {
         infrastructure = _newAddress;
     }
 
     function generateFighters() public {
-        Fighters memory newFighters = Fighters(
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            true
-        );
+        Fighters memory newFighters = Fighters(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         idToFighters[fightersId] = newFighters;
         idToOwnerFighters[fightersId] = msg.sender;
         fightersId++;
@@ -194,13 +185,24 @@ contract FightersContract is Ownable {
         return 450;
     }
 
+    modifier allowCallOnlyFromFighterAndBomberContract() {
+        require(msg.sender == address(this) || msg.sender == bombers);
+        _;
+    }
+
     //internal only
-    function increaseAircraftCount(uint256 amount, uint256 id) internal {
+    function increaseAircraftCount(uint256 amount, uint256 id)
+        public
+        allowCallOnlyFromFighterAndBomberContract
+    {
         idToFighters[id].aircraft += amount;
     }
 
     //internal only
-    function decreaseAircraftCount(uint256 amount, uint256 id) internal {
+    function decreaseAircraftCount(uint256 amount, uint256 id)
+        public
+        allowCallOnlyFromFighterAndBomberContract
+    {
         idToFighters[id].aircraft -= amount;
     }
 
@@ -266,7 +268,10 @@ contract FightersContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    function decreaseP51MustangCount(uint256 amount, uint256 id) public onlyWar {
+    function decreaseP51MustangCount(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
         idToFighters[id].p51MustangCount -= amount;
         idToFighters[id].aircraft -= amount;
     }
@@ -347,7 +352,10 @@ contract FightersContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    function decreaseF100SuperSabreCount(uint256 amount, uint256 id) public onlyWar  {
+    function decreaseF100SuperSabreCount(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
         idToFighters[id].f100SuperSabreCount -= amount;
         idToFighters[id].aircraft -= amount;
     }
@@ -374,7 +382,10 @@ contract FightersContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    function decreaseF35LightningCount(uint256 amount, uint256 id) public onlyWar {
+    function decreaseF35LightningCount(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
         idToFighters[id].f35LightningCount -= amount;
         idToFighters[id].aircraft -= amount;
     }
