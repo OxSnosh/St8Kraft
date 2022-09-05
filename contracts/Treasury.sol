@@ -77,6 +77,18 @@ contract TreasuryContract is Ownable {
         treasuryId++;
     }
 
+    function collectTaxes(uint256 id) public {
+        require(idToOwnerTreasury[id] == msg.sender, "!nation owner");
+        uint256 dailyIncomePerCitizen = InfrastructureContract(infrastructure)
+            .getDailyIncome(id);
+        uint256 daysSinceLastTaxCollection = idToTreasury[id]
+            .daysSinceLastTaxCollection;
+        uint256 taxesCollectible = (dailyIncomePerCitizen *
+            daysSinceLastTaxCollection);
+        idToTreasury[id].balance += taxesCollectible;
+        idToTreasury[id].daysSinceLastTaxCollection = 0;
+    }
+
     function payBills(uint256 id) public {
         require(idToOwnerTreasury[id] == msg.sender, "!nation owner");
         uint256 availableFunds = idToTreasury[id].balance;
@@ -86,6 +98,7 @@ contract TreasuryContract is Ownable {
             "balance not high enough to pay bills"
         );
         idToTreasury[id].balance -= billsPayable;
+        idToTreasury[id].daysSinceLastBillPaid = 0;
         idToTreasury[id].inactive = false;
     }
 
