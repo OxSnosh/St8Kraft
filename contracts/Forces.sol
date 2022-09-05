@@ -5,7 +5,6 @@ import "./Treasury.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract ForcesContract is Ownable {
-    uint256 private forcesId;
     uint256 public soldierCost;
     uint256 public tankCost;
     uint256 public cruiseMissileCost;
@@ -38,11 +37,10 @@ contract ForcesContract is Ownable {
     mapping(uint256 => Forces) public idToForces;
     mapping(uint256 => address) public idToOwnerForces;
 
-    function generateForces() public {
+    function generateForces(uint256 id, address nationOwner) public {
         Forces memory newForces = Forces(0, 0, 0, 0, 0, 0, 0, 0, 0, true);
-        idToForces[forcesId] = newForces;
-        idToOwnerForces[forcesId] = msg.sender;
-        forcesId++;
+        idToForces[id] = newForces;
+        idToOwnerForces[id] = nationOwner;
     }
 
     function updateSoldierCost(uint256 newPrice) public onlyOwner {

@@ -18,8 +18,6 @@ import "./Bombers.sol";
 
 contract CountryMinter is ERC721, Ownable {
     uint256 public countryId;
-    uint256 public dayCounter;
-    address public warBucks;
     address public countryParameters;
     address public infrastructure;
     address public resources;
@@ -48,7 +46,6 @@ contract CountryMinter is ERC721, Ownable {
     );
 
     constructor(
-        address _warBucks,
         address _countryParameters,
         address _treasury,
         address _infrastructure,
@@ -59,7 +56,6 @@ contract CountryMinter is ERC721, Ownable {
         address _fighters,
         address _bombers
     ) ERC721("MetaNations", "MNS") {
-        warBucks = _warBucks;
         countryParameters = _countryParameters;
         treasury = _treasury;
         infrastructure = _infrastructure;
@@ -100,26 +96,29 @@ contract CountryMinter is ERC721, Ownable {
             "Wallet already contains a country"
         );
         CountryParametersContract(countryParameters).generateCountryParameters(
+            countryId,
+            msg.sender,
             ruler,
             nationName,
             capitalCity,
             nationSlogan
         );
-        InfrastructureContract(infrastructure).generateInfrastructure();
-        ResourcesContract(resources).generateResources();
-        ImprovementsContract1(improvements1).generateImprovements();
-        ImprovementsContract2(improvements2).generateImprovements();
-        ImprovementsContract3(improvements3).generateImprovements();
-        WondersContract1(wonders1).generateWonders1();
-        WondersContract2(wonders2).generateWonders2();
-        WondersContract3(wonders3).generateWonders3();
-        WondersContract4(wonders4).generateWonders4();
-        TreasuryContract(treasury).generateTreasury();
-        MilitaryContract(military).generateMilitary();
-        ForcesContract(forces).generateForces();
-        NavyContract(navy).generateNavy();
-        FightersContract(fighters).generateFighters();
+        InfrastructureContract(infrastructure).generateInfrastructure(countryId, msg.sender);
+        ResourcesContract(resources).generateResources(countryId, msg.sender);
+        ImprovementsContract1(improvements1).generateImprovements(countryId, msg.sender);
+        ImprovementsContract2(improvements2).generateImprovements(countryId, msg.sender);
+        ImprovementsContract3(improvements3).generateImprovements(countryId, msg.sender);
+        WondersContract1(wonders1).generateWonders1(countryId, msg.sender);
+        WondersContract2(wonders2).generateWonders2(countryId, msg.sender);
+        WondersContract3(wonders3).generateWonders3(countryId, msg.sender);
+        WondersContract4(wonders4).generateWonders4(countryId, msg.sender);
+        TreasuryContract(treasury).generateTreasury(countryId, msg.sender);
+        MilitaryContract(military).generateMilitary(countryId, msg.sender);
+        ForcesContract(forces).generateForces(countryId, msg.sender);
+        NavyContract(navy).generateNavy(countryId, msg.sender);
+        FightersContract(fighters).generateFighters(countryId, msg.sender);
         BombersContract(bombers).generateBombers(countryId, msg.sender);
+        //bombers Market Here
         idToOwner[countryId] = msg.sender;
         ownerCountryCount[msg.sender]++;
         emit nationCreated(msg.sender, nationName, ruler);

@@ -11,7 +11,7 @@ import "./Fighters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract TreasuryContract is Ownable {
-    uint256 private treasuryId;
+    uint256 public counter;
     address public wonders1;
     address public improvements1;
     address public infrastructure;
@@ -58,7 +58,7 @@ contract TreasuryContract is Ownable {
         daysToInactive = 20;
     }
 
-    function generateTreasury() public {
+    function generateTreasury(uint256 id, address nationOwner) public {
         Treasury memory newTreasury = Treasury(
             0,
             0,
@@ -71,10 +71,10 @@ contract TreasuryContract is Ownable {
             0,
             false
         );
-        idToTreasury[treasuryId] = newTreasury;
-        idToOwnerTreasury[treasuryId] = msg.sender;
-        idToTreasury[treasuryId].balance += seedMoney;
-        treasuryId++;
+        idToTreasury[id] = newTreasury;
+        idToOwnerTreasury[id] = nationOwner;
+        idToTreasury[id].balance += seedMoney;
+        counter++;
     }
 
     function collectTaxes(uint256 id) public {
@@ -293,7 +293,7 @@ contract TreasuryContract is Ownable {
     //need way for only chainlink keeper to call this
     function incrementDaysSince() external {
         uint256 i;
-        for (i = 0; i < treasuryId; i++) {
+        for (i = 0; i < counter; i++) {
             require(
                 idToTreasury[i].inactive == false,
                 "nation needs to pay bills"
@@ -325,5 +325,10 @@ contract TreasuryContract is Ownable {
     {
         uint256 balance = idToTreasury[id].balance;
         return balance;
+    }
+
+    function checkInactive(uint256 id) public view returns (bool) {
+        bool isInactive = idToTreasury[id].inactive;
+        return isInactive;
     }
 }

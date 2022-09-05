@@ -7,8 +7,6 @@ import "./Infrastructure.sol";
 import "./Improvements.sol";
 
 contract ResourcesContract is VRFConsumerBaseV2 {
-    uint256 private resourcesId;
-    uint256 public requestCounter;
     uint256 public resourcesLength = 21;
     uint256[] private s_randomWords;
     uint256[] public playerResources;
@@ -130,7 +128,7 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         improvements = _improvements;
     }
 
-    function generateResources() public {
+    function generateResources(uint256 id, address nationOwner) public {
         Resources1 memory newResources1 = Resources1(
             false,
             false,
@@ -181,18 +179,16 @@ contract ResourcesContract is VRFConsumerBaseV2 {
             false,
             false
         );
-        idToResources1[resourcesId] = newResources1;
-        idToResources2[resourcesId] = newResources2;
-        idToBonusResources[resourcesId] = newBonusResources;
-        idToMoonResources[resourcesId] = newMoonResources;
-        idToMarsResources[resourcesId] = newMarsResources;
-        idToOwnerResources[resourcesId] = msg.sender;
-        fulfillRequest();
-        //when to increment resources id
-        //resourcesId++
+        idToResources1[id] = newResources1;
+        idToResources2[id] = newResources2;
+        idToBonusResources[id] = newBonusResources;
+        idToMoonResources[id] = newMoonResources;
+        idToMarsResources[id] = newMarsResources;
+        idToOwnerResources[id] = nationOwner;
+        fulfillRequest(id);
     }
 
-    function fulfillRequest() public {
+    function fulfillRequest(uint256 id) public {
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
@@ -200,9 +196,7 @@ contract ResourcesContract is VRFConsumerBaseV2 {
             i_callbackGasLimit,
             NUM_WORDS
         );
-        //should this be resourcesID?
-        s_requestIdToRequestIndex[requestId] = requestCounter;
-        requestCounter += 1;
+        s_requestIdToRequestIndex[requestId] = id;
     }
 
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords)
@@ -222,9 +216,8 @@ contract ResourcesContract is VRFConsumerBaseV2 {
             randomResource2 = randomResource2 + 1;
         }
         playerResources = [randomResource1, randomResource2];
-        idToPlayerResources[resourcesId] = playerResources;
-        setResources(resourcesId);
-        resourcesId++;
+        idToPlayerResources[requestNumber] = playerResources;
+        setResources(requestNumber);
     }
 
     function setResources(uint256 id) internal {

@@ -45,15 +45,6 @@ contract BombersContract is Ownable {
         war = _war;
     }
 
-    function generateBombers(uint256 id, address nationOwner)
-        public
-        onlyCountryMinter
-    {
-        Bombers memory newBombers = Bombers(0, 0, 0, 0, 0, 0, 0, 0, 0);
-        idToBombers[id] = newBombers;
-        idToOwnerBombers[id] = nationOwner;
-    }
-
     modifier onlyCountryMinter() {
         require(msg.sender == countryMinter, "only countryMinter can call");
         _;
@@ -75,6 +66,39 @@ contract BombersContract is Ownable {
         _;
     }
 
+    function updateCountryMinterAddress(address _countryMinter) public onlyOwner {
+        countryMinter = _countryMinter;
+    }
+
+    function updateBombersMarketAddress(address _bombersMarket) public onlyOwner {
+        bombersMarket = _bombersMarket;
+    }
+
+    function updateFightersAddress(address _fighters) public onlyOwner {
+        fighters = _fighters;
+    }
+
+    function updateTreasuryAddress(address _treasury) public onlyOwner {
+        treasury = _treasury;
+    }
+
+    function updateInfrastructureAddress(address _infrastructure) public onlyOwner {
+        infrastructure = _infrastructure;
+    }
+
+    function updateWarAddress(address _war) public onlyOwner {
+        war = _war;
+    }
+
+    function generateBombers(uint256 id, address nationOwner)
+        public
+        onlyCountryMinter
+    {
+        Bombers memory newBombers = Bombers(0, 0, 0, 0, 0, 0, 0, 0, 0);
+        idToBombers[id] = newBombers;
+        idToOwnerBombers[id] = nationOwner;
+    }
+
     function getAh1CobraCount(uint256 id) public view returns (uint256) {
         uint256 count = idToBombers[id].ah1CobraCount;
         return count;
@@ -89,7 +113,7 @@ contract BombersContract is Ownable {
 
     function decreaseAh1CobraCount(uint256 amount, uint256 id) public onlyWar {
         uint256 currentAmount = idToBombers[id].ah1CobraCount;
-        require((currentAmount - amount) >= 0, "cannot delete that many");
+        require((currentAmount - amount) >= 0, "cannot decrease that many");
         idToBombers[id].ah1CobraCount -= amount;
         FightersContract(fighters).decreaseAircraftCount(amount, id);
     }
@@ -407,8 +431,24 @@ contract BombersMarket is Ownable {
         idToOwnerBombersMarket[id] = nationOwner;
     }
 
+    function updateCountryMinterAddress(address newAddress) public onlyOwner {
+        countryMinter = newAddress;
+    }
+
     function updateBombers1Address(address newAddress) public onlyOwner {
         bombers1 = newAddress;
+    }
+
+    function updateFightersAddress(address newAddress) public onlyOwner {
+        fighters = newAddress;
+    }
+
+    function updateInfrastructureAddress(address newAddress) public onlyOwner {
+        infrastructure = newAddress;
+    }
+
+    function updateTreasuryAddress(address newAddress) public onlyOwner {
+        treasury = newAddress;
     }
 
     function updateAh1CobraSpecs(

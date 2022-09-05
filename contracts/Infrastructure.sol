@@ -62,7 +62,7 @@ contract InfrastructureContract is Ownable {
         forces = _forces;
     }
 
-    function generateInfrastructure() public {
+    function generateInfrastructure(uint256 id, address nationOwner) public {
         Infrastructure memory newInfrastrusture = Infrastructure(
             20,
             0,
@@ -75,8 +75,8 @@ contract InfrastructureContract is Ownable {
             0,
             0
         );
-        idToInfrastructure[infrastructureId] = newInfrastrusture;
-        idToOwnerInfrastructure[infrastructureId] = msg.sender;
+        idToInfrastructure[id] = newInfrastrusture;
+        idToOwnerInfrastructure[id] = nationOwner;
         infrastructureId++;
     }
 

@@ -58,14 +58,16 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     }
 
     function generateCountryParameters(
+        uint256 id,
+        address nationOwner,
         string memory rulerName,
         string memory nationName,
         string memory capitalCity,
         string memory nationSlogan
     ) public {
         CountryParameters memory newCountryParameters = CountryParameters(
-            parametersId,
-            msg.sender,
+            id,
+            nationOwner,
             rulerName,
             nationName,
             capitalCity,
@@ -80,14 +82,13 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
             0,
             0
         );
-        idToCountryParameters[parametersId] = newCountryParameters;
-        idToCountrySettings[parametersId] = newCountrySettings;
-        idToOwnerParameters[parametersId] = msg.sender;
-        fulfillRequest(parametersId);
-        parametersId++;
+        idToCountryParameters[id] = newCountryParameters;
+        idToCountrySettings[id] = newCountrySettings;
+        idToOwnerParameters[id] = nationOwner;
+        fulfillRequest(id);
     }
 
-    function fulfillRequest(uint256 parameterId) public {
+    function fulfillRequest(uint256 id) public {
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
@@ -96,7 +97,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
             NUM_WORDS
         );
         //should this be resourcesID?
-        s_requestIdToRequestIndex[requestId] = parameterId;
+        s_requestIdToRequestIndex[requestId] = id;
     }
 
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords)

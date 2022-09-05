@@ -7,7 +7,6 @@ import "./Improvements.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract WondersContract1 is Ownable {
-    uint256 private wondersId1;
     address public treasuryAddress;
     address public wondersContract2Address;
     address public wondersContract3Address;
@@ -161,7 +160,7 @@ contract WondersContract1 is Ownable {
         idToWonders1[id].wonderCount -= 1;
     }
 
-    function generateWonders1() public {
+    function generateWonders1(uint256 id, address nationOwner) public {
         Wonders1 memory newWonders1 = Wonders1(
             0,
             false,
@@ -176,9 +175,8 @@ contract WondersContract1 is Ownable {
             false,
             false
         );
-        idToWonders1[wondersId1] = newWonders1;
-        idToOwnerWonders1[wondersId1] = msg.sender;
-        wondersId1++;
+        idToWonders1[id] = newWonders1;
+        idToOwnerWonders1[id] = nationOwner;
     }
 
     function updateAgricultureDevelopmentCost(uint256 newPrice)
@@ -550,7 +548,6 @@ contract WondersContract1 is Ownable {
 }
 
 contract WondersContract2 is Ownable {
-    uint256 private wondersId2;
     address public treasuryAddress;
     address public infrastructureAddress;
     address public wonderContract1Address;
@@ -689,7 +686,7 @@ contract WondersContract2 is Ownable {
         infrastructureAddress = _infrastructureAddress;
     }
 
-    function generateWonders2() public {
+    function generateWonders2(uint256 id, address nationOwner) public {
         Wonders2 memory newWonders2 = Wonders2(
             false,
             false,
@@ -704,9 +701,8 @@ contract WondersContract2 is Ownable {
             false,
             false
         );
-        idToWonders2[wondersId2] = newWonders2;
-        idToOwnerWonders2[wondersId2] = msg.sender;
-        wondersId2++;
+        idToWonders2[id] = newWonders2;
+        idToOwnerWonders2[id] = nationOwner;
     }
 
     function updateGreatMonumentCost(uint256 newPrice) public onlyOwner {
@@ -1131,7 +1127,6 @@ contract WondersContract2 is Ownable {
 }
 
 contract WondersContract3 is Ownable {
-    uint256 private wondersId3;
     address public treasuryAddress;
     address public infrastructureAddress;
     address public wonderContract1Address;
@@ -1279,7 +1274,7 @@ contract WondersContract3 is Ownable {
         wonderContract4Address = _wonderContract4Address;
     }
 
-    function generateWonders3() public {
+    function generateWonders3(uint256 id, address nationOwner) public {
         Wonders3 memory newWonders3 = Wonders3(
             false,
             false,
@@ -1294,9 +1289,8 @@ contract WondersContract3 is Ownable {
             false,
             false
         );
-        idToWonders3[wondersId3] = newWonders3;
-        idToOwnerWonders3[wondersId3] = msg.sender;
-        wondersId3++;
+        idToWonders3[id] = newWonders3;
+        idToOwnerWonders3[id] = nationOwner;
     }
 
     function updateMoonBaseCost(uint256 newPrice) public onlyOwner {
@@ -1867,7 +1861,7 @@ contract WondersContract4 is Ownable {
         improvementsContract3Address = _improvementsContract3Address;
     }
 
-    function generateWonders4() public {
+    function generateWonders4(uint256 id, address nationOwner) public {
         Wonders4 memory newWonders4 = Wonders4(
             false,
             false,
@@ -1877,8 +1871,8 @@ contract WondersContract4 is Ownable {
             false,
             false
         );
-        idToWonders4[wondersId4] = newWonders4;
-        idToOwnerWonders4[wondersId4] = msg.sender;
+        idToWonders4[id] = newWonders4;
+        idToOwnerWonders4[id] = nationOwner;
         wondersId4++;
     }
 

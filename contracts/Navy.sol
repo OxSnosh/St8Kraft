@@ -6,7 +6,6 @@ import "./Improvements.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract NavyContract is Ownable {
-    uint256 private navyId;
     address public treasuryAddress;
     address public improvementsContract1Address;
     address public improvementsContract3Address;
@@ -53,11 +52,10 @@ contract NavyContract is Ownable {
         aircraftCarrierCost = 800;
     }
 
-    function generateNavy() public {
+    function generateNavy(uint256 id, address nationOwner) public {
         Navy memory newNavy = Navy(0, 0, 0, 0, 0, 0, 0, 0, 0, true);
-        idToNavy[navyId] = newNavy;
-        idToOwnerNavy[navyId] = msg.sender;
-        navyId++;
+        idToNavy[id] = newNavy;
+        idToOwnerNavy[id] = nationOwner;
     }
 
     function updateCorvetteCost(uint256 newPrice) public onlyOwner {

@@ -7,7 +7,6 @@ import "./Navy.sol";
 import "./Forces.sol";
 
 contract ImprovementsContract1 is Ownable {
-    uint256 private improvementsId1;
     address public treasuryAddress;
     address public improvementContract2Address;
     address public improvementContract3Address;
@@ -144,7 +143,7 @@ contract ImprovementsContract1 is Ownable {
         navyContractAddress = _navyContractAddress;
     }
 
-    function generateImprovements() public {
+    function generateImprovements(uint256 id, address nationOwner) public {
         Improvements1 memory newImprovements1 = Improvements1(
             0,
             0,
@@ -159,9 +158,8 @@ contract ImprovementsContract1 is Ownable {
             0,
             0
         );
-        idToImprovements1[improvementsId1] = newImprovements1;
-        idToOwnerImprovements1[improvementsId1] = msg.sender;
-        improvementsId1++;
+        idToImprovements1[id] = newImprovements1;
+        idToOwnerImprovements1[id] = nationOwner;
     }
 
     function updateAirportCost(uint256 newPrice) public onlyOwner {
@@ -554,7 +552,6 @@ contract ImprovementsContract1 is Ownable {
 }
 
 contract ImprovementsContract2 is Ownable {
-    uint256 private improvementsId2;
     address public treasuryAddress;
     address public improvementsContract1Address;
     address public forcesAddress;
@@ -679,7 +676,7 @@ contract ImprovementsContract2 is Ownable {
         forcesAddress = _newForcesAddress;
     }
 
-    function generateImprovements() public {
+    function generateImprovements(uint256 id, address nationOwner) public {
         Improvements2 memory newImprovements2 = Improvements2(
             0,
             0,
@@ -694,9 +691,8 @@ contract ImprovementsContract2 is Ownable {
             0,
             0
         );
-        idToImprovements2[improvementsId2] = newImprovements2;
-        idToOwnerImprovements2[improvementsId2] = msg.sender;
-        improvementsId2++;
+        idToImprovements2[id] = newImprovements2;
+        idToOwnerImprovements2[id] = nationOwner;
     }
 
     function updateForeignMinistryCost(uint256 newPrice) public onlyOwner {
@@ -1336,7 +1332,7 @@ contract ImprovementsContract3 is Ownable {
         navyContractAddress = _navyContractAddress;
     }
 
-    function generateImprovements() public {
+    function generateImprovements(uint256 id, address nationOwner) public {
         Improvements3 memory newImprovements3 = Improvements3(
             0,
             0,
@@ -1350,8 +1346,8 @@ contract ImprovementsContract3 is Ownable {
             0,
             0
         );
-        idToImprovements3[improvementsId3] = newImprovements3;
-        idToOwnerImprovements3[improvementsId3] = msg.sender;
+        idToImprovements3[id] = newImprovements3;
+        idToOwnerImprovements3[id] = nationOwner;
         improvementsId3++;
     }
 

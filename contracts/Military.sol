@@ -2,8 +2,7 @@
 pragma solidity 0.8.7;
 
 contract MilitaryContract {
-    uint256 private militaryId;
-
+    
     struct Military {
         uint256 defconLevel;
         uint256 threatLevel;
@@ -16,11 +15,10 @@ contract MilitaryContract {
     mapping(uint256 => Military) public idToMilitary;
     mapping(uint256 => address) public idToOwnerMilitary;
 
-    function generateMilitary() public {
+    function generateMilitary(uint256 id, address nationOwner) public {
         Military memory newMilitary = Military(5, 1, false, 0, 0, 0);
-        idToMilitary[militaryId] = newMilitary;
-        idToOwnerMilitary[militaryId] = msg.sender;
-        militaryId++;
+        idToMilitary[id] = newMilitary;
+        idToOwnerMilitary[id] = nationOwner;
     }
 
     function updateDefconLevel(uint256 newDefcon, uint256 id) public {
