@@ -369,7 +369,7 @@ contract BombersContract is Ownable {
     }
 }
 
-contract BombersMarket is Ownable {
+contract BombersMarketplace is Ownable {
     address public countryMinter;
     address public bombers1;
     address public fighters;

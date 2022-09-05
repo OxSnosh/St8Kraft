@@ -34,6 +34,8 @@ contract CountryMinter is ERC721, Ownable {
     address public treasury;
     address public navy;
     address public fighters;
+    address public fightersMarket;
+    address public bombersMarket;
     address public bombers;
 
     mapping(uint256 => address) public idToOwner;
@@ -54,7 +56,9 @@ contract CountryMinter is ERC721, Ownable {
         address _forces,
         address _navy,
         address _fighters,
-        address _bombers
+        address _fightersMarket,
+        address _bombers,
+        address _bombersMarket
     ) ERC721("MetaNations", "MNS") {
         countryParameters = _countryParameters;
         treasury = _treasury;
@@ -64,7 +68,9 @@ contract CountryMinter is ERC721, Ownable {
         forces = _forces;
         navy = _navy;
         fighters = _fighters;
+        fightersMarket = _fightersMarket;
         bombers = _bombers;
+        bombersMarket = _bombersMarket;
     }
 
     function constructorContinued(
@@ -117,11 +123,19 @@ contract CountryMinter is ERC721, Ownable {
         ForcesContract(forces).generateForces(countryId, msg.sender);
         NavyContract(navy).generateNavy(countryId, msg.sender);
         FightersContract(fighters).generateFighters(countryId, msg.sender);
+        FightersMarketplace(fightersMarket).initiateFightersMarket(countryId, msg.sender);
         BombersContract(bombers).generateBombers(countryId, msg.sender);
-        //bombers Market Here
+        BombersMarketplace(bombersMarket).initiateBombersMarket(countryId, msg.sender);        
         idToOwner[countryId] = msg.sender;
         ownerCountryCount[msg.sender]++;
         emit nationCreated(msg.sender, nationName, ruler);
         countryId++;
+    }
+
+    function checkOwnership(uint256 id) public view returns (bool) {
+        if(idToOwner[id] == msg.sender) {
+            return true;
+        }
+        return false;
     }
 }
