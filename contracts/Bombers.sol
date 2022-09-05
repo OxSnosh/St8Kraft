@@ -55,7 +55,12 @@ contract BombersContract is Ownable {
     mapping(uint256 => Bombers) public idToBombers;
     mapping(uint256 => address) public idToOwnerBombers;
 
-    constructor(address _treasuryAddress, address _fightersAddress, address _infrastructure, address _war) {
+    constructor(
+        address _treasuryAddress,
+        address _fightersAddress,
+        address _infrastructure,
+        address _war
+    ) {
         treasuryAddress = _treasuryAddress;
         fightersAddress = _fightersAddress;
         infrastructure = _infrastructure;
@@ -168,12 +173,11 @@ contract BombersContract is Ownable {
     }
 
     function buyAh1Cobra(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerBombers[id] == msg.sender,
-            "!nation ruler"
-        );
+        require(idToOwnerBombers[id] == msg.sender, "!nation ruler");
         uint256 aircraftCount = idToFighters[id].aircraft;
-        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(id);
+        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
+            id
+        );
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -193,17 +197,26 @@ contract BombersContract is Ownable {
     }
 
     function decreaseAh1CobraCount(uint256 amount, uint256 id) public onlyWar {
+        uint256 currentAmount = idToBombers[id].ah1CobraCount;
+        require((currentAmount - amount) >= 0, "cannot delete that many");
+        idToBombers[id].ah1CobraCount -= amount;
+        FightersContract(fightersAddress).decreaseAircraftCount(amount, id);
+    }
+
+    function scrapAh1Cobra(uint256 amount, uint256 id) public {
+        require(idToOwnerBombers[id] == msg.sender, "!nation ruler");
+        uint256 currentAmount = idToBombers[id].ah1CobraCount;
+        require((currentAmount - amount) >= 0, "cannot delete that many");
         idToBombers[id].ah1CobraCount -= amount;
         FightersContract(fightersAddress).decreaseAircraftCount(amount, id);
     }
 
     function buyAh64Apache(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerBombers[id] == msg.sender,
-            "!nation ruler"
-        );
+        require(idToOwnerBombers[id] == msg.sender, "!nation ruler");
         uint256 aircraftCount = idToFighters[id].aircraft;
-        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(id);
+        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
+            id
+        );
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -222,18 +235,30 @@ contract BombersContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    function decreaseAh64ApacheCount(uint256 amount, uint256 id) public onlyWar {
+    function decreaseAh64ApacheCount(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
+        uint256 currentAmount = idToBombers[id].ah64ApacheCount;
+        require((currentAmount - amount) >= 0, "cannot delete that many");
+        idToBombers[id].ah64ApacheCount -= amount;
+        FightersContract(fightersAddress).decreaseAircraftCount(amount, id);
+    }
+
+    function scrapAh64Apache(uint256 amount, uint256 id) public {
+        require(idToOwnerBombers[id] == msg.sender, "!nation ruler");
+        uint256 currentAmount = idToBombers[id].ah64ApacheCount;
+        require((currentAmount - amount) >= 0, "cannot delete that many");
         idToBombers[id].ah64ApacheCount -= amount;
         FightersContract(fightersAddress).decreaseAircraftCount(amount, id);
     }
 
     function buyBristolBlenheim(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerBombers[id] == msg.sender,
-            "!nation ruler"
-        );
+        require(idToOwnerBombers[id] == msg.sender, "!nation ruler");
         uint256 aircraftCount = idToFighters[id].aircraft;
-        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(id);
+        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
+            id
+        );
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -252,18 +277,30 @@ contract BombersContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    function decreaseBristolBlenheimCount(uint256 amount, uint256 id) public onlyWar {
+    function decreaseBristolBlenheimCount(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
+        uint256 currentAmount = idToBombers[id].bristolBlenheimCount;
+        require((currentAmount - amount) >= 0, "cannot delete that many");
+        idToBombers[id].bristolBlenheimCount -= amount;
+        FightersContract(fightersAddress).decreaseAircraftCount(amount, id);
+    }
+
+    function scrapBristolBlenheim(uint256 amount, uint256 id) public {
+        require(idToOwnerBombers[id] == msg.sender, "!nation ruler");
+        uint256 currentAmount = idToBombers[id].bristolBlenheimCount;
+        require((currentAmount - amount) >= 0, "cannot delete that many");
         idToBombers[id].bristolBlenheimCount -= amount;
         FightersContract(fightersAddress).decreaseAircraftCount(amount, id);
     }
 
     function buyB52Mitchell(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerBombers[id] == msg.sender,
-            "!nation ruler"
-        );
+        require(idToOwnerBombers[id] == msg.sender, "!nation ruler");
         uint256 aircraftCount = idToFighters[id].aircraft;
-        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(id);
+        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
+            id
+        );
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -282,18 +319,30 @@ contract BombersContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    function decreaseB52MitchellCount(uint256 amount, uint256 id) public onlyWar  {
+    function decreaseB52MitchellCount(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
+        uint256 currentAmount = idToBombers[id].b52MitchellCount;
+        require((currentAmount - amount) >= 0, "cannot delete that many");
+        idToBombers[id].b52MitchellCount -= amount;
+        FightersContract(fightersAddress).decreaseAircraftCount(amount, id);
+    }
+
+    function scrapB52Mitchell(uint256 amount, uint256 id) public {
+        require(idToOwnerBombers[id] == msg.sender, "!nation ruler");
+        uint256 currentAmount = idToBombers[id].b52MitchellCount;
+        require((currentAmount - amount) >= 0, "cannot delete that many");
         idToBombers[id].b52MitchellCount -= amount;
         FightersContract(fightersAddress).decreaseAircraftCount(amount, id);
     }
 
     function buyB17gFlyingFortress(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerBombers[id] == msg.sender,
-            "!nation ruler"
-        );
+        require(idToOwnerBombers[id] == msg.sender, "!nation ruler");
         uint256 aircraftCount = idToFighters[id].aircraft;
-        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(id);
+        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
+            id
+        );
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -312,18 +361,30 @@ contract BombersContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    function decreaseB17gFlyingFortress(uint256 amount, uint256 id) public onlyWar {
+    function decreaseB17gFlyingFortressCount(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
+        uint256 currentAmount = idToBombers[id].b17gFlyingFortressCount;
+        require((currentAmount - amount) >= 0, "cannot delete that many");
+        idToBombers[id].b17gFlyingFortressCount -= amount;
+        FightersContract(fightersAddress).decreaseAircraftCount(amount, id);
+    }
+
+    function scrapB17gFlyingFortress(uint256 amount, uint256 id) public {
+        require(idToOwnerBombers[id] == msg.sender, "!nation ruler");
+        uint256 currentAmount = idToBombers[id].b17gFlyingFortressCount;
+        require((currentAmount - amount) >= 0, "cannot delete that many");
         idToBombers[id].b17gFlyingFortressCount -= amount;
         FightersContract(fightersAddress).decreaseAircraftCount(amount, id);
     }
 
     function buyB52Stratofortress(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerBombers[id] == msg.sender,
-            "!nation ruler"
-        );
+        require(idToOwnerBombers[id] == msg.sender, "!nation ruler");
         uint256 aircraftCount = idToFighters[id].aircraft;
-        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(id);
+        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
+            id
+        );
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -342,18 +403,30 @@ contract BombersContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    function decreaseB52StratofortressCount(uint256 amount, uint256 id) public onlyWar {
+    function decreaseB52StratofortressCount(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
+        uint256 currentAmount = idToBombers[id].b52StratofortressCount;
+        require((currentAmount - amount) >= 0, "cannot delete that many");
         idToBombers[id].b52StratofortressCount -= amount;
         FightersContract(fightersAddress).decreaseAircraftCount(amount, id);
     }
 
-    function buyb2Spirit(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerBombers[id] == msg.sender,
-            "!nation ruler"
-        );
+    function scrapB52Stratofortress(uint256 amount, uint256 id) public {
+        require(idToOwnerBombers[id] == msg.sender, "!nation ruler");
+        uint256 currentAmount = idToBombers[id].b52StratofortressCount;
+        require((currentAmount - amount) >= 0, "cannot delete that many");
+        idToBombers[id].b52StratofortressCount -= amount;
+        FightersContract(fightersAddress).decreaseAircraftCount(amount, id);
+    }
+
+    function buyB2Spirit(uint256 amount, uint256 id) public {
+        require(idToOwnerBombers[id] == msg.sender, "!nation ruler");
         uint256 aircraftCount = idToFighters[id].aircraft;
-        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(id);
+        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
+            id
+        );
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -372,18 +445,27 @@ contract BombersContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    function decreaseb2SpiritCount(uint256 amount, uint256 id) public onlyWar {
+    function decreaseB2SpiritCount(uint256 amount, uint256 id) public onlyWar {
+        uint256 currentAmount = idToBombers[id].b2SpiritCount;
+        require((currentAmount - amount) >= 0, "cannot delete that many");
+        idToBombers[id].b2SpiritCount -= amount;
+        FightersContract(fightersAddress).decreaseAircraftCount(amount, id);
+    }
+
+    function scrapB2Spirit(uint256 amount, uint256 id) public {
+        require(idToOwnerBombers[id] == msg.sender, "!nation ruler");
+        uint256 currentAmount = idToBombers[id].b2SpiritCount;
+        require((currentAmount - amount) >= 0, "cannot delete that many");
         idToBombers[id].b2SpiritCount -= amount;
         FightersContract(fightersAddress).decreaseAircraftCount(amount, id);
     }
 
     function buyB1bLancer(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerBombers[id] == msg.sender,
-            "!nation ruler"
-        );
+        require(idToOwnerBombers[id] == msg.sender, "!nation ruler");
         uint256 aircraftCount = idToFighters[id].aircraft;
-        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(id);
+        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
+            id
+        );
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -403,17 +485,26 @@ contract BombersContract is Ownable {
     }
 
     function decreaseB1bLancerCount(uint256 amount, uint256 id) public onlyWar {
+        uint256 currentAmount = idToBombers[id].b1bLancerCount;
+        require((currentAmount - amount) >= 0, "cannot delete that many");
+        idToBombers[id].b1bLancerCount -= amount;
+        FightersContract(fightersAddress).decreaseAircraftCount(amount, id);
+    }
+
+    function scrapB1bLancer(uint256 amount, uint256 id) public {
+        require(idToOwnerBombers[id] == msg.sender, "!nation ruler");
+        uint256 currentAmount = idToBombers[id].b1bLancerCount;
+        require((currentAmount - amount) >= 0, "cannot delete that many");
         idToBombers[id].b1bLancerCount -= amount;
         FightersContract(fightersAddress).decreaseAircraftCount(amount, id);
     }
 
     function buyTupolevTu160(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerBombers[id] == msg.sender,
-            "!nation ruler"
-        );
+        require(idToOwnerBombers[id] == msg.sender, "!nation ruler");
         uint256 aircraftCount = idToFighters[id].aircraft;
-        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(id);
+        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
+            id
+        );
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -432,7 +523,20 @@ contract BombersContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    function decreaseTupolevTu160Count(uint256 amount, uint256 id) public onlyWar {
+    function decreaseTupolevTu160Count(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
+        uint256 currentAmount = idToBombers[id].tupolevTu160Count;
+        require((currentAmount - amount) >= 0, "cannot delete that many");
+        idToBombers[id].tupolevTu160Count -= amount;
+        FightersContract(fightersAddress).decreaseAircraftCount(amount, id);
+    }
+
+    function scrapTupolevTu160(uint256 amount, uint256 id) public {
+        require(idToOwnerBombers[id] == msg.sender, "!nation ruler");
+        uint256 currentAmount = idToBombers[id].tupolevTu160Count;
+        require((currentAmount - amount) >= 0, "cannot delete that many");
         idToBombers[id].tupolevTu160Count -= amount;
         FightersContract(fightersAddress).decreaseAircraftCount(amount, id);
     }
