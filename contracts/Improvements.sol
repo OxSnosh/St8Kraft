@@ -1760,6 +1760,15 @@ contract ImprovementsContract3 is Ownable {
         }
     }
 
+    function getPoliceHeadquartersCount(uint256 countryId)
+        public
+        view
+        returns (uint256 count)
+    {
+        uint256 count = idToImprovements3[countryId].policeHeadquartersCount;
+        return count;
+    }
+
     function getSatelliteCount(uint256 countryId)
         public
         view

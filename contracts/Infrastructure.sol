@@ -10,7 +10,6 @@ import "./CountryParameters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract InfrastructureContract is Ownable {
-    uint256 private infrastructureId;
     address public resources;
     address public improvements1;
     address public improvements3;
@@ -80,7 +79,6 @@ contract InfrastructureContract is Ownable {
         );
         idToInfrastructure[id] = newInfrastrusture;
         idToOwnerInfrastructure[id] = nationOwner;
-        infrastructureId++;
     }
 
     //how to graduate tech and infrastructure purchases
@@ -771,5 +769,11 @@ contract InfrastructureContract is Ownable {
             environmentPenalty = true;
         }
         return (soldierPopulationRatio, environmentPenalty);
+    }
+
+    function getTotalPopulationCount(uint256 id) public view returns (uint256) {
+        uint256 infra = getInfrastructureCount(id);
+        uint256 population = (infra * 8);
+        return population;
     }
 }

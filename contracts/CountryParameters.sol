@@ -169,7 +169,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         uint256 daysSinceChange = idToCountrySettings[id]
             .daysSinceGovernmentChenge;
         require(daysSinceChange >= 3, "need to wait 3 days before changing");
-        require(newType <= 14, "invalid type");
+        require(newType <= 10, "invalid type");
         idToCountrySettings[id].governmentType = newType;
         idToCountrySettings[id].daysSinceGovernmentChenge = 0;
     }
@@ -182,7 +182,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         uint256 daysSinceChange = idToCountrySettings[id]
             .daysSinceReligionChange;
         require(daysSinceChange >= 3, "need to wait 3 days before changing");
-        require(newType <= 10, "invalid type");
+        require(newType <= 14, "invalid type");
         idToCountrySettings[id].daysSinceReligionChange = newType;
         idToCountrySettings[id].daysSinceReligionChange = 0;
     }
