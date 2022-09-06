@@ -20,6 +20,7 @@ contract InfrastructureContract is Ownable {
     address public wonders4;
     address public forces;
     address public treasury;
+    address public aid;
     address public parameters;
 
     struct Infrastructure {
@@ -48,7 +49,8 @@ contract InfrastructureContract is Ownable {
         address _wonders4,
         address _treasury,
         address _parameters,
-        address _forces
+        address _forces,
+        address _aid
     ) {
         resources = _resources;
         improvements1 = _improvements1;
@@ -60,6 +62,7 @@ contract InfrastructureContract is Ownable {
         treasury = _treasury;
         parameters = _parameters;
         forces = _forces;
+        aid = _aid;
     }
 
     function generateInfrastructure(uint256 id, address nationOwner) public {
@@ -161,11 +164,6 @@ contract InfrastructureContract is Ownable {
     }
 
     function getTechCostMultiplier(uint256 id) public view returns (uint256) {
-        //gold -5%
-        //microchips -8%
-        //-10% per university
-        //national research lab -3%
-        //space program  - 3%
         uint256 goldMultiplier = 0;
         uint256 microchipMultiplier = 0;
         uint256 universityMultiplier = 0;
@@ -200,6 +198,18 @@ contract InfrastructureContract is Ownable {
             spaceProgramMultiplier;
         uint256 multiplier = (100 - sumOfAdjustments);
         return multiplier;
+    }
+
+    modifier onlyAidContract {
+        require(msg.sender == aid);
+        _;
+    }
+
+    function sendTech(uint256 idSender, uint256 idReciever, uint256 amount) public onlyAidContract {
+        uint256 balanceOfSender = idToInfrastructure[idSender].technologyCount;
+        require(balanceOfSender >= amount, "sender does not have enought tech");
+        idToInfrastructure[idSender].technologyCount -= amount;
+        idToInfrastructure[idReciever].technologyCount += amount;
     }
 
     function buyInfrastructure(uint256 id, uint256 buyAmount) public {

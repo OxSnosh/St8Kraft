@@ -19,6 +19,7 @@ contract TreasuryContract is Ownable {
     address public fighters;
     address public warBucksAddress;
     address public forces;
+    address public aid;
     uint256 public daysToInactive;
     uint256 private gameTaxPercentage = 0;
     uint256 public seedMoney = 2000000;
@@ -46,7 +47,8 @@ contract TreasuryContract is Ownable {
         address _infrastructure,
         address _forces,
         address _navy,
-        address _fighters
+        address _fighters,
+        address _aid
     ) {
         warBucksAddress = _warBucksAddress;
         wonders1 = _wonders1;
@@ -55,6 +57,7 @@ contract TreasuryContract is Ownable {
         forces = _forces;
         navy = _navy;
         fighters = _fighters;
+        aid = _aid;
         daysToInactive = 20;
     }
 
@@ -274,6 +277,22 @@ contract TreasuryContract is Ownable {
         }
     }
 
+    modifier onlyAidContract() {
+        require(msg.sender == aid);
+        _;
+    }
+
+    function sendAidBalance(
+        uint256 idSender,
+        uint256 idRecipient,
+        uint256 amount
+    ) public onlyAidContract {
+        uint256 balance = idToTreasury[idSender].balance;
+        require(balance >= amount, "not enough balance");
+        idToTreasury[idSender].balance -= amount;
+        idToTreasury[idRecipient].balance += amount;
+    }
+
     //NEED FUNCTION TO WITHDRAW TAXES
 
     function withdrawFunds(uint256 amount, uint256 id) public {
@@ -318,11 +337,7 @@ contract TreasuryContract is Ownable {
         daysToInactive = newDays;
     }
 
-    function checkBalance(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
+    function checkBalance(uint256 id) public view returns (uint256) {
         uint256 balance = idToTreasury[id].balance;
         return balance;
     }
@@ -330,5 +345,149 @@ contract TreasuryContract is Ownable {
     function checkInactive(uint256 id) public view returns (bool) {
         bool isInactive = idToTreasury[id].inactive;
         return isInactive;
+    }
+}
+
+contract AidContract is Ownable {
+    address public countryMinter;
+    address public treasury;
+    address public forces;
+    address public infrastructure;
+    uint256 public aidProposalId;
+
+    constructor(
+        address _countryMinter,
+        address _treasury,
+        address _forces,
+        address _infrastructure
+    ) {
+        countryMinter = _countryMinter;
+        treasury = _treasury;
+        forces = _forces;
+        infrastructure = _infrastructure;
+    }
+
+    struct Proposal {
+        uint256 timeProposed;
+        uint256 idSender;
+        uint256 idRecipient;
+        uint256 techAid;
+        uint256 balanceAid;
+        uint256 soldierAid;
+        bool accepted;
+        bool cancelled;
+    }
+
+    mapping(uint256 => address) public idToOwnerAid;
+    mapping(uint256 => Proposal) public idToProposal;
+
+    function updateCountryMinterAddress(address _newAddress) public onlyOwner {
+        countryMinter = _newAddress;
+    }
+
+    function updateTreasuryAddress(address _newAddress) public onlyOwner {
+        treasury = _newAddress;
+    }
+
+    function updateForcesAddress(address _newAddress) public onlyOwner {
+        forces = _newAddress;
+    }
+
+    function updateInfrastructureAddress(address _newAddress) public onlyOwner {
+        infrastructure = _newAddress;
+    }
+
+    modifier onlyCountryMinter() {
+        require(
+            msg.sender == countryMinter,
+            "caller must be country minter contract"
+        );
+        _;
+    }
+
+    function initiateAid(uint256 id, address nationOwner)
+        public
+        onlyCountryMinter
+    {
+        idToOwnerAid[id] = nationOwner;
+    }
+
+    function proposeAid(
+        uint256 idSender,
+        uint256 idRecipient,
+        uint256 techAid,
+        uint256 balanceAid,
+        uint256 soldiersAid
+    ) public {
+        require(idToOwnerAid[idSender] == msg.sender, "!nation ruler");
+        uint256 techAvailable = InfrastructureContract(infrastructure)
+            .getTechnologyCount(idSender);
+        uint256 balanceAvailable = TreasuryContract(treasury).checkBalance(
+            idSender
+        );
+        uint256 soldiersAvailable = ForcesContract(forces)
+            .getDefendingSoldierCount(idSender);
+        require(techAvailable >= techAid, "not enough tech for this proposal");
+        require(
+            balanceAvailable >= balanceAid,
+            "not enough funds for this porposal"
+        );
+        require(
+            soldiersAvailable >= soldiersAid,
+            "not enough soldiers for this porposal"
+        );
+        Proposal memory newProposal = Proposal(
+            block.timestamp,
+            idSender,
+            idRecipient,
+            techAid,
+            balanceAid,
+            soldiersAid,
+            false,
+            false
+        );
+        idToProposal[aidProposalId] = newProposal;
+        aidProposalId++;
+    }
+
+    function proposalExpired(uint256 proposalId) public view returns (bool) {
+        uint256 timeProposed = idToProposal[proposalId].timeProposed;
+        uint256 timeElapsed = (block.timestamp - timeProposed);
+        bool expired = false;
+        if (timeElapsed > 7 days) {
+            expired = true;
+        }
+        return expired;
+    }
+
+    function acceptProposal(uint256 proposalId) public {
+        bool expired = proposalExpired(proposalId);
+        require(expired == false, "proposal expired");
+        uint256 idSender = idToProposal[proposalId].idSender;
+        uint256 idRecipient = idToProposal[proposalId].idRecipient;
+        uint256 tech = idToProposal[proposalId].techAid;
+        uint256 balance = idToProposal[proposalId].balanceAid;
+        uint256 soldiers = idToProposal[proposalId].soldierAid;
+        bool accepted = idToProposal[proposalId].accepted;
+        require(accepted == false, "this offer has been accepted already");
+        bool cancelled = idToProposal[proposalId].cancelled;
+        require(cancelled == false, "this offer has been cancelled");
+        address addressRecipient = idToOwnerAid[idRecipient];
+        require(
+            addressRecipient == msg.sender,
+            "you are not the recipient of this proposal"
+        );
+        InfrastructureContract(infrastructure).sendTech(
+            idSender,
+            idRecipient,
+            tech
+        );
+        TreasuryContract(treasury).sendAidBalance(
+            idSender,
+            idRecipient,
+            balance
+        );
+        ForcesContract(forces).sendSoldiers(idSender, idRecipient, soldiers);
+        idToProposal[proposalId].accepted = true;
     }
 }

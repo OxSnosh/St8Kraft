@@ -11,6 +11,7 @@ contract ForcesContract is Ownable {
     uint256 public nukeCost;
     uint256 public spyCost;
     address public treasuryAddress;
+    address public aid;
 
     struct Forces {
         uint256 numberOfSoldiers;
@@ -25,8 +26,9 @@ contract ForcesContract is Ownable {
         bool nationExists;
     }
 
-    constructor(address _treasuryAddress) {
+    constructor(address _treasuryAddress, address _aid) {
         treasuryAddress = _treasuryAddress;
+        aid = _aid;
         soldierCost = 100;
         tankCost = 200;
         cruiseMissileCost = 300;
@@ -76,15 +78,16 @@ contract ForcesContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
+    modifier onlyAidContract() {
+        require(msg.sender == aid);
+        _;
+    }
+
     function sendSoldiers(
-        uint256 amount,
         uint256 idSender,
-        uint256 idReciever
-    ) public {
-        require(
-            idToOwnerForces[idSender] == msg.sender,
-            "You are not the nation ruler"
-        );
+        uint256 idReciever,
+        uint256 amount
+    ) public onlyAidContract {
         uint256 defendingSoldierCount = idToForces[idSender].defendingSoldiers;
         require(
             defendingSoldierCount >= amount,
@@ -98,6 +101,15 @@ contract ForcesContract is Ownable {
         idToForces[idSender].numberOfSoldiers -= amount;
         idToForces[idReciever].defendingSoldiers += amount;
         idToForces[idReciever].numberOfSoldiers += amount;
+    }
+
+    function getDefendingSoldierCount(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 count = idToForces[id].defendingSoldiers;
+        return count;
     }
 
     function deploySoldiers(uint256 amountToDeploy, uint256 id) public {
@@ -136,7 +148,11 @@ contract ForcesContract is Ownable {
         idToForces[id].numberOfSoldiers -= amount;
     }
 
-    function getSoldierCount(uint256 id) public view returns (uint256 soldiers) {
+    function getSoldierCount(uint256 id)
+        public
+        view
+        returns (uint256 soldiers)
+    {
         uint256 soldierAmount = idToForces[id].numberOfSoldiers;
         return soldierAmount;
     }

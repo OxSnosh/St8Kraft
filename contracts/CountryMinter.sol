@@ -32,6 +32,7 @@ contract CountryMinter is ERC721, Ownable {
     address public military;
     address public forces;
     address public treasury;
+    address public aid;
     address public navy;
     address public fighters;
     address public fightersMarket;
@@ -52,28 +53,16 @@ contract CountryMinter is ERC721, Ownable {
         address _treasury,
         address _infrastructure,
         address _resources,
-        address _military,
-        address _forces,
-        address _navy,
-        address _fighters,
-        address _fightersMarket,
-        address _bombers,
-        address _bombersMarket
+        address _aid
     ) ERC721("MetaNations", "MNS") {
         countryParameters = _countryParameters;
         treasury = _treasury;
         infrastructure = _infrastructure;
         resources = _resources;
-        military = _military;
-        forces = _forces;
-        navy = _navy;
-        fighters = _fighters;
-        fightersMarket = _fightersMarket;
-        bombers = _bombers;
-        bombersMarket = _bombersMarket;
+        aid = _aid;
     }
 
-    function constructorContinued(
+    function constructorContinued1(
         address _improvements1,
         address _improvements2,
         address _improvements3,
@@ -89,6 +78,24 @@ contract CountryMinter is ERC721, Ownable {
         wonders2 = _wonders2;
         wonders3 = _wonders3;
         wonders4 = _wonders4;
+    }
+
+    function constructorContinued2(
+        address _military,
+        address _forces,
+        address _navy,
+        address _fighters,
+        address _fightersMarket,
+        address _bombers,
+        address _bombersMarket
+    ) public onlyOwner {
+        military = _military;
+        forces = _forces;
+        navy = _navy;
+        fighters = _fighters;
+        fightersMarket = _fightersMarket;
+        bombers = _bombers;
+        bombersMarket = _bombersMarket;
     }
 
     function generateCountry(
@@ -119,6 +126,7 @@ contract CountryMinter is ERC721, Ownable {
         WondersContract3(wonders3).generateWonders3(countryId, msg.sender);
         WondersContract4(wonders4).generateWonders4(countryId, msg.sender);
         TreasuryContract(treasury).generateTreasury(countryId, msg.sender);
+        AidContract(aid).initiateAid(countryId, msg.sender);
         MilitaryContract(military).generateMilitary(countryId, msg.sender);
         ForcesContract(forces).generateForces(countryId, msg.sender);
         NavyContract(navy).generateNavy(countryId, msg.sender);
