@@ -412,6 +412,7 @@ contract AidContract is Ownable {
         idToOwnerAid[id] = nationOwner;
     }
 
+    //check for sanctions
     function proposeAid(
         uint256 idSender,
         uint256 idRecipient,
@@ -460,6 +461,7 @@ contract AidContract is Ownable {
         return expired;
     }
 
+    //check for sanctions
     function acceptProposal(uint256 proposalId) public {
         bool expired = proposalExpired(proposalId);
         require(expired == false, "proposal expired");
@@ -489,5 +491,23 @@ contract AidContract is Ownable {
         );
         ForcesContract(forces).sendSoldiers(idSender, idRecipient, soldiers);
         idToProposal[proposalId].accepted = true;
+    }
+
+    function cancelAid(uint256 proposalId) public {
+        uint256 idRecipient = idToProposal[proposalId].idRecipient;
+        uint256 idSender = idToProposal[proposalId].idSender;
+        address recipient = idToOwnerAid[idRecipient];
+        address sender = idToOwnerAid[idSender];
+        require(
+            sender == msg.sender || recipient == msg.sender,
+            "caller not a participant in this trade"
+        );
+        bool cancelled = idToProposal[proposalId].cancelled;
+        require(cancelled == false, "trade already cancelled");
+        bool accepted = idToProposal[proposalId].cancelled;
+        require(accepted == false, "trade already accepted");
+        bool expired = proposalExpired(proposalId);
+        require(expired == false, "trade already expired");
+        idToProposal[proposalId].cancelled = true;
     }
 }
