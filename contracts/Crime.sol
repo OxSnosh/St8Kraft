@@ -15,13 +15,20 @@ contract CrimeContract is Ownable {
     ImprovementsContract3 imp3;
     CountryParametersContract cp;
 
-    constructor (address _infrastructure, address _improvements3, address _parameters) {
+    constructor(
+        address _infrastructure,
+        address _improvements3,
+        address _parameters
+    ) {
         inf = InfrastructureContract(_infrastructure);
         imp3 = ImprovementsContract3(_improvements3);
         cp = CountryParametersContract(_parameters);
     }
 
-    function updateInfrastructureContract(address _newAddress) public onlyOwner {
+    function updateInfrastructureContract(address _newAddress)
+        public
+        onlyOwner
+    {
         infrastructure = _newAddress;
         inf = InfrastructureContract(_newAddress);
     }
@@ -36,29 +43,57 @@ contract CrimeContract is Ownable {
         cp = CountryParametersContract(_newAddress);
     }
 
+    function getCrimeIndex(uint256 id) public view returns (uint256) {
+        uint256 cps = getCrimePreventionScore(id);
+        uint256 crimeIndex;
+        if (cps < 100) {
+            crimeIndex = 6;
+        } else if (cps < 180) {
+            crimeIndex = 5;
+        } else if (cps < 260) {
+            crimeIndex = 4;
+        } else if (cps < 340) {
+            crimeIndex = 3;
+        } else if (cps < 420) {
+            crimeIndex = 2;
+        } else if (cps < 500) {
+            crimeIndex = 1;
+        } else {
+            crimeIndex = 0;
+        }
+        return crimeIndex;
+    }
+
     function getCrimePreventionScore(uint256 id) public view returns (uint256) {
         uint256 litPoints = getLiteracyPoints(id);
         uint256 improvementPoints = getImprovementPoints(id);
         uint256 governmentPoints = getPointsFromGovernmentType(id);
         uint256 getPointsFromInfrastructure = getPointsFromInfrastruture(id);
         uint256 populationPoints = getPointsFromPopulation(id);
+        uint256 cps = (litPoints +
+            improvementPoints +
+            governmentPoints +
+            getPointsFromInfrastructure +
+            populationPoints);
         //add government positions
-
+        return cps;
     }
 
     function getLiteracyPoints(uint256 id) public view returns (uint256) {
         uint256 tech = inf.getTechnologyCount(id);
         uint256 litBeforeModifiers;
-        if(tech <= 50) {
+        if (tech <= 50) {
             litBeforeModifiers = 20;
         } else {
-            uint256 addedLiteracy = ((tech-50)/3);
+            uint256 addedLiteracy = ((tech - 50) / 3);
             litBeforeModifiers = (20 + addedLiteracy);
         }
         uint256 schoolPoints = imp3.getSchoolCount(id);
         uint256 universities = imp3.getUniversityCount(id);
         uint256 universityPoints = (universities * 3);
-        uint256 literacy = (litBeforeModifiers + schoolPoints + universityPoints);
+        uint256 literacy = (litBeforeModifiers +
+            schoolPoints +
+            universityPoints);
         uint256 litPoints = ((literacy * 80) / 100);
         return litPoints;
     }
@@ -71,11 +106,17 @@ contract CrimeContract is Ownable {
         uint256 universityPoints = (universities * 10);
         uint256 policeHqPoints = (policeHqs * 2);
         uint256 taxMultiplier = getTaxRateCrimeMultiplier(id);
-        uint256 improvementPoints = (((schoolPoints + universityPoints + policeHqPoints) * taxMultiplier) / 100);
+        uint256 improvementPoints = (((schoolPoints +
+            universityPoints +
+            policeHqPoints) * taxMultiplier) / 100);
         return improvementPoints;
     }
 
-    function getTaxRateCrimeMultiplier(uint256 id) public view returns (uint256) {
+    function getTaxRateCrimeMultiplier(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 taxRate = inf.getTaxRate(id);
         uint256 taxRateCrimeMultiplier;
         if (taxRate <= 10) {
@@ -125,7 +166,11 @@ contract CrimeContract is Ownable {
         return taxMultiplier;
     }
 
-    function getPointsFromGovernmentType(uint256 id) public view returns (uint256) {
+    function getPointsFromGovernmentType(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 governmentPoints;
         uint256 gov = cp.getGovernmentType(id);
         if (gov == 0) {
@@ -154,7 +199,11 @@ contract CrimeContract is Ownable {
         return governmentPoints;
     }
 
-    function getPointsFromInfrastruture(uint256 id) public view returns (uint256) {
+    function getPointsFromInfrastruture(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 infra = inf.getInfrastructureCount(id);
         uint256 infraPoints = (infra / 100);
         return infraPoints;
