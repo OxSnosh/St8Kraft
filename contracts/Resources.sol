@@ -689,6 +689,11 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         return isLumber;
     }
 
+    function viewLead(uint256 id) public view returns (bool) {
+        bool isLead = idToResources1[id].lead;
+        return isLead;
+    }
+
     function viewIron(uint256 id) public view returns (bool) {
         bool isIron = idToResources1[id].iron;
         return isIron;
@@ -714,6 +719,21 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         return isRubber;
     }
 
+    function viewOil(uint256 id) public view returns (bool) {
+        bool isOil = idToResources2[id].oil;
+        return isOil;
+    }
+
+    function viewUranium(uint256 id) public view returns (bool) {
+        bool isUranium = idToResources2[id].uranium;
+        return isUranium;
+    }
+
+    function viewWater(uint256 id) public view returns (bool) {
+        bool isWater = idToResources2[id].water;
+        return isWater;
+    }
+
     function viewConstruction(uint256 id) public view returns (bool) {
         bool isConstruction = idToBonusResources[id].construction;
         return isConstruction;
@@ -722,6 +742,11 @@ contract ResourcesContract is VRFConsumerBaseV2 {
     function viewSteel(uint256 id) public view returns (bool) {
         bool isSteel = idToBonusResources[id].steel;
         return isSteel;
+    }
+
+    function viewRadiationCleanup(uint256 id) public view returns (bool) {
+        bool isRadiationCleanup = idToBonusResources[id].radiationCleanup;
+        return isRadiationCleanup;
     }
 
     function getTradingPartners(uint256 id) public view returns (uint256[] memory) {

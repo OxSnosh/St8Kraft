@@ -446,7 +446,7 @@ contract InfrastructureContract is Ownable {
             (universities * 8) -
             (guerillaCamp * 8) -
             (casinos * 1));
-        uint256 dailyIncomePerCitizen = ((32 + (2 * happiness)) * multipliers);
+        uint256 dailyIncomePerCitizen = (((32 + (2 * happiness)) * multipliers) / 100);
         return dailyIncomePerCitizen;
     }
 

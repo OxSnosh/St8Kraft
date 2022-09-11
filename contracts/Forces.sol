@@ -309,6 +309,11 @@ contract ForcesContract is Ownable {
         idToForces[idReciever].nuclearWeapons += amount;
     }
 
+    function getNukeCount(uint256 id) public view returns (uint256 tanks) {
+        uint256 count = idToForces[id].nuclearWeapons;
+        return count;
+    }
+
     //called during a battle
     //how can I make sure that only the fighting contract can call this (modifier?)
     function decreaseNukeCount(uint256 amount, uint256 id) public {

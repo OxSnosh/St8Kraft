@@ -494,6 +494,16 @@ contract ImprovementsContract1 is Ownable {
         return borderFortificationAmount;
     }
 
+    function getBorderWallCount(uint256 countryId)
+        public
+        view
+        returns (uint256 count)
+    {
+        uint256 borderWallAmount = idToImprovements1[countryId]
+            .borderWallCount;
+        return borderWallAmount;
+    }
+
     function getBankCount(uint256 countryId)
         public
         view
@@ -1763,7 +1773,7 @@ contract ImprovementsContract3 is Ownable {
     function getPoliceHeadquartersCount(uint256 countryId)
         public
         view
-        returns (uint256 count)
+        returns (uint256)
     {
         uint256 count = idToImprovements3[countryId].policeHeadquartersCount;
         return count;

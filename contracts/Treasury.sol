@@ -190,6 +190,7 @@ contract TreasuryContract is Ownable {
         uint256 aircraftCount = FightersContract(fighters).getAircraftCount(id);
         uint256 aircraftUpkeep = (aircraftCount * 200);
         uint256 navyUpkeep = getNavyUpkeep(id);
+        //add cruise missiles and nukes
         uint256 dailyMilitaryUpkeep = soldierUpkeep +
             tankUpkeep +
             aircraftUpkeep +
@@ -437,6 +438,9 @@ contract AidContract is Ownable {
             soldiersAvailable >= soldiersAid,
             "not enough soldiers for this porposal"
         );
+        require(techAid <= 100, "max tech aid is 100");
+        require(balanceAid <= 6000000, "max balance aid is 6,000,000");
+        require(soldiersAid <= 4000, "max soldier aid is 4000");
         Proposal memory newProposal = Proposal(
             block.timestamp,
             idSender,
