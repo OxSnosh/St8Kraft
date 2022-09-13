@@ -20,6 +20,7 @@ contract TreasuryContract is Ownable {
     address public warBucksAddress;
     address public forces;
     address public aid;
+    address public taxes;
     uint256 public daysToInactive;
     uint256 private gameTaxPercentage = 0;
     uint256 public seedMoney = 2000000;
@@ -48,7 +49,8 @@ contract TreasuryContract is Ownable {
         address _forces,
         address _navy,
         address _fighters,
-        address _aid
+        address _aid,
+        address _taxes
     ) {
         warBucksAddress = _warBucksAddress;
         wonders1 = _wonders1;
@@ -58,7 +60,13 @@ contract TreasuryContract is Ownable {
         navy = _navy;
         fighters = _fighters;
         aid = _aid;
+        taxes = _taxes;
         daysToInactive = 20;
+    }
+
+    modifier onlyTaxesContract {
+        require(msg.sender == taxes, "only callable from taxes contract");
+        _;
     }
 
     function generateTreasury(uint256 id, address nationOwner) public {
@@ -80,15 +88,8 @@ contract TreasuryContract is Ownable {
         counter++;
     }
 
-    function collectTaxes(uint256 id) public {
-        require(idToOwnerTreasury[id] == msg.sender, "!nation owner");
-        uint256 dailyIncomePerCitizen = InfrastructureContract(infrastructure)
-            .getDailyIncome(id);
-        uint256 daysSinceLastTaxCollection = idToTreasury[id]
-            .daysSinceLastTaxCollection;
-        uint256 taxesCollectible = (dailyIncomePerCitizen *
-            daysSinceLastTaxCollection);
-        idToTreasury[id].balance += taxesCollectible;
+    function increaseBalanceOnTaxCollection(uint256 id, uint256 amount) public onlyTaxesContract {
+        idToTreasury[id].balance += amount;
         idToTreasury[id].daysSinceLastTaxCollection = 0;
     }
 
@@ -336,6 +337,11 @@ contract TreasuryContract is Ownable {
 
     function setDaysToInactive(uint256 newDays) public onlyOwner {
         daysToInactive = newDays;
+    }
+
+    function getDaysSinceLastTaxCollection(uint256 id) public view returns (uint256) {
+        uint256 daysSince = idToTreasury[id].daysSinceLastTaxCollection;
+        return daysSince;
     }
 
     function checkBalance(uint256 id) public view returns (uint256) {

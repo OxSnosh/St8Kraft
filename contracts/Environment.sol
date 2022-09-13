@@ -6,6 +6,7 @@ import "./Infrastructure.sol";
 import "./Improvements.sol";
 import "./Wonders.sol";
 import "./Forces.sol";
+import "./Taxes.sol";
 import "./CountryParameters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -17,6 +18,7 @@ contract EnvironmentContract is Ownable {
     address public wonders4;
     address public forces;
     address public parameters;
+    address public taxes;
 
     ResourcesContract res;
     InfrastructureContract inf;
@@ -25,6 +27,7 @@ contract EnvironmentContract is Ownable {
     WondersContract4 won4;
     ForcesContract force;
     CountryParametersContract param;
+    TaxesContract tax;
 
 
     constructor (
@@ -34,7 +37,8 @@ contract EnvironmentContract is Ownable {
         address _wonders3,
         address _wonders4,
         address _forces,
-        address _parameters
+        address _parameters,
+        address _taxes
     ) {
         resources = _resources;
         res = ResourcesContract(_resources);
@@ -50,6 +54,8 @@ contract EnvironmentContract is Ownable {
         force = ForcesContract(_forces);
         parameters = _parameters;
         param = CountryParametersContract(_parameters);
+        taxes = _taxes;
+        tax = TaxesContract(_taxes);
     }
 
     function updateResourcesContract (address newAddress) public onlyOwner {
@@ -85,6 +91,11 @@ contract EnvironmentContract is Ownable {
     function updateParametersContract (address newAddress) public onlyOwner {
         parameters = newAddress;
         param = CountryParametersContract(newAddress);
+    }
+
+    function updateTaxesContract (address newAddress) public onlyOwner {
+        taxes = newAddress;
+        tax = TaxesContract(newAddress);
     }
 
     function getEnvironmentScore(uint256 id) public view returns (uint256) {
@@ -198,7 +209,7 @@ contract EnvironmentContract is Ownable {
 
     function getEnvironmentScoreFromMilitaryDensity(uint256 id) internal view returns (int256) {
         int256 pointsFromMilitaryRatiio;
-        (, bool environmentPenalty) = inf.soldierToPopulationRatio(id);
+        (, bool environmentPenalty) = tax.soldierToPopulationRatio(id);
         if (environmentPenalty == false) {
             pointsFromMilitaryRatiio += 10;
         }
@@ -208,10 +219,11 @@ contract EnvironmentContract is Ownable {
     function getEnvironmentScoreFromInfrastructure(uint256 id) internal view returns (int256) {
         int256 pointsFromInfrastructure;
         uint256 land = inf.getLandCount(id);
-        uint256 infrastructure = inf.getInfrastructureCount(id);
-        if ((infrastructure / 2) <= land) {
+        uint256 infra = inf.getInfrastructureCount(id);
+        if ((infra / 2) <= land) {
             pointsFromInfrastructure += 10;
         }
+        return pointsFromInfrastructure;
     }
 
     function getScoreFromNukes(uint256 id) internal view returns (int256) {
