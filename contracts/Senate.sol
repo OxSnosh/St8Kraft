@@ -1,0 +1,101 @@
+//SPDX-License-Identifier: Unlicense
+pragma solidity 0.8.7;
+
+import "./CountryParameters.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract SenateContract is Ownable {
+    address public countryMinter;
+    address public parameters;
+
+    struct Voter {
+        uint256 votes;
+        bool voted;
+        bool senator;
+        uint256 votesToSanction;
+        bool sanctioned;
+    }
+
+    uint256[] public sanctionVotes;
+
+    constructor(address _countryMinter, address _parameters) {
+        countryMinter = _countryMinter;
+        parameters = _parameters;
+    }
+
+    CountryParametersContract params;
+
+    mapping(uint256 => Voter) public idToVoter;
+    mapping(uint256 => uint256[]) public idToSanctionVotes;
+    mapping(uint256 => address) public idToOwnerVoter;
+
+    function updateCountryMinter(address newAddress) public onlyOwner {
+        countryMinter = newAddress;
+    }
+
+    function updateCountryParametersContract(address newAddress) public onlyOwner {
+        parameters = newAddress;
+        params = CountryParametersContract(newAddress);
+    }
+
+    function generateForces(uint256 id, address nationOwner) public {
+        Voter memory newVoter = Voter(0, false, false, 0, false);
+        idToVoter[id] = newVoter;
+        idToOwnerVoter[id] = nationOwner;
+    }
+
+    function voteForSenator(uint256 idVoter, uint256 idOfSenateVote) public {
+        require(idToOwnerVoter[idVoter] == msg.sender, "!nation owner");
+        require(idToVoter[idVoter].voted == false, "already voted");
+        uint256 voterTeam = params.getTeam(idVoter);
+        uint256 teamOfVote = params.getTeam(idOfSenateVote);
+        require(teamOfVote == voterTeam, "you can only vote for a fellow team member");
+        idToVoter[idOfSenateVote].votes++;
+        idToVoter[idVoter].voted = true;
+    }
+
+    function sanctionTeamMember(uint256 idSenator, uint256 idSanctioned) public {
+        require(idToVoter[idSenator].senator == true, "!senator");
+        require(idToVoter[idSanctioned].senator == false, "cannot sanction a senator");
+        idToVoter[idSanctioned].votesToSanction++;
+        uint256[] storage sanctionVoteArray = getSanctionVotes(idSanctioned);
+        for (uint256 i = 0; i < sanctionVoteArray.length; i++) {
+            require(sanctionVoteArray[i] != idSenator, "you already voted to sanction this nation");
+        }
+        sanctionVoteArray.push(idSenator);
+        setSanctionArray(sanctionVoteArray, idSanctioned);
+        if (idToVoter[idSanctioned].votesToSanction >= 3) {
+            idToVoter[idSanctioned].sanctioned = true;
+        }
+    }
+
+    function liftSanctionVote(uint256 idSenator, uint256 idSanctioned) public {
+        require(idToVoter[idSenator].senator == true, "!senator");
+        (bool voted, uint256 indexOfSenatorVote) = checkIfSenatorVoted(idSenator, idSanctioned);
+        require(voted == true, "senator does not have an active sanction vote for this nation");
+        uint256[] storage sanctionVoteArrayToDelete = getSanctionVotes(idSanctioned);
+        delete sanctionVoteArrayToDelete[indexOfSenatorVote];
+        if (idToVoter[idSanctioned].votesToSanction < 3) {
+            idToVoter[idSanctioned].sanctioned = false;
+        }
+    }
+
+    function getSanctionVotes(uint256 id) internal view returns (uint256[] storage) {
+        uint256[] storage sanctionVoteArray = idToSanctionVotes[id];
+        return sanctionVoteArray;
+    }
+
+    function setSanctionArray(uint256[] memory sanctionArray, uint256 idSanctioned) internal {
+        idToSanctionVotes[idSanctioned] = sanctionArray;
+    }
+
+    function checkIfSenatorVoted(uint256 senatorId, uint256 idSanctioned) internal view returns (bool, uint256) {
+        uint256[] memory sanctionVoteCheck = getSanctionVotes(idSanctioned);
+        for(uint256 i = 0; i < sanctionVoteCheck.length; i++) {
+            if (sanctionVotes[i] == senatorId) {
+                return (true, i);
+            }
+        }
+        return (false, 0);
+    }
+}
