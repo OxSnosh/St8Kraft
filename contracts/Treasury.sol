@@ -21,6 +21,7 @@ contract TreasuryContract is Ownable {
     address public forces;
     address public aid;
     address public taxes;
+    address public bills;
     uint256 public daysToInactive;
     uint256 private gameTaxPercentage = 0;
     uint256 public seedMoney = 2000000;
@@ -50,7 +51,8 @@ contract TreasuryContract is Ownable {
         address _navy,
         address _fighters,
         address _aid,
-        address _taxes
+        address _taxes,
+        address _bills
     ) {
         warBucksAddress = _warBucksAddress;
         wonders1 = _wonders1;
@@ -61,13 +63,10 @@ contract TreasuryContract is Ownable {
         fighters = _fighters;
         aid = _aid;
         taxes = _taxes;
+        bills = _bills;
         daysToInactive = 20;
     }
 
-    modifier onlyTaxesContract {
-        require(msg.sender == taxes, "only callable from taxes contract");
-        _;
-    }
 
     function generateTreasury(uint256 id, address nationOwner) public {
         Treasury memory newTreasury = Treasury(
@@ -88,183 +87,25 @@ contract TreasuryContract is Ownable {
         counter++;
     }
 
+    modifier onlyTaxesContract {
+        require(msg.sender == taxes, "only callable from taxes contract");
+        _;
+    }
+
     function increaseBalanceOnTaxCollection(uint256 id, uint256 amount) public onlyTaxesContract {
         idToTreasury[id].balance += amount;
         idToTreasury[id].daysSinceLastTaxCollection = 0;
     }
 
-    function payBills(uint256 id) public {
-        require(idToOwnerTreasury[id] == msg.sender, "!nation owner");
-        uint256 availableFunds = idToTreasury[id].balance;
-        uint256 billsPayable = getBillsPayable(id);
-        require(
-            availableFunds >= billsPayable,
-            "balance not high enough to pay bills"
-        );
-        idToTreasury[id].balance -= billsPayable;
+    modifier onlyBillsContract {
+        require(msg.sender == bills, "only callable from taxes contract");
+        _;
+    }
+
+    function decreaseBalanceOnBillsPaid(uint256 id, uint256 amount) public onlyBillsContract {
+        idToTreasury[id].balance -= amount;
         idToTreasury[id].daysSinceLastBillPaid = 0;
         idToTreasury[id].inactive = false;
-    }
-
-    function getBillsPayable(uint256 id) public view returns (uint256) {
-        uint256 daysSinceLastPayment = idToTreasury[id].daysSinceLastBillPaid;
-        uint256 infrastructureBillsPayable = calculateDailyBillsFromInfrastructure(
-                id
-            );
-        uint256 militaryBillsPayable = calculateDailyBillsFromMilitary(id);
-        uint256 improvementBillsPayable = calculateDailyBillsFromImprovements(
-            id
-        );
-        uint256 wonderCount = WondersContract1(wonders1).getWonderCount(id);
-        uint256 wonderBillsPayable = (wonderCount * 5000);
-        uint256 dailyBillsPayable = infrastructureBillsPayable +
-            militaryBillsPayable +
-            improvementBillsPayable +
-            wonderBillsPayable;
-        uint256 billsPayable = (dailyBillsPayable * daysSinceLastPayment);
-        return billsPayable;
-    }
-
-    function calculateDailyBillsFromInfrastructure(uint256 id)
-        public
-        view
-        returns (uint256 infrastructureBills)
-    {
-        uint256 infrastructureAmount = InfrastructureContract(infrastructure)
-            .getInfrastructureCount(id);
-        uint256 upkeep;
-        uint256 infrastructureCostPerLevel;
-        if (infrastructureAmount < 100) {
-            upkeep = ((400 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
-        } else if (infrastructureAmount < 200) {
-            upkeep = ((500 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
-        } else if (infrastructureAmount < 300) {
-            upkeep = ((600 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
-        } else if (infrastructureAmount < 500) {
-            upkeep = ((700 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
-        } else if (infrastructureAmount < 700) {
-            upkeep = ((800 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
-        } else if (infrastructureAmount < 1000) {
-            upkeep = ((900 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
-        } else if (infrastructureAmount < 2000) {
-            upkeep = ((110 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
-        } else if (infrastructureAmount < 3000) {
-            upkeep = ((130 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
-        } else if (infrastructureAmount < 4000) {
-            upkeep = ((150 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
-        } else if (infrastructureAmount < 5000) {
-            upkeep = ((170 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
-        } else if (infrastructureAmount < 8000) {
-            upkeep = ((1725 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 1000);
-        } else if (infrastructureAmount < 15000) {
-            upkeep = ((175 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
-        } else {
-            upkeep = ((180 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
-        }
-        uint256 dailyInfrastructureBillsDue = infrastructureCostPerLevel *
-            infrastructureAmount;
-        return dailyInfrastructureBillsDue;
-    }
-
-    function calculateDailyBillsFromMilitary(uint256 id)
-        public
-        view
-        returns (uint256 militaryBills)
-    {
-        uint256 soldierCount = ForcesContract(forces).getSoldierCount(id);
-        uint256 soldierUpkeep = (soldierCount * 2);
-        uint256 tankCount = ForcesContract(forces).getTankCount(id);
-        uint256 tankUpkeep = (tankCount * 40);
-        uint256 aircraftCount = FightersContract(fighters).getAircraftCount(id);
-        uint256 aircraftUpkeep = (aircraftCount * 200);
-        uint256 navyUpkeep = getNavyUpkeep(id);
-        //add cruise missiles and nukes
-        uint256 dailyMilitaryUpkeep = soldierUpkeep +
-            tankUpkeep +
-            aircraftUpkeep +
-            navyUpkeep;
-        return dailyMilitaryUpkeep;
-    }
-
-    function getNavyUpkeep(uint256 id)
-        public
-        view
-        returns (uint256 navyUpkeep)
-    {
-        uint256 corvetteCount = NavyContract(navy).getCorvetteCount(id);
-        uint256 corvetteUpkeep = (corvetteCount * 5000);
-        uint256 landingShipCount = NavyContract(navy).getLandingShipCount(id);
-        uint256 landingShipUpkeep = (landingShipCount * 10000);
-        uint256 battleshipCount = NavyContract(navy).getBattleshipCount(id);
-        uint256 battleshipUpkeep = (battleshipCount * 25000);
-        uint256 cruiserCount = NavyContract(navy).getCruiserCount(id);
-        uint256 cruiserUpkeep = (cruiserCount * 10000);
-        uint256 additionalNavyUpkeep = getNavyUpkeepAppended(id);
-        uint256 dailyNavyUpkeep = additionalNavyUpkeep +
-            corvetteUpkeep +
-            landingShipUpkeep +
-            battleshipUpkeep +
-            cruiserUpkeep;
-        return dailyNavyUpkeep;
-    }
-
-    function getNavyUpkeepAppended(uint256 id) internal view returns (uint256) {
-        uint256 frigateCount = NavyContract(navy).getFrigateCount(id);
-        uint256 frigateUpkeep = (frigateCount * 15000);
-        uint256 destroyerCount = NavyContract(navy).getDestroyerCount(id);
-        uint256 destroyerUpkeep = (destroyerCount * 20000);
-        uint256 submarineCount = NavyContract(navy).getSubmarineCount(id);
-        uint256 submarineUpkeep = (submarineCount * 25000);
-        uint256 aircraftCarrierCount = NavyContract(navy)
-            .getAircraftCarrierCount(id);
-        uint256 aircraftCarrierUpkeep = (aircraftCarrierCount * 30000);
-        uint256 additionalNavyUpkeep = frigateUpkeep +
-            destroyerUpkeep +
-            submarineUpkeep +
-            aircraftCarrierUpkeep;
-        return additionalNavyUpkeep;
-    }
-
-    function calculateDailyBillsFromImprovements(uint256 id)
-        public
-        view
-        returns (uint256 improvementBills)
-    {
-        uint256 improvementCount = ImprovementsContract1(improvements1)
-            .getImprovementCount(id);
-        uint256 upkeepPerLevel;
-        if (improvementCount < 5) {
-            upkeepPerLevel = 500;
-        } else if (improvementCount < 8) {
-            upkeepPerLevel = 600;
-        } else if (improvementCount < 15) {
-            upkeepPerLevel = 750;
-        } else if (improvementCount < 20) {
-            upkeepPerLevel = 950;
-        } else if (improvementCount < 30) {
-            upkeepPerLevel = 1200;
-        } else if (improvementCount < 40) {
-            upkeepPerLevel = 1500;
-        } else if (improvementCount < 50) {
-            upkeepPerLevel = 2000;
-        } else {
-            upkeepPerLevel = 3000;
-        }
-        uint256 dailyImprovementBillsDue = (improvementCount * upkeepPerLevel);
-        return dailyImprovementBillsDue;
     }
 
     function spendBalance(uint256 id, uint256 cost) public {
@@ -295,7 +136,7 @@ contract TreasuryContract is Ownable {
         idToTreasury[idRecipient].balance += amount;
     }
 
-    //NEED FUNCTION TO WITHDRAW TAXES
+    //NEED FUNCTION TO WITHDRAW TAXES COLLECTED BY GAME
 
     function withdrawFunds(uint256 amount, uint256 id) public {
         require(idToOwnerTreasury[id] == msg.sender);
@@ -344,6 +185,11 @@ contract TreasuryContract is Ownable {
         return daysSince;
     }
 
+    function getDaysSinceLastBillsPaid(uint256 id) public view returns (uint256) {
+        uint256 daysSince = idToTreasury[id].daysSinceLastBillPaid;
+        return daysSince;
+    }
+
     function checkBalance(uint256 id) public view returns (uint256) {
         uint256 balance = idToTreasury[id].balance;
         return balance;
@@ -355,169 +201,169 @@ contract TreasuryContract is Ownable {
     }
 }
 
-contract AidContract is Ownable {
-    address public countryMinter;
-    address public treasury;
-    address public forces;
-    address public infrastructure;
-    uint256 public aidProposalId;
+// contract AidContract is Ownable {
+//     address public countryMinter;
+//     address public treasury;
+//     address public forces;
+//     address public infrastructure;
+//     uint256 public aidProposalId;
 
-    constructor(
-        address _countryMinter,
-        address _treasury,
-        address _forces,
-        address _infrastructure
-    ) {
-        countryMinter = _countryMinter;
-        treasury = _treasury;
-        forces = _forces;
-        infrastructure = _infrastructure;
-    }
+//     constructor(
+//         address _countryMinter,
+//         address _treasury,
+//         address _forces,
+//         address _infrastructure
+//     ) {
+//         countryMinter = _countryMinter;
+//         treasury = _treasury;
+//         forces = _forces;
+//         infrastructure = _infrastructure;
+//     }
 
-    struct Proposal {
-        uint256 timeProposed;
-        uint256 idSender;
-        uint256 idRecipient;
-        uint256 techAid;
-        uint256 balanceAid;
-        uint256 soldierAid;
-        bool accepted;
-        bool cancelled;
-    }
+//     struct Proposal {
+//         uint256 timeProposed;
+//         uint256 idSender;
+//         uint256 idRecipient;
+//         uint256 techAid;
+//         uint256 balanceAid;
+//         uint256 soldierAid;
+//         bool accepted;
+//         bool cancelled;
+//     }
 
-    mapping(uint256 => address) public idToOwnerAid;
-    mapping(uint256 => Proposal) public idToProposal;
+//     mapping(uint256 => address) public idToOwnerAid;
+//     mapping(uint256 => Proposal) public idToProposal;
 
-    function updateCountryMinterAddress(address _newAddress) public onlyOwner {
-        countryMinter = _newAddress;
-    }
+//     function updateCountryMinterAddress(address _newAddress) public onlyOwner {
+//         countryMinter = _newAddress;
+//     }
 
-    function updateTreasuryAddress(address _newAddress) public onlyOwner {
-        treasury = _newAddress;
-    }
+//     function updateTreasuryAddress(address _newAddress) public onlyOwner {
+//         treasury = _newAddress;
+//     }
 
-    function updateForcesAddress(address _newAddress) public onlyOwner {
-        forces = _newAddress;
-    }
+//     function updateForcesAddress(address _newAddress) public onlyOwner {
+//         forces = _newAddress;
+//     }
 
-    function updateInfrastructureAddress(address _newAddress) public onlyOwner {
-        infrastructure = _newAddress;
-    }
+//     function updateInfrastructureAddress(address _newAddress) public onlyOwner {
+//         infrastructure = _newAddress;
+//     }
 
-    modifier onlyCountryMinter() {
-        require(
-            msg.sender == countryMinter,
-            "caller must be country minter contract"
-        );
-        _;
-    }
+//     modifier onlyCountryMinter() {
+//         require(
+//             msg.sender == countryMinter,
+//             "caller must be country minter contract"
+//         );
+//         _;
+//     }
 
-    function initiateAid(uint256 id, address nationOwner)
-        public
-        onlyCountryMinter
-    {
-        idToOwnerAid[id] = nationOwner;
-    }
+//     function initiateAid(uint256 id, address nationOwner)
+//         public
+//         onlyCountryMinter
+//     {
+//         idToOwnerAid[id] = nationOwner;
+//     }
 
-    //check for sanctions
-    function proposeAid(
-        uint256 idSender,
-        uint256 idRecipient,
-        uint256 techAid,
-        uint256 balanceAid,
-        uint256 soldiersAid
-    ) public {
-        require(idToOwnerAid[idSender] == msg.sender, "!nation ruler");
-        uint256 techAvailable = InfrastructureContract(infrastructure)
-            .getTechnologyCount(idSender);
-        uint256 balanceAvailable = TreasuryContract(treasury).checkBalance(
-            idSender
-        );
-        uint256 soldiersAvailable = ForcesContract(forces)
-            .getDefendingSoldierCount(idSender);
-        require(techAvailable >= techAid, "not enough tech for this proposal");
-        require(
-            balanceAvailable >= balanceAid,
-            "not enough funds for this porposal"
-        );
-        require(
-            soldiersAvailable >= soldiersAid,
-            "not enough soldiers for this porposal"
-        );
-        require(techAid <= 100, "max tech aid is 100");
-        require(balanceAid <= 6000000, "max balance aid is 6,000,000");
-        require(soldiersAid <= 4000, "max soldier aid is 4000");
-        Proposal memory newProposal = Proposal(
-            block.timestamp,
-            idSender,
-            idRecipient,
-            techAid,
-            balanceAid,
-            soldiersAid,
-            false,
-            false
-        );
-        idToProposal[aidProposalId] = newProposal;
-        aidProposalId++;
-    }
+//     //check for sanctions
+//     function proposeAid(
+//         uint256 idSender,
+//         uint256 idRecipient,
+//         uint256 techAid,
+//         uint256 balanceAid,
+//         uint256 soldiersAid
+//     ) public {
+//         require(idToOwnerAid[idSender] == msg.sender, "!nation ruler");
+//         uint256 techAvailable = InfrastructureContract(infrastructure)
+//             .getTechnologyCount(idSender);
+//         uint256 balanceAvailable = TreasuryContract(treasury).checkBalance(
+//             idSender
+//         );
+//         uint256 soldiersAvailable = ForcesContract(forces)
+//             .getDefendingSoldierCount(idSender);
+//         require(techAvailable >= techAid, "not enough tech for this proposal");
+//         require(
+//             balanceAvailable >= balanceAid,
+//             "not enough funds for this porposal"
+//         );
+//         require(
+//             soldiersAvailable >= soldiersAid,
+//             "not enough soldiers for this porposal"
+//         );
+//         require(techAid <= 100, "max tech aid is 100");
+//         require(balanceAid <= 6000000, "max balance aid is 6,000,000");
+//         require(soldiersAid <= 4000, "max soldier aid is 4000");
+//         Proposal memory newProposal = Proposal(
+//             block.timestamp,
+//             idSender,
+//             idRecipient,
+//             techAid,
+//             balanceAid,
+//             soldiersAid,
+//             false,
+//             false
+//         );
+//         idToProposal[aidProposalId] = newProposal;
+//         aidProposalId++;
+//     }
 
-    function proposalExpired(uint256 proposalId) public view returns (bool) {
-        uint256 timeProposed = idToProposal[proposalId].timeProposed;
-        uint256 timeElapsed = (block.timestamp - timeProposed);
-        bool expired = false;
-        if (timeElapsed > 7 days) {
-            expired = true;
-        }
-        return expired;
-    }
+//     function proposalExpired(uint256 proposalId) public view returns (bool) {
+//         uint256 timeProposed = idToProposal[proposalId].timeProposed;
+//         uint256 timeElapsed = (block.timestamp - timeProposed);
+//         bool expired = false;
+//         if (timeElapsed > 7 days) {
+//             expired = true;
+//         }
+//         return expired;
+//     }
 
-    //check for sanctions
-    function acceptProposal(uint256 proposalId) public {
-        bool expired = proposalExpired(proposalId);
-        require(expired == false, "proposal expired");
-        uint256 idSender = idToProposal[proposalId].idSender;
-        uint256 idRecipient = idToProposal[proposalId].idRecipient;
-        uint256 tech = idToProposal[proposalId].techAid;
-        uint256 balance = idToProposal[proposalId].balanceAid;
-        uint256 soldiers = idToProposal[proposalId].soldierAid;
-        bool accepted = idToProposal[proposalId].accepted;
-        require(accepted == false, "this offer has been accepted already");
-        bool cancelled = idToProposal[proposalId].cancelled;
-        require(cancelled == false, "this offer has been cancelled");
-        address addressRecipient = idToOwnerAid[idRecipient];
-        require(
-            addressRecipient == msg.sender,
-            "you are not the recipient of this proposal"
-        );
-        InfrastructureContract(infrastructure).sendTech(
-            idSender,
-            idRecipient,
-            tech
-        );
-        TreasuryContract(treasury).sendAidBalance(
-            idSender,
-            idRecipient,
-            balance
-        );
-        ForcesContract(forces).sendSoldiers(idSender, idRecipient, soldiers);
-        idToProposal[proposalId].accepted = true;
-    }
+//     //check for sanctions
+//     function acceptProposal(uint256 proposalId) public {
+//         bool expired = proposalExpired(proposalId);
+//         require(expired == false, "proposal expired");
+//         uint256 idSender = idToProposal[proposalId].idSender;
+//         uint256 idRecipient = idToProposal[proposalId].idRecipient;
+//         uint256 tech = idToProposal[proposalId].techAid;
+//         uint256 balance = idToProposal[proposalId].balanceAid;
+//         uint256 soldiers = idToProposal[proposalId].soldierAid;
+//         bool accepted = idToProposal[proposalId].accepted;
+//         require(accepted == false, "this offer has been accepted already");
+//         bool cancelled = idToProposal[proposalId].cancelled;
+//         require(cancelled == false, "this offer has been cancelled");
+//         address addressRecipient = idToOwnerAid[idRecipient];
+//         require(
+//             addressRecipient == msg.sender,
+//             "you are not the recipient of this proposal"
+//         );
+//         InfrastructureContract(infrastructure).sendTech(
+//             idSender,
+//             idRecipient,
+//             tech
+//         );
+//         TreasuryContract(treasury).sendAidBalance(
+//             idSender,
+//             idRecipient,
+//             balance
+//         );
+//         ForcesContract(forces).sendSoldiers(idSender, idRecipient, soldiers);
+//         idToProposal[proposalId].accepted = true;
+//     }
 
-    function cancelAid(uint256 proposalId) public {
-        uint256 idRecipient = idToProposal[proposalId].idRecipient;
-        uint256 idSender = idToProposal[proposalId].idSender;
-        address recipient = idToOwnerAid[idRecipient];
-        address sender = idToOwnerAid[idSender];
-        require(
-            sender == msg.sender || recipient == msg.sender,
-            "caller not a participant in this trade"
-        );
-        bool cancelled = idToProposal[proposalId].cancelled;
-        require(cancelled == false, "trade already cancelled");
-        bool accepted = idToProposal[proposalId].cancelled;
-        require(accepted == false, "trade already accepted");
-        bool expired = proposalExpired(proposalId);
-        require(expired == false, "trade already expired");
-        idToProposal[proposalId].cancelled = true;
-    }
-}
+//     function cancelAid(uint256 proposalId) public {
+//         uint256 idRecipient = idToProposal[proposalId].idRecipient;
+//         uint256 idSender = idToProposal[proposalId].idSender;
+//         address recipient = idToOwnerAid[idRecipient];
+//         address sender = idToOwnerAid[idSender];
+//         require(
+//             sender == msg.sender || recipient == msg.sender,
+//             "caller not a participant in this trade"
+//         );
+//         bool cancelled = idToProposal[proposalId].cancelled;
+//         require(cancelled == false, "trade already cancelled");
+//         bool accepted = idToProposal[proposalId].cancelled;
+//         require(accepted == false, "trade already accepted");
+//         bool expired = proposalExpired(proposalId);
+//         require(expired == false, "trade already expired");
+//         idToProposal[proposalId].cancelled = true;
+//     }
+// }

@@ -8,6 +8,7 @@ import "./Wonders.sol";
 import "./Resources.sol";
 import "./CountryParameters.sol";
 import "./Forces.sol";
+import "./Military.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract TaxesContract is Ownable {
@@ -23,6 +24,7 @@ contract TaxesContract is Ownable {
     address public wonders4;
     address public resources;
     address public forces;
+    address public military;
 
     InfrastructureContract inf;
     TreasuryContract tsy;
@@ -35,6 +37,7 @@ contract TaxesContract is Ownable {
     WondersContract4 won4;
     ResourcesContract res;
     ForcesContract frc;
+    MilitaryContract mil;
 
     constructor(
         address _countryMinter,
@@ -64,7 +67,8 @@ contract TaxesContract is Ownable {
         address _wonders3,
         address _wonders4,
         address _resources,
-        address _forces
+        address _forces,
+        address _military
     ) public onlyOwner {
         parameters = _parameters;
         params = CountryParametersContract(_parameters);
@@ -78,6 +82,8 @@ contract TaxesContract is Ownable {
         res = ResourcesContract(_resources);
         forces = _forces;
         frc = ForcesContract(_forces);
+        military = _military;
+        mil = MilitaryContract(_military);
     }
 
     mapping(uint256 => address) public idToOwnerTaxes;
@@ -144,6 +150,11 @@ contract TaxesContract is Ownable {
         frc = ForcesContract(newAddress);
     }
 
+    function updateMilitaryContract(address newAddress) public onlyOwner {
+        military = newAddress;
+        mil = MilitaryContract(newAddress);
+    }
+
     function initiateTaxes(uint256 id, address nationOwner)
         public
         onlyCountryMinter
@@ -190,25 +201,40 @@ contract TaxesContract is Ownable {
 
     //need to make sure happiness stays positive for overflow
     function getHappiness(uint256 id) public view returns (uint256) {
+        uint256 happinessAdditions = getHappinessPointsToAdd(id);
+        uint256 happinessSubtractions = getHappinessPointsToSubtract(id);
+        uint256 happiness = (
+            happinessAdditions +
+            happinessSubtractions);
+        return happiness;
+    }
+
+    function getHappinessPointsToAdd(uint256 id) public view returns (uint256) {
         uint256 compatabilityPoints = checkCompatability(id);
         uint256 densityPoints = getDensityPoints(id);
         uint256 wonderPoints = getHappinessFromWonders(id);
         uint256 technologyPoints = getTechnologyPoints(id);
         uint256 pointsFromAge = getPointsFromNationAge(id);
         uint256 pointsFromTrades = getPointsFromTrades(id);
-        //below this gets subtracted
-        uint256 taxRatePoints = getTaxRatePoints(id);
-        uint256 pointsFromStability = getPointsFromMilitary(id);
-        uint256 happiness = (25 +
+        uint256 pointsFromDefcon = getPointsFromDefcon(id);
+        uint256 happinessPointsToAdd = (
             compatabilityPoints +
             densityPoints +
             wonderPoints +
             technologyPoints +
             pointsFromAge +
-            pointsFromTrades -
+            pointsFromTrades +
+            pointsFromDefcon);
+        return happinessPointsToAdd;
+    }
+
+    function getHappinessPointsToSubtract(uint256 id) public view returns (uint256) {
+        uint256 taxRatePoints = getTaxRatePoints(id);
+        uint256 pointsFromStability = getPointsFromMilitary(id);
+        uint256 happinessPointsToSubtract = (25 -
             taxRatePoints -
             pointsFromStability);
-        return happiness;
+        return happinessPointsToSubtract;
     }
 
     function checkCompatability(uint256 id)
@@ -439,6 +465,23 @@ contract TaxesContract is Ownable {
             }
         }
         return pointsFromTeamTrades;
+    }
+
+    function getPointsFromDefcon(uint256 id) public view returns (uint256) {
+        uint256 defconLevel = mil.getDefconLevel(id);
+        uint256 pointsFromDefcon;
+        if (defconLevel == 5) {
+            pointsFromDefcon = 4;
+        } else if (defconLevel == 4) {
+            pointsFromDefcon = 3;
+        } else if (defconLevel == 3) {
+            pointsFromDefcon = 2;
+        } else if (defconLevel == 2) {
+            pointsFromDefcon = 1;
+        } else {
+            pointsFromDefcon = 0;
+        }
+        return pointsFromDefcon;
     }
 
     function getTaxRatePoints(uint256 id) public view returns (uint256) {

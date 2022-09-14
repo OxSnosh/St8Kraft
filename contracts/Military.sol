@@ -37,6 +37,11 @@ contract MilitaryContract {
         idToMilitary[id].defconLevel = newDefcon;
     }
 
+    function getDefconLevel(uint256 id) public view returns (uint256) {
+        uint256 defcon = idToMilitary[id].defconLevel;
+        return defcon;
+    }
+
     function updateThreatLevel(uint256 newThreatLevel, uint256 id) public {
         require(
             idToOwnerMilitary[id] == msg.sender,

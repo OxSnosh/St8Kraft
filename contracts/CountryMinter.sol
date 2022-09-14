@@ -15,6 +15,7 @@ import "./Treasury.sol";
 import "./Navy.sol";
 import "./Fighters.sol";
 import "./Bombers.sol";
+import "./Aid.sol";
 
 contract CountryMinter is ERC721, Ownable {
     uint256 public countryId;
