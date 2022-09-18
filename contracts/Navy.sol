@@ -28,7 +28,8 @@ contract NavyContract is Ownable {
         uint256 destroyerCount;
         uint256 submarineCount;
         uint256 aircraftCarrierCount;
-        bool nationExists;
+        //need keeper to reset to 0
+        bool blockadedToday;
     }
 
     mapping(uint256 => Navy) public idToNavy;
@@ -53,7 +54,7 @@ contract NavyContract is Ownable {
     }
 
     function generateNavy(uint256 id, address nationOwner) public {
-        Navy memory newNavy = Navy(0, 0, 0, 0, 0, 0, 0, 0, 0, true);
+        Navy memory newNavy = Navy(0, 0, 0, 0, 0, 0, 0, 0, 0, false);
         idToNavy[id] = newNavy;
         idToOwnerNavy[id] = nationOwner;
     }
@@ -145,25 +146,6 @@ contract NavyContract is Ownable {
         return corvetteAmount;
     }
 
-    function sendCorvette(
-        uint256 amount,
-        uint256 idSender,
-        uint256 idReciever
-    ) public {
-        require(
-            idToOwnerNavy[idSender] == msg.sender,
-            "You are not the nation ruler"
-        );
-        require(
-            idToNavy[idReciever].nationExists = true,
-            "Destination nation does not exist"
-        );
-        idToNavy[idSender].corvetteCount -= amount;
-        idToNavy[idSender].navyVessels -= amount;
-        idToNavy[idReciever].corvetteCount += amount;
-        idToNavy[idReciever].navyVessels += amount;
-    }
-
     //callable from fighting contract
     //needs modifier
     function decreaseCorvetteCount(uint256 amount, uint256 id) public {
@@ -191,25 +173,6 @@ contract NavyContract is Ownable {
     function getLandingShipCount(uint256 id) public view returns (uint256) {
         uint256 landingShipAmount = idToNavy[id].landingShipCount;
         return landingShipAmount;
-    }
-
-    function sendLandingShip(
-        uint256 amount,
-        uint256 idSender,
-        uint256 idReciever
-    ) public {
-        require(
-            idToOwnerNavy[idSender] == msg.sender,
-            "You are not the nation ruler"
-        );
-        require(
-            idToNavy[idReciever].nationExists = true,
-            "Destination nation does not exist"
-        );
-        idToNavy[idSender].landingShipCount -= amount;
-        idToNavy[idSender].navyVessels -= amount;
-        idToNavy[idReciever].landingShipCount += amount;
-        idToNavy[idReciever].navyVessels += amount;
     }
 
     //callable from fighting contract
@@ -241,25 +204,6 @@ contract NavyContract is Ownable {
         return battleshipAmount;
     }
 
-    function sendBattleship(
-        uint256 amount,
-        uint256 idSender,
-        uint256 idReciever
-    ) public {
-        require(
-            idToOwnerNavy[idSender] == msg.sender,
-            "You are not the nation ruler"
-        );
-        require(
-            idToNavy[idReciever].nationExists = true,
-            "Destination nation does not exist"
-        );
-        idToNavy[idSender].battleshipCount -= amount;
-        idToNavy[idSender].navyVessels -= amount;
-        idToNavy[idReciever].battleshipCount += amount;
-        idToNavy[idReciever].navyVessels += amount;
-    }
-
     //callable from fighting contract
     //needs modifier
     function decreaseBatteshipCount(uint256 amount, uint256 id) public {
@@ -287,25 +231,6 @@ contract NavyContract is Ownable {
     function getCruiserCount(uint256 id) public view returns (uint256) {
         uint256 cruiserAmount = idToNavy[id].cruiserCount;
         return cruiserAmount;
-    }
-
-    function sendCruiser(
-        uint256 amount,
-        uint256 idSender,
-        uint256 idReciever
-    ) public {
-        require(
-            idToOwnerNavy[idSender] == msg.sender,
-            "You are not the nation ruler"
-        );
-        require(
-            idToNavy[idReciever].nationExists = true,
-            "Destination nation does not exist"
-        );
-        idToNavy[idSender].cruiserCount -= amount;
-        idToNavy[idSender].navyVessels -= amount;
-        idToNavy[idReciever].cruiserCount += amount;
-        idToNavy[idReciever].navyVessels += amount;
     }
 
     //callable from fighting contract
@@ -337,25 +262,6 @@ contract NavyContract is Ownable {
         return frigateAmount;
     }
 
-    function sendFrigate(
-        uint256 amount,
-        uint256 idSender,
-        uint256 idReciever
-    ) public {
-        require(
-            idToOwnerNavy[idSender] == msg.sender,
-            "You are not the nation ruler"
-        );
-        require(
-            idToNavy[idReciever].nationExists = true,
-            "Destination nation does not exist"
-        );
-        idToNavy[idSender].frigateCount -= amount;
-        idToNavy[idSender].navyVessels -= amount;
-        idToNavy[idReciever].frigateCount += amount;
-        idToNavy[idReciever].navyVessels += amount;
-    }
-
     //callable from fighting contract
     //needs modifier
     function decreaseFrigateCount(uint256 amount, uint256 id) public {
@@ -383,25 +289,6 @@ contract NavyContract is Ownable {
     function getDestroyerCount(uint256 id) public view returns (uint256) {
         uint256 destroyerAmount = idToNavy[id].destroyerCount;
         return destroyerAmount;
-    }
-
-    function sendDestroyer(
-        uint256 amount,
-        uint256 idSender,
-        uint256 idReciever
-    ) public {
-        require(
-            idToOwnerNavy[idSender] == msg.sender,
-            "You are not the nation ruler"
-        );
-        require(
-            idToNavy[idReciever].nationExists = true,
-            "Destination nation does not exist"
-        );
-        idToNavy[idSender].destroyerCount -= amount;
-        idToNavy[idSender].navyVessels -= amount;
-        idToNavy[idReciever].destroyerCount += amount;
-        idToNavy[idReciever].navyVessels += amount;
     }
 
     //callable from fighting contract
@@ -433,25 +320,6 @@ contract NavyContract is Ownable {
         return submarineAmount;
     }
 
-    function sendSubmarine(
-        uint256 amount,
-        uint256 idSender,
-        uint256 idReciever
-    ) public {
-        require(
-            idToOwnerNavy[idSender] == msg.sender,
-            "You are not the nation ruler"
-        );
-        require(
-            idToNavy[idReciever].nationExists = true,
-            "Destination nation does not exist"
-        );
-        idToNavy[idSender].submarineCount -= amount;
-        idToNavy[idSender].navyVessels -= amount;
-        idToNavy[idReciever].submarineCount += amount;
-        idToNavy[idReciever].navyVessels += amount;
-    }
-
     //callable from fighting contract
     //needs modifier
     function decreaseSubmarineCount(uint256 amount, uint256 id) public {
@@ -481,29 +349,43 @@ contract NavyContract is Ownable {
         return aircraftCarrierAmount;
     }
 
-    function sendAircraftCarrier(
-        uint256 amount,
-        uint256 idSender,
-        uint256 idReciever
-    ) public {
-        require(
-            idToOwnerNavy[idSender] == msg.sender,
-            "You are not the nation ruler"
-        );
-        require(
-            idToNavy[idReciever].nationExists = true,
-            "Destination nation does not exist"
-        );
-        idToNavy[idSender].aircraftCarrierCount -= amount;
-        idToNavy[idSender].navyVessels -= amount;
-        idToNavy[idReciever].aircraftCarrierCount += amount;
-        idToNavy[idReciever].navyVessels += amount;
-    }
-
     //callable from fighting contract
     //needs modifier
     function decreaseAircraftCarrierCount(uint256 amount, uint256 id) public {
         idToNavy[id].aircraftCarrierCount -= amount;
         idToNavy[id].navyVessels -= amount;
+    }
+
+    function getBlockadedToday(uint256 id) public view returns (bool) {
+        bool blockadedToday = idToNavy[id].blockadedToday;
+        return blockadedToday;
+    }
+
+    function getBlockadeCapableShips(uint256 id) public view returns (uint256) {
+        uint256 battleships = getBattleshipCount(id);
+        uint256 cruisers = getCruiserCount(id);
+        uint256 frigates = getFrigateCount(id);
+        uint256 subs = getSubmarineCount(id);
+        uint256 blockadeCapableShips = (
+            battleships +
+            cruisers +
+            frigates +
+            subs
+        );
+        return blockadeCapableShips;
+    }
+
+    function getBreakBlockadeCapableShips(uint256 id) public view returns (uint256) {
+        uint256 battleships = getBattleshipCount(id);
+        uint256 cruisers = getCruiserCount(id);
+        uint256 frigates = getFrigateCount(id);
+        uint256 destroyers = getDestroyerCount(id);
+        uint256 breakBlockadeCapableShips = (
+            battleships +
+            cruisers +
+            frigates +
+            destroyers
+        );
+        return breakBlockadeCapableShips;
     }
 }

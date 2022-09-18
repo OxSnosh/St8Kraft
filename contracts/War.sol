@@ -10,6 +10,7 @@ contract WarContract is Ownable {
     address public countryMinter;
     address public nationStrength;
     address public military;
+    uint256[] public activeWars;
 
     NationStrengthContract nsc;
     MilitaryContract mil;
@@ -23,6 +24,8 @@ contract WarContract is Ownable {
         bool peaceDeclared;
         bool offensePeaceOffered;
         bool defensePeaceOffered;
+        uint256 offenseBlockades;
+        uint256 defenseBlockades;
     }
 
     struct OffenseLosses {
@@ -55,6 +58,7 @@ contract WarContract is Ownable {
     mapping(uint256 => War) public warIdToWar;
     mapping(uint256 => OffenseLosses) public warIdToOffenseLosses;
     mapping(uint256 => DefenseLosses) public warIdToDefenseLosses;
+    mapping(uint256 => uint256[]) public idToActiveWars;
 
     constructor(
         address _countryMinter,
@@ -108,12 +112,16 @@ contract WarContract is Ownable {
             isStrengthWithinRange == true,
             "nation strength is not within range"
         );
-        War memory newWar = War(warId, offenseId, defenseId, true, 7, false, false, false);
+        War memory newWar = War(warId, offenseId, defenseId, true, 7, false, false, false, 0, 0);
         warIdToWar[warId] = newWar;
         OffenseLosses memory newOffenseLosses = OffenseLosses(warId, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         warIdToOffenseLosses[warId] = newOffenseLosses;
         DefenseLosses memory newDefenseLosses = DefenseLosses(warId, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         warIdToDefenseLosses[warId] = newDefenseLosses;
+        uint256[] storage offenseActiveWars = idToActiveWars[offenseId];
+        offenseActiveWars.push(warId);
+        uint256[] storage defenseActiveWars = idToActiveWars[defenseId];
+        defenseActiveWars.push(warId);
         warId++;
     }
 
@@ -134,22 +142,57 @@ contract WarContract is Ownable {
         }
     }
 
-    function offerPeace(uint256 offerId, uint256 warId) public {
+    function offerPeace(uint256 offerId, uint256 _warId) public {
         require(idToOwnerWar[offerId] == msg.sender, "!nation owner");
-        uint256 offenseNation = warIdToWar[warId].offenseId;
-        uint256 defenseNation = warIdToWar[warId].defenseId;
+        uint256 offenseNation = warIdToWar[_warId].offenseId;
+        uint256 defenseNation = warIdToWar[_warId].defenseId;
         require(offerId == offenseNation || offerId == defenseNation, "nation not involved in this war");
         if (offerId == offenseNation) {
-            warIdToWar[warId].offensePeaceOffered = true;
+            warIdToWar[_warId].offensePeaceOffered = true;
         }
         if (offerId == defenseNation) {
-            warIdToWar[warId].defensePeaceOffered = true;
+            warIdToWar[_warId].defensePeaceOffered = true;
         }
-        bool offensePeaceOffered = warIdToWar[warId].offensePeaceOffered;
-        bool defensePeaceOffered = warIdToWar[warId].defensePeaceOffered;
+        bool offensePeaceOffered = warIdToWar[_warId].offensePeaceOffered;
+        bool defensePeaceOffered = warIdToWar[_warId].defensePeaceOffered;
         if (offensePeaceOffered == true && defensePeaceOffered == true) {
-            warIdToWar[warId].peaceDeclared = true;
-            warIdToWar[warId].active = false;
+            warIdToWar[_warId].peaceDeclared = true;
+            warIdToWar[_warId].active = false;
+            removeActiveWar(offenseNation, defenseNation, _warId);
         }
+
+    }
+
+    function removeActiveWar(uint256 offenseId, uint256 defenseId, uint256 _warId) internal {
+        uint256[] storage offenseActiveWars = idToActiveWars[offenseId];
+        for(uint i = 0; i < offenseActiveWars.length; i++) {
+            if(offenseActiveWars[i] == _warId) {
+                offenseActiveWars[i] = offenseActiveWars[offenseActiveWars.length-1];
+                offenseActiveWars.pop();
+                idToActiveWars[offenseId] = offenseActiveWars;
+            }
+        }
+        uint256[] storage defenseActiveWars = idToActiveWars[defenseId];
+        for(uint i = 0; i < defenseActiveWars.length; i++) {
+            if(defenseActiveWars[i] == _warId) {
+                defenseActiveWars[i] = defenseActiveWars[defenseActiveWars.length-1];
+                defenseActiveWars.pop();
+                idToActiveWars[defenseId] = defenseActiveWars;
+            }
+        }
+    }
+
+    function isWarActive(uint256 _warId) public view returns (bool) {
+        bool isActive = warIdToWar[_warId].active;
+        return isActive;
+    }
+
+    function isPeaceOffered(uint256 _warId) public view returns (bool) {
+        bool peaceOffered = false;
+        if (warIdToWar[_warId].offensePeaceOffered == true ||
+            warIdToWar[_warId].defensePeaceOffered == true) {
+                peaceOffered = true;
+            }
+        return peaceOffered;
     }
 }
