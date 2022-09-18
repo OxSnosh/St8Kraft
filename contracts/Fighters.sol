@@ -101,7 +101,7 @@ contract FightersContract is Ownable {
         return count;
     }
 
-    function getMaxAircraftCount(uint256 id) public view returns (uint256) {
+    function getMaxAircraftCount(uint256 id) public pure returns (uint256) {
         return 450;
     }
 

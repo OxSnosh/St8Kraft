@@ -235,6 +235,16 @@ contract ForcesContract is Ownable {
         return tankAmount;
     }
 
+    function getDeployedTankCount(uint256 id) public view returns (uint256 tanks) {
+        uint256 tankAmount = idToForces[id].deployedTanks;
+        return tankAmount;
+    }
+
+    function getDefendingTankCount(uint256 id) public view returns (uint256 tanks) {
+        uint256 tankAmount = idToForces[id].defendingTanks;
+        return tankAmount;
+    }
+
     function buyCruiseMissiles(uint256 amount, uint256 id) public {
         require(
             idToOwnerForces[id] == msg.sender,

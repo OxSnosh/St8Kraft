@@ -67,4 +67,9 @@ contract MilitaryContract {
             idToMilitary[id].warPeacePreference = true;
         }
     }
+
+    function getWarPeacePreference(uint256 id) public view returns (bool) {
+        bool warOk = idToMilitary[id].warPeacePreference;
+        return warOk;
+    }
 }

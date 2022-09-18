@@ -26,7 +26,6 @@ contract InfrastructureContract is Ownable {
         uint256 landArea;
         uint256 technologyCount;
         uint256 infrastructureCount;
-        uint256 nationStrength;
         uint16 taxRate;
         uint256 populationCount;
         uint256 citizenCount;
@@ -69,7 +68,6 @@ contract InfrastructureContract is Ownable {
             20,
             0,
             20,
-            0,
             0,
             0,
             0,
@@ -407,15 +405,6 @@ contract InfrastructureContract is Ownable {
         uint256 infrastructureAmount = idToInfrastructure[countryId]
             .infrastructureCount;
         return infrastructureAmount;
-    }
-
-    function getNationStrength(uint256 countryId)
-        public
-        view
-        returns (uint256 nationStrength)
-    {
-        uint256 strength = idToInfrastructure[countryId].nationStrength;
-        return strength;
     }
 
     function getTaxRate(uint256 id)
