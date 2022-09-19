@@ -106,6 +106,7 @@ contract BillsContract is Ownable {
         idToOwnerBills[id] = nationOwner;
     }
 
+    //need to reduce by a percentage for blockades
     function payBills(uint256 id) public {
         require(idToOwnerBills[id] == msg.sender, "!nation owner");
         uint256 availableFunds = tsy.checkBalance(id);
