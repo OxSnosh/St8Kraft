@@ -180,25 +180,16 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         uint256 countryId;
     }
 
-    struct NavyLosses {
-        uint256 corvetteLosses;
-        uint256 landingShipLosses;
-        uint256 battleshipLosses;
-        uint256 cruiserLosses;
-        uint256 frigateLosses;
-        uint256 destroyerLosses;
-        uint256 submarineLosses;
-        uint256 aircraftCarrierLosses;
-    }
-
     mapping(uint256 => NavyForces) idToAttackerNavy;
     mapping(uint256 => NavyForces) idToDefenderNavy;
     mapping(uint256 => uint256[]) battleIdToAttackerChanceArray;
     mapping(uint256 => uint256[]) battleIdToAttackerTypeArray;
     mapping(uint256 => uint256) battleIdToAttackerCumulativeSumOdds;
+    mapping(uint256 => uint256[]) battleIdToAttackerLosses;
     mapping(uint256 => uint256[]) battleIdToDefenderChanceArray;
     mapping(uint256 => uint256[]) battleIdToDefenderTypeArray;
     mapping(uint256 => uint256) battleIdToDefenderCumulativeSumOdds;    
+    mapping(uint256 => uint256[]) battleIdToDefenderLosses;
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
@@ -503,7 +494,12 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
             } else {
                 generateLossForAttacker(requestNumber, randomNumnerForShipSelection);
             }
-        }      
+        }
+        uint256[] memory defenderLosses = battleIdToDefenderLosses[requestNumber];
+        uint256[] memory attackerLosses = battleIdToAttackerLosses[requestNumber];
+        uint256 defenderId = idToDefenderNavy[requestNumber].countryId;
+        uint256 attackerId = idToAttackerNavy[requestNumber].countryId;
+        nav.decrementLosses(defenderLosses, defenderId, attackerLosses, attackerId);      
     }
 
     function getLosses (uint256 battleId, uint256 numberBetweenZeroAndTwo) public view returns (uint256) {
@@ -554,26 +550,56 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
     }
 
     function generateLossForDefender(uint256 battleId, uint256 randomNumberForShipLoss) public {
+        uint256[] storage chanceArray = battleIdToDefenderChanceArray[battleId];
+        uint256[] storage typeArray = battleIdToDefenderTypeArray[battleId];
+        uint256 cumulativeValue = battleIdToDefenderCumulativeSumOdds[battleId];
+        uint256 randomNumber = (randomNumberForShipLoss % cumulativeValue);
+        uint256 shipType;
+        uint256 amountToDecrease;
+        for(uint i; i < chanceArray.length; i++) {
+            if(randomNumber <= chanceArray[i]) {
+                shipType = typeArray[i];
+                amountToDecrease = getAmountToDecrease(shipType);
+            }
+            uint j = i;
+            for(j; j < chanceArray.length; j++) {
+                if(chanceArray[j] >= randomNumber) {
+                    chanceArray[j] -= amountToDecrease;
+                }
+            }
+            break;
+        }
+        battleIdToDefenderCumulativeSumOdds[battleId] -= amountToDecrease;
+        uint256[] storage defenderLosses = battleIdToDefenderLosses[battleId];
+        defenderLosses.push(shipType);
+    }
+
+    function generateLossForAttacker(uint256 battleId, uint256 randomNumberForShipLoss) public {
         uint256[] storage chanceArray = battleIdToAttackerChanceArray[battleId];
         uint256[] storage typeArray = battleIdToAttackerTypeArray[battleId];
         uint256 cumulativeValue = battleIdToAttackerCumulativeSumOdds[battleId];
         uint256 randomNumber = (randomNumberForShipLoss % cumulativeValue);
+        uint256 shipType;
+        uint256 amountToDecrease;
         for(uint i; i < chanceArray.length; i++) {
             if(randomNumber <= chanceArray[i]) {
-                uint256 shipType = typeArray[i];
-                uint256 amountToDecrease = getAmountToDecrease(shipType);
-                if(chanceArray[i] <= randomNumber) {
-                    chanceArray[i] = chanceArray[i] - amountToDecrease;
+                shipType = typeArray[i];
+                amountToDecrease = getAmountToDecrease(shipType);
+            }
+            uint j = i;
+            for(j; j < chanceArray.length; j++) {
+                if(chanceArray[j] >= randomNumber) {
+                    chanceArray[j] -= amountToDecrease;
                 }
             }
+            break;
         }
+        battleIdToAttackerCumulativeSumOdds[battleId] -= amountToDecrease;
+        uint256[] storage defenderLosses = battleIdToAttackerLosses[battleId];
+        defenderLosses.push(shipType);
     }
 
-    function generateLossForAttacker(uint256 battleId, uint256 randomNumber) public {
-
-    }
-
-    function getAmountToDecrease(uint256 shipType) internal view returns (uint256) {
+    function getAmountToDecrease(uint256 shipType) internal pure returns (uint256) {
         uint256 amountToDecrease;
         if (shipType == 1) {
             amountToDecrease = 15;

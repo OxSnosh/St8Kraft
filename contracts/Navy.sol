@@ -9,6 +9,7 @@ contract NavyContract is Ownable {
     address public treasuryAddress;
     address public improvementsContract1Address;
     address public improvementsContract3Address;
+    address public navyBattleAddress;
     uint256 public corvetteCost;
     uint256 public landingShipCost;
     uint256 public battleshipCost;
@@ -122,6 +123,57 @@ contract NavyContract is Ownable {
             submarineAmount +
             aircraftCarrierAmount);
         return shipCount;
+    }
+
+    modifier onlyBattle() {
+        require(msg.sender == navyBattleAddress, "only callable from battle");
+        _;
+    }
+
+    function decrementLosses(
+        uint256[] memory defenderLosses,
+        uint256 defenderId,
+        uint256[] memory attackerLosses,
+        uint256 attackerId
+    ) public onlyBattle {
+        for(uint i; i < defenderLosses.length; i++) {
+            if (defenderLosses[i] == 1) {
+                idToNavy[defenderId].corvetteCount -= 1;
+            } else if (defenderLosses[i] == 2) {
+                idToNavy[defenderId].landingShipCount -= 1;
+            } else if (defenderLosses[i] == 3) {
+                idToNavy[defenderId].battleshipCount -= 1;
+            } else if (defenderLosses[i] == 4) {
+                idToNavy[defenderId].cruiserCount -= 1;
+            } else if (defenderLosses[i] == 5) {
+                idToNavy[defenderId].frigateCount -= 1;
+            } else if (defenderLosses[i] == 6) {
+                idToNavy[defenderId].destroyerCount -= 1;
+            } else if (defenderLosses[i] == 7) {
+                idToNavy[defenderId].submarineCount -= 1;
+            } else if (defenderLosses[i] == 8) {
+                idToNavy[defenderId].aircraftCarrierCount -= 1;
+            }
+        }
+        for(uint i; i < attackerLosses.length; i++) {
+            if (attackerLosses[i] == 1) {
+                idToNavy[attackerId].corvetteCount -= 1;
+            } else if (defenderLosses[i] == 2) {
+                idToNavy[attackerId].landingShipCount -= 1;
+            } else if (defenderLosses[i] == 3) {
+                idToNavy[attackerId].battleshipCount -= 1;
+            } else if (defenderLosses[i] == 4) {
+                idToNavy[attackerId].cruiserCount -= 1;
+            } else if (defenderLosses[i] == 5) {
+                idToNavy[attackerId].frigateCount -= 1;
+            } else if (defenderLosses[i] == 6) {
+                idToNavy[attackerId].destroyerCount -= 1;
+            } else if (defenderLosses[i] == 7) {
+                idToNavy[attackerId].submarineCount -= 1;
+            } else if (defenderLosses[i] == 8) {
+                idToNavy[attackerId].aircraftCarrierCount -= 1;
+            }
+        }
     }
 
     function buyCorvette(uint256 amount, uint256 id) public {
@@ -366,26 +418,26 @@ contract NavyContract is Ownable {
         uint256 cruisers = getCruiserCount(id);
         uint256 frigates = getFrigateCount(id);
         uint256 subs = getSubmarineCount(id);
-        uint256 blockadeCapableShips = (
-            battleships +
+        uint256 blockadeCapableShips = (battleships +
             cruisers +
             frigates +
-            subs
-        );
+            subs);
         return blockadeCapableShips;
     }
 
-    function getBreakBlockadeCapableShips(uint256 id) public view returns (uint256) {
+    function getBreakBlockadeCapableShips(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 battleships = getBattleshipCount(id);
         uint256 cruisers = getCruiserCount(id);
         uint256 frigates = getFrigateCount(id);
         uint256 destroyers = getDestroyerCount(id);
-        uint256 breakBlockadeCapableShips = (
-            battleships +
+        uint256 breakBlockadeCapableShips = (battleships +
             cruisers +
             frigates +
-            destroyers
-        );
+            destroyers);
         return breakBlockadeCapableShips;
     }
 }
