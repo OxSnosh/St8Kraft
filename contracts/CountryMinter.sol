@@ -141,8 +141,8 @@ contract CountryMinter is ERC721, Ownable {
         countryId++;
     }
 
-    function checkOwnership(uint256 id) public view returns (bool) {
-        if(idToOwner[id] == msg.sender) {
+    function checkOwnership(uint256 id, address caller) public view returns (bool) {
+        if(idToOwner[id] == caller) {
             return true;
         }
         return false;

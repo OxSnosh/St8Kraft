@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.7;
 
+import "./CountryMinter.sol";
 import "./Navy.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
@@ -134,6 +135,32 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
         blockadeIdToBlockade[requestNumber]
             .blockadePercentageReduction = blockadePercentage;
     }
+
+    function getActiveBlockades(uint256 countryId) public view returns (uint256[] memory) {
+        uint256[] memory activeBlockadesToReturn = idToActiveBlockades[countryId];
+        return (activeBlockadesToReturn);
+    }
+}
+
+contract BreakBlocadeContract is Ownable {
+    address public countryMinter;
+    address public navalBlockade;
+
+    CountryMinter mint;
+    NavalBlockadeContract navBlock;
+
+    constructor (address _countryMinter, address _navalBlockade) {
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
+        navalBlockade = _navalBlockade;
+        navBlock = NavalBlockadeContract(_navalBlockade);
+    }
+
+    function breakBlockade(uint256 attackerId, uint256 blockaderId) public {
+        bool isOwner = mint.checkOwnership(attackerId, msg.sender);
+        require (isOwner, "caller not nation owner");
+    }
+
 }
 
 contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
