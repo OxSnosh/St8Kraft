@@ -284,7 +284,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
             uint256 corvetteOdds = (idToAttackerNavy[battleId].corvetteCount * corvetteTargetSize);
             chances.push(corvetteOdds);
             types.push(1);
-            cumulativeSum += corvetteOdds;
+            cumulativeSum = corvetteOdds;
         }
         //landing ship
         if(idToAttackerNavy[battleId].landingShipCount > 0) {
@@ -488,7 +488,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         uint256 totalStrength = (attackerStartingStrength + defenderStartingStrength);
         for(uint i = 1; i < losses + 1; i++) {
             uint256 randomNumberForTeamSelection = (s_randomWords[i] % totalStrength);
-            uint256 randomNumnerForShipSelection = s_randomWords[i+9];
+            uint256 randomNumnerForShipSelection = s_randomWords[i+8];
             if (randomNumberForTeamSelection <= attackerStartingStrength) {
                 generateLossForDefender(requestNumber, randomNumnerForShipSelection);
             } else {
@@ -556,18 +556,19 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         uint256 randomNumber = (randomNumberForShipLoss % cumulativeValue);
         uint256 shipType;
         uint256 amountToDecrease;
+        uint j;
         for(uint i; i < chanceArray.length; i++) {
             if(randomNumber <= chanceArray[i]) {
                 shipType = typeArray[i];
                 amountToDecrease = getAmountToDecrease(shipType);
+                j = i;
+                break;
             }
-            uint j = i;
-            for(j; j < chanceArray.length; j++) {
-                if(chanceArray[j] >= randomNumber) {
-                    chanceArray[j] -= amountToDecrease;
-                }
+        }
+        for(j; j < chanceArray.length; j++) {
+            if(chanceArray[j] >= randomNumber) {
+                chanceArray[j] -= amountToDecrease;
             }
-            break;
         }
         battleIdToDefenderCumulativeSumOdds[battleId] -= amountToDecrease;
         uint256[] storage defenderLosses = battleIdToDefenderLosses[battleId];
