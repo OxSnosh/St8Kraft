@@ -3,6 +3,7 @@ pragma solidity 0.8.7;
 
 import "./CountryMinter.sol";
 import "./Navy.sol";
+import "./War.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
@@ -180,6 +181,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     address public countryMinter;
     address public navalBlockade;
     address public navy;
+    address public warAddress;
     uint256 battleshipStrength = 5;
     uint256 cruiserStrength = 6;
     uint256 frigateStrength = 8;
@@ -203,6 +205,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     CountryMinter mint;
     NavalBlockadeContract navBlock;
     NavyContract nav;
+    WarContract war;
 
     struct BreakBlockade {
         uint256 battleshipCount;
@@ -210,6 +213,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         uint256 frigateCount;
         uint256 destroyerCount;
         uint256 breakerStrength;
+        uint256 warId;
         uint256 breakerId;
     }
 
@@ -219,6 +223,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         uint256 frigateCount;
         uint256 submarineCount;
         uint256 defenderStrength;
+        uint256 warId;
         uint256 defenderId;
     }
 
@@ -239,6 +244,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         address _countryMinter,
         address _navalBlockade,
         address _navy,
+        address _warAddress,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
@@ -250,13 +256,15 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         navBlock = NavalBlockadeContract(_navalBlockade);
         navy = _navy;
         nav = NavyContract(_navy);
+        warAddress = _warAddress;
+        war = WarContract(_warAddress);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
     }
 
-    function breakBlockade(uint256 attackerId, uint256 blockaderId) public {
+    function breakBlockade(uint256 warId, uint256 attackerId, uint256 blockaderId) public {
         bool isOwner = mint.checkOwnership(attackerId, msg.sender);
         require(isOwner, "caller not nation owner");
         uint256[] memory attackerBlockades = navBlock.getActiveBlockadesAgainst(
@@ -271,8 +279,8 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
             }
         }
         require(isBlockader, "!blockaded by this nation");
-        generateBreakBlockadeStruct(attackerId, breakBlockadeId);
-        generateDefendBlockadeStruct(blockaderId, breakBlockadeId);
+        generateBreakBlockadeStruct(warId, attackerId, breakBlockadeId);
+        generateDefendBlockadeStruct(warId, blockaderId, breakBlockadeId);
         generateBreakBlockadeChanceArray(breakBlockadeId);
         generateDefendBlockadeChanceArray(breakBlockadeId);
         fulfillRequest(breakBlockadeId);
@@ -280,6 +288,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     }
 
     function generateBreakBlockadeStruct(
+        uint256 warId,
         uint256 attackerId,
         uint256 breakBlockId
     ) internal {
@@ -294,12 +303,14 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
             frigates,
             destroyers,
             breakerStrength,
+            warId,
             attackerId
         );
         breakBlockadeIdToBreakBlockade[breakBlockId] = newBreakBlockade;
     }
 
     function generateDefendBlockadeStruct(
+        uint256 warId,
         uint256 defenderId,
         uint256 breakBlockId
     ) internal {
@@ -314,6 +325,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
             frigates,
             submarines,
             defenderStrength,
+            warId,
             defenderId
         );
         breakBlockadeIdToDefendBlockade[breakBlockId] = newDefendBlockade;
@@ -509,6 +521,9 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
             breakerLosses,
             breakerId
         );
+        uint256 warId = breakBlockadeIdToBreakBlockade[requestNumber].warId;
+        war.addNavyCasualties(warId, breakerId, breakerLosses.length);
+        war.addNavyCasualties(warId, defenderId, defenderLosses.length);
         navBlock.checkIfBlockadeCapable(defenderId);
     }
 
@@ -659,6 +674,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
     address public navy;
     uint256 public navyBattleId;
     address public navyBlockade;
+    address public warAddress;
     uint256 corvetteStrength = 1;
     uint256 landingShipStrength = 3;
     uint256 battleshipStrength = 5;
@@ -687,6 +703,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
 
     NavyContract nav;
     NavalBlockadeContract navBlock;
+    WarContract war;
 
     struct NavyForces {
         uint256 corvetteCount;
@@ -698,6 +715,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         uint256 submarineCount;
         uint256 aircraftCarrierCount;
         uint256 startingStrength;
+        uint256 warId;
         uint256 countryId;
     }
 
@@ -716,6 +734,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
 
     constructor(
         address _navy,
+        address _war,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
@@ -723,6 +742,8 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
     ) VRFConsumerBaseV2(vrfCoordinatorV2) {
         navy = _navy;
         nav = NavyContract(_navy);
+        warAddress = _war;
+        war = WarContract(_war);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
@@ -734,16 +755,26 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         nav = NavyContract(newAddress);
     }
 
-    function navalAttack(uint256 attackerId, uint256 defenderId) public {
-        generateAttackerNavyStruct(navyBattleId, attackerId);
-        generateDefenderNavyStruct(navyBattleId, defenderId);
+    function updateWarContract(address newAddress) public onlyOwner {
+        warAddress = newAddress;
+        war = WarContract(newAddress);
+    }
+
+    function navalAttack(uint256 warId, uint256 attackerId, uint256 defenderId) public {
+        bool isActiveWar = war.isWarActive(warId);
+        require(isActiveWar, "!not active war");
+        (uint256 warOffense, uint256 warDefense) = war.getInvolvedParties(warId);
+        require(warOffense == attackerId || warOffense == defenderId, "invalid parameters");
+        require(warDefense == attackerId || warDefense == defenderId, "invalid parameters");
+        generateAttackerNavyStruct(warId, navyBattleId, attackerId);
+        generateDefenderNavyStruct(warId, navyBattleId, defenderId);
         generateAttackerChanceArray(navyBattleId);
         generateDefenderChanceArray(navyBattleId);
         fulfillRequest(navyBattleId);
         navyBattleId++;
     }
 
-    function generateAttackerNavyStruct(uint256 battleId, uint256 countryId)
+    function generateAttackerNavyStruct(uint256 warId, uint256 battleId, uint256 countryId)
         internal
     {
         uint256 corvetteCount = nav.getCorvetteCount(countryId);
@@ -765,12 +796,13 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
             submarineCount,
             aircraftCarrierCount,
             strengthAttacker,
+            warId,
             countryId
         );
         idToAttackerNavy[battleId] = newNavyForces;
     }
 
-    function generateDefenderNavyStruct(uint256 attackId, uint256 countryId)
+    function generateDefenderNavyStruct(uint256 warId, uint256 attackId, uint256 countryId)
         internal
     {
         uint256 corvetteCount = nav.getCorvetteCount(countryId);
@@ -792,6 +824,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
             submarineCount,
             aircraftCarrierCount,
             defnederStrength,
+            warId,
             countryId
         );
         idToDefenderNavy[attackId] = newNavyForces;
@@ -1079,6 +1112,9 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
             attackerLosses,
             attackerId
         );
+        uint256 warId = idToAttackerNavy[requestNumber].warId;
+        war.addNavyCasualties(warId, defenderId, defenderLosses.length);
+        war.addNavyCasualties(warId, attackerId, attackerLosses.length);
         navBlock.checkIfBlockadeCapable(defenderId);
     }
 

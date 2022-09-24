@@ -10,6 +10,7 @@ contract WarContract is Ownable {
     address public countryMinter;
     address public nationStrength;
     address public military;
+    address public navyBattleAddress;
     uint256[] public activeWars;
 
     NationStrengthContract nsc;
@@ -63,10 +64,12 @@ contract WarContract is Ownable {
     constructor(
         address _countryMinter,
         address _nationStrength,
-        address _military
+        address _military,
+        address _navyBattleAddress
     ) {
         countryMinter = _countryMinter;
         nationStrength = _nationStrength;
+        navyBattleAddress = _navyBattleAddress;
         nsc = NationStrengthContract(_nationStrength);
         military = _military;
         mil = MilitaryContract(_military);
@@ -112,11 +115,44 @@ contract WarContract is Ownable {
             isStrengthWithinRange == true,
             "nation strength is not within range"
         );
-        War memory newWar = War(warId, offenseId, defenseId, true, 7, false, false, false, 0, 0);
+        War memory newWar = War(
+            warId,
+            offenseId,
+            defenseId,
+            true,
+            7,
+            false,
+            false,
+            false,
+            0,
+            0
+        );
         warIdToWar[warId] = newWar;
-        OffenseLosses memory newOffenseLosses = OffenseLosses(warId, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        OffenseLosses memory newOffenseLosses = OffenseLosses(
+            warId,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        );
         warIdToOffenseLosses[warId] = newOffenseLosses;
-        DefenseLosses memory newDefenseLosses = DefenseLosses(warId, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        DefenseLosses memory newDefenseLosses = DefenseLosses(
+            warId,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        );
         warIdToDefenseLosses[warId] = newDefenseLosses;
         uint256[] storage offenseActiveWars = idToActiveWars[offenseId];
         offenseActiveWars.push(warId);
@@ -146,7 +182,10 @@ contract WarContract is Ownable {
         require(idToOwnerWar[offerId] == msg.sender, "!nation owner");
         uint256 offenseNation = warIdToWar[_warId].offenseId;
         uint256 defenseNation = warIdToWar[_warId].defenseId;
-        require(offerId == offenseNation || offerId == defenseNation, "nation not involved in this war");
+        require(
+            offerId == offenseNation || offerId == defenseNation,
+            "nation not involved in this war"
+        );
         if (offerId == offenseNation) {
             warIdToWar[_warId].offensePeaceOffered = true;
         }
@@ -160,25 +199,54 @@ contract WarContract is Ownable {
             warIdToWar[_warId].active = false;
             removeActiveWar(offenseNation, defenseNation, _warId);
         }
-
     }
 
-    function removeActiveWar(uint256 offenseId, uint256 defenseId, uint256 _warId) internal {
+    function removeActiveWar(
+        uint256 offenseId,
+        uint256 defenseId,
+        uint256 _warId
+    ) internal {
         uint256[] storage offenseActiveWars = idToActiveWars[offenseId];
-        for(uint i = 0; i < offenseActiveWars.length; i++) {
-            if(offenseActiveWars[i] == _warId) {
-                offenseActiveWars[i] = offenseActiveWars[offenseActiveWars.length-1];
+        for (uint256 i = 0; i < offenseActiveWars.length; i++) {
+            if (offenseActiveWars[i] == _warId) {
+                offenseActiveWars[i] = offenseActiveWars[
+                    offenseActiveWars.length - 1
+                ];
                 offenseActiveWars.pop();
                 idToActiveWars[offenseId] = offenseActiveWars;
             }
         }
         uint256[] storage defenseActiveWars = idToActiveWars[defenseId];
-        for(uint i = 0; i < defenseActiveWars.length; i++) {
-            if(defenseActiveWars[i] == _warId) {
-                defenseActiveWars[i] = defenseActiveWars[defenseActiveWars.length-1];
+        for (uint256 i = 0; i < defenseActiveWars.length; i++) {
+            if (defenseActiveWars[i] == _warId) {
+                defenseActiveWars[i] = defenseActiveWars[
+                    defenseActiveWars.length - 1
+                ];
                 defenseActiveWars.pop();
                 idToActiveWars[defenseId] = defenseActiveWars;
             }
+        }
+    }
+
+    modifier onlyNavyBattle() {
+        require(
+            msg.sender == navyBattleAddress,
+            "function only callable from navy battle contract"
+        );
+        _;
+    }
+
+    function addNavyCasualties(
+        uint256 warId,
+        uint256 nationId,
+        uint256 navyCasualties
+    ) public onlyNavyBattle {
+        (uint256 offenseId, uint256 defenseId) = getInvolvedParties(warId);
+        if(offenseId == nationId) {
+            warIdToOffenseLosses[warId].navyLost = navyCasualties;
+        }
+        if(defenseId == nationId) {
+            warIdToDefenseLosses[warId].navyLost = navyCasualties;
         }
     }
 
@@ -187,12 +255,24 @@ contract WarContract is Ownable {
         return isActive;
     }
 
+    function getInvolvedParties(uint256 _warId)
+        public
+        view
+        returns (uint256, uint256)
+    {
+        uint256 offenseId = warIdToWar[_warId].offenseId;
+        uint256 defenseId = warIdToWar[_warId].defenseId;
+        return (offenseId, defenseId);
+    }
+
     function isPeaceOffered(uint256 _warId) public view returns (bool) {
         bool peaceOffered = false;
-        if (warIdToWar[_warId].offensePeaceOffered == true ||
-            warIdToWar[_warId].defensePeaceOffered == true) {
-                peaceOffered = true;
-            }
+        if (
+            warIdToWar[_warId].offensePeaceOffered == true ||
+            warIdToWar[_warId].defensePeaceOffered == true
+        ) {
+            peaceOffered = true;
+        }
         return peaceOffered;
     }
 }

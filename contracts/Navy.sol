@@ -3,6 +3,7 @@ pragma solidity 0.8.7;
 
 import "./Treasury.sol";
 import "./Improvements.sol";
+import "./War.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract NavyContract is Ownable {
@@ -10,6 +11,7 @@ contract NavyContract is Ownable {
     address public improvementsContract1Address;
     address public improvementsContract3Address;
     address public navyBattleAddress;
+    address public warAddress;
     uint256 public corvetteCost;
     uint256 public landingShipCost;
     uint256 public battleshipCost;
@@ -36,28 +38,38 @@ contract NavyContract is Ownable {
     mapping(uint256 => Navy) public idToNavy;
     mapping(uint256 => address) public idToOwnerNavy;
 
+    WarContract war;
+
     constructor(
         address _treasuryAddress,
         address _improvementsContract1Address,
-        address _improvementsContract3Address
+        address _improvementsContract3Address,
+        address _warAddress
     ) {
         treasuryAddress = _treasuryAddress;
         improvementsContract1Address = _improvementsContract1Address;
         improvementsContract3Address = _improvementsContract3Address;
-        corvetteCost = 100;
-        landingShipCost = 200;
-        battleshipCost = 300;
-        cruiserCost = 400;
-        frigateCost = 500;
-        destroyerCost = 600;
-        submarineCost = 700;
-        aircraftCarrierCost = 800;
+        warAddress = _warAddress;
+        war = WarContract(_warAddress);
+        corvetteCost = 300000;
+        landingShipCost = 300000;
+        battleshipCost = 300000;
+        cruiserCost = 500000;
+        frigateCost = 750000;
+        destroyerCost = 1000000;
+        submarineCost = 1500000;
+        aircraftCarrierCost = 2000000;
     }
 
     function generateNavy(uint256 id, address nationOwner) public {
         Navy memory newNavy = Navy(0, 0, 0, 0, 0, 0, 0, 0, 0, false);
         idToNavy[id] = newNavy;
         idToOwnerNavy[id] = nationOwner;
+    }
+
+    function updateWarContract(address newAddress) public onlyOwner {
+        warAddress = newAddress;
+        war = WarContract(newAddress);
     }
 
     function updateCorvetteCost(uint256 newPrice) public onlyOwner {
@@ -174,6 +186,7 @@ contract NavyContract is Ownable {
                 idToNavy[attackerId].aircraftCarrierCount -= 1;
             }
         }
+
     }
 
     function buyCorvette(uint256 amount, uint256 id) public {
