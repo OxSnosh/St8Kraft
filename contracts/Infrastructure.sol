@@ -22,12 +22,14 @@ contract InfrastructureContract is Ownable {
     address public aid;
     address public parameters;
     address public spyAddress;
+    address public taxes;
 
     struct Infrastructure {
         uint256 landArea;
         uint256 technologyCount;
         uint256 infrastructureCount;
-        uint16 taxRate;
+        uint256 taxRate;
+        bool collectionNeededToChangeRate;
         uint256 populationCount;
         uint256 citizenCount;
         uint256 criminalCount;
@@ -64,12 +66,24 @@ contract InfrastructureContract is Ownable {
         aid = _aid;
     }
 
-    function constructorContinued (address _spyAddress) public onlyOwner {
+    function constructorContinued(address _spyAddress, address _tax) public onlyOwner {
         spyAddress = _spyAddress;
+        taxes = _tax;
     }
 
-    modifier onlySpyContract {
-        require (msg.sender == spyAddress, "only spy contract can call this function");
+    modifier onlySpyContract() {
+        require(
+            msg.sender == spyAddress,
+            "only spy contract can call this function"
+        );
+        _;
+    }
+
+    modifier onlyTaxesContract() {
+        require(
+            msg.sender == taxes,
+            "only tax contract can call this function"
+        );
         _;
     }
 
@@ -78,7 +92,8 @@ contract InfrastructureContract is Ownable {
             20,
             0,
             20,
-            0,
+            16,
+            false,
             0,
             0,
             0,
@@ -205,12 +220,16 @@ contract InfrastructureContract is Ownable {
         return multiplier;
     }
 
-    modifier onlyAidContract {
+    modifier onlyAidContract() {
         require(msg.sender == aid);
         _;
     }
 
-    function sendTech(uint256 idSender, uint256 idReciever, uint256 amount) public onlyAidContract {
+    function sendTech(
+        uint256 idSender,
+        uint256 idReciever,
+        uint256 amount
+    ) public onlyAidContract {
         uint256 balanceOfSender = idToInfrastructure[idSender].technologyCount;
         require(balanceOfSender >= amount, "sender does not have enought tech");
         idToInfrastructure[idSender].technologyCount -= amount;
@@ -457,6 +476,7 @@ contract InfrastructureContract is Ownable {
     {
         idToInfrastructure[countryId].infrastructureCount += amount;
     }
+
     function getTaxRate(uint256 id)
         public
         view
@@ -464,6 +484,35 @@ contract InfrastructureContract is Ownable {
     {
         uint256 taxRate = idToInfrastructure[id].taxRate;
         return taxRate;
+    }
+
+    function setTaxRate(uint256 id, uint256 newTaxRate) public {
+        require(
+            idToInfrastructure[id].collectionNeededToChangeRate == false,
+            "need to collect taxes before changing tax rate"
+        );
+        require(newTaxRate <= 28, "cannot tax above 28%");
+        require(newTaxRate >= 15, "cannot tax below 15%");
+        idToInfrastructure[id].taxRate = newTaxRate;
+    }
+
+    function setTaxRateFromSpyContract(uint256 id, uint256 newTaxRate)
+        public
+        onlySpyContract
+    {
+        require(newTaxRate <= 28, "cannot tax above 28%");
+        require(newTaxRate >= 15, "cannot tax below 15%");
+        idToInfrastructure[id].taxRate = newTaxRate;
+        idToInfrastructure[id].collectionNeededToChangeRate = true;
+    }
+
+    function toggleCollectionNeededToChangeRate(uint256 id) public onlyTaxesContract {
+        idToInfrastructure[id].collectionNeededToChangeRate = false;
+    }
+
+    function checkIfCollectionNeededToChangeRate(uint256 id) public view returns (bool) {
+        bool collectionNeeded = idToInfrastructure[id].collectionNeededToChangeRate;
+        return collectionNeeded;
     }
 
     function getTotalPopulationCount(uint256 id) public view returns (uint256) {

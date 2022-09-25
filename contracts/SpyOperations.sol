@@ -249,7 +249,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         } else if (attackType == 12) {
             uint256 cost = (300000 + (defenderStrength * 15));
             tsy.spendBalance(attackerId, cost);
-            captureMoneyReserves(attackerId, defenderId, attackId);
+            captureMoneyReserves(attackerId, defenderId);
         } else if (attackType == 13) {
             uint256 cost = (500000 + (defenderStrength * 5));
             tsy.spendBalance(attackerId, cost);
@@ -398,15 +398,18 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
 
     function sabotogeTaxes(uint256 defenderId, uint256 attackId) internal {
         uint256[] memory randomNumbers = s_requestIndexToRandomWords[attackId];
+        uint256 randomNumberToSetTaxes = ((randomNumbers[1] % 4) + 23);
+        inf.setTaxRateFromSpyContract(defenderId, randomNumberToSetTaxes);
     }
 
-    function captureMoneyReserves(uint256 attackerId, uint256 defenderId, uint256 attackId)
-        internal
-    {
+    function captureMoneyReserves(
+        uint256 attackerId,
+        uint256 defenderId
+    ) internal {
         //max 5% or $10 million
         uint256 defenderBalance = tsy.checkBalance(defenderId);
         uint256 amountToTransfer;
-        if(defenderBalance <= 200000000) {
+        if (defenderBalance <= 200000000) {
             amountToTransfer = ((defenderBalance * 5) / 100);
         } else {
             amountToTransfer = 10000000;
@@ -414,9 +417,11 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         tsy.transferBalance(attackerId, defenderId, amountToTransfer);
     }
 
-    function captureInfrastructure(uint256 attackerId, uint256 defenderId, uint256 attackId)
-        internal
-    {
+    function captureInfrastructure(
+        uint256 attackerId,
+        uint256 defenderId,
+        uint256 attackId
+    ) internal {
         //random between 5 and 15
         uint256[] memory randomNumbers = s_requestIndexToRandomWords[attackId];
         uint256 randomNumberToDecreaseFromDefender = ((randomNumbers[1] % 10) +

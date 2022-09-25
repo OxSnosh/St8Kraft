@@ -46,7 +46,6 @@ contract TaxesContract is Ownable {
         address _improvements1,
         address _improvements2,
         address _improvements3
-
     ) {
         countryMinter = _countryMinter;
         infrastructure = _infrastructure;
@@ -125,7 +124,10 @@ contract TaxesContract is Ownable {
         imp3 = ImprovementsContract3(newAddress);
     }
 
-    function updateCountryParametersContract(address newAddress) public onlyOwner {
+    function updateCountryParametersContract(address newAddress)
+        public
+        onlyOwner
+    {
         parameters = newAddress;
         params = CountryParametersContract(newAddress);
     }
@@ -168,8 +170,12 @@ contract TaxesContract is Ownable {
         uint256 daysSinceLastTaxCollection = tsy.getDaysSinceLastTaxCollection(
             id
         );
-        uint256 taxesCollectible = (dailyIncomePerCitizen *
+        uint256 taxRate = inf.getTaxRate(id);
+        uint256 dailyTaxesCollectiblePerCitizen = ((dailyIncomePerCitizen *
+            taxRate) / 100);
+        uint256 taxesCollectible = (dailyTaxesCollectiblePerCitizen *
             daysSinceLastTaxCollection);
+        inf.toggleCollectionNeededToChangeRate(id);
         tsy.increaseBalanceOnTaxCollection(id, taxesCollectible);
     }
 
@@ -182,9 +188,7 @@ contract TaxesContract is Ownable {
         uint256 schools = imp3.getSchoolCount(id);
         uint256 universities = imp3.getUniversityCount(id);
         //detractors (subtracted)
-        uint256 casinos = imp1.getCasinoCount(
-            id
-        );
+        uint256 casinos = imp1.getCasinoCount(id);
         uint256 guerillaCamp = imp2.getGuerillaCampCount(id);
         uint256 multipliers = (100 +
             (banks * 7) +
@@ -203,9 +207,7 @@ contract TaxesContract is Ownable {
     function getHappiness(uint256 id) public view returns (uint256) {
         uint256 happinessAdditions = getHappinessPointsToAdd(id);
         uint256 happinessSubtractions = getHappinessPointsToSubtract(id);
-        uint256 happiness = (
-            happinessAdditions +
-            happinessSubtractions);
+        uint256 happiness = (happinessAdditions + happinessSubtractions);
         return happiness;
     }
 
@@ -217,8 +219,7 @@ contract TaxesContract is Ownable {
         uint256 pointsFromAge = getPointsFromNationAge(id);
         uint256 pointsFromTrades = getPointsFromTrades(id);
         uint256 pointsFromDefcon = getPointsFromDefcon(id);
-        uint256 happinessPointsToAdd = (
-            compatabilityPoints +
+        uint256 happinessPointsToAdd = (compatabilityPoints +
             densityPoints +
             wonderPoints +
             technologyPoints +
@@ -228,7 +229,11 @@ contract TaxesContract is Ownable {
         return happinessPointsToAdd;
     }
 
-    function getHappinessPointsToSubtract(uint256 id) public view returns (uint256) {
+    function getHappinessPointsToSubtract(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 taxRatePoints = getTaxRatePoints(id);
         uint256 pointsFromStability = getPointsFromMilitary(id);
         uint256 happinessPointsToSubtract = (25 -
@@ -386,9 +391,7 @@ contract TaxesContract is Ownable {
             bool
         )
     {
-        bool isWarMemorial = won3.getNationalWarMemorial(
-            id
-        );
+        bool isWarMemorial = won3.getNationalWarMemorial(id);
         bool isScientificDevCenter = won3.getScientificDevelopmentCenter(id);
         bool isSpaceProgram = won4.getSpaceProgram(id);
         bool isUniversalHealthcare = won4.getUniversalHealthcare(id);
@@ -447,19 +450,13 @@ contract TaxesContract is Ownable {
         return agePoints;
     }
 
-    function getPointsFromTrades(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
+    function getPointsFromTrades(uint256 id) public view returns (uint256) {
         uint256[] memory partners = res.getTradingPartners(id);
         uint256 pointsFromTeamTrades = 0;
         for (uint256 i = 0; i < partners.length; i++) {
             uint256 partnerId = partners[i];
             uint256 callerNationTeam = params.getTeam(id);
-            uint256 partnerTeam = params.getTeam(
-                partnerId
-            );
+            uint256 partnerTeam = params.getTeam(partnerId);
             if (callerNationTeam == partnerTeam) {
                 pointsFromTeamTrades++;
             }
