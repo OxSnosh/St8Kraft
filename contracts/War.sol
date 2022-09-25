@@ -237,16 +237,16 @@ contract WarContract is Ownable {
     }
 
     function addNavyCasualties(
-        uint256 warId,
+        uint256 _warId,
         uint256 nationId,
         uint256 navyCasualties
     ) public onlyNavyBattle {
-        (uint256 offenseId, uint256 defenseId) = getInvolvedParties(warId);
+        (uint256 offenseId, uint256 defenseId) = getInvolvedParties(_warId);
         if(offenseId == nationId) {
-            warIdToOffenseLosses[warId].navyLost = navyCasualties;
+            warIdToOffenseLosses[_warId].navyLost = navyCasualties;
         }
         if(defenseId == nationId) {
-            warIdToDefenseLosses[warId].navyLost = navyCasualties;
+            warIdToDefenseLosses[_warId].navyLost = navyCasualties;
         }
     }
 

@@ -22,6 +22,7 @@ contract TreasuryContract is Ownable {
     address public aid;
     address public taxes;
     address public bills;
+    address public spyAddress;
     uint256 public daysToInactive;
     uint256 private gameTaxPercentage = 0;
     uint256 public seedMoney = 2000000;
@@ -52,7 +53,8 @@ contract TreasuryContract is Ownable {
         address _fighters,
         address _aid,
         address _taxes,
-        address _bills
+        address _bills,
+        address _spyAddress
     ) {
         warBucksAddress = _warBucksAddress;
         wonders1 = _wonders1;
@@ -64,6 +66,7 @@ contract TreasuryContract is Ownable {
         aid = _aid;
         taxes = _taxes;
         bills = _bills;
+        spyAddress = _spyAddress;
         daysToInactive = 20;
     }
 
@@ -92,6 +95,11 @@ contract TreasuryContract is Ownable {
         _;
     }
 
+    modifier onlySpyContract {
+        require(msg.sender == spyAddress, "only callable from spy contract");
+        _;
+    }
+
     function increaseBalanceOnTaxCollection(uint256 id, uint256 amount) public onlyTaxesContract {
         idToTreasury[id].balance += amount;
         idToTreasury[id].daysSinceLastTaxCollection = 0;
@@ -111,7 +119,7 @@ contract TreasuryContract is Ownable {
     function spendBalance(uint256 id, uint256 cost) public {
         //need a way to only allow the nation owner to do this
         uint256 balance = idToTreasury[id].balance;
-        require(balance >= cost);
+        require(balance >= cost, "insuffucuent funds");
         idToTreasury[id].balance -= cost;
         //TAXES here
         uint256 taxLevied = ((cost * gameTaxPercentage) / 100);
@@ -193,6 +201,11 @@ contract TreasuryContract is Ownable {
     function checkBalance(uint256 id) public view returns (uint256) {
         uint256 balance = idToTreasury[id].balance;
         return balance;
+    }
+
+    function transferBalance(uint256 toId, uint256 fromId, uint256 amount) public onlySpyContract {
+        idToTreasury[toId].balance += amount;
+        idToTreasury[fromId].balance -= amount;
     }
 
     function checkInactive(uint256 id) public view returns (bool) {

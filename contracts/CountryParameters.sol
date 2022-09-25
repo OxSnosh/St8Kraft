@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     uint256 private parametersId;
+    address public spyAddress;
     uint256[] private s_randomWords;
 
     //chainlink variables
@@ -46,15 +47,22 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
 
     /* Functions */
     constructor(
+        address _spyAddress,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
         uint32 callbackGasLimit
     ) VRFConsumerBaseV2(vrfCoordinatorV2) {
+        spyAddress = _spyAddress;
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
+    }
+
+    modifier onlySpyContract {
+        require(msg.sender == spyAddress, "function only callable from spy contract");
+        _;
     }
 
     function generateCountryParameters(
@@ -174,6 +182,10 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         idToCountrySettings[id].daysSinceGovernmentChenge = 0;
     }
 
+    function updateDesiredGovernment(uint256 id, uint256 newType) public onlySpyContract {
+        idToGovernmentPreference[id] = newType;
+    }
+
     function setReligion(uint256 id, uint256 newType) public {
         require(
             idToOwnerParameters[id] == msg.sender,
@@ -185,6 +197,10 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         require(newType <= 14, "invalid type");
         idToCountrySettings[id].daysSinceReligionChange = newType;
         idToCountrySettings[id].daysSinceReligionChange = 0;
+    }
+
+    function updateDesiredReligion(uint256 id, uint256 newType) public onlySpyContract {
+        idToReligionPreference[id] = newType;
     }
 
     //needs to be called by a keeper

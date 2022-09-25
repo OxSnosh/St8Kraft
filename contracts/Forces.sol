@@ -12,6 +12,7 @@ contract ForcesContract is Ownable {
     uint256 public spyCost;
     address public treasuryAddress;
     address public aid;
+    address public spyAddress;
 
     struct Forces {
         uint256 numberOfSoldiers;
@@ -26,8 +27,9 @@ contract ForcesContract is Ownable {
         bool nationExists;
     }
 
-    constructor(address _treasuryAddress, address _aid) {
+    constructor(address _treasuryAddress, address _aid, address _spyAddress) {
         treasuryAddress = _treasuryAddress;
+        spyAddress = _spyAddress;
         aid = _aid;
         soldierCost = 100;
         tankCost = 200;
@@ -65,6 +67,16 @@ contract ForcesContract is Ownable {
         spyCost = newPrice;
     }
 
+    modifier onlyAidContract() {
+        require(msg.sender == aid);
+        _;
+    }
+
+    modifier onlySpyContract {
+        require (msg.sender == spyAddress, "only callable from spy contract");
+        _;
+    }
+
     function buySoldiers(uint256 amount, uint256 id) public {
         require(
             idToOwnerForces[id] == msg.sender,
@@ -76,11 +88,6 @@ contract ForcesContract is Ownable {
         idToForces[id].numberOfSoldiers += amount;
         idToForces[id].defendingSoldiers += amount;
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
-
-    modifier onlyAidContract() {
-        require(msg.sender == aid);
-        _;
     }
 
     function sendSoldiers(
@@ -216,15 +223,11 @@ contract ForcesContract is Ownable {
         idToForces[id].deployedTanks -= amountToWithdraw;
     }
 
-    //called during a battle
-    //how can I make sure that only the fighting contract can call this (modifier?)
-    function decreaseDefendingTankCount(uint256 amount, uint256 id) public {
+    function decreaseDefendingTankCount(uint256 amount, uint256 id) public onlySpyContract {
         idToForces[id].defendingTanks -= amount;
         idToForces[id].numberOfTanks -= amount;
     }
 
-    //called during battle
-    //also needs modifier
     function decreaseDeployedTankCount(uint256 amount, uint256 id) public {
         idToForces[id].deployedTanks -= amount;
         idToForces[id].numberOfTanks -= amount;
@@ -284,9 +287,7 @@ contract ForcesContract is Ownable {
         return count;
     }
 
-    //called during a battle
-    //how can I make sure that only the fighting contract can call this (modifier?)
-    function decreaseCruiseMissileCount(uint256 amount, uint256 id) public {
+    function decreaseCruiseMissileCount(uint256 amount, uint256 id) public onlySpyContract {
         idToForces[id].cruiseMissiles -= amount;
     }
 
@@ -329,10 +330,8 @@ contract ForcesContract is Ownable {
         return count;
     }
 
-    //called during a battle
-    //how can I make sure that only the fighting contract can call this (modifier?)
-    function decreaseNukeCount(uint256 amount, uint256 id) public {
-        idToForces[id].nuclearWeapons -= amount;
+    function decreaseNukeCountFromSpyContract(uint256 id) public onlySpyContract {
+        idToForces[id].nuclearWeapons -= 1;
     }
 
     function buySpies(uint256 amount, uint256 id) public {
@@ -372,7 +371,11 @@ contract ForcesContract is Ownable {
 
     //called during a battle
     //how can I make sure that only the fighting contract can call this (modifier?)
-    function decreaseSpyCount(uint256 amount, uint256 id) public {
+    function decreaseAttackerSpyCount(uint256 id) public onlySpyContract {
+        idToForces[id].numberOfSpies -= 1;
+    }
+
+    function decreaseDefenderSpyCount(uint256 amount, uint256 id) public onlySpyContract {
         idToForces[id].numberOfSpies -= amount;
     }
 

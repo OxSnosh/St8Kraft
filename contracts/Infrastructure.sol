@@ -21,6 +21,7 @@ contract InfrastructureContract is Ownable {
     address public treasury;
     address public aid;
     address public parameters;
+    address public spyAddress;
 
     struct Infrastructure {
         uint256 landArea;
@@ -63,6 +64,15 @@ contract InfrastructureContract is Ownable {
         aid = _aid;
     }
 
+    function constructorContinued (address _spyAddress) public onlyOwner {
+        spyAddress = _spyAddress;
+    }
+
+    modifier onlySpyContract {
+        require (msg.sender == spyAddress, "only spy contract can call this function");
+        _;
+    }
+
     function generateInfrastructure(uint256 id, address nationOwner) public {
         Infrastructure memory newInfrastrusture = Infrastructure(
             20,
@@ -79,7 +89,6 @@ contract InfrastructureContract is Ownable {
         idToOwnerInfrastructure[id] = nationOwner;
     }
 
-    //how to graduate tech and infrastructure purchases
     function buyTech(uint256 id, uint256 amount) public {
         require(
             idToOwnerInfrastructure[id] == msg.sender,
@@ -387,6 +396,20 @@ contract InfrastructureContract is Ownable {
         return landAmount;
     }
 
+    function decreaseLandCount(uint256 countryId, uint256 amount)
+        public
+        onlySpyContract
+    {
+        idToInfrastructure[countryId].landArea -= amount;
+    }
+
+    function increaseLandCount(uint256 countryId, uint256 amount)
+        public
+        onlySpyContract
+    {
+        idToInfrastructure[countryId].landArea += amount;
+    }
+
     function getTechnologyCount(uint256 countryId)
         public
         view
@@ -395,6 +418,20 @@ contract InfrastructureContract is Ownable {
         uint256 technologyAmount = idToInfrastructure[countryId]
             .technologyCount;
         return technologyAmount;
+    }
+
+    function decreaseTechCount(uint256 countryId, uint256 amount)
+        public
+        onlySpyContract
+    {
+        idToInfrastructure[countryId].technologyCount -= amount;
+    }
+
+    function increaseTechCount(uint256 countryId, uint256 amount)
+        public
+        onlySpyContract
+    {
+        idToInfrastructure[countryId].technologyCount += amount;
     }
 
     function getInfrastructureCount(uint256 countryId)
@@ -407,6 +444,19 @@ contract InfrastructureContract is Ownable {
         return infrastructureAmount;
     }
 
+    function decreaseInfrastructureCount(uint256 countryId, uint256 amount)
+        public
+        onlySpyContract
+    {
+        idToInfrastructure[countryId].infrastructureCount -= amount;
+    }
+
+    function increaseInfrastructureCount(uint256 countryId, uint256 amount)
+        public
+        onlySpyContract
+    {
+        idToInfrastructure[countryId].infrastructureCount += amount;
+    }
     function getTaxRate(uint256 id)
         public
         view
