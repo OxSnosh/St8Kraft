@@ -39,7 +39,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         uint256 infrastructureDestroyed;
     }
 
-    mappint(uint256 => CruiseMissileAttack) attackIdToCruiseMissile;
+    mapping(uint256 => CruiseMissileAttack) attackIdToCruiseMissile;
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
@@ -91,6 +91,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
             0,
             0
         );
+        war.incrementCruiseMissileAttack(warId, attackerId);
         attackIdToCruiseMissile[cruiseMissileAttackId] = newAttack;
         fulfillRequest(cruiseMissileAttackId);
         cruiseMissileAttackId++;
@@ -115,7 +116,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         s_requestIndexToRandomWords[requestNumber] = randomWords;
         s_randomWords = randomWords;
         uint256 damageType = ((s_randomWords[0] % 3) + 1);
-        if(damageType == 1) {
+        if (damageType == 1) {
             destroyTanks(requestNumber);
         } else if (damageType == 2) {
             destroyTech(requestNumber);
@@ -129,10 +130,13 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         uint256 tankCount = force.getDefendingTankCount(defenderId);
         uint256[] memory randomNumbers = s_requestIndexToRandomWords[attackId];
         uint256 randomTankCount = (randomNumbers[1] % 15);
-        if(tankCount <= randomTankCount) {
+        if (tankCount <= randomTankCount) {
             force.decreaseDefendingTankCount(tankCount, defenderId);
         } else {
-            force.decreaseDefendingTankCount(randomTankCount, defenderId);
+            force.decreaseDefendingTankCountFromCruiseMissileContract(
+                randomTankCount,
+                defenderId
+            );
         }
     }
 
@@ -153,6 +157,4 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         // uint256 randomNumber = (randomNumbers[1] % );
         inf.decreaseInfrastructureCountFromCruiseMissileContract(defenderId, 5);
     }
-
-
 }

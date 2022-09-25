@@ -2,6 +2,8 @@
 pragma solidity 0.8.7;
 
 import "./Treasury.sol";
+import "./Infrastructure.sol";
+import "./Resources.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract ForcesContract is Ownable {
@@ -14,6 +16,11 @@ contract ForcesContract is Ownable {
     address public aid;
     address public spyAddress;
     address public cruiseMissile;
+    address public infrastructure;
+    address public resources;
+
+    InfrastructureContract inf;
+    ResourcesContract res;
 
     struct Forces {
         uint256 numberOfSoldiers;
@@ -32,16 +39,21 @@ contract ForcesContract is Ownable {
         address _treasuryAddress,
         address _aid,
         address _spyAddress,
-        address _cruiseMissile
+        address _cruiseMissile,
+        address _infrastructure,
+        address _resources
     ) {
         treasuryAddress = _treasuryAddress;
         spyAddress = _spyAddress;
         cruiseMissile = _cruiseMissile;
         aid = _aid;
+        infrastructure = _infrastructure;
+        inf = InfrastructureContract(_infrastructure);
+        resources = _resources;
+        res = ResourcesContract(_resources);
         soldierCost = 100;
         tankCost = 200;
         cruiseMissileCost = 20000;
-        nukeCost = 400;
         spyCost = 500;
     }
 
@@ -52,6 +64,16 @@ contract ForcesContract is Ownable {
         Forces memory newForces = Forces(0, 0, 0, 0, 0, 0, 0, 0, 0, true);
         idToForces[id] = newForces;
         idToOwnerForces[id] = nationOwner;
+    }
+
+    function updateInfrastructureContract(address newAddress) public onlyOwner {
+        infrastructure = newAddress;
+        inf = InfrastructureContract(newAddress);
+    }
+
+    function updateResourcesContract(address newAddress) public onlyOwner {
+        resources = newAddress;
+        res = ResourcesContract(newAddress);
     }
 
     function updateSoldierCost(uint256 newPrice) public onlyOwner {
@@ -85,7 +107,10 @@ contract ForcesContract is Ownable {
     }
 
     modifier onlyCruiseMissileContract() {
-        require(msg.sender == cruiseMissile, "only callable from cruise missile contract");
+        require(
+            msg.sender == cruiseMissile,
+            "only callable from cruise missile contract"
+        );
         _;
     }
 
@@ -243,7 +268,7 @@ contract ForcesContract is Ownable {
         idToForces[id].numberOfTanks -= amount;
     }
 
-    function decreaseDefendingTankCount(uint256 amount, uint256 id)
+    function decreaseDefendingTankCountFromCruiseMissileContract(uint256 amount, uint256 id)
         public
         onlyCruiseMissileContract
     {
@@ -326,37 +351,25 @@ contract ForcesContract is Ownable {
     }
 
     function buyNukes(uint256 amount, uint256 id) public {
+        //tech 75 infra 1000 access to uranium
         require(
             idToOwnerForces[id] == msg.sender,
             "You are not the nation ruler"
         );
-        uint256 purchasePrice = nukeCost * amount;
+        require(amount == 1, "can only purchase one nuke a day");
+        uint256 techAmount = inf.getTechnologyCount(id);
+        require(techAmount >= 75, "insufficient tech");
+        uint256 infrastructureAmount = inf.getInfrastructureCount(id);
+        require(infrastructureAmount >= 1000, "insufficient infrastructure");
+        bool isUranium = res.viewUranium(id);
+        require(isUranium, "no uranium");
+        uint256 nukeCount = idToForces[id].nuclearWeapons;
+        uint256 purchasePrice = (500000 + (nukeCount * 50000));
+        uint256 cost = (purchasePrice * amount);
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice);
+        require(balance >= cost, "insufficient funds");
         idToForces[id].nuclearWeapons += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-    }
-
-    function sendNukes(
-        uint256 amount,
-        uint256 idSender,
-        uint256 idReciever
-    ) public {
-        require(
-            idToOwnerForces[idSender] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 nukeCount = idToForces[idSender].nuclearWeapons;
-        require(
-            nukeCount >= amount,
-            "You do not have enough cruise missiles to send"
-        );
-        require(
-            idToForces[idReciever].nationExists = true,
-            "Destination nation does not exist"
-        );
-        idToForces[idSender].nuclearWeapons -= amount;
-        idToForces[idReciever].nuclearWeapons += amount;
+        TreasuryContract(treasuryAddress).spendBalance(id, cost);
     }
 
     function getNukeCount(uint256 id) public view returns (uint256) {

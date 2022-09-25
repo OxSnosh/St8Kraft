@@ -204,7 +204,7 @@ contract BillsContract is Ownable {
         uint256 navyUpkeep = getNavyUpkeep(id);
         uint256 nukeCount = frc.getNukeCount(id);
         uint256 nukeUpkeep = (nukeCount * 5000);
-        uint256 cruiseMissileCount = frc.getCruiseMillileCount(id);
+        uint256 cruiseMissileCount = frc.getCruiseMissileCount(id);
         uint256 cruiseMissileUpkeep = (cruiseMissileCount * 200);
         uint256 dailyMilitaryUpkeep = soldierUpkeep +
             tankUpkeep +

@@ -28,8 +28,8 @@ contract WarContract is Ownable {
         bool defensePeaceOffered;
         uint256 offenseBlockades;
         uint256 defenseBlockades;
-        uint256 offesneCruiseMissilesLaunchesToday;
-        uint256 defenseCruiseMissilesLaunchesToday;
+        uint256 offenseCruiseMissileLaunchesToday;
+        uint256 defenseCruiseMissileLaunchesToday;
     }
 
     struct OffenseLosses {
@@ -63,13 +63,6 @@ contract WarContract is Ownable {
     mapping(uint256 => OffenseLosses) public warIdToOffenseLosses;
     mapping(uint256 => DefenseLosses) public warIdToDefenseLosses;
     mapping(uint256 => uint256[]) public idToActiveWars;
-
-    modifier onlyCruiseMissileContract() {
-        require(
-            msg.sender == cruiseMissile,
-            "function only callable from cruise missile contract"
-        );
-    }
 
     constructor(
         address _countryMinter,
@@ -109,6 +102,14 @@ contract WarContract is Ownable {
         _;
     }
 
+    modifier onlyCruiseMissileContract() {
+        require(
+            msg.sender == cruiseMissile,
+            "only callable from cruise missile contract"
+        );
+        _;
+    }
+
     function initiateNationForWar(uint256 id, address nationOwner)
         public
         onlyCountryMinter
@@ -136,6 +137,8 @@ contract WarContract is Ownable {
             false,
             false,
             false,
+            0,
+            0,
             0,
             0
         );
@@ -262,12 +265,21 @@ contract WarContract is Ownable {
         }
     }
 
-    function incrementCruiseMissileAttacks(uint256 warId, uint256 nationId)
+    function incrementCruiseMissileAttack(uint256 _warId, uint256 nationId)
         public
         onlyCruiseMissileContract
     {
-        
-
+        (uint256 offenseId, uint256 defenseId) = getInvolvedParties(warId);
+        if(nationId == offenseId) {
+            uint256 launchesToday = warIdToWar[_warId].offenseCruiseMissileLaunchesToday;
+            require(launchesToday < 2, "too many launches today");
+            warIdToWar[warId].offenseCruiseMissileLaunchesToday += 1;
+        }
+        if(nationId == defenseId) {
+            uint256 launchesToday = warIdToWar[_warId].defenseCruiseMissileLaunchesToday;
+            require(launchesToday < 2, "too many launches today");
+            warIdToWar[warId].defenseCruiseMissileLaunchesToday += 1;
+        }
     }
 
     function isWarActive(uint256 _warId) public view returns (bool) {

@@ -112,7 +112,7 @@ contract NationStrengthContract is Ownable {
         uint256 defendingTankCount = frc.getDefendingTankCount(id);
         uint256 tankStrength = (((deployedTankCount * 15) +
             (defendingTankCount * 20)) / 100);
-        uint256 cruiseMissileCount = frc.getCruiseMillileCount(id);
+        uint256 cruiseMissileCount = frc.getCruiseMissileCount(id);
         uint256 cruiseMissileStrength = ((cruiseMissileCount * 10));
         uint256 nukeCount = frc.getNukeCount(id);
         uint256 nukeStrength = ((nukeCount**2) * 10);
