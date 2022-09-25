@@ -11,6 +11,7 @@ contract WarContract is Ownable {
     address public nationStrength;
     address public military;
     address public navyBattleAddress;
+    address public cruiseMissile;
     uint256[] public activeWars;
 
     NationStrengthContract nsc;
@@ -27,6 +28,8 @@ contract WarContract is Ownable {
         bool defensePeaceOffered;
         uint256 offenseBlockades;
         uint256 defenseBlockades;
+        uint256 offesneCruiseMissilesLaunchesToday;
+        uint256 defenseCruiseMissilesLaunchesToday;
     }
 
     struct OffenseLosses {
@@ -61,11 +64,19 @@ contract WarContract is Ownable {
     mapping(uint256 => DefenseLosses) public warIdToDefenseLosses;
     mapping(uint256 => uint256[]) public idToActiveWars;
 
+    modifier onlyCruiseMissileContract() {
+        require(
+            msg.sender == cruiseMissile,
+            "function only callable from cruise missile contract"
+        );
+    }
+
     constructor(
         address _countryMinter,
         address _nationStrength,
         address _military,
-        address _navyBattleAddress
+        address _navyBattleAddress,
+        address _cruiseMissile
     ) {
         countryMinter = _countryMinter;
         nationStrength = _nationStrength;
@@ -73,6 +84,7 @@ contract WarContract is Ownable {
         nsc = NationStrengthContract(_nationStrength);
         military = _military;
         mil = MilitaryContract(_military);
+        cruiseMissile = _cruiseMissile;
     }
 
     function updateCountryMinterContract(address newAddress) public onlyOwner {
@@ -242,12 +254,20 @@ contract WarContract is Ownable {
         uint256 navyCasualties
     ) public onlyNavyBattle {
         (uint256 offenseId, uint256 defenseId) = getInvolvedParties(_warId);
-        if(offenseId == nationId) {
+        if (offenseId == nationId) {
             warIdToOffenseLosses[_warId].navyLost = navyCasualties;
         }
-        if(defenseId == nationId) {
+        if (defenseId == nationId) {
             warIdToDefenseLosses[_warId].navyLost = navyCasualties;
         }
+    }
+
+    function incrementCruiseMissileAttacks(uint256 warId, uint256 nationId)
+        public
+        onlyCruiseMissileContract
+    {
+        
+
     }
 
     function isWarActive(uint256 _warId) public view returns (bool) {

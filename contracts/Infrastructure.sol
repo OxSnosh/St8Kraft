@@ -23,6 +23,7 @@ contract InfrastructureContract is Ownable {
     address public parameters;
     address public spyAddress;
     address public taxes;
+    address public cruiseMissile;
 
     struct Infrastructure {
         uint256 landArea;
@@ -66,9 +67,14 @@ contract InfrastructureContract is Ownable {
         aid = _aid;
     }
 
-    function constructorContinued(address _spyAddress, address _tax) public onlyOwner {
+    function constructorContinued(
+        address _spyAddress,
+        address _tax,
+        address _cruiseMissile
+    ) public onlyOwner {
         spyAddress = _spyAddress;
         taxes = _tax;
+        cruiseMissile = _cruiseMissile;
     }
 
     modifier onlySpyContract() {
@@ -83,6 +89,14 @@ contract InfrastructureContract is Ownable {
         require(
             msg.sender == taxes,
             "only tax contract can call this function"
+        );
+        _;
+    }
+
+    modifier onlyCruiseMissileContract() {
+        require(
+            msg.sender == cruiseMissile,
+            "only callable from cruise missile contract"
         );
         _;
     }
@@ -446,6 +460,13 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[countryId].technologyCount -= amount;
     }
 
+    function decreaseTechCountFromCruiseMissileContract(uint256 countryId, uint256 amount)
+        public
+        onlyCruiseMissileContract
+    {
+        idToInfrastructure[countryId].technologyCount -= amount;
+    }
+
     function increaseTechCount(uint256 countryId, uint256 amount)
         public
         onlySpyContract
@@ -466,6 +487,13 @@ contract InfrastructureContract is Ownable {
     function decreaseInfrastructureCount(uint256 countryId, uint256 amount)
         public
         onlySpyContract
+    {
+        idToInfrastructure[countryId].infrastructureCount -= amount;
+    }
+
+    function decreaseInfrastructureCountFromCruiseMissileContract(uint256 countryId, uint256 amount)
+        public
+        onlyCruiseMissileContract
     {
         idToInfrastructure[countryId].infrastructureCount -= amount;
     }
@@ -506,12 +534,20 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[id].collectionNeededToChangeRate = true;
     }
 
-    function toggleCollectionNeededToChangeRate(uint256 id) public onlyTaxesContract {
+    function toggleCollectionNeededToChangeRate(uint256 id)
+        public
+        onlyTaxesContract
+    {
         idToInfrastructure[id].collectionNeededToChangeRate = false;
     }
 
-    function checkIfCollectionNeededToChangeRate(uint256 id) public view returns (bool) {
-        bool collectionNeeded = idToInfrastructure[id].collectionNeededToChangeRate;
+    function checkIfCollectionNeededToChangeRate(uint256 id)
+        public
+        view
+        returns (bool)
+    {
+        bool collectionNeeded = idToInfrastructure[id]
+            .collectionNeededToChangeRate;
         return collectionNeeded;
     }
 

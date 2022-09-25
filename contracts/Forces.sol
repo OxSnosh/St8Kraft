@@ -13,6 +13,7 @@ contract ForcesContract is Ownable {
     address public treasuryAddress;
     address public aid;
     address public spyAddress;
+    address public cruiseMissile;
 
     struct Forces {
         uint256 numberOfSoldiers;
@@ -27,13 +28,19 @@ contract ForcesContract is Ownable {
         bool nationExists;
     }
 
-    constructor(address _treasuryAddress, address _aid, address _spyAddress) {
+    constructor(
+        address _treasuryAddress,
+        address _aid,
+        address _spyAddress,
+        address _cruiseMissile
+    ) {
         treasuryAddress = _treasuryAddress;
         spyAddress = _spyAddress;
+        cruiseMissile = _cruiseMissile;
         aid = _aid;
         soldierCost = 100;
         tankCost = 200;
-        cruiseMissileCost = 300;
+        cruiseMissileCost = 20000;
         nukeCost = 400;
         spyCost = 500;
     }
@@ -72,8 +79,13 @@ contract ForcesContract is Ownable {
         _;
     }
 
-    modifier onlySpyContract {
-        require (msg.sender == spyAddress, "only callable from spy contract");
+    modifier onlySpyContract() {
+        require(msg.sender == spyAddress, "only callable from spy contract");
+        _;
+    }
+
+    modifier onlyCruiseMissileContract() {
+        require(msg.sender == cruiseMissile, "only callable from cruise missile contract");
         _;
     }
 
@@ -223,7 +235,18 @@ contract ForcesContract is Ownable {
         idToForces[id].deployedTanks -= amountToWithdraw;
     }
 
-    function decreaseDefendingTankCount(uint256 amount, uint256 id) public onlySpyContract {
+    function decreaseDefendingTankCount(uint256 amount, uint256 id)
+        public
+        onlySpyContract
+    {
+        idToForces[id].defendingTanks -= amount;
+        idToForces[id].numberOfTanks -= amount;
+    }
+
+    function decreaseDefendingTankCount(uint256 amount, uint256 id)
+        public
+        onlyCruiseMissileContract
+    {
         idToForces[id].defendingTanks -= amount;
         idToForces[id].numberOfTanks -= amount;
     }
@@ -238,12 +261,20 @@ contract ForcesContract is Ownable {
         return tankAmount;
     }
 
-    function getDeployedTankCount(uint256 id) public view returns (uint256 tanks) {
+    function getDeployedTankCount(uint256 id)
+        public
+        view
+        returns (uint256 tanks)
+    {
         uint256 tankAmount = idToForces[id].deployedTanks;
         return tankAmount;
     }
 
-    function getDefendingTankCount(uint256 id) public view returns (uint256 tanks) {
+    function getDefendingTankCount(uint256 id)
+        public
+        view
+        returns (uint256 tanks)
+    {
         uint256 tankAmount = idToForces[id].defendingTanks;
         return tankAmount;
     }
@@ -282,12 +313,15 @@ contract ForcesContract is Ownable {
         idToForces[idReciever].cruiseMissiles += amount;
     }
 
-    function getCruiseMillileCount(uint256 id) public view returns (uint256) {
+    function getCruiseMissileCount(uint256 id) public view returns (uint256) {
         uint256 count = idToForces[id].cruiseMissiles;
         return count;
     }
 
-    function decreaseCruiseMissileCount(uint256 amount, uint256 id) public onlySpyContract {
+    function decreaseCruiseMissileCount(uint256 amount, uint256 id)
+        public
+        onlySpyContract
+    {
         idToForces[id].cruiseMissiles -= amount;
     }
 
@@ -330,7 +364,10 @@ contract ForcesContract is Ownable {
         return count;
     }
 
-    function decreaseNukeCountFromSpyContract(uint256 id) public onlySpyContract {
+    function decreaseNukeCountFromSpyContract(uint256 id)
+        public
+        onlySpyContract
+    {
         idToForces[id].nuclearWeapons -= 1;
     }
 
@@ -375,7 +412,10 @@ contract ForcesContract is Ownable {
         idToForces[id].numberOfSpies -= 1;
     }
 
-    function decreaseDefenderSpyCount(uint256 amount, uint256 id) public onlySpyContract {
+    function decreaseDefenderSpyCount(uint256 amount, uint256 id)
+        public
+        onlySpyContract
+    {
         idToForces[id].numberOfSpies -= amount;
     }
 
