@@ -381,6 +381,312 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         airBattleIdToAttackerFighterCumulativeOdds[battleId] = cumulativeSum;
     }
 
+    function generateAttackerBomberChanceArray(uint256 battleId) internal {
+        uint256[] storage chances = airBattleIdToAttackerBomberChanceArray[
+            battleId
+        ];
+        uint256[] storage types = airBattleIdToAttackerBomberTypeArray[
+            battleId
+        ];
+        uint256 cumulativeSum;
+        //ah1CobraCount,
+        if (airBattleIdToAttackerBombers[battleId].ah1CobraCount > 0) {
+            uint256 ah1Odds = ((
+                airBattleIdToAttackerBombers[battleId].ah1CobraCount
+            ) * (10 - ah1CobraStrength));
+            chances.push(ah1Odds);
+            types.push(1);
+            cumulativeSum = ah1Odds;
+        }
+        //ah64ApacheCount,
+        if (airBattleIdToAttackerBombers[battleId].ah64ApacheCount > 0) {
+            uint256 ah64Odds = ((
+                airBattleIdToAttackerBombers[battleId].ah64ApacheCount
+            ) * (10 - ah64ApacheStrength));
+            uint256 ah64OddsToPush = (cumulativeSum + ah64Odds);
+            chances.push(ah64OddsToPush);
+            types.push(2);
+            cumulativeSum = ah64OddsToPush;
+        }
+        //bristolBlenheimCount,
+        if (airBattleIdToAttackerBombers[battleId].bristolBlenheimCount > 0) {
+            uint256 bristolOdds = ((
+                airBattleIdToAttackerBombers[battleId].bristolBlenheimCount
+            ) * (10 - bristolBlenheimStrength));
+            uint256 bristolOddsToPush = (cumulativeSum + bristolOdds);
+            chances.push(bristolOddsToPush);
+            types.push(3);
+            cumulativeSum = bristolOddsToPush;
+        }
+        //b52MitchellCount,
+        if (airBattleIdToAttackerBombers[battleId].b52MitchellCount > 0) {
+            uint256 b52MOdds = ((
+                airBattleIdToAttackerBombers[battleId].b52MitchellCount
+            ) * (10 - b52MitchellStrength));
+            uint256 b52MOddsToPush = (cumulativeSum + b52MOdds);
+            chances.push(b52MOddsToPush);
+            types.push(4);
+            cumulativeSum = b52MOddsToPush;
+        }
+        //b17gFlyingFortressCount,
+        if (airBattleIdToAttackerBombers[battleId].b17gFlyingFortressCount > 0) {
+            uint256 b17Odds = ((
+                airBattleIdToAttackerBombers[battleId].b17gFlyingFortressCount
+            ) * (10 - b17gFlyingFortressStrength));
+            uint256 b17OddsToPush = (cumulativeSum + b17Odds);
+            chances.push(b17OddsToPush);
+            types.push(5);
+            cumulativeSum = b17OddsToPush;
+        }
+        //b52StratofortressCount,
+        if (airBattleIdToAttackerBombers[battleId].b52StratofortressCount > 0) {
+            uint256 b52SOdds = ((
+                airBattleIdToAttackerBombers[battleId].b52StratofortressCount
+            ) * (10 - b52StratofortressStrength));
+            uint256 b52SOddsToPush = (cumulativeSum + b52SOdds);
+            chances.push(b52SOddsToPush);
+            types.push(6);
+            cumulativeSum = b52SOddsToPush;
+        }
+        //b2SpiritCount,
+        if (airBattleIdToAttackerBombers[battleId].b2SpiritCount > 0) {
+            uint256 b2SOdds = ((
+                airBattleIdToAttackerBombers[battleId].b2SpiritCount
+            ) * (10 - b2SpiritStrength));
+            uint256 b2SOddsToPush = (cumulativeSum + b2SOdds);
+            chances.push(b2SOddsToPush);
+            types.push(7);
+            cumulativeSum = b2SOddsToPush;
+        }
+        //b1bLancerCount,
+        if (airBattleIdToAttackerBombers[battleId].b1bLancerCount > 0) {
+            uint256 b1bOdds = ((
+                airBattleIdToAttackerBombers[battleId].b1bLancerCount
+            ) * (10 - b1bLancerStrength));
+            uint256 b1bOddsToPush = (cumulativeSum + b1bOdds);
+            chances.push(b1bOddsToPush);
+            types.push(8);
+            cumulativeSum = b1bOddsToPush;
+        }
+        //tupolevTu160Count,
+        if (airBattleIdToAttackerBombers[battleId].tupolevTu160Count > 0) {
+            uint256 tupolevOdds = ((
+                airBattleIdToAttackerBombers[battleId].tupolevTu160Count
+            ) * (10 - tupolevTu160Strength));
+            uint256 tupolevOddsToPush = (cumulativeSum + tupolevOdds);
+            chances.push(tupolevOddsToPush);
+            types.push(9);
+            cumulativeSum = tupolevOddsToPush;
+        }
+        airBattleIdToAttackerBomberChanceArray[battleId] = chances;
+        airBattleIdToAttackerBomberTypeArray[battleId] = types;
+        airBattleIdToAttackerBomberCumulativeOdds[battleId] = cumulativeSum;
+    }
+
+    function generateDefenderFighterChanceArray(uint256 battleId) internal {
+        uint256[] storage chances = airBattleIdToDefenderFighterChanceArray[
+            battleId
+        ];
+        uint256[] storage types = airBattleIdToDefenderFighterTypeArray[
+            battleId
+        ];
+        uint256 cumulativeSum;
+        //yak9Count,
+        if (airBattleIdToDefenderFighters[battleId].yak9Count > 0) {
+            uint256 yak9Odds = ((
+                airBattleIdToDefenderFighters[battleId].yak9Count
+            ) * (10 - yak9Strength));
+            chances.push(yak9Odds);
+            types.push(1);
+            cumulativeSum = yak9Odds;
+        }
+        //p51MustangCount,
+        if (airBattleIdToDefenderFighters[battleId].p51MustangCount > 0) {
+            uint256 p51Odds = ((
+                airBattleIdToDefenderFighters[battleId].p51MustangCount
+            ) * (10 - p51MustangStrength));
+            uint256 p51OddsToPush = (cumulativeSum + p51Odds);
+            chances.push(p51OddsToPush);
+            types.push(2);
+            cumulativeSum = p51OddsToPush;
+        }
+        //f86SabreCount,
+        if (airBattleIdToDefenderFighters[battleId].f86SabreCount > 0) {
+            uint256 f86Odds = ((
+                airBattleIdToDefenderFighters[battleId].f86SabreCount
+            ) * (10 - f86SabreStrength));
+            uint256 f86OddsToPush = (cumulativeSum + f86Odds);
+            chances.push(f86OddsToPush);
+            types.push(3);
+            cumulativeSum = f86OddsToPush;
+        }
+        //mig15Count,
+        if (airBattleIdToDefenderFighters[battleId].mig15Count > 0) {
+            uint256 mig15Odds = ((
+                airBattleIdToDefenderFighters[battleId].mig15Count
+            ) * (10 - mig15Strength));
+            uint256 mig15OddsToPush = (cumulativeSum + mig15Odds);
+            chances.push(mig15OddsToPush);
+            types.push(4);
+            cumulativeSum = mig15OddsToPush;
+        }
+        //f100SuperSabreCount,
+        if (airBattleIdToDefenderFighters[battleId].f100SuperSabreCount > 0) {
+            uint256 f100Odds = ((
+                airBattleIdToDefenderFighters[battleId].f100SuperSabreCount
+            ) * (10 - f100SuperSabreStrength));
+            uint256 f100OddsToPush = (cumulativeSum + f100Odds);
+            chances.push(f100OddsToPush);
+            types.push(5);
+            cumulativeSum = f100OddsToPush;
+        }
+        //f35LightningCount,
+        if (airBattleIdToDefenderFighters[battleId].f35LightningCount > 0) {
+            uint256 f35Odds = ((
+                airBattleIdToDefenderFighters[battleId].f35LightningCount
+            ) * (10 - f35LightningStrength));
+            uint256 f35OddsToPush = (cumulativeSum + f35Odds);
+            chances.push(f35OddsToPush);
+            types.push(6);
+            cumulativeSum = f35OddsToPush;
+        }
+        //f15EagleCount,
+        if (airBattleIdToDefenderFighters[battleId].f15EagleCount > 0) {
+            uint256 f15Odds = ((
+                airBattleIdToDefenderFighters[battleId].f15EagleCount
+            ) * (10 - f15EagleStrength));
+            uint256 f15OddsToPush = (cumulativeSum + f15Odds);
+            chances.push(f15OddsToPush);
+            types.push(7);
+            cumulativeSum = f15OddsToPush;
+        }
+        //su30MkiCount,
+        if (airBattleIdToDefenderFighters[battleId].su30MkiCount > 0) {
+            uint256 su30Odds = ((
+                airBattleIdToDefenderFighters[battleId].su30MkiCount
+            ) * (10 - su30MkiStrength));
+            uint256 su30OddsToPush = (cumulativeSum + su30Odds);
+            chances.push(su30OddsToPush);
+            types.push(8);
+            cumulativeSum = su30OddsToPush;
+        }
+        //f22RaptorCount,
+        if (airBattleIdToDefenderFighters[battleId].f22RaptorCount > 0) {
+            uint256 f22Odds = ((
+                airBattleIdToDefenderFighters[battleId].f22RaptorCount
+            ) * (10 - f22RaptorStrength));
+            uint256 f22OddsToPush = (cumulativeSum + f22Odds);
+            chances.push(f22OddsToPush);
+            types.push(9);
+            cumulativeSum = f22OddsToPush;
+        }
+        airBattleIdToDefenderFighterChanceArray[battleId] = chances;
+        airBattleIdToDefenderFighterTypeArray[battleId] = types;
+        airBattleIdToDefenderFighterCumulativeOdds[battleId] = cumulativeSum;
+    }
+
+    function generateDefenderBomberChanceArray(uint256 battleId) internal {
+        uint256[] storage chances = airBattleIdToDefenderBomberChanceArray[
+            battleId
+        ];
+        uint256[] storage types = airBattleIdToDefenderBomberTypeArray[
+            battleId
+        ];
+        uint256 cumulativeSum;
+        //ah1CobraCount,
+        if (airBattleIdToDefenderBombers[battleId].ah1CobraCount > 0) {
+            uint256 ah1Odds = ((
+                airBattleIdToDefenderBombers[battleId].ah1CobraCount
+            ) * (10 - ah1CobraStrength));
+            chances.push(ah1Odds);
+            types.push(1);
+            cumulativeSum = ah1Odds;
+        }
+        //ah64ApacheCount,
+        if (airBattleIdToDefenderBombers[battleId].ah64ApacheCount > 0) {
+            uint256 ah64Odds = ((
+                airBattleIdToDefenderBombers[battleId].ah64ApacheCount
+            ) * (10 - ah64ApacheStrength));
+            uint256 ah64OddsToPush = (cumulativeSum + ah64Odds);
+            chances.push(ah64OddsToPush);
+            types.push(2);
+            cumulativeSum = ah64OddsToPush;
+        }
+        //bristolBlenheimCount,
+        if (airBattleIdToDefenderBombers[battleId].bristolBlenheimCount > 0) {
+            uint256 bristolOdds = ((
+                airBattleIdToDefenderBombers[battleId].bristolBlenheimCount
+            ) * (10 - bristolBlenheimStrength));
+            uint256 bristolOddsToPush = (cumulativeSum + bristolOdds);
+            chances.push(bristolOddsToPush);
+            types.push(3);
+            cumulativeSum = bristolOddsToPush;
+        }
+        //b52MitchellCount,
+        if (airBattleIdToDefenderBombers[battleId].b52MitchellCount > 0) {
+            uint256 b52MOdds = ((
+                airBattleIdToDefenderBombers[battleId].b52MitchellCount
+            ) * (10 - b52MitchellStrength));
+            uint256 b52MOddsToPush = (cumulativeSum + b52MOdds);
+            chances.push(b52MOddsToPush);
+            types.push(4);
+            cumulativeSum = b52MOddsToPush;
+        }
+        //b17gFlyingFortressCount,
+        if (airBattleIdToDefenderBombers[battleId].b17gFlyingFortressCount > 0) {
+            uint256 b17Odds = ((
+                airBattleIdToDefenderBombers[battleId].b17gFlyingFortressCount
+            ) * (10 - b17gFlyingFortressStrength));
+            uint256 b17OddsToPush = (cumulativeSum + b17Odds);
+            chances.push(b17OddsToPush);
+            types.push(5);
+            cumulativeSum = b17OddsToPush;
+        }
+        //b52StratofortressCount,
+        if (airBattleIdToDefenderBombers[battleId].b52StratofortressCount > 0) {
+            uint256 b52SOdds = ((
+                airBattleIdToDefenderBombers[battleId].b52StratofortressCount
+            ) * (10 - b52StratofortressStrength));
+            uint256 b52SOddsToPush = (cumulativeSum + b52SOdds);
+            chances.push(b52SOddsToPush);
+            types.push(6);
+            cumulativeSum = b52SOddsToPush;
+        }
+        //b2SpiritCount,
+        if (airBattleIdToDefenderBombers[battleId].b2SpiritCount > 0) {
+            uint256 b2SOdds = ((
+                airBattleIdToDefenderBombers[battleId].b2SpiritCount
+            ) * (10 - b2SpiritStrength));
+            uint256 b2SOddsToPush = (cumulativeSum + b2SOdds);
+            chances.push(b2SOddsToPush);
+            types.push(7);
+            cumulativeSum = b2SOddsToPush;
+        }
+        //b1bLancerCount,
+        if (airBattleIdToDefenderBombers[battleId].b1bLancerCount > 0) {
+            uint256 b1bOdds = ((
+                airBattleIdToDefenderBombers[battleId].b1bLancerCount
+            ) * (10 - b1bLancerStrength));
+            uint256 b1bOddsToPush = (cumulativeSum + b1bOdds);
+            chances.push(b1bOddsToPush);
+            types.push(8);
+            cumulativeSum = b1bOddsToPush;
+        }
+        //tupolevTu160Count,
+        if (airBattleIdToDefenderBombers[battleId].tupolevTu160Count > 0) {
+            uint256 tupolevOdds = ((
+                airBattleIdToDefenderBombers[battleId].tupolevTu160Count
+            ) * (10 - tupolevTu160Strength));
+            uint256 tupolevOddsToPush = (cumulativeSum + tupolevOdds);
+            chances.push(tupolevOddsToPush);
+            types.push(9);
+            cumulativeSum = tupolevOddsToPush;
+        }
+        airBattleIdToDefenderBomberChanceArray[battleId] = chances;
+        airBattleIdToDefenderBomberTypeArray[battleId] = types;
+        airBattleIdToDefenderBomberCumulativeOdds[battleId] = cumulativeSum;
+    }
+
     function fulfillRequest(uint256 battleId) public {
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
