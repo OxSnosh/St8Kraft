@@ -48,6 +48,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 f15EagleCount;
         uint256 su30MkiCount;
         uint256 f22RaptorCount;
+        uint256 strength;
         uint256 countryId;
         uint256 warId;
     }
@@ -62,6 +63,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 b2SpiritCount;
         uint256 b1bLancerCount;
         uint256 tupolevTu160Count;
+        uint256 strength;
         uint256 countryId;
         uint256 warId;
     }
@@ -139,6 +141,9 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         generateDefenderFighterStruct(warId, airBattleId, defenderId);
         generateDefenderBomberStruct(warId, airBattleId, defenderId);
         generateAttackerFighterChanceArray(airBattleId);
+        generateAttackerBomberChanceArray(airBattleId);
+        generateDefenderFighterChanceArray(airBattleId);
+        generateDefenderBomberChanceArray(airBattleId);
         fulfillRequest(airBattleId);
         airBattleId++;
     }
@@ -159,6 +164,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 f15EagleCount = fighter.getF15EagleCount(attackerId);
         uint256 su30MkiCount = fighter.getSu30MkiCount(attackerId);
         uint256 f22RaptorCount = fighter.getF22RaptorCount(attackerId);
+        uint256 attackerFighterStrength = getAttackerFighterStrength(battleId);
         FightersToBattle memory newFighters = FightersToBattle(
             yak9Count,
             p51MustangCount,
@@ -169,6 +175,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
             f15EagleCount,
             su30MkiCount,
             f22RaptorCount,
+            attackerFighterStrength,
             attackerId,
             warId
         );
@@ -195,6 +202,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 b2SpiritCount = bomber.getB2SpiritCount(attackerId);
         uint256 b1bLancerCount = bomber.getB1bLancer(attackerId);
         uint256 tupolevTu160Count = bomber.getTupolevTu160(attackerId);
+        uint256 attackerBomberStrength = getAttackerBomberStrength(battleId);
         BombersToBattle memory newBombers = BombersToBattle(
             ah1CobraCount,
             ah64ApacheCount,
@@ -205,6 +213,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
             b2SpiritCount,
             b1bLancerCount,
             tupolevTu160Count,
+            attackerBomberStrength,
             attackerId,
             warId
         );
@@ -227,6 +236,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 f15EagleCount = fighter.getF15EagleCount(defenderId);
         uint256 su30MkiCount = fighter.getSu30MkiCount(defenderId);
         uint256 f22RaptorCount = fighter.getF22RaptorCount(defenderId);
+        uint256 defenderFighterStrength = getDefenderFighterStrength(battleId);
         FightersToBattle memory newFighters = FightersToBattle(
             yak9Count,
             p51MustangCount,
@@ -237,6 +247,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
             f15EagleCount,
             su30MkiCount,
             f22RaptorCount,
+            defenderFighterStrength,
             defenderId,
             warId
         );
@@ -263,6 +274,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 b2SpiritCount = bomber.getB2SpiritCount(defenderId);
         uint256 b1bLancerCount = bomber.getB1bLancer(defenderId);
         uint256 tupolevTu160Count = bomber.getTupolevTu160(defenderId);
+        uint256 defenderBomberStrength = getDefenderBomberStrength(battleId);
         BombersToBattle memory newBombers = BombersToBattle(
             ah1CobraCount,
             ah64ApacheCount,
@@ -273,6 +285,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
             b2SpiritCount,
             b1bLancerCount,
             tupolevTu160Count,
+            defenderBomberStrength,
             defenderId,
             warId
         );
@@ -429,7 +442,9 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
             cumulativeSum = b52MOddsToPush;
         }
         //b17gFlyingFortressCount,
-        if (airBattleIdToAttackerBombers[battleId].b17gFlyingFortressCount > 0) {
+        if (
+            airBattleIdToAttackerBombers[battleId].b17gFlyingFortressCount > 0
+        ) {
             uint256 b17Odds = ((
                 airBattleIdToAttackerBombers[battleId].b17gFlyingFortressCount
             ) * (10 - b17gFlyingFortressStrength));
@@ -633,7 +648,9 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
             cumulativeSum = b52MOddsToPush;
         }
         //b17gFlyingFortressCount,
-        if (airBattleIdToDefenderBombers[battleId].b17gFlyingFortressCount > 0) {
+        if (
+            airBattleIdToDefenderBombers[battleId].b17gFlyingFortressCount > 0
+        ) {
             uint256 b17Odds = ((
                 airBattleIdToDefenderBombers[battleId].b17gFlyingFortressCount
             ) * (10 - b17gFlyingFortressStrength));
@@ -686,6 +703,52 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         airBattleIdToDefenderBomberTypeArray[battleId] = types;
         airBattleIdToDefenderBomberCumulativeOdds[battleId] = cumulativeSum;
     }
+
+    function getAttackerFighterStrength(uint256 battleId)
+        internal
+        view
+        returns (uint256)
+    {
+        uint256 _yak9Strength = airBattleIdToAttackerFighters[battleId].yak9Count * yak9Strength;
+        uint256 _p51MustangStrength = airBattleIdToAttackerFighters[battleId].p51MustangCount * p51MustangStrength;
+        uint256 _f86SabreStrength = airBattleIdToAttackerFighters[battleId].f86SabreCount * f86SabreStrength;
+        uint256 _mig15Strength = airBattleIdToAttackerFighters[battleId].mig15Count * mig15Strength;
+        uint256 _f100SuperSabreStrength = airBattleIdToAttackerFighters[battleId].f100SuperSabreCount * f100SuperSabreStrength;
+        uint256 _f35LightningStrength = airBattleIdToAttackerFighters[battleId].f35LightningCount * f35LightningStrength;
+        uint256 _f15EagleStrength = airBattleIdToAttackerFighters[battleId].f15EagleCount * f15EagleStrength;
+        uint256 _su30MkiStrength = airBattleIdToAttackerFighters[battleId].su30MkiCount * su30MkiStrength;
+        uint256 _f22RaptorStrength = airBattleIdToAttackerFighters[battleId].f22RaptorCount * f22RaptorStrength;
+        uint256 strength = (
+            _yak9Strength +
+            _p51MustangStrength +
+            _f86SabreStrength +
+            _mig15Strength + 
+            _f100SuperSabreStrength +
+            _f35LightningStrength +
+            _f15EagleStrength +
+            _su30MkiStrength +
+            _f22RaptorStrength
+        );
+        return strength;
+    }
+
+    function getAttackerBomberStrength(uint256 battleId)
+        internal
+        view
+        returns (uint256)
+    {}
+
+    function getDefenderFighterStrength(uint256 battleId)
+        internal
+        view
+        returns (uint256)
+    {}
+
+    function getDefenderBomberStrength(uint256 battleId)
+        internal
+        view
+        returns (uint256)
+    {}
 
     function fulfillRequest(uint256 battleId) public {
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
