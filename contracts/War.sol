@@ -307,4 +307,9 @@ contract WarContract is Ownable {
         }
         return peaceOffered;
     }
+
+    function getDaysLeft(uint256 _warId) public view returns (uint256) {
+        uint256 daysLeft = warIdToWar[_warId].daysLeft;
+        return daysLeft;
+    }
 }

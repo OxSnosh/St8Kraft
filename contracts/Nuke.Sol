@@ -1,12 +1,192 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.7;
 
+import "./CountryMinter.sol";
+import "./War.sol";
+import "./Wonders.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
-contract NukeContract is Ownable {
+contract NukeContract is Ownable, VRFConsumerBaseV2 {
+    uint256 nukeAttackId;
+    address countryMinter;
+    address warAddress;
+    address wonders1;
 
+    //Chainlik Variables
+    uint256[] private s_randomWords;
+    VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
+    uint64 private immutable i_subscriptionId;
+    bytes32 private immutable i_gasLane;
+    uint32 private immutable i_callbackGasLimit;
+    uint16 private constant REQUEST_CONFIRMATIONS = 3;
+    uint32 private constant NUM_WORDS = 1;
 
-    
+    CountryMinter mint;
+    WarContract war;
+    WondersContract1 won1;
+
+    struct NukeAttack {
+        uint256 warId;
+        uint256 attackerId;
+        uint256 defenderId;
+        uint256 attackType;
+    }
+
+    mapping(uint256 => NukeAttack) nukeAttackIdToNukeAttack;
+    mapping(uint256 => uint256) s_requestIdToRequestIndex;
+    mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
+
+    constructor(
+        address _countryMinter,
+        address _warAddress,
+        address _wonders1,
+        address vrfCoordinatorV2,
+        uint64 subscriptionId,
+        bytes32 gasLane, // keyHash
+        uint32 callbackGasLimit
+    ) VRFConsumerBaseV2(vrfCoordinatorV2) {
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
+        warAddress = _warAddress;
+        war = WarContract(_warAddress);
+        wonders1 = _wonders1;
+        won1 = WondersContract1(_wonders1);
+        i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
+        i_gasLane = gasLane;
+        i_subscriptionId = subscriptionId;
+        i_callbackGasLimit = callbackGasLimit;
+    }
+
+    function updateCountryMinterContract(address newAddress) public onlyOwner {
+        countryMinter = newAddress;
+        mint = CountryMinter(newAddress);
+    }
+
+    function updateWarContract(address newAddress) public onlyOwner {
+        warAddress = newAddress;
+        war = WarContract(newAddress);
+    }
+
+    function updateWonders1Contract(address newAddress) public onlyOwner {
+        wonders1 = newAddress;
+        won1 = WondersContract1(newAddress);
+    }
+
+    function launchNuke(
+        uint256 warId,
+        uint256 attackerId,
+        uint256 defenderId,
+        uint256 attackType
+    ) public {
+        bool isOwner = mint.checkOwnership(attackerId, msg.sender);
+        require(isOwner, "!nation owner");
+        bool isActive = war.isWarActive(warId);
+        require(isActive, "war not active");
+        (uint256 offenseId, uint256 defenseId) = war.getInvolvedParties(warId);
+        require(
+            attackerId == offenseId || attackerId == defenseId,
+            "attacker not involved in this war"
+        );
+        require(
+            defenderId == offenseId || defenderId == defenseId,
+            "defender not involved in this war"
+        );
+        uint256 daysLeft = war.getDaysLeft(warId);
+        require(daysLeft < 6, "not at war long enough to launch a nuke");
+        bool emp = won1.getEmpWeaponization(attackerId);
+        if (!emp) {
+            require(
+                attackType == 1,
+                "can only launch a standard attack without emp"
+            );
+        } else {
+            require(attackType <= 4, "invalid attack type");
+        }
+        NukeAttack memory newAttack = NukeAttack(
+            warId,
+            attackerId,
+            defenderId,
+            attackType
+        );
+        nukeAttackIdToNukeAttack[nukeAttackId] = newAttack;
+        fulfillRequest(nukeAttackId);
+        nukeAttackId++;
+    }
+
+    function fulfillRequest(uint256 id) public {
+        uint256 requestId = i_vrfCoordinator.requestRandomWords(
+            i_gasLane,
+            i_subscriptionId,
+            REQUEST_CONFIRMATIONS,
+            i_callbackGasLimit,
+            NUM_WORDS
+        );
+        s_requestIdToRequestIndex[requestId] = id;
+    }
+
+    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords)
+        internal
+        override
+    {
+        uint256 requestNumber = s_requestIdToRequestIndex[requestId];
+        s_requestIndexToRandomWords[requestNumber] = randomWords;
+        s_randomWords = randomWords;
+        uint256 randomNukeSuccessNumber = ((s_randomWords[0] % 100) + 1);
+        if (randomNukeSuccessNumber < 60) {
+            //nuke attack thwarted
+        } else {
+            inflictNukeDamage(requestNumber);
+        }
+    }
+
+    function inflictNukeDamage(uint256 attackId) internal {
+        uint256 attackTpye = nukeAttackIdToNukeAttack[attackId].attackType;
+        if (attackType == 1) {
+            standardAttack(attackId);
+        } else if (attackType == 2) {
+            infrastructureAttack(attackId);
+        } else if (attackType == 3) {
+            landAttack(attackId);
+        } else {
+            technologyAttack(attackId);
+        }
+    }
+
+    function standardAttack(uint256 attackId) internal {
+        uint256 defenderId = nukeAttackIdToNukeAttack[attackId].defenderId;
+        force.decreaseDefendingSoldierCountFromNukeAttack(defenderId);
+        force.decreaseDefendingTankCountFromNukeContract(defenderId);
+        inf.decreaseLandFromNukeContract(defenderId);
+        inf.decreaseInfrastructureCountFromNukeContract(defenderId);
+        inf.decreaseTechCountFromNukeContract(defenderId);
+    }
+
+    function infrastructureAttack(uint256 attackId) internal {
+        uint256 defenderId = nukeAttackIdToNukeAttack[attackId].defenderId;
+        force.decreaseDefendingSoldierCountFromNukeAttack(defenderId);
+        force.decreaseDefendingTankCountFromNukeContract(defenderId);
+        inf.decreaseLandFromNukeContract(defenderId);
+        inf.decreaseInfrastructureCountFromNukeContract(defenderId);
+        inf.decreaseTechCountFromNukeContract(defenderId);
+    }
+
+    function landAttack(uint256 attackId) internal {
+        uint256 defenderId = nukeAttackIdToNukeAttack[attackId].defenderId;
+        force.decreaseDefendingSoldierCountFromNukeAttack(defenderId);
+        force.decreaseDefendingTankCountFromNukeContract(defenderId);
+        inf.decreaseLandFromNukeContract(defenderId);
+        inf.decreaseInfrastructureCountFromNukeContract(defenderId);
+        inf.decreaseTechCountFromNukeContract(defenderId);
+    }
+
+    function technologyAttack(uint256 attackId) internal {
+        uint256 defenderId = nukeAttackIdToNukeAttack[attackId].defenderId;
+        force.decreaseDefendingSoldierCountFromNukeAttack(defenderId);
+        force.decreaseDefendingTankCountFromNukeContract(defenderId);
+        inf.decreaseLandFromNukeContract(defenderId);
+        inf.decreaseInfrastructureCountFromNukeContract(defenderId);
+        inf.decreaseTechCountFromNukeContract(defenderId);
+    }
 }

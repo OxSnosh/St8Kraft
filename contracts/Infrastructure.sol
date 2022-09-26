@@ -24,6 +24,7 @@ contract InfrastructureContract is Ownable {
     address public spyAddress;
     address public taxes;
     address public cruiseMissile;
+    address public nukeAddress;
 
     struct Infrastructure {
         uint256 landArea;
@@ -70,11 +71,13 @@ contract InfrastructureContract is Ownable {
     function constructorContinued(
         address _spyAddress,
         address _tax,
-        address _cruiseMissile
+        address _cruiseMissile,
+        address _nukeAddress
     ) public onlyOwner {
         spyAddress = _spyAddress;
         taxes = _tax;
         cruiseMissile = _cruiseMissile;
+        nukeAddress = _nukeAddress;
     }
 
     modifier onlySpyContract() {
@@ -96,6 +99,14 @@ contract InfrastructureContract is Ownable {
     modifier onlyCruiseMissileContract() {
         require(
             msg.sender == cruiseMissile,
+            "only callable from cruise missile contract"
+        );
+        _;
+    }
+
+    modifier onlyNukeContract() {
+        require(
+            msg.sender == nukeAddress,
             "only callable from cruise missile contract"
         );
         _;
@@ -436,6 +447,19 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[countryId].landArea -= amount;
     }
 
+    function decreaseLandCountFromNukeContract(uint256 countryId)
+        public
+        onlyNukeContract
+    {
+        uint256 landAmount = idToInfrastructure[countryId].landArea;
+        uint256 landAmountToDecrease = ((landAmount * 35) /100);
+        if(landAmountToDecrease > 150) {
+            idToInfrastructure[countryId].landArea -= 150;
+        } else {
+            idToInfrastructure[countryId].landArea -= landAmountToDecrease;
+        }
+    }
+
     function increaseLandCount(uint256 countryId, uint256 amount)
         public
         onlySpyContract
@@ -467,6 +491,19 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[countryId].technologyCount -= amount;
     }
 
+        function decreaseTechCountFromNukeContract(uint256 countryId)
+        public
+        onlyNukeContract
+    {
+        uint256 techAmount = idToInfrastructure[countryId].technologyCount;
+        uint256 techAmountToDecrease = ((techAmount * 35) /100);
+        if(techAmountToDecrease > 50) {
+            idToInfrastructure[countryId].technologyCount -= 50;
+        } else {
+            idToInfrastructure[countryId].technologyCount -= techAmountToDecrease;
+        }
+    }
+
     function increaseTechCount(uint256 countryId, uint256 amount)
         public
         onlySpyContract
@@ -496,6 +533,19 @@ contract InfrastructureContract is Ownable {
         onlyCruiseMissileContract
     {
         idToInfrastructure[countryId].infrastructureCount -= amount;
+    }
+
+    function decreaseInfrastructureCountFromNukeContract(uint256 countryId)
+        public
+        onlyNukeContract
+    {
+        uint256 infrastructureAmount = idToInfrastructure[countryId].infrastructureCount;
+        uint256 infrastructureAmountToDecrease = ((infrastructureAmount * 35) /100);
+        if(infrastructureAmountToDecrease > 150) {
+            idToInfrastructure[countryId].infrastructureCount -= 150;
+        } else {
+            idToInfrastructure[countryId].infrastructureCount -= infrastructureAmountToDecrease;
+        }
     }
 
     function increaseInfrastructureCount(uint256 countryId, uint256 amount)
