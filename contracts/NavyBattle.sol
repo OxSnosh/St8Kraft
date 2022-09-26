@@ -61,8 +61,9 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
     function blockade(uint256 attackerId, uint256 defenderId) public {
         bool blockadedAlready = nav.getBlockadedToday(defenderId);
         require(blockadedAlready == false, "nation already blockaded today");
-        uint256 activeBlockadesAgainstCount = idToActiveBlockadesAgainst[attackerId]
-            .length;
+        uint256 activeBlockadesAgainstCount = idToActiveBlockadesAgainst[
+            attackerId
+        ].length;
         require(
             activeBlockadesAgainstCount == 0,
             "you cannot blockade while being blockaded"
@@ -93,10 +94,15 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
         blockadeIdToBlockade[blockadeId] = newBlockade;
         //need keeper to increment blockade days
         fulfillRequest(blockadeId);
-        uint256[] storage newActiveBlockadesAgainst = idToActiveBlockadesAgainst[defenderId];
+        uint256[]
+            storage newActiveBlockadesAgainst = idToActiveBlockadesAgainst[
+                defenderId
+            ];
         newActiveBlockadesAgainst.push(blockadeId);
         idToActiveBlockadesAgainst[defenderId] = newActiveBlockadesAgainst;
-        uint256[] storage newActiveBlockadesFor = idToActiveBlockadesFor[attackerId];
+        uint256[] storage newActiveBlockadesFor = idToActiveBlockadesFor[
+            attackerId
+        ];
         newActiveBlockadesFor.push(blockadeId);
         idToActiveBlockadesFor[attackerId] = newActiveBlockadesFor;
         blockadeId++;
@@ -106,7 +112,9 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
         uint256 attackerId,
         uint256 defenderId
     ) internal view returns (bool) {
-        uint256[] memory activeBlockadeArray = idToActiveBlockadesAgainst[defenderId];
+        uint256[] memory activeBlockadeArray = idToActiveBlockadesAgainst[
+            defenderId
+        ];
         for (uint256 i = 0; i < activeBlockadeArray.length; i++) {
             uint256 idOfActiveBlockade = activeBlockadeArray[i];
             uint256 idOfAttackerOfActiveBlockade = blockadeIdToBlockade[
@@ -155,14 +163,17 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
 
     function checkIfBlockadeCapable(uint256 countryId) public {
         uint256 blockadeCapableShips = nav.getBlockadeCapableShips(countryId);
-        if(blockadeCapableShips == 0) {
+        if (blockadeCapableShips == 0) {
             uint256[] storage blockadesFor = idToActiveBlockadesFor[countryId];
-            for(uint i = 0; i < blockadesFor.length; i++) {
+            for (uint256 i = 0; i < blockadesFor.length; i++) {
                 blockadeId = blockadesFor[i];
                 blockadeIdToBlockade[blockadeId].blockadeActive = false;
-                uint256 blockadedCountry = blockadeIdToBlockade[blockadeId].blockadedId;
-                uint256[] storage blockadesAgainst = idToActiveBlockadesAgainst[blockadedCountry];
-                for(uint j = 0; j < blockadesAgainst.length; j++) {
+                uint256 blockadedCountry = blockadeIdToBlockade[blockadeId]
+                    .blockadedId;
+                uint256[] storage blockadesAgainst = idToActiveBlockadesAgainst[
+                    blockadedCountry
+                ];
+                for (uint256 j = 0; j < blockadesAgainst.length; j++) {
                     if (blockadesAgainst[j] == blockadeId) {
                         blockadesAgainst[j] = blockadesAgainst[j] - 1;
                         delete blockadesAgainst[i];
@@ -170,7 +181,6 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
                     }
                 }
                 delete blockadesFor[i];
-
             }
         }
     }
@@ -264,7 +274,11 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         i_callbackGasLimit = callbackGasLimit;
     }
 
-    function breakBlockade(uint256 warId, uint256 attackerId, uint256 blockaderId) public {
+    function breakBlockade(
+        uint256 warId,
+        uint256 attackerId,
+        uint256 blockaderId
+    ) public {
         bool isOwner = mint.checkOwnership(attackerId, msg.sender);
         require(isOwner, "caller not nation owner");
         uint256[] memory attackerBlockades = navBlock.getActiveBlockadesAgainst(
@@ -331,14 +345,19 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         breakBlockadeIdToDefendBlockade[breakBlockId] = newDefendBlockade;
     }
 
-        function generateBreakBlockadeChanceArray(uint256 breakBlockId) internal {
-        uint256[] storage chances = battleIdToBreakBlockadeChanceArray[breakBlockId];
-        uint256[] storage types = battleIdToBreakBlockadeTypeArray[breakBlockId];
+    function generateBreakBlockadeChanceArray(uint256 breakBlockId) internal {
+        uint256[] storage chances = battleIdToBreakBlockadeChanceArray[
+            breakBlockId
+        ];
+        uint256[] storage types = battleIdToBreakBlockadeTypeArray[
+            breakBlockId
+        ];
         uint256 cumulativeSum;
         //battleship
         if (breakBlockadeIdToBreakBlockade[breakBlockId].battleshipCount > 0) {
-            uint256 battleshipOdds = (breakBlockadeIdToBreakBlockade[breakBlockId]
-                .battleshipCount * battleshipTargetSize);
+            uint256 battleshipOdds = (breakBlockadeIdToBreakBlockade[
+                breakBlockId
+            ].battleshipCount * battleshipTargetSize);
             uint256 battleshipOddsToPush = (battleshipOdds + cumulativeSum);
             chances.push(battleshipOddsToPush);
             types.push(3);
@@ -346,8 +365,8 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         }
         //cruiser
         if (breakBlockadeIdToDefendBlockade[breakBlockId].cruiserCount > 0) {
-            uint256 cruiserOdds = (breakBlockadeIdToDefendBlockade[breakBlockId].cruiserCount *
-                cruiserTargetSize);
+            uint256 cruiserOdds = (breakBlockadeIdToDefendBlockade[breakBlockId]
+                .cruiserCount * cruiserTargetSize);
             uint256 cruiserOddsToPush = (cruiserOdds + cumulativeSum);
             chances.push(cruiserOddsToPush);
             types.push(4);
@@ -355,8 +374,8 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         }
         //frigate
         if (breakBlockadeIdToBreakBlockade[breakBlockId].frigateCount > 0) {
-            uint256 frigateOdds = (breakBlockadeIdToBreakBlockade[breakBlockId].frigateCount *
-                frigateTargetSize);
+            uint256 frigateOdds = (breakBlockadeIdToBreakBlockade[breakBlockId]
+                .frigateCount * frigateTargetSize);
             uint256 frigateOddsToPush = (frigateOdds + cumulativeSum);
             chances.push(frigateOddsToPush);
             types.push(5);
@@ -364,8 +383,9 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         }
         //destroyer
         if (breakBlockadeIdToBreakBlockade[breakBlockId].destroyerCount > 0) {
-            uint256 destroyerOdds = (breakBlockadeIdToBreakBlockade[breakBlockId].destroyerCount *
-                destroyerTargetSize);
+            uint256 destroyerOdds = (breakBlockadeIdToBreakBlockade[
+                breakBlockId
+            ].destroyerCount * destroyerTargetSize);
             uint256 destroyerOddsToPush = (destroyerOdds + cumulativeSum);
             chances.push(destroyerOddsToPush);
             types.push(6);
@@ -377,13 +397,18 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     }
 
     function generateDefendBlockadeChanceArray(uint256 breakBlockId) internal {
-        uint256[] storage chances = battleIdToDefendBlockadeChanceArray[breakBlockId];
-        uint256[] storage types = battleIdToDefendBlockadeTypeArray[breakBlockId];
+        uint256[] storage chances = battleIdToDefendBlockadeChanceArray[
+            breakBlockId
+        ];
+        uint256[] storage types = battleIdToDefendBlockadeTypeArray[
+            breakBlockId
+        ];
         uint256 cumulativeSum;
         //battleship
         if (breakBlockadeIdToDefendBlockade[breakBlockId].battleshipCount > 0) {
-            uint256 battleshipOdds = (breakBlockadeIdToDefendBlockade[breakBlockId]
-                .battleshipCount * battleshipTargetSize);
+            uint256 battleshipOdds = (breakBlockadeIdToDefendBlockade[
+                breakBlockId
+            ].battleshipCount * battleshipTargetSize);
             uint256 battleshipOddsToPush = (battleshipOdds + cumulativeSum);
             chances.push(battleshipOddsToPush);
             types.push(3);
@@ -391,8 +416,8 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         }
         //cruiser
         if (breakBlockadeIdToDefendBlockade[breakBlockId].cruiserCount > 0) {
-            uint256 cruiserOdds = (breakBlockadeIdToDefendBlockade[breakBlockId].cruiserCount *
-                cruiserTargetSize);
+            uint256 cruiserOdds = (breakBlockadeIdToDefendBlockade[breakBlockId]
+                .cruiserCount * cruiserTargetSize);
             uint256 cruiserOddsToPush = (cruiserOdds + cumulativeSum);
             chances.push(cruiserOddsToPush);
             types.push(4);
@@ -400,8 +425,8 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         }
         //frigate
         if (breakBlockadeIdToDefendBlockade[breakBlockId].frigateCount > 0) {
-            uint256 frigateOdds = (breakBlockadeIdToDefendBlockade[breakBlockId].frigateCount *
-                frigateTargetSize);
+            uint256 frigateOdds = (breakBlockadeIdToDefendBlockade[breakBlockId]
+                .frigateCount * frigateTargetSize);
             uint256 frigateOddsToPush = (frigateOdds + cumulativeSum);
             chances.push(frigateOddsToPush);
             types.push(5);
@@ -409,8 +434,9 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         }
         //submarine
         if (breakBlockadeIdToDefendBlockade[breakBlockId].submarineCount > 0) {
-            uint256 destroyerOdds = (breakBlockadeIdToDefendBlockade[breakBlockId].submarineCount *
-                destroyerTargetSize);
+            uint256 destroyerOdds = (breakBlockadeIdToDefendBlockade[
+                breakBlockId
+            ].submarineCount * destroyerTargetSize);
             uint256 destroyerOddsToPush = (destroyerOdds + cumulativeSum);
             chances.push(destroyerOddsToPush);
             types.push(6);
@@ -428,18 +454,16 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     {
         uint256 _battleshipStrength = breakBlockadeIdToBreakBlockade[battleId]
             .battleshipCount * battleshipStrength;
-        uint256 _cruiserStrength = breakBlockadeIdToBreakBlockade[battleId].cruiserCount *
-            cruiserStrength;
-        uint256 _frigateStrength = breakBlockadeIdToBreakBlockade[battleId].frigateCount *
-            frigateStrength;
-        uint256 _destroyerStrength = breakBlockadeIdToBreakBlockade[battleId].destroyerCount *
-            destroyerStrength;
-        uint256 strength = (
-            _battleshipStrength +
+        uint256 _cruiserStrength = breakBlockadeIdToBreakBlockade[battleId]
+            .cruiserCount * cruiserStrength;
+        uint256 _frigateStrength = breakBlockadeIdToBreakBlockade[battleId]
+            .frigateCount * frigateStrength;
+        uint256 _destroyerStrength = breakBlockadeIdToBreakBlockade[battleId]
+            .destroyerCount * destroyerStrength;
+        uint256 strength = (_battleshipStrength +
             _cruiserStrength +
             _frigateStrength +
-            _destroyerStrength
-        );
+            _destroyerStrength);
         return strength;
     }
 
@@ -450,18 +474,16 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     {
         uint256 _battleshipStrength = breakBlockadeIdToDefendBlockade[battleId]
             .battleshipCount * battleshipStrength;
-        uint256 _cruiserStrength = breakBlockadeIdToDefendBlockade[battleId].cruiserCount *
-            cruiserStrength;
-        uint256 _frigateStrength = breakBlockadeIdToDefendBlockade[battleId].frigateCount *
-            frigateStrength;
-        uint256 _submarineStrength = breakBlockadeIdToDefendBlockade[battleId].submarineCount *
-            submarineStrength;
-        uint256 strength = (
-            _battleshipStrength +
+        uint256 _cruiserStrength = breakBlockadeIdToDefendBlockade[battleId]
+            .cruiserCount * cruiserStrength;
+        uint256 _frigateStrength = breakBlockadeIdToDefendBlockade[battleId]
+            .frigateCount * frigateStrength;
+        uint256 _submarineStrength = breakBlockadeIdToDefendBlockade[battleId]
+            .submarineCount * submarineStrength;
+        uint256 strength = (_battleshipStrength +
             _cruiserStrength +
             _frigateStrength +
-            _submarineStrength
-        );
+            _submarineStrength);
         return strength;
     }
 
@@ -485,10 +507,12 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         s_randomWords = randomWords;
         uint256 numberBetweenZeroAndTwo = (s_randomWords[0] % 2);
         uint256 losses = getLosses(requestNumber, numberBetweenZeroAndTwo);
-        uint256 breakerStartingStrength = breakBlockadeIdToBreakBlockade[requestNumber]
-            .breakerStrength;
-        uint256 defenderStartingStrength = breakBlockadeIdToDefendBlockade[requestNumber]
-            .defenderStrength;
+        uint256 breakerStartingStrength = breakBlockadeIdToBreakBlockade[
+            requestNumber
+        ].breakerStrength;
+        uint256 defenderStartingStrength = breakBlockadeIdToDefendBlockade[
+            requestNumber
+        ].defenderStrength;
         uint256 totalStrength = (breakerStartingStrength +
             defenderStartingStrength);
         for (uint256 i = 1; i < losses + 1; i++) {
@@ -513,8 +537,10 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         uint256[] memory defenderLosses = battleIdToDefendBlockadeLosses[
             requestNumber
         ];
-        uint256 defenderId = breakBlockadeIdToDefendBlockade[requestNumber].defenderId;
-        uint256 breakerId = breakBlockadeIdToBreakBlockade[requestNumber].breakerId;
+        uint256 defenderId = breakBlockadeIdToDefendBlockade[requestNumber]
+            .defenderId;
+        uint256 breakerId = breakBlockadeIdToBreakBlockade[requestNumber]
+            .breakerId;
         nav.decrementLosses(
             defenderLosses,
             defenderId,
@@ -534,7 +560,8 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     {
         uint256 breakerId = breakBlockadeIdToBreakBlockade[battleId].breakerId;
         uint256 breakerCount = getBreakerShipCount(breakerId);
-        uint256 defenderId = breakBlockadeIdToDefendBlockade[battleId].defenderId;
+        uint256 defenderId = breakBlockadeIdToDefendBlockade[battleId]
+            .defenderId;
         uint256 defenderCount = getDefenderShipCount(defenderId);
         uint256 totalShips = (breakerCount + defenderCount);
         uint256 losses;
@@ -556,27 +583,32 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         return losses;
     }
 
-    function getBreakerShipCount(uint256 countryId) internal view returns (uint256) {
-
+    function getBreakerShipCount(uint256 countryId)
+        internal
+        view
+        returns (uint256)
+    {
         uint256 battleshipCount = nav.getBattleshipCount(countryId);
         uint256 cruiserCount = nav.getCruiserCount(countryId);
         uint256 frigateCount = nav.getFrigateCount(countryId);
         uint256 destroyerCount = nav.getDestroyerCount(countryId);
-        uint256 count = (
-            battleshipCount +
+        uint256 count = (battleshipCount +
             cruiserCount +
             frigateCount +
             destroyerCount);
         return count;
     }
 
-    function getDefenderShipCount(uint256 countryId) internal view returns (uint256) {
+    function getDefenderShipCount(uint256 countryId)
+        internal
+        view
+        returns (uint256)
+    {
         uint256 battleshipCount = nav.getBattleshipCount(countryId);
         uint256 cruiserCount = nav.getCruiserCount(countryId);
         uint256 frigateCount = nav.getFrigateCount(countryId);
         uint256 submarineCount = nav.getSubmarineCount(countryId);
-        uint256 count = (
-            battleshipCount +
+        uint256 count = (battleshipCount +
             cruiserCount +
             frigateCount +
             submarineCount);
@@ -587,9 +619,15 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         uint256 battleId,
         uint256 randomNumberForShipLoss
     ) public {
-        uint256[] storage chanceArray = battleIdToDefendBlockadeChanceArray[battleId];
-        uint256[] storage typeArray = battleIdToDefendBlockadeTypeArray[battleId];
-        uint256 cumulativeValue = battleIdToDefendBlockadeCumulativeSumOdds[battleId];
+        uint256[] storage chanceArray = battleIdToDefendBlockadeChanceArray[
+            battleId
+        ];
+        uint256[] storage typeArray = battleIdToDefendBlockadeTypeArray[
+            battleId
+        ];
+        uint256 cumulativeValue = battleIdToDefendBlockadeCumulativeSumOdds[
+            battleId
+        ];
         uint256 randomNumber = (randomNumberForShipLoss % cumulativeValue);
         uint256 shipType;
         uint256 amountToDecrease;
@@ -608,7 +646,9 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
             }
         }
         battleIdToDefendBlockadeCumulativeSumOdds[battleId] -= amountToDecrease;
-        uint256[] storage defenderLosses = battleIdToDefendBlockadeLosses[battleId];
+        uint256[] storage defenderLosses = battleIdToDefendBlockadeLosses[
+            battleId
+        ];
         defenderLosses.push(shipType);
     }
 
@@ -616,9 +656,15 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         uint256 battleId,
         uint256 randomNumberForShipLoss
     ) public {
-        uint256[] storage chanceArray = battleIdToBreakBlockadeChanceArray[battleId];
-        uint256[] storage typeArray = battleIdToBreakBlockadeTypeArray[battleId];
-        uint256 cumulativeValue = battleIdToBreakBlockadeCumulativeSumOdds[battleId];
+        uint256[] storage chanceArray = battleIdToBreakBlockadeChanceArray[
+            battleId
+        ];
+        uint256[] storage typeArray = battleIdToBreakBlockadeTypeArray[
+            battleId
+        ];
+        uint256 cumulativeValue = battleIdToBreakBlockadeCumulativeSumOdds[
+            battleId
+        ];
         uint256 randomNumber = (randomNumberForShipLoss % cumulativeValue);
         uint256 shipType;
         uint256 amountToDecrease;
@@ -639,7 +685,9 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
             }
         }
         battleIdToBreakBlockadeCumulativeSumOdds[battleId] -= amountToDecrease;
-        uint256[] storage defenderLosses = battleIdToBreakBlockadeLosses[battleId];
+        uint256[] storage defenderLosses = battleIdToBreakBlockadeLosses[
+            battleId
+        ];
         defenderLosses.push(shipType);
     }
 
@@ -760,12 +808,24 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         war = WarContract(newAddress);
     }
 
-    function navalAttack(uint256 warId, uint256 attackerId, uint256 defenderId) public {
+    function navalAttack(
+        uint256 warId,
+        uint256 attackerId,
+        uint256 defenderId
+    ) public {
         bool isActiveWar = war.isWarActive(warId);
         require(isActiveWar, "!not active war");
-        (uint256 warOffense, uint256 warDefense) = war.getInvolvedParties(warId);
-        require(warOffense == attackerId || warOffense == defenderId, "invalid parameters");
-        require(warDefense == attackerId || warDefense == defenderId, "invalid parameters");
+        (uint256 warOffense, uint256 warDefense) = war.getInvolvedParties(
+            warId
+        );
+        require(
+            warOffense == attackerId || warOffense == defenderId,
+            "invalid parameters"
+        );
+        require(
+            warDefense == attackerId || warDefense == defenderId,
+            "invalid parameters"
+        );
         generateAttackerNavyStruct(warId, navyBattleId, attackerId);
         generateDefenderNavyStruct(warId, navyBattleId, defenderId);
         generateAttackerChanceArray(navyBattleId);
@@ -774,9 +834,11 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         navyBattleId++;
     }
 
-    function generateAttackerNavyStruct(uint256 warId, uint256 battleId, uint256 countryId)
-        internal
-    {
+    function generateAttackerNavyStruct(
+        uint256 warId,
+        uint256 battleId,
+        uint256 countryId
+    ) internal {
         uint256 corvetteCount = nav.getCorvetteCount(countryId);
         uint256 landingShipCount = nav.getLandingShipCount(countryId);
         uint256 battleshipCount = nav.getBattleshipCount(countryId);
@@ -802,9 +864,11 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         idToAttackerNavy[battleId] = newNavyForces;
     }
 
-    function generateDefenderNavyStruct(uint256 warId, uint256 attackId, uint256 countryId)
-        internal
-    {
+    function generateDefenderNavyStruct(
+        uint256 warId,
+        uint256 attackId,
+        uint256 countryId
+    ) internal {
         uint256 corvetteCount = nav.getCorvetteCount(countryId);
         uint256 landingShipCount = nav.getLandingShipCount(countryId);
         uint256 battleshipCount = nav.getBattleshipCount(countryId);
