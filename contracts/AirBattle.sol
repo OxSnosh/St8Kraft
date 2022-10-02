@@ -142,17 +142,6 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 su30MkiCount,
         uint256 f22RaptorCount
         ) = war.getDeployedFightersHighStrength(warId, attackerId);
-        // uint256 yak9Count = fighter.getYak9Count(attackerId);
-        // uint256 p51MustangCount = fighter.getP51MustangCount(attackerId);
-        // uint256 f86SabreCount = fighter.getF86SabreCount(attackerId);
-        // uint256 mig15Count = fighter.getMig15Count(attackerId);
-        // uint256 f100SuperSabreCount = fighter.getF100SuperSabreCount(
-        //     attackerId
-        // );
-        // uint256 f35LightningCount = fighter.getF35LightningCount(attackerId);
-        // uint256 f15EagleCount = fighter.getF15EagleCount(attackerId);
-        // uint256 su30MkiCount = fighter.getSu30MkiCount(attackerId);
-        // uint256 f22RaptorCount = fighter.getF22RaptorCount(attackerId);
         FightersToBattle memory newFighters = FightersToBattle(
             yak9Count,
             p51MustangCount,
@@ -178,29 +167,17 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 battleId,
         uint256 defenderId
     ) internal {
-        (uint256 yak9Count,
-        uint256 p51MustangCount,
-        uint256 f86SabreCount,
-        uint256 mig15Count,
-        uint256 f100SuperSabreCount
-        ) = war.getDeployedFightersLowStrength(warId, defenderId);
-        (
-        uint256 f35LightningCount,
-        uint256 f15EagleCount,
-        uint256 su30MkiCount,
-        uint256 f22RaptorCount
-        ) = war.getDeployedFightersHighStrength(warId, defenderId);
-        // uint256 yak9Count = fighter.getYak9Count(defenderId);
-        // uint256 p51MustangCount = fighter.getP51MustangCount(defenderId);
-        // uint256 f86SabreCount = fighter.getF86SabreCount(defenderId);
-        // uint256 mig15Count = fighter.getMig15Count(defenderId);
-        // uint256 f100SuperSabreCount = fighter.getF100SuperSabreCount(
-        //     defenderId
-        // );
-        // uint256 f35LightningCount = fighter.getF35LightningCount(defenderId);
-        // uint256 f15EagleCount = fighter.getF15EagleCount(defenderId);
-        // uint256 su30MkiCount = fighter.getSu30MkiCount(defenderId);
-        // uint256 f22RaptorCount = fighter.getF22RaptorCount(defenderId);
+        uint256 yak9Count = fighter.getDefendingYak9Count(defenderId);
+        uint256 p51MustangCount = fighter.getDefendingP51MustangCount(defenderId);
+        uint256 f86SabreCount = fighter.getDefendingF86SabreCount(defenderId);
+        uint256 mig15Count = fighter.getDefendingMig15Count(defenderId);
+        uint256 f100SuperSabreCount = fighter.getDefendingF100SuperSabreCount(
+            defenderId
+        );
+        uint256 f35LightningCount = fighter.getDefendingF35LightningCount(defenderId);
+        uint256 f15EagleCount = fighter.getDefendingF15EagleCount(defenderId);
+        uint256 su30MkiCount = fighter.getDefendingSu30MkiCount(defenderId);
+        uint256 f22RaptorCount = fighter.getDefendingF22RaptorCount(defenderId);
         FightersToBattle memory newFighters = FightersToBattle(
             yak9Count,
             p51MustangCount,
@@ -519,8 +496,6 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
             uint256 attackerBomberStrength = airBattleIdToAttackerFighters[
                 requestNumber
             ].bomberStrength;
-            uint256 attackerStrength = (attackerFighterStrength +
-                attackerBomberStrength);
             uint256 defenderFighterStrength = airBattleIdToDefenderFighters[
                 requestNumber
             ].fighterStrength;
@@ -553,16 +528,9 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         view
         returns (uint256)
     {
-        uint256 attackerId = airBattleIdToAttackerFighters[battleId].countryId;
-        uint256 attackerFighterCount = getFighterCount(attackerId);
-        uint256 attackerBomberCount = getBomberCount(attackerId);
-        uint256 defenderId = airBattleIdToDefenderFighters[battleId].countryId;
-        uint256 defenderFighterCount = getFighterCount(defenderId);
-        uint256 defenderBomberCount = getBomberCount(defenderId);
-        uint256 totalAircraft = (attackerFighterCount +
-            attackerBomberCount +
-            defenderFighterCount +
-            defenderBomberCount);
+        uint256 attackerFighterCount = getAttackingFighterCount(battleId);
+        uint256 defenderFighterCount = getDefendingFighterCount(battleId);
+        uint256 totalAircraft = (attackerFighterCount + defenderFighterCount);
         uint256 losses;
         if (totalAircraft < 4) {
             losses = 1;
@@ -586,58 +554,62 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         return losses;
     }
 
-    function getFighterCount(uint256 countryId)
-        internal
-        view
-        returns (uint256)
-    {
-        uint256 yak9Count = fighter.getYak9Count(countryId);
-        uint256 p51MustangCount = fighter.getP51MustangCount(countryId);
-        uint256 f86SabreCount = fighter.getF86SabreCount(countryId);
-        uint256 mig15Count = fighter.getMig15Count(countryId);
-        uint256 f100SuperSabreCount = fighter.getF100SuperSabreCount(countryId);
-        uint256 f35LightningCount = fighter.getF35LightningCount(countryId);
-        uint256 f15EagleCount = fighter.getF15EagleCount(countryId);
-        uint256 su30MkiCount = fighter.getSu30MkiCount(countryId);
-        uint256 f22RaptorCount = fighter.getF22RaptorCount(countryId);
+    function getAttackingFighterCount(uint256 battleId) internal view returns (uint256) {
+        uint256 yak9Count = airBattleIdToAttackerFighters[battleId].yak9Count;
+        uint256 p51MustangCount = airBattleIdToAttackerFighters[battleId].p51MustangCount;
+        uint256 f86SabreCount = airBattleIdToAttackerFighters[battleId].f86SabreCount;
+        uint256 mig15Count = airBattleIdToAttackerFighters[battleId].mig15Count;
+        uint256 additionalCount = getAdditionalAttackerFighterCount(battleId);
         uint256 count = (yak9Count +
             p51MustangCount +
             f86SabreCount +
             mig15Count +
-            f100SuperSabreCount +
-            f35LightningCount +
-            f15EagleCount +
-            su30MkiCount +
-            f22RaptorCount);
+            additionalCount);
         return count;
     }
 
-    function getBomberCount(uint256 countryId) internal view returns (uint256) {
-        uint256 ah1CobraCount = bomber.getAh1CobraCount(countryId);
-        uint256 ah64ApacheCount = bomber.getAh64ApacheCount(countryId);
-        uint256 bristolBlenheimCount = bomber.getBristolBlenheimCount(
-            countryId
+    function getAdditionalAttackerFighterCount(uint256 battleId) internal view returns (uint256) {
+        uint256 f100SuperSabreCount = airBattleIdToAttackerFighters[battleId].f100SuperSabreCount;
+        uint256 f35LightningCount = airBattleIdToAttackerFighters[battleId].f35LightningCount;
+        uint256 f15EagleCount = airBattleIdToAttackerFighters[battleId].f15EagleCount;
+        uint256 su30MkiCount = airBattleIdToAttackerFighters[battleId].su30MkiCount;
+        uint256 f22RaptorCount = airBattleIdToAttackerFighters[battleId].f22RaptorCount;
+        uint256 additionalCount = (f100SuperSabreCount +
+            f35LightningCount +
+            f15EagleCount +
+            su30MkiCount +
+            f22RaptorCount
         );
-        uint256 b52MitchellCount = bomber.getB52MitchellCount(countryId);
-        uint256 b17gFlyingFortressCount = bomber.getB17gFlyingFortressCount(
-            countryId
-        );
-        uint256 b52StratofortressCount = bomber.getB52StratofortressCount(
-            countryId
-        );
-        uint256 b2SpiritCount = bomber.getB2SpiritCount(countryId);
-        uint256 b1bLancerCount = bomber.getB1bLancer(countryId);
-        uint256 tupolevTu160Count = bomber.getTupolevTu160(countryId);
-        uint256 count = (ah1CobraCount +
-            ah64ApacheCount +
-            bristolBlenheimCount +
-            b52MitchellCount +
-            b17gFlyingFortressCount +
-            b52StratofortressCount +
-            b2SpiritCount +
-            b1bLancerCount +
-            tupolevTu160Count);
+        return additionalCount;
+    }
+
+    function getDefendingFighterCount(uint256 battleId) internal view returns (uint256) {
+        uint256 yak9Count = airBattleIdToDefenderFighters[battleId].yak9Count;
+        uint256 p51MustangCount = airBattleIdToDefenderFighters[battleId].p51MustangCount;
+        uint256 f86SabreCount = airBattleIdToDefenderFighters[battleId].f86SabreCount;
+        uint256 mig15Count = airBattleIdToDefenderFighters[battleId].mig15Count;
+        uint256 additionalCount = getAdditionalDefendingFighterCount(battleId);
+        uint256 count = (yak9Count +
+            p51MustangCount +
+            f86SabreCount +
+            mig15Count +
+            additionalCount);
         return count;
+    }
+
+    function getAdditionalDefendingFighterCount(uint256 battleId) internal view returns (uint256) {
+        uint256 f100SuperSabreCount = airBattleIdToDefenderFighters[battleId].f100SuperSabreCount;
+        uint256 f35LightningCount = airBattleIdToDefenderFighters[battleId].f35LightningCount;
+        uint256 f15EagleCount = airBattleIdToDefenderFighters[battleId].f15EagleCount;
+        uint256 su30MkiCount = airBattleIdToDefenderFighters[battleId].su30MkiCount;
+        uint256 f22RaptorCount = airBattleIdToDefenderFighters[battleId].f22RaptorCount;
+        uint256 additionalCount = (f100SuperSabreCount +
+            f35LightningCount +
+            f15EagleCount +
+            su30MkiCount +
+            f22RaptorCount
+        );
+        return additionalCount;
     }
 
     function dogfight(uint256 battleId, uint256 index) internal {

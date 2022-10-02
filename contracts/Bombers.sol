@@ -645,7 +645,7 @@ contract BombersContract is Ownable {
     }
 }
 
-contract BombersMarketplace is Ownable {
+contract BombersMarketplace1 is Ownable {
     address public countryMinter;
     address public bombers1;
     address public fighters;
