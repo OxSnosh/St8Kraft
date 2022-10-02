@@ -666,18 +666,6 @@ contract BombersMarketplace1 is Ownable {
     uint256 public b17gFlyingFortressCost = 30000;
     uint256 public b17gFlyingFortressRequiredInfrastructure = 500;
     uint256 public b17gFlyingFortressRequiredTech = 200;
-    uint256 public b52StratofortressCost = 35000;
-    uint256 public b52StratofortressRequiredInfrastructure = 600;
-    uint256 public b52StratofortressRequiredTech = 255;
-    uint256 public b2SpiritCost = 40000;
-    uint256 public b2SpiritRequiredInfrastructure = 700;
-    uint256 public b2SpiritRequiredTech = 315;
-    uint256 public b1bLancerCost = 45000;
-    uint256 public b1bLancerRequiredInfrastructure = 850;
-    uint256 public b1bLancerRequiredTech = 405;
-    uint256 public tupolevTu160Cost = 50000;
-    uint256 public tupolevTu160RequiredInfrastructure = 1000;
-    uint256 public tupolevTu160RequiredTech = 500;
 
     CountryMinter mint;
     FightersContract fight;
@@ -793,46 +781,6 @@ contract BombersMarketplace1 is Ownable {
         b17gFlyingFortressRequiredTech = newTech;
     }
 
-    function updateB52StratofortressSpecs(
-        uint256 newPrice,
-        uint256 newInfra,
-        uint256 newTech
-    ) public onlyOwner {
-        b52StratofortressCost = newPrice;
-        b52StratofortressRequiredInfrastructure = newInfra;
-        b52StratofortressRequiredTech = newTech;
-    }
-
-    function updateb2SpiritSpecs(
-        uint256 newPrice,
-        uint256 newInfra,
-        uint256 newTech
-    ) public onlyOwner {
-        b2SpiritCost = newPrice;
-        b2SpiritRequiredInfrastructure = newInfra;
-        b2SpiritRequiredTech = newTech;
-    }
-
-    function updateB1bLancerSpecs(
-        uint256 newPrice,
-        uint256 newInfra,
-        uint256 newTech
-    ) public onlyOwner {
-        b1bLancerCost = newPrice;
-        b1bLancerRequiredInfrastructure = newInfra;
-        b1bLancerRequiredTech = newTech;
-    }
-
-    function updateTupolevTu160Specs(
-        uint256 newPrice,
-        uint256 newInfra,
-        uint256 newTech
-    ) public onlyOwner {
-        tupolevTu160Cost = newPrice;
-        tupolevTu160RequiredInfrastructure = newInfra;
-        tupolevTu160RequiredTech = newTech;
-    }
-
     function buyAh1Cobra(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
@@ -946,6 +894,130 @@ contract BombersMarketplace1 is Ownable {
         bomb1.increaseB17gFlyingFortressCount(id, amount);
         fight.increaseAircraftCount(amount, id);
         tsy.spendBalance(id, purchasePrice);
+    }
+}
+
+contract BombersMarketplace2 is Ownable {
+    address public countryMinter;
+    address public bombers1;
+    address public fighters;
+    address public infrastructure;
+    address public treasury;
+    uint256 public b52StratofortressCost = 35000;
+    uint256 public b52StratofortressRequiredInfrastructure = 600;
+    uint256 public b52StratofortressRequiredTech = 255;
+    uint256 public b2SpiritCost = 40000;
+    uint256 public b2SpiritRequiredInfrastructure = 700;
+    uint256 public b2SpiritRequiredTech = 315;
+    uint256 public b1bLancerCost = 45000;
+    uint256 public b1bLancerRequiredInfrastructure = 850;
+    uint256 public b1bLancerRequiredTech = 405;
+    uint256 public tupolevTu160Cost = 50000;
+    uint256 public tupolevTu160RequiredInfrastructure = 1000;
+    uint256 public tupolevTu160RequiredTech = 500;
+
+    CountryMinter mint;
+    FightersContract fight;
+    InfrastructureContract inf;
+    TreasuryContract tsy;
+    BombersContract bomb1;
+
+    constructor(
+        address _countryMinter,
+        address _bombers1,
+        address _fighters,
+        address _infrastructure,
+        address _treasury
+    ) {
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
+        bombers1 = _bombers1;
+        bomb1 = BombersContract(_bombers1);
+        fighters = _fighters;
+        fight = FightersContract(_fighters);
+        infrastructure = _infrastructure;
+        inf = InfrastructureContract(_infrastructure);
+        treasury = _treasury;
+        tsy = TreasuryContract(_treasury);
+    }
+
+    mapping(uint256 => address) public idToOwnerBombersMarket;
+
+    modifier onlyCountryMinter() {
+        require(msg.sender == countryMinter, "only countryMinter can call");
+        _;
+    }
+
+    function initiateBombersMarket(uint256 id, address nationOwner)
+        public
+        onlyCountryMinter
+    {
+        idToOwnerBombersMarket[id] = nationOwner;
+    }
+
+    function updateCountryMinterAddress(address newAddress) public onlyOwner {
+        countryMinter = newAddress;
+        mint = CountryMinter(newAddress);
+    }
+
+    function updateBombers1Address(address newAddress) public onlyOwner {
+        bombers1 = newAddress;
+        bomb1 = BombersContract(newAddress);
+    }
+
+    function updateFightersAddress(address newAddress) public onlyOwner {
+        fighters = newAddress;
+        fight = FightersContract(newAddress);
+    }
+
+    function updateInfrastructureAddress(address newAddress) public onlyOwner {
+        infrastructure = newAddress;
+        inf = InfrastructureContract(newAddress);
+    }
+
+    function updateTreasuryAddress(address newAddress) public onlyOwner {
+        treasury = newAddress;
+        tsy = TreasuryContract(newAddress);
+    }
+
+    function updateB52StratofortressSpecs(
+        uint256 newPrice,
+        uint256 newInfra,
+        uint256 newTech
+    ) public onlyOwner {
+        b52StratofortressCost = newPrice;
+        b52StratofortressRequiredInfrastructure = newInfra;
+        b52StratofortressRequiredTech = newTech;
+    }
+
+    function updateb2SpiritSpecs(
+        uint256 newPrice,
+        uint256 newInfra,
+        uint256 newTech
+    ) public onlyOwner {
+        b2SpiritCost = newPrice;
+        b2SpiritRequiredInfrastructure = newInfra;
+        b2SpiritRequiredTech = newTech;
+    }
+
+    function updateB1bLancerSpecs(
+        uint256 newPrice,
+        uint256 newInfra,
+        uint256 newTech
+    ) public onlyOwner {
+        b1bLancerCost = newPrice;
+        b1bLancerRequiredInfrastructure = newInfra;
+        b1bLancerRequiredTech = newTech;
+    }
+
+    function updateTupolevTu160Specs(
+        uint256 newPrice,
+        uint256 newInfra,
+        uint256 newTech
+    ) public onlyOwner {
+        tupolevTu160Cost = newPrice;
+        tupolevTu160RequiredInfrastructure = newInfra;
+        tupolevTu160RequiredTech = newTech;
     }
 
     function buyB52Stratofortress(uint256 amount, uint256 id) public {
