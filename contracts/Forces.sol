@@ -21,6 +21,7 @@ contract ForcesContract is Ownable {
     address public resources;
     address public wonders1;
     address public nukeAddress;
+    address public airBattle;
 
     InfrastructureContract inf;
     ResourcesContract res;
@@ -48,7 +49,8 @@ contract ForcesContract is Ownable {
         address _infrastructure,
         address _resources,
         address _wonders1,
-        address _nukeAddress
+        address _nukeAddress,
+        address _airBattle
     ) {
         treasuryAddress = _treasuryAddress;
         spyAddress = _spyAddress;
@@ -56,6 +58,7 @@ contract ForcesContract is Ownable {
         aid = _aid;
         infrastructure = _infrastructure;
         nukeAddress = _nukeAddress;
+        airBattle = _airBattle;
         inf = InfrastructureContract(_infrastructure);
         resources = _resources;
         res = ResourcesContract(_resources);
@@ -128,6 +131,14 @@ contract ForcesContract is Ownable {
         require(
             msg.sender == nukeAddress,
             "only callable from nuke contract"
+        );
+        _;
+    }
+
+    modifier onlyAirBattle() {
+        require(
+            msg.sender == airBattle,
+            "only callable from air battle contract"
         );
         _;
     }
@@ -288,6 +299,21 @@ contract ForcesContract is Ownable {
         uint256 defendingTanks = idToForces[id].defendingTanks;
         uint256 defendingTanksToDecrease = ((defendingTanks * 35) / 100);
         idToForces[id].numberOfTanks -= defendingTanksToDecrease;
+        idToForces[id].defendingTanks -= defendingTanksToDecrease;
+    }
+
+    function decreaseDefendingTankCountFromAirBattleContract(uint256 id, uint256 amountToDecrease)
+        public
+        onlyAirBattle
+    {
+        uint256 defendingTanks = idToForces[id].defendingTanks;
+        if(amountToDecrease >= defendingTanks) {
+            idToForces[id].numberOfTanks -= defendingTanks;
+            idToForces[id].defendingTanks = 0;
+        } else {
+            idToForces[id].numberOfTanks -= amountToDecrease;
+            idToForces[id].defendingTanks -= amountToDecrease;
+        }
     }
 
     function decreaseDeployedTankCount(uint256 amount, uint256 id) public {
@@ -349,6 +375,18 @@ contract ForcesContract is Ownable {
         uint256 cruiseMissiles = idToForces[id].cruiseMissiles;
         uint256 cruiseMissilesToDecrease = ((cruiseMissiles * 35) / 100);
         idToForces[id].cruiseMissiles -= cruiseMissilesToDecrease;
+    }
+
+        function decreaseCruiseMissileCountFromAirBattleContract(uint256 id, uint256 amountToDecrease)
+        public
+        onlyAirBattle
+    {
+        uint256 cruiseMissiles = idToForces[id].cruiseMissiles;
+        if(amountToDecrease >= cruiseMissiles) {
+            idToForces[id].cruiseMissiles = 0;
+        } else {
+            idToForces[id].cruiseMissiles -= amountToDecrease;
+        }
     }
 
     function buyNukes(uint256 amount, uint256 id) public {

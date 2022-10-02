@@ -25,6 +25,7 @@ contract InfrastructureContract is Ownable {
     address public taxes;
     address public cruiseMissile;
     address public nukeAddress;
+    address public airBattle;
 
     struct Infrastructure {
         uint256 landArea;
@@ -72,12 +73,14 @@ contract InfrastructureContract is Ownable {
         address _spyAddress,
         address _tax,
         address _cruiseMissile,
-        address _nukeAddress
+        address _nukeAddress,
+        address _airBattle
     ) public onlyOwner {
         spyAddress = _spyAddress;
         taxes = _tax;
         cruiseMissile = _cruiseMissile;
         nukeAddress = _nukeAddress;
+        airBattle = _airBattle;
     }
 
     modifier onlySpyContract() {
@@ -108,6 +111,14 @@ contract InfrastructureContract is Ownable {
         require(
             msg.sender == nukeAddress,
             "only callable from cruise missile contract"
+        );
+        _;
+    }
+
+    modifier onlyAirBattle() {
+        require(
+            msg.sender == airBattle,
+            "function only callable from Air Battle contract"
         );
         _;
     }
@@ -545,6 +556,18 @@ contract InfrastructureContract is Ownable {
             idToInfrastructure[countryId].infrastructureCount -= 150;
         } else {
             idToInfrastructure[countryId].infrastructureCount -= infrastructureAmountToDecrease;
+        }
+    }
+
+    function decreaseInfrastructureCountFromAirBattleContract(uint256 countryId, uint256 amountToDecrease)
+        public
+        onlyAirBattle
+    {
+        uint256 infrastructureAmount = idToInfrastructure[countryId].infrastructureCount;
+        if(amountToDecrease >= infrastructureAmount) {
+            idToInfrastructure[countryId].infrastructureCount = 0;
+        } else {
+            idToInfrastructure[countryId].infrastructureCount -= amountToDecrease;
         }
     }
 
