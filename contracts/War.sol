@@ -11,6 +11,7 @@ contract WarContract is Ownable {
     address public nationStrength;
     address public military;
     address public navyBattleAddress;
+    address public airBattleAddress;
     address public cruiseMissile;
     uint256[] public activeWars;
 
@@ -125,11 +126,13 @@ contract WarContract is Ownable {
         address _nationStrength,
         address _military,
         address _navyBattleAddress,
+        address _airBattleAddress,
         address _cruiseMissile
     ) {
         countryMinter = _countryMinter;
         nationStrength = _nationStrength;
         navyBattleAddress = _navyBattleAddress;
+        airBattleAddress = _airBattleAddress;
         nsc = NationStrengthContract(_nationStrength);
         military = _military;
         mil = MilitaryContract(_military);
@@ -498,11 +501,129 @@ contract WarContract is Ownable {
             su30MkiCount = warIdToDefenseDeployed1[_warId].su30MkiDeployed;
             f22RaptorCount = warIdToDefenseDeployed1[_warId].f22RaptorDeployed;
         }
+        return (f35LightningCount, f15EagleCount, su30MkiCount, f22RaptorCount);
+    }
+
+    function getDeployedBombersLowStrength(uint256 _warId, uint256 countryId)
+        public
+        view
+        returns (
+            uint256,
+            uint256,
+            uint256,
+            uint256,
+            uint256
+        )
+    {
+        uint256 ah1CobraDeployed;
+        uint256 ah64ApacheDeployed;
+        uint256 bristolBlenheimDeployed;
+        uint256 b52MitchellDeployed;
+        uint256 b17gFlyingFortressDeployed;
+        if (warIdToWar[_warId].offenseId == countryId) {
+            ah1CobraDeployed = warIdToOffenseDeployed2[_warId].ah1CobraDeployed;
+            ah64ApacheDeployed = warIdToOffenseDeployed2[_warId]
+                .ah64ApacheDeployed;
+            bristolBlenheimDeployed = warIdToOffenseDeployed2[_warId]
+                .bristolBlenheimDeployed;
+            b52MitchellDeployed = warIdToOffenseDeployed2[_warId]
+                .b52MitchellDeployed;
+            b17gFlyingFortressDeployed = warIdToOffenseDeployed2[_warId]
+                .b17gFlyingFortressDeployed;
+        }
+        if (warIdToWar[_warId].defenseId == countryId) {
+            ah1CobraDeployed = warIdToDefenseDeployed2[_warId].ah1CobraDeployed;
+            ah64ApacheDeployed = warIdToDefenseDeployed2[_warId]
+                .ah64ApacheDeployed;
+            bristolBlenheimDeployed = warIdToDefenseDeployed2[_warId]
+                .bristolBlenheimDeployed;
+            b52MitchellDeployed = warIdToDefenseDeployed2[_warId]
+                .b52MitchellDeployed;
+            b17gFlyingFortressDeployed = warIdToDefenseDeployed2[_warId]
+                .b17gFlyingFortressDeployed;
+        }
         return (
-            f35LightningCount,
-            f15EagleCount,
-            su30MkiCount,
-            f22RaptorCount
+            ah1CobraDeployed,
+            ah64ApacheDeployed,
+            bristolBlenheimDeployed,
+            b52MitchellDeployed,
+            b17gFlyingFortressDeployed
         );
+    }
+
+    function getDeployedBombersHighStrength(uint256 _warId, uint256 countryId)
+        public
+        view
+        returns (
+            uint256,
+            uint256,
+            uint256,
+            uint256
+        )
+    {
+        uint256 b52StratofortressDeployed;
+        uint256 b2SpiritDeployed;
+        uint256 b1bLancerDeployed;
+        uint256 tupolevTu160Deployed;
+        if (warIdToWar[_warId].offenseId == countryId) {
+            b52StratofortressDeployed = warIdToOffenseDeployed2[_warId]
+                .b52StratofortressDeployed;
+            b2SpiritDeployed = warIdToOffenseDeployed2[_warId].b2SpiritDeployed;
+            b1bLancerDeployed = warIdToOffenseDeployed2[_warId]
+                .b1bLancerDeployed;
+            tupolevTu160Deployed = warIdToOffenseDeployed2[_warId]
+                .tupolevTu160Deployed;
+        }
+        if (warIdToWar[_warId].defenseId == countryId) {
+            b52StratofortressDeployed = warIdToOffenseDeployed2[_warId]
+                .b52StratofortressDeployed;
+            b2SpiritDeployed = warIdToOffenseDeployed2[_warId].b2SpiritDeployed;
+            b1bLancerDeployed = warIdToOffenseDeployed2[_warId]
+                .b1bLancerDeployed;
+            tupolevTu160Deployed = warIdToOffenseDeployed2[_warId]
+                .tupolevTu160Deployed;
+        }
+        return (
+            b52StratofortressDeployed,
+            b2SpiritDeployed,
+            b1bLancerDeployed,
+            tupolevTu160Deployed
+        );
+    }
+
+    modifier onlyAirBattle() {
+        require(
+            msg.sender == airBattleAddress,
+            "function only callable from air battle"
+        );
+        _;
+    }
+
+    function resetDeployedBombers(uint256 _warId, uint256 countryId)
+        public
+        onlyAirBattle
+    {
+        if (warIdToWar[_warId].offenseId == countryId) {
+            warIdToDefenseDeployed2[_warId].ah1CobraDeployed = 0;
+            warIdToDefenseDeployed2[_warId].ah64ApacheDeployed = 0;
+            warIdToDefenseDeployed2[_warId].bristolBlenheimDeployed = 0;
+            warIdToDefenseDeployed2[_warId].b52MitchellDeployed = 0;
+            warIdToDefenseDeployed2[_warId].b17gFlyingFortressDeployed = 0;
+            warIdToOffenseDeployed2[_warId].b52StratofortressDeployed = 0;
+            warIdToOffenseDeployed2[_warId].b2SpiritDeployed = 0;
+            warIdToOffenseDeployed2[_warId].b1bLancerDeployed = 0;
+            warIdToOffenseDeployed2[_warId].tupolevTu160Deployed = 0;
+        }
+        if (warIdToWar[_warId].defenseId == countryId) {
+            warIdToDefenseDeployed2[_warId].ah1CobraDeployed = 0;
+            warIdToDefenseDeployed2[_warId].ah64ApacheDeployed = 0;
+            warIdToDefenseDeployed2[_warId].bristolBlenheimDeployed = 0;
+            warIdToDefenseDeployed2[_warId].b52MitchellDeployed = 0;
+            warIdToDefenseDeployed2[_warId].b17gFlyingFortressDeployed = 0;
+            warIdToOffenseDeployed2[_warId].b52StratofortressDeployed = 0;
+            warIdToOffenseDeployed2[_warId].b2SpiritDeployed = 0;
+            warIdToOffenseDeployed2[_warId].b1bLancerDeployed = 0;
+            warIdToOffenseDeployed2[_warId].tupolevTu160Deployed = 0;
+        }
     }
 }

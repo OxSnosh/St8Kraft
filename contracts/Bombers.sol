@@ -10,6 +10,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract BombersContract is Ownable {
     address public countryMinter;
     address public bombersMarket;
+    address public airBattle;
     address public fighters;
     address public treasury;
     address public infrastructure;
@@ -50,6 +51,7 @@ contract BombersContract is Ownable {
     constructor(
         address _countryMinter,
         address _bombersMarket,
+        address _airBattle,
         address _treasuryAddress,
         address _fightersAddress,
         address _infrastructure,
@@ -58,6 +60,7 @@ contract BombersContract is Ownable {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
         bombersMarket = _bombersMarket;
+        airBattle = _airBattle;
         treasury = _treasuryAddress;
         fighters = _fightersAddress;
         infrastructure = _infrastructure;
@@ -73,6 +76,14 @@ contract BombersContract is Ownable {
         require(
             msg.sender == war,
             "this function can only be called by battle"
+        );
+        _;
+    }
+
+    modifier onlyAirBattle() {
+        require(
+            msg.sender == airBattle,
+            "function only callable from Air Battle Contract"
         );
         _;
     }
@@ -197,7 +208,7 @@ contract BombersContract is Ownable {
 
     function decreaseDeployedAh1CobraCount(uint256 amount, uint256 id)
         public
-        onlyWar
+        onlyAirBattle
     {
         uint256 currentAmount = idToDeployedBombers[id].ah1CobraCount;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
@@ -252,7 +263,7 @@ contract BombersContract is Ownable {
 
     function decreaseDeployedAh64ApacheCount(uint256 amount, uint256 id)
         public
-        onlyWar
+        onlyAirBattle
     {
         uint256 currentAmount = idToDeployedBombers[id].ah64ApacheCount;
         require((currentAmount - amount) >= 0, "cannot delete that many");
@@ -307,7 +318,7 @@ contract BombersContract is Ownable {
 
     function decreaseDeployedBristolBlenheimCount(uint256 amount, uint256 id)
         public
-        onlyWar
+        onlyAirBattle
     {
         uint256 currentAmount = idToDeployedBombers[id].bristolBlenheimCount;
         require((currentAmount - amount) >= 0, "cannot delete that many");
@@ -362,7 +373,7 @@ contract BombersContract is Ownable {
 
     function decreaseDeployedB52MitchellCount(uint256 amount, uint256 id)
         public
-        onlyWar
+        onlyAirBattle
     {
         uint256 currentAmount = idToDeployedBombers[id].b52MitchellCount;
         require((currentAmount - amount) >= 0, "cannot delete that many");
@@ -418,7 +429,7 @@ contract BombersContract is Ownable {
 
     function decreaseDeployedB17gFlyingFortressCount(uint256 amount, uint256 id)
         public
-        onlyWar
+        onlyAirBattle
     {
         uint256 currentAmount = idToDeployedBombers[id].b17gFlyingFortressCount;
         require((currentAmount - amount) >= 0, "cannot delete that many");
@@ -474,7 +485,7 @@ contract BombersContract is Ownable {
 
     function decreaseDeployedB52StratofortressCount(uint256 amount, uint256 id)
         public
-        onlyWar
+        onlyAirBattle
     {
         uint256 currentAmount = idToDeployedBombers[id].b52StratofortressCount;
         require((currentAmount - amount) >= 0, "cannot delete that many");
@@ -529,7 +540,7 @@ contract BombersContract is Ownable {
 
     function decreaseDeployedB2SpiritCount(uint256 amount, uint256 id)
         public
-        onlyWar
+        onlyAirBattle
     {
         uint256 currentAmount = idToDeployedBombers[id].b2SpiritCount;
         require((currentAmount - amount) >= 0, "cannot delete that many");
@@ -576,7 +587,7 @@ contract BombersContract is Ownable {
 
     function decreaseDeployedB1bLancerCount(uint256 amount, uint256 id)
         public
-        onlyWar
+        onlyAirBattle
     {
         uint256 currentAmount = idToDeployedBombers[id].b1bLancerCount;
         require((currentAmount - amount) >= 0, "cannot delete that many");
@@ -627,7 +638,7 @@ contract BombersContract is Ownable {
 
     function decreaseDeployedTupolevTu160Count(uint256 amount, uint256 id)
         public
-        onlyWar
+        onlyAirBattle
     {
         uint256 currentAmount = idToDeployedBombers[id].tupolevTu160Count;
         require((currentAmount - amount) >= 0, "cannot delete that many");

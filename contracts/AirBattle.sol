@@ -515,7 +515,9 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
                 } else if (defenderFighterStrength == 0 && attackerBomberStrength == 0) {
                     break;
                 } else if (defenderFighterStrength > 0) {
-                    // eliminateAttackerBombers(requestNumber);
+                    uint256 countryId = airBattleIdToAttackerFighters[requestNumber].countryId;
+                    uint256 warId = airBattleIdToAttackerFighters[requestNumber].warId;
+                    eliminateAttackerBombers(countryId, warId);
                 } else {
                     break;
                 }
@@ -738,5 +740,33 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
             amountToDecrease = 1;
         }
         return amountToDecrease;
+    }
+
+    function eliminateAttackerBombers(
+        uint256 attackerId,
+        uint256 warId
+    ) internal {
+        (uint256 ah1CobraDeployed,
+        uint256 ah64ApacheDeployed,
+        uint256 bristolBlenheimDeployed,
+        uint256 b52MitchellDeployed,
+        uint256 b17gFlyingFortressDeployed
+        ) = war.getDeployedBombersLowStrength(warId, attackerId);
+        (
+        uint256 b52StratofortressDeployed,
+        uint256 b2SpiritDeployed,
+        uint256 b1bLancerDeployed,
+        uint256 tupolevTu160Deployed
+        ) = war.getDeployedBombersHighStrength(warId, attackerId);
+        war.resetDeployedBombers(warId, attackerId);
+        bomber.decreaseDeployedAh1CobraCount(ah1CobraDeployed, attackerId);
+        bomber.decreaseDeployedAh64ApacheCount(ah64ApacheDeployed, attackerId);
+        bomber.decreaseDeployedBristolBlenheimCount(bristolBlenheimDeployed, attackerId);
+        bomber.decreaseDeployedB52MitchellCount(b52MitchellDeployed, attackerId);
+        bomber.decreaseDeployedB17gFlyingFortressCount(b17gFlyingFortressDeployed, attackerId);
+        bomber.decreaseDeployedB52StratofortressCount(b52StratofortressDeployed, attackerId);
+        bomber.decreaseDeployedB2SpiritCount(b2SpiritDeployed, attackerId);
+        bomber.decreaseDeployedB1bLancerCount(b1bLancerDeployed, attackerId);
+        bomber.decreaseDeployedTupolevTu160Count(tupolevTu160Deployed, attackerId);
     }
 }
