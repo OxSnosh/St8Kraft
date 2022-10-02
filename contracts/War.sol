@@ -32,14 +32,66 @@ contract WarContract is Ownable {
         uint256 defenseCruiseMissileLaunchesToday;
     }
 
+    struct OffenseDeployed1 {
+        uint256 tanksDeployed;
+        uint256 soldiersDeployed;
+        uint256 yak9Deployed;
+        uint256 p51MustangDeployed;
+        uint256 f86SabreDeployed;
+        uint256 mig15Deployed;
+        uint256 f100SuperSabreDeployed;
+        uint256 f35LightningDeployed;
+        uint256 f15EagleDeployed;
+        uint256 su30MkiDeployed;
+        uint256 f22RaptorDeployed;
+    }
+
+    struct OffenseDeployed2 {
+        uint256 ah1CobraDeployed;
+        uint256 ah64ApacheDeployed;
+        uint256 bristolBlenheimDeployed;
+        uint256 b52MitchellDeployed;
+        uint256 b17gFlyingFortressDeployed;
+        uint256 b52StratofortressDeployed;
+        uint256 b2SpiritDeployed;
+        uint256 b1bLancerDeployed;
+        uint256 tupolevTu160Deployed;
+    }
+
+    struct DefenseDeployed1 {
+        uint256 tanksDeployed;
+        uint256 soldiersDeployed;
+        uint256 yak9Deployed;
+        uint256 p51MustangDeployed;
+        uint256 f86SabreDeployed;
+        uint256 mig15Deployed;
+        uint256 f100SuperSabreDeployed;
+        uint256 f35LightningDeployed;
+        uint256 f15EagleDeployed;
+        uint256 su30MkiDeployed;
+        uint256 f22RaptorDeployed;
+    }
+
+    struct DefenseDeployed2 {
+        uint256 ah1CobraDeployed;
+        uint256 ah64ApacheDeployed;
+        uint256 bristolBlenheimDeployed;
+        uint256 b52MitchellDeployed;
+        uint256 b17gFlyingFortressDeployed;
+        uint256 b52StratofortressDeployed;
+        uint256 b2SpiritDeployed;
+        uint256 b1bLancerDeployed;
+        uint256 tupolevTu160Deployed;
+    }
+
     struct OffenseLosses {
         uint256 warId;
         uint256 nationId;
         uint256 soldiersLost;
         uint256 tanksLost;
         uint256 cruiseMissilesLost;
-        uint256 aircraftLost;
-        uint256 navyLost;
+        uint256 aircraftStrengthLost;
+        uint256 navyStrengthLost;
         uint256 infrastructureLost;
         uint256 technologyLost;
         uint256 landLost;
@@ -51,8 +103,8 @@ contract WarContract is Ownable {
         uint256 soldiersLost;
         uint256 tanksLost;
         uint256 cruiseMissilesLost;
-        uint256 aircraftLost;
-        uint256 navyLost;
+        uint256 aircraftStrengthLost;
+        uint256 navyStrengthLost;
         uint256 infrastructureLost;
         uint256 technologyLost;
         uint256 landLost;
@@ -60,6 +112,10 @@ contract WarContract is Ownable {
 
     mapping(uint256 => address) public idToOwnerWar;
     mapping(uint256 => War) public warIdToWar;
+    mapping(uint256 => OffenseDeployed1) public warIdToOffenseDeployed1;
+    mapping(uint256 => OffenseDeployed2) public warIdToOffenseDeployed2;
+    mapping(uint256 => DefenseDeployed1) public warIdToDefenseDeployed1;
+    mapping(uint256 => DefenseDeployed2) public warIdToDefenseDeployed2;
     mapping(uint256 => OffenseLosses) public warIdToOffenseLosses;
     mapping(uint256 => DefenseLosses) public warIdToDefenseLosses;
     mapping(uint256 => uint256[]) public idToActiveWars;
@@ -173,7 +229,63 @@ contract WarContract is Ownable {
         offenseActiveWars.push(warId);
         uint256[] storage defenseActiveWars = idToActiveWars[defenseId];
         defenseActiveWars.push(warId);
+        initializeDeployments(warId);
         warId++;
+    }
+
+    function initializeDeployments(uint256 _warId) internal {
+        OffenseDeployed1 memory newOffenseDeployed1 = OffenseDeployed1(
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        );
+        warIdToOffenseDeployed1[_warId] = newOffenseDeployed1;
+        OffenseDeployed2 memory newOffenseDeployed2 = OffenseDeployed2(
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        );
+        warIdToOffenseDeployed2[_warId] = newOffenseDeployed2;
+        DefenseDeployed1 memory newDefenseDeployed1 = DefenseDeployed1(
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        );
+        warIdToDefenseDeployed1[_warId] = newDefenseDeployed1;
+        DefenseDeployed2 memory newDefenseDeployed2 = DefenseDeployed2(
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        );
+        warIdToDefenseDeployed2[_warId] = newDefenseDeployed2;
     }
 
     function checkStrength(uint256 offenseId, uint256 defenseId)
@@ -258,10 +370,10 @@ contract WarContract is Ownable {
     ) public onlyNavyBattle {
         (uint256 offenseId, uint256 defenseId) = getInvolvedParties(_warId);
         if (offenseId == nationId) {
-            warIdToOffenseLosses[_warId].navyLost = navyCasualties;
+            warIdToOffenseLosses[_warId].navyStrengthLost = navyCasualties;
         }
         if (defenseId == nationId) {
-            warIdToDefenseLosses[_warId].navyLost = navyCasualties;
+            warIdToDefenseLosses[_warId].navyStrengthLost = navyCasualties;
         }
     }
 
@@ -270,13 +382,15 @@ contract WarContract is Ownable {
         onlyCruiseMissileContract
     {
         (uint256 offenseId, uint256 defenseId) = getInvolvedParties(warId);
-        if(nationId == offenseId) {
-            uint256 launchesToday = warIdToWar[_warId].offenseCruiseMissileLaunchesToday;
+        if (nationId == offenseId) {
+            uint256 launchesToday = warIdToWar[_warId]
+                .offenseCruiseMissileLaunchesToday;
             require(launchesToday < 2, "too many launches today");
             warIdToWar[warId].offenseCruiseMissileLaunchesToday += 1;
         }
-        if(nationId == defenseId) {
-            uint256 launchesToday = warIdToWar[_warId].defenseCruiseMissileLaunchesToday;
+        if (nationId == defenseId) {
+            uint256 launchesToday = warIdToWar[_warId]
+                .defenseCruiseMissileLaunchesToday;
             require(launchesToday < 2, "too many launches today");
             warIdToWar[warId].defenseCruiseMissileLaunchesToday += 1;
         }
@@ -311,5 +425,84 @@ contract WarContract is Ownable {
     function getDaysLeft(uint256 _warId) public view returns (uint256) {
         uint256 daysLeft = warIdToWar[_warId].daysLeft;
         return daysLeft;
+    }
+
+    function getDeployedFightersLowStrength(uint256 _warId, uint256 countryId)
+        public
+        view
+        returns (
+            uint256,
+            uint256,
+            uint256,
+            uint256,
+            uint256
+        )
+    {
+        uint256 yak9Count;
+        uint256 p51MustangCount;
+        uint256 f86SabreCount;
+        uint256 mig15Count;
+        uint256 f100SuperSabreCount;
+        if (warIdToWar[_warId].offenseId == countryId) {
+            yak9Count = warIdToOffenseDeployed1[_warId].yak9Deployed;
+            p51MustangCount = warIdToOffenseDeployed1[_warId]
+                .p51MustangDeployed;
+            f86SabreCount = warIdToOffenseDeployed1[_warId].f86SabreDeployed;
+            mig15Count = warIdToOffenseDeployed1[_warId].mig15Deployed;
+            f100SuperSabreCount = warIdToOffenseDeployed1[_warId]
+                .f100SuperSabreDeployed;
+        }
+        if (warIdToWar[_warId].defenseId == countryId) {
+            yak9Count = warIdToDefenseDeployed1[_warId].yak9Deployed;
+            p51MustangCount = warIdToDefenseDeployed1[_warId]
+                .p51MustangDeployed;
+            f86SabreCount = warIdToDefenseDeployed1[_warId].f86SabreDeployed;
+            mig15Count = warIdToDefenseDeployed1[_warId].mig15Deployed;
+            f100SuperSabreCount = warIdToDefenseDeployed1[_warId]
+                .f100SuperSabreDeployed;
+        }
+        return (
+            yak9Count,
+            p51MustangCount,
+            f86SabreCount,
+            mig15Count,
+            f100SuperSabreCount
+        );
+    }
+
+    function getDeployedFightersHighStrength(uint256 _warId, uint256 countryId)
+        public
+        view
+        returns (
+            uint256,
+            uint256,
+            uint256,
+            uint256
+        )
+    {
+        uint256 f35LightningCount;
+        uint256 f15EagleCount;
+        uint256 su30MkiCount;
+        uint256 f22RaptorCount;
+        if (warIdToWar[_warId].offenseId == countryId) {
+            f35LightningCount = warIdToOffenseDeployed1[_warId]
+                .f35LightningDeployed;
+            f15EagleCount = warIdToOffenseDeployed1[_warId].f15EagleDeployed;
+            su30MkiCount = warIdToOffenseDeployed1[_warId].su30MkiDeployed;
+            f22RaptorCount = warIdToOffenseDeployed1[_warId].f22RaptorDeployed;
+        }
+        if (warIdToWar[_warId].defenseId == countryId) {
+            f35LightningCount = warIdToDefenseDeployed1[_warId]
+                .f35LightningDeployed;
+            f15EagleCount = warIdToDefenseDeployed1[_warId].f15EagleDeployed;
+            su30MkiCount = warIdToDefenseDeployed1[_warId].su30MkiDeployed;
+            f22RaptorCount = warIdToDefenseDeployed1[_warId].f22RaptorDeployed;
+        }
+        return (
+            f35LightningCount,
+            f15EagleCount,
+            su30MkiCount,
+            f22RaptorCount
+        );
     }
 }

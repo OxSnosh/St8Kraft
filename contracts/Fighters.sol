@@ -3,6 +3,8 @@ pragma solidity 0.8.7;
 
 import "./Treasury.sol";
 import "./Infrastructure.sol";
+import "./CountryMinter.sol";
+import "./Bombers.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract FightersContract is Ownable {
@@ -13,8 +15,10 @@ contract FightersContract is Ownable {
     address public infrastructure;
     address public war;
 
-    struct Fighters {
-        uint256 aircraft;
+    CountryMinter mint;
+
+    struct DefendingFighters {
+        uint256 defendingAircraft;
         uint256 yak9Count;
         uint256 p51MustangCount;
         uint256 f86SabreCount;
@@ -26,7 +30,21 @@ contract FightersContract is Ownable {
         uint256 f22RaptorCount;
     }
 
-    mapping(uint256 => Fighters) public idToFighters;
+    struct DeployedFighters {
+        uint256 deployedAircraft;
+        uint256 yak9Count;
+        uint256 p51MustangCount;
+        uint256 f86SabreCount;
+        uint256 mig15Count;
+        uint256 f100SuperSabreCount;
+        uint256 f35LightningCount;
+        uint256 f15EagleCount;
+        uint256 su30MkiCount;
+        uint256 f22RaptorCount;
+    }
+
+    mapping(uint256 => DefendingFighters) public idToDefendingFighters;
+    mapping(uint256 => DeployedFighters) public idToDeployedFighters;
     mapping(uint256 => address) public idToOwnerFighters;
 
     constructor(
@@ -38,6 +56,7 @@ contract FightersContract is Ownable {
         address _infrastructure
     ) {
         countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
         bombers = _bombers;
         fightersMarket = _fightersMarket;
         treasuryAddress = _treasuryAddress;
@@ -91,14 +110,28 @@ contract FightersContract is Ownable {
     }
 
     function generateFighters(uint256 id, address nationOwner) public {
-        Fighters memory newFighters = Fighters(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        idToFighters[id] = newFighters;
+        DefendingFighters memory newDefendingFighters = DefendingFighters(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        idToDefendingFighters[id] = newDefendingFighters;
+        DeployedFighters memory newDeployedFighters = DeployedFighters(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        idToDeployedFighters[id] = newDeployedFighters;
         idToOwnerFighters[id] = nationOwner;
     }
 
     function getAircraftCount(uint256 id) public view returns (uint256) {
-        uint256 count = idToFighters[id].aircraft;
+        uint256 defendingCount = idToDefendingFighters[id].defendingAircraft;
+        uint256 deployedCount = idToDeployedFighters[id].deployedAircraft;
+        uint256 count = (defendingCount + deployedCount);
         return count;
+    }
+    
+    function getDefendingCount(uint256 id) public view returns (uint256) {
+        uint256 defendingCount = idToDefendingFighters[id].defendingAircraft;
+        return defendingCount;
+    }
+
+    function getDeployedCount(uint256 id) public view returns (uint256) {
+        uint256 deployedCount = idToDeployedFighters[id].deployedAircraft;
+        return deployedCount;
     }
 
     function getMaxAircraftCount(uint256 id) public pure returns (uint256) {
@@ -114,46 +147,76 @@ contract FightersContract is Ownable {
         public
         onlyBomberContract
     {
-        idToFighters[id].aircraft += amount;
+        idToDefendingFighters[id].defendingAircraft += amount;
     }
 
-    function decreaseAircraftCount(uint256 amount, uint256 id)
+    function decreaseDefendingAircraftCount(uint256 amount, uint256 id)
         public
         onlyBomberContract
     {
-        idToFighters[id].aircraft -= amount;
+        idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function destroyAircraft(uint256 amount, uint256 id) internal onlyWar {
-        idToFighters[id].aircraft -= amount;
+    function decreaseDeployedAircraftCount(uint256 amount, uint256 id)
+        public
+        onlyBomberContract
+    {
+        idToDeployedFighters[id].deployedAircraft -= amount;
     }
 
-    function getYak9Count(uint256 id) public view returns (uint256) {
-        uint256 count = idToFighters[id].yak9Count;
+    function destroyDefendingAircraft(uint256 amount, uint256 id) internal onlyWar {
+        idToDefendingFighters[id].defendingAircraft -= amount;
+    }
+
+    function destroyDeployedAircraft(uint256 amount, uint256 id) internal onlyWar {
+        idToDeployedFighters[id].deployedAircraft -= amount;
+    }
+
+    function getDefendingYak9Count(uint256 id) public view returns (uint256) {
+        uint256 count = idToDefendingFighters[id].yak9Count;
+        return count;
+    }
+
+    function getDeployedYak9Count(uint256 id) public view returns (uint256) {
+        uint256 count = idToDeployedFighters[id].yak9Count;
         return count;
     }
 
     function increaseYak9Count(uint256 id, uint256 amount) public onlyMarket {
-        idToFighters[id].yak9Count += amount;
+        idToDefendingFighters[id].yak9Count += amount;
+        idToDefendingFighters[id].defendingAircraft += amount;
     }
 
-    function decreaseYak9Count(uint256 amount, uint256 id) public onlyWar {
-        uint256 currentAmount = idToFighters[id].yak9Count;
+    function decreaseDefendingYak9Count(uint256 amount, uint256 id) public onlyWar {
+        uint256 currentAmount = idToDefendingFighters[id].yak9Count;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
-        idToFighters[id].yak9Count -= amount;
-        idToFighters[id].aircraft -= amount;
+        idToDefendingFighters[id].yak9Count -= amount;
+        idToDefendingFighters[id].defendingAircraft -= amount;
+    }
+
+    function decreaseDeployedYak9Count(uint256 amount, uint256 id) public onlyWar {
+        uint256 currentAmount = idToDeployedFighters[id].yak9Count;
+        require((currentAmount - amount) >= 0, "cannot decrease that many");
+        idToDeployedFighters[id].yak9Count -= amount;
+        idToDeployedFighters[id].deployedAircraft -= amount;
     }
 
     function scrapYak9(uint256 amount, uint256 id) public {
-        require(idToOwnerFighters[id] == msg.sender, "!nation ruler");
-        uint256 currentAmount = idToFighters[id].yak9Count;
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation ruler");
+        uint256 currentAmount = idToDefendingFighters[id].yak9Count;
         require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToFighters[id].yak9Count -= amount;
-        idToFighters[id].aircraft -= amount;
+        idToDefendingFighters[id].yak9Count -= amount;
+        idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function getP51MustangCount(uint256 id) public view returns (uint256) {
-        uint256 count = idToFighters[id].p51MustangCount;
+    function getDefendingP51MustangCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToDefendingFighters[id].p51MustangCount;
+        return count;
+    }
+
+    function getDeployedP51MustangCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToDeployedFighters[id].p51MustangCount;
         return count;
     }
 
@@ -161,29 +224,46 @@ contract FightersContract is Ownable {
         public
         onlyMarket
     {
-        idToFighters[id].p51MustangCount += amount;
+        idToDefendingFighters[id].p51MustangCount += amount;
+        idToDefendingFighters[id].defendingAircraft += amount;
     }
 
-    function decreaseP51MustangCount(uint256 amount, uint256 id)
+    function decreaseDefendingP51MustangCount(uint256 amount, uint256 id)
         public
         onlyWar
     {
-        uint256 currentAmount = idToFighters[id].p51MustangCount;
+        uint256 currentAmount = idToDefendingFighters[id].p51MustangCount;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
-        idToFighters[id].p51MustangCount -= amount;
-        idToFighters[id].aircraft -= amount;
+        idToDefendingFighters[id].p51MustangCount -= amount;
+        idToDefendingFighters[id].defendingAircraft -= amount;
+    }
+
+    function decreaseDeployedP51MustangCount(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
+        uint256 currentAmount = idToDeployedFighters[id].p51MustangCount;
+        require((currentAmount - amount) >= 0, "cannot decrease that many");
+        idToDeployedFighters[id].p51MustangCount -= amount;
+        idToDeployedFighters[id].deployedAircraft -= amount;
     }
 
     function scrapP51Mustang(uint256 amount, uint256 id) public {
-        require(idToOwnerFighters[id] == msg.sender, "!nation ruler");
-        uint256 currentAmount = idToFighters[id].p51MustangCount;
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation ruler");
+        uint256 currentAmount = idToDefendingFighters[id].p51MustangCount;
         require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToFighters[id].p51MustangCount -= amount;
-        idToFighters[id].aircraft -= amount;
+        idToDefendingFighters[id].p51MustangCount -= amount;
+        idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function getF86SabreCount(uint256 id) public view returns (uint256) {
-        uint256 count = idToFighters[id].f86SabreCount;
+    function getDefendingF86SabreCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToDefendingFighters[id].f86SabreCount;
+        return count;
+    }
+
+    function getDeployedF86SabreCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToDeployedFighters[id].f86SabreCount;
         return count;
     }
 
@@ -191,51 +271,78 @@ contract FightersContract is Ownable {
         public
         onlyMarket
     {
-        idToFighters[id].f86SabreCount += amount;
+        idToDefendingFighters[id].f86SabreCount += amount;
+        idToDefendingFighters[id].defendingAircraft += amount;
     }
 
-    function decreaseF86SabreCount(uint256 amount, uint256 id) public onlyWar {
-        uint256 currentAmount = idToFighters[id].f86SabreCount;
+    function decreaseDefendingF86SabreCount(uint256 amount, uint256 id) public onlyWar {
+        uint256 currentAmount = idToDefendingFighters[id].f86SabreCount;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
-        idToFighters[id].f86SabreCount -= amount;
-        idToFighters[id].aircraft -= amount;
+        idToDefendingFighters[id].f86SabreCount -= amount;
+        idToDefendingFighters[id].defendingAircraft -= amount;
+    }
+
+    function decreaseDeployedF86SabreCount(uint256 amount, uint256 id) public onlyWar {
+        uint256 currentAmount = idToDeployedFighters[id].f86SabreCount;
+        require((currentAmount - amount) >= 0, "cannot decrease that many");
+        idToDeployedFighters[id].f86SabreCount -= amount;
+        idToDeployedFighters[id].deployedAircraft -= amount;
     }
 
     function scrapF86Sabre(uint256 amount, uint256 id) public {
-        require(idToOwnerFighters[id] == msg.sender, "!nation ruler");
-        uint256 currentAmount = idToFighters[id].f86SabreCount;
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation ruler");
+        uint256 currentAmount = idToDefendingFighters[id].f86SabreCount;
         require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToFighters[id].f86SabreCount -= amount;
-        idToFighters[id].aircraft -= amount;
+        idToDefendingFighters[id].f86SabreCount -= amount;
+        idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    ///Mig15
-    function getMig15Count(uint256 id) public view returns (uint256) {
-        uint256 count = idToFighters[id].mig15Count;
+    function getDefendingMig15Count(uint256 id) public view returns (uint256) {
+        uint256 count = idToDefendingFighters[id].mig15Count;
+        return count;
+    }
+
+    function getDeployedMig15Count(uint256 id) public view returns (uint256) {
+        uint256 count = idToDeployedFighters[id].mig15Count;
         return count;
     }
 
     function increaseMig15Count(uint256 id, uint256 amount) public onlyMarket {
-        idToFighters[id].mig15Count += amount;
+        idToDefendingFighters[id].mig15Count += amount;
+        idToDefendingFighters[id].defendingAircraft += amount;
     }
 
-    function decreaseMig15Count(uint256 amount, uint256 id) public onlyWar {
-        uint256 currentAmount = idToFighters[id].mig15Count;
+    function decreaseDefendingMig15Count(uint256 amount, uint256 id) public onlyWar {
+        uint256 currentAmount = idToDefendingFighters[id].mig15Count;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
-        idToFighters[id].mig15Count -= amount;
-        idToFighters[id].aircraft -= amount;
+        idToDefendingFighters[id].mig15Count -= amount;
+        idToDefendingFighters[id].defendingAircraft -= amount;
+    }
+
+    function decreaseDeployedMig15Count(uint256 amount, uint256 id) public onlyWar {
+        uint256 currentAmount = idToDeployedFighters[id].mig15Count;
+        require((currentAmount - amount) >= 0, "cannot decrease that many");
+        idToDeployedFighters[id].mig15Count -= amount;
+        idToDeployedFighters[id].deployedAircraft -= amount;
     }
 
     function scrapMig15(uint256 amount, uint256 id) public {
-        require(idToOwnerFighters[id] == msg.sender, "!nation ruler");
-        uint256 currentAmount = idToFighters[id].mig15Count;
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation ruler");
+        uint256 currentAmount = idToDefendingFighters[id].mig15Count;
         require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToFighters[id].mig15Count -= amount;
-        idToFighters[id].aircraft -= amount;
+        idToDefendingFighters[id].mig15Count -= amount;
+        idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function getF100SuperSabreCount(uint256 id) public view returns (uint256) {
-        uint256 count = idToFighters[id].f100SuperSabreCount;
+    function getDefendingF100SuperSabreCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToDefendingFighters[id].f100SuperSabreCount;
+        return count;
+    }
+
+    function getDeployedF100SuperSabreCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToDeployedFighters[id].f100SuperSabreCount;
         return count;
     }
 
@@ -243,29 +350,46 @@ contract FightersContract is Ownable {
         public
         onlyMarket
     {
-        idToFighters[id].f100SuperSabreCount += amount;
+        idToDefendingFighters[id].f100SuperSabreCount += amount;
+        idToDefendingFighters[id].defendingAircraft += amount;
     }
 
-    function decreaseF100SuperSabreCount(uint256 amount, uint256 id)
+    function decreaseDefendingF100SuperSabreCount(uint256 amount, uint256 id)
         public
         onlyWar
     {
-        uint256 currentAmount = idToFighters[id].f100SuperSabreCount;
+        uint256 currentAmount = idToDefendingFighters[id].f100SuperSabreCount;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
-        idToFighters[id].f100SuperSabreCount -= amount;
-        idToFighters[id].aircraft -= amount;
+        idToDefendingFighters[id].f100SuperSabreCount -= amount;
+        idToDefendingFighters[id].defendingAircraft -= amount;
+    }
+
+    function decreaseDeployedF100SuperSabreCount(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
+        uint256 currentAmount = idToDeployedFighters[id].f100SuperSabreCount;
+        require((currentAmount - amount) >= 0, "cannot decrease that many");
+        idToDeployedFighters[id].f100SuperSabreCount -= amount;
+        idToDeployedFighters[id].deployedAircraft -= amount;
     }
 
     function scrapF100SuperSabre(uint256 amount, uint256 id) public {
-        require(idToOwnerFighters[id] == msg.sender, "!nation ruler");
-        uint256 currentAmount = idToFighters[id].f100SuperSabreCount;
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation ruler");
+        uint256 currentAmount = idToDefendingFighters[id].f100SuperSabreCount;
         require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToFighters[id].f100SuperSabreCount -= amount;
-        idToFighters[id].aircraft -= amount;
+        idToDefendingFighters[id].f100SuperSabreCount -= amount;
+        idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function getF35LightningCount(uint256 id) public view returns (uint256) {
-        uint256 count = idToFighters[id].f35LightningCount;
+    function getDefendingF35LightningCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToDefendingFighters[id].f35LightningCount;
+        return count;
+    }
+
+    function getDeployedF35LightningCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToDeployedFighters[id].f35LightningCount;
         return count;
     }
 
@@ -273,29 +397,46 @@ contract FightersContract is Ownable {
         public
         onlyMarket
     {
-        idToFighters[id].f35LightningCount += amount;
+        idToDefendingFighters[id].f35LightningCount += amount;
+        idToDefendingFighters[id].defendingAircraft += amount;
     }
 
-    function decreaseF35LightningCount(uint256 amount, uint256 id)
+    function decreaseDefendingF35LightningCount(uint256 amount, uint256 id)
         public
         onlyWar
     {
-        uint256 currentAmount = idToFighters[id].f35LightningCount;
+        uint256 currentAmount = idToDefendingFighters[id].f35LightningCount;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
-        idToFighters[id].f35LightningCount -= amount;
-        idToFighters[id].aircraft -= amount;
+        idToDefendingFighters[id].f35LightningCount -= amount;
+        idToDefendingFighters[id].defendingAircraft -= amount;
+    }
+
+    function decreaseDeployedF35LightningCount(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
+        uint256 currentAmount = idToDeployedFighters[id].f35LightningCount;
+        require((currentAmount - amount) >= 0, "cannot decrease that many");
+        idToDeployedFighters[id].f35LightningCount -= amount;
+        idToDeployedFighters[id].deployedAircraft -= amount;
     }
 
     function scrapF35Lightning(uint256 amount, uint256 id) public {
-        require(idToOwnerFighters[id] == msg.sender, "!nation ruler");
-        uint256 currentAmount = idToFighters[id].f35LightningCount;
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation ruler");
+        uint256 currentAmount = idToDefendingFighters[id].f35LightningCount;
         require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToFighters[id].f35LightningCount -= amount;
-        idToFighters[id].aircraft -= amount;
+        idToDefendingFighters[id].f35LightningCount -= amount;
+        idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function getF15EagleCount(uint256 id) public view returns (uint256) {
-        uint256 count = idToFighters[id].f15EagleCount;
+    function getDefendingF15EagleCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToDefendingFighters[id].f15EagleCount;
+        return count;
+    }
+
+    function getDeployedF15EagleCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToDeployedFighters[id].f15EagleCount;
         return count;
     }
 
@@ -303,26 +444,40 @@ contract FightersContract is Ownable {
         public
         onlyMarket
     {
-        idToFighters[id].f15EagleCount += amount;
+        idToDefendingFighters[id].f15EagleCount += amount;
+        idToDefendingFighters[id].defendingAircraft += amount;
     }
 
-    function decreaseF15EagleCount(uint256 amount, uint256 id) public onlyWar {
-        uint256 currentAmount = idToFighters[id].f15EagleCount;
+    function decreaseDefendingF15EagleCount(uint256 amount, uint256 id) public onlyWar {
+        uint256 currentAmount = idToDefendingFighters[id].f15EagleCount;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
-        idToFighters[id].f15EagleCount -= amount;
-        idToFighters[id].aircraft -= amount;
+        idToDefendingFighters[id].f15EagleCount -= amount;
+        idToDefendingFighters[id].defendingAircraft -= amount;
+    }
+
+    function decreaseDeployedF15EagleCount(uint256 amount, uint256 id) public onlyWar {
+        uint256 currentAmount = idToDeployedFighters[id].f15EagleCount;
+        require((currentAmount - amount) >= 0, "cannot decrease that many");
+        idToDeployedFighters[id].f15EagleCount -= amount;
+        idToDeployedFighters[id].deployedAircraft -= amount;
     }
 
     function scrapF15Eagle(uint256 amount, uint256 id) public {
-        require(idToOwnerFighters[id] == msg.sender, "!nation ruler");
-        uint256 currentAmount = idToFighters[id].f35LightningCount;
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation ruler");
+        uint256 currentAmount = idToDefendingFighters[id].f35LightningCount;
         require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToFighters[id].f35LightningCount -= amount;
-        idToFighters[id].aircraft -= amount;
+        idToDefendingFighters[id].f35LightningCount -= amount;
+        idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function getSu30MkiCount(uint256 id) public view returns (uint256) {
-        uint256 count = idToFighters[id].su30MkiCount;
+    function getDefendingSu30MkiCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToDefendingFighters[id].su30MkiCount;
+        return count;
+    }
+
+    function getDeployedSu30MkiCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToDeployedFighters[id].su30MkiCount;
         return count;
     }
 
@@ -330,26 +485,40 @@ contract FightersContract is Ownable {
         public
         onlyMarket
     {
-        idToFighters[id].su30MkiCount += amount;
+        idToDefendingFighters[id].su30MkiCount += amount;
+        idToDefendingFighters[id].defendingAircraft += amount;
     }
 
-    function decreaseSu30MkiCount(uint256 amount, uint256 id) public onlyWar {
-        uint256 currentAmount = idToFighters[id].su30MkiCount;
+    function decreaseDefendingSu30MkiCount(uint256 amount, uint256 id) public onlyWar {
+        uint256 currentAmount = idToDefendingFighters[id].su30MkiCount;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
-        idToFighters[id].su30MkiCount -= amount;
-        idToFighters[id].aircraft -= amount;
+        idToDefendingFighters[id].su30MkiCount -= amount;
+        idToDefendingFighters[id].defendingAircraft -= amount;
+    }
+
+    function decreaseDeployedSu30MkiCount(uint256 amount, uint256 id) public onlyWar {
+        uint256 currentAmount = idToDeployedFighters[id].su30MkiCount;
+        require((currentAmount - amount) >= 0, "cannot decrease that many");
+        idToDeployedFighters[id].su30MkiCount -= amount;
+        idToDeployedFighters[id].deployedAircraft -= amount;
     }
 
     function scrapSu30Mki(uint256 amount, uint256 id) public {
-        require(idToOwnerFighters[id] == msg.sender, "!nation ruler");
-        uint256 currentAmount = idToFighters[id].su30MkiCount;
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation ruler");
+        uint256 currentAmount = idToDefendingFighters[id].su30MkiCount;
         require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToFighters[id].su30MkiCount -= amount;
-        idToFighters[id].aircraft -= amount;
+        idToDefendingFighters[id].su30MkiCount -= amount;
+        idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function getF22RaptorCount(uint256 id) public view returns (uint256) {
-        uint256 count = idToFighters[id].f22RaptorCount;
+    function getDefendingF22RaptorCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToDefendingFighters[id].f22RaptorCount;
+        return count;
+    }
+
+    function getDeployedF22RaptorCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToDeployedFighters[id].f22RaptorCount;
         return count;
     }
 
@@ -357,28 +526,38 @@ contract FightersContract is Ownable {
         public
         onlyMarket
     {
-        idToFighters[id].f22RaptorCount += amount;
+        idToDefendingFighters[id].f22RaptorCount += amount;
+        idToDefendingFighters[id].defendingAircraft += amount;
+    }
+
+    function decreaseDefendingF22RaptorCount(uint256 amount, uint256 id) public onlyWar {
+        uint256 currentAmount = idToDefendingFighters[id].f22RaptorCount;
+        require((currentAmount - amount) >= 0, "cannot decrease that many");
+        idToDefendingFighters[id].f22RaptorCount -= amount;
+        idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
     function decreaseF22RaptorCount(uint256 amount, uint256 id) public onlyWar {
-        uint256 currentAmount = idToFighters[id].f22RaptorCount;
+        uint256 currentAmount = idToDeployedFighters[id].f22RaptorCount;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
-        idToFighters[id].f22RaptorCount -= amount;
-        idToFighters[id].aircraft -= amount;
+        idToDeployedFighters[id].f22RaptorCount -= amount;
+        idToDeployedFighters[id].deployedAircraft -= amount;
     }
 
     function scrapF22Raptor(uint256 amount, uint256 id) public {
-        require(idToOwnerFighters[id] == msg.sender, "!nation ruler");
-        uint256 currentAmount = idToFighters[id].f22RaptorCount;
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation ruler");
+        uint256 currentAmount = idToDefendingFighters[id].f22RaptorCount;
         require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToFighters[id].f22RaptorCount -= amount;
-        idToFighters[id].aircraft -= amount;
+        idToDefendingFighters[id].f22RaptorCount -= amount;
+        idToDefendingFighters[id].defendingAircraft -= amount;
     }
 }
 
 contract FightersMarketplace is Ownable {
     address public countryMinter;
     address public fighters;
+    address public bombers;
     address public treasury;
     address public infrastructure;
     uint256 public yak9Cost = 10000;
@@ -409,17 +588,25 @@ contract FightersMarketplace is Ownable {
     uint256 public f22RaptorRequiredInfrastructure = 1000;
     uint256 public f22RaptorRequiredTech = 500;
 
+    CountryMinter mint;
+    BombersContract bomb;
+
     constructor(
         address _countryMinter,
+        address _bombers,
         address _fighters,
         address _treasury,
         address _infrastructure
     ) {
         countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
+        bombers = _bombers; 
+        bomb = BombersContract(_bombers);
         fighters = _fighters;
         treasury = _treasury;
         infrastructure = _infrastructure;
     }
+
 
     mapping(uint256 => address) public idToOwnerFightersMarket;
 
@@ -437,6 +624,12 @@ contract FightersMarketplace is Ownable {
 
     function updateCountryMinterAddress(address newAddress) public onlyOwner {
         countryMinter = newAddress;
+        mint = CountryMinter(newAddress);
+    }
+
+    function updateBombersAddress(address newAddress) public onlyOwner {
+        bombers = newAddress;
+        bomb = BombersContract(newAddress);
     }
 
     function updateFighters1Address(address newAddress) public onlyOwner {
@@ -542,11 +735,14 @@ contract FightersMarketplace is Ownable {
     }
 
     function buyYak9(uint256 amount, uint256 id) public {
-        require(idToOwnerFightersMarket[id] == msg.sender, "!nation ruler");
-        uint256 aircraftCount = FightersContract(fighters).getAircraftCount(id);
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation ruler");
+        uint256 fighterCount = FightersContract(fighters).getAircraftCount(id);
+        uint256 bomberCount = bomb.getAircraftCount(id);
         uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
             id
         );
+        uint256 aircraftCount = (fighterCount + bomberCount);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -561,16 +757,18 @@ contract FightersMarketplace is Ownable {
         uint256 balance = TreasuryContract(treasury).checkBalance(id);
         require(balance >= purchasePrice);
         FightersContract(fighters).increaseYak9Count(id, amount);
-        FightersContract(fighters).increaseAircraftCount(amount, id);
         TreasuryContract(treasury).spendBalance(id, purchasePrice);
     }
 
     function buyP51Mustang(uint256 amount, uint256 id) public {
-        require(idToOwnerFightersMarket[id] == msg.sender, "!nation ruler");
-        uint256 aircraftCount = FightersContract(fighters).getAircraftCount(id);
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation ruler");
+        uint256 fighterCount = FightersContract(fighters).getAircraftCount(id);
+        uint256 bomberCount = bomb.getAircraftCount(id);
         uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
             id
         );
+        uint256 aircraftCount = (fighterCount + bomberCount);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -590,11 +788,14 @@ contract FightersMarketplace is Ownable {
     }
 
     function buyF86Sabre(uint256 amount, uint256 id) public {
-        require(idToOwnerFightersMarket[id] == msg.sender, "!nation ruler");
-        uint256 aircraftCount = FightersContract(fighters).getAircraftCount(id);
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation ruler");
+        uint256 fighterCount = FightersContract(fighters).getAircraftCount(id);
+        uint256 bomberCount = bomb.getAircraftCount(id);
         uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
             id
         );
+        uint256 aircraftCount = (fighterCount + bomberCount);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -614,11 +815,14 @@ contract FightersMarketplace is Ownable {
     }
 
     function buyMig15(uint256 amount, uint256 id) public {
-        require(idToOwnerFightersMarket[id] == msg.sender, "!nation ruler");
-        uint256 aircraftCount = FightersContract(fighters).getAircraftCount(id);
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation ruler");
+        uint256 fighterCount = FightersContract(fighters).getAircraftCount(id);
+        uint256 bomberCount = bomb.getAircraftCount(id);
         uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
             id
         );
+        uint256 aircraftCount = (fighterCount + bomberCount);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -638,11 +842,14 @@ contract FightersMarketplace is Ownable {
     }
 
     function buyF100SuperSabre(uint256 amount, uint256 id) public {
-        require(idToOwnerFightersMarket[id] == msg.sender, "!nation ruler");
-        uint256 aircraftCount = FightersContract(fighters).getAircraftCount(id);
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation ruler");
+        uint256 fighterCount = FightersContract(fighters).getAircraftCount(id);
+        uint256 bomberCount = bomb.getAircraftCount(id);
         uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
             id
         );
+        uint256 aircraftCount = (fighterCount + bomberCount);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -662,11 +869,14 @@ contract FightersMarketplace is Ownable {
     }
 
     function buyF35Lightning(uint256 amount, uint256 id) public {
-        require(idToOwnerFightersMarket[id] == msg.sender, "!nation ruler");
-        uint256 aircraftCount = FightersContract(fighters).getAircraftCount(id);
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation ruler");
+        uint256 fighterCount = FightersContract(fighters).getAircraftCount(id);
+        uint256 bomberCount = bomb.getAircraftCount(id);
         uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
             id
         );
+        uint256 aircraftCount = (fighterCount + bomberCount);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -686,11 +896,14 @@ contract FightersMarketplace is Ownable {
     }
 
     function buyF15Eagle(uint256 amount, uint256 id) public {
-        require(idToOwnerFightersMarket[id] == msg.sender, "!nation ruler");
-        uint256 aircraftCount = FightersContract(fighters).getAircraftCount(id);
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation ruler");
+        uint256 fighterCount = FightersContract(fighters).getAircraftCount(id);
+        uint256 bomberCount = bomb.getAircraftCount(id);
         uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
             id
         );
+        uint256 aircraftCount = (fighterCount + bomberCount);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -710,11 +923,14 @@ contract FightersMarketplace is Ownable {
     }
 
     function buySu30Mki(uint256 amount, uint256 id) public {
-        require(idToOwnerFightersMarket[id] == msg.sender, "!nation ruler");
-        uint256 aircraftCount = FightersContract(fighters).getAircraftCount(id);
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation ruler");
+        uint256 fighterCount = FightersContract(fighters).getAircraftCount(id);
+        uint256 bomberCount = bomb.getAircraftCount(id);
         uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
             id
         );
+        uint256 aircraftCount = (fighterCount + bomberCount);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -734,11 +950,14 @@ contract FightersMarketplace is Ownable {
     }
 
     function buyF22Raptor(uint256 amount, uint256 id) public {
-        require(idToOwnerFightersMarket[id] == msg.sender, "!nation ruler");
-        uint256 aircraftCount = FightersContract(fighters).getAircraftCount(id);
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation ruler");
+        uint256 fighterCount = FightersContract(fighters).getAircraftCount(id);
+        uint256 bomberCount = bomb.getAircraftCount(id);
         uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
             id
         );
+        uint256 aircraftCount = (fighterCount + bomberCount);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);

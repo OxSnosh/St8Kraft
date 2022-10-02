@@ -132,25 +132,30 @@ contract NationStrengthContract is Ownable {
         view
         returns (uint256)
     {
-        uint256 fighterStrength = getStrengthFromFighters(id);
-        uint256 bomberStrength = getStrengthFromBombers(id);
-        uint256 strengthFromAirForce = (fighterStrength + bomberStrength);
+        uint256 defendingFighterStrength = getStrengthFromDefendingFighters(id);
+        uint256 defendingBomberStrength = getStrengthFromDefendingBombers(id);
+        uint256 deployedFighterStrength = getStrengthFromDeployedFighters(id);
+        uint256 deployedBomberStrength = getStrengthFromDeployedBombers(id);
+        uint256 strengthFromAirForce = (defendingFighterStrength +
+            defendingBomberStrength +
+            deployedFighterStrength +
+            deployedBomberStrength);
         return strengthFromAirForce;
     }
 
-    function getStrengthFromFighters(uint256 id)
+    function getStrengthFromDefendingFighters(uint256 id)
         internal
         view
         returns (uint256)
     {
-        uint256 yak9Count = fight.getYak9Count(id);
-        uint256 p51MustangCount = fight.getP51MustangCount(id);
-        uint256 f86SabreCount = fight.getF86SabreCount(id);
-        uint256 mig15Count = fight.getMig15Count(id);
-        uint256 f100SuperSabreCount = fight.getF100SuperSabreCount(id);
-        uint256 additionalFighterStrength = getAdditionalStrengthFromFighters(
-            id
-        );
+        uint256 yak9Count = fight.getDefendingYak9Count(id);
+        uint256 p51MustangCount = fight.getDefendingP51MustangCount(id);
+        uint256 f86SabreCount = fight.getDefendingF86SabreCount(id);
+        uint256 mig15Count = fight.getDefendingMig15Count(id);
+        uint256 f100SuperSabreCount = fight.getDefendingF100SuperSabreCount(id);
+        uint256 additionalFighterStrength = getAdditionalStrengthFromDefendingFighters(
+                id
+            );
         uint256 strengthFromFighters = (((yak9Count * 1) +
             (p51MustangCount * 2) +
             (f86SabreCount * 3) +
@@ -160,15 +165,15 @@ contract NationStrengthContract is Ownable {
         return strengthFromFighters;
     }
 
-    function getAdditionalStrengthFromFighters(uint256 id)
+    function getAdditionalStrengthFromDefendingFighters(uint256 id)
         public
         view
         returns (uint256)
     {
-        uint256 f35LightningCount = fight.getF35LightningCount(id);
-        uint256 f15EagleCount = fight.getF15EagleCount(id);
-        uint256 su30MkiCount = fight.getSu30MkiCount(id);
-        uint256 f22RaptorCount = fight.getF22RaptorCount(id);
+        uint256 f35LightningCount = fight.getDefendingF35LightningCount(id);
+        uint256 f15EagleCount = fight.getDefendingF15EagleCount(id);
+        uint256 su30MkiCount = fight.getDefendingSu30MkiCount(id);
+        uint256 f22RaptorCount = fight.getDefendingF22RaptorCount(id);
         uint256 additionalFighterStrength = ((f35LightningCount * 6) +
             (f15EagleCount * 7) +
             (su30MkiCount * 8) +
@@ -176,17 +181,20 @@ contract NationStrengthContract is Ownable {
         return additionalFighterStrength;
     }
 
-    function getStrengthFromBombers(uint256 id)
+    function getStrengthFromDefendingBombers(uint256 id)
         internal
         view
         returns (uint256)
     {
-        uint256 ah1CobraCount = bomb.getAh1CobraCount(id);
-        uint256 ah64ApacheCount = bomb.getAh64ApacheCount(id);
-        uint256 bristolBlenheimCount = bomb.getBristolBlenheimCount(id);
-        uint256 b52MitchellCount = bomb.getB52MitchellCount(id);
-        uint256 b17gFlyingFortressCount = bomb.getB17gFlyingFortressCount(id);
-        uint256 additionalStrengthFromBombers = getAdditionalStrengthFromBombers(
+        uint256 ah1CobraCount = bomb.getDefendingAh1CobraCount(id);
+        uint256 ah64ApacheCount = bomb.getDefendingAh64ApacheCount(id);
+        uint256 bristolBlenheimCount = bomb.getDefendingBristolBlenheimCount(
+            id
+        );
+        uint256 b52MitchellCount = bomb.getDefendingB52MitchellCount(id);
+        uint256 b17gFlyingFortressCount = bomb
+            .getDefendingB17gFlyingFortressCount(id);
+        uint256 additionalStrengthFromBombers = getAdditionalStrengthFromDefendingBombers(
                 id
             );
         uint256 strengthFromBombers = (((ah1CobraCount * 1) +
@@ -198,15 +206,96 @@ contract NationStrengthContract is Ownable {
         return strengthFromBombers;
     }
 
-    function getAdditionalStrengthFromBombers(uint256 id)
+    function getAdditionalStrengthFromDefendingBombers(uint256 id)
         internal
         view
         returns (uint256)
     {
-        uint256 b52StratofortressCount = bomb.getB52StratofortressCount(id);
-        uint256 b2SpiritCount = bomb.getB2SpiritCount(id);
-        uint256 b1bLancerCount = bomb.getB1bLancer(id);
-        uint256 tupolevTu160Count = bomb.getTupolevTu160(id);
+        uint256 b52StratofortressCount = bomb
+            .getDefendingB52StratofortressCount(id);
+        uint256 b2SpiritCount = bomb.getDefendingB2SpiritCount(id);
+        uint256 b1bLancerCount = bomb.getDefendingB1bLancer(id);
+        uint256 tupolevTu160Count = bomb.getDefendingTupolevTu160(id);
+        uint256 additionalStrengthFromBombers = ((b52StratofortressCount * 6) +
+            (b2SpiritCount * 7) +
+            (b1bLancerCount * 8) +
+            (tupolevTu160Count * 9));
+        return additionalStrengthFromBombers;
+    }
+
+    function getStrengthFromDeployedFighters(uint256 id)
+        internal
+        view
+        returns (uint256)
+    {
+        uint256 yak9Count = fight.getDeployedYak9Count(id);
+        uint256 p51MustangCount = fight.getDeployedP51MustangCount(id);
+        uint256 f86SabreCount = fight.getDeployedF86SabreCount(id);
+        uint256 mig15Count = fight.getDeployedMig15Count(id);
+        uint256 f100SuperSabreCount = fight.getDeployedF100SuperSabreCount(id);
+        uint256 additionalFighterStrength = getAdditionalStrengthFromDeployedFighters(
+                id
+            );
+        uint256 strengthFromFighters = (((yak9Count * 1) +
+            (p51MustangCount * 2) +
+            (f86SabreCount * 3) +
+            (mig15Count * 4) +
+            (f100SuperSabreCount * 5) +
+            additionalFighterStrength) * 5);
+        return strengthFromFighters;
+    }
+
+    function getAdditionalStrengthFromDeployedFighters(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 f35LightningCount = fight.getDeployedF35LightningCount(id);
+        uint256 f15EagleCount = fight.getDeployedF15EagleCount(id);
+        uint256 su30MkiCount = fight.getDeployedSu30MkiCount(id);
+        uint256 f22RaptorCount = fight.getDeployedF22RaptorCount(id);
+        uint256 additionalFighterStrength = ((f35LightningCount * 6) +
+            (f15EagleCount * 7) +
+            (su30MkiCount * 8) +
+            (f22RaptorCount * 9));
+        return additionalFighterStrength;
+    }
+
+    function getStrengthFromDeployedBombers(uint256 id)
+        internal
+        view
+        returns (uint256)
+    {
+        uint256 ah1CobraCount = bomb.getDeployedAh1CobraCount(id);
+        uint256 ah64ApacheCount = bomb.getDeployedAh64ApacheCount(id);
+        uint256 bristolBlenheimCount = bomb.getDeployedBristolBlenheimCount(
+            id
+        );
+        uint256 b52MitchellCount = bomb.getDeployedB52MitchellCount(id);
+        uint256 b17gFlyingFortressCount = bomb
+            .getDeployedB17gFlyingFortressCount(id);
+        uint256 additionalStrengthFromBombers = getAdditionalStrengthFromDeployedBombers(
+                id
+            );
+        uint256 strengthFromBombers = (((ah1CobraCount * 1) +
+            (ah64ApacheCount * 2) +
+            (bristolBlenheimCount * 3) +
+            (b52MitchellCount * 4) +
+            (b17gFlyingFortressCount * 5) +
+            additionalStrengthFromBombers) * 5);
+        return strengthFromBombers;
+    }
+
+    function getAdditionalStrengthFromDeployedBombers(uint256 id)
+        internal
+        view
+        returns (uint256)
+    {
+        uint256 b52StratofortressCount = bomb
+            .getDeployedB52StratofortressCount(id);
+        uint256 b2SpiritCount = bomb.getDeployedB2SpiritCount(id);
+        uint256 b1bLancerCount = bomb.getDeployedB1bLancer(id);
+        uint256 tupolevTu160Count = bomb.getDeployedTupolevTu160(id);
         uint256 additionalStrengthFromBombers = ((b52StratofortressCount * 6) +
             (b2SpiritCount * 7) +
             (b1bLancerCount * 8) +
