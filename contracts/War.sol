@@ -91,7 +91,7 @@ contract WarContract is Ownable {
         uint256 soldiersLost;
         uint256 tanksLost;
         uint256 cruiseMissilesLost;
-        uint256 aircraftStrengthLost;
+        uint256 aircraftLost;
         uint256 navyStrengthLost;
         uint256 infrastructureLost;
         uint256 technologyLost;
@@ -104,7 +104,7 @@ contract WarContract is Ownable {
         uint256 soldiersLost;
         uint256 tanksLost;
         uint256 cruiseMissilesLost;
-        uint256 aircraftStrengthLost;
+        uint256 aircraftLost;
         uint256 navyStrengthLost;
         uint256 infrastructureLost;
         uint256 technologyLost;
@@ -604,11 +604,11 @@ contract WarContract is Ownable {
         onlyAirBattle
     {
         if (warIdToWar[_warId].offenseId == countryId) {
-            warIdToDefenseDeployed2[_warId].ah1CobraDeployed = 0;
-            warIdToDefenseDeployed2[_warId].ah64ApacheDeployed = 0;
-            warIdToDefenseDeployed2[_warId].bristolBlenheimDeployed = 0;
-            warIdToDefenseDeployed2[_warId].b52MitchellDeployed = 0;
-            warIdToDefenseDeployed2[_warId].b17gFlyingFortressDeployed = 0;
+            warIdToOffenseDeployed2[_warId].ah1CobraDeployed = 0;
+            warIdToOffenseDeployed2[_warId].ah64ApacheDeployed = 0;
+            warIdToOffenseDeployed2[_warId].bristolBlenheimDeployed = 0;
+            warIdToOffenseDeployed2[_warId].b52MitchellDeployed = 0;
+            warIdToOffenseDeployed2[_warId].b17gFlyingFortressDeployed = 0;
             warIdToOffenseDeployed2[_warId].b52StratofortressDeployed = 0;
             warIdToOffenseDeployed2[_warId].b2SpiritDeployed = 0;
             warIdToOffenseDeployed2[_warId].b1bLancerDeployed = 0;
@@ -620,10 +620,128 @@ contract WarContract is Ownable {
             warIdToDefenseDeployed2[_warId].bristolBlenheimDeployed = 0;
             warIdToDefenseDeployed2[_warId].b52MitchellDeployed = 0;
             warIdToDefenseDeployed2[_warId].b17gFlyingFortressDeployed = 0;
-            warIdToOffenseDeployed2[_warId].b52StratofortressDeployed = 0;
-            warIdToOffenseDeployed2[_warId].b2SpiritDeployed = 0;
-            warIdToOffenseDeployed2[_warId].b1bLancerDeployed = 0;
-            warIdToOffenseDeployed2[_warId].tupolevTu160Deployed = 0;
+            warIdToDefenseDeployed2[_warId].b52StratofortressDeployed = 0;
+            warIdToDefenseDeployed2[_warId].b2SpiritDeployed = 0;
+            warIdToDefenseDeployed2[_warId].b1bLancerDeployed = 0;
+            warIdToDefenseDeployed2[_warId].tupolevTu160Deployed = 0;
+        }
+    }
+
+    function decrementLosses(
+        uint256 _warId,
+        uint256[] memory defenderLosses,
+        uint256 defenderId,
+        uint256[] memory attackerLosses,
+        uint256 attackerId
+    ) public onlyAirBattle {
+        (uint256 offenseWarId, uint256 defenseWarId) = getInvolvedParties(
+            _warId
+        );
+        if (offenseWarId == attackerId) {
+            for (uint256 i; i < attackerLosses.length; i++) {
+                if (attackerLosses[i] == 1) {
+                    warIdToOffenseDeployed1[_warId].yak9Deployed -= 1;
+                } else if (attackerLosses[i] == 2) {
+                    warIdToOffenseDeployed1[_warId].p51MustangDeployed -= 1;
+                } else if (attackerLosses[i] == 3) {
+                    warIdToOffenseDeployed1[_warId].f86SabreDeployed -= 1;
+                } else if (attackerLosses[i] == 4) {
+                    warIdToOffenseDeployed1[_warId].mig15Deployed -= 1;
+                } else if (attackerLosses[i] == 5) {
+                    warIdToOffenseDeployed1[_warId].f100SuperSabreDeployed -= 1;
+                } else if (attackerLosses[i] == 6) {
+                    warIdToOffenseDeployed1[_warId].f35LightningDeployed -= 1;
+                } else if (attackerLosses[i] == 7) {
+                    warIdToOffenseDeployed1[_warId].f15EagleDeployed -= 1;
+                } else if (attackerLosses[i] == 8) {
+                    warIdToOffenseDeployed1[_warId].su30MkiDeployed -= 1;
+                } else if (attackerLosses[i] == 9) {
+                    warIdToOffenseDeployed1[_warId].f22RaptorDeployed -= 1;
+                }
+            }
+        }
+        if (offenseWarId == defenderId) {
+            for (uint256 i; i < defenderLosses.length; i++) {
+                if (defenderLosses[i] == 1) {
+                    warIdToOffenseDeployed1[_warId].yak9Deployed -= 1;
+                } else if (defenderLosses[i] == 2) {
+                    warIdToOffenseDeployed1[_warId].p51MustangDeployed -= 1;
+                } else if (defenderLosses[i] == 3) {
+                    warIdToOffenseDeployed1[_warId].f86SabreDeployed -= 1;
+                } else if (defenderLosses[i] == 4) {
+                    warIdToOffenseDeployed1[_warId].mig15Deployed -= 1;
+                } else if (defenderLosses[i] == 5) {
+                    warIdToOffenseDeployed1[_warId].f100SuperSabreDeployed -= 1;
+                } else if (defenderLosses[i] == 6) {
+                    warIdToOffenseDeployed1[_warId].f35LightningDeployed -= 1;
+                } else if (defenderLosses[i] == 7) {
+                    warIdToOffenseDeployed1[_warId].f15EagleDeployed -= 1;
+                } else if (defenderLosses[i] == 8) {
+                    warIdToOffenseDeployed1[_warId].su30MkiDeployed -= 1;
+                } else if (defenderLosses[i] == 9) {
+                    warIdToOffenseDeployed1[_warId].f22RaptorDeployed -= 1;
+                }
+            }
+        }
+        if (defenseWarId == attackerId) {
+            for (uint256 i; i < attackerLosses.length; i++) {
+                if (attackerLosses[i] == 1) {
+                    warIdToDefenseDeployed1[_warId].yak9Deployed -= 1;
+                } else if (attackerLosses[i] == 2) {
+                    warIdToDefenseDeployed1[_warId].p51MustangDeployed -= 1;
+                } else if (attackerLosses[i] == 3) {
+                    warIdToDefenseDeployed1[_warId].f86SabreDeployed -= 1;
+                } else if (attackerLosses[i] == 4) {
+                    warIdToDefenseDeployed1[_warId].mig15Deployed -= 1;
+                } else if (attackerLosses[i] == 5) {
+                    warIdToDefenseDeployed1[_warId].f100SuperSabreDeployed -= 1;
+                } else if (attackerLosses[i] == 6) {
+                    warIdToDefenseDeployed1[_warId].f35LightningDeployed -= 1;
+                } else if (attackerLosses[i] == 7) {
+                    warIdToDefenseDeployed1[_warId].f15EagleDeployed -= 1;
+                } else if (attackerLosses[i] == 8) {
+                    warIdToDefenseDeployed1[_warId].su30MkiDeployed -= 1;
+                } else if (attackerLosses[i] == 9) {
+                    warIdToDefenseDeployed1[_warId].f22RaptorDeployed -= 1;
+                }
+            }
+        }
+        if (defenseWarId == defenderId) {
+            for (uint256 i; i < defenderLosses.length; i++) {
+                if (defenderLosses[i] == 1) {
+                    warIdToDefenseDeployed1[_warId].yak9Deployed -= 1;
+                } else if (defenderLosses[i] == 2) {
+                    warIdToDefenseDeployed1[_warId].p51MustangDeployed -= 1;
+                } else if (defenderLosses[i] == 3) {
+                    warIdToDefenseDeployed1[_warId].f86SabreDeployed -= 1;
+                } else if (defenderLosses[i] == 4) {
+                    warIdToDefenseDeployed1[_warId].mig15Deployed -= 1;
+                } else if (defenderLosses[i] == 5) {
+                    warIdToDefenseDeployed1[_warId].f100SuperSabreDeployed -= 1;
+                } else if (defenderLosses[i] == 6) {
+                    warIdToDefenseDeployed1[_warId].f35LightningDeployed -= 1;
+                } else if (defenderLosses[i] == 7) {
+                    warIdToDefenseDeployed1[_warId].f15EagleDeployed -= 1;
+                } else if (defenderLosses[i] == 8) {
+                    warIdToDefenseDeployed1[_warId].su30MkiDeployed -= 1;
+                } else if (defenderLosses[i] == 9) {
+                    warIdToDefenseDeployed1[_warId].f22RaptorDeployed -= 1;
+                }
+            }
+        }
+    }
+
+    function addAirBattleCasualties(
+        uint256 _warId,
+        uint256 nationId,
+        uint256 battleCausalties
+    ) public onlyAirBattle {
+        (uint256 offenseId, uint256 defenseId) = getInvolvedParties(_warId);
+        if (offenseId == nationId) {
+            warIdToOffenseLosses[_warId].aircraftLost = battleCausalties;
+        }
+        if (defenseId == nationId) {
+            warIdToDefenseLosses[_warId].aircraftLost = battleCausalties;
         }
     }
 }

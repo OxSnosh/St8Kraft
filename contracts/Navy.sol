@@ -186,7 +186,6 @@ contract NavyContract is Ownable {
                 idToNavy[attackerId].aircraftCarrierCount -= 1;
             }
         }
-
     }
 
     function buyCorvette(uint256 amount, uint256 id) public {

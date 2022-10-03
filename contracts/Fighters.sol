@@ -14,6 +14,7 @@ contract FightersContract is Ownable {
     address public treasuryAddress;
     address public infrastructure;
     address public war;
+    address public airBattle;
 
     CountryMinter mint;
 
@@ -53,7 +54,8 @@ contract FightersContract is Ownable {
         address _fightersMarket,
         address _treasuryAddress,
         address _war,
-        address _infrastructure
+        address _infrastructure,
+        address _airBattle
     ) {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
@@ -62,6 +64,7 @@ contract FightersContract is Ownable {
         treasuryAddress = _treasuryAddress;
         war = _war;
         infrastructure = _infrastructure;
+        airBattle = _airBattle;
     }
 
     modifier onlyCountryMinter() {
@@ -81,6 +84,14 @@ contract FightersContract is Ownable {
         require(
             msg.sender == fightersMarket,
             "this function can only be called by market"
+        );
+        _;
+    }
+
+    modifier onlyAirBattle() {
+        require(
+            msg.sender == airBattle,
+            "this function can only be called by air battle"
         );
         _;
     }
@@ -110,9 +121,31 @@ contract FightersContract is Ownable {
     }
 
     function generateFighters(uint256 id, address nationOwner) public {
-        DefendingFighters memory newDefendingFighters = DefendingFighters(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        DefendingFighters memory newDefendingFighters = DefendingFighters(
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        );
         idToDefendingFighters[id] = newDefendingFighters;
-        DeployedFighters memory newDeployedFighters = DeployedFighters(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        DeployedFighters memory newDeployedFighters = DeployedFighters(
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        );
         idToDeployedFighters[id] = newDeployedFighters;
         idToOwnerFighters[id] = nationOwner;
     }
@@ -123,7 +156,7 @@ contract FightersContract is Ownable {
         uint256 count = (defendingCount + deployedCount);
         return count;
     }
-    
+
     function getDefendingCount(uint256 id) public view returns (uint256) {
         uint256 defendingCount = idToDefendingFighters[id].defendingAircraft;
         return defendingCount;
@@ -164,11 +197,17 @@ contract FightersContract is Ownable {
         idToDeployedFighters[id].deployedAircraft -= amount;
     }
 
-    function destroyDefendingAircraft(uint256 amount, uint256 id) internal onlyWar {
+    function destroyDefendingAircraft(uint256 amount, uint256 id)
+        internal
+        onlyWar
+    {
         idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function destroyDeployedAircraft(uint256 amount, uint256 id) internal onlyWar {
+    function destroyDeployedAircraft(uint256 amount, uint256 id)
+        internal
+        onlyWar
+    {
         idToDeployedFighters[id].deployedAircraft -= amount;
     }
 
@@ -187,14 +226,20 @@ contract FightersContract is Ownable {
         idToDefendingFighters[id].defendingAircraft += amount;
     }
 
-    function decreaseDefendingYak9Count(uint256 amount, uint256 id) public onlyWar {
+    function decreaseDefendingYak9Count(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
         uint256 currentAmount = idToDefendingFighters[id].yak9Count;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
         idToDefendingFighters[id].yak9Count -= amount;
         idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function decreaseDeployedYak9Count(uint256 amount, uint256 id) public onlyWar {
+    function decreaseDeployedYak9Count(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
         uint256 currentAmount = idToDeployedFighters[id].yak9Count;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
         idToDeployedFighters[id].yak9Count -= amount;
@@ -210,12 +255,20 @@ contract FightersContract is Ownable {
         idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function getDefendingP51MustangCount(uint256 id) public view returns (uint256) {
+    function getDefendingP51MustangCount(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 count = idToDefendingFighters[id].p51MustangCount;
         return count;
     }
 
-    function getDeployedP51MustangCount(uint256 id) public view returns (uint256) {
+    function getDeployedP51MustangCount(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 count = idToDeployedFighters[id].p51MustangCount;
         return count;
     }
@@ -257,12 +310,20 @@ contract FightersContract is Ownable {
         idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function getDefendingF86SabreCount(uint256 id) public view returns (uint256) {
+    function getDefendingF86SabreCount(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 count = idToDefendingFighters[id].f86SabreCount;
         return count;
     }
 
-    function getDeployedF86SabreCount(uint256 id) public view returns (uint256) {
+    function getDeployedF86SabreCount(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 count = idToDeployedFighters[id].f86SabreCount;
         return count;
     }
@@ -275,14 +336,20 @@ contract FightersContract is Ownable {
         idToDefendingFighters[id].defendingAircraft += amount;
     }
 
-    function decreaseDefendingF86SabreCount(uint256 amount, uint256 id) public onlyWar {
+    function decreaseDefendingF86SabreCount(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
         uint256 currentAmount = idToDefendingFighters[id].f86SabreCount;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
         idToDefendingFighters[id].f86SabreCount -= amount;
         idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function decreaseDeployedF86SabreCount(uint256 amount, uint256 id) public onlyWar {
+    function decreaseDeployedF86SabreCount(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
         uint256 currentAmount = idToDeployedFighters[id].f86SabreCount;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
         idToDeployedFighters[id].f86SabreCount -= amount;
@@ -313,14 +380,20 @@ contract FightersContract is Ownable {
         idToDefendingFighters[id].defendingAircraft += amount;
     }
 
-    function decreaseDefendingMig15Count(uint256 amount, uint256 id) public onlyWar {
+    function decreaseDefendingMig15Count(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
         uint256 currentAmount = idToDefendingFighters[id].mig15Count;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
         idToDefendingFighters[id].mig15Count -= amount;
         idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function decreaseDeployedMig15Count(uint256 amount, uint256 id) public onlyWar {
+    function decreaseDeployedMig15Count(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
         uint256 currentAmount = idToDeployedFighters[id].mig15Count;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
         idToDeployedFighters[id].mig15Count -= amount;
@@ -336,12 +409,20 @@ contract FightersContract is Ownable {
         idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function getDefendingF100SuperSabreCount(uint256 id) public view returns (uint256) {
+    function getDefendingF100SuperSabreCount(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 count = idToDefendingFighters[id].f100SuperSabreCount;
         return count;
     }
 
-    function getDeployedF100SuperSabreCount(uint256 id) public view returns (uint256) {
+    function getDeployedF100SuperSabreCount(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 count = idToDeployedFighters[id].f100SuperSabreCount;
         return count;
     }
@@ -383,12 +464,20 @@ contract FightersContract is Ownable {
         idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function getDefendingF35LightningCount(uint256 id) public view returns (uint256) {
+    function getDefendingF35LightningCount(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 count = idToDefendingFighters[id].f35LightningCount;
         return count;
     }
 
-    function getDeployedF35LightningCount(uint256 id) public view returns (uint256) {
+    function getDeployedF35LightningCount(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 count = idToDeployedFighters[id].f35LightningCount;
         return count;
     }
@@ -430,12 +519,20 @@ contract FightersContract is Ownable {
         idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function getDefendingF15EagleCount(uint256 id) public view returns (uint256) {
+    function getDefendingF15EagleCount(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 count = idToDefendingFighters[id].f15EagleCount;
         return count;
     }
 
-    function getDeployedF15EagleCount(uint256 id) public view returns (uint256) {
+    function getDeployedF15EagleCount(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 count = idToDeployedFighters[id].f15EagleCount;
         return count;
     }
@@ -448,14 +545,20 @@ contract FightersContract is Ownable {
         idToDefendingFighters[id].defendingAircraft += amount;
     }
 
-    function decreaseDefendingF15EagleCount(uint256 amount, uint256 id) public onlyWar {
+    function decreaseDefendingF15EagleCount(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
         uint256 currentAmount = idToDefendingFighters[id].f15EagleCount;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
         idToDefendingFighters[id].f15EagleCount -= amount;
         idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function decreaseDeployedF15EagleCount(uint256 amount, uint256 id) public onlyWar {
+    function decreaseDeployedF15EagleCount(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
         uint256 currentAmount = idToDeployedFighters[id].f15EagleCount;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
         idToDeployedFighters[id].f15EagleCount -= amount;
@@ -471,7 +574,11 @@ contract FightersContract is Ownable {
         idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function getDefendingSu30MkiCount(uint256 id) public view returns (uint256) {
+    function getDefendingSu30MkiCount(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 count = idToDefendingFighters[id].su30MkiCount;
         return count;
     }
@@ -489,14 +596,20 @@ contract FightersContract is Ownable {
         idToDefendingFighters[id].defendingAircraft += amount;
     }
 
-    function decreaseDefendingSu30MkiCount(uint256 amount, uint256 id) public onlyWar {
+    function decreaseDefendingSu30MkiCount(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
         uint256 currentAmount = idToDefendingFighters[id].su30MkiCount;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
         idToDefendingFighters[id].su30MkiCount -= amount;
         idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function decreaseDeployedSu30MkiCount(uint256 amount, uint256 id) public onlyWar {
+    function decreaseDeployedSu30MkiCount(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
         uint256 currentAmount = idToDeployedFighters[id].su30MkiCount;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
         idToDeployedFighters[id].su30MkiCount -= amount;
@@ -512,12 +625,20 @@ contract FightersContract is Ownable {
         idToDefendingFighters[id].defendingAircraft -= amount;
     }
 
-    function getDefendingF22RaptorCount(uint256 id) public view returns (uint256) {
+    function getDefendingF22RaptorCount(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 count = idToDefendingFighters[id].f22RaptorCount;
         return count;
     }
 
-    function getDeployedF22RaptorCount(uint256 id) public view returns (uint256) {
+    function getDeployedF22RaptorCount(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 count = idToDeployedFighters[id].f22RaptorCount;
         return count;
     }
@@ -530,7 +651,10 @@ contract FightersContract is Ownable {
         idToDefendingFighters[id].defendingAircraft += amount;
     }
 
-    function decreaseDefendingF22RaptorCount(uint256 amount, uint256 id) public onlyWar {
+    function decreaseDefendingF22RaptorCount(uint256 amount, uint256 id)
+        public
+        onlyWar
+    {
         uint256 currentAmount = idToDefendingFighters[id].f22RaptorCount;
         require((currentAmount - amount) >= 0, "cannot decrease that many");
         idToDefendingFighters[id].f22RaptorCount -= amount;
@@ -551,6 +675,58 @@ contract FightersContract is Ownable {
         require((currentAmount - amount) >= 0, "cannot delete that many");
         idToDefendingFighters[id].f22RaptorCount -= amount;
         idToDefendingFighters[id].defendingAircraft -= amount;
+    }
+
+    function decrementLosses(
+        uint256[] memory defenderLosses,
+        uint256 defenderId,
+        uint256[] memory attackerLosses,
+        uint256 attackerId
+    ) public onlyAirBattle {
+        idToDefendingFighters[defenderId].defendingAircraft -= defenderLosses.length;
+        for(uint i; i < defenderLosses.length; i++) {
+            if (defenderLosses[i] == 1) {
+                idToDefendingFighters[defenderId].yak9Count -= 1;
+            } else if (defenderLosses[i] == 2) {
+                idToDefendingFighters[defenderId].p51MustangCount -= 1;
+            } else if (defenderLosses[i] == 3) {
+                idToDefendingFighters[defenderId].f86SabreCount -= 1;
+            } else if (defenderLosses[i] == 4) {
+                idToDefendingFighters[defenderId].mig15Count -= 1;
+            } else if (defenderLosses[i] == 5) {
+                idToDefendingFighters[defenderId].f100SuperSabreCount -= 1;
+            } else if (defenderLosses[i] == 6) {
+                idToDefendingFighters[defenderId].f35LightningCount -= 1;
+            } else if (defenderLosses[i] == 7) {
+                idToDefendingFighters[defenderId].f15EagleCount -= 1;
+            } else if (defenderLosses[i] == 8) {
+                idToDefendingFighters[defenderId].su30MkiCount -= 1;
+            }else if (defenderLosses[i] == 9) {
+                idToDefendingFighters[defenderId].f22RaptorCount -= 1;
+            }
+        }
+        idToDeployedFighters[attackerId].deployedAircraft -= attackerLosses.length;
+        for(uint i; i < attackerLosses.length; i++) {
+            if (attackerLosses[i] == 1) {
+                idToDeployedFighters[attackerId].yak9Count -= 1;
+            } else if (attackerLosses[i] == 2) {
+                idToDeployedFighters[attackerId].p51MustangCount -= 1;
+            } else if (attackerLosses[i] == 3) {
+                idToDeployedFighters[attackerId].f86SabreCount -= 1;
+            } else if (attackerLosses[i] == 4) {
+                idToDeployedFighters[attackerId].mig15Count -= 1;
+            } else if (attackerLosses[i] == 5) {
+                idToDeployedFighters[attackerId].f100SuperSabreCount -= 1;
+            } else if (attackerLosses[i] == 6) {
+                idToDeployedFighters[attackerId].f35LightningCount -= 1;
+            } else if (attackerLosses[i] == 7) {
+                idToDeployedFighters[attackerId].f15EagleCount -= 1;
+            } else if (attackerLosses[i] == 8) {
+                idToDeployedFighters[attackerId].su30MkiCount -= 1;
+            }else if (attackerLosses[i] == 9) {
+                idToDeployedFighters[attackerId].f22RaptorCount -= 1;
+            }
+        }
     }
 }
 
@@ -600,13 +776,12 @@ contract FightersMarketplace is Ownable {
     ) {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
-        bombers = _bombers; 
+        bombers = _bombers;
         bomb = BombersContract(_bombers);
         fighters = _fighters;
         treasury = _treasury;
         infrastructure = _infrastructure;
     }
-
 
     mapping(uint256 => address) public idToOwnerFightersMarket;
 

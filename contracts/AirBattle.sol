@@ -544,6 +544,26 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
                 }
             }
         }
+        uint256[] memory attackerLosses = airBattleIdToAttackerFighterLosses[requestNumber];
+        uint256[] memory defenderLosses = airBattleIdToDefenderFighterLosses[requestNumber];
+        uint256 attackerId = airBattleIdToAttackerFighters[requestNumber].countryId;
+        uint256 defenderId = airBattleIdToDefenderFighters[requestNumber].countryId;
+        fighter.decrementLosses(
+            defenderLosses,
+            defenderId,
+            attackerLosses,
+            attackerId
+        );
+        uint256 _warId = airBattleIdToAttackerFighters[requestNumber].warId;
+        war.decrementLosses(
+            _warId,
+            defenderLosses,
+            defenderId,
+            attackerLosses,
+            attackerId
+        );
+        war.addAirBattleCasualties(_warId, attackerId, attackerLosses.length);
+        war.addAirBattleCasualties(_warId, defenderId, defenderLosses.length);
     }
 
     function getLosses(uint256 battleId, uint256 numberBetweenZeroAndFive)
