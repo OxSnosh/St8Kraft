@@ -26,77 +26,217 @@ contract ResourcesContract is VRFConsumerBaseV2 {
 
     struct Resources1 {
         bool aluminium;
+        //Aluminum 
+        //Increases soldier efficiency +20%, 
+        //lowers infrastructure purchase cost -7%, and 
+        //lowers aircraft purchase costs -8%.
         bool cattle;
+        //Cattle
+        //Increases number of citizens +5% 
+        //and lowers land purchase cost -10%.
         bool coal;
+        //Coal
+        //Increases the purchased land area of a nation by 15%, 
+        //increases soldier efficiency +8%, 
+        //and lowers infrastructure purchase cost -4%.
         bool fish;
+        //Fish
+        //Increases number of citizens +8% 
+        //and lowers land purchase cost -5%.
         bool furs;
+        //Furs
+        //Increases citizen's daily income +$3.50 
+        //and triples the natural growth of a nation.
         bool gems;
+        //Gems
+        //Increases citizen's daily income +$1.50 
+        //and increases population happiness +2.5.
         bool gold;
+        //Gold
+        //Increases citizen's daily income +$3.00 
+        //and lowers technology cost by 5%.
         bool iron;
+        //Iron
+        //Lowers soldier purchase cost -$3.00, 
+        //lowers infrastructure upkeep costs -10%, 
+        //lowers infrastructure purchase costs -5%, 
+        //and lowers tank upkeep costs -5%.
         bool lead;
+        //Lead
+        //Lowers cruise missile and nuclear weapon purchase cost and upkeep cost -20%, 
+        //lowers aircraft upkeep cost -25%, 
+        //lowers tank purchase and upkeep costs -8%, 
+        //lowers soldier upkeep cost -$0.50, 
+        //reduces environment penalties for owning nuclear weapons by 50%, 
+        //and lowers all navy vessel upkeep cost -20%.
         bool lumber;
+        //Lumber
+        //Lowers infrastructure purchase cost -6% 
+        //and lowers infrastructure upkeep costs -8%.
         bool marble;
+        //Marble
+        //Lowers infrastructure purchase cost -10%.
     }
 
     struct Resources2 {
         bool oil;
+        //Oil
+        //Lowers soldier purchase cost -$3.00, 
+        //increases population happiness +1.5, 
+        //increases soldier efficiency +10%, 
+        //lowers tank upkeep cost -5%, 
+        //lowers aircraft purchase cost -4%, 
+        //and lowers all navy vessel upkeep cost -10%.
+        //
         bool pigs;
+        //Pigs
+        //Lowers soldier upkeep cost -$0.50, 
+        //increases soldier efficiency +15%, 
+        //and increases number of citizens +3.5%.
         bool rubber;
+        //Rubber
+        //Increases purchased land area of a nation by 20%, 
+        //lowers land purchase cost -10%, 
+        //triples the value of land when selling (from $100 to $300), 
+        //lowers infrastructure purchase cost -3%, 
+        //and lowers aircraft purchase cost -4%.
         bool silver;
+        //Silver
+        //Increases citizen's daily income +$2.00 
+        //and increases population happiness +2.
         bool spices;
+        //Spices
+        //Increases the purchased land area of a nation by 8% 
+        //and increases population happiness +2.
         bool sugar;
+        //Sugar
+        //Increases number of citizens +3%, 
+        //and increases population happiness +1.
         bool uranium;
+        //Uranium
+        //Reduces infrastructure upkeep cost -3%. 
+        //Allow nations to develop nuclear weapons only if that nation's government preference 
+        //supports nuclear weapons. 
+        //If a nations government preference favors nuclear technology for the use of nuclear 
+        //power plants but does not support nuclear weapons then the nation will receive +$3.00 
+        //per citizen and +$0.15 for every level of tech purchased up to level 30 but loses -1 
+        //population happiness. 
+        //If a nation owns nuclear weapons but does not have uranium the cost to maintain nukes 
+        //is doubled. 
+        //Lowers Submarine and Aircraft Carrier navy vessel purchase and upkeep cost -5%.
         bool water;
+        //Water
+        //Increases number of citizens per mile before population unhappiness by 50, 
+        //increases population happiness +2.5, 
+        //and improves a nation's environment by 1.
         bool wheat;
+        //Wheat 
+        //Increases number of citizens +8%.
         bool wine;
+        //Wine
+        //Increases population happiness +3.
     }
 
     struct BonusResources {
         bool beer;
+        //beer
         //requires Water, Wheat, Lumber, Aluminium
+        //Increases population happiness + 2. 
         bool steel;
+        //steel
         //reduces infrastructure cost -2%.
-        //Lowers all vessel costs -15%
+        //Lowers all vessel purchase costs -15%
         //requires Coal and Iron
         bool construction;
+        //construction
+        //Reduces infrastructure cost -5% and 
+        //raises the aircraft limit +10.
         //requires Lumber, Iron, Marble, Aluminium, tech > 5
         bool fastFood;
+        //fast food
+        //Increases population happiness + 2. 
         //requires Cattle, Sugar, Spices, Pigs
         bool fineJewelry;
+        //fine jewelry
+        //Increases population happiness + 3.
         //requires Gold, Silver, Gems, Coal
         bool scholars;
+        //scholars
         //increases population income +$3.00
         //requires literacy rate > 90%, lumber, lead
         bool asphalt;
+        //asphalt
+        //Lowers infrastructure upkeep cost -5%. 
         //requires Construction, Oil, Rubber
         bool automobiles;
+        //automobiles
+        //Increases population happiness +3.
         //requires Asphalt, Steel
         bool affluentPopulation;
+        //affluent population
+        //Increases number of citizens +5%.
         //requires fineJewelry, Fish, Furs, Wine
         bool microchips;
+        //microchips
         //reduces tech cost -8%
         //increases population happiness +2
         //lowers frigate, destroyer, submarine, aircraft carrier upkeep cost -10%
         //requires Gold, Lead, Oil, tech > 10
+        //Lowers Frigate, Destroyer, Submarine and Aircraft Carrier navy vessel 
+        //purchase and upkeep cost -10%.
         bool radiationCleanup;
+        //radiation cleanup
         //reduces nuclear anarchy effects by 1 day
         //Improves a nation's environment by 1
-        //Resuces global radiation for oyur nation by 50%
+        //Resuces global radiation for your nation by 50%
         //requires Construction, Microchips, Steel and Technology > 15
     }
 
     struct MoonResources {
         bool calcium;
+        //Calcium
+        //Mined from Lunar surface. 
+        //Increases population income by $3.00 for the resources 
+        //Rubber, Furs, Spices & Wine that your nation has access to.
         bool radon;
+        //radon
+        //Mined from Lunar surface. 
+        //Increases population income by $3.00 for the resources 
+        //Lead, Gold, Water & Uranium that your nation has access to.
         bool silicon;
+        //Silicon
+        //Mined from Lunar surface. 
+        //Increases population income by $3.00 for the resources 
+        //Rubber, Furs, Gems & Silver that your nation has access to.
         bool titanium;
+        //Titanium
+        //Mined from Lunar surface. 
+        //Increases population income by $3.00 for the resources 
+        //Gold, Lead, Coal & Oil that your nation has access to.
     }
 
     struct MarsResources {
         bool basalt;
+        //basalt
+        //+3 happiness if nation has Automobiles, 
+        //–5% infra upkeep if nation has Asphalt, 
+        //–5% infra purchase cost if nation has Construction.
         bool magnesium;
+        //magnesium
+        //Mined from Martian surface. 
+        //+4 happiness if nation has Microchips, 
+        //–4% infra upkeep if nation has Steel.
         bool potassium;
+        //Mined from Martian surface. 
+        //+3 happiness if nation has Fine Jewelry, 
+        //+$3 citizen income if nation has Scholars, 
+        //+$3 citizen income if nation has Affluent Population.
         bool sodium;
+        //Sodium
+        //Mined from Martian surface. 
+        //+2 happiness if nation has Fast Food, 
+        //+2 happiness if nation has Beer, 
+        //Decreases GRL by an additional 50% (75% total) if you have Radiation Cleanup.
     }
 
     mapping(uint256 => Resources1) public idToResources1;
@@ -205,7 +345,7 @@ contract ResourcesContract is VRFConsumerBaseV2 {
     {
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
         s_requestIndexToRandomWords[requestNumber] = randomWords;
-        s_randomWords = randomWords;
+        s_randomWords = s_requestIndexToRandomWords[requestNumber];
         uint256 randomResource1 = (s_randomWords[0] % 20);
         uint256 randomResource2 = (s_randomWords[1] % 20);
         //handle 2 of the same randomly generated numbers
