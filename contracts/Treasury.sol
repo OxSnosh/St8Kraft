@@ -23,6 +23,7 @@ contract TreasuryContract is Ownable {
     address public taxes;
     address public bills;
     address public spyAddress;
+    address public groundBattle;
     uint256 public daysToInactive;
     uint256 private gameTaxPercentage = 0;
     uint256 public seedMoney = 2000000;
@@ -70,6 +71,9 @@ contract TreasuryContract is Ownable {
         daysToInactive = 20;
     }
 
+    function constructorContinued (address _groundBattle) public onlyOwner {
+        groundBattle = _groundBattle;
+    }
 
     function generateTreasury(uint256 id, address nationOwner) public {
         Treasury memory newTreasury = Treasury(
@@ -90,27 +94,33 @@ contract TreasuryContract is Ownable {
         counter++;
     }
 
-    modifier onlyTaxesContract {
+    modifier onlyTaxesContract() {
         require(msg.sender == taxes, "only callable from taxes contract");
         _;
     }
 
-    modifier onlySpyContract {
+    modifier onlySpyContract() {
         require(msg.sender == spyAddress, "only callable from spy contract");
         _;
     }
 
-    function increaseBalanceOnTaxCollection(uint256 id, uint256 amount) public onlyTaxesContract {
+    function increaseBalanceOnTaxCollection(uint256 id, uint256 amount)
+        public
+        onlyTaxesContract
+    {
         idToTreasury[id].balance += amount;
         idToTreasury[id].daysSinceLastTaxCollection = 0;
     }
 
-    modifier onlyBillsContract {
+    modifier onlyBillsContract() {
         require(msg.sender == bills, "only callable from taxes contract");
         _;
     }
 
-    function decreaseBalanceOnBillsPaid(uint256 id, uint256 amount) public onlyBillsContract {
+    function decreaseBalanceOnBillsPaid(uint256 id, uint256 amount)
+        public
+        onlyBillsContract
+    {
         idToTreasury[id].balance -= amount;
         idToTreasury[id].daysSinceLastBillPaid = 0;
         idToTreasury[id].inactive = false;
@@ -142,6 +152,28 @@ contract TreasuryContract is Ownable {
         require(balance >= amount, "not enough balance");
         idToTreasury[idSender].balance -= amount;
         idToTreasury[idRecipient].balance += amount;
+    }
+
+    modifier onlyGroundBattle() {
+        require (msg.sender == groundBattle,
+        "function only callable from ground battle");
+        _;
+    }
+
+    function transferSpoils(
+        uint256 randomNumber,
+        uint256 attackerId,
+        uint256 defenderId
+    ) public onlyGroundBattle {
+        uint256 defenderBalance = idToTreasury[defenderId].balance;
+        uint256 fundsToTransfer = ((defenderBalance * randomNumber) / 100);
+        if(fundsToTransfer < 2000000) {
+            idToTreasury[defenderId].balance -= fundsToTransfer;
+            idToTreasury[attackerId].balance += fundsToTransfer;
+        } else {
+            idToTreasury[defenderId].balance -= 2000000;
+            idToTreasury[attackerId].balance += 2000000;   
+        }
     }
 
     //NEED FUNCTION TO WITHDRAW TAXES COLLECTED BY GAME
@@ -188,12 +220,20 @@ contract TreasuryContract is Ownable {
         daysToInactive = newDays;
     }
 
-    function getDaysSinceLastTaxCollection(uint256 id) public view returns (uint256) {
+    function getDaysSinceLastTaxCollection(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 daysSince = idToTreasury[id].daysSinceLastTaxCollection;
         return daysSince;
     }
 
-    function getDaysSinceLastBillsPaid(uint256 id) public view returns (uint256) {
+    function getDaysSinceLastBillsPaid(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 daysSince = idToTreasury[id].daysSinceLastBillPaid;
         return daysSince;
     }
@@ -203,7 +243,11 @@ contract TreasuryContract is Ownable {
         return balance;
     }
 
-    function transferBalance(uint256 toId, uint256 fromId, uint256 amount) public onlySpyContract {
+    function transferBalance(
+        uint256 toId,
+        uint256 fromId,
+        uint256 amount
+    ) public onlySpyContract {
         idToTreasury[toId].balance += amount;
         idToTreasury[fromId].balance -= amount;
     }

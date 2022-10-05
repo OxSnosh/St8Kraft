@@ -12,6 +12,7 @@ contract WarContract is Ownable {
     address public military;
     address public navyBattleAddress;
     address public airBattleAddress;
+    address public groundBattle;
     address public cruiseMissile;
     uint256[] public activeWars;
 
@@ -34,8 +35,8 @@ contract WarContract is Ownable {
     }
 
     struct OffenseDeployed1 {
-        uint256 tanksDeployed;
         uint256 soldiersDeployed;
+        uint256 tanksDeployed;
         uint256 yak9Deployed;
         uint256 p51MustangDeployed;
         uint256 f86SabreDeployed;
@@ -60,8 +61,8 @@ contract WarContract is Ownable {
     }
 
     struct DefenseDeployed1 {
-        uint256 tanksDeployed;
         uint256 soldiersDeployed;
+        uint256 tanksDeployed;
         uint256 yak9Deployed;
         uint256 p51MustangDeployed;
         uint256 f86SabreDeployed;
@@ -127,12 +128,14 @@ contract WarContract is Ownable {
         address _military,
         address _navyBattleAddress,
         address _airBattleAddress,
+        address _groundBattle,
         address _cruiseMissile
     ) {
         countryMinter = _countryMinter;
         nationStrength = _nationStrength;
         navyBattleAddress = _navyBattleAddress;
         airBattleAddress = _airBattleAddress;
+        groundBattle = _groundBattle;
         nsc = NationStrengthContract(_nationStrength);
         military = _military;
         mil = MilitaryContract(_military);
@@ -743,5 +746,49 @@ contract WarContract is Ownable {
         if (defenseId == nationId) {
             warIdToDefenseLosses[_warId].aircraftLost = battleCausalties;
         }
+    }
+
+    function getDeployedGroundForces(uint256 _warId, uint256 attackerId)
+        public
+        view
+        returns (uint256, uint256)
+    {
+        uint256 soldiersDeployed;
+        uint256 tanksDeployed;
+        (uint256 offenseId, uint256 defenseId) = getInvolvedParties(_warId);
+        if (attackerId == offenseId) {
+            soldiersDeployed = warIdToOffenseDeployed1[_warId].soldiersDeployed;
+            tanksDeployed = warIdToOffenseDeployed1[_warId].tanksDeployed;
+        }
+        if (attackerId == defenseId) {
+            soldiersDeployed = warIdToDefenseDeployed1[_warId].soldiersDeployed;
+            tanksDeployed = warIdToDefenseDeployed1[_warId].tanksDeployed;
+        }
+        return (soldiersDeployed, tanksDeployed);
+    }
+
+    modifier onlyGroundBattle() {
+        require(
+            msg.sender == groundBattle,
+            "function only callable from navy battle contract"
+        );
+        _;
+    }
+
+    function decreaseGroundBattleLosses(
+        uint256 soldierLosses,
+        uint256 tankLosses,
+        uint256 attackerId,
+        uint256 _warId
+    ) public onlyGroundBattle {
+        (uint256 offenseId, uint256 defenseId) = getInvolvedParties(_warId);
+        if (offenseId == attackerId) {
+            warIdToOffenseDeployed1[_warId].soldiersDeployed -= soldierLosses;
+            warIdToOffenseDeployed1[_warId].tanksDeployed -= tankLosses;
+        } else if (defenseId == attackerId) {
+            warIdToDefenseDeployed1[_warId].soldiersDeployed -= soldierLosses;
+            warIdToDefenseDeployed1[_warId].tanksDeployed -= tankLosses;
+        }
+
     }
 }

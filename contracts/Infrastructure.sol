@@ -26,6 +26,7 @@ contract InfrastructureContract is Ownable {
     address public cruiseMissile;
     address public nukeAddress;
     address public airBattle;
+    address public groundBattle;
 
     struct Infrastructure {
         uint256 landArea;
@@ -74,13 +75,15 @@ contract InfrastructureContract is Ownable {
         address _tax,
         address _cruiseMissile,
         address _nukeAddress,
-        address _airBattle
+        address _airBattle,
+        address _groundBattle
     ) public onlyOwner {
         spyAddress = _spyAddress;
         taxes = _tax;
         cruiseMissile = _cruiseMissile;
         nukeAddress = _nukeAddress;
         airBattle = _airBattle;
+        groundBattle = _groundBattle;
     }
 
     modifier onlySpyContract() {
@@ -119,6 +122,14 @@ contract InfrastructureContract is Ownable {
         require(
             msg.sender == airBattle,
             "function only callable from Air Battle contract"
+        );
+        _;
+    }
+
+    modifier onlyGroundBattle() {
+        require(
+            msg.sender == groundBattle,
+            "function only callable from Ground Battle contract"
         );
         _;
     }
@@ -463,8 +474,8 @@ contract InfrastructureContract is Ownable {
         onlyNukeContract
     {
         uint256 landAmount = idToInfrastructure[countryId].landArea;
-        uint256 landAmountToDecrease = ((landAmount * 35) /100);
-        if(landAmountToDecrease > 150) {
+        uint256 landAmountToDecrease = ((landAmount * 35) / 100);
+        if (landAmountToDecrease > 150) {
             idToInfrastructure[countryId].landArea -= 150;
         } else {
             idToInfrastructure[countryId].landArea -= landAmountToDecrease;
@@ -495,23 +506,24 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[countryId].technologyCount -= amount;
     }
 
-    function decreaseTechCountFromCruiseMissileContract(uint256 countryId, uint256 amount)
-        public
-        onlyCruiseMissileContract
-    {
+    function decreaseTechCountFromCruiseMissileContract(
+        uint256 countryId,
+        uint256 amount
+    ) public onlyCruiseMissileContract {
         idToInfrastructure[countryId].technologyCount -= amount;
     }
 
-        function decreaseTechCountFromNukeContract(uint256 countryId)
+    function decreaseTechCountFromNukeContract(uint256 countryId)
         public
         onlyNukeContract
     {
         uint256 techAmount = idToInfrastructure[countryId].technologyCount;
-        uint256 techAmountToDecrease = ((techAmount * 35) /100);
-        if(techAmountToDecrease > 50) {
+        uint256 techAmountToDecrease = ((techAmount * 35) / 100);
+        if (techAmountToDecrease > 50) {
             idToInfrastructure[countryId].technologyCount -= 50;
         } else {
-            idToInfrastructure[countryId].technologyCount -= techAmountToDecrease;
+            idToInfrastructure[countryId]
+                .technologyCount -= techAmountToDecrease;
         }
     }
 
@@ -539,10 +551,10 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[countryId].infrastructureCount -= amount;
     }
 
-    function decreaseInfrastructureCountFromCruiseMissileContract(uint256 countryId, uint256 amount)
-        public
-        onlyCruiseMissileContract
-    {
+    function decreaseInfrastructureCountFromCruiseMissileContract(
+        uint256 countryId,
+        uint256 amount
+    ) public onlyCruiseMissileContract {
         idToInfrastructure[countryId].infrastructureCount -= amount;
     }
 
@@ -550,24 +562,29 @@ contract InfrastructureContract is Ownable {
         public
         onlyNukeContract
     {
-        uint256 infrastructureAmount = idToInfrastructure[countryId].infrastructureCount;
-        uint256 infrastructureAmountToDecrease = ((infrastructureAmount * 35) /100);
-        if(infrastructureAmountToDecrease > 150) {
+        uint256 infrastructureAmount = idToInfrastructure[countryId]
+            .infrastructureCount;
+        uint256 infrastructureAmountToDecrease = ((infrastructureAmount * 35) /
+            100);
+        if (infrastructureAmountToDecrease > 150) {
             idToInfrastructure[countryId].infrastructureCount -= 150;
         } else {
-            idToInfrastructure[countryId].infrastructureCount -= infrastructureAmountToDecrease;
+            idToInfrastructure[countryId]
+                .infrastructureCount -= infrastructureAmountToDecrease;
         }
     }
 
-    function decreaseInfrastructureCountFromAirBattleContract(uint256 countryId, uint256 amountToDecrease)
-        public
-        onlyAirBattle
-    {
-        uint256 infrastructureAmount = idToInfrastructure[countryId].infrastructureCount;
-        if(amountToDecrease >= infrastructureAmount) {
+    function decreaseInfrastructureCountFromAirBattleContract(
+        uint256 countryId,
+        uint256 amountToDecrease
+    ) public onlyAirBattle {
+        uint256 infrastructureAmount = idToInfrastructure[countryId]
+            .infrastructureCount;
+        if (amountToDecrease >= infrastructureAmount) {
             idToInfrastructure[countryId].infrastructureCount = 0;
         } else {
-            idToInfrastructure[countryId].infrastructureCount -= amountToDecrease;
+            idToInfrastructure[countryId]
+                .infrastructureCount -= amountToDecrease;
         }
     }
 
@@ -628,5 +645,29 @@ contract InfrastructureContract is Ownable {
         uint256 infra = getInfrastructureCount(id);
         uint256 population = (infra * 8);
         return population;
+    }
+
+    function transferLandAndTech(
+        uint256 landMiles,
+        uint256 techLevels,
+        uint256 attackerId,
+        uint256 defenderId
+    ) public onlyGroundBattle {
+        uint256 defenderLand = idToInfrastructure[defenderId].landArea;
+        uint256 defenderTech = idToInfrastructure[defenderId].technologyCount;
+        if(defenderLand <= landMiles) {
+            idToInfrastructure[defenderId].landArea = 0;
+            idToInfrastructure[attackerId].landArea += defenderLand;
+        } else {
+            idToInfrastructure[defenderId].landArea -= landMiles;
+            idToInfrastructure[attackerId].landArea += landMiles;
+        }
+        if(defenderTech <= techLevels) {
+            idToInfrastructure[defenderId].technologyCount = 0;
+            idToInfrastructure[attackerId].technologyCount += defenderTech;
+        } else {
+            idToInfrastructure[defenderId].technologyCount = techLevels;
+            idToInfrastructure[attackerId].technologyCount += techLevels;
+        }
     }
 }
