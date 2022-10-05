@@ -22,6 +22,7 @@ contract ForcesContract is Ownable {
     address public wonders1;
     address public nukeAddress;
     address public airBattle;
+    address public groundBattle;
 
     InfrastructureContract inf;
     ResourcesContract res;
@@ -50,15 +51,17 @@ contract ForcesContract is Ownable {
         address _resources,
         address _wonders1,
         address _nukeAddress,
-        address _airBattle
+        address _airBattle,
+        address _groundBattle
     ) {
         treasuryAddress = _treasuryAddress;
         spyAddress = _spyAddress;
         cruiseMissile = _cruiseMissile;
         aid = _aid;
-        infrastructure = _infrastructure;
         nukeAddress = _nukeAddress;
         airBattle = _airBattle;
+        groundBattle = _groundBattle;
+        infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
         resources = _resources;
         res = ResourcesContract(_resources);
@@ -138,6 +141,14 @@ contract ForcesContract is Ownable {
     modifier onlyAirBattle() {
         require(
             msg.sender == airBattle,
+            "only callable from air battle contract"
+        );
+        _;
+    }
+
+    modifier onlyGroundBattle() {
+        require(
+            msg.sender == groundBattle,
             "only callable from air battle contract"
         );
         _;
@@ -481,5 +492,19 @@ contract ForcesContract is Ownable {
     {
         uint256 spyAmount = idToForces[countryId].numberOfSpies;
         return spyAmount;
+    }
+
+    function decreaseDeployedUnits(uint256 attackerSoldierLosses, uint256 attackerTankLosses, uint256 attackerId) public onlyGroundBattle {
+        idToForces[attackerId].numberOfSoldiers -= attackerSoldierLosses;
+        idToForces[attackerId].deployedSoldiers -= attackerSoldierLosses;
+        idToForces[attackerId].numberOfTanks -= attackerTankLosses;
+        idToForces[attackerId].deployedTanks -= attackerTankLosses;
+    }
+
+    function decreaseDefendingUnits(uint256 defenderSoldierLosses, uint256 defenderTankLosses, uint256 defenderId) public onlyGroundBattle {
+        idToForces[defenderId].numberOfSoldiers -= defenderSoldierLosses;
+        idToForces[defenderId].defendingSoldiers -= defenderSoldierLosses;
+        idToForces[defenderId].numberOfTanks -= defenderTankLosses;
+        idToForces[defenderId].defendingTanks -= defenderTankLosses;
     }
 }

@@ -190,7 +190,8 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             )= defenseVictory(requestNumber);
         }
         war.decreaseGroundBattleLosses(attackerSoldierLosses, attackerTankLosses, attackerId, warId);
-
+        force.decreaseDeployedUnits(attackerSoldierLosses, attackerTankLosses, attackerId);
+        force.decreaseDefendingUnits(defenderSoldierLosses, defenderTankLosses, defenderId);
     }
 
     function getPercentageLosses(uint256 battleId)

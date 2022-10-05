@@ -789,6 +789,5 @@ contract WarContract is Ownable {
             warIdToDefenseDeployed1[_warId].soldiersDeployed -= soldierLosses;
             warIdToDefenseDeployed1[_warId].tanksDeployed -= tankLosses;
         }
-
     }
 }
