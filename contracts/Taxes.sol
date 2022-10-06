@@ -198,8 +198,10 @@ contract TaxesContract is Ownable {
             (universities * 8) -
             (guerillaCamp * 8) -
             (casinos * 1));
-        uint256 dailyIncomePerCitizen = (((32 + (2 * happiness)) *
+        uint256 baseDailyIncomePerCitizen = (((32 + (2 * happiness)) *
             multipliers) / 100);
+        uint256 incomeAdjustments = getIncomeAdjustments(id);
+        uint256 dailyIncomePerCitizen = baseDailyIncomePerCitizen + incomeAdjustments;
         return dailyIncomePerCitizen;
     }
 
@@ -214,6 +216,7 @@ contract TaxesContract is Ownable {
     function getHappinessPointsToAdd(uint256 id) public view returns (uint256) {
         uint256 compatabilityPoints = checkCompatability(id);
         uint256 densityPoints = getDensityPoints(id);
+        uint256 pointsFromResources = getPointsFromResources(id);
         uint256 wonderPoints = getHappinessFromWonders(id);
         uint256 technologyPoints = getTechnologyPoints(id);
         uint256 pointsFromAge = getPointsFromNationAge(id);
@@ -221,6 +224,7 @@ contract TaxesContract is Ownable {
         uint256 pointsFromDefcon = getPointsFromDefcon(id);
         uint256 happinessPointsToAdd = (compatabilityPoints +
             densityPoints +
+            pointsFromResources +
             wonderPoints +
             technologyPoints +
             pointsFromAge +
@@ -276,6 +280,15 @@ contract TaxesContract is Ownable {
             densityPoints = 1;
         }
         return densityPoints;
+    }
+
+    function getPointsFromResources(uint256 id) public view returns (uint256) {
+        uint256 pointsFromResources = 0;
+        bool gems = res.viewGems(id);
+        if (gems) {
+            pointsFromResources += 3;
+        }
+        return pointsFromResources;
     }
 
     function getHappinessFromWonders(uint256 id)
@@ -528,5 +541,22 @@ contract TaxesContract is Ownable {
             environmentPenalty = true;
         }
         return (soldierPopulationRatio, environmentPenalty);
+    }
+
+    function getIncomeAdjustments(uint256 id) public view returns (uint256) {
+        uint256 adjustments = 0;
+        bool furs = res.viewFurs(id);
+        if (furs) {
+            adjustments += 4;
+        }
+        bool gems = res.viewGems(id);
+        if (gems) {
+            adjustments += 2;
+        }
+        bool gold = res.viewGold(id);
+        if (gold) {
+            adjustments += 3;
+        }
+        return adjustments;
     }
 }

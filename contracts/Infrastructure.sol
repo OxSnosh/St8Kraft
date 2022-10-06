@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.7;
 
+import "./CountryMinter.sol";
 import "./Resources.sol";
 import "./Improvements.sol";
 import "./Wonders.sol";
@@ -10,6 +11,7 @@ import "./CountryParameters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract InfrastructureContract is Ownable {
+    address public countryMinter;
     address public resources;
     address public improvements1;
     address public improvements3;
@@ -28,17 +30,15 @@ contract InfrastructureContract is Ownable {
     address public airBattle;
     address public groundBattle;
 
+    CountryMinter mint;
+    ResourcesContract res;
+
     struct Infrastructure {
         uint256 landArea;
         uint256 technologyCount;
         uint256 infrastructureCount;
         uint256 taxRate;
         bool collectionNeededToChangeRate;
-        uint256 populationCount;
-        uint256 citizenCount;
-        uint256 criminalCount;
-        uint16 populationHappiness;
-        uint16 crimeIndex;
     }
 
     mapping(uint256 => Infrastructure) public idToInfrastructure;
@@ -58,6 +58,7 @@ contract InfrastructureContract is Ownable {
         address _aid
     ) {
         resources = _resources;
+        res = ResourcesContract(_resources);
         improvements1 = _improvements1;
         improvements3 = _improvements3;
         wonders1 = _wonders1;
@@ -76,7 +77,8 @@ contract InfrastructureContract is Ownable {
         address _cruiseMissile,
         address _nukeAddress,
         address _airBattle,
-        address _groundBattle
+        address _groundBattle,
+        address _countryMinter
     ) public onlyOwner {
         spyAddress = _spyAddress;
         taxes = _tax;
@@ -84,6 +86,8 @@ contract InfrastructureContract is Ownable {
         nukeAddress = _nukeAddress;
         airBattle = _airBattle;
         groundBattle = _groundBattle;
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
     }
 
     modifier onlySpyContract() {
@@ -140,15 +144,79 @@ contract InfrastructureContract is Ownable {
             0,
             20,
             16,
-            false,
-            0,
-            0,
-            0,
-            0,
-            0
+            false
         );
         idToInfrastructure[id] = newInfrastrusture;
         idToOwnerInfrastructure[id] = nationOwner;
+    }
+
+    function buyLand(uint256 id, uint256 amount) public {
+        bool owner = mint.checkOwnership(id, msg.sender);
+        require(owner, "!nation owner");
+        uint256 costPerMile = getLandCostPerMile(id);
+        uint256 purchasePriceMultiplier = getLandPriceMultiplier(id);
+        uint256 adjustedCostPerMile = ((costPerMile * purchasePriceMultiplier) /
+            100);
+        uint256 cost = (amount * adjustedCostPerMile);
+        idToInfrastructure[id].landArea += amount;
+        TreasuryContract(treasury).spendBalance(id, cost);
+    }
+
+    function getLandCostPerMile(uint256 id) public view returns (uint256) {
+        uint256 currentLand = idToInfrastructure[id].landArea;
+        uint256 costPerLevel = 400;
+        if (currentLand > 30) {
+            costPerLevel = (400 + (currentLand * 2));
+        } else if (currentLand > 100) {
+            costPerLevel = (400 + (currentLand * 3));
+        } else if (currentLand > 200) {
+            costPerLevel = (400 + (currentLand * 5));
+        } else if (currentLand > 250) {
+            costPerLevel = (400 + (currentLand * 10));
+        } else if (currentLand > 300) {
+            costPerLevel = (400 + (currentLand * 15));
+        } else if (currentLand > 400) {
+            costPerLevel = (400 + (currentLand * 20));
+        } else if (currentLand > 500) {
+            costPerLevel = (400 + (currentLand * 25));
+        } else if (currentLand > 800) {
+            costPerLevel = (400 + (currentLand * 30));
+        } else if (currentLand > 1200) {
+            costPerLevel = (400 + (currentLand * 35));
+        } else if (currentLand > 2000) {
+            costPerLevel = (400 + (currentLand * 40));
+        } else if (currentLand > 3000) {
+            costPerLevel = (400 + (currentLand * 45));
+        } else if (currentLand > 4000) {
+            costPerLevel = (400 + (currentLand * 55));
+        } else {
+            costPerLevel = (400 + (currentLand * 75));
+        }
+        return costPerLevel;
+    }
+
+    function getLandPriceMultiplier(uint256 id) public view returns (uint256) {
+        uint256 multiplier = 100;
+        bool cattle = res.viewCattle(id);
+        if (cattle) {
+            multiplier -= 10;
+        }
+        bool fish = res.viewFish(id);
+        if (fish) {
+            multiplier -= 5;
+        }
+        return multiplier;
+    }
+
+    function getAreaOfInfluence(uint256 id) public view returns (uint256) {
+        uint256 currentLand = idToInfrastructure[id].landArea;
+        uint256 landModifier = 100;
+        bool coal = res.viewCoal(id);
+        if (coal) {
+            landModifier += 15;
+        }
+        uint256 areaOfInfluence = ((currentLand * landModifier) / 100);
+        return areaOfInfluence;
     }
 
     function buyTech(uint256 id, uint256 amount) public {
@@ -299,7 +367,7 @@ contract InfrastructureContract is Ownable {
             costAdjustments2 +
             costAdjustments3);
         uint256 multiplier = (100 - adjustments);
-        uint256 adjustedCostPerLevel = (grossCostPerLevel * multiplier);
+        uint256 adjustedCostPerLevel = ((grossCostPerLevel * multiplier) / 100);
         uint256 cost = buyAmount * adjustedCostPerLevel;
         TreasuryContract(treasury).spendBalance(id, cost);
     }
@@ -356,10 +424,10 @@ contract InfrastructureContract is Ownable {
             lumberMultiplier = 6;
         }
         if (isIron) {
-            ironMultiplier = 6;
+            ironMultiplier = 5;
         }
         if (isMarble) {
-            marbleMultiplier = 6;
+            marbleMultiplier = 10;
         }
         uint256 sumOfAdjustments = lumberMultiplier +
             ironMultiplier +
@@ -385,10 +453,10 @@ contract InfrastructureContract is Ownable {
         uint256 factoryCount = ImprovementsContract1(improvements1)
             .getFactoryCount(id);
         if (isRubber) {
-            rubberMultiplier = 6;
+            rubberMultiplier = 3;
         }
         if (isConstruction) {
-            constructionMultiplier = 6;
+            constructionMultiplier = 5;
         }
         if (isInterstateSystem) {
             insterstateSystemMultiplier = 6;
@@ -419,13 +487,13 @@ contract InfrastructureContract is Ownable {
         bool isCoal = ResourcesContract(resources).viewCoal(id);
         bool isSteel = ResourcesContract(resources).viewSteel(id);
         if (isAluminium) {
-            aluminiumMultiplier = 6;
+            aluminiumMultiplier = 7;
         }
         if (isCoal) {
-            coalMultiplier = 6;
+            coalMultiplier = 4;
         }
         if (isSteel) {
-            steelMultiplier = 6;
+            steelMultiplier = 2;
         }
         uint256 sumOfAdjustments = aluminiumMultiplier +
             coalMultiplier +
@@ -643,7 +711,17 @@ contract InfrastructureContract is Ownable {
 
     function getTotalPopulationCount(uint256 id) public view returns (uint256) {
         uint256 infra = getInfrastructureCount(id);
-        uint256 population = (infra * 8);
+        uint256 populationBaseCount = (infra * 8);
+        uint256 populationModifier = 100;
+        bool cattle = res.viewCattle(id);
+        if (cattle) {
+            populationModifier += 5;
+        }
+        bool fish = res.viewFish(id);
+        if (fish) {
+            populationModifier += 8;
+        }
+        uint256 population = ((populationBaseCount * populationModifier) / 100);
         return population;
     }
 
@@ -655,14 +733,14 @@ contract InfrastructureContract is Ownable {
     ) public onlyGroundBattle {
         uint256 defenderLand = idToInfrastructure[defenderId].landArea;
         uint256 defenderTech = idToInfrastructure[defenderId].technologyCount;
-        if(defenderLand <= landMiles) {
+        if (defenderLand <= landMiles) {
             idToInfrastructure[defenderId].landArea = 0;
             idToInfrastructure[attackerId].landArea += defenderLand;
         } else {
             idToInfrastructure[defenderId].landArea -= landMiles;
             idToInfrastructure[attackerId].landArea += landMiles;
         }
-        if(defenderTech <= techLevels) {
+        if (defenderTech <= techLevels) {
             idToInfrastructure[defenderId].technologyCount = 0;
             idToInfrastructure[attackerId].technologyCount += defenderTech;
         } else {

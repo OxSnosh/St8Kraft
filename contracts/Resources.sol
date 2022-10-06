@@ -27,39 +27,39 @@ contract ResourcesContract is VRFConsumerBaseV2 {
     struct Resources1 {
         bool aluminium;
         //Aluminum 
-        //Increases soldier efficiency +20%, 
-        //lowers infrastructure purchase cost -7%, and 
-        //lowers aircraft purchase costs -8%.
+        //DONE //Increases soldier efficiency +20%, 
+        //DONE //lowers infrastructure purchase cost -7%, and 
+        //DONE //lowers aircraft purchase costs -8%.
         bool cattle;
         //Cattle
-        //Increases number of citizens +5% 
-        //and lowers land purchase cost -10%.
+        //DONE //Increases number of citizens +5% 
+        //DONE //and lowers land purchase cost -10%.
         bool coal;
         //Coal
-        //Increases the purchased land area of a nation by 15%, 
-        //increases soldier efficiency +8%, 
-        //and lowers infrastructure purchase cost -4%.
+        //DONE //Increases the purchased land area of a nation by 15%, 
+        //DONE //increases soldier efficiency +8%, 
+        //DONE //and lowers infrastructure purchase cost -4%.
         bool fish;
         //Fish
-        //Increases number of citizens +8% 
-        //and lowers land purchase cost -5%.
+        //DONE //Increases number of citizens +8% 
+        //DOME //and lowers land purchase cost -5%.
         bool furs;
         //Furs
-        //Increases citizen's daily income +$3.50 
+        //DONE //Increases citizen's daily income +$3.50 
         //and triples the natural growth of a nation.
         bool gems;
         //Gems
-        //Increases citizen's daily income +$1.50 
-        //and increases population happiness +2.5.
+        //DONE //Increases citizen's daily income +$1.50 
+        //DONE //and increases population happiness +2.5.
         bool gold;
         //Gold
-        //Increases citizen's daily income +$3.00 
-        //and lowers technology cost by 5%.
+        //DONE //Increases citizen's daily income +$3.00 
+        //DONE //and lowers technology cost by 5%.
         bool iron;
         //Iron
-        //Lowers soldier purchase cost -$3.00, 
+        //DONE //Lowers soldier purchase cost -$3.00, 
         //lowers infrastructure upkeep costs -10%, 
-        //lowers infrastructure purchase costs -5%, 
+        //DONE //lowers infrastructure purchase costs -5%, 
         //and lowers tank upkeep costs -5%.
         bool lead;
         //Lead
@@ -71,11 +71,11 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         //and lowers all navy vessel upkeep cost -20%.
         bool lumber;
         //Lumber
-        //Lowers infrastructure purchase cost -6% 
+        //DONE //Lowers infrastructure purchase cost -6% 
         //and lowers infrastructure upkeep costs -8%.
         bool marble;
         //Marble
-        //Lowers infrastructure purchase cost -10%.
+        //DONE //Lowers infrastructure purchase cost -10%.
     }
 
     struct Resources2 {
@@ -98,7 +98,7 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         //Increases purchased land area of a nation by 20%, 
         //lowers land purchase cost -10%, 
         //triples the value of land when selling (from $100 to $300), 
-        //lowers infrastructure purchase cost -3%, 
+        //DONE //lowers infrastructure purchase cost -3%, 
         //and lowers aircraft purchase cost -4%.
         bool silver;
         //Silver
@@ -144,12 +144,12 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         //Increases population happiness + 2. 
         bool steel;
         //steel
-        //reduces infrastructure cost -2%.
+        //DONE //reduces infrastructure cost -2%.
         //Lowers all vessel purchase costs -15%
         //requires Coal and Iron
         bool construction;
         //construction
-        //Reduces infrastructure cost -5% and 
+        //DONE //Reduces infrastructure cost -5% and 
         //raises the aircraft limit +10.
         //requires Lumber, Iron, Marble, Aluminium, tech > 5
         bool fastFood;
@@ -814,39 +814,14 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         return (resource1, resource2);
     }
 
-    function viewGold(uint256 id) public view returns (bool) {
-        bool isGold = idToResources1[id].gold;
-        return isGold;
-    }
-
-    function viewMicrochips(uint256 id) public view returns (bool) {
-        bool isMicrochips = idToBonusResources[id].microchips;
-        return isMicrochips;
-    }
-
-    function viewLumber(uint256 id) public view returns (bool) {
-        bool isLumber = idToResources1[id].lumber;
-        return isLumber;
-    }
-
-    function viewLead(uint256 id) public view returns (bool) {
-        bool isLead = idToResources1[id].lead;
-        return isLead;
-    }
-
-    function viewIron(uint256 id) public view returns (bool) {
-        bool isIron = idToResources1[id].iron;
-        return isIron;
-    }
-
-    function viewMarble(uint256 id) public view returns (bool) {
-        bool isMarble = idToResources1[id].marble;
-        return isMarble;
-    }
-
     function viewAluminium(uint256 id) public view returns (bool) {
         bool isAluminium = idToResources1[id].aluminium;
         return isAluminium;
+    }
+
+    function viewCattle(uint256 id) public view returns (bool) {
+        bool isCattle = idToResources1[id].cattle;
+        return isCattle;
     }
 
     function viewCoal(uint256 id) public view returns (bool) {
@@ -854,14 +829,74 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         return isCoal;
     }
 
-    function viewRubber(uint256 id) public view returns (bool) {
-        bool isRubber = idToResources2[id].rubber;
-        return isRubber;
+    function viewConstruction(uint256 id) public view returns (bool) {
+        bool isConstruction = idToBonusResources[id].construction;
+        return isConstruction;
+    }
+
+    function viewFish(uint256 id) public view returns (bool) {
+        bool isFish = idToResources1[id].fish;
+        return isFish;
+    }
+
+    function viewFurs(uint256 id) public view returns (bool) {
+        bool isFurs = idToResources1[id].furs;
+        return isFurs;
+    }
+
+    function viewGems(uint256 id) public view returns (bool) {
+        bool isGems = idToResources1[id].gems;
+        return isGems;
+    }
+
+    function viewGold(uint256 id) public view returns (bool) {
+        bool isGold = idToResources1[id].gold;
+        return isGold;
+    }
+
+    function viewIron(uint256 id) public view returns (bool) {
+        bool isIron = idToResources1[id].iron;
+        return isIron;
+    }
+
+    function viewLead(uint256 id) public view returns (bool) {
+        bool isLead = idToResources1[id].lead;
+        return isLead;
+    }
+
+    function viewLumber(uint256 id) public view returns (bool) {
+        bool isLumber = idToResources1[id].lumber;
+        return isLumber;
+    }
+
+    function viewMarble(uint256 id) public view returns (bool) {
+        bool isMarble = idToResources1[id].marble;
+        return isMarble;
+    }
+
+    function viewMicrochips(uint256 id) public view returns (bool) {
+        bool isMicrochips = idToBonusResources[id].microchips;
+        return isMicrochips;
     }
 
     function viewOil(uint256 id) public view returns (bool) {
         bool isOil = idToResources2[id].oil;
         return isOil;
+    }
+
+    function viewRadiationCleanup(uint256 id) public view returns (bool) {
+        bool isRadiationCleanup = idToBonusResources[id].radiationCleanup;
+        return isRadiationCleanup;
+    }
+
+    function viewRubber(uint256 id) public view returns (bool) {
+        bool isRubber = idToResources2[id].rubber;
+        return isRubber;
+    }
+
+    function viewSteel(uint256 id) public view returns (bool) {
+        bool isSteel = idToBonusResources[id].steel;
+        return isSteel;
     }
 
     function viewUranium(uint256 id) public view returns (bool) {
@@ -872,21 +907,6 @@ contract ResourcesContract is VRFConsumerBaseV2 {
     function viewWater(uint256 id) public view returns (bool) {
         bool isWater = idToResources2[id].water;
         return isWater;
-    }
-
-    function viewConstruction(uint256 id) public view returns (bool) {
-        bool isConstruction = idToBonusResources[id].construction;
-        return isConstruction;
-    }
-
-    function viewSteel(uint256 id) public view returns (bool) {
-        bool isSteel = idToBonusResources[id].steel;
-        return isSteel;
-    }
-
-    function viewRadiationCleanup(uint256 id) public view returns (bool) {
-        bool isRadiationCleanup = idToBonusResources[id].radiationCleanup;
-        return isRadiationCleanup;
     }
 
     function getTradingPartners(uint256 id) public view returns (uint256[] memory) {

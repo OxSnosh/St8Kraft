@@ -8,7 +8,6 @@ import "./Wonders.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract ForcesContract is Ownable {
-    uint256 public soldierCost;
     uint256 public tankCost;
     uint256 public cruiseMissileCost;
     uint256 public nukeCost;
@@ -67,8 +66,7 @@ contract ForcesContract is Ownable {
         res = ResourcesContract(_resources);
         wonders1 = _wonders1;
         won1 = WondersContract1(_wonders1);
-        soldierCost = 100;
-        tankCost = 200;
+        tankCost = 480;
         cruiseMissileCost = 20000;
         spyCost = 500;
     }
@@ -90,10 +88,6 @@ contract ForcesContract is Ownable {
     function updateResourcesContract(address newAddress) public onlyOwner {
         resources = newAddress;
         res = ResourcesContract(newAddress);
-    }
-
-    function updateSoldierCost(uint256 newPrice) public onlyOwner {
-        soldierCost = newPrice;
     }
 
     function updateTankCost(uint256 newPrice) public onlyOwner {
@@ -159,12 +153,22 @@ contract ForcesContract is Ownable {
             idToOwnerForces[id] == msg.sender,
             "You are not the nation ruler"
         );
+        uint256 soldierCost = getSoldierCost(id);
         uint256 purchasePrice = soldierCost * amount;
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToForces[id].numberOfSoldiers += amount;
         idToForces[id].defendingSoldiers += amount;
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    }
+
+    function getSoldierCost(uint256 id) public view returns (uint256) {
+        uint256 soldierCost = 12;
+        bool iron = res.viewIron(id);
+        if (iron) {
+            soldierCost -= 3;
+        }
+        return soldierCost;
     }
 
     function sendSoldiers(
@@ -250,6 +254,24 @@ contract ForcesContract is Ownable {
     {
         uint256 soldierAmount = idToForces[id].numberOfSoldiers;
         return soldierAmount;
+    }
+
+    function getDeployedSoldierCount(uint256 id)
+        public
+        view
+        returns (uint256 soldiers)
+    {
+        uint256 soldierAmount = idToForces[id].deployedSoldiers;
+        return soldierAmount;
+    }
+
+    function getSoldierEfficiencyModifier(uint256 id) public view returns (uint256) {
+        uint256 efficiencyModifier = 100;
+        bool aluminum = res.viewAluminium(id);
+        if(aluminum) { efficiencyModifier += 20; }
+        bool coal = res.viewCoal(id);
+        if(coal) { efficiencyModifier += 8; }
+        return efficiencyModifier;
     }
 
     function buyTanks(uint256 amount, uint256 id) public {
