@@ -138,6 +138,12 @@ contract TreasuryContract is Ownable {
         }
     }
 
+    // need modifier
+    function returnBalance(uint256 id, uint256 cost) public {
+        //need a way to only allow the nation owner to do this
+        idToTreasury[id].balance += cost;
+    }
+
     modifier onlyAidContract() {
         require(msg.sender == aid);
         _;

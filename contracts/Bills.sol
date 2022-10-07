@@ -218,6 +218,10 @@ contract BillsContract is Ownable {
         if (lumber) {
             infrastructureUpkeepModifier -= 8;
         }
+        bool uranium = res.viewUranium(id);
+        if (uranium) {
+            infrastructureUpkeepModifier -= 3;
+        }
         uint256 dailyInfrastructureBillsDue = ((baseDailyInfrastructureUpkeep *
             infrastructureUpkeepModifier) / 100);
         return dailyInfrastructureBillsDue;
@@ -259,6 +263,10 @@ contract BillsContract is Ownable {
         if (lead) {
             soldierUpkeepModifier -= 20;
         }
+        bool pigs = res.viewPigs(id);
+        if (pigs) {
+            soldierUpkeepModifier -= 25;
+        }
         uint256 adjustedSoldierUpkeep = ((soldierUpkeep *
             soldierUpkeepModifier) / 100);
         return adjustedSoldierUpkeep;
@@ -273,6 +281,10 @@ contract BillsContract is Ownable {
         uint256 tankUpkeepModifier = 100;
         bool iron = res.viewIron(id);
         if (iron) {
+            tankUpkeepModifier -= 5;
+        }
+        bool oil = res.viewOil(id);
+        if (oil) {
             tankUpkeepModifier -= 5;
         }
         uint256 adjustedTankUpkeep = ((tankUpkeep *
@@ -293,6 +305,10 @@ contract BillsContract is Ownable {
         }
         uint256 adjustedNukeUpkeep = ((nukeUpkeep *
             nukeUpkeepModifier) / 100);
+        bool uranium = res.viewUranium(id);
+        if (!uranium) {
+            adjustedNukeUpkeep = (adjustedNukeUpkeep * 2);
+        }
         return adjustedNukeUpkeep;
     }
 
@@ -360,6 +376,11 @@ contract BillsContract is Ownable {
         uint256 submarineUpkeep = (submarineCount * 25000);
         uint256 aircraftCarrierCount = nav.getAircraftCarrierCount(id);
         uint256 aircraftCarrierUpkeep = (aircraftCarrierCount * 30000);
+        bool uranium = res.viewUranium(id);
+        if (uranium) {
+            submarineUpkeep = ((submarineUpkeep * 95) / 100);
+            aircraftCarrierUpkeep = ((aircraftCarrierUpkeep * 95) / 100);
+        }
         uint256 additionalNavyUpkeep = frigateUpkeep +
             destroyerUpkeep +
             submarineUpkeep +
@@ -376,6 +397,10 @@ contract BillsContract is Ownable {
         bool lead = res.viewLead(id);
         if (lead) {
             navyUpkeepModifier -= 20;
+        }
+        bool oil = res.viewOil(id);
+        if (oil) {
+            navyUpkeepModifier -= 10;
         }
         uint256 adjustedNavyUpkeep = ((baseNavyUpkeep *
             navyUpkeepModifier) / 100);

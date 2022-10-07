@@ -29,8 +29,7 @@ contract EnvironmentContract is Ownable {
     CountryParametersContract param;
     TaxesContract tax;
 
-
-    constructor (
+    constructor(
         address _resources,
         address _infrastructure,
         address _improvements1,
@@ -58,42 +57,42 @@ contract EnvironmentContract is Ownable {
         tax = TaxesContract(_taxes);
     }
 
-    function updateResourcesContract (address newAddress) public onlyOwner {
+    function updateResourcesContract(address newAddress) public onlyOwner {
         resources = newAddress;
         res = ResourcesContract(newAddress);
     }
 
-    function updateInfrastructureContract (address newAddress) public onlyOwner {
+    function updateInfrastructureContract(address newAddress) public onlyOwner {
         infrastructure = newAddress;
         inf = InfrastructureContract(newAddress);
     }
 
-    function updateImprovementsContract1 (address newAddress) public onlyOwner {
+    function updateImprovementsContract1(address newAddress) public onlyOwner {
         improvements1 = newAddress;
         imp1 = ImprovementsContract1(newAddress);
     }
 
-    function updateWondersContract3 (address newAddress) public onlyOwner {
+    function updateWondersContract3(address newAddress) public onlyOwner {
         wonders3 = newAddress;
         won3 = WondersContract3(newAddress);
     }
 
-    function updateWondersContract4 (address newAddress) public onlyOwner {
+    function updateWondersContract4(address newAddress) public onlyOwner {
         wonders4 = newAddress;
         won4 = WondersContract4(newAddress);
     }
 
-    function updateForcesContract (address newAddress) public onlyOwner {
+    function updateForcesContract(address newAddress) public onlyOwner {
         forces = newAddress;
         force = ForcesContract(newAddress);
     }
 
-    function updateParametersContract (address newAddress) public onlyOwner {
+    function updateParametersContract(address newAddress) public onlyOwner {
         parameters = newAddress;
         param = CountryParametersContract(newAddress);
     }
 
-    function updateTaxesContract (address newAddress) public onlyOwner {
+    function updateTaxesContract(address newAddress) public onlyOwner {
         taxes = newAddress;
         tax = TaxesContract(newAddress);
     }
@@ -124,19 +123,24 @@ contract EnvironmentContract is Ownable {
         } else if (grossScore > 90) {
             environmentScore = 10;
         }
-        return environmentScore;    
-    }   
+        return environmentScore;
+    }
 
     function getGrossEnvironmentScore(uint256 id) public view returns (int256) {
         int256 scoreFromResources = getEnvironmentScoreFromResources(id);
-        int256 scoreFromImprovementsAndWonders = getEnvironmentScoreFromImprovementsAndWonders(id); 
+        int256 scoreFromImprovementsAndWonders = getEnvironmentScoreFromImprovementsAndWonders(
+                id
+            );
         int256 scoreFromTech = getEnvironmentScoreFromTech(id);
-        int256 scoreFromMilitaryRatio = getEnvironmentScoreFromMilitaryDensity(id);
-        int256 scoreFromInfrastructure = getEnvironmentScoreFromInfrastructure(id);
+        int256 scoreFromMilitaryRatio = getEnvironmentScoreFromMilitaryDensity(
+            id
+        );
+        int256 scoreFromInfrastructure = getEnvironmentScoreFromInfrastructure(
+            id
+        );
         int256 scoreFromNukes = getScoreFromNukes(id);
         int256 scoreFromGovernment = getScoreFromGovernment(id);
-        int256 grossEnvironmentScore = 
-            scoreFromResources +
+        int256 grossEnvironmentScore = scoreFromResources +
             scoreFromImprovementsAndWonders +
             scoreFromTech +
             scoreFromMilitaryRatio +
@@ -146,7 +150,11 @@ contract EnvironmentContract is Ownable {
         return grossEnvironmentScore;
     }
 
-    function getEnvironmentScoreFromResources(uint256 id) internal view returns (int256) {
+    function getEnvironmentScoreFromResources(uint256 id)
+        internal
+        view
+        returns (int256)
+    {
         int256 pointsFromResources;
         bool isCoal = res.viewCoal(id);
         bool isOil = res.viewOil(id);
@@ -171,9 +179,15 @@ contract EnvironmentContract is Ownable {
         return pointsFromResources;
     }
 
-    function getEnvironmentScoreFromImprovementsAndWonders(uint256 id) public view returns (int256) {
+    function getEnvironmentScoreFromImprovementsAndWonders(uint256 id)
+        public
+        view
+        returns (int256)
+    {
         uint256 borderWallCount = imp1.getBorderWallCount(id);
-        bool isNationalEnvironmentOffice = won3.getNationalEnvironmentOffice(id);
+        bool isNationalEnvironmentOffice = won3.getNationalEnvironmentOffice(
+            id
+        );
         bool isWeaponsResearchCenter = won4.getWeaponsResearchCenter(id);
         int256 pointsFromWondersAndImprovements;
         if (borderWallCount == 0) {
@@ -189,16 +203,20 @@ contract EnvironmentContract is Ownable {
         } else if (borderWallCount == 5) {
             pointsFromWondersAndImprovements += 50;
         }
-        if (isNationalEnvironmentOffice){
+        if (isNationalEnvironmentOffice) {
             pointsFromWondersAndImprovements += 10;
         }
-        if (isWeaponsResearchCenter){
+        if (isWeaponsResearchCenter) {
             pointsFromWondersAndImprovements -= 10;
         }
         return pointsFromWondersAndImprovements;
     }
 
-    function getEnvironmentScoreFromTech(uint256 id) internal view returns (int256) {
+    function getEnvironmentScoreFromTech(uint256 id)
+        internal
+        view
+        returns (int256)
+    {
         uint256 techCount = inf.getTechnologyCount(id);
         int256 pointsFromTech;
         if (techCount >= 6) {
@@ -207,7 +225,11 @@ contract EnvironmentContract is Ownable {
         return pointsFromTech;
     }
 
-    function getEnvironmentScoreFromMilitaryDensity(uint256 id) internal view returns (int256) {
+    function getEnvironmentScoreFromMilitaryDensity(uint256 id)
+        internal
+        view
+        returns (int256)
+    {
         int256 pointsFromMilitaryRatiio;
         (, bool environmentPenalty) = tax.soldierToPopulationRatio(id);
         if (environmentPenalty == false) {
@@ -216,7 +238,11 @@ contract EnvironmentContract is Ownable {
         return pointsFromMilitaryRatiio;
     }
 
-    function getEnvironmentScoreFromInfrastructure(uint256 id) internal view returns (int256) {
+    function getEnvironmentScoreFromInfrastructure(uint256 id)
+        internal
+        view
+        returns (int256)
+    {
         int256 pointsFromInfrastructure;
         uint256 land = inf.getLandCount(id);
         uint256 infra = inf.getInfrastructureCount(id);
@@ -242,25 +268,25 @@ contract EnvironmentContract is Ownable {
     function getScoreFromGovernment(uint256 id) internal view returns (int256) {
         int256 pointsFromGovernmentType;
         uint256 governmentType = param.getGovernmentType(id);
-        if (governmentType == 0 ||
+        if (
+            governmentType == 0 ||
             governmentType == 2 ||
             governmentType == 4 ||
-            governmentType == 10 
+            governmentType == 10
         ) {
             pointsFromGovernmentType -= 10;
         }
         return pointsFromGovernmentType;
     }
-        //lead (nuke penatly)
-        //wonders (national env office +1)
-        //wonders (weapons research complex -1)
-        //border walls +1
+    //lead (nuke penatly)
+    //wonders (national env office +1)
+    //wonders (weapons research complex -1)
+    //border walls +1
 
-        //tech (> 6)
-        //military (soldiers <60% of populaiton) (-1)
-        //land (>50% infrastructure) -1 (or +1 over)
-        //government type (communist, dictatorship, transitional or anarchy)  -1
-        //nukes -0.10 env per nuke
-        //government positions
-
+    //tech (> 6)
+    //military (soldiers <60% of populaiton) (-1)
+    //land (>50% infrastructure) -1 (or +1 over)
+    //government type (communist, dictatorship, transitional or anarchy)  -1
+    //nukes -0.10 env per nuke
+    //government positions
 }

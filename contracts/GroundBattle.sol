@@ -108,6 +108,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     ) internal {
         (uint256 soldiersDeployed, uint256 tanksDeployed) = war
             .getDeployedGroundForces(warId, attackerId);
+        //need efficiency modifier
         uint256 attackerForcesStrength = (soldiersDeployed +
             (17 * tanksDeployed));
         GroundForcesToBattle memory newGroundForces = GroundForcesToBattle(

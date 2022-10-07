@@ -274,9 +274,15 @@ contract TaxesContract is Ownable {
         return populationDensity;
     }
 
-    function getDensityPoints(uint256 density) public pure returns (uint256) {
+    function getDensityPoints(uint256 id) public view returns (uint256) {
         uint256 densityPoints = 0;
-        if (density < 70) {
+        uint256 density = checkPopulationDensity(id);
+        uint256 maxDensity = 70;
+        bool water = res.viewWater(id);
+        if (water) {
+            maxDensity = 120;
+        }
+        if (density < maxDensity) {
             densityPoints = 1;
         }
         return densityPoints;
@@ -286,6 +292,42 @@ contract TaxesContract is Ownable {
         uint256 pointsFromResources = 0;
         bool gems = res.viewGems(id);
         if (gems) {
+            pointsFromResources += 3;
+        }
+        bool oil = res.viewOil(id);
+        if (oil) {
+            pointsFromResources += 2;
+        }
+        bool silver = res.viewSilver(id);
+        if (silver) {
+            pointsFromResources += 2;
+        }
+        bool spices = res.viewSpices(id);
+        if (spices) {
+            pointsFromResources += 2;
+        }
+        bool sugar = res.viewSugar(id);
+        if (sugar) {
+            pointsFromResources += 1;
+        }
+        bool water = res.viewWater(id);
+        if (water) {
+            pointsFromResources += 3;
+        }
+        bool wine = res.viewWine(id);
+        if (wine) {
+            pointsFromResources += 3;
+        }
+        bool beer = res.viewBeer(id);
+        if (beer) {
+            pointsFromResources += 2;
+        }
+        bool fastFood = res.viewFastFood(id);
+        if (fastFood) {
+            pointsFromResources += 2;
+        }
+        bool fineJewelry = res.viewFineJewelry(id);
+        if (fineJewelry) {
             pointsFromResources += 3;
         }
         return pointsFromResources;
@@ -555,6 +597,14 @@ contract TaxesContract is Ownable {
         }
         bool gold = res.viewGold(id);
         if (gold) {
+            adjustments += 3;
+        }
+        bool silver = res.viewSilver(id);
+        if (silver) {
+            adjustments += 2;
+        }
+        bool scholars = res.viewScholars(id);
+        if (scholars) {
             adjustments += 3;
         }
         return adjustments;

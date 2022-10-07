@@ -125,10 +125,7 @@ contract ForcesContract is Ownable {
     }
 
     modifier onlyNukeContract() {
-        require(
-            msg.sender == nukeAddress,
-            "only callable from nuke contract"
-        );
+        require(msg.sender == nukeAddress, "only callable from nuke contract");
         _;
     }
 
@@ -166,6 +163,10 @@ contract ForcesContract is Ownable {
         uint256 soldierCost = 12;
         bool iron = res.viewIron(id);
         if (iron) {
+            soldierCost -= 3;
+        }
+        bool oil = res.viewOil(id);
+        if (oil) {
             soldierCost -= 3;
         }
         return soldierCost;
@@ -227,16 +228,26 @@ contract ForcesContract is Ownable {
         idToForces[id].numberOfSoldiers -= amount;
     }
 
-    function decreaseDefendingSoldierCountFromNukeAttack(uint256 id) public onlyNukeContract {
+    function decreaseDefendingSoldierCountFromNukeAttack(uint256 id)
+        public
+        onlyNukeContract
+    {
         bool falloutShelter = won1.getFalloutShelterSystem(id);
-        if(!falloutShelter) {        
-            uint256 numberOfDefendingSoldiers = idToForces[id].defendingSoldiers;
+        if (!falloutShelter) {
+            uint256 numberOfDefendingSoldiers = idToForces[id]
+                .defendingSoldiers;
             idToForces[id].defendingSoldiers = 0;
             idToForces[id].numberOfSoldiers -= numberOfDefendingSoldiers;
-        } else /* falloutShelter */ {
-            uint256 numberOfDefendingSoldierCasualties = ((idToForces[id].defendingSoldiers) / 2);
-            idToForces[id].defendingSoldiers = numberOfDefendingSoldierCasualties;
-            idToForces[id].numberOfSoldiers -= numberOfDefendingSoldierCasualties;
+        }
+        /* falloutShelter */
+        else {
+            uint256 numberOfDefendingSoldierCasualties = ((
+                idToForces[id].defendingSoldiers
+            ) / 2);
+            idToForces[id]
+                .defendingSoldiers = numberOfDefendingSoldierCasualties;
+            idToForces[id]
+                .numberOfSoldiers -= numberOfDefendingSoldierCasualties;
         }
     }
 
@@ -265,12 +276,28 @@ contract ForcesContract is Ownable {
         return soldierAmount;
     }
 
-    function getSoldierEfficiencyModifier(uint256 id) public view returns (uint256) {
+    function getSoldierEfficiencyModifier(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 efficiencyModifier = 100;
         bool aluminum = res.viewAluminium(id);
-        if(aluminum) { efficiencyModifier += 20; }
+        if (aluminum) {
+            efficiencyModifier += 20;
+        }
         bool coal = res.viewCoal(id);
-        if(coal) { efficiencyModifier += 8; }
+        if (coal) {
+            efficiencyModifier += 8;
+        }
+        bool oil = res.viewOil(id);
+        if (oil) {
+            efficiencyModifier += 10;
+        }
+        bool pigs = res.viewPigs(id);
+        if (pigs) {
+            efficiencyModifier += 15;
+        }
         return efficiencyModifier;
     }
 
@@ -317,10 +344,10 @@ contract ForcesContract is Ownable {
         idToForces[id].numberOfTanks -= amount;
     }
 
-    function decreaseDefendingTankCountFromCruiseMissileContract(uint256 amount, uint256 id)
-        public
-        onlyCruiseMissileContract
-    {
+    function decreaseDefendingTankCountFromCruiseMissileContract(
+        uint256 amount,
+        uint256 id
+    ) public onlyCruiseMissileContract {
         idToForces[id].defendingTanks -= amount;
         idToForces[id].numberOfTanks -= amount;
     }
@@ -335,12 +362,12 @@ contract ForcesContract is Ownable {
         idToForces[id].defendingTanks -= defendingTanksToDecrease;
     }
 
-    function decreaseDefendingTankCountFromAirBattleContract(uint256 id, uint256 amountToDecrease)
-        public
-        onlyAirBattle
-    {
+    function decreaseDefendingTankCountFromAirBattleContract(
+        uint256 id,
+        uint256 amountToDecrease
+    ) public onlyAirBattle {
         uint256 defendingTanks = idToForces[id].defendingTanks;
-        if(amountToDecrease >= defendingTanks) {
+        if (amountToDecrease >= defendingTanks) {
             idToForces[id].numberOfTanks -= defendingTanks;
             idToForces[id].defendingTanks = 0;
         } else {
@@ -401,7 +428,7 @@ contract ForcesContract is Ownable {
         idToForces[id].cruiseMissiles -= amount;
     }
 
-        function decreaseCruiseMissileCountFromNukeContract(uint256 id)
+    function decreaseCruiseMissileCountFromNukeContract(uint256 id)
         public
         onlyNukeContract
     {
@@ -410,12 +437,12 @@ contract ForcesContract is Ownable {
         idToForces[id].cruiseMissiles -= cruiseMissilesToDecrease;
     }
 
-        function decreaseCruiseMissileCountFromAirBattleContract(uint256 id, uint256 amountToDecrease)
-        public
-        onlyAirBattle
-    {
+    function decreaseCruiseMissileCountFromAirBattleContract(
+        uint256 id,
+        uint256 amountToDecrease
+    ) public onlyAirBattle {
         uint256 cruiseMissiles = idToForces[id].cruiseMissiles;
-        if(amountToDecrease >= cruiseMissiles) {
+        if (amountToDecrease >= cruiseMissiles) {
             idToForces[id].cruiseMissiles = 0;
         } else {
             idToForces[id].cruiseMissiles -= amountToDecrease;
@@ -516,14 +543,22 @@ contract ForcesContract is Ownable {
         return spyAmount;
     }
 
-    function decreaseDeployedUnits(uint256 attackerSoldierLosses, uint256 attackerTankLosses, uint256 attackerId) public onlyGroundBattle {
+    function decreaseDeployedUnits(
+        uint256 attackerSoldierLosses,
+        uint256 attackerTankLosses,
+        uint256 attackerId
+    ) public onlyGroundBattle {
         idToForces[attackerId].numberOfSoldiers -= attackerSoldierLosses;
         idToForces[attackerId].deployedSoldiers -= attackerSoldierLosses;
         idToForces[attackerId].numberOfTanks -= attackerTankLosses;
         idToForces[attackerId].deployedTanks -= attackerTankLosses;
     }
 
-    function decreaseDefendingUnits(uint256 defenderSoldierLosses, uint256 defenderTankLosses, uint256 defenderId) public onlyGroundBattle {
+    function decreaseDefendingUnits(
+        uint256 defenderSoldierLosses,
+        uint256 defenderTankLosses,
+        uint256 defenderId
+    ) public onlyGroundBattle {
         idToForces[defenderId].numberOfSoldiers -= defenderSoldierLosses;
         idToForces[defenderId].defendingSoldiers -= defenderSoldierLosses;
         idToForces[defenderId].numberOfTanks -= defenderTankLosses;

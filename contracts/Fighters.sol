@@ -15,9 +15,11 @@ contract FightersContract is Ownable {
     address public treasuryAddress;
     address public infrastructure;
     address public war;
+    address public resources;
     address public airBattle;
 
     CountryMinter mint;
+    ResourcesContract res;
 
     struct DefendingFighters {
         uint256 defendingAircraft;
@@ -56,10 +58,13 @@ contract FightersContract is Ownable {
         address _treasuryAddress,
         address _war,
         address _infrastructure,
+        address _resources,
         address _airBattle
     ) {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
+        resources = _resources;
+        res = ResourcesContract(_resources);
         bombers = _bombers;
         fightersMarket = _fightersMarket;
         treasuryAddress = _treasuryAddress;
@@ -168,8 +173,13 @@ contract FightersContract is Ownable {
         return deployedCount;
     }
 
-    function getMaxAircraftCount(uint256 id) public pure returns (uint256) {
-        return 450;
+    function getMaxAircraftCount(uint256 id) public view returns (uint256) {
+        uint256 maxAircraftCount = 450;
+        bool construction = res.viewConstruction(id);
+        if (construction) {
+            maxAircraftCount +=10;
+        }
+        return maxAircraftCount; 
     }
 
     modifier onlyBomberContract() {
@@ -1166,6 +1176,10 @@ contract FightersMarketplace is Ownable {
         uint256 aircraftPurchaseModifier = 100;
         bool aluminium = res.viewAluminium(id);
         if(aluminium) { aircraftPurchaseModifier -= 8; }
+        bool oil = res.viewOil(id);
+        if(oil) { aircraftPurchaseModifier -= 4; }
+        bool rubber = res.viewRubber(id);
+        if(rubber) { aircraftPurchaseModifier -= 4; }
         return aircraftPurchaseModifier;
     }
 }

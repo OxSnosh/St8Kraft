@@ -4,12 +4,14 @@ pragma solidity 0.8.7;
 import "./Treasury.sol";
 import "./Improvements.sol";
 import "./War.sol";
+import "./Resources.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract NavyContract is Ownable {
     address public treasuryAddress;
     address public improvementsContract1Address;
     address public improvementsContract3Address;
+    address public resources;
     address public navyBattleAddress;
     address public warAddress;
     uint256 public corvetteCost;
@@ -39,18 +41,22 @@ contract NavyContract is Ownable {
     mapping(uint256 => address) public idToOwnerNavy;
 
     WarContract war;
+    ResourcesContract res;
 
     constructor(
         address _treasuryAddress,
         address _improvementsContract1Address,
         address _improvementsContract3Address,
-        address _warAddress
+        address _warAddress,
+        address _resources
     ) {
         treasuryAddress = _treasuryAddress;
         improvementsContract1Address = _improvementsContract1Address;
         improvementsContract3Address = _improvementsContract3Address;
         warAddress = _warAddress;
         war = WarContract(_warAddress);
+        resources = _resources;
+        res = ResourcesContract(_resources);
         corvetteCost = 300000;
         landingShipCost = 300000;
         battleshipCost = 300000;
@@ -198,6 +204,10 @@ contract NavyContract is Ownable {
         ).getDrydockCount(id);
         require(drydockAmount > 0, "Must own a drydock to purchase");
         uint256 purchasePrice = corvetteCost * amount;
+        bool steel = res.viewSteel(id);
+        if (steel) {
+            purchasePrice = ((purchasePrice * 85)/ 100);
+        }
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].corvetteCount += amount;
@@ -227,6 +237,10 @@ contract NavyContract is Ownable {
         ).getShipyardCount(id);
         require(shipyardAmount > 0, "Must own a shipyard to purchase");
         uint256 purchasePrice = landingShipCost * amount;
+        bool steel = res.viewSteel(id);
+        if (steel) {
+            purchasePrice = ((purchasePrice * 85)/ 100);
+        }
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].landingShipCount += amount;
@@ -256,6 +270,10 @@ contract NavyContract is Ownable {
         ).getDrydockCount(id);
         require(drydockAmount > 0, "Must own a drydock to purchase");
         uint256 purchasePrice = battleshipCost * amount;
+        bool steel = res.viewSteel(id);
+        if (steel) {
+            purchasePrice = ((purchasePrice * 85)/ 100);
+        }
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].battleshipCount += amount;
@@ -285,6 +303,10 @@ contract NavyContract is Ownable {
         ).getDrydockCount(id);
         require(drydockAmount > 0, "Must own a drydock to purchase");
         uint256 purchasePrice = cruiserCost * amount;
+        bool steel = res.viewSteel(id);
+        if (steel) {
+            purchasePrice = ((purchasePrice * 85)/ 100);
+        }
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].cruiserCount += amount;
@@ -314,6 +336,10 @@ contract NavyContract is Ownable {
         ).getShipyardCount(id);
         require(shipyardAmount > 0, "Must own a shipyard to purchase");
         uint256 purchasePrice = frigateCost * amount;
+        bool steel = res.viewSteel(id);
+        if (steel) {
+            purchasePrice = ((purchasePrice * 85)/ 100);
+        }
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].frigateCount += amount;
@@ -343,6 +369,10 @@ contract NavyContract is Ownable {
         ).getDrydockCount(id);
         require(drydockAmount > 0, "Must own a drydock to purchase");
         uint256 purchasePrice = destroyerCost * amount;
+        bool steel = res.viewSteel(id);
+        if (steel) {
+            purchasePrice = ((purchasePrice * 85)/ 100);
+        }
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].destroyerCount += amount;
@@ -372,6 +402,10 @@ contract NavyContract is Ownable {
         ).getShipyardCount(id);
         require(shipyardAmount > 0, "Must own a shipyard to purchase");
         uint256 purchasePrice = submarineCost * amount;
+        bool steel = res.viewSteel(id);
+        if (steel) {
+            purchasePrice = ((purchasePrice * 85)/ 100);
+        }
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].submarineCount += amount;
@@ -401,6 +435,10 @@ contract NavyContract is Ownable {
         ).getShipyardCount(id);
         require(shipyardAmount > 0, "Must own a shipyard to purchase");
         uint256 purchasePrice = aircraftCarrierCost * amount;
+        bool steel = res.viewSteel(id);
+        if (steel) {
+            purchasePrice = ((purchasePrice * 85)/ 100);
+        }
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].aircraftCarrierCount += amount;

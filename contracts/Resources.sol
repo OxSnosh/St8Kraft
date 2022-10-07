@@ -81,88 +81,88 @@ contract ResourcesContract is VRFConsumerBaseV2 {
     struct Resources2 {
         bool oil;
         //Oil
-        //Lowers soldier purchase cost -$3.00, 
-        //increases population happiness +1.5, 
-        //increases soldier efficiency +10%, 
-        //lowers tank upkeep cost -5%, 
-        //lowers aircraft purchase cost -4%, 
-        //and lowers all navy vessel upkeep cost -10%.
+        //DONE //Lowers soldier purchase cost -$3.00, 
+        //DONE //increases population happiness +1.5, 
+        //DONE //increases soldier efficiency +10%, 
+        //DONE //lowers tank upkeep cost -5%, 
+        //DONE //lowers aircraft purchase cost -4%, 
+        //DONE //and lowers all navy vessel upkeep cost -10%.
         //
         bool pigs;
         //Pigs
-        //Lowers soldier upkeep cost -$0.50, 
-        //increases soldier efficiency +15%, 
-        //and increases number of citizens +3.5%.
+        //DONE //Lowers soldier upkeep cost -$0.50, 
+        //DONE //increases soldier efficiency +15%, 
+        //DONE //and increases number of citizens +3.5%.
         bool rubber;
         //Rubber
-        //Increases purchased land area of a nation by 20%, 
-        //lowers land purchase cost -10%, 
-        //triples the value of land when selling (from $100 to $300), 
+        //DONE //Increases purchased land area of a nation by 20%, 
+        //DONE //lowers land purchase cost -10%, 
+        //DONE //triples the value of land when selling (from $100 to $300), 
         //DONE //lowers infrastructure purchase cost -3%, 
-        //and lowers aircraft purchase cost -4%.
+        //DONE //and lowers aircraft purchase cost -4%.
         bool silver;
         //Silver
-        //Increases citizen's daily income +$2.00 
-        //and increases population happiness +2.
+        //DONE //Increases citizen's daily income +$2.00 
+        //DONE //and increases population happiness +2.
         bool spices;
         //Spices
-        //Increases the purchased land area of a nation by 8% 
-        //and increases population happiness +2.
+        //DONE //Increases the purchased land area of a nation by 8% 
+        //DONE //and increases population happiness +2.
         bool sugar;
         //Sugar
-        //Increases number of citizens +3%, 
-        //and increases population happiness +1.
+        //DONE //Increases number of citizens +3%, 
+        //DONE //and increases population happiness +1.
         bool uranium;
         //Uranium
-        //Reduces infrastructure upkeep cost -3%. 
-        //Allow nations to develop nuclear weapons only if that nation's government preference 
+        //DONE //Reduces infrastructure upkeep cost -3%. 
+        //DONE //Allow nations to develop nuclear weapons only if that nation's government preference 
         //supports nuclear weapons. 
         //If a nations government preference favors nuclear technology for the use of nuclear 
         //power plants but does not support nuclear weapons then the nation will receive +$3.00 
         //per citizen and +$0.15 for every level of tech purchased up to level 30 but loses -1 
         //population happiness. 
-        //If a nation owns nuclear weapons but does not have uranium the cost to maintain nukes 
+        //DONE //If a nation owns nuclear weapons but does not have uranium the cost to maintain nukes 
         //is doubled. 
-        //Lowers Submarine and Aircraft Carrier navy vessel purchase and upkeep cost -5%.
+        //DONE //Lowers Submarine and Aircraft Carrier navy vessel purchase and upkeep cost -5%.
         bool water;
         //Water
-        //Increases number of citizens per mile before population unhappiness by 50, 
-        //increases population happiness +2.5, 
-        //and improves a nation's environment by 1.
+        //DONE //Increases number of citizens per mile before population unhappiness by 50, 
+        //DONE //increases population happiness +2.5, 
+        //DONE //and improves a nation's environment by 1.
         bool wheat;
         //Wheat 
-        //Increases number of citizens +8%.
+        //DONE //Increases number of citizens +8%.
         bool wine;
         //Wine
-        //Increases population happiness +3.
+        //DONE //Increases population happiness +3.
     }
 
     struct BonusResources {
         bool beer;
         //beer
         //requires Water, Wheat, Lumber, Aluminium
-        //Increases population happiness + 2. 
+        //DONE //Increases population happiness + 2. 
         bool steel;
         //steel
         //DONE //reduces infrastructure cost -2%.
-        //Lowers all vessel purchase costs -15%
+        //DONE //Lowers all vessel purchase costs -15%
         //requires Coal and Iron
         bool construction;
         //construction
         //DONE //Reduces infrastructure cost -5% and 
-        //raises the aircraft limit +10.
+        //DONE //raises the aircraft limit +10.
         //requires Lumber, Iron, Marble, Aluminium, tech > 5
         bool fastFood;
         //fast food
-        //Increases population happiness + 2. 
+        //DONE //Increases population happiness + 2. 
         //requires Cattle, Sugar, Spices, Pigs
         bool fineJewelry;
         //fine jewelry
-        //Increases population happiness + 3.
+        //DONE //Increases population happiness + 3.
         //requires Gold, Silver, Gems, Coal
         bool scholars;
         //scholars
-        //increases population income +$3.00
+        //DONE //increases population income +$3.00
         //requires literacy rate > 90%, lumber, lead
         bool asphalt;
         //asphalt
@@ -819,6 +819,11 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         return isAluminium;
     }
 
+    function viewBeer(uint256 id) public view returns (bool) {
+        bool isBeer = idToBonusResources[id].beer;
+        return isBeer;
+    }
+
     function viewCattle(uint256 id) public view returns (bool) {
         bool isCattle = idToResources1[id].cattle;
         return isCattle;
@@ -832,6 +837,16 @@ contract ResourcesContract is VRFConsumerBaseV2 {
     function viewConstruction(uint256 id) public view returns (bool) {
         bool isConstruction = idToBonusResources[id].construction;
         return isConstruction;
+    }
+
+    function viewFastFood(uint256 id) public view returns (bool) {
+        bool isFastFood = idToBonusResources[id].fastFood;
+        return isFastFood;
+    }
+
+    function viewFineJewelry(uint256 id) public view returns (bool) {
+        bool isFineJewelry = idToBonusResources[id].fineJewelry;
+        return isFineJewelry;
     }
 
     function viewFish(uint256 id) public view returns (bool) {
@@ -884,6 +899,11 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         return isOil;
     }
 
+    function viewPigs(uint256 id) public view returns (bool) {
+        bool isPigs = idToResources2[id].pigs;
+        return isPigs;
+    }
+
     function viewRadiationCleanup(uint256 id) public view returns (bool) {
         bool isRadiationCleanup = idToBonusResources[id].radiationCleanup;
         return isRadiationCleanup;
@@ -894,9 +914,29 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         return isRubber;
     }
 
+    function viewScholars(uint256 id) public view returns (bool) {
+        bool isScholars = idToBonusResources[id].scholars;
+        return isScholars;
+    }
+
+    function viewSilver(uint256 id) public view returns (bool) {
+        bool isSilver = idToResources2[id].silver;
+        return isSilver;
+    }
+
+    function viewSpices(uint256 id) public view returns (bool) {
+        bool isSpices = idToResources2[id].spices;
+        return isSpices;
+    }
+
     function viewSteel(uint256 id) public view returns (bool) {
         bool isSteel = idToBonusResources[id].steel;
         return isSteel;
+    }
+
+    function viewSugar(uint256 id) public view returns (bool) {
+        bool isSugar = idToResources2[id].sugar;
+        return isSugar;
     }
 
     function viewUranium(uint256 id) public view returns (bool) {
@@ -907,6 +947,16 @@ contract ResourcesContract is VRFConsumerBaseV2 {
     function viewWater(uint256 id) public view returns (bool) {
         bool isWater = idToResources2[id].water;
         return isWater;
+    }
+
+    function viewWheat(uint256 id) public view returns (bool) {
+        bool isWheat = idToResources2[id].wheat;
+        return isWheat;
+    }
+
+    function viewWine(uint256 id) public view returns (bool) {
+        bool isWine = idToResources2[id].wine;
+        return isWine;
     }
 
     function getTradingPartners(uint256 id) public view returns (uint256[] memory) {

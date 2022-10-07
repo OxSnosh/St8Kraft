@@ -205,6 +205,10 @@ contract InfrastructureContract is Ownable {
         if (fish) {
             multiplier -= 5;
         }
+        bool rubber = res.viewRubber(id);
+        if (rubber) {
+            multiplier -= 10;
+        }
         return multiplier;
     }
 
@@ -215,8 +219,31 @@ contract InfrastructureContract is Ownable {
         if (coal) {
             landModifier += 15;
         }
+        bool rubber = res.viewRubber(id);
+        if (rubber) {
+            landModifier += 20;
+        }
+        bool spices = res.viewSpices(id);
+        if (spices) {
+            landModifier += 8;
+        }
         uint256 areaOfInfluence = ((currentLand * landModifier) / 100);
         return areaOfInfluence;
+    }
+
+    function sellLand(uint256 id, uint256 amount) public {
+        bool owner = mint.checkOwnership(id, msg.sender);
+        require(owner, "!nation owner");
+        uint256 currentLand = idToInfrastructure[id].landArea;
+        require(amount < currentLand, "cannot sell all land");
+        idToInfrastructure[id].landArea -= amount;
+        uint256 costPerMile = 100;
+        bool rubber = res.viewRubber(id);
+        if (rubber) {
+            costPerMile = 300;
+        }
+        uint256 totalCost = (amount * costPerMile);
+        TreasuryContract(treasury).returnBalance(id, totalCost);
     }
 
     function buyTech(uint256 id, uint256 amount) public {
@@ -367,7 +394,8 @@ contract InfrastructureContract is Ownable {
             costAdjustments2 +
             costAdjustments3);
         uint256 multiplier = (100 - adjustments);
-        uint256 adjustedCostPerLevel = ((grossCostPerLevel * multiplier) / 100);
+        //check amount of zeros below
+        uint256 adjustedCostPerLevel = ((grossCostPerLevel * multiplier));
         uint256 cost = buyAmount * adjustedCostPerLevel;
         TreasuryContract(treasury).spendBalance(id, cost);
     }
@@ -719,6 +747,18 @@ contract InfrastructureContract is Ownable {
         }
         bool fish = res.viewFish(id);
         if (fish) {
+            populationModifier += 8;
+        }
+        bool pigs = res.viewPigs(id);
+        if (pigs) {
+            populationModifier += 4;
+        }
+        bool sugar = res.viewSugar(id);
+        if (sugar) {
+            populationModifier += 3;
+        }
+        bool wheat = res.viewWheat(id);
+        if (wheat) {
             populationModifier += 8;
         }
         uint256 population = ((populationBaseCount * populationModifier) / 100);
