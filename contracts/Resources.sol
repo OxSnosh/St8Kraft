@@ -58,21 +58,21 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         bool iron;
         //Iron
         //DONE //Lowers soldier purchase cost -$3.00, 
-        //lowers infrastructure upkeep costs -10%, 
+        //DONE //lowers infrastructure upkeep costs -10%, 
         //DONE //lowers infrastructure purchase costs -5%, 
-        //and lowers tank upkeep costs -5%.
+        //DONE //and lowers tank upkeep costs -5%.
         bool lead;
         //Lead
-        //Lowers cruise missile and nuclear weapon purchase cost and upkeep cost -20%, 
-        //lowers aircraft upkeep cost -25%, 
+        //DONE //Lowers cruise missile and nuclear weapon purchase cost and upkeep cost -20%, 
+        //DONE //lowers aircraft upkeep cost -25%, 
         //lowers tank purchase and upkeep costs -8%, 
-        //lowers soldier upkeep cost -$0.50, 
-        //reduces environment penalties for owning nuclear weapons by 50%, 
-        //and lowers all navy vessel upkeep cost -20%.
+        //DONE //lowers soldier upkeep cost -$0.50, 
+        //DONE //reduces environment penalties for owning nuclear weapons by 50%, 
+        //DONE //and lowers all navy vessel upkeep cost -20%.
         bool lumber;
         //Lumber
         //DONE //Lowers infrastructure purchase cost -6% 
-        //and lowers infrastructure upkeep costs -8%.
+        //DONE //and lowers infrastructure upkeep costs -8%.
         bool marble;
         //Marble
         //DONE //Lowers infrastructure purchase cost -10%.

@@ -8,6 +8,7 @@ import "./Forces.sol";
 import "./Fighters.sol";
 import "./Navy.sol";
 import "./Improvements.sol";
+import "./Resources.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract BillsContract is Ownable {
@@ -19,6 +20,7 @@ contract BillsContract is Ownable {
     address public fighters;
     address public navy;
     address public improvements1;
+    address public resources;
 
     TreasuryContract tsy;
     WondersContract1 won1;
@@ -27,6 +29,7 @@ contract BillsContract is Ownable {
     FightersContract fight;
     NavyContract nav;
     ImprovementsContract1 imp1;
+    ResourcesContract res;
 
     mapping(uint256 => address) public idToOwnerBills;
 
@@ -38,7 +41,8 @@ contract BillsContract is Ownable {
         address _forces,
         address _fighters,
         address _navy,
-        address _improvements1
+        address _improvements1,
+        address _resources
     ) {
         countryMinter = _countryMinter;
         treasury = _treasury;
@@ -55,6 +59,8 @@ contract BillsContract is Ownable {
         nav = NavyContract(_navy);
         improvements1 = _improvements1;
         imp1 = ImprovementsContract1(_improvements1);
+        resources = _resources;
+        res = ResourcesContract(_resources);
     }
 
     function updateCountryMinter(address newAddress) public onlyOwner {
@@ -89,6 +95,11 @@ contract BillsContract is Ownable {
     function updateImprovementsContract1(address newAddress) public onlyOwner {
         improvements1 = newAddress;
         imp1 = ImprovementsContract1(newAddress);
+    }
+
+    function updateResourcesContract1(address newAddress) public onlyOwner {
+        resources = newAddress;
+        res = ResourcesContract(newAddress);
     }
 
     modifier onlyCountryMinter() {
@@ -185,8 +196,30 @@ contract BillsContract is Ownable {
             upkeep = ((180 * infrastructureAmount) + 20);
             infrastructureCostPerLevel = (upkeep / 100);
         }
-        uint256 dailyInfrastructureBillsDue = infrastructureCostPerLevel *
+        uint256 baseInfrastructureBillsDue = infrastructureCostPerLevel *
             infrastructureAmount;
+        uint256 dailyInfrastructureBillsDue = calculateModifiedInfrastrucureUpkeep(
+                baseInfrastructureBillsDue,
+                id
+            );
+        return dailyInfrastructureBillsDue;
+    }
+
+    function calculateModifiedInfrastrucureUpkeep(
+        uint256 baseDailyInfrastructureUpkeep,
+        uint256 id
+    ) public view returns (uint256) {
+        uint256 infrastructureUpkeepModifier = 100;
+        bool iron = res.viewIron(id);
+        if (iron) {
+            infrastructureUpkeepModifier -= 10;
+        }
+        bool lumber = res.viewLumber(id);
+        if (lumber) {
+            infrastructureUpkeepModifier -= 8;
+        }
+        uint256 dailyInfrastructureBillsDue = ((baseDailyInfrastructureUpkeep *
+            infrastructureUpkeepModifier) / 100);
         return dailyInfrastructureBillsDue;
     }
 
@@ -196,23 +229,103 @@ contract BillsContract is Ownable {
         returns (uint256 militaryBills)
     {
         uint256 soldierCount = frc.getSoldierCount(id);
-        uint256 soldierUpkeep = (soldierCount * 2);
+        uint256 soldierUpkeep = getSoldierUpkeep(id, soldierCount);
         uint256 tankCount = frc.getTankCount(id);
-        uint256 tankUpkeep = (tankCount * 40);
+        uint256 tankUpkeep = getTankUpkeep(id, tankCount);
         uint256 aircraftCount = fight.getAircraftCount(id);
-        uint256 aircraftUpkeep = (aircraftCount * 200);
+        uint256 aircraftUpkeep = getAircraftUpkeep(id, aircraftCount);
         uint256 navyUpkeep = getNavyUpkeep(id);
         uint256 nukeCount = frc.getNukeCount(id);
-        uint256 nukeUpkeep = (nukeCount * 5000);
+        uint256 nukeUpkeep = getNukeUpkeep(id, nukeCount);
         uint256 cruiseMissileCount = frc.getCruiseMissileCount(id);
-        uint256 cruiseMissileUpkeep = (cruiseMissileCount * 200);
+        uint256 cruiseMissileUpkeep = getCruiseMissileUpkeep(id, cruiseMissileCount);
         uint256 dailyMilitaryUpkeep = soldierUpkeep +
             tankUpkeep +
             aircraftUpkeep +
-            navyUpkeep+
+            navyUpkeep +
             nukeUpkeep +
             cruiseMissileUpkeep;
         return dailyMilitaryUpkeep;
+    }
+
+    function getSoldierUpkeep(uint256 id, uint256 soldierCount)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 soldierUpkeep = (soldierCount * 2);
+        uint256 soldierUpkeepModifier = 100;
+        bool lead = res.viewLead(id);
+        if (lead) {
+            soldierUpkeepModifier -= 20;
+        }
+        uint256 adjustedSoldierUpkeep = ((soldierUpkeep *
+            soldierUpkeepModifier) / 100);
+        return adjustedSoldierUpkeep;
+    }
+
+    function getTankUpkeep(uint256 id, uint256 tankCount)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 tankUpkeep = (tankCount * 40);
+        uint256 tankUpkeepModifier = 100;
+        bool iron = res.viewIron(id);
+        if (iron) {
+            tankUpkeepModifier -= 5;
+        }
+        uint256 adjustedTankUpkeep = ((tankUpkeep *
+            tankUpkeepModifier) / 100);
+        return adjustedTankUpkeep;
+    }
+
+    function getNukeUpkeep(uint256 id, uint256 nukeCount)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 nukeUpkeep = (nukeCount * 5000);
+        uint256 nukeUpkeepModifier = 100;
+        bool lead = res.viewLead(id);
+        if (lead) {
+            nukeUpkeepModifier -= 20;
+        }
+        uint256 adjustedNukeUpkeep = ((nukeUpkeep *
+            nukeUpkeepModifier) / 100);
+        return adjustedNukeUpkeep;
+    }
+
+    function getCruiseMissileUpkeep(uint256 id, uint256 missileCount)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 missileUpkeep = (missileCount * 500);
+        uint256 missileUpkeepModifier = 100;
+        bool lead = res.viewLead(id);
+        if (lead) {
+            missileUpkeepModifier -= 20;
+        }
+        uint256 adjustedMissileUpkeep = ((missileUpkeep *
+            missileUpkeepModifier) / 100);
+        return adjustedMissileUpkeep;
+    }
+
+    function getAircraftUpkeep(uint256 id, uint256 aircraftCount)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 aircraftUpkeep = (aircraftCount * 200);
+        uint256 aircraftUpkeepModifier = 100;
+        bool lead = res.viewLead(id);
+        if (lead) {
+            aircraftUpkeepModifier -= 25;
+        }
+        uint256 adjustedAircraftUpkeep = ((aircraftUpkeep *
+            aircraftUpkeepModifier) / 100);
+        return adjustedAircraftUpkeep;
     }
 
     function getNavyUpkeep(uint256 id)
@@ -229,11 +342,12 @@ contract BillsContract is Ownable {
         uint256 cruiserCount = nav.getCruiserCount(id);
         uint256 cruiserUpkeep = (cruiserCount * 10000);
         uint256 additionalNavyUpkeep = getNavyUpkeepAppended(id);
-        uint256 dailyNavyUpkeep = additionalNavyUpkeep +
+        uint256 baseNavyUpkeep = additionalNavyUpkeep +
             corvetteUpkeep +
             landingShipUpkeep +
             battleshipUpkeep +
             cruiserUpkeep;
+        uint256 dailyNavyUpkeep = getAdjustedNavyUpkeep(id, baseNavyUpkeep);
         return dailyNavyUpkeep;
     }
 
@@ -251,6 +365,21 @@ contract BillsContract is Ownable {
             submarineUpkeep +
             aircraftCarrierUpkeep;
         return additionalNavyUpkeep;
+    }
+
+    function getAdjustedNavyUpkeep(uint256 id, uint256 baseNavyUpkeep)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 navyUpkeepModifier = 100;
+        bool lead = res.viewLead(id);
+        if (lead) {
+            navyUpkeepModifier -= 20;
+        }
+        uint256 adjustedNavyUpkeep = ((baseNavyUpkeep *
+            navyUpkeepModifier) / 100);
+        return adjustedNavyUpkeep;
     }
 
     function calculateDailyBillsFromImprovements(uint256 id)
