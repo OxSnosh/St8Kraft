@@ -166,28 +166,26 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         //requires literacy rate > 90%, lumber, lead
         bool asphalt;
         //asphalt
-        //Lowers infrastructure upkeep cost -5%. 
+        //DONE //Lowers infrastructure upkeep cost -5%. 
         //requires Construction, Oil, Rubber
         bool automobiles;
         //automobiles
-        //Increases population happiness +3.
+        //DONE //Increases population happiness +3.
         //requires Asphalt, Steel
         bool affluentPopulation;
         //affluent population
-        //Increases number of citizens +5%.
+        //DONE //Increases number of citizens +5%.
         //requires fineJewelry, Fish, Furs, Wine
         bool microchips;
         //microchips
-        //reduces tech cost -8%
-        //increases population happiness +2
-        //lowers frigate, destroyer, submarine, aircraft carrier upkeep cost -10%
+        //DONE //reduces tech cost -8%
+        //DONE //increases population happiness +2
+        //DONE //lowers frigate, destroyer, submarine, aircraft carrier upkeep cost -10%
         //requires Gold, Lead, Oil, tech > 10
-        //Lowers Frigate, Destroyer, Submarine and Aircraft Carrier navy vessel 
-        //purchase and upkeep cost -10%.
         bool radiationCleanup;
         //radiation cleanup
         //reduces nuclear anarchy effects by 1 day
-        //Improves a nation's environment by 1
+        //DONE //Improves a nation's environment by 1
         //Resuces global radiation for your nation by 50%
         //requires Construction, Microchips, Steel and Technology > 15
     }
@@ -814,9 +812,24 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         return (resource1, resource2);
     }
 
+    function viewAffluentPopulation(uint256 id) public view returns (bool) {
+        bool isAffluentPopulation = idToBonusResources[id].affluentPopulation;
+        return isAffluentPopulation;
+    }
+
     function viewAluminium(uint256 id) public view returns (bool) {
         bool isAluminium = idToResources1[id].aluminium;
         return isAluminium;
+    }
+
+    function viewAsphalt(uint256 id) public view returns (bool) {
+        bool isAsphalt = idToBonusResources[id].asphalt;
+        return isAsphalt;
+    }
+
+    function viewAutomobiles(uint256 id) public view returns (bool) {
+        bool isAutomobiles = idToBonusResources[id].automobiles;
+        return isAutomobiles;
     }
 
     function viewBeer(uint256 id) public view returns (bool) {

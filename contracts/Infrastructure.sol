@@ -511,9 +511,11 @@ contract InfrastructureContract is Ownable {
         uint256 aluminiumMultiplier = 0;
         uint256 coalMultiplier = 0;
         uint256 steelMultiplier = 0;
+        uint256 asphaltMultiplier = 0;
         bool isAluminium = ResourcesContract(resources).viewAluminium(id);
         bool isCoal = ResourcesContract(resources).viewCoal(id);
         bool isSteel = ResourcesContract(resources).viewSteel(id);
+        bool isAsphalt = ResourcesContract(resources).viewAsphalt(id);
         if (isAluminium) {
             aluminiumMultiplier = 7;
         }
@@ -523,9 +525,13 @@ contract InfrastructureContract is Ownable {
         if (isSteel) {
             steelMultiplier = 2;
         }
-        uint256 sumOfAdjustments = aluminiumMultiplier +
+        if (isAsphalt) {
+            asphaltMultiplier = 5;
+        }
+        uint256 sumOfAdjustments = (aluminiumMultiplier +
             coalMultiplier +
-            steelMultiplier;
+            steelMultiplier +
+            asphaltMultiplier);
         return sumOfAdjustments;
     }
 
@@ -760,6 +766,10 @@ contract InfrastructureContract is Ownable {
         bool wheat = res.viewWheat(id);
         if (wheat) {
             populationModifier += 8;
+        }
+        bool affluentPopulation = res.viewAffluentPopulation(id);
+        if (affluentPopulation) {
+            populationModifier += 5;
         }
         uint256 population = ((populationBaseCount * populationModifier) / 100);
         return population;

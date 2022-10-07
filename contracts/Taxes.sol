@@ -330,7 +330,22 @@ contract TaxesContract is Ownable {
         if (fineJewelry) {
             pointsFromResources += 3;
         }
+        uint256 additionalPoints = getAdditionalPointsFromResources(id);
+        pointsFromResources += additionalPoints;
         return pointsFromResources;
+    }
+
+    function getAdditionalPointsFromResources(uint256 id) public view returns (uint256) {
+        uint256 additionalPointsFromResources;
+        bool automobiles = res.viewAutomobiles(id);
+        if (automobiles) {
+            additionalPointsFromResources += 3;
+        }
+        bool microchips = res.viewMicrochips(id);
+        if(microchips) {
+            additionalPointsFromResources += 2;
+        }
+        return additionalPointsFromResources;
     }
 
     function getHappinessFromWonders(uint256 id)

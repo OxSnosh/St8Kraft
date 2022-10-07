@@ -340,6 +340,10 @@ contract NavyContract is Ownable {
         if (steel) {
             purchasePrice = ((purchasePrice * 85)/ 100);
         }
+        bool microchips = res.viewMicrochips(id);
+        if (microchips) {
+            purchasePrice = ((purchasePrice * 90) / 100);
+        }
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].frigateCount += amount;
@@ -372,6 +376,10 @@ contract NavyContract is Ownable {
         bool steel = res.viewSteel(id);
         if (steel) {
             purchasePrice = ((purchasePrice * 85)/ 100);
+        }
+        bool microchips = res.viewMicrochips(id);
+        if (microchips) {
+            purchasePrice = ((purchasePrice * 90) / 100);
         }
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
@@ -406,6 +414,10 @@ contract NavyContract is Ownable {
         if (steel) {
             purchasePrice = ((purchasePrice * 85)/ 100);
         }
+        bool microchips = res.viewMicrochips(id);
+        if (microchips) {
+            purchasePrice = ((purchasePrice * 90) / 100);
+        }
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].submarineCount += amount;
@@ -438,6 +450,10 @@ contract NavyContract is Ownable {
         bool steel = res.viewSteel(id);
         if (steel) {
             purchasePrice = ((purchasePrice * 85)/ 100);
+        }
+        bool microchips = res.viewMicrochips(id);
+        if (microchips) {
+            purchasePrice = ((purchasePrice * 90) / 100);
         }
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
