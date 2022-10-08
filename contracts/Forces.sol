@@ -5,6 +5,9 @@ import "./Treasury.sol";
 import "./Infrastructure.sol";
 import "./Resources.sol";
 import "./Wonders.sol";
+import "./Improvements.sol";
+import "./CountryMinter.sol";
+import "./War.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract ForcesContract is Ownable {
@@ -12,20 +15,26 @@ contract ForcesContract is Ownable {
     uint256 public cruiseMissileCost;
     uint256 public nukeCost;
     uint256 public spyCost;
+    address public countryMinter;
     address public treasuryAddress;
     address public aid;
     address public spyAddress;
     address public cruiseMissile;
     address public infrastructure;
     address public resources;
+    address public improvements1;
     address public wonders1;
     address public nukeAddress;
     address public airBattle;
     address public groundBattle;
+    address public warAddress;
 
+    CountryMinter mint;
     InfrastructureContract inf;
     ResourcesContract res;
     WondersContract1 won1;
+    ImprovementsContract1 imp1;
+    WarContract war;
 
     struct Forces {
         uint256 numberOfSoldiers;
@@ -46,12 +55,10 @@ contract ForcesContract is Ownable {
         address _aid,
         address _spyAddress,
         address _cruiseMissile,
-        address _infrastructure,
-        address _resources,
-        address _wonders1,
         address _nukeAddress,
         address _airBattle,
-        address _groundBattle
+        address _groundBattle,
+        address _warAddress
     ) {
         treasuryAddress = _treasuryAddress;
         spyAddress = _spyAddress;
@@ -59,16 +66,31 @@ contract ForcesContract is Ownable {
         aid = _aid;
         nukeAddress = _nukeAddress;
         airBattle = _airBattle;
+        warAddress = _warAddress;
+        war = WarContract(_warAddress);
         groundBattle = _groundBattle;
+        tankCost = 480;
+        cruiseMissileCost = 20000;
+        spyCost = 500;
+    }
+
+    function constructorContinued (
+        address _infrastructure,
+        address _resources,
+        address _improvements1,
+        address _wonders1,
+        address _countryMinter
+    ) public onlyOwner {
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
         resources = _resources;
         res = ResourcesContract(_resources);
         wonders1 = _wonders1;
         won1 = WondersContract1(_wonders1);
-        tankCost = 480;
-        cruiseMissileCost = 20000;
-        spyCost = 500;
+        improvements1 = _improvements1;
+        imp1 = ImprovementsContract1(_improvements1);
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
     }
 
     mapping(uint256 => Forces) public idToForces;
@@ -88,6 +110,11 @@ contract ForcesContract is Ownable {
     function updateResourcesContract(address newAddress) public onlyOwner {
         resources = newAddress;
         res = ResourcesContract(newAddress);
+    }
+
+    function updateImprovementsContract1(address newAddress) public onlyOwner {
+        improvements1 = newAddress;
+        imp1 = ImprovementsContract1(newAddress);
     }
 
     function updateTankCost(uint256 newPrice) public onlyOwner {
@@ -201,15 +228,27 @@ contract ForcesContract is Ownable {
         return count;
     }
 
-    function deploySoldiers(uint256 amountToDeploy, uint256 id) public {
-        require(
-            idToOwnerForces[id] == msg.sender,
-            "You are not the nation ruler"
-        );
+    function deploySoldiers(uint256 amountToDeploy, uint256 id, uint256 warId) public {
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require (isOwner, "!nation owner");
+        uint256 totalSoldiers = getSoldierCount(id);
+        uint256 deployedSoldiers = getDeployedSoldierCount(id);
+        uint256 maxDeployablePercentage = getMaxDeployablePercentage(id);
+        require ((((deployedSoldiers + amountToDeploy) * 100) / totalSoldiers) <= maxDeployablePercentage);
+        war.deploySoldiers(id, warId, amountToDeploy);
         uint256 defendingSoldierCount = idToForces[id].defendingSoldiers;
         require(defendingSoldierCount >= amountToDeploy);
         idToForces[id].defendingSoldiers -= amountToDeploy;
         idToForces[id].deployedSoldiers += amountToDeploy;
+    }
+
+    function getMaxDeployablePercentage(uint256 id) public view returns (uint256) {
+        uint256 maxDeployablePercentage = 80;
+        uint256 borderFortificationCount = imp1.getBorderFortificationCount(id);
+        if (borderFortificationCount > 0) {
+            maxDeployablePercentage -= (2 * borderFortificationCount);
+        }
+        return maxDeployablePercentage;
     }
 
     function withdrawSoldiers(uint256 amountToWithdraw, uint256 id) public {
@@ -276,7 +315,7 @@ contract ForcesContract is Ownable {
         return soldierAmount;
     }
 
-    function getSoldierEfficiencyModifier(uint256 id)
+    function getDeployedSoldierEfficiencyModifier(uint256 id)
         public
         view
         returns (uint256)
@@ -297,6 +336,43 @@ contract ForcesContract is Ownable {
         bool pigs = res.viewPigs(id);
         if (pigs) {
             efficiencyModifier += 15;
+        }
+        uint256 barracks = imp1.getBarracksCount(id);
+        if (barracks > 0) {
+            efficiencyModifier += (10 * barracks);
+        }
+        return efficiencyModifier;
+    }
+
+    function getDefendingSoldierEfficiencyModifier(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 efficiencyModifier = 100;
+        bool aluminum = res.viewAluminium(id);
+        if (aluminum) {
+            efficiencyModifier += 20;
+        }
+        bool coal = res.viewCoal(id);
+        if (coal) {
+            efficiencyModifier += 8;
+        }
+        bool oil = res.viewOil(id);
+        if (oil) {
+            efficiencyModifier += 10;
+        }
+        bool pigs = res.viewPigs(id);
+        if (pigs) {
+            efficiencyModifier += 15;
+        }
+        uint256 barracks = imp1.getBarracksCount(id);
+        if (barracks > 0) {
+            efficiencyModifier += (10 * barracks);
+        }
+        uint256 borderFortification = imp1.getBorderFortificationCount(id);
+        if (borderFortification > 0 ) {
+            efficiencyModifier += (borderFortification * 2);
         }
         return efficiencyModifier;
     }

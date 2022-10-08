@@ -6,6 +6,7 @@ import "./Infrastructure.sol";
 import "./CountryMinter.sol";
 import "./Bombers.sol";
 import "./Resources.sol";
+import "./Improvements.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract FightersContract is Ownable {
@@ -16,10 +17,12 @@ contract FightersContract is Ownable {
     address public infrastructure;
     address public war;
     address public resources;
+    address public improvements1;
     address public airBattle;
 
     CountryMinter mint;
     ResourcesContract res;
+    ImprovementsContract1 imp1;
 
     struct DefendingFighters {
         uint256 defendingAircraft;
@@ -59,12 +62,15 @@ contract FightersContract is Ownable {
         address _war,
         address _infrastructure,
         address _resources,
+        address _improvements1,
         address _airBattle
     ) {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
         resources = _resources;
         res = ResourcesContract(_resources);
+        improvements1 = _improvements1;
+        imp1 = ImprovementsContract1(_improvements1);
         bombers = _bombers;
         fightersMarket = _fightersMarket;
         treasuryAddress = _treasuryAddress;
@@ -177,9 +183,9 @@ contract FightersContract is Ownable {
         uint256 maxAircraftCount = 450;
         bool construction = res.viewConstruction(id);
         if (construction) {
-            maxAircraftCount +=10;
+            maxAircraftCount += 10;
         }
-        return maxAircraftCount; 
+        return maxAircraftCount;
     }
 
     modifier onlyBomberContract() {
@@ -694,8 +700,9 @@ contract FightersContract is Ownable {
         uint256[] memory attackerLosses,
         uint256 attackerId
     ) public onlyAirBattle {
-        idToDefendingFighters[defenderId].defendingAircraft -= defenderLosses.length;
-        for(uint i; i < defenderLosses.length; i++) {
+        idToDefendingFighters[defenderId].defendingAircraft -= defenderLosses
+            .length;
+        for (uint256 i; i < defenderLosses.length; i++) {
             if (defenderLosses[i] == 1) {
                 idToDefendingFighters[defenderId].yak9Count -= 1;
             } else if (defenderLosses[i] == 2) {
@@ -712,12 +719,13 @@ contract FightersContract is Ownable {
                 idToDefendingFighters[defenderId].f15EagleCount -= 1;
             } else if (defenderLosses[i] == 8) {
                 idToDefendingFighters[defenderId].su30MkiCount -= 1;
-            }else if (defenderLosses[i] == 9) {
+            } else if (defenderLosses[i] == 9) {
                 idToDefendingFighters[defenderId].f22RaptorCount -= 1;
             }
         }
-        idToDeployedFighters[attackerId].deployedAircraft -= attackerLosses.length;
-        for(uint i; i < attackerLosses.length; i++) {
+        idToDeployedFighters[attackerId].deployedAircraft -= attackerLosses
+            .length;
+        for (uint256 i; i < attackerLosses.length; i++) {
             if (attackerLosses[i] == 1) {
                 idToDeployedFighters[attackerId].yak9Count -= 1;
             } else if (attackerLosses[i] == 2) {
@@ -734,20 +742,21 @@ contract FightersContract is Ownable {
                 idToDeployedFighters[attackerId].f15EagleCount -= 1;
             } else if (attackerLosses[i] == 8) {
                 idToDeployedFighters[attackerId].su30MkiCount -= 1;
-            }else if (attackerLosses[i] == 9) {
+            } else if (attackerLosses[i] == 9) {
                 idToDeployedFighters[attackerId].f22RaptorCount -= 1;
             }
         }
     }
 }
 
-contract FightersMarketplace is Ownable {
+contract FightersMarketplace1 is Ownable {
     address public countryMinter;
     address public fighters;
     address public bombers;
     address public treasury;
     address public infrastructure;
     address public resources;
+    address public improvements1;
     uint256 public yak9Cost = 10000;
     uint256 public yak9RequiredInfrastructure = 100;
     uint256 public yak9RequiredTech = 30;
@@ -763,22 +772,11 @@ contract FightersMarketplace is Ownable {
     uint256 public f100SuperSabreCost = 30000;
     uint256 public f100SuperSabreRequiredInfrastructure = 500;
     uint256 public f100SuperSabreRequiredTech = 200;
-    uint256 public f35LightningCost = 35000;
-    uint256 public f35LightningRequiredInfrastructure = 600;
-    uint256 public f35LightningRequiredTech = 255;
-    uint256 public f15EagleCost = 40000;
-    uint256 public f15EagleRequiredInfrastructure = 700;
-    uint256 public f15EagleRequiredTech = 315;
-    uint256 public su30MkiCost = 45000;
-    uint256 public su30MkiRequiredInfrastructure = 850;
-    uint256 public su30MkiRequiredTech = 405;
-    uint256 public f22RaptorCost = 50000;
-    uint256 public f22RaptorRequiredInfrastructure = 1000;
-    uint256 public f22RaptorRequiredTech = 500;
 
     CountryMinter mint;
     BombersContract bomb;
     ResourcesContract res;
+    ImprovementsContract1 imp1;
 
     constructor(
         address _countryMinter,
@@ -786,7 +784,8 @@ contract FightersMarketplace is Ownable {
         address _fighters,
         address _treasury,
         address _infrastructure,
-        address _resources
+        address _resources,
+        address _improvements1
     ) {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
@@ -794,8 +793,10 @@ contract FightersMarketplace is Ownable {
         bomb = BombersContract(_bombers);
         resources = _resources;
         res = ResourcesContract(_resources);
-        fighters = _fighters;
+        improvements1 = _improvements1;
+        imp1 = ImprovementsContract1(_improvements1);
         treasury = _treasury;
+        fighters = _fighters;
         infrastructure = _infrastructure;
     }
 
@@ -804,13 +805,6 @@ contract FightersMarketplace is Ownable {
     modifier onlyCountryMinter() {
         require(msg.sender == countryMinter, "only countryMinter can call");
         _;
-    }
-
-    function initiateFightersMarket(uint256 id, address nationOwner)
-        public
-        onlyCountryMinter
-    {
-        idToOwnerFightersMarket[id] = nationOwner;
     }
 
     function updateCountryMinterAddress(address newAddress) public onlyOwner {
@@ -840,95 +834,60 @@ contract FightersMarketplace is Ownable {
         res = ResourcesContract(newAddress);
     }
 
-    // function updateYak9Specs(
-    //     uint256 newPrice,
-    //     uint256 newInfra,
-    //     uint256 newTech
-    // ) public onlyOwner {
-    //     yak9Cost = newPrice;
-    //     yak9RequiredInfrastructure = newInfra;
-    //     yak9RequiredTech = newTech;
-    // }
+    function updateImprovements1Address(address newAddress) public onlyOwner {
+        improvements1 = newAddress;
+        imp1 = ImprovementsContract1(newAddress);
+    }
 
-    // function updateP51MustangSpecs(
-    //     uint256 newPrice,
-    //     uint256 newInfra,
-    //     uint256 newTech
-    // ) public onlyOwner {
-    //     p51MustangCost = newPrice;
-    //     p51MustangRequiredInfrastructure = newInfra;
-    //     p51MustangRequiredTech = newTech;
-    // }
+    function updateYak9Specs(
+        uint256 newPrice,
+        uint256 newInfra,
+        uint256 newTech
+    ) public onlyOwner {
+        yak9Cost = newPrice;
+        yak9RequiredInfrastructure = newInfra;
+        yak9RequiredTech = newTech;
+    }
 
-    // function updateF86SabreSpecs(
-    //     uint256 newPrice,
-    //     uint256 newInfra,
-    //     uint256 newTech
-    // ) public onlyOwner {
-    //     f86SabreCost = newPrice;
-    //     f86SabreRequiredInfrastructure = newInfra;
-    //     f86SabreRequiredTech = newTech;
-    // }
+    function updateP51MustangSpecs(
+        uint256 newPrice,
+        uint256 newInfra,
+        uint256 newTech
+    ) public onlyOwner {
+        p51MustangCost = newPrice;
+        p51MustangRequiredInfrastructure = newInfra;
+        p51MustangRequiredTech = newTech;
+    }
 
-    // function updateMig15Specs(
-    //     uint256 newPrice,
-    //     uint256 newInfra,
-    //     uint256 newTech
-    // ) public onlyOwner {
-    //     mig15Cost = newPrice;
-    //     mig15RequiredInfrastructure = newInfra;
-    //     mig15RequiredTech = newTech;
-    // }
+    function updateF86SabreSpecs(
+        uint256 newPrice,
+        uint256 newInfra,
+        uint256 newTech
+    ) public onlyOwner {
+        f86SabreCost = newPrice;
+        f86SabreRequiredInfrastructure = newInfra;
+        f86SabreRequiredTech = newTech;
+    }
 
-    // function updateF100SuperSabreSpecs(
-    //     uint256 newPrice,
-    //     uint256 newInfra,
-    //     uint256 newTech
-    // ) public onlyOwner {
-    //     f100SuperSabreCost = newPrice;
-    //     f100SuperSabreRequiredInfrastructure = newInfra;
-    //     f100SuperSabreRequiredTech = newTech;
-    // }
+    function updateMig15Specs(
+        uint256 newPrice,
+        uint256 newInfra,
+        uint256 newTech
+    ) public onlyOwner {
+        mig15Cost = newPrice;
+        mig15RequiredInfrastructure = newInfra;
+        mig15RequiredTech = newTech;
+    }
 
-    // function updateF35LightningSpecs(
-    //     uint256 newPrice,
-    //     uint256 newInfra,
-    //     uint256 newTech
-    // ) public onlyOwner {
-    //     f35LightningCost = newPrice;
-    //     f35LightningRequiredInfrastructure = newInfra;
-    //     f35LightningRequiredTech = newTech;
-    // }
-
-    // function updateF15EagleSpecs(
-    //     uint256 newPrice,
-    //     uint256 newInfra,
-    //     uint256 newTech
-    // ) public onlyOwner {
-    //     f15EagleCost = newPrice;
-    //     f15EagleRequiredInfrastructure = newInfra;
-    //     f15EagleRequiredTech = newTech;
-    // }
-
-    // function updateSU30MkiSpecs(
-    //     uint256 newPrice,
-    //     uint256 newInfra,
-    //     uint256 newTech
-    // ) public onlyOwner {
-    //     su30MkiCost = newPrice;
-    //     su30MkiRequiredInfrastructure = newInfra;
-    //     su30MkiRequiredTech = newTech;
-    // }
-
-    // function updateF22RaptorSpecs(
-    //     uint256 newPrice,
-    //     uint256 newInfra,
-    //     uint256 newTech
-    // ) public onlyOwner {
-    //     f22RaptorCost = newPrice;
-    //     f22RaptorRequiredInfrastructure = newInfra;
-    //     f22RaptorRequiredTech = newTech;
-    // }
+    function updateF100SuperSabreSpecs(
+        uint256 newPrice,
+        uint256 newInfra,
+        uint256 newTech
+    ) public onlyOwner {
+        f100SuperSabreCost = newPrice;
+        f100SuperSabreRequiredInfrastructure = newInfra;
+        f100SuperSabreRequiredTech = newTech;
+    }
 
     function buyYak9(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
@@ -1064,6 +1023,159 @@ contract FightersMarketplace is Ownable {
         TreasuryContract(treasury).spendBalance(id, purchasePrice);
     }
 
+    function getAircraftPurchaseCostModifier(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 aircraftPurchaseModifier = 100;
+        bool aluminium = res.viewAluminium(id);
+        if (aluminium) {
+            aircraftPurchaseModifier -= 8;
+        }
+        bool oil = res.viewOil(id);
+        if (oil) {
+            aircraftPurchaseModifier -= 4;
+        }
+        bool rubber = res.viewRubber(id);
+        if (rubber) {
+            aircraftPurchaseModifier -= 4;
+        }
+        uint256 airports = imp1.getAirportCount(id);
+        if (airports > 0) {
+            aircraftPurchaseModifier -= (2 * airports);
+        }
+        return aircraftPurchaseModifier;
+    }
+}
+
+contract FightersMarketplace2 is Ownable {
+    address public countryMinter;
+    address public fighters;
+    address public bombers;
+    address public treasury;
+    address public infrastructure;
+    address public resources;
+    address public improvements1;
+    uint256 public f35LightningCost = 35000;
+    uint256 public f35LightningRequiredInfrastructure = 600;
+    uint256 public f35LightningRequiredTech = 255;
+    uint256 public f15EagleCost = 40000;
+    uint256 public f15EagleRequiredInfrastructure = 700;
+    uint256 public f15EagleRequiredTech = 315;
+    uint256 public su30MkiCost = 45000;
+    uint256 public su30MkiRequiredInfrastructure = 850;
+    uint256 public su30MkiRequiredTech = 405;
+    uint256 public f22RaptorCost = 50000;
+    uint256 public f22RaptorRequiredInfrastructure = 1000;
+    uint256 public f22RaptorRequiredTech = 500;
+
+    CountryMinter mint;
+    BombersContract bomb;
+    ResourcesContract res;
+    ImprovementsContract1 imp1;
+
+    constructor(
+        address _countryMinter,
+        address _bombers,
+        address _fighters,
+        address _treasury,
+        address _infrastructure,
+        address _resources,
+        address _improvements1
+    ) {
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
+        bombers = _bombers;
+        bomb = BombersContract(_bombers);
+        resources = _resources;
+        res = ResourcesContract(_resources);
+        improvements1 = _improvements1;
+        imp1 = ImprovementsContract1(_improvements1);
+        treasury = _treasury;
+        fighters = _fighters;
+        infrastructure = _infrastructure;
+    }
+
+    mapping(uint256 => address) public idToOwnerFightersMarket;
+
+    modifier onlyCountryMinter() {
+        require(msg.sender == countryMinter, "only countryMinter can call");
+        _;
+    }
+
+    function updateCountryMinterAddress(address newAddress) public onlyOwner {
+        countryMinter = newAddress;
+        mint = CountryMinter(newAddress);
+    }
+
+    function updateBombersAddress(address newAddress) public onlyOwner {
+        bombers = newAddress;
+        bomb = BombersContract(newAddress);
+    }
+
+    function updateFighters1Address(address newAddress) public onlyOwner {
+        fighters = newAddress;
+    }
+
+    function updateInfrastructureAddress(address newAddress) public onlyOwner {
+        infrastructure = newAddress;
+    }
+
+    function updateTreasuryAddress(address newAddress) public onlyOwner {
+        treasury = newAddress;
+    }
+
+    function updateResourcesAddress(address newAddress) public onlyOwner {
+        resources = newAddress;
+        res = ResourcesContract(newAddress);
+    }
+
+    function updateImprovements1Address(address newAddress) public onlyOwner {
+        improvements1 = newAddress;
+        imp1 = ImprovementsContract1(newAddress);
+    }
+
+    function updateF35LightningSpecs(
+        uint256 newPrice,
+        uint256 newInfra,
+        uint256 newTech
+    ) public onlyOwner {
+        f35LightningCost = newPrice;
+        f35LightningRequiredInfrastructure = newInfra;
+        f35LightningRequiredTech = newTech;
+    }
+
+    function updateF15EagleSpecs(
+        uint256 newPrice,
+        uint256 newInfra,
+        uint256 newTech
+    ) public onlyOwner {
+        f15EagleCost = newPrice;
+        f15EagleRequiredInfrastructure = newInfra;
+        f15EagleRequiredTech = newTech;
+    }
+
+    function updateSU30MkiSpecs(
+        uint256 newPrice,
+        uint256 newInfra,
+        uint256 newTech
+    ) public onlyOwner {
+        su30MkiCost = newPrice;
+        su30MkiRequiredInfrastructure = newInfra;
+        su30MkiRequiredTech = newTech;
+    }
+
+    function updateF22RaptorSpecs(
+        uint256 newPrice,
+        uint256 newInfra,
+        uint256 newTech
+    ) public onlyOwner {
+        f22RaptorCost = newPrice;
+        f22RaptorRequiredInfrastructure = newInfra;
+        f22RaptorRequiredTech = newTech;
+    }
+
     function buyF35Lightning(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
@@ -1172,14 +1284,4 @@ contract FightersMarketplace is Ownable {
         TreasuryContract(treasury).spendBalance(id, purchasePrice);
     }
 
-    function getAircraftPurchaseCostModifier(uint256 id) public view returns (uint256) {
-        uint256 aircraftPurchaseModifier = 100;
-        bool aluminium = res.viewAluminium(id);
-        if(aluminium) { aircraftPurchaseModifier -= 8; }
-        bool oil = res.viewOil(id);
-        if(oil) { aircraftPurchaseModifier -= 4; }
-        bool rubber = res.viewRubber(id);
-        if(rubber) { aircraftPurchaseModifier -= 4; }
-        return aircraftPurchaseModifier;
-    }
 }

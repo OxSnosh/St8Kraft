@@ -267,6 +267,10 @@ contract BillsContract is Ownable {
         if (pigs) {
             soldierUpkeepModifier -= 25;
         }
+        uint256 barracks = imp1.getBarracksCount(id);
+        if (barracks > 0) {
+            soldierUpkeepModifier -= (10 * barracks);
+        }
         uint256 adjustedSoldierUpkeep = ((soldierUpkeep *
             soldierUpkeepModifier) / 100);
         return adjustedSoldierUpkeep;
@@ -338,6 +342,10 @@ contract BillsContract is Ownable {
         bool lead = res.viewLead(id);
         if (lead) {
             aircraftUpkeepModifier -= 25;
+        }
+        uint256 airports = imp1.getAirportCount(id);
+        if (airports > 0) {
+            aircraftUpkeepModifier -= (2 * airports);
         }
         uint256 adjustedAircraftUpkeep = ((aircraftUpkeep *
             aircraftUpkeepModifier) / 100);

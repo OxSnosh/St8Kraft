@@ -27,23 +27,23 @@ contract ImprovementsContract1 is Ownable {
         uint256 improvementCount;
         //Airport
         //$100,000
-        //reduces aircraft cost -2%
-        //reduces aircraft upkeep cost -2%
+        //DONE //reduces aircraft cost -2%
+        //DONE //reduces aircraft upkeep cost -2%
         //Limit 3
         uint256 airportCount;
         //Bank
         //$100,000
-        //population income +7%
+        //DONE //population income +7%
         uint256 bankCount;
         //Barracks
         //$50,000
-        //increases soldier efficiency +10%
-        //reduces soldier upkeep -10%
+        //DONE //increases soldier efficiency +10%
+        //DONE //reduces soldier upkeep -10%
         uint256 barracksCount;
         //Border Fortifications
         //$125,000
-        //Raises effectiveness of defending soldiers +2%
-        //reduces max deployment -2%
+        //DONE //Raises effectiveness of defending soldiers +2%
+        //DONE //reduces max deployment -2%
         //Requires maintaining a border wall for each Border Fortification
         //Limit 3
         //Cannot own if forward operating base is owned
@@ -482,6 +482,26 @@ contract ImprovementsContract1 is Ownable {
             idToImprovements1[countryId].factoryCount -= amount;
             idToImprovements1[countryId].improvementCount -= amount;
         }
+    }
+
+    function getAirportCount(uint256 countryId)
+        public
+        view
+        returns (uint256 count)
+    {
+        uint256 airportAmount = idToImprovements1[countryId]
+            .airportCount;
+        return airportAmount;
+    }
+
+    function getBarracksCount(uint256 countryId)
+        public
+        view
+        returns (uint256 count)
+    {
+        uint256 barracksAmount = idToImprovements1[countryId]
+            .barracksCount;
+        return barracksAmount;
     }
 
     function getBorderFortificationCount(uint256 countryId)

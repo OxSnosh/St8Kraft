@@ -14,6 +14,7 @@ contract WarContract is Ownable {
     address public airBattleAddress;
     address public groundBattle;
     address public cruiseMissile;
+    address public forces;
     uint256[] public activeWars;
 
     NationStrengthContract nsc;
@@ -129,7 +130,8 @@ contract WarContract is Ownable {
         address _navyBattleAddress,
         address _airBattleAddress,
         address _groundBattle,
-        address _cruiseMissile
+        address _cruiseMissile,
+        address _forces
     ) {
         countryMinter = _countryMinter;
         nationStrength = _nationStrength;
@@ -140,6 +142,7 @@ contract WarContract is Ownable {
         military = _military;
         mil = MilitaryContract(_military);
         cruiseMissile = _cruiseMissile;
+        forces = _forces;
     }
 
     function updateCountryMinterContract(address newAddress) public onlyOwner {
@@ -745,6 +748,30 @@ contract WarContract is Ownable {
         }
         if (defenseId == nationId) {
             warIdToDefenseLosses[_warId].aircraftLost = battleCausalties;
+        }
+    }
+
+    modifier onlyForcesContract() {
+        require(msg.sender == forces, "only callable from forces");
+        _;
+    }
+
+    function deploySoldiers(
+        uint256 nationId,
+        uint256 _warId,
+        uint256 amountToDeploy
+    ) public onlyForcesContract {
+        bool isActive = isWarActive(_warId);
+        require(isActive, "war not active");
+        (uint256 offenseId, uint256 defenseId) = getInvolvedParties(_warId);
+        require(
+            nationId == offenseId || nationId == defenseId,
+            "nation not involved"
+        );
+        if (nationId == offenseId) {
+            warIdToOffenseDeployed1[warId].soldiersDeployed += amountToDeploy;
+        } else if (nationId == defenseId) {
+            warIdToDefenseDeployed1[warId].soldiersDeployed += amountToDeploy;
         }
     }
 

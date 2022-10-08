@@ -132,7 +132,6 @@ contract CountryMinter is ERC721, Ownable {
         ForcesContract(forces).generateForces(countryId, msg.sender);
         NavyContract(navy).generateNavy(countryId, msg.sender);
         FightersContract(fighters).generateFighters(countryId, msg.sender);
-        FightersMarketplace(fightersMarket).initiateFightersMarket(countryId, msg.sender);
         BombersContract(bombers).generateBombers(countryId, msg.sender);
         // BombersMarketplace(bombersMarket).initiateBombersMarket(countryId, msg.sender);        
         idToOwner[countryId] = msg.sender;
