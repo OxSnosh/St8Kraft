@@ -17,6 +17,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
     address bomberAddress;
     address infrastructure;
     address forces;
+    address missiles;
     //fighter strength
     uint256 yak9Strength = 1;
     uint256 p51MustangStrength = 2;
@@ -43,6 +44,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
     BombersContract bomber;
     InfrastructureContract inf;
     ForcesContract force;
+    MissilesContract mis;
 
     struct FightersToBattle {
         uint256 yak9Count;
@@ -108,6 +110,11 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
+    }
+
+    function constructorContinued(address _missiles) public onlyOwner {
+        missiles = _missiles;
+        mis = MissilesContract(_missiles);
     }
 
     function airBattle(
@@ -544,10 +551,16 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
                 }
             }
         }
-        uint256[] memory attackerLosses = airBattleIdToAttackerFighterLosses[requestNumber];
-        uint256[] memory defenderLosses = airBattleIdToDefenderFighterLosses[requestNumber];
-        uint256 attackerId = airBattleIdToAttackerFighters[requestNumber].countryId;
-        uint256 defenderId = airBattleIdToDefenderFighters[requestNumber].countryId;
+        uint256[] memory attackerLosses = airBattleIdToAttackerFighterLosses[
+            requestNumber
+        ];
+        uint256[] memory defenderLosses = airBattleIdToDefenderFighterLosses[
+            requestNumber
+        ];
+        uint256 attackerId = airBattleIdToAttackerFighters[requestNumber]
+            .countryId;
+        uint256 defenderId = airBattleIdToDefenderFighters[requestNumber]
+            .countryId;
         fighter.decrementLosses(
             defenderLosses,
             defenderId,
@@ -880,7 +893,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
             defenderId,
             tanksToDeduct
         );
-        force.decreaseCruiseMissileCountFromAirBattleContract(
+        mis.decreaseCruiseMissileCountFromAirBattleContract(
             defenderId,
             cruiseMissilesToDeduct
         );

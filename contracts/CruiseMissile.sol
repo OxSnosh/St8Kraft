@@ -15,6 +15,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
     address public countryMinter;
     address public warAddress;
     address public infrastructure;
+    address public missiles;
 
     //Chainlik Variables
     uint256[] private s_randomWords;
@@ -29,6 +30,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
     CountryMinter mint;
     WarContract war;
     InfrastructureContract inf;
+    MissilesContract mis;
 
     struct CruiseMissileAttack {
         uint256 warId;
@@ -48,6 +50,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         address _countryMinter,
         address _war,
         address _infrastructure,
+        address _missiles,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
@@ -61,6 +64,8 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         war = WarContract(_war);
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
+        missiles = _missiles;
+        mis = MissilesContract(_missiles);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
@@ -79,7 +84,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
     ) public {
         bool isOwner = mint.checkOwnership(attackerId, msg.sender);
         require(isOwner, "!nation owner");
-        uint256 missileCount = force.getCruiseMissileCount(attackerId);
+        uint256 missileCount = mis.getCruiseMissileCount(attackerId);
         require(missileCount > 0, "no cruise missiles");
         bool isWarActive = war.isWarActive(warId);
         require(isWarActive, "not active war");

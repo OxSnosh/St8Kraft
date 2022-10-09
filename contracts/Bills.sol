@@ -22,6 +22,7 @@ contract BillsContract is Ownable {
     address public improvements1;
     address public improvements2;
     address public resources;
+    address public missiles;
 
     TreasuryContract tsy;
     WondersContract1 won1;
@@ -32,6 +33,7 @@ contract BillsContract is Ownable {
     ImprovementsContract1 imp1;
     ImprovementsContract2 imp2;
     ResourcesContract res;
+    MissilesContract mis;
 
     mapping(uint256 => address) public idToOwnerBills;
 
@@ -60,17 +62,20 @@ contract BillsContract is Ownable {
         nav = NavyContract(_navy);
         resources = _resources;
         res = ResourcesContract(_resources);
+
     }
 
     function constructorContinued (
         address _improvements1,
-        address _improvements2
+        address _improvements2,
+        address _missiles
     ) public onlyOwner {
         improvements1 = _improvements1;
         imp1 = ImprovementsContract1(_improvements1);
         improvements2 = _improvements2;
         imp2 = ImprovementsContract2(_improvements2);
-
+        missiles = _missiles;
+        mis = MissilesContract(_missiles);
     }
 
     function updateCountryMinter(address newAddress) public onlyOwner {
@@ -249,9 +254,9 @@ contract BillsContract is Ownable {
         uint256 aircraftCount = fight.getAircraftCount(id);
         uint256 aircraftUpkeep = getAircraftUpkeep(id, aircraftCount);
         uint256 navyUpkeep = getNavyUpkeep(id);
-        uint256 nukeCount = frc.getNukeCount(id);
+        uint256 nukeCount = mis.getNukeCount(id);
         uint256 nukeUpkeep = getNukeUpkeep(id, nukeCount);
-        uint256 cruiseMissileCount = frc.getCruiseMissileCount(id);
+        uint256 cruiseMissileCount = mis.getCruiseMissileCount(id);
         uint256 cruiseMissileUpkeep = getCruiseMissileUpkeep(id, cruiseMissileCount);
         uint256 dailyMilitaryUpkeep = soldierUpkeep +
             tankUpkeep +

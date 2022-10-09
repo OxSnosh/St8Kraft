@@ -514,94 +514,6 @@ contract ForcesContract is Ownable {
         return tankAmount;
     }
 
-    function buyCruiseMissiles(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerForces[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 purchasePrice = cruiseMissileCost;
-        uint256 factoryCount = imp1.getFactoryCount(id);
-        uint256 costModifier = 100;
-        if (factoryCount > 0) {
-            costModifier -= (factoryCount * 5);
-        }
-        uint256 cost = (amount * ((purchasePrice * costModifier) / 100));
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= cost);
-        idToForces[id].cruiseMissiles += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, cost);
-    }
-
-    function getCruiseMissileCount(uint256 id) public view returns (uint256) {
-        uint256 count = idToForces[id].cruiseMissiles;
-        return count;
-    }
-
-    function decreaseCruiseMissileCount(uint256 amount, uint256 id)
-        public
-        onlySpyContract
-    {
-        idToForces[id].cruiseMissiles -= amount;
-    }
-
-    function decreaseCruiseMissileCountFromNukeContract(uint256 id)
-        public
-        onlyNukeContract
-    {
-        uint256 cruiseMissiles = idToForces[id].cruiseMissiles;
-        uint256 cruiseMissilesToDecrease = ((cruiseMissiles * 35) / 100);
-        idToForces[id].cruiseMissiles -= cruiseMissilesToDecrease;
-    }
-
-    function decreaseCruiseMissileCountFromAirBattleContract(
-        uint256 id,
-        uint256 amountToDecrease
-    ) public onlyAirBattle {
-        uint256 cruiseMissiles = idToForces[id].cruiseMissiles;
-        if (amountToDecrease >= cruiseMissiles) {
-            idToForces[id].cruiseMissiles = 0;
-        } else {
-            idToForces[id].cruiseMissiles -= amountToDecrease;
-        }
-    }
-
-    function buyNukes(uint256 amount, uint256 id) public {
-        //tech 75 infra 1000 access to uranium
-        require(
-            idToOwnerForces[id] == msg.sender,
-            "You are not the nation ruler"
-        );
-        require(amount == 1, "can only purchase one nuke a day");
-        uint256 techAmount = inf.getTechnologyCount(id);
-        require(techAmount >= 75, "insufficient tech");
-        uint256 infrastructureAmount = inf.getInfrastructureCount(id);
-        require(infrastructureAmount >= 1000, "insufficient infrastructure");
-        bool isUranium = res.viewUranium(id);
-        require(isUranium, "no uranium");
-        require(amount == 1, "can only purchase one nuke");
-        uint256 nukesPurchasedToday = idToForces[id].nukesPurchasedToday;
-        require(nukesPurchasedToday < 1, "already purchased nuke today");
-        uint256 nukeCount = idToForces[id].nuclearWeapons;
-        uint256 purchasePrice = (500000 + (nukeCount * 50000));
-        uint256 cost = (purchasePrice * amount);
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= cost, "insufficient funds");
-        idToForces[id].nuclearWeapons += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, cost);
-    }
-
-    function getNukeCount(uint256 id) public view returns (uint256) {
-        uint256 count = idToForces[id].nuclearWeapons;
-        return count;
-    }
-
-    function decreaseNukeCountFromSpyContract(uint256 id)
-        public
-        onlySpyContract
-    {
-        idToForces[id].nuclearWeapons -= 1;
-    }
-
     function buySpies(uint256 amount, uint256 id) public {
         require(
             idToOwnerForces[id] == msg.sender,
@@ -671,5 +583,227 @@ contract ForcesContract is Ownable {
         idToForces[defenderId].defendingSoldiers -= defenderSoldierLosses;
         idToForces[defenderId].numberOfTanks -= defenderTankLosses;
         idToForces[defenderId].defendingTanks -= defenderTankLosses;
+    }
+}
+
+contract MissilesContract is Ownable {
+    uint256 public cruiseMissileCost;
+    uint256 public nukeCost;
+    address public countryMinter;
+    address public treasury;
+    // address public aid;
+    address public spyAddress;
+    // address public cruiseMissile;
+    // address public infrastructure;
+    address public resources;
+    address public improvements1;
+    // address public improvements2;
+    // address public wonders1;
+    address public nukeAddress;
+    address public airBattle;
+    // address public groundBattle;
+    // address public warAddress;
+    address public countryinter;
+
+    CountryMinter mint;
+    InfrastructureContract inf;
+    ResourcesContract res;
+    WondersContract1 won1;
+    ImprovementsContract1 imp1;
+    ImprovementsContract2 imp2;
+    WarContract war;
+    TreasuryContract tsy;
+
+    struct Missiles {
+        uint256 cruiseMissiles;
+        uint256 nuclearWeapons;
+        uint256 nukesPurchasedToday;
+    }
+
+    constructor(
+        address _treasury,
+        // address _aid,
+        address _spyAddress,
+        // address _cruiseMissile,
+        address _nukeAddress,
+        address _airBattle
+        // address _groundBattle,
+        // address _warAddress
+    ) {
+        treasury = _treasury;
+        tsy = TreasuryContract(_treasury);
+        spyAddress = _spyAddress;
+        // cruiseMissile = _cruiseMissile;
+        // aid = _aid;
+        nukeAddress = _nukeAddress;
+        airBattle = _airBattle;
+        // warAddress = _warAddress;
+        // war = WarContract(_warAddress);
+        // groundBattle = _groundBattle;
+        cruiseMissileCost = 20000;
+    }
+
+    function constructorContinued(
+        // address _infrastructure,
+        address _resources,
+        address _improvements1,
+        // address _improvements2,
+        // address _wonders1,
+        address _countryMinter
+    ) public onlyOwner {
+        // infrastructure = _infrastructure;
+        // inf = InfrastructureContract(_infrastructure);
+        resources = _resources;
+        res = ResourcesContract(_resources);
+        // wonders1 = _wonders1;
+        // won1 = WondersContract1(_wonders1);
+        improvements1 = _improvements1;
+        imp1 = ImprovementsContract1(_improvements1);
+        // improvements2 = _improvements2;
+        // imp2 = ImprovementsContract2(_improvements2);
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
+    }
+
+    mapping(uint256 => Missiles) public idToMissiles;
+    mapping(uint256 => address) public idToOwnerMissiles;
+
+    function generateMissiles(uint256 id, address nationOwner) public {
+        Missiles memory newMissiles = Missiles(0, 0, 0);
+        idToMissiles[id] = newMissiles;
+        idToOwnerMissiles[id] = nationOwner;
+    }
+
+    // function updateInfrastructureContract(address newAddress) public onlyOwner {
+    //     infrastructure = newAddress;
+    //     inf = InfrastructureContract(newAddress);
+    // }
+
+    // function updateResourcesContract(address newAddress) public onlyOwner {
+    //     resources = newAddress;
+    //     res = ResourcesContract(newAddress);
+    // }
+
+    // function updateImprovementsContract1(address newAddress) public onlyOwner {
+    //     improvements1 = newAddress;
+    //     imp1 = ImprovementsContract1(newAddress);
+    // }
+
+    // function updateCruiseMissileCost(uint256 newPrice) public onlyOwner {
+    //     cruiseMissileCost = newPrice;
+    // }
+
+    modifier onlySpyContract() {
+        require(msg.sender == spyAddress, "only callable from spy contract");
+        _;
+    }
+
+    // modifier onlyCruiseMissileContract() {
+    //     require(
+    //         msg.sender == cruiseMissile,
+    //         "only callable from cruise missile contract"
+    //     );
+    //     _;
+    // }
+
+    modifier onlyNukeContract() {
+        require(msg.sender == nukeAddress, "only callable from nuke contract");
+        _;
+    }
+
+    modifier onlyAirBattle() {
+        require(
+            msg.sender == airBattle,
+            "only callable from air battle contract"
+        );
+        _;
+    }
+
+    // modifier onlyGroundBattle() {
+    //     require(
+    //         msg.sender == groundBattle,
+    //         "only callable from air battle contract"
+    //     );
+    //     _;
+    // }
+
+    function buyCruiseMissiles(uint256 amount, uint256 id) public {
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
+        uint256 purchasePrice = cruiseMissileCost;
+        uint256 factoryCount = imp1.getFactoryCount(id);
+        uint256 costModifier = 100;
+        if (factoryCount > 0) {
+            costModifier -= (factoryCount * 5);
+        }
+        uint256 cost = (amount * ((purchasePrice * costModifier) / 100));
+        idToMissiles[id].cruiseMissiles += amount;
+        tsy.spendBalance(id, cost);
+    }
+
+    function getCruiseMissileCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToMissiles[id].cruiseMissiles;
+        return count;
+    }
+
+    function decreaseCruiseMissileCount(uint256 amount, uint256 id)
+        public
+        onlySpyContract
+    {
+        idToMissiles[id].cruiseMissiles -= amount;
+    }
+
+    function decreaseCruiseMissileCountFromNukeContract(uint256 id)
+        public
+        onlyNukeContract
+    {
+        uint256 cruiseMissiles = idToMissiles[id].cruiseMissiles;
+        uint256 cruiseMissilesToDecrease = ((cruiseMissiles * 35) / 100);
+        idToMissiles[id].cruiseMissiles -= cruiseMissilesToDecrease;
+    }
+
+    function decreaseCruiseMissileCountFromAirBattleContract(
+        uint256 id,
+        uint256 amountToDecrease
+    ) public onlyAirBattle {
+        uint256 cruiseMissiles = idToMissiles[id].cruiseMissiles;
+        if (amountToDecrease >= cruiseMissiles) {
+            idToMissiles[id].cruiseMissiles = 0;
+        } else {
+            idToMissiles[id].cruiseMissiles -= amountToDecrease;
+        }
+    }
+
+    function buyNukes(uint256 id) public {
+        //tech 75 infra 1000 access to uranium
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
+        uint256 techAmount = inf.getTechnologyCount(id);
+        require(techAmount >= 75, "insufficient tech");
+        uint256 infrastructureAmount = inf.getInfrastructureCount(id);
+        require(infrastructureAmount >= 1000, "insufficient infrastructure");
+        bool isUranium = res.viewUranium(id);
+        require(isUranium, "no uranium");
+        uint256 nukesPurchasedToday = idToMissiles[id].nukesPurchasedToday;
+        require(nukesPurchasedToday < 1, "already purchased nuke today");
+        idToMissiles[id].nukesPurchasedToday += 1;
+        uint256 nukeCount = idToMissiles[id].nuclearWeapons;
+        uint256 cost = (500000 + (nukeCount * 50000));
+        idToMissiles[id].nuclearWeapons += 1;
+        tsy.spendBalance(id, cost);
+    }
+
+    function getNukeCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToMissiles[id].nuclearWeapons;
+        return count;
+    }
+
+    //need to decrease nuke count when launched
+
+    function decreaseNukeCountFromSpyContract(uint256 id)
+        public
+        onlySpyContract
+    {
+        idToMissiles[id].nuclearWeapons -= 1;
     }
 }

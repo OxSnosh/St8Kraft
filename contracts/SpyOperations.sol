@@ -19,6 +19,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
     address public nationStrength;
     address public treasury;
     address public parameters;
+    address public missiles;
 
     //Chainlik Variables
     uint256[] private s_randomWords;
@@ -35,6 +36,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
     NationStrengthContract strength;
     TreasuryContract tsy;
     CountryParametersContract params;
+    MissilesContract mis;
 
     struct SpyAttack {
         uint256 attackerId;
@@ -51,8 +53,6 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         address _forces,
         address _military,
         address _nationStrength,
-        address _treasury,
-        address _parameters,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
@@ -66,14 +66,23 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         mil = MilitaryContract(_military);
         nationStrength = _nationStrength;
         strength = NationStrengthContract(_nationStrength);
-        treasury = _treasury;
-        tsy = TreasuryContract(_treasury);
-        parameters = _parameters;
-        params = CountryParametersContract(_parameters);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
+    }
+
+    function constructorContinued (
+        address _treasury,
+        address _parameters,
+        address _missiles
+    ) public onlyOwner {
+        treasury = _treasury;
+        tsy = TreasuryContract(_treasury);
+        parameters = _parameters;
+        params = CountryParametersContract(_parameters);
+        missiles = _missiles;
+        mis = MissilesContract(_missiles);
     }
 
     function updateInfrastructureContract(address newAddress) public onlyOwner {
@@ -274,7 +283,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         //random number between 3 and 5
         uint256[] memory randomNumbers = s_requestIndexToRandomWords[attackId];
         uint256 randomNumber = ((randomNumbers[1] % 3) + 2);
-        force.decreaseCruiseMissileCount(randomNumber, defenderId);
+        mis.decreaseCruiseMissileCount(randomNumber, defenderId);
     }
 
     function destroyDefendingTanks(uint256 defenderId, uint256 attackId)
@@ -445,6 +454,6 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
 
     function destroyNukes(uint256 defenderId) internal {
         //max 1
-        force.decreaseNukeCountFromSpyContract(defenderId);
+        mis.decreaseNukeCountFromSpyContract(defenderId);
     }
 }

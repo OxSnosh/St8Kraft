@@ -19,6 +19,7 @@ contract EnvironmentContract is Ownable {
     address public forces;
     address public parameters;
     address public taxes;
+    address public missiles;
 
     ResourcesContract res;
     InfrastructureContract inf;
@@ -28,6 +29,7 @@ contract EnvironmentContract is Ownable {
     ForcesContract force;
     CountryParametersContract param;
     TaxesContract tax;
+    MissilesContract mis;
 
     constructor(
         address _resources,
@@ -37,7 +39,8 @@ contract EnvironmentContract is Ownable {
         address _wonders4,
         address _forces,
         address _parameters,
-        address _taxes
+        address _taxes,
+        address _missiles
     ) {
         resources = _resources;
         res = ResourcesContract(_resources);
@@ -55,6 +58,8 @@ contract EnvironmentContract is Ownable {
         param = CountryParametersContract(_parameters);
         taxes = _taxes;
         tax = TaxesContract(_taxes);
+        missiles = _missiles;
+        mis = MissilesContract(_missiles);
     }
 
     function updateResourcesContract(address newAddress) public onlyOwner {
@@ -254,7 +259,7 @@ contract EnvironmentContract is Ownable {
 
     function getScoreFromNukes(uint256 id) internal view returns (int256) {
         int256 pointsFromNukes;
-        uint256 nukeCount = force.getNukeCount(id);
+        uint256 nukeCount = mis.getNukeCount(id);
         if (nukeCount > 0) {
             pointsFromNukes -= (int256(nukeCount));
         }

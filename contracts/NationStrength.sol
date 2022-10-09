@@ -14,19 +14,22 @@ contract NationStrengthContract is Ownable {
     address public fighters;
     address public bombers;
     address public navy;
+    address public missiles;
 
     InfrastructureContract inf;
     ForcesContract frc;
     FightersContract fight;
     BombersContract bomb;
     NavyContract nav;
+    MissilesContract mis;
 
     constructor(
         address _infrastructure,
         address _forces,
         address _fighters,
         address _bombers,
-        address _navy
+        address _navy,
+        address _missiles
     ) {
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
@@ -38,6 +41,8 @@ contract NationStrengthContract is Ownable {
         bomb = BombersContract(_bombers);
         navy = _navy;
         nav = NavyContract(_navy);
+        missiles = _missiles;
+        mis = MissilesContract(_missiles);
     }
 
     function updateInfrastructureContract(address newAddress) public onlyOwner {
@@ -112,9 +117,9 @@ contract NationStrengthContract is Ownable {
         uint256 defendingTankCount = frc.getDefendingTankCount(id);
         uint256 tankStrength = (((deployedTankCount * 15) +
             (defendingTankCount * 20)) / 100);
-        uint256 cruiseMissileCount = frc.getCruiseMissileCount(id);
+        uint256 cruiseMissileCount = mis.getCruiseMissileCount(id);
         uint256 cruiseMissileStrength = ((cruiseMissileCount * 10));
-        uint256 nukeCount = frc.getNukeCount(id);
+        uint256 nukeCount = mis.getNukeCount(id);
         uint256 nukeStrength = ((nukeCount**2) * 10);
         uint256 aircraftStrength = getStrengthFromAirForce(id);
         uint256 navyStrength = getStrengthFromNavy(id);
