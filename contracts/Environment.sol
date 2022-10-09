@@ -287,7 +287,6 @@ contract EnvironmentContract is Ownable {
     //wonders (national env office +1)
     //wonders (weapons research complex -1)
     //border walls +1
-
     //tech (> 6)
     //military (soldiers <60% of populaiton) (-1)
     //land (>50% infrastructure) -1 (or +1 over)

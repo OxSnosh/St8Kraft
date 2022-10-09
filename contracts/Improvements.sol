@@ -11,6 +11,7 @@ contract ImprovementsContract1 is Ownable {
     address public treasuryAddress;
     address public improvementContract2Address;
     address public improvementContract3Address;
+    address public improvementContract4Address;
     address public wonders1;
     address public navyContractAddress;
     uint256 public airportCost = 100000;
@@ -108,11 +109,13 @@ contract ImprovementsContract1 is Ownable {
         address _treasuryAddress,
         address _improvementContract2Address,
         address _improvementContract3Address,
+        address _improvementContract4Address,
         address _navyContractAddress
     ) {
         treasuryAddress = _treasuryAddress;
         improvementContract2Address = _improvementContract2Address;
         improvementContract3Address = _improvementContract3Address;
+        improvementContract4Address = _improvementContract4Address;
         navyContractAddress = _navyContractAddress;
     }
 
@@ -134,10 +137,12 @@ contract ImprovementsContract1 is Ownable {
 
     function updateImprovementContractAddresses(
         address _improvementContract2Address,
-        address _improvementContract3Address
+        address _improvementContract3Address,
+        address _improvementContract4Address
     ) public onlyOwner {
         improvementContract2Address = _improvementContract2Address;
         improvementContract3Address = _improvementContract3Address;
+        improvementContract4Address = _improvementContract4Address;
     }
 
     function updateNavyContractAddress(address _navyContractAddress)
@@ -330,8 +335,8 @@ contract ImprovementsContract1 is Ownable {
                 fobCount == 0,
                 "Cannot own if forward operating base is owned"
             );
-            uint256 munitionsFactoryCount = ImprovementsContract2(
-                improvementContract2Address
+            uint256 munitionsFactoryCount = ImprovementsContract4(
+                improvementContract4Address
             ).getMunitionsFactoryCount(countryId);
             require(
                 munitionsFactoryCount == 0,
@@ -590,10 +595,6 @@ contract ImprovementsContract2 is Ownable {
     uint256 public intelligenceAgencyCost = 38500;
     uint256 public jailCost = 25000;
     uint256 public laborCampCost = 150000;
-    uint256 public missileDefenseCost = 90000;
-    uint256 public munitionsFactoryCost = 200000;
-    uint256 public navalAcademyCost = 300000;
-    uint256 public navalConstructionYardCost = 300000;
 
     WondersContract1 won1;
 
@@ -651,34 +652,6 @@ contract ImprovementsContract2 is Ownable {
         //reduces population happiness -1.
         //Incarcerates up to 200 criminals per Labor Camp.
         uint256 laborCampCount;
-        //Missile Defense
-        //$90,000
-        //Reduces effectiveness of incoming cruise missiles used against your nation -10%.
-        //Nations must retain at least three missile defenses if that nation owns a Strategic Defense Initiative wonder.
-        uint256 missileDefenseCount;
-        //MunitionsFactory
-        //$200,000
-        //Increases enemy infrastructure damage from your aircraft, cruise missiles, and nukes +3%
-        //+0.3 penalty to environment per Munitions Factory.
-        //Requires maintaining 3 or more Factories.
-        //Requires having Lead as a resource to purchase.
-        //Limit 5.
-        //Cannot build if Bunkers owned.
-        //Collection required to delete.
-        uint256 munitionsFactoryCount;
-        //Naval Academy
-        //$300,000
-        //Increases both attacking and defending navy vessel strength +1.
-        //Limit 2 per nation.
-        //Requires Harbor.
-        uint256 navalAcademyCount;
-        //Naval Construction Yard
-        //$300,000
-        //Increases the daily purchase limit for navy vessels +1.
-        //Your nation must have pre-existing navy support capabilities (via Drydocks and Shipyards) to actually purchase navy vessels.
-        //Limit 3 per nation.
-        //requires Harbor
-        uint256 navalConstructionYardCount;
     }
 
     mapping(uint256 => Improvements2) public idToImprovements2;
@@ -713,10 +686,6 @@ contract ImprovementsContract2 is Ownable {
 
     function generateImprovements(uint256 id, address nationOwner) public {
         Improvements2 memory newImprovements2 = Improvements2(
-            0,
-            0,
-            0,
-            0,
             0,
             0,
             0,
@@ -760,25 +729,6 @@ contract ImprovementsContract2 is Ownable {
 
     function updateLaborCampCost(uint256 newPrice) public onlyOwner {
         laborCampCost = newPrice;
-    }
-
-    function updateMissileDefenseCost(uint256 newPrice) public onlyOwner {
-        missileDefenseCost = newPrice;
-    }
-
-    function updateMunitionsFactoryCost(uint256 newPrice) public onlyOwner {
-        munitionsFactoryCost = newPrice;
-    }
-
-    function updateNavalAcademyCost(uint256 newPrice) public onlyOwner {
-        navalAcademyCost = newPrice;
-    }
-
-    function updateNavalConstructionYardCost(uint256 newPrice)
-        public
-        onlyOwner
-    {
-        navalConstructionYardCost = newPrice;
     }
 
     function buyImprovement2(
@@ -941,84 +891,7 @@ contract ImprovementsContract2 is Ownable {
                 countryId,
                 purchasePrice
             );
-        } else if (improvementId == 9) {
-            uint256 purchasePrice = missileDefenseCost * amount;
-            require(balance >= purchasePrice, "Insufficient balance");
-            uint256 existingCount = idToImprovements2[countryId]
-                .missileDefenseCount;
-            require((existingCount + amount) <= 5, "Cannot own more than 5");
-            idToImprovements2[countryId].missileDefenseCount += amount;
-            uint256 existingImprovementTotal = ImprovementsContract1(
-                improvementsContract1Address
-            ).getImprovementCount(countryId);
-            uint256 newImprovementTotal = existingImprovementTotal + amount;
-            ImprovementsContract1(improvementsContract1Address)
-                .updateImprovementCount(countryId, newImprovementTotal);
-            TreasuryContract(treasuryAddress).spendBalance(
-                countryId,
-                purchasePrice
-            );
-        } else if (improvementId == 10) {
-            uint256 purchasePrice = munitionsFactoryCost * amount;
-            require(balance >= purchasePrice, "Insufficient balance");
-            uint256 existingCount = idToImprovements2[countryId]
-                .munitionsFactoryCount;
-            require((existingCount + amount) <= 5, "Cannot own more than 5");
-            uint256 bunkerAmount = ImprovementsContract1(
-                improvementsContract1Address
-            ).getBunkerCount(countryId);
-            require(bunkerAmount == 0, "Cannot own if bunker is owned");
-            //require owning lead as a resource
-            idToImprovements2[countryId].munitionsFactoryCount += amount;
-            uint256 existingImprovementTotal = ImprovementsContract1(
-                improvementsContract1Address
-            ).getImprovementCount(countryId);
-            uint256 newImprovementTotal = existingImprovementTotal + amount;
-            ImprovementsContract1(improvementsContract1Address)
-                .updateImprovementCount(countryId, newImprovementTotal);
-            TreasuryContract(treasuryAddress).spendBalance(
-                countryId,
-                purchasePrice
-            );
-        } else if (improvementId == 11) {
-            uint256 purchasePrice = navalAcademyCost * amount;
-            require(balance >= purchasePrice, "Insufficient balance");
-            uint256 existingCount = idToImprovements2[countryId]
-                .navalAcademyCount;
-            require((existingCount + amount) <= 2, "Cannot own more than 2");
-            uint256 harborAmount = idToImprovements2[countryId].harborCount;
-            require(harborAmount < 0, "must own a harbor to purchase");
-            idToImprovements2[countryId].navalAcademyCount += amount;
-            uint256 existingImprovementTotal = ImprovementsContract1(
-                improvementsContract1Address
-            ).getImprovementCount(countryId);
-            uint256 newImprovementTotal = existingImprovementTotal + amount;
-            ImprovementsContract1(improvementsContract1Address)
-                .updateImprovementCount(countryId, newImprovementTotal);
-            TreasuryContract(treasuryAddress).spendBalance(
-                countryId,
-                purchasePrice
-            );
-        } else {
-            uint256 purchasePrice = navalConstructionYardCost * amount;
-            require(balance >= purchasePrice, "Insufficient balance");
-            uint256 existingCount = idToImprovements2[countryId]
-                .navalConstructionYardCount;
-            require((existingCount + amount) <= 3, "Cannot own more than 3");
-            uint256 harborAmount = idToImprovements2[countryId].harborCount;
-            require(harborAmount < 0, "must own a harbor to purchase");
-            idToImprovements2[countryId].navalConstructionYardCount += amount;
-            uint256 existingImprovementTotal = ImprovementsContract1(
-                improvementsContract1Address
-            ).getImprovementCount(countryId);
-            uint256 newImprovementTotal = existingImprovementTotal + amount;
-            ImprovementsContract1(improvementsContract1Address)
-                .updateImprovementCount(countryId, newImprovementTotal);
-            TreasuryContract(treasuryAddress).spendBalance(
-                countryId,
-                purchasePrice
-            );
-        }
+        } 
     }
 
     function deleteImprovement2(
@@ -1136,51 +1009,6 @@ contract ImprovementsContract2 is Ownable {
             uint256 newImprovementTotal = existingImprovementTotal -= amount;
             ImprovementsContract1(improvementsContract1Address)
                 .updateImprovementCount(countryId, newImprovementTotal);
-        } else if (improvementId == 9) {
-            uint256 existingCount = idToImprovements2[countryId]
-                .missileDefenseCount;
-            require((existingCount - amount) >= 0, "Cannot delete that many");
-            //cannot delete below 3 if strategic defense init
-            idToImprovements2[countryId].missileDefenseCount -= amount;
-            uint256 existingImprovementTotal = ImprovementsContract1(
-                improvementsContract1Address
-            ).getImprovementCount(countryId);
-            uint256 newImprovementTotal = existingImprovementTotal -= amount;
-            ImprovementsContract1(improvementsContract1Address)
-                .updateImprovementCount(countryId, newImprovementTotal);
-        } else if (improvementId == 10) {
-            uint256 existingCount = idToImprovements2[countryId]
-                .munitionsFactoryCount;
-            require((existingCount - amount) >= 0, "Cannot delete that many");
-            idToImprovements2[countryId].munitionsFactoryCount -= amount;
-            uint256 existingImprovementTotal = ImprovementsContract1(
-                improvementsContract1Address
-            ).getImprovementCount(countryId);
-            uint256 newImprovementTotal = existingImprovementTotal -= amount;
-            ImprovementsContract1(improvementsContract1Address)
-                .updateImprovementCount(countryId, newImprovementTotal);
-        } else if (improvementId == 11) {
-            uint256 existingCount = idToImprovements2[countryId]
-                .navalAcademyCount;
-            require((existingCount - amount) >= 0, "Cannot delete that many");
-            idToImprovements2[countryId].navalAcademyCount -= amount;
-            uint256 existingImprovementTotal = ImprovementsContract1(
-                improvementsContract1Address
-            ).getImprovementCount(countryId);
-            uint256 newImprovementTotal = existingImprovementTotal -= amount;
-            ImprovementsContract1(improvementsContract1Address)
-                .updateImprovementCount(countryId, newImprovementTotal);
-        } else {
-            uint256 existingCount = idToImprovements2[countryId]
-                .navalConstructionYardCount;
-            require((existingCount - amount) >= 0, "Cannot delete that many");
-            idToImprovements2[countryId].navalConstructionYardCount -= amount;
-            uint256 existingImprovementTotal = ImprovementsContract1(
-                improvementsContract1Address
-            ).getImprovementCount(countryId);
-            uint256 newImprovementTotal = existingImprovementTotal -= amount;
-            ImprovementsContract1(improvementsContract1Address)
-                .updateImprovementCount(countryId, newImprovementTotal);
         }
     }
 
@@ -1201,16 +1029,6 @@ contract ImprovementsContract2 is Ownable {
         uint256 fobCount = idToImprovements2[countryId]
             .forwardOperatingBaseCount;
         return fobCount;
-    }
-
-    function getMunitionsFactoryCount(uint256 countryId)
-        public
-        view
-        returns (uint256 count)
-    {
-        uint256 munitionsFactoryAmount = idToImprovements2[countryId]
-            .munitionsFactoryCount;
-        return munitionsFactoryAmount;
     }
 
     function getGuerillaCampCount(uint256 countryId)
@@ -1249,15 +1067,285 @@ contract ImprovementsContract2 is Ownable {
             .intelligenceAgencyCount;
         return intelAgencyAmount;
     }
+}
+
+contract ImprovementsContract4 is Ownable {
+    address public treasuryAddress;
+    address public improvementsContract1Address;
+    address public forcesAddress;
+    address public wonders1;
+    address public improvements2;
+    uint256 public missileDefenseCost = 90000;
+    uint256 public munitionsFactoryCost = 200000;
+    uint256 public navalAcademyCost = 300000;
+    uint256 public navalConstructionYardCost = 300000;
+
+    WondersContract1 won1;
+    ImprovementsContract2 imp2;
+
+    struct Improvements4 {
+        //Missile Defense
+        //$90,000
+        //Reduces effectiveness of incoming cruise missiles used against your nation -10%.
+        //Nations must retain at least three missile defenses if that nation owns a Strategic Defense Initiative wonder.
+        uint256 missileDefenseCount;
+        //MunitionsFactory
+        //$200,000
+        //Increases enemy infrastructure damage from your aircraft, cruise missiles, and nukes +3%
+        //+0.3 penalty to environment per Munitions Factory.
+        //Requires maintaining 3 or more Factories.
+        //Requires having Lead as a resource to purchase.
+        //Limit 5.
+        //Cannot build if Bunkers owned.
+        //Collection required to delete.
+        uint256 munitionsFactoryCount;
+        //Naval Academy
+        //$300,000
+        //Increases both attacking and defending navy vessel strength +1.
+        //Limit 2 per nation.
+        //Requires Harbor.
+        uint256 navalAcademyCount;
+        //Naval Construction Yard
+        //$300,000
+        //Increases the daily purchase limit for navy vessels +1.
+        //Your nation must have pre-existing navy support capabilities (via Drydocks and Shipyards) to actually purchase navy vessels.
+        //Limit 3 per nation.
+        //requires Harbor
+        uint256 navalConstructionYardCount;
+    }
+
+    mapping(uint256 => Improvements4) public idToImprovements4;
+    mapping(uint256 => address) public idToOwnerImprovements4;
+
+    constructor(
+        address _treasuryAddress,
+        address _forcesAddress,
+        address _wonders1,
+        address _improvements2
+    ) {
+        treasuryAddress = _treasuryAddress;
+        forcesAddress = _forcesAddress;
+        wonders1 = _wonders1;
+        improvements2 = _improvements2;
+        imp2 = ImprovementsContract2(_improvements2);
+    }
+
+    function updateTreasuryAddress(address _newTreasuryAddress)
+        public
+        onlyOwner
+    {
+        treasuryAddress = _newTreasuryAddress;
+    }
+
+    function updateImprovementContract1Address(
+        address _newImprovementsContract1Address
+    ) public onlyOwner {
+        improvementsContract1Address = _newImprovementsContract1Address;
+    }
+
+    function updateForcesAddress(address _newForcesAddress) public onlyOwner {
+        forcesAddress = _newForcesAddress;
+    }
+
+    function generateImprovements(uint256 id, address nationOwner) public {
+        Improvements4 memory newImprovements4 = Improvements4(
+            0,
+            0,
+            0,
+            0
+        );
+        idToImprovements4[id] = newImprovements4;
+        idToOwnerImprovements4[id] = nationOwner;
+    }
+
+    function updateMissileDefenseCost(uint256 newPrice) public onlyOwner {
+        missileDefenseCost = newPrice;
+    }
+
+    function updateMunitionsFactoryCost(uint256 newPrice) public onlyOwner {
+        munitionsFactoryCost = newPrice;
+    }
+
+    function updateNavalAcademyCost(uint256 newPrice) public onlyOwner {
+        navalAcademyCost = newPrice;
+    }
+
+    function updateNavalConstructionYardCost(uint256 newPrice)
+        public
+        onlyOwner
+    {
+        navalConstructionYardCost = newPrice;
+    }
+
+    function buyImprovement2(
+        uint256 amount,
+        uint256 countryId,
+        uint256 improvementId
+    ) public {
+        require(
+            idToOwnerImprovements4[countryId] == msg.sender,
+            "You are not the nation ruler"
+        );
+        require(improvementId <= 12, "Invalid improvement ID");
+        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(
+            countryId
+        );
+        if (improvementId == 1) {
+            uint256 purchasePrice = missileDefenseCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements4[countryId]
+                .missileDefenseCount;
+            require((existingCount + amount) <= 5, "Cannot own more than 5");
+            idToImprovements4[countryId].missileDefenseCount += amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal + amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 2) {
+            uint256 purchasePrice = munitionsFactoryCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements4[countryId]
+                .munitionsFactoryCount;
+            require((existingCount + amount) <= 5, "Cannot own more than 5");
+            uint256 bunkerAmount = ImprovementsContract1(
+                improvementsContract1Address
+            ).getBunkerCount(countryId);
+            require(bunkerAmount == 0, "Cannot own if bunker is owned");
+            //require owning lead as a resource
+            idToImprovements4[countryId].munitionsFactoryCount += amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal + amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 3) {
+            uint256 purchasePrice = navalAcademyCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements4[countryId]
+                .navalAcademyCount;
+            require((existingCount + amount) <= 2, "Cannot own more than 2");
+            uint256 harborAmount = imp2.getHarborCount(countryId);
+            require(harborAmount < 0, "must own a harbor to purchase");
+            idToImprovements4[countryId].navalAcademyCount += amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal + amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        } else if (improvementId == 4) {
+            uint256 purchasePrice = navalConstructionYardCost * amount;
+            require(balance >= purchasePrice, "Insufficient balance");
+            uint256 existingCount = idToImprovements4[countryId]
+                .navalConstructionYardCount;
+            require((existingCount + amount) <= 3, "Cannot own more than 3");
+            uint256 harborAmount = imp2.getHarborCount(countryId);
+            require(harborAmount < 0, "must own a harbor to purchase");
+            idToImprovements4[countryId].navalConstructionYardCount += amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal + amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+            TreasuryContract(treasuryAddress).spendBalance(
+                countryId,
+                purchasePrice
+            );
+        }
+    }
+
+    function deleteImprovement2(
+        uint256 amount,
+        uint256 countryId,
+        uint256 improvementId
+    ) public {
+        require(
+            idToOwnerImprovements4[countryId] == msg.sender,
+            "You are not the nation ruler"
+        );
+        require(improvementId <= 12, "Invalid improvement ID");
+        if (improvementId == 1) {
+            uint256 existingCount = idToImprovements4[countryId]
+                .missileDefenseCount;
+            require((existingCount - amount) >= 0, "Cannot delete that many");
+            //cannot delete below 3 if strategic defense init
+            idToImprovements4[countryId].missileDefenseCount -= amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal -= amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+        } else if (improvementId == 2) {
+            uint256 existingCount = idToImprovements4[countryId]
+                .munitionsFactoryCount;
+            require((existingCount - amount) >= 0, "Cannot delete that many");
+            idToImprovements4[countryId].munitionsFactoryCount -= amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal -= amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+        } else if (improvementId == 3) {
+            uint256 existingCount = idToImprovements4[countryId]
+                .navalAcademyCount;
+            require((existingCount - amount) >= 0, "Cannot delete that many");
+            idToImprovements4[countryId].navalAcademyCount -= amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal -= amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+        } else if (improvementId == 4) {
+            uint256 existingCount = idToImprovements4[countryId]
+                .navalConstructionYardCount;
+            require((existingCount - amount) >= 0, "Cannot delete that many");
+            idToImprovements4[countryId].navalConstructionYardCount -= amount;
+            uint256 existingImprovementTotal = ImprovementsContract1(
+                improvementsContract1Address
+            ).getImprovementCount(countryId);
+            uint256 newImprovementTotal = existingImprovementTotal -= amount;
+            ImprovementsContract1(improvementsContract1Address)
+                .updateImprovementCount(countryId, newImprovementTotal);
+        }
+    }
 
     function getMissileDefenseCount(uint256 countryId)
         public
         view
         returns (uint256 count)
     {
-        uint256 missileDefenseAmount = idToImprovements2[countryId]
+        uint256 missileDefenseAmount = idToImprovements4[countryId]
             .missileDefenseCount;
         return missileDefenseAmount;
+    }
+
+    function getMunitionsFactoryCount(uint256 countryId)
+        public
+        view
+        returns (uint256 count)
+    {
+        uint256 munitionsFactoryAmount = idToImprovements4[countryId]
+            .munitionsFactoryCount;
+        return munitionsFactoryAmount;
     }
 }
 

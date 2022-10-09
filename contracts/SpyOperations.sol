@@ -312,7 +312,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         uint256 landAmount = inf.getLandCount(defenderId);
         require(landAmount >= 15, "defender does not have enough land");
         inf.decreaseLandCount(defenderId, randomNumberToDecreaseFromDefender);
-        inf.increaseLandCount(attackerId, randomNumberToAddToAttacker);
+        inf.increaseLandCountFromSpyContract(attackerId, randomNumberToAddToAttacker);
     }
 
     function changeGovernment(uint256 defenderId, uint256 attackId) internal {
@@ -401,8 +401,8 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
             randomNumberToDecreaseFromDefender);
         uint256 techAmount = inf.getTechnologyCount(defenderId);
         require(techAmount >= 15, "defender does not have enough tech");
-        inf.decreaseLandCount(defenderId, randomNumberToDecreaseFromDefender);
-        inf.increaseLandCount(attackerId, randomNumberToAddToAttacker);
+        inf.decreaseTechCountFromSpyContract(defenderId, randomNumberToDecreaseFromDefender);
+        inf.increaseTechCountFromSpyContract(attackerId, randomNumberToAddToAttacker);
     }
 
     function sabotogeTaxes(uint256 defenderId, uint256 attackId) internal {
@@ -442,11 +442,11 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
             infrastructureAmount >= 15,
             "defender does not have enough infrastructure"
         );
-        inf.decreaseInfrastructureCount(
+        inf.decreaseInfrastructureCountFromSpyContract(
             defenderId,
             randomNumberToDecreaseFromDefender
         );
-        inf.increaseInfrastructureCount(
+        inf.increaseInfrastructureCountFromSpyContract(
             attackerId,
             randomNumberToAddToAttacker
         );

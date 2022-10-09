@@ -1963,7 +1963,7 @@ contract WondersContract4 is Ownable {
             bool existingWonder = idToWonders4[countryId]
                 .strategicDefenseInitiative;
             require(existingWonder = false, "Already owned");
-            uint256 missileDefenseCount = ImprovementsContract2(
+            uint256 missileDefenseCount = ImprovementsContract4(
                 improvementsContract2Address
             ).getMissileDefenseCount(countryId);
             require(
