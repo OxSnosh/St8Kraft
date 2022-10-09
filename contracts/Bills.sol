@@ -237,6 +237,10 @@ contract BillsContract is Ownable {
         if (uranium) {
             infrastructureUpkeepModifier -= 3;
         }
+        uint256 laborCamps = imp2.getLaborCampCount(id);
+        if (laborCamps > 0) {
+            infrastructureUpkeepModifier -= (laborCamps * 10);
+        }
         uint256 dailyInfrastructureBillsDue = ((baseDailyInfrastructureUpkeep *
             infrastructureUpkeepModifier) / 100);
         return dailyInfrastructureBillsDue;

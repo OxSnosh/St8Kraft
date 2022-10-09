@@ -643,14 +643,14 @@ contract ImprovementsContract2 is Ownable {
         uint256 intelligenceAgencyCount;
         //Jail
         //$25,000
-        //Incarcerates up to 500 criminals
+        //DONE //Incarcerates up to 500 criminals
         //Limit 5
         uint256 jailCount;
         //Labor Camp
         //$150,000
-        //Reduces infrastructure upkeep costs -10%
-        //reduces population happiness -1.
-        //Incarcerates up to 200 criminals per Labor Camp.
+        //DONE //Reduces infrastructure upkeep costs -10%
+        //DONE //reduces population happiness -1.
+        //DONE //Incarcerates up to 200 criminals per Labor Camp.
         uint256 laborCampCount;
     }
 
@@ -1066,6 +1066,26 @@ contract ImprovementsContract2 is Ownable {
         uint256 intelAgencyAmount = idToImprovements2[countryId]
             .intelligenceAgencyCount;
         return intelAgencyAmount;
+    }
+
+    function getJailCount(uint256 countryId)
+        public
+        view
+        returns (uint256 count)
+    {
+        uint256 jailAmount = idToImprovements2[countryId]
+            .jailCount;
+        return jailAmount;
+    }
+
+    function getLaborCampCount(uint256 countryId)
+        public
+        view
+        returns (uint256 count)
+    {
+        uint256 laborCampAmount = idToImprovements2[countryId]
+            .laborCampCount;
+        return laborCampAmount;
     }
 }
 

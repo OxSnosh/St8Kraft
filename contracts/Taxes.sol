@@ -257,9 +257,11 @@ contract TaxesContract is Ownable {
         uint256 taxRatePoints = getTaxRatePoints(id);
         uint256 pointsFromStability = getPointsFromMilitary(id);
         uint256 pointsFromCrime = getPointsFromCriminals(id);
-        uint256 happinessPointsToSubtract = (30 -
+        uint256 pointsFromImprovements = getPointsToSubtractFromImprovements(id);
+        uint256 happinessPointsToSubtract = (35 -
             taxRatePoints -
             pointsFromCrime - 
+            pointsFromImprovements -
             pointsFromStability);
         return happinessPointsToSubtract;
     }
@@ -658,6 +660,15 @@ contract TaxesContract is Ownable {
             pointsFromCrime = 5;
         }
         return pointsFromCrime;
+    }
+
+    function getPointsToSubtractFromImprovements(uint256 id) public view returns (uint256) {
+        uint256 pointsToSubtractFromImprovements;
+        uint256 laborCamps = imp2.getLaborCampCount(id);
+        if (laborCamps > 0) {
+            pointsToSubtractFromImprovements += (laborCamps * 1);
+        }
+        return pointsToSubtractFromImprovements;
     }
 
     function getIncomeAdjustments(uint256 id) public view returns (uint256) {

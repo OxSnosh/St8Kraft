@@ -18,7 +18,6 @@ contract TechnologyMarketContract is Ownable {
     address public wonders4;
     address public treasury;
 
-
     CountryMinter mint;
     ResourcesContract res;
     TreasuryContract tsy;

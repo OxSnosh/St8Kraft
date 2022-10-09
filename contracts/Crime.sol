@@ -9,17 +9,20 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract CrimeContract is Ownable {
     address public infrastructure;
     address public improvements1;
+    address public improvements2;
     address public improvements3;
     address public parameters;
 
     InfrastructureContract inf;
     ImprovementsContract1 imp1;
+    ImprovementsContract2 imp2;
     ImprovementsContract3 imp3;
     CountryParametersContract cp;
 
     constructor(
         address _infrastructure,
         address _improvements1,
+        address _improvements2,
         address _improvements3,
         address _parameters
     ) {
@@ -27,6 +30,8 @@ contract CrimeContract is Ownable {
         inf = InfrastructureContract(_infrastructure);
         improvements1 = _improvements1;
         imp1 = ImprovementsContract1(_improvements1);
+        improvements2 = _improvements2;
+        imp2 = ImprovementsContract2(_improvements2);
         improvements3 = _improvements3;
         imp3 = ImprovementsContract3(_improvements3);
         cp = CountryParametersContract(_parameters);
@@ -56,6 +61,14 @@ contract CrimeContract is Ownable {
         uint256 criminalPercentage = (crimeIndex + 1);
         uint256 baseCriminalCount = ((totalPopulation * criminalPercentage) /
             100);
+        uint256 jailCount = imp2.getJailCount(id);
+        uint256 laborCamps = imp2.getLaborCampCount(id);
+        uint256 criminalsIncarcerated = ((jailCount * 500) + (laborCamps * 200));
+        if(baseCriminalCount <= criminalsIncarcerated) {
+            baseCriminalCount = 0;
+        } else {
+            baseCriminalCount = baseCriminalCount - criminalsIncarcerated;
+        }
         uint256 criminalCountPercentageModifier = 100;
         uint256 borderWalls = imp1.getBorderWallCount(id);
         if (borderWalls > 0) {
