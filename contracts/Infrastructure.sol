@@ -93,7 +93,7 @@ contract InfrastructureContract is Ownable {
         aid = _aid;
     }
 
-    function constructorContinued(
+    function constructorContinued2(
         address _spyAddress,
         address _tax,
         address _cruiseMissile,

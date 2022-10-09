@@ -4,9 +4,9 @@ pragma solidity 0.8.7;
 import "./CountryMinter.sol";
 import "./Resources.sol";
 import "./Improvements.sol";
+import "./Infrastructure.sol";
 import "./Wonders.sol";
 import "./Treasury.sol";
-import "./Forces.sol";
 import "./CountryParameters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -15,133 +15,42 @@ contract InfrastructureMarketContract is Ownable {
     address public resources;
     address public infrastructure;
     address public improvements1;
-    address public improvements2;
-    address public improvements3;
-    address public wonders1;
     address public wonders2;
-    address public wonders3;
-    address public wonders4;
-    address public forces;
     address public treasury;
-    address public aid;
     address public parameters;
-    address public spyAddress;
-    address public taxes;
-    address public cruiseMissile;
-    address public nukeAddress;
-    address public airBattle;
-    address public groundBattle;
 
     CountryMinter mint;
     ResourcesContract res;
     ImprovementsContract1 imp1;
-    ImprovementsContract2 imp2;
-    ImprovementsContract3 imp3;
+    WondersContract2 won2;
+    CountryParametersContract param;
     InfrastructureContract inf;
+    TreasuryContract tsy;
 
     constructor(
         address _resources,
+        address _parameters,
         address _improvements1,
-        address _improvements2,
-        address _improvements3
+        address _countryMinter,
+        address _wonders2,
+        address _treasury,
+        address _infrastructure
     ) {
         resources = _resources;
         res = ResourcesContract(_resources);
+        parameters = _parameters;
+        param = CountryParametersContract(_parameters);
         improvements1 = _improvements1;
         imp1 = ImprovementsContract1(_improvements1);
-        improvements2 = _improvements2;
-        imp2 = ImprovementsContract2(_improvements2);
-        improvements3 = _improvements3;
-        imp3 = ImprovementsContract3(_improvements3);
-    }
-    
-    function constructorContinued(
-        address _wonders1,
-        address _wonders2,
-        address _wonders3,
-        address _wonders4,
-        address _treasury,
-        address _parameters,
-        address _forces,
-        address _aid,
-        address _infrastructure
-    ) public onlyOwner {
-        wonders1 = _wonders1;
-        wonders2 = _wonders2;
-        wonders3 = _wonders3;
-        wonders4 = _wonders4;
-        treasury = _treasury;
-        parameters = _parameters;
-        forces = _forces;
-        aid = _aid;
-        infrastructure = _infrastructure;
-    }
-
-    function constructorContinued(
-        address _spyAddress,
-        address _tax,
-        address _cruiseMissile,
-        address _nukeAddress,
-        address _airBattle,
-        address _groundBattle,
-        address _countryMinter
-    ) public onlyOwner {
-        spyAddress = _spyAddress;
-        taxes = _tax;
-        cruiseMissile = _cruiseMissile;
-        nukeAddress = _nukeAddress;
-        airBattle = _airBattle;
-        groundBattle = _groundBattle;
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
-    }
+        wonders2 = _wonders2;
+        won2 = WondersContract2(_wonders2);
+        treasury = _treasury;
+        tsy = TreasuryContract(_treasury);
+        infrastructure = _infrastructure;
+        inf = InfrastructureContract(_infrastructure);
 
-    modifier onlySpyContract() {
-        require(
-            msg.sender == spyAddress,
-            "only spy contract can call this function"
-        );
-        _;
-    }
-
-    modifier onlyTaxesContract() {
-        require(
-            msg.sender == taxes,
-            "only tax contract can call this function"
-        );
-        _;
-    }
-
-    modifier onlyCruiseMissileContract() {
-        require(
-            msg.sender == cruiseMissile,
-            "only callable from cruise missile contract"
-        );
-        _;
-    }
-
-    modifier onlyNukeContract() {
-        require(
-            msg.sender == nukeAddress,
-            "only callable from cruise missile contract"
-        );
-        _;
-    }
-
-    modifier onlyAirBattle() {
-        require(
-            msg.sender == airBattle,
-            "function only callable from Air Battle contract"
-        );
-        _;
-    }
-
-    modifier onlyGroundBattle() {
-        require(
-            msg.sender == groundBattle,
-            "function only callable from Ground Battle contract"
-        );
-        _;
     }
 
     function buyInfrastructure(uint256 id, uint256 buyAmount) public {
@@ -162,7 +71,7 @@ contract InfrastructureMarketContract is Ownable {
         uint256 adjustedCostPerLevel = ((grossCostPerLevel * multiplier));
         uint256 cost = buyAmount * adjustedCostPerLevel;
         inf.increaseInfrastructureFromMarket(id, buyAmount);
-        TreasuryContract(treasury).spendBalance(id, cost);
+        tsy.spendBalance(id, cost);
     }
 
     function getInfrastructureCostPerLevel(uint256 currentInfrastructureAmount)
@@ -210,9 +119,9 @@ contract InfrastructureMarketContract is Ownable {
         uint256 lumberMultiplier = 0;
         uint256 ironMultiplier = 0;
         uint256 marbleMultiplier = 0;
-        bool isLumber = ResourcesContract(resources).viewLumber(id);
-        bool isIron = ResourcesContract(resources).viewIron(id);
-        bool isMarble = ResourcesContract(resources).viewMarble(id);
+        bool isLumber = res.viewLumber(id);
+        bool isIron = res.viewIron(id);
+        bool isMarble = res.viewMarble(id);
         if (isLumber) {
             lumberMultiplier = 6;
         }
@@ -238,13 +147,11 @@ contract InfrastructureMarketContract is Ownable {
         uint256 insterstateSystemMultiplier = 0;
         uint256 accomodativeGovernmentMultiplier = 0;
         uint256 factoryMultiplier = 0;
-        bool isRubber = ResourcesContract(resources).viewRubber(id);
-        bool isConstruction = ResourcesContract(resources).viewConstruction(id);
-        bool isInterstateSystem = WondersContract2(wonders2)
-            .getInterstateSystem(id);
+        bool isRubber = res.viewRubber(id);
+        bool isConstruction = res.viewConstruction(id);
+        bool isInterstateSystem = won2.getInterstateSystem(id);
         bool isAccomodativeGovernment = checkAccomodativeGovernment(id);
-        uint256 factoryCount = ImprovementsContract1(improvements1)
-            .getFactoryCount(id);
+        uint256 factoryCount = imp1.getFactoryCount(id);
         if (isRubber) {
             rubberMultiplier = 3;
         }
@@ -277,10 +184,10 @@ contract InfrastructureMarketContract is Ownable {
         uint256 coalMultiplier = 0;
         uint256 steelMultiplier = 0;
         uint256 asphaltMultiplier = 0;
-        bool isAluminium = ResourcesContract(resources).viewAluminium(id);
-        bool isCoal = ResourcesContract(resources).viewCoal(id);
-        bool isSteel = ResourcesContract(resources).viewSteel(id);
-        bool isAsphalt = ResourcesContract(resources).viewAsphalt(id);
+        bool isAluminium = res.viewAluminium(id);
+        bool isCoal = res.viewCoal(id);
+        bool isSteel = res.viewSteel(id);
+        bool isAsphalt = res.viewAsphalt(id);
         if (isAluminium) {
             aluminiumMultiplier = 7;
         }
@@ -305,8 +212,7 @@ contract InfrastructureMarketContract is Ownable {
         view
         returns (bool)
     {
-        uint256 governmentType = CountryParametersContract(parameters)
-            .getGovernmentType(countryId);
+        uint256 governmentType = param.getGovernmentType(countryId);
         if (
             governmentType == 2 ||
             governmentType == 5 ||
