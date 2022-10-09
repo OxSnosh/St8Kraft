@@ -190,7 +190,7 @@ contract EnvironmentContract is Ownable {
         );
         bool isWeaponsResearchCenter = won4.getWeaponsResearchCenter(id);
         int256 pointsFromWondersAndImprovements;
-        if (borderWallCount == 0) {
+        if (borderWallCount > 0) {
             pointsFromWondersAndImprovements += 0;
         } else if (borderWallCount == 1) {
             pointsFromWondersAndImprovements += 10;

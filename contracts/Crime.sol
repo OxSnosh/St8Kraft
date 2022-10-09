@@ -8,19 +8,26 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract CrimeContract is Ownable {
     address public infrastructure;
+    address public improvements1;
     address public improvements3;
     address public parameters;
 
     InfrastructureContract inf;
+    ImprovementsContract1 imp1;
     ImprovementsContract3 imp3;
     CountryParametersContract cp;
 
     constructor(
         address _infrastructure,
+        address _improvements1,
         address _improvements3,
         address _parameters
     ) {
+        infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
+        improvements1 = _improvements1;
+        imp1 = ImprovementsContract1(_improvements1);
+        improvements3 = _improvements3;
         imp3 = ImprovementsContract3(_improvements3);
         cp = CountryParametersContract(_parameters);
     }
@@ -41,6 +48,32 @@ contract CrimeContract is Ownable {
     function updateCountryParameters(address _newAddress) public onlyOwner {
         parameters = _newAddress;
         cp = CountryParametersContract(_newAddress);
+    }
+
+    function getCriminalCount(uint256 id) public view returns (uint256) {
+        uint256 totalPopulation = inf.getTotalPopulationCount(id);
+        uint256 crimeIndex = getCrimeIndex(id);
+        uint256 criminalPercentage = (crimeIndex + 1);
+        uint256 baseCriminalCount = ((totalPopulation * criminalPercentage) /
+            100);
+        uint256 criminalCountPercentageModifier = 100;
+        uint256 borderWalls = imp1.getBorderWallCount(id);
+        if (borderWalls > 0) {
+            criminalCountPercentageModifier -= borderWalls;
+        }
+        uint256 criminalCount = ((baseCriminalCount *
+            criminalCountPercentageModifier) / 100);
+        return criminalCount;
+    }
+
+    function getUnincarceratedCriminalCount(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 totalCriminalCount = getCriminalCount(id);
+        uint256 unincarceratedCriminalCount = totalCriminalCount;
+        return unincarceratedCriminalCount;
     }
 
     function getCrimeIndex(uint256 id) public view returns (uint256) {
@@ -102,13 +135,19 @@ contract CrimeContract is Ownable {
         uint256 schools = imp3.getSchoolCount(id);
         uint256 universities = imp3.getUniversityCount(id);
         uint256 policeHqs = imp3.getPoliceHeadquartersCount(id);
+        uint256 casinoCount = imp1.getCasinoCount(id);
         uint256 schoolPoints = (schools * 3);
         uint256 universityPoints = (universities * 10);
         uint256 policeHqPoints = (policeHqs * 2);
+        uint256 casinoPoints = (casinoCount * 2);
         uint256 taxMultiplier = getTaxRateCrimeMultiplier(id);
-        uint256 improvementPoints = (((schoolPoints +
+        uint256 improvementPoints = (((
+            4 +
+            schoolPoints +
             universityPoints +
-            policeHqPoints) * taxMultiplier) / 100);
+            policeHqPoints - 
+            casinoPoints
+            ) * taxMultiplier) / 100);
         return improvementPoints;
     }
 

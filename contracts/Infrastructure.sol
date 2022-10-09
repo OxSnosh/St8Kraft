@@ -14,6 +14,7 @@ contract InfrastructureContract is Ownable {
     address public countryMinter;
     address public resources;
     address public improvements1;
+    address public improvements2;
     address public improvements3;
     address public wonders1;
     address public wonders2;
@@ -32,6 +33,9 @@ contract InfrastructureContract is Ownable {
 
     CountryMinter mint;
     ResourcesContract res;
+    ImprovementsContract1 imp1;
+    ImprovementsContract2 imp2;
+    ImprovementsContract3 imp3;
 
     struct Infrastructure {
         uint256 landArea;
@@ -47,7 +51,20 @@ contract InfrastructureContract is Ownable {
     constructor(
         address _resources,
         address _improvements1,
-        address _improvements3,
+        address _improvements2,
+        address _improvements3
+    ) {
+        resources = _resources;
+        res = ResourcesContract(_resources);
+        improvements1 = _improvements1;
+        imp1 = ImprovementsContract1(_improvements1);
+        improvements2 = _improvements2;
+        imp2 = ImprovementsContract2(_improvements2);
+        improvements3 = _improvements3;
+        imp3 = ImprovementsContract3(_improvements3);
+    }
+    
+    function constructorContinued(
         address _wonders1,
         address _wonders2,
         address _wonders3,
@@ -56,11 +73,7 @@ contract InfrastructureContract is Ownable {
         address _parameters,
         address _forces,
         address _aid
-    ) {
-        resources = _resources;
-        res = ResourcesContract(_resources);
-        improvements1 = _improvements1;
-        improvements3 = _improvements3;
+    ) public onlyOwner {
         wonders1 = _wonders1;
         wonders2 = _wonders2;
         wonders3 = _wonders3;
@@ -70,6 +83,7 @@ contract InfrastructureContract is Ownable {
         forces = _forces;
         aid = _aid;
     }
+
 
     function constructorContinued(
         address _spyAddress,
@@ -655,9 +669,22 @@ contract InfrastructureContract is Ownable {
 
     function decreaseInfrastructureCountFromCruiseMissileContract(
         uint256 countryId,
-        uint256 amount
+        uint256 amountToDecrease
     ) public onlyCruiseMissileContract {
-        idToInfrastructure[countryId].infrastructureCount -= amount;
+        uint256 infrastructureDamageModifier = 100;
+        uint256 bunkerCount = imp1.getBunkerCount(countryId);
+        if (bunkerCount > 0) {
+            infrastructureDamageModifier -= (5 * bunkerCount);
+        }
+        uint256 damage = ((amountToDecrease * infrastructureDamageModifier) /
+            100);
+        uint256 infrastructureAmount = idToInfrastructure[countryId]
+            .infrastructureCount;
+        if (damage >= infrastructureAmount) {
+            idToInfrastructure[countryId].infrastructureCount = 0;
+        } else {
+            idToInfrastructure[countryId].infrastructureCount -= damage;
+        }
     }
 
     function decreaseInfrastructureCountFromNukeContract(uint256 countryId)
@@ -666,8 +693,13 @@ contract InfrastructureContract is Ownable {
     {
         uint256 infrastructureAmount = idToInfrastructure[countryId]
             .infrastructureCount;
-        uint256 infrastructureAmountToDecrease = ((infrastructureAmount * 35) /
-            100);
+        uint256 damagePercentage = 35;
+        uint256 bunkerCount = imp1.getBunkerCount(countryId);
+        if (bunkerCount > 0) {
+            damagePercentage -= bunkerCount;
+        }
+        uint256 infrastructureAmountToDecrease = ((infrastructureAmount *
+            damagePercentage) / 100);
         if (infrastructureAmountToDecrease > 150) {
             idToInfrastructure[countryId].infrastructureCount -= 150;
         } else {
@@ -680,13 +712,19 @@ contract InfrastructureContract is Ownable {
         uint256 countryId,
         uint256 amountToDecrease
     ) public onlyAirBattle {
+        uint256 infrastructureDamageModifier = 100;
+        uint256 bunkerCount = imp1.getBunkerCount(countryId);
+        if (bunkerCount > 0) {
+            infrastructureDamageModifier -= (5 * bunkerCount);
+        }
+        uint256 damage = ((amountToDecrease * infrastructureDamageModifier) /
+            100);
         uint256 infrastructureAmount = idToInfrastructure[countryId]
             .infrastructureCount;
-        if (amountToDecrease >= infrastructureAmount) {
+        if (damage >= infrastructureAmount) {
             idToInfrastructure[countryId].infrastructureCount = 0;
         } else {
-            idToInfrastructure[countryId]
-                .infrastructureCount -= amountToDecrease;
+            idToInfrastructure[countryId].infrastructureCount -= damage;
         }
     }
 
@@ -771,8 +809,29 @@ contract InfrastructureContract is Ownable {
         if (affluentPopulation) {
             populationModifier += 5;
         }
+        uint256 additionalModifierPoints = getAdditionalPopulationModifierPoints(
+                id
+            );
+        populationModifier += additionalModifierPoints;
         uint256 population = ((populationBaseCount * populationModifier) / 100);
         return population;
+    }
+
+    function getAdditionalPopulationModifierPoints(uint256 id) internal view returns (uint256) {
+        uint256 additionalPoints;
+        uint256 borderWalls = imp1.getBorderWallCount(id);
+        if (borderWalls > 0) {
+            additionalPoints -= (2 * borderWalls);
+        }
+        uint256 clinicCount = imp1.getClinicCount(id);
+        if (clinicCount > 0) {
+            additionalPoints += (2 * clinicCount);
+        }
+        uint256 hospitals = imp2.getHospitalCount(id);
+        if (hospitals > 0) {
+            additionalPoints += 6;
+        }
+        return additionalPoints;
     }
 
     function transferLandAndTech(

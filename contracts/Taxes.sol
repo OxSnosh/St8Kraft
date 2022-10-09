@@ -9,6 +9,7 @@ import "./Resources.sol";
 import "./CountryParameters.sol";
 import "./Forces.sol";
 import "./Military.sol";
+import "./Crime.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract TaxesContract is Ownable {
@@ -25,6 +26,7 @@ contract TaxesContract is Ownable {
     address public resources;
     address public forces;
     address public military;
+    address public crime;
 
     InfrastructureContract inf;
     TreasuryContract tsy;
@@ -38,6 +40,7 @@ contract TaxesContract is Ownable {
     ResourcesContract res;
     ForcesContract frc;
     MilitaryContract mil;
+    CrimeContract crm;
 
     constructor(
         address _countryMinter,
@@ -67,7 +70,8 @@ contract TaxesContract is Ownable {
         address _wonders4,
         address _resources,
         address _forces,
-        address _military
+        address _military,
+        address _crime
     ) public onlyOwner {
         parameters = _parameters;
         params = CountryParametersContract(_parameters);
@@ -83,6 +87,8 @@ contract TaxesContract is Ownable {
         frc = ForcesContract(_forces);
         military = _military;
         mil = MilitaryContract(_military);
+        crime = _crime;
+        crm = CrimeContract(_crime);
     }
 
     mapping(uint256 => address) public idToOwnerTaxes;
@@ -192,14 +198,14 @@ contract TaxesContract is Ownable {
         uint256 guerillaCamp = imp2.getGuerillaCampCount(id);
         uint256 multipliers = (100 +
             (banks * 7) +
-            (ministries * 1) +
+            (ministries * 5) +
             (harbors * 1) +
             (schools * 5) +
             (universities * 8) -
             (guerillaCamp * 8) -
             (casinos * 1));
-        uint256 baseDailyIncomePerCitizen = (((32 + (2 * happiness)) *
-            multipliers) / 100);
+        uint256 baseDailyIncomePerCitizen = (35 + (((2 * happiness) *
+            multipliers) / 100));
         uint256 incomeAdjustments = getIncomeAdjustments(id);
         uint256 dailyIncomePerCitizen = baseDailyIncomePerCitizen + incomeAdjustments;
         return dailyIncomePerCitizen;
@@ -217,20 +223,30 @@ contract TaxesContract is Ownable {
         uint256 compatabilityPoints = checkCompatability(id);
         uint256 densityPoints = getDensityPoints(id);
         uint256 pointsFromResources = getPointsFromResources(id);
+        uint256 pointsFromImprovements = getPointsFromImprovements(id);
         uint256 wonderPoints = getHappinessFromWonders(id);
+        uint256 additionalHappinessPoints = getAdditionalHappinessPointsToAdd(id);
+        uint256 happinessPointsToAdd = (compatabilityPoints +
+            densityPoints +
+            pointsFromResources +
+            pointsFromImprovements +
+            wonderPoints+
+            additionalHappinessPoints);
+        return happinessPointsToAdd;
+    }
+
+    function getAdditionalHappinessPointsToAdd(uint256 id) internal view returns (uint256) {
         uint256 technologyPoints = getTechnologyPoints(id);
         uint256 pointsFromAge = getPointsFromNationAge(id);
         uint256 pointsFromTrades = getPointsFromTrades(id);
         uint256 pointsFromDefcon = getPointsFromDefcon(id);
-        uint256 happinessPointsToAdd = (compatabilityPoints +
-            densityPoints +
-            pointsFromResources +
-            wonderPoints +
+        uint256 additonalHappinessPointsToAdd = (
             technologyPoints +
             pointsFromAge +
             pointsFromTrades +
-            pointsFromDefcon);
-        return happinessPointsToAdd;
+            pointsFromDefcon
+        );
+        return additonalHappinessPointsToAdd;
     }
 
     function getHappinessPointsToSubtract(uint256 id)
@@ -240,8 +256,10 @@ contract TaxesContract is Ownable {
     {
         uint256 taxRatePoints = getTaxRatePoints(id);
         uint256 pointsFromStability = getPointsFromMilitary(id);
-        uint256 happinessPointsToSubtract = (25 -
+        uint256 pointsFromCrime = getPointsFromCriminals(id);
+        uint256 happinessPointsToSubtract = (30 -
             taxRatePoints -
+            pointsFromCrime - 
             pointsFromStability);
         return happinessPointsToSubtract;
     }
@@ -346,6 +364,23 @@ contract TaxesContract is Ownable {
             additionalPointsFromResources += 2;
         }
         return additionalPointsFromResources;
+    }
+
+    function getPointsFromImprovements(uint256 id) public view returns (uint256) {
+        uint256 pointsFromImprovements;
+        uint256 borderWalls = imp1.getBorderWallCount(id);
+        if (borderWalls > 0) {
+            pointsFromImprovements += (2 * borderWalls);
+        }
+        uint256 casinos = imp1.getCasinoCount(id);
+        if (casinos > 0) {
+            pointsFromImprovements += (2 * casinos);
+        }
+        uint256 churchCount = imp1.getChurchCount(id);
+        if (churchCount > 0) {
+            pointsFromImprovements += churchCount;
+        }
+        return pointsFromImprovements;
     }
 
     function getHappinessFromWonders(uint256 id)
@@ -565,6 +600,12 @@ contract TaxesContract is Ownable {
         } else if (taxRate <= 30) {
             subtractTaxPoints = 7;
         }
+        uint256 intelAgencies = imp2.getIntelAgencyCount(id);
+        if (intelAgencies > 0 && taxRate <= 23) {
+            subtractTaxPoints = 0;
+        } else if (intelAgencies > 0 && taxRate <= 25) {
+            subtractTaxPoints -= 5;
+        }
         return subtractTaxPoints;
     }
 
@@ -598,6 +639,25 @@ contract TaxesContract is Ownable {
             environmentPenalty = true;
         }
         return (soldierPopulationRatio, environmentPenalty);
+    }
+
+    function getPointsFromCriminals(uint256 id) public view returns (uint256) {
+        uint256 unincarceratedCriminals = crm.getUnincarceratedCriminalCount(id);
+        uint256 pointsFromCrime;
+        if (unincarceratedCriminals < 200) {
+            pointsFromCrime = 0;
+        } else if (unincarceratedCriminals < 1000) {
+            pointsFromCrime = 1;
+        } else if (unincarceratedCriminals < 2000) {
+            pointsFromCrime = 2;
+        } else if (unincarceratedCriminals < 3000) {
+            pointsFromCrime = 3;
+        } else if (unincarceratedCriminals < 4000) {
+            pointsFromCrime = 4;
+        } else {
+            pointsFromCrime = 5;
+        }
+        return pointsFromCrime;
     }
 
     function getIncomeAdjustments(uint256 id) public view returns (uint256) {

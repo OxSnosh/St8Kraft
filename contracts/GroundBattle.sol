@@ -5,6 +5,7 @@ import "./War.sol";
 import "./Infrastructure.sol";
 import "./Forces.sol";
 import "./Treasury.sol";
+import "./Improvements.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
@@ -15,6 +16,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     address infrastructure;
     address forces;
     address treasury;
+    address improvements2;
     uint256 soldierStrength = 1;
     uint256 tankStrength = 17;
 
@@ -22,6 +24,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     InfrastructureContract inf;
     ForcesContract force;
     TreasuryContract tsy;
+    ImprovementsContract2 imp2;
 
     struct GroundForcesToBattle {
         uint256 attackType;
@@ -52,6 +55,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         address _infrastructure,
         address _forces,
         address _treasury,
+        address _improvements2,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
@@ -64,6 +68,8 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         force = ForcesContract(_forces);
         treasury = _treasury;
         tsy = TreasuryContract(_treasury);
+        improvements2 = _improvements2;
+        imp2 = ImprovementsContract2(_improvements2);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
@@ -110,7 +116,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             .getDeployedGroundForces(warId, attackerId);
         //need efficiency modifier
         uint256 attackerForcesStrength = (soldiersDeployed +
-            (17 * tanksDeployed));
+            (15 * tanksDeployed));
         GroundForcesToBattle memory newGroundForces = GroundForcesToBattle(
             attackType,
             soldiersDeployed,
@@ -368,22 +374,27 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 randomLandMiles;
         uint256 randomTechLevels;
         uint256 attackType = groundBattleIdToAttackerForces[battleId].attackType;
+        uint256 fobCount = imp2.getForwardOperatingBaseCount(attackerId);
+        uint256 attackModifier = 0;
+        if (fobCount > 0) {
+            attackModifier = (2 * fobCount);
+        }
         if (attackType == 1) {
-            randomBalancePercentage = (0 + (randomWords[5] % 10));
-            randomLandMiles = (0 + (randomWords[6] % 3));
-            randomTechLevels = (0 + (randomWords[7]) % 3);
+            randomBalancePercentage = (0 + attackModifier + (randomWords[5] % 10));
+            randomLandMiles = (0 + fobCount + (randomWords[6] % 3));
+            randomTechLevels = (0 + fobCount + (randomWords[7]) % 3);
         } else if (attackType == 2) {
-            randomBalancePercentage = (5 + (randomWords[5] % 10));
-            randomLandMiles = (2 + (randomWords[6] % 5));
-            randomTechLevels = (2 + (randomWords[7]) % 3);
+            randomBalancePercentage = (5 + attackModifier + (randomWords[5] % 10));
+            randomLandMiles = (2 + fobCount + (randomWords[6] % 5));
+            randomTechLevels = (2 + fobCount + (randomWords[7]) % 3);
         } else if (attackType == 3) {
-            randomBalancePercentage = (10 + (randomWords[5] % 15));
-            randomLandMiles = (5 + (randomWords[6] % 5));
-            randomTechLevels = (3 + (randomWords[7]) % 4);
+            randomBalancePercentage = (10 + attackModifier + (randomWords[5] % 15));
+            randomLandMiles = (5 + fobCount + (randomWords[6] % 5));
+            randomTechLevels = (3 + fobCount + (randomWords[7]) % 4);
         } else if (attackType == 4) {
-            randomBalancePercentage = (10 + (randomWords[5] % 20));
-            randomLandMiles = (7 + (randomWords[6] % 5));
-            randomTechLevels = (5 + (randomWords[7]) % 4);
+            randomBalancePercentage = (10 + attackModifier + (randomWords[5] % 20));
+            randomLandMiles = (7 + fobCount + (randomWords[6] % 5));
+            randomTechLevels = (5 + fobCount + (randomWords[7]) % 4);
         }
         tsy.transferSpoils(randomBalancePercentage, attackerId, defenderId);
         inf.transferLandAndTech(randomLandMiles, randomTechLevels, attackerId, defenderId);

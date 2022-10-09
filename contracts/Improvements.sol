@@ -2,14 +2,16 @@
 pragma solidity 0.8.7;
 
 import "./Treasury.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Navy.sol";
 import "./Forces.sol";
+import "./Wonders.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract ImprovementsContract1 is Ownable {
     address public treasuryAddress;
     address public improvementContract2Address;
     address public improvementContract3Address;
+    address public wonders1;
     address public navyContractAddress;
     uint256 public airportCost = 100000;
     uint256 public bankCost = 100000;
@@ -22,6 +24,8 @@ contract ImprovementsContract1 is Ownable {
     uint256 public clinicCost = 50000;
     uint256 public drydockCost = 100000;
     uint256 public factoryCost = 150000;
+
+    WondersContract1 won1;
 
     struct Improvements1 {
         uint256 improvementCount;
@@ -51,15 +55,15 @@ contract ImprovementsContract1 is Ownable {
         uint256 borderFortificationCount;
         //Border Walls
         //$60,000
-        //Decreases citizen count by -2%
-        //increases population happiness +2,
-        //Improves environment +1
-        //Reduces the number of criminals in a nation 1% for each Border Wall.
+        //DONE //Decreases citizen count by -2%
+        //DONE //increases population happiness +2,
+        //DONE //Improves environment +1
+        //DONE //Reduces the number of criminals in a nation 1% for each Border Wall.
         //Border Walls may only be purchased one at a time.
         uint256 borderWallCount;
         //Bunker
         //$200,000
-        //Reduces infrastructure damage from aircraft, cruise missiles, and nukes -3%
+        //DONE //Reduces infrastructure damage from aircraft, cruise missiles, and nukes -3%
         //Requires maintaining a Barracks for each Bunker.
         //Limit 5
         //Cannot build if Munitions Factory or Forward Operating Base is owned.
@@ -67,18 +71,18 @@ contract ImprovementsContract1 is Ownable {
         uint256 bunkerCount;
         //Casino
         //$100,000
-        //Increases happiness by 1.5,
-        //decreases citizen income by 1%
-        //-25 to crime prevention score.
+        //DONE //Increases happiness by 1.5,
+        //DONE //decreases citizen income by 1%
+        //DONE //-25 to crime prevention score.
         //Limit 2.
         uint256 casinoCount;
         //Church
         //$40,000
-        //Increases population happiness +1.
+        //DONE //Increases population happiness +1.
         uint256 churchCount;
         //Clinic
         //$50,000
-        //Increases population count by 2%
+        //DONE //Increases population count by 2%
         //Purchasing 2 or more clinics allows you to purchase hospitals.
         //This improvement may not be destroyed if it is supporting a hospital until the hospital is first destroyed.
         uint256 clinicCount;
@@ -91,9 +95,9 @@ contract ImprovementsContract1 is Ownable {
         uint256 drydockCount;
         //Factory
         //$150,000
-        //Decreases cost of cruise missiles -5%
-        //decreases tank cost -10%,
-        //reduces initial infrastructure purchase cost -8%.
+        //DONE //Decreases cost of cruise missiles -5%
+        //DONE //decreases tank cost -10%,
+        //DONE //reduces initial infrastructure purchase cost -8%.
         uint256 factoryCount;
     }
 
@@ -489,8 +493,7 @@ contract ImprovementsContract1 is Ownable {
         view
         returns (uint256 count)
     {
-        uint256 airportAmount = idToImprovements1[countryId]
-            .airportCount;
+        uint256 airportAmount = idToImprovements1[countryId].airportCount;
         return airportAmount;
     }
 
@@ -499,8 +502,7 @@ contract ImprovementsContract1 is Ownable {
         view
         returns (uint256 count)
     {
-        uint256 barracksAmount = idToImprovements1[countryId]
-            .barracksCount;
+        uint256 barracksAmount = idToImprovements1[countryId].barracksCount;
         return barracksAmount;
     }
 
@@ -519,28 +521,12 @@ contract ImprovementsContract1 is Ownable {
         view
         returns (uint256 count)
     {
-        uint256 borderWallAmount = idToImprovements1[countryId]
-            .borderWallCount;
+        uint256 borderWallAmount = idToImprovements1[countryId].borderWallCount;
         return borderWallAmount;
     }
 
-    function getBankCount(uint256 countryId)
-        public
-        view
-        returns (uint256 )
-    {
-        uint256 count = idToImprovements1[countryId]
-            .bankCount;
-        return count;
-    }
-
-    function getCasinoCount(uint256 countryId)
-        public
-        view
-        returns (uint256 )
-    {
-        uint256 count = idToImprovements1[countryId]
-            .casinoCount;
+    function getBankCount(uint256 countryId) public view returns (uint256) {
+        uint256 count = idToImprovements1[countryId].bankCount;
         return count;
     }
 
@@ -551,6 +537,16 @@ contract ImprovementsContract1 is Ownable {
     {
         uint256 bunkerAmount = idToImprovements1[countryId].bunkerCount;
         return bunkerAmount;
+    }
+
+    function getCasinoCount(uint256 countryId) public view returns (uint256) {
+        uint256 count = idToImprovements1[countryId].casinoCount;
+        return count;
+    }
+
+    function getChurchCount(uint256 countryId) public view returns (uint256) {
+        uint256 count = idToImprovements1[countryId].churchCount;
+        return count;
     }
 
     function getDrydockCount(uint256 countryId)
@@ -585,6 +581,7 @@ contract ImprovementsContract2 is Ownable {
     address public treasuryAddress;
     address public improvementsContract1Address;
     address public forcesAddress;
+    address public wonders1;
     uint256 public foreignMinistryCost = 120000;
     uint256 public forwardOperatingBaseCost = 125000;
     uint256 public guerillaCampCost = 20000;
@@ -598,17 +595,20 @@ contract ImprovementsContract2 is Ownable {
     uint256 public navalAcademyCost = 300000;
     uint256 public navalConstructionYardCost = 300000;
 
+    WondersContract1 won1;
+
     struct Improvements2 {
         //Foreign Ministry
         //$120,000
-        //Increases population income by 5%
+        //DONE //Increases population income by 5%
         //Opens +1 extra foreign aid slot.
         //Limit one foreign ministry per nation
         uint256 foreignMinistryCount;
         //Forward Operating Base
         //$125,000
-        //Increases ground attack damage 5%,
-        //Reduces effectiveness of one's own defending soldiers -3%.
+        //DONE //Increases spoils from ground attack damage 2% for balance
+        //DONE //Increases spoils from ground attack damage +1/fob for Land and Tech;
+        //DONE //Reduces effectiveness of one's own defending soldiers -3%.
         //Requires maintaining a Barracks for each Forward Operating Base.
         //Limit 2.
         //Cannot own if Border Fortifications or Bunker is owned.
@@ -616,28 +616,28 @@ contract ImprovementsContract2 is Ownable {
         uint256 forwardOperatingBaseCount;
         //Guerilla Camp
         //$20,000
-        //Increases soldier efficiency +35%,
-        //reduces soldier upkeep cost -10%
-        //reduces citizen income -8%.
+        //DONE //Increases soldier efficiency +35%,
+        //DONE //reduces soldier upkeep cost -10%
+        //DONE //reduces citizen income -8%.
         uint256 guerillaCampCount;
         //Harbor
         //$200,000
-        //Increases population income by 1%.
-        //Opens +1 extra trade slot
+        //DONE //Increases population income by 1%.
+        //DONE //Opens +1 extra trade slot
         //Limit one harbor per nation.
         //This improvement may not be destroyed if it is supporting trade agreements or navy vessels until those trade agreements and navy vessels are first removed.
         uint256 harborCount;
         //Hospital
         //$180,000
-        //Increases population count by 6%.
+        //DONE //Increases population count by 6%.
         //Need 2 clinics for a hospital.
         //Limit one hospital per nation.
         //Nations must retain at least one hospital if that nation owns a Universal Health Care wonder.
         uint256 hospitalCount;
         //Intelligence Agency
         //$38,500
-        //Increases happiness for tax rates greater than 23% +1
-        //Each Intelligence Agency allows nations to purchase + 100 spies
+        //DONE //Increases happiness for tax rates greater than 23% +1
+        //DONE //Each Intelligence Agency allows nations to purchase + 100 spies
         //This improvement may not be destroyed if it is supporting spies until those spies are first destroyed.
         uint256 intelligenceAgencyCount;
         //Jail
@@ -684,9 +684,14 @@ contract ImprovementsContract2 is Ownable {
     mapping(uint256 => Improvements2) public idToImprovements2;
     mapping(uint256 => address) public idToOwnerImprovements2;
 
-    constructor(address _treasuryAddress, address _forcesAddress) {
+    constructor(
+        address _treasuryAddress,
+        address _forcesAddress,
+        address _wonders1
+    ) {
         treasuryAddress = _treasuryAddress;
         forcesAddress = _forcesAddress;
+        wonders1 = _wonders1;
     }
 
     function updateTreasuryAddress(address _newTreasuryAddress)
@@ -1095,8 +1100,13 @@ contract ImprovementsContract2 is Ownable {
                 countryId
             );
             uint256 newIntelAgencyCount = existingCount - amount;
+            bool centralIntelAgency = won1.getCentralIntelligenceAgency(countryId);
+            uint256 baseSpyCount = 50;
+            if (centralIntelAgency) {
+                baseSpyCount = 300;
+            }
             require(
-                spyCount <= (newIntelAgencyCount * 100),
+                spyCount <= (baseSpyCount + (newIntelAgencyCount * 100)),
                 "You have too many spies, each intel agency supports 100 spies"
             );
             idToImprovements2[countryId].intelligenceAgencyCount -= amount;
@@ -1174,6 +1184,15 @@ contract ImprovementsContract2 is Ownable {
         }
     }
 
+    function getForeignMinistryCount(uint256 countryId)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 count = idToImprovements2[countryId].foreignMinistryCount;
+        return count;
+    }
+
     function getForwardOperatingBaseCount(uint256 countryId)
         public
         view
@@ -1182,16 +1201,6 @@ contract ImprovementsContract2 is Ownable {
         uint256 fobCount = idToImprovements2[countryId]
             .forwardOperatingBaseCount;
         return fobCount;
-    }
-
-    function getForeignMinistryCount(uint256 countryId)
-        public
-        view
-        returns (uint256)
-    {
-        uint256 count = idToImprovements2[countryId]
-            .foreignMinistryCount;
-        return count;
     }
 
     function getMunitionsFactoryCount(uint256 countryId)
@@ -1231,12 +1240,23 @@ contract ImprovementsContract2 is Ownable {
         return hospitalAmount;
     }
 
+    function getIntelAgencyCount(uint256 countryId)
+        public
+        view
+        returns (uint256 count)
+    {
+        uint256 intelAgencyAmount = idToImprovements2[countryId]
+            .intelligenceAgencyCount;
+        return intelAgencyAmount;
+    }
+
     function getMissileDefenseCount(uint256 countryId)
         public
         view
         returns (uint256 count)
     {
-        uint256 missileDefenseAmount = idToImprovements2[countryId].missileDefenseCount;
+        uint256 missileDefenseAmount = idToImprovements2[countryId]
+            .missileDefenseCount;
         return missileDefenseAmount;
     }
 }
@@ -1740,9 +1760,13 @@ contract ImprovementsContract3 is Ownable {
         } else if (improvementId == 8) {
             uint256 existingCount = idToImprovements3[countryId].schoolCount;
             require((existingCount - amount) >= 0, "Cannot delete that many");
-            uint256 universityAmount = idToImprovements3[countryId].universityCount;
+            uint256 universityAmount = idToImprovements3[countryId]
+                .universityCount;
             uint256 newCount = existingCount - amount;
-            require(newCount >= universityAmount, "Must own one school for each university");
+            require(
+                newCount >= universityAmount,
+                "Must own one school for each university"
+            );
             idToImprovements3[countryId].schoolCount -= amount;
             uint256 existingImprovementTotal = ImprovementsContract1(
                 improvementsContract1Address
@@ -1808,11 +1832,7 @@ contract ImprovementsContract3 is Ownable {
         return satelliteAmount;
     }
 
-    function getSchoolCount(uint256 countryId)
-        public
-        view
-        returns (uint256)
-    {
+    function getSchoolCount(uint256 countryId) public view returns (uint256) {
         uint256 count = idToImprovements3[countryId].schoolCount;
         return count;
     }

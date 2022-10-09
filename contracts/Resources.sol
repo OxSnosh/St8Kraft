@@ -672,11 +672,11 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         if (requestorHarborAmount > 0) {
             requestorMaxTrades = 4;
         }
-        require(
-            requestorMaxTrades >= (requestorTotalTrades + 1),
-            "requestor has too many active and proposed trades"
-        );
-        return true;
+        if(requestorMaxTrades >= (requestorTotalTrades + 1)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     function isTradePossibleForRecipient(uint256 recipientId)
@@ -701,11 +701,11 @@ contract ResourcesContract is VRFConsumerBaseV2 {
         if (recipientHarborAmount > 0) {
             recipientMaxTrades = 5;
         }
-        require(
-            recipientMaxTrades >= (recipientTotalTrades + 1),
-            "recipient has too many active and proposed trades"
-        );
-        return true;
+        if(recipientMaxTrades >= (recipientTotalTrades + 1)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     function fulfillTradingPartner(uint256 recipientId, uint256 requestorId)

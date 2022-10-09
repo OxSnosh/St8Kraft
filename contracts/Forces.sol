@@ -23,6 +23,7 @@ contract ForcesContract is Ownable {
     address public infrastructure;
     address public resources;
     address public improvements1;
+    address public improvements2;
     address public wonders1;
     address public nukeAddress;
     address public airBattle;
@@ -34,6 +35,7 @@ contract ForcesContract is Ownable {
     ResourcesContract res;
     WondersContract1 won1;
     ImprovementsContract1 imp1;
+    ImprovementsContract2 imp2;
     WarContract war;
 
     struct Forces {
@@ -74,10 +76,11 @@ contract ForcesContract is Ownable {
         spyCost = 500;
     }
 
-    function constructorContinued (
+    function constructorContinued(
         address _infrastructure,
         address _resources,
         address _improvements1,
+        address _improvements2,
         address _wonders1,
         address _countryMinter
     ) public onlyOwner {
@@ -89,6 +92,8 @@ contract ForcesContract is Ownable {
         won1 = WondersContract1(_wonders1);
         improvements1 = _improvements1;
         imp1 = ImprovementsContract1(_improvements1);
+        improvements2 = _improvements2;
+        imp2 = ImprovementsContract2(_improvements2);
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
     }
@@ -228,13 +233,20 @@ contract ForcesContract is Ownable {
         return count;
     }
 
-    function deploySoldiers(uint256 amountToDeploy, uint256 id, uint256 warId) public {
+    function deploySoldiers(
+        uint256 amountToDeploy,
+        uint256 id,
+        uint256 warId
+    ) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         uint256 totalSoldiers = getSoldierCount(id);
         uint256 deployedSoldiers = getDeployedSoldierCount(id);
         uint256 maxDeployablePercentage = getMaxDeployablePercentage(id);
-        require ((((deployedSoldiers + amountToDeploy) * 100) / totalSoldiers) <= maxDeployablePercentage);
+        require(
+            (((deployedSoldiers + amountToDeploy) * 100) / totalSoldiers) <=
+                maxDeployablePercentage
+        );
         war.deploySoldiers(id, warId, amountToDeploy);
         uint256 defendingSoldierCount = idToForces[id].defendingSoldiers;
         require(defendingSoldierCount >= amountToDeploy);
@@ -242,7 +254,11 @@ contract ForcesContract is Ownable {
         idToForces[id].deployedSoldiers += amountToDeploy;
     }
 
-    function getMaxDeployablePercentage(uint256 id) public view returns (uint256) {
+    function getMaxDeployablePercentage(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 maxDeployablePercentage = 80;
         uint256 borderFortificationCount = imp1.getBorderFortificationCount(id);
         if (borderFortificationCount > 0) {
@@ -341,6 +357,10 @@ contract ForcesContract is Ownable {
         if (barracks > 0) {
             efficiencyModifier += (10 * barracks);
         }
+        uint256 guerillaCamps = imp2.getGuerillaCampCount(id);
+        if (guerillaCamps > 0) {
+            efficiencyModifier += (35 * guerillaCamps);
+        }
         return efficiencyModifier;
     }
 
@@ -371,8 +391,16 @@ contract ForcesContract is Ownable {
             efficiencyModifier += (10 * barracks);
         }
         uint256 borderFortification = imp1.getBorderFortificationCount(id);
-        if (borderFortification > 0 ) {
+        if (borderFortification > 0) {
             efficiencyModifier += (borderFortification * 2);
+        }
+        uint256 fobCount = imp2.getForwardOperatingBaseCount(id);
+        if (fobCount > 0) {
+            efficiencyModifier -= (fobCount * 3);
+        }
+        uint256 guerillaCamps = imp2.getGuerillaCampCount(id);
+        if (guerillaCamps > 0) {
+            efficiencyModifier += (35 * guerillaCamps);
         }
         return efficiencyModifier;
     }
@@ -382,12 +410,18 @@ contract ForcesContract is Ownable {
             idToOwnerForces[id] == msg.sender,
             "You are not the nation ruler"
         );
-        uint256 purchasePrice = tankCost * amount;
+        uint256 purchasePrice = tankCost;
+        uint256 factoryCount = imp1.getFactoryCount(id);
+        uint256 costModifier = 100;
+        if (factoryCount > 0) {
+            costModifier -= (factoryCount * 5);
+        }
+        uint256 cost = (amount * ((purchasePrice * costModifier) / 100));
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice);
+        require(balance >= cost);
         idToForces[id].numberOfTanks += amount;
         idToForces[id].defendingTanks += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+        TreasuryContract(treasuryAddress).spendBalance(id, cost);
     }
 
     function deployTanks(uint256 amountToDeploy, uint256 id) public {
@@ -485,11 +519,17 @@ contract ForcesContract is Ownable {
             idToOwnerForces[id] == msg.sender,
             "You are not the nation ruler"
         );
-        uint256 purchasePrice = cruiseMissileCost * amount;
+        uint256 purchasePrice = cruiseMissileCost;
+        uint256 factoryCount = imp1.getFactoryCount(id);
+        uint256 costModifier = 100;
+        if (factoryCount > 0) {
+            costModifier -= (factoryCount * 5);
+        }
+        uint256 cost = (amount * ((purchasePrice * costModifier) / 100));
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice);
+        require(balance >= cost);
         idToForces[id].cruiseMissiles += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+        TreasuryContract(treasuryAddress).spendBalance(id, cost);
     }
 
     function getCruiseMissileCount(uint256 id) public view returns (uint256) {
@@ -567,6 +607,12 @@ contract ForcesContract is Ownable {
             idToOwnerForces[id] == msg.sender,
             "You are not the nation ruler"
         );
+        uint256 maxSpyCount = getMaxSpyCount(id);
+        uint256 currentSpyCount = idToForces[id].numberOfSpies;
+        require(
+            (currentSpyCount + amount) <= maxSpyCount,
+            "cannot own that many spies"
+        );
         uint256 purchasePrice = spyCost * amount;
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
@@ -574,27 +620,13 @@ contract ForcesContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    //should there be a send spy function?
-    function sendSpies(
-        uint256 amount,
-        uint256 idSender,
-        uint256 idReciever
-    ) public {
-        require(
-            idToOwnerForces[idSender] == msg.sender,
-            "You are not the nation ruler"
-        );
-        uint256 cruiseMissileCount = idToForces[idSender].cruiseMissiles;
-        require(
-            cruiseMissileCount >= amount,
-            "You do not have enough cruise missiles to send"
-        );
-        require(
-            idToForces[idReciever].nationExists = true,
-            "Destination nation does not exist"
-        );
-        idToForces[idSender].cruiseMissiles -= amount;
-        idToForces[idReciever].cruiseMissiles += amount;
+    function getMaxSpyCount(uint256 id) public view returns (uint256) {
+        uint256 maxSpyCount = 50;
+        uint256 intelAgencies = imp2.getIntelAgencyCount(id);
+        if (maxSpyCount > 0) {
+            maxSpyCount += (intelAgencies * 100);
+        }
+        return maxSpyCount;
     }
 
     //called during a battle

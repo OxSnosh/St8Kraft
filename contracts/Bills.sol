@@ -20,6 +20,7 @@ contract BillsContract is Ownable {
     address public fighters;
     address public navy;
     address public improvements1;
+    address public improvements2;
     address public resources;
 
     TreasuryContract tsy;
@@ -29,6 +30,7 @@ contract BillsContract is Ownable {
     FightersContract fight;
     NavyContract nav;
     ImprovementsContract1 imp1;
+    ImprovementsContract2 imp2;
     ResourcesContract res;
 
     mapping(uint256 => address) public idToOwnerBills;
@@ -41,7 +43,6 @@ contract BillsContract is Ownable {
         address _forces,
         address _fighters,
         address _navy,
-        address _improvements1,
         address _resources
     ) {
         countryMinter = _countryMinter;
@@ -57,10 +58,19 @@ contract BillsContract is Ownable {
         fight = FightersContract(_fighters);
         navy = _navy;
         nav = NavyContract(_navy);
-        improvements1 = _improvements1;
-        imp1 = ImprovementsContract1(_improvements1);
         resources = _resources;
         res = ResourcesContract(_resources);
+    }
+
+    function constructorContinued (
+        address _improvements1,
+        address _improvements2
+    ) public onlyOwner {
+        improvements1 = _improvements1;
+        imp1 = ImprovementsContract1(_improvements1);
+        improvements2 = _improvements2;
+        imp2 = ImprovementsContract2(_improvements2);
+
     }
 
     function updateCountryMinter(address newAddress) public onlyOwner {
@@ -270,6 +280,10 @@ contract BillsContract is Ownable {
         uint256 barracks = imp1.getBarracksCount(id);
         if (barracks > 0) {
             soldierUpkeepModifier -= (10 * barracks);
+        }
+        uint256 guerillaCamps = imp2.getGuerillaCampCount(id);
+        if (guerillaCamps > 0) {
+            soldierUpkeepModifier -= (10 * guerillaCamps);
         }
         uint256 adjustedSoldierUpkeep = ((soldierUpkeep *
             soldierUpkeepModifier) / 100);
