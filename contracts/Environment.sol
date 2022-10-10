@@ -14,6 +14,7 @@ contract EnvironmentContract is Ownable {
     address public resources;
     address public infrastructure;
     address public improvements1;
+    address public improvements3;
     address public improvements4;
     address public wonders3;
     address public wonders4;
@@ -25,6 +26,7 @@ contract EnvironmentContract is Ownable {
     ResourcesContract res;
     InfrastructureContract inf;
     ImprovementsContract1 imp1;
+    ImprovementsContract3 imp3;
     ImprovementsContract4 imp4;
     WondersContract3 won3;
     WondersContract4 won4;
@@ -36,8 +38,6 @@ contract EnvironmentContract is Ownable {
     constructor(
         address _resources,
         address _infrastructure,
-        address _improvements1,
-        address _improvements4,
         address _wonders3,
         address _wonders4,
         address _forces,
@@ -49,10 +49,6 @@ contract EnvironmentContract is Ownable {
         res = ResourcesContract(_resources);
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
-        improvements1 = _improvements1;
-        imp1 = ImprovementsContract1(_improvements1);
-        improvements4 = _improvements4;
-        imp4 = ImprovementsContract4(_improvements4);
         wonders3 = _wonders3;
         won3 = WondersContract3(_wonders3);
         wonders4 = _wonders4;
@@ -65,6 +61,19 @@ contract EnvironmentContract is Ownable {
         tax = TaxesContract(_taxes);
         missiles = _missiles;
         mis = MissilesContract(_missiles);
+    }
+
+    function constructorContinued(
+        address _improvements1,
+        address _improvements3,
+        address _improvements4
+    ) public onlyOwner {
+        improvements1 = _improvements1;
+        imp1 = ImprovementsContract1(_improvements1);
+        improvements3 = _improvements3;
+        imp3 = ImprovementsContract3(_improvements3);
+        improvements4 = _improvements4;
+        imp4 = ImprovementsContract4(_improvements4);
     }
 
     function updateResourcesContract(address newAddress) public onlyOwner {
@@ -196,6 +205,7 @@ contract EnvironmentContract is Ownable {
     {
         uint256 borderWallCount = imp1.getBorderWallCount(id);
         uint256 munitionsFactories = imp4.getMunitionsFactoryCount(id);
+        uint256 redLightDistricts = imp3.getRedLightDistrictCount(id);
         bool isNationalEnvironmentOffice = won3.getNationalEnvironmentOffice(
             id
         );
@@ -215,17 +225,24 @@ contract EnvironmentContract is Ownable {
             pointsFromWondersAndImprovements += 50;
         }
         if (munitionsFactories == 0) {
-            pointsFromWondersAndImprovements += 0;
+            pointsFromWondersAndImprovements -= 0;
         } else if (munitionsFactories == 1) {
-            pointsFromWondersAndImprovements += 3;
+            pointsFromWondersAndImprovements -= 3;
         } else if (munitionsFactories == 2) {
-            pointsFromWondersAndImprovements += 6;
+            pointsFromWondersAndImprovements -= 6;
         } else if (munitionsFactories == 3) {
-            pointsFromWondersAndImprovements += 9;
+            pointsFromWondersAndImprovements -= 9;
         } else if (munitionsFactories == 4) {
-            pointsFromWondersAndImprovements += 12;
+            pointsFromWondersAndImprovements -= 12;
         } else if (munitionsFactories == 5) {
-            pointsFromWondersAndImprovements += 15;
+            pointsFromWondersAndImprovements -= 15;
+        }
+        if (redLightDistricts == 0) {
+            pointsFromWondersAndImprovements -= 0;
+        } else if (redLightDistricts == 1) {
+            pointsFromWondersAndImprovements -= 5;
+        } else if (redLightDistricts == 2) {
+            pointsFromWondersAndImprovements -= 10;
         }
         if (isNationalEnvironmentOffice) {
             pointsFromWondersAndImprovements += 10;

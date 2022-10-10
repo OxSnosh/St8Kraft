@@ -63,8 +63,11 @@ contract CrimeContract is Ownable {
             100);
         uint256 jailCount = imp2.getJailCount(id);
         uint256 laborCamps = imp2.getLaborCampCount(id);
-        uint256 criminalsIncarcerated = ((jailCount * 500) + (laborCamps * 200));
-        if(baseCriminalCount <= criminalsIncarcerated) {
+        uint256 prisons = imp3.getPrisonCount(id);
+        uint256 criminalsIncarcerated = ((jailCount * 500) +
+            (laborCamps * 200) +
+            (prisons * 5000));
+        if (baseCriminalCount <= criminalsIncarcerated) {
             baseCriminalCount = 0;
         } else {
             baseCriminalCount = baseCriminalCount - criminalsIncarcerated;
@@ -77,16 +80,6 @@ contract CrimeContract is Ownable {
         uint256 criminalCount = ((baseCriminalCount *
             criminalCountPercentageModifier) / 100);
         return criminalCount;
-    }
-
-    function getUnincarceratedCriminalCount(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
-        uint256 totalCriminalCount = getCriminalCount(id);
-        uint256 unincarceratedCriminalCount = totalCriminalCount;
-        return unincarceratedCriminalCount;
     }
 
     function getCrimeIndex(uint256 id) public view returns (uint256) {
@@ -149,18 +142,19 @@ contract CrimeContract is Ownable {
         uint256 universities = imp3.getUniversityCount(id);
         uint256 policeHqs = imp3.getPoliceHeadquartersCount(id);
         uint256 casinoCount = imp1.getCasinoCount(id);
+        uint256 redLightDistricts = imp3.getRedLightDistrictCount(id);
         uint256 schoolPoints = (schools * 3);
         uint256 universityPoints = (universities * 10);
         uint256 policeHqPoints = (policeHqs * 2);
         uint256 casinoPoints = (casinoCount * 2);
+        uint256 redLightDistrictPoints = (redLightDistricts * 2);
         uint256 taxMultiplier = getTaxRateCrimeMultiplier(id);
-        uint256 improvementPoints = (((
-            4 +
+        uint256 improvementPoints = (((8 +
             schoolPoints +
             universityPoints +
-            policeHqPoints - 
-            casinoPoints
-            ) * taxMultiplier) / 100);
+            policeHqPoints -
+            casinoPoints -
+            redLightDistrictPoints) * taxMultiplier) / 100);
         return improvementPoints;
     }
 

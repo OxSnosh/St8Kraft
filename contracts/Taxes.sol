@@ -382,6 +382,18 @@ contract TaxesContract is Ownable {
         if (churchCount > 0) {
             pointsFromImprovements += churchCount;
         }
+        uint256 policeHeadquarters = imp3.getPoliceHeadquartersCount(id);
+        if (policeHeadquarters > 0) {
+            pointsFromImprovements += (2 * policeHeadquarters);
+        }
+        uint256 redLightDistricts = imp3.getRedLightDistrictCount(id);
+        if (redLightDistricts > 0) {
+            pointsFromImprovements += (redLightDistricts);
+        }
+        uint256 stadiums = imp3.getStadiumCount(id);
+        if (stadiums > 0) {
+            pointsFromImprovements += (3 * stadiums);
+        }
         return pointsFromImprovements;
     }
 
@@ -644,7 +656,7 @@ contract TaxesContract is Ownable {
     }
 
     function getPointsFromCriminals(uint256 id) public view returns (uint256) {
-        uint256 unincarceratedCriminals = crm.getUnincarceratedCriminalCount(id);
+        uint256 unincarceratedCriminals = crm.getCriminalCount(id);
         uint256 pointsFromCrime;
         if (unincarceratedCriminals < 200) {
             pointsFromCrime = 0;

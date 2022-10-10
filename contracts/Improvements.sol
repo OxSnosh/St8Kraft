@@ -1412,11 +1412,11 @@ contract ImprovementsContract3 is Ownable {
         uint256 officeOfPropagandaCount;
         //Police Headquarters
         //$75,000
-        //Increases population happiness +2.
+        //DONE //Increases population happiness +2.
         uint256 policeHeadquartersCount;
         //Prison
         //$200,000
-        //Incarcerates up to 5,000 criminals.
+        //DONE //Incarcerates up to 5,000 criminals.
         //Limit 5
         uint256 prisonCount;
         //RadiationContainmentChamber
@@ -1429,9 +1429,9 @@ contract ImprovementsContract3 is Ownable {
         uint256 radiationContainmentChamberCount;
         //RedLightDistrict
         //$50,000
-        //Increases happiness by 1,
-        //penalizes environment by 0.5,
-        //-25 to crime prevention score
+        //DONE //Increases happiness by 1,
+        //DONE //penalizes environment by 0.5,
+        //DONE //-25 to crime prevention score
         //Limit 2
         uint256 redLightDistrictCount;
         //Rehabilitation Facility
@@ -1441,32 +1441,32 @@ contract ImprovementsContract3 is Ownable {
         uint256 rehabilitationFacilityCount;
         //Satellite
         //$90,000
-        //Increases effectiveness of cruise missiles used by your nation +10%.
+        //DONE //Increases effectiveness of cruise missiles used by your nation +10%.
         //Nations must retain at least three satellites if that nation owns a Strategic Defense Initiative wonder
         uint256 satelliteCount;
         //School
         //$85,000
-        //Increases population income by 5%
-        //increases literacy rate +1%
+        //DONE //Increases population income by 5%
+        //DONE //increases literacy rate +1%
         //Purchasing 3 or more schools allows you to purchase universities
         //This improvement may not be destroyed if it is supporting universities until the universities are first destroyed.
         uint256 schoolCount;
         //Shipyard
         //$100,000
-        //Allows nations to build and maintain navy Landing Ships, Frigates, Submarines, and Aircraft Carriers.
+        //DONE //Allows nations to build and maintain navy Landing Ships, Frigates, Submarines, and Aircraft Carriers.
         //Increases the number of each of these types of ships that a nation can support +1.
         //This improvement may not be destroyed if it is supporting navy vessels until those navy vessels are first destroyed.
         //Requires Harbor
         uint256 shipyardCount;
         //Stadium
         //$110,000
-        //Increases population happiness + 3.
+        //DONE //Increases population happiness + 3.
         uint256 stadiumCount;
         //University
         //$180,000
-        //Increases population income by 8%
-        //reduces technology cost -10%
-        //increases literacy rate +3%.
+        //DONE //Increases population income by 8%
+        //DONE //reduces technology cost -10%
+        //DONE //increases literacy rate +3%.
         //Three schools must be purchased before any universities can be purchased.
         //Limit 2
         uint256 universityCount;
@@ -1955,6 +1955,24 @@ contract ImprovementsContract3 is Ownable {
         return count;
     }
 
+    function getPrisonCount(uint256 countryId)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 count = idToImprovements3[countryId].prisonCount;
+        return count;
+    }
+
+    function getRedLightDistrictCount(uint256 countryId)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 count = idToImprovements3[countryId].redLightDistrictCount;
+        return count;
+    }
+
     function getSatelliteCount(uint256 countryId)
         public
         view
@@ -1976,6 +1994,15 @@ contract ImprovementsContract3 is Ownable {
     {
         uint256 shipyardAmount = idToImprovements3[countryId].shipyardCount;
         return shipyardAmount;
+    }
+
+    function getStadiumCount(uint256 countryId)
+        public
+        view
+        returns (uint256 count)
+    {
+        uint256 stadiumAmount = idToImprovements3[countryId].stadiumCount;
+        return stadiumAmount;
     }
 
     function getUniversityCount(uint256 countryId)

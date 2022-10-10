@@ -147,7 +147,7 @@ contract TechnologyMarketContract is Ownable {
             microchipMultiplier = 8;
         }
         if (universityCount > 0) {
-            universityMultiplier = (universityCount * 2);
+            universityMultiplier = (universityCount * 10);
         }
         if (isNationalResearchLab) {
             nationalResearchLabMultiplier = 3;
