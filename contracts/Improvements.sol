@@ -64,7 +64,7 @@ contract ImprovementsContract1 is Ownable {
         uint256 borderWallCount;
         //Bunker
         //$200,000
-        //DONE //Reduces infrastructure damage from aircraft, cruise missiles, and nukes -3%
+        //DONE //Reduces infrastructure damage from [[aircraft,]] cruise missiles, and nukes -3%
         //Requires maintaining a Barracks for each Bunker.
         //Limit 5
         //Cannot build if Munitions Factory or Forward Operating Base is owned.
@@ -891,7 +891,7 @@ contract ImprovementsContract2 is Ownable {
                 countryId,
                 purchasePrice
             );
-        } 
+        }
     }
 
     function deleteImprovement2(
@@ -973,7 +973,9 @@ contract ImprovementsContract2 is Ownable {
                 countryId
             );
             uint256 newIntelAgencyCount = existingCount - amount;
-            bool centralIntelAgency = won1.getCentralIntelligenceAgency(countryId);
+            bool centralIntelAgency = won1.getCentralIntelligenceAgency(
+                countryId
+            );
             uint256 baseSpyCount = 50;
             if (centralIntelAgency) {
                 baseSpyCount = 300;
@@ -1073,8 +1075,7 @@ contract ImprovementsContract2 is Ownable {
         view
         returns (uint256 count)
     {
-        uint256 jailAmount = idToImprovements2[countryId]
-            .jailCount;
+        uint256 jailAmount = idToImprovements2[countryId].jailCount;
         return jailAmount;
     }
 
@@ -1083,8 +1084,7 @@ contract ImprovementsContract2 is Ownable {
         view
         returns (uint256 count)
     {
-        uint256 laborCampAmount = idToImprovements2[countryId]
-            .laborCampCount;
+        uint256 laborCampAmount = idToImprovements2[countryId].laborCampCount;
         return laborCampAmount;
     }
 }
@@ -1106,13 +1106,13 @@ contract ImprovementsContract4 is Ownable {
     struct Improvements4 {
         //Missile Defense
         //$90,000
-        //Reduces effectiveness of incoming cruise missiles used against your nation -10%.
+        //DONE //Reduces effectiveness of incoming cruise missiles used against your nation -10%.
         //Nations must retain at least three missile defenses if that nation owns a Strategic Defense Initiative wonder.
         uint256 missileDefenseCount;
         //MunitionsFactory
         //$200,000
-        //Increases enemy infrastructure damage from your aircraft, cruise missiles, and nukes +3%
-        //+0.3 penalty to environment per Munitions Factory.
+        //DONE //Increases enemy infrastructure damage from your [[aircraft,]] cruise missiles, and nukes +3%
+        //DONE //+0.3 penalty to environment per Munitions Factory.
         //Requires maintaining 3 or more Factories.
         //Requires having Lead as a resource to purchase.
         //Limit 5.
@@ -1121,13 +1121,13 @@ contract ImprovementsContract4 is Ownable {
         uint256 munitionsFactoryCount;
         //Naval Academy
         //$300,000
-        //Increases both attacking and defending navy vessel strength +1.
+        //DONE //Increases both attacking and defending navy vessel strength +1.
         //Limit 2 per nation.
         //Requires Harbor.
         uint256 navalAcademyCount;
         //Naval Construction Yard
         //$300,000
-        //Increases the daily purchase limit for navy vessels +1.
+        //DONE //Increases the daily purchase limit for navy vessels +1.
         //Your nation must have pre-existing navy support capabilities (via Drydocks and Shipyards) to actually purchase navy vessels.
         //Limit 3 per nation.
         //requires Harbor
@@ -1168,12 +1168,7 @@ contract ImprovementsContract4 is Ownable {
     }
 
     function generateImprovements(uint256 id, address nationOwner) public {
-        Improvements4 memory newImprovements4 = Improvements4(
-            0,
-            0,
-            0,
-            0
-        );
+        Improvements4 memory newImprovements4 = Improvements4(0, 0, 0, 0);
         idToImprovements4[id] = newImprovements4;
         idToOwnerImprovements4[id] = nationOwner;
     }
@@ -1197,7 +1192,7 @@ contract ImprovementsContract4 is Ownable {
         navalConstructionYardCost = newPrice;
     }
 
-    function buyImprovement2(
+    function buyImprovement4(
         uint256 amount,
         uint256 countryId,
         uint256 improvementId
@@ -1290,7 +1285,7 @@ contract ImprovementsContract4 is Ownable {
         }
     }
 
-    function deleteImprovement2(
+    function deleteImprovement4(
         uint256 amount,
         uint256 countryId,
         uint256 improvementId
@@ -1367,6 +1362,26 @@ contract ImprovementsContract4 is Ownable {
             .munitionsFactoryCount;
         return munitionsFactoryAmount;
     }
+
+    function getNavalAcademyCount(uint256 countryId)
+        public
+        view
+        returns (uint256 count)
+    {
+        uint256 navalAcademyAmount = idToImprovements4[countryId]
+            .navalAcademyCount;
+        return navalAcademyAmount;
+    }
+
+    function getNavalConstructionYardCount(uint256 countryId)
+        public
+        view
+        returns (uint256 count)
+    {
+        uint256 navalConstructionYardAmount = idToImprovements4[countryId]
+            .navalConstructionYardCount;
+        return navalConstructionYardAmount;
+    }
 }
 
 contract ImprovementsContract3 is Ownable {
@@ -1390,7 +1405,7 @@ contract ImprovementsContract3 is Ownable {
     struct Improvements3 {
         //Office of Propoganda
         //$200,000
-        //Decreases the effectiveness of enemy defending soldiers 3%.
+        //DONE //Decreases the effectiveness of enemy defending soldiers 3%.
         //Requires maintaining a Forward Operating Base for each Office of Propaganda
         //Limit 2
         //Collection required to delete.
@@ -1920,6 +1935,15 @@ contract ImprovementsContract3 is Ownable {
             ImprovementsContract1(improvementsContract1Address)
                 .updateImprovementCount(countryId, newImprovementTotal);
         }
+    }
+
+    function getOfficeOfPropagandaCount(uint256 countryId)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 count = idToImprovements3[countryId].officeOfPropagandaCount;
+        return count;
     }
 
     function getPoliceHeadquartersCount(uint256 countryId)

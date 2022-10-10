@@ -5,15 +5,18 @@ import "./Treasury.sol";
 import "./Improvements.sol";
 import "./War.sol";
 import "./Resources.sol";
+import "./Military.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract NavyContract is Ownable {
     address public treasuryAddress;
     address public improvementsContract1Address;
     address public improvementsContract3Address;
+    address public improvements4;
     address public resources;
     address public navyBattleAddress;
     address public warAddress;
+    address public military;
     uint256 public corvetteCost;
     uint256 public landingShipCost;
     uint256 public battleshipCost;
@@ -35,6 +38,7 @@ contract NavyContract is Ownable {
         uint256 aircraftCarrierCount;
         //need keeper to reset to 0
         bool blockadedToday;
+        uint256 purchasesToday;
     }
 
     mapping(uint256 => Navy) public idToNavy;
@@ -42,21 +46,29 @@ contract NavyContract is Ownable {
 
     WarContract war;
     ResourcesContract res;
+    MilitaryContract mil;
+    ImprovementsContract4 imp4;
 
     constructor(
         address _treasuryAddress,
         address _improvementsContract1Address,
         address _improvementsContract3Address,
+        address _improvements4,
         address _warAddress,
-        address _resources
+        address _resources,
+        address _military
     ) {
         treasuryAddress = _treasuryAddress;
         improvementsContract1Address = _improvementsContract1Address;
         improvementsContract3Address = _improvementsContract3Address;
+        improvements4 = _improvements4;
+        imp4 = ImprovementsContract4(_improvements4);
         warAddress = _warAddress;
         war = WarContract(_warAddress);
         resources = _resources;
         res = ResourcesContract(_resources);
+        military = _military;
+        mil = MilitaryContract(_military);
         corvetteCost = 300000;
         landingShipCost = 300000;
         battleshipCost = 300000;
@@ -68,7 +80,7 @@ contract NavyContract is Ownable {
     }
 
     function generateNavy(uint256 id, address nationOwner) public {
-        Navy memory newNavy = Navy(0, 0, 0, 0, 0, 0, 0, 0, 0, false);
+        Navy memory newNavy = Navy(0, 0, 0, 0, 0, 0, 0, 0, 0, false, 0);
         idToNavy[id] = newNavy;
         idToOwnerNavy[id] = nationOwner;
     }
@@ -154,7 +166,7 @@ contract NavyContract is Ownable {
         uint256[] memory attackerLosses,
         uint256 attackerId
     ) public onlyBattle {
-        for(uint i; i < defenderLosses.length; i++) {
+        for (uint256 i; i < defenderLosses.length; i++) {
             if (defenderLosses[i] == 1) {
                 idToNavy[defenderId].corvetteCount -= 1;
             } else if (defenderLosses[i] == 2) {
@@ -173,7 +185,7 @@ contract NavyContract is Ownable {
                 idToNavy[defenderId].aircraftCarrierCount -= 1;
             }
         }
-        for(uint i; i < attackerLosses.length; i++) {
+        for (uint256 i; i < attackerLosses.length; i++) {
             if (attackerLosses[i] == 1) {
                 idToNavy[attackerId].corvetteCount -= 1;
             } else if (defenderLosses[i] == 2) {
@@ -199,6 +211,11 @@ contract NavyContract is Ownable {
             idToOwnerNavy[id] == msg.sender,
             "You are not the nation ruler"
         );
+        uint256 availablePurchases = getAvailablePurchases(id);
+        require(
+            amount <= availablePurchases,
+            "purchase exceeds daily purchase limit"
+        );
         uint256 drydockAmount = ImprovementsContract1(
             improvementsContract1Address
         ).getDrydockCount(id);
@@ -206,7 +223,7 @@ contract NavyContract is Ownable {
         uint256 purchasePrice = corvetteCost * amount;
         bool steel = res.viewSteel(id);
         if (steel) {
-            purchasePrice = ((purchasePrice * 85)/ 100);
+            purchasePrice = ((purchasePrice * 85) / 100);
         }
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
@@ -232,6 +249,11 @@ contract NavyContract is Ownable {
             idToOwnerNavy[id] == msg.sender,
             "You are not the nation ruler"
         );
+        uint256 availablePurchases = getAvailablePurchases(id);
+        require(
+            amount <= availablePurchases,
+            "purchase exceeds daily purchase limit"
+        );
         uint256 shipyardAmount = ImprovementsContract3(
             improvementsContract3Address
         ).getShipyardCount(id);
@@ -239,7 +261,7 @@ contract NavyContract is Ownable {
         uint256 purchasePrice = landingShipCost * amount;
         bool steel = res.viewSteel(id);
         if (steel) {
-            purchasePrice = ((purchasePrice * 85)/ 100);
+            purchasePrice = ((purchasePrice * 85) / 100);
         }
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
@@ -265,6 +287,11 @@ contract NavyContract is Ownable {
             idToOwnerNavy[id] == msg.sender,
             "You are not the nation ruler"
         );
+        uint256 availablePurchases = getAvailablePurchases(id);
+        require(
+            amount <= availablePurchases,
+            "purchase exceeds daily purchase limit"
+        );
         uint256 drydockAmount = ImprovementsContract1(
             improvementsContract1Address
         ).getDrydockCount(id);
@@ -272,7 +299,7 @@ contract NavyContract is Ownable {
         uint256 purchasePrice = battleshipCost * amount;
         bool steel = res.viewSteel(id);
         if (steel) {
-            purchasePrice = ((purchasePrice * 85)/ 100);
+            purchasePrice = ((purchasePrice * 85) / 100);
         }
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
@@ -298,6 +325,11 @@ contract NavyContract is Ownable {
             idToOwnerNavy[id] == msg.sender,
             "You are not the nation ruler"
         );
+        uint256 availablePurchases = getAvailablePurchases(id);
+        require(
+            amount <= availablePurchases,
+            "purchase exceeds daily purchase limit"
+        );
         uint256 drydockAmount = ImprovementsContract1(
             improvementsContract1Address
         ).getDrydockCount(id);
@@ -305,7 +337,7 @@ contract NavyContract is Ownable {
         uint256 purchasePrice = cruiserCost * amount;
         bool steel = res.viewSteel(id);
         if (steel) {
-            purchasePrice = ((purchasePrice * 85)/ 100);
+            purchasePrice = ((purchasePrice * 85) / 100);
         }
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
@@ -331,6 +363,11 @@ contract NavyContract is Ownable {
             idToOwnerNavy[id] == msg.sender,
             "You are not the nation ruler"
         );
+        uint256 availablePurchases = getAvailablePurchases(id);
+        require(
+            amount <= availablePurchases,
+            "purchase exceeds daily purchase limit"
+        );
         uint256 shipyardAmount = ImprovementsContract3(
             improvementsContract3Address
         ).getShipyardCount(id);
@@ -338,7 +375,7 @@ contract NavyContract is Ownable {
         uint256 purchasePrice = frigateCost * amount;
         bool steel = res.viewSteel(id);
         if (steel) {
-            purchasePrice = ((purchasePrice * 85)/ 100);
+            purchasePrice = ((purchasePrice * 85) / 100);
         }
         bool microchips = res.viewMicrochips(id);
         if (microchips) {
@@ -368,6 +405,11 @@ contract NavyContract is Ownable {
             idToOwnerNavy[id] == msg.sender,
             "You are not the nation ruler"
         );
+        uint256 availablePurchases = getAvailablePurchases(id);
+        require(
+            amount <= availablePurchases,
+            "purchase exceeds daily purchase limit"
+        );
         uint256 drydockAmount = ImprovementsContract1(
             improvementsContract1Address
         ).getDrydockCount(id);
@@ -375,7 +417,7 @@ contract NavyContract is Ownable {
         uint256 purchasePrice = destroyerCost * amount;
         bool steel = res.viewSteel(id);
         if (steel) {
-            purchasePrice = ((purchasePrice * 85)/ 100);
+            purchasePrice = ((purchasePrice * 85) / 100);
         }
         bool microchips = res.viewMicrochips(id);
         if (microchips) {
@@ -405,6 +447,11 @@ contract NavyContract is Ownable {
             idToOwnerNavy[id] == msg.sender,
             "You are not the nation ruler"
         );
+        uint256 availablePurchases = getAvailablePurchases(id);
+        require(
+            amount <= availablePurchases,
+            "purchase exceeds daily purchase limit"
+        );
         uint256 shipyardAmount = ImprovementsContract3(
             improvementsContract3Address
         ).getShipyardCount(id);
@@ -412,7 +459,7 @@ contract NavyContract is Ownable {
         uint256 purchasePrice = submarineCost * amount;
         bool steel = res.viewSteel(id);
         if (steel) {
-            purchasePrice = ((purchasePrice * 85)/ 100);
+            purchasePrice = ((purchasePrice * 85) / 100);
         }
         bool microchips = res.viewMicrochips(id);
         if (microchips) {
@@ -442,6 +489,11 @@ contract NavyContract is Ownable {
             idToOwnerNavy[id] == msg.sender,
             "You are not the nation ruler"
         );
+        uint256 availablePurchases = getAvailablePurchases(id);
+        require(
+            amount <= availablePurchases,
+            "purchase exceeds daily purchase limit"
+        );
         uint256 shipyardAmount = ImprovementsContract3(
             improvementsContract3Address
         ).getShipyardCount(id);
@@ -449,7 +501,7 @@ contract NavyContract is Ownable {
         uint256 purchasePrice = aircraftCarrierCost * amount;
         bool steel = res.viewSteel(id);
         if (steel) {
-            purchasePrice = ((purchasePrice * 85)/ 100);
+            purchasePrice = ((purchasePrice * 85) / 100);
         }
         bool microchips = res.viewMicrochips(id);
         if (microchips) {
@@ -472,6 +524,23 @@ contract NavyContract is Ownable {
     function decreaseAircraftCarrierCount(uint256 amount, uint256 id) public {
         idToNavy[id].aircraftCarrierCount -= amount;
         idToNavy[id].navyVessels -= amount;
+    }
+
+    function getAvailablePurchases(uint256 id) public view returns (uint256) {
+        uint256 purchasesToday = idToNavy[id].purchasesToday;
+        uint256 maxDailyPurchases;
+        bool isWar = mil.getWarPeacePreference(id);
+        if (isWar) {
+            maxDailyPurchases = 5;
+        } else {
+            maxDailyPurchases = 2;
+        }
+        uint256 navalConstructionYards = imp4.getNavalConstructionYardCount(id);
+        if (navalConstructionYards > 0) {
+            maxDailyPurchases += navalConstructionYards;
+        }
+        uint256 availablePurchases = (maxDailyPurchases - purchasesToday);
+        return availablePurchases;
     }
 
     function getBlockadedToday(uint256 id) public view returns (bool) {

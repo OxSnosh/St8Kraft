@@ -13,6 +13,8 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     address countryMinter;
     address warAddress;
     address wonders1;
+    address improvements3;
+    address improvements4;
 
     //Chainlik Variables
     uint256[] private s_randomWords;
@@ -26,6 +28,8 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     CountryMinter mint;
     WarContract war;
     WondersContract1 won1;
+    ImprovementsContract3 imp3;
+    ImprovementsContract4 imp4;
 
     struct NukeAttack {
         uint256 warId;
@@ -42,6 +46,8 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         address _countryMinter,
         address _warAddress,
         address _wonders1,
+        address _improvements3,
+        address _improvements4,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
@@ -53,6 +59,10 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         war = WarContract(_warAddress);
         wonders1 = _wonders1;
         won1 = WondersContract1(_wonders1);
+        improvements3 = _improvements3;
+        imp3 = ImprovementsContract3(_improvements3);
+        improvemen4 = _improvements4;
+        imp4 = ImprovementsContract4(_improvements4);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
@@ -133,11 +143,22 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
         s_requestIndexToRandomWords[requestNumber] = randomWords;
         s_randomWords = randomWords;
+        uint256 defenderMissileDefenses = imp4.getMissileDefenseCount(
+            defenderId
+        );
+        uint256 attackerSattelites = imp3.getSatelliteCount(attackerId);
+        uint256 thwartOdds = 60;
+        if (defenderMissileDefenses > 0) {
+            thwartOdds += (defenderMissileDefenses * 5);
+        }
+        if (attackerSattelites > 0) {
+            thwartOdds -= (attackerSattelites * 5);
+        }
         uint256 randomNukeSuccessNumber = ((s_randomWords[0] % 100) + 1);
-        if (randomNukeSuccessNumber < 60) {
-            //nuke attack thwarted
-        } else {
+        if (randomNukeSuccessNumber > thwartOdds) {
             inflictNukeDamage(requestNumber);
+        } else {
+            //thwart event
         }
     }
 
@@ -156,10 +177,11 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
 
     function standardAttack(uint256 attackId) internal {
         uint256 defenderId = nukeAttackIdToNukeAttack[attackId].defenderId;
+        uint256 attackerId = nukeAttackIdToNukeAttack[attackId].attackerId;
         force.decreaseDefendingSoldierCountFromNukeAttack(defenderId);
         force.decreaseDefendingTankCountFromNukeContract(defenderId);
         inf.decreaseLandFromNukeContract(defenderId);
-        inf.decreaseInfrastructureCountFromNukeContract(defenderId);
+        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId);
         inf.decreaseTechCountFromNukeContract(defenderId);
     }
 

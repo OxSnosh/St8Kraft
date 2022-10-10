@@ -14,6 +14,7 @@ contract EnvironmentContract is Ownable {
     address public resources;
     address public infrastructure;
     address public improvements1;
+    address public improvements4;
     address public wonders3;
     address public wonders4;
     address public forces;
@@ -24,6 +25,7 @@ contract EnvironmentContract is Ownable {
     ResourcesContract res;
     InfrastructureContract inf;
     ImprovementsContract1 imp1;
+    ImprovementsContract4 imp4;
     WondersContract3 won3;
     WondersContract4 won4;
     ForcesContract force;
@@ -35,6 +37,7 @@ contract EnvironmentContract is Ownable {
         address _resources,
         address _infrastructure,
         address _improvements1,
+        address _improvements4,
         address _wonders3,
         address _wonders4,
         address _forces,
@@ -48,6 +51,8 @@ contract EnvironmentContract is Ownable {
         inf = InfrastructureContract(_infrastructure);
         improvements1 = _improvements1;
         imp1 = ImprovementsContract1(_improvements1);
+        improvements4 = _improvements4;
+        imp4 = ImprovementsContract4(_improvements4);
         wonders3 = _wonders3;
         won3 = WondersContract3(_wonders3);
         wonders4 = _wonders4;
@@ -190,12 +195,13 @@ contract EnvironmentContract is Ownable {
         returns (int256)
     {
         uint256 borderWallCount = imp1.getBorderWallCount(id);
+        uint256 munitionsFactories = imp4.getMunitionsFactoryCount(id);
         bool isNationalEnvironmentOffice = won3.getNationalEnvironmentOffice(
             id
         );
         bool isWeaponsResearchCenter = won4.getWeaponsResearchCenter(id);
         int256 pointsFromWondersAndImprovements;
-        if (borderWallCount > 0) {
+        if (borderWallCount == 0) {
             pointsFromWondersAndImprovements += 0;
         } else if (borderWallCount == 1) {
             pointsFromWondersAndImprovements += 10;
@@ -207,6 +213,19 @@ contract EnvironmentContract is Ownable {
             pointsFromWondersAndImprovements += 40;
         } else if (borderWallCount == 5) {
             pointsFromWondersAndImprovements += 50;
+        }
+        if (munitionsFactories == 0) {
+            pointsFromWondersAndImprovements += 0;
+        } else if (munitionsFactories == 1) {
+            pointsFromWondersAndImprovements += 3;
+        } else if (munitionsFactories == 2) {
+            pointsFromWondersAndImprovements += 6;
+        } else if (munitionsFactories == 3) {
+            pointsFromWondersAndImprovements += 9;
+        } else if (munitionsFactories == 4) {
+            pointsFromWondersAndImprovements += 12;
+        } else if (munitionsFactories == 5) {
+            pointsFromWondersAndImprovements += 15;
         }
         if (isNationalEnvironmentOffice) {
             pointsFromWondersAndImprovements += 10;

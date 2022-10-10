@@ -17,14 +17,14 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     address forces;
     address treasury;
     address improvements2;
-    uint256 soldierStrength = 1;
-    uint256 tankStrength = 17;
+    address improvements3;
 
     WarContract war;
     InfrastructureContract inf;
     ForcesContract force;
     TreasuryContract tsy;
     ImprovementsContract2 imp2;
+    ImprovementsContract3 imp3;
 
     struct GroundForcesToBattle {
         uint256 attackType;
@@ -56,6 +56,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         address _forces,
         address _treasury,
         address _improvements2,
+        address _improvements3,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
@@ -70,6 +71,8 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         tsy = TreasuryContract(_treasury);
         improvements2 = _improvements2;
         imp2 = ImprovementsContract2(_improvements2);
+        improvements3 = _improvements3;
+        imp3 = ImprovementsContract3(_improvements3);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
@@ -115,8 +118,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         (uint256 soldiersDeployed, uint256 tanksDeployed) = war
             .getDeployedGroundForces(warId, attackerId);
         //need efficiency modifier
-        uint256 attackerForcesStrength = (soldiersDeployed +
-            (15 * tanksDeployed));
+        (uint256 attackerForcesStrength, , ) = getAttackerForcesStrength(attackerId, warId);
         GroundForcesToBattle memory newGroundForces = GroundForcesToBattle(
             attackType,
             soldiersDeployed,
@@ -133,19 +135,64 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 battleId,
         uint256 defenderId
     ) internal {
-        (uint256 soldiersDeployed, uint256 tanksDeployed) = war
-            .getDeployedGroundForces(warId, defenderId);
-        uint256 attackerForcesStrength = (soldiersDeployed +
-            (17 * tanksDeployed));
+        uint256 soldiers = force.getDefendingSoldierCount(defenderId);
+        uint256 tanks = force.getDefendingTankCount(defenderId);
+        (uint256 defenderForcesStrength, , ) = getDefenderForcesStrength(defenderId, battleId);
         GroundForcesToBattle memory newGroundForces = GroundForcesToBattle(
             0,
-            soldiersDeployed,
-            tanksDeployed,
-            attackerForcesStrength,
+            soldiers,
+            tanks,
+            defenderForcesStrength,
             defenderId,
             warId
         );
         groundBattleIdToAttackerForces[battleId] = newGroundForces;
+    }
+
+    function getAttackerForcesStrength(uint256 attackerId, uint256 warId)
+        public
+        view
+        returns (
+            uint256,
+            uint256,
+            uint256
+        )
+    {
+        (uint256 soldiersDeployed, uint256 tanksDeployed) = war
+            .getDeployedGroundForces(warId, attackerId);
+        uint256 efficiencyModifier = force
+            .getDeployedSoldierEfficiencyModifier(attackerId);
+        uint256 soldierStrength = ((soldiersDeployed * efficiencyModifier) /
+            100);
+        uint256 tankStrength = (15 * tanksDeployed);
+        uint256 attackerForcesStrength = (soldierStrength + tankStrength);
+        return (attackerForcesStrength, soldierStrength, tankStrength);
+    }
+
+    function getDefenderForcesStrength(uint256 defenderId, uint256 battleId)
+        public
+        view
+        returns (
+            uint256,
+            uint256,
+            uint256
+        )
+    {
+        uint256 soldiers = force.getDefendingSoldierCount(defenderId);
+        uint256 tanks = force.getDefendingTankCount(defenderId);
+        uint256 efficiencyModifier = force
+            .getDefendingSoldierEfficiencyModifier(defenderId);
+        uint256 soldierStrength = ((soldiers * efficiencyModifier) /
+            100);
+        uint256 attackerId = groundBattleIdToAttackerForces[battleId].countryId;
+        uint256 officeOfPropagandaCount = imp3.getOfficeOfPropagandaCount(attackerId);
+        if(officeOfPropagandaCount > 0) {
+            uint256 mod = (100 - (5 * officeOfPropagandaCount));
+            soldierStrength = ((soldierStrength * mod) / 100);
+        }
+        uint256 tankStrength = (17 * tanks);
+        uint256 defenderForcesStrength = (soldierStrength + tankStrength);
+        return (defenderForcesStrength, soldierStrength, tankStrength);
     }
 
     function fulfillRequest(uint256 battleId) public {
@@ -177,28 +224,43 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 attackerTankLosses;
         uint256 defenderSoldierLosses;
         uint256 defenderTankLosses;
-        uint256 attackerId = groundBattleIdToAttackerForces[requestNumber].countryId;
-        uint256 defenderId = groundBattleIdToDefenderForces[requestNumber].countryId;
+        uint256 attackerId = groundBattleIdToAttackerForces[requestNumber]
+            .countryId;
+        uint256 defenderId = groundBattleIdToDefenderForces[requestNumber]
+            .countryId;
         uint256 warId = groundBattleIdToAttackerForces[requestNumber].warId;
         if (randomNumberForOutcomeSelection <= attackerStrength) {
             (
-            attackerSoldierLosses,
-            attackerTankLosses,
-            defenderSoldierLosses,
-            defenderTankLosses
-            )= attackVictory(requestNumber);
+                attackerSoldierLosses,
+                attackerTankLosses,
+                defenderSoldierLosses,
+                defenderTankLosses
+            ) = attackVictory(requestNumber);
             collectSpoils(requestNumber, attackerId);
         } else if (randomNumberForOutcomeSelection > attackerStrength) {
             (
+                attackerSoldierLosses,
+                attackerTankLosses,
+                defenderSoldierLosses,
+                defenderTankLosses
+            ) = defenseVictory(requestNumber);
+        }
+        war.decreaseGroundBattleLosses(
             attackerSoldierLosses,
             attackerTankLosses,
+            attackerId,
+            warId
+        );
+        force.decreaseDeployedUnits(
+            attackerSoldierLosses,
+            attackerTankLosses,
+            attackerId
+        );
+        force.decreaseDefendingUnits(
             defenderSoldierLosses,
-            defenderTankLosses
-            )= defenseVictory(requestNumber);
-        }
-        war.decreaseGroundBattleLosses(attackerSoldierLosses, attackerTankLosses, attackerId, warId);
-        force.decreaseDeployedUnits(attackerSoldierLosses, attackerTankLosses, attackerId);
-        force.decreaseDefendingUnits(defenderSoldierLosses, defenderTankLosses, defenderId);
+            defenderTankLosses,
+            defenderId
+        );
     }
 
     function getPercentageLosses(uint256 battleId)
@@ -216,8 +278,10 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 outcomeModifierForWinnerTanks = randomWords[2];
         uint256 winnerSoldierLossesPercentage;
         uint256 winnerTankLossesPercentage;
-        (uint256 loserSoldierLossesPercentage,
-        uint256 loserTankLossesPercentage) = getLoserPercentageLosses(battleId);
+        (
+            uint256 loserSoldierLossesPercentage,
+            uint256 loserTankLossesPercentage
+        ) = getLoserPercentageLosses(battleId);
         uint256 attackType = groundBattleIdToAttackerForces[battleId]
             .attackType;
         if (attackType == 1) {
@@ -252,10 +316,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     function getLoserPercentageLosses(uint256 battleId)
         public
         view
-        returns (
-            uint256,
-            uint256
-        )
+        returns (uint256, uint256)
     {
         uint256[] memory randomWords = s_requestIndexToRandomWords[battleId];
         uint256 outcomeModifierForLoserSoldiers = randomWords[3];
@@ -285,10 +346,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             loserTankLossesPercentage = (45 +
                 (outcomeModifierForLoserTanks % 15));
         }
-        return (
-            loserSoldierLossesPercentage,
-            loserTankLossesPercentage
-        );
+        return (loserSoldierLossesPercentage, loserTankLossesPercentage);
     }
 
     function attackVictory(uint256 battleId)
@@ -370,33 +428,47 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     function collectSpoils(uint256 battleId, uint256 attackerId) public {
         uint256 defenderId = groundBattleIdToDefenderForces[battleId].countryId;
         uint256[] memory randomWords = s_requestIndexToRandomWords[battleId];
-        uint256 randomBalancePercentage; 
+        uint256 randomBalancePercentage;
         uint256 randomLandMiles;
         uint256 randomTechLevels;
-        uint256 attackType = groundBattleIdToAttackerForces[battleId].attackType;
+        uint256 attackType = groundBattleIdToAttackerForces[battleId]
+            .attackType;
         uint256 fobCount = imp2.getForwardOperatingBaseCount(attackerId);
         uint256 attackModifier = 0;
         if (fobCount > 0) {
             attackModifier = (2 * fobCount);
         }
         if (attackType == 1) {
-            randomBalancePercentage = (0 + attackModifier + (randomWords[5] % 10));
+            randomBalancePercentage = (0 +
+                attackModifier +
+                (randomWords[5] % 10));
             randomLandMiles = (0 + fobCount + (randomWords[6] % 3));
-            randomTechLevels = (0 + fobCount + (randomWords[7]) % 3);
+            randomTechLevels = (0 + fobCount + ((randomWords[7]) % 3));
         } else if (attackType == 2) {
-            randomBalancePercentage = (5 + attackModifier + (randomWords[5] % 10));
+            randomBalancePercentage = (5 +
+                attackModifier +
+                (randomWords[5] % 10));
             randomLandMiles = (2 + fobCount + (randomWords[6] % 5));
-            randomTechLevels = (2 + fobCount + (randomWords[7]) % 3);
+            randomTechLevels = (2 + fobCount + ((randomWords[7]) % 3));
         } else if (attackType == 3) {
-            randomBalancePercentage = (10 + attackModifier + (randomWords[5] % 15));
+            randomBalancePercentage = (10 +
+                attackModifier +
+                (randomWords[5] % 15));
             randomLandMiles = (5 + fobCount + (randomWords[6] % 5));
-            randomTechLevels = (3 + fobCount + (randomWords[7]) % 4);
+            randomTechLevels = (3 + fobCount + ((randomWords[7]) % 4));
         } else if (attackType == 4) {
-            randomBalancePercentage = (10 + attackModifier + (randomWords[5] % 20));
+            randomBalancePercentage = (10 +
+                attackModifier +
+                (randomWords[5] % 20));
             randomLandMiles = (7 + fobCount + (randomWords[6] % 5));
-            randomTechLevels = (5 + fobCount + (randomWords[7]) % 4);
+            randomTechLevels = (5 + fobCount + ((randomWords[7]) % 4));
         }
         tsy.transferSpoils(randomBalancePercentage, attackerId, defenderId);
-        inf.transferLandAndTech(randomLandMiles, randomTechLevels, attackerId, defenderId);
+        inf.transferLandAndTech(
+            randomLandMiles,
+            randomTechLevels,
+            attackerId,
+            defenderId
+        );
     }
 }

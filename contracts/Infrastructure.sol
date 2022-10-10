@@ -19,6 +19,7 @@ contract InfrastructureContract is Ownable {
     address public improvements1;
     address public improvements2;
     address public improvements3;
+    address public improvements4;
     address public wonders1;
     address public wonders2;
     address public wonders3;
@@ -39,6 +40,7 @@ contract InfrastructureContract is Ownable {
     ImprovementsContract1 imp1;
     ImprovementsContract2 imp2;
     ImprovementsContract3 imp3;
+    ImprovementsContract4 imp4;
 
     struct Infrastructure {
         uint256 landArea;
@@ -56,6 +58,7 @@ contract InfrastructureContract is Ownable {
         address _improvements1,
         address _improvements2,
         address _improvements3,
+        address _improvements4,
         address _infrastructureMarket,
         address _techMarket,
         address _landMarket
@@ -68,6 +71,8 @@ contract InfrastructureContract is Ownable {
         imp2 = ImprovementsContract2(_improvements2);
         improvements3 = _improvements3;
         imp3 = ImprovementsContract3(_improvements3);
+        improvements4 = _improvements4;
+        imp4 = ImprovementsContract4(_improvements4);
         infrastructureMarket = _infrastructureMarket;
         techMarket = _techMarket;
         landMarket = _landMarket;
@@ -369,39 +374,43 @@ contract InfrastructureContract is Ownable {
         uint256 countryId,
         uint256 amountToDecrease
     ) public onlyCruiseMissileContract {
-        uint256 infrastructureDamageModifier = 100;
-        uint256 bunkerCount = imp1.getBunkerCount(countryId);
-        if (bunkerCount > 0) {
-            infrastructureDamageModifier -= (5 * bunkerCount);
-        }
-        uint256 damage = ((amountToDecrease * infrastructureDamageModifier) /
-            100);
+        // uint256 infrastructureDamageModifier = 100;
+        // uint256 bunkerCount = imp1.getBunkerCount(countryId);
+        // if (bunkerCount > 0) {
+        //     infrastructureDamageModifier -= (5 * bunkerCount);
+        // }
+        // uint256 damage = ((amountToDecrease * infrastructureDamageModifier) /
+        //     100);
         uint256 infrastructureAmount = idToInfrastructure[countryId]
             .infrastructureCount;
-        if (damage >= infrastructureAmount) {
+        if (amountToDecrease >= infrastructureAmount) {
             idToInfrastructure[countryId].infrastructureCount = 0;
         } else {
-            idToInfrastructure[countryId].infrastructureCount -= damage;
+            idToInfrastructure[countryId].infrastructureCount -= amountToDecrease;
         }
     }
 
-    function decreaseInfrastructureCountFromNukeContract(uint256 countryId)
+    function decreaseInfrastructureCountFromNukeContract(uint256 defenderId, uint256 attackerId)
         public
         onlyNukeContract
     {
-        uint256 infrastructureAmount = idToInfrastructure[countryId]
+        uint256 infrastructureAmount = idToInfrastructure[defenderId]
             .infrastructureCount;
         uint256 damagePercentage = 35;
-        uint256 bunkerCount = imp1.getBunkerCount(countryId);
+        uint256 bunkerCount = imp1.getBunkerCount(defenderId);
         if (bunkerCount > 0) {
-            damagePercentage -= bunkerCount;
+            damagePercentage -= (bunkerCount * 3);
+        }
+        uint256 attackerMunitionsFactory = imp4.getMunitionsFactoryCount(attackerId);
+        if (attackerMunitionsFactory > 0) {
+            damagePercentage += (attackerMunitionsFactory * 3);
         }
         uint256 infrastructureAmountToDecrease = ((infrastructureAmount *
             damagePercentage) / 100);
         if (infrastructureAmountToDecrease > 150) {
-            idToInfrastructure[countryId].infrastructureCount -= 150;
+            idToInfrastructure[defenderId].infrastructureCount -= 150;
         } else {
-            idToInfrastructure[countryId]
+            idToInfrastructure[defenderId]
                 .infrastructureCount -= infrastructureAmountToDecrease;
         }
     }

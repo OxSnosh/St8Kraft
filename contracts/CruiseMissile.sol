@@ -16,6 +16,9 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
     address public warAddress;
     address public infrastructure;
     address public missiles;
+    address public improvements1;
+    address public improvements3;
+    address public improvements4;
 
     //Chainlik Variables
     uint256[] private s_randomWords;
@@ -24,13 +27,16 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
     bytes32 private immutable i_gasLane;
     uint32 private immutable i_callbackGasLimit;
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
-    uint32 private constant NUM_WORDS = 2;
+    uint32 private constant NUM_WORDS = 3;
 
     ForcesContract force;
     CountryMinter mint;
     WarContract war;
     InfrastructureContract inf;
     MissilesContract mis;
+    ImprovementsContract1 imp1;
+    ImprovementsContract3 imp3;
+    ImprovementsContract4 imp4;
 
     struct CruiseMissileAttack {
         uint256 warId;
@@ -70,6 +76,19 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
+    }
+
+    function constructorContinued(
+        address _improvements1,
+        address _improvements3,
+        address _improvements4
+    ) public onlyOwner {
+        improvements1 = _improvements1;
+        imp1 = ImprovementsContract1(_improvements1);
+        improvements3 = _improvements3;
+        imp3 = ImprovementsContract3(_improvements3);
+        improvements4 = _improvements4;
+        imp4 = ImprovementsContract4(_improvements4);
     }
 
     function updateForcesContract(address newAddress) public onlyOwner {
@@ -120,23 +139,50 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
         s_requestIndexToRandomWords[requestNumber] = randomWords;
         s_randomWords = randomWords;
-        uint256 damageType = ((s_randomWords[0] % 3) + 1);
-        if (damageType == 1) {
+        uint256 defenderId = attackIdToCruiseMissile[requestNumber].defenderId;
+        uint256 attackerId = attackIdToCruiseMissile[requestNumber].attackerId;
+        uint256 defenderMissileDefenses = imp4.getMissileDefenseCount(
+            defenderId
+        );
+        uint256 attackerSattelites = imp3.getSatelliteCount(attackerId);
+        uint256 successOdds = 75;
+        if (defenderMissileDefenses > 0) {
+            successOdds -= (5 * defenderMissileDefenses);
+        }
+        if (attackerSattelites > 0) {
+            successOdds += (5 * attackerSattelites);
+        }
+        uint256[] memory randomNumbers = s_requestIndexToRandomWords[
+            requestNumber
+        ];
+        uint256 randomNumber = (randomNumbers[0] % 100);
+        if (randomNumber < successOdds) {
             destroyTanks(requestNumber);
-        } else if (damageType == 2) {
             destroyTech(requestNumber);
-        } else {
             destroyInfrastructure(requestNumber);
+        } else {
+            /* emit thwarted event */
         }
     }
 
     function destroyTanks(uint256 attackId) internal {
         uint256 defenderId = attackIdToCruiseMissile[attackId].defenderId;
+        uint256 attackerId = attackIdToCruiseMissile[attackId].attackerId;
         uint256 tankCount = force.getDefendingTankCount(defenderId);
         uint256[] memory randomNumbers = s_requestIndexToRandomWords[attackId];
-        uint256 randomTankCount = (randomNumbers[1] % 15);
+        uint256 defenderBunkerCount = imp1.getBunkerCount(defenderId);
+        uint256 attackerMunitionsFactory = imp4.getMunitionsFactoryCount(
+            attackerId
+        );
+        uint256 randomTankCount = (10 +
+            (randomNumbers[1] % 5) +
+            attackerMunitionsFactory -
+            defenderBunkerCount);
         if (tankCount <= randomTankCount) {
-            force.decreaseDefendingTankCount(tankCount, defenderId);
+            force.decreaseDefendingTankCountFromCruiseMissileContract(
+                tankCount,
+                defenderId
+            );
         } else {
             force.decreaseDefendingTankCountFromCruiseMissileContract(
                 randomTankCount,
@@ -147,19 +193,44 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
 
     function destroyTech(uint256 attackId) internal {
         uint256 defenderId = attackIdToCruiseMissile[attackId].defenderId;
+        uint256 attackerId = attackIdToCruiseMissile[attackId].attackerId;
         uint256 techCount = inf.getTechnologyCount(defenderId);
-        require(techCount >= 1, "not enought tech");
-        // uint256[] memory randomNumbers = s_requestIndexToRandomWords[attackId];
-        // uint256 randomNumber = randomNumbers[1];
-        inf.decreaseTechCountFromCruiseMissileContract(defenderId, 1);
+        if (techCount >= 2) {
+            uint256 defenderBunkerCount = imp1.getBunkerCount(defenderId);
+            uint256 attackerMunitionsFactory = imp4.getMunitionsFactoryCount(
+                attackerId
+            );
+            uint256 amount = 1;
+            if (defenderBunkerCount == 5) {
+                amount -= 1;
+            }
+            if (attackerMunitionsFactory == 5) {
+                amount += 1;
+            }
+            inf.decreaseTechCountFromCruiseMissileContract(defenderId, amount);
+        }
     }
 
     function destroyInfrastructure(uint256 attackId) internal {
         uint256 defenderId = attackIdToCruiseMissile[attackId].defenderId;
+        uint256 attackerId = attackIdToCruiseMissile[attackId].attackerId;
         uint256 infrastructureCount = inf.getInfrastructureCount(defenderId);
-        require(infrastructureCount >= 5, "not enough infrastructure");
-        // uint256[] memory randomNumbers = s_requestIndexToRandomWords[attackId];
-        // uint256 randomNumber = (randomNumbers[1] % );
-        inf.decreaseInfrastructureCountFromCruiseMissileContract(defenderId, 5);
+        if (infrastructureCount >= 15) {
+            uint256[] memory randomNumbers = s_requestIndexToRandomWords[
+                attackId
+            ];
+            uint256 defenderBunkerCount = imp1.getBunkerCount(defenderId);
+            uint256 attackerMunitionsFactory = imp4.getMunitionsFactoryCount(
+                attackerId
+            );
+            uint256 randomInfrastructureCount = (5 +
+                (randomNumbers[2] % 5) +
+                attackerMunitionsFactory -
+                defenderBunkerCount);
+            inf.decreaseInfrastructureCountFromCruiseMissileContract(
+                defenderId,
+                randomInfrastructureCount
+            );
+        }
     }
 }

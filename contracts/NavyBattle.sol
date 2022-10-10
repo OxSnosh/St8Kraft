@@ -4,6 +4,7 @@ pragma solidity 0.8.7;
 import "./CountryMinter.sol";
 import "./Navy.sol";
 import "./War.sol";
+import "./Improvements.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
@@ -192,6 +193,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     address public navalBlockade;
     address public navy;
     address public warAddress;
+    address public improvements4;
     uint256 battleshipStrength = 5;
     uint256 cruiserStrength = 6;
     uint256 frigateStrength = 8;
@@ -216,6 +218,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     NavalBlockadeContract navBlock;
     NavyContract nav;
     WarContract war;
+    ImprovementsContract4 imp4;
 
     struct BreakBlockade {
         uint256 battleshipCount;
@@ -255,6 +258,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         address _navalBlockade,
         address _navy,
         address _warAddress,
+        address _improvements4,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
@@ -268,6 +272,8 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         nav = NavyContract(_navy);
         warAddress = _warAddress;
         war = WarContract(_warAddress);
+        improvements4 = _improvements4;
+        imp4 = ImprovementsContract4(_improvements4);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
@@ -464,6 +470,12 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
             _cruiserStrength +
             _frigateStrength +
             _destroyerStrength);
+        uint256 breakerId = breakBlockadeIdToBreakBlockade[battleId].breakerId;
+        uint256 navalAcademyCount = imp4.getNavalAcademyCount(breakerId);
+        if(navalAcademyCount > 0) {
+            uint256 breakerShipCount = getBreakerShipCount(breakerId);
+            strength += (breakerShipCount * navalAcademyCount);
+        }
         return strength;
     }
 
@@ -484,6 +496,12 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
             _cruiserStrength +
             _frigateStrength +
             _submarineStrength);
+        uint256 defenderId = breakBlockadeIdToDefendBlockade[battleId].defenderId;
+        uint256 navalAcademyCount = imp4.getNavalAcademyCount(defenderId);
+        if(navalAcademyCount > 0) {
+            uint256 defenderShipCount = getDefenderShipCount(defenderId);
+            strength += (defenderShipCount * navalAcademyCount);
+        }
         return strength;
     }
 
@@ -723,6 +741,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
     uint256 public navyBattleId;
     address public navyBlockade;
     address public warAddress;
+    address public improvements4;
     uint256 corvetteStrength = 1;
     uint256 landingShipStrength = 3;
     uint256 battleshipStrength = 5;
@@ -752,6 +771,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
     NavyContract nav;
     NavalBlockadeContract navBlock;
     WarContract war;
+    ImprovementsContract4 imp4;
 
     struct NavyForces {
         uint256 corvetteCount;
@@ -783,6 +803,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
     constructor(
         address _navy,
         address _war,
+        address _improvements4,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
@@ -792,6 +813,8 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         nav = NavyContract(_navy);
         warAddress = _war;
         war = WarContract(_war);
+        improvements4 = _improvements4;
+        imp4 = ImprovementsContract4(_improvements4);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
@@ -1085,6 +1108,12 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
             _destroyerStrength +
             _submarineStrength +
             _aircraftCarrierStrength);
+        uint256 attackerId = idToAttackerNavy[battleId].countryId;
+        uint256 navalAcademyCount = imp4.getNavalAcademyCount(attackerId);
+        if(navalAcademyCount > 0) {
+            uint256 shipCount = getShipCount(attackerId);
+            strength += (shipCount * navalAcademyCount);
+        }
         return strength;
     }
 
@@ -1117,6 +1146,12 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
             _destroyerStrength +
             _submarineStrength +
             _aircraftCarrierStrength);
+        uint256 defenderId = idToDefenderNavy[battleId].countryId;
+        uint256 navalAcademyCount = imp4.getNavalAcademyCount(defenderId);
+        if(navalAcademyCount > 0) {
+            uint256 shipCount = getShipCount(defenderId);
+            strength += (shipCount * navalAcademyCount);
+        }
         return strength;
     }
 
