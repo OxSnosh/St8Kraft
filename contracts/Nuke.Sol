@@ -4,17 +4,28 @@ pragma solidity 0.8.7;
 import "./CountryMinter.sol";
 import "./War.sol";
 import "./Wonders.sol";
+import "./Infrastructure.sol";
+import "./Forces.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
 contract NukeContract is Ownable, VRFConsumerBaseV2 {
     uint256 nukeAttackId;
+    uint256 nukesDroppedToday;
+    uint256 nukesDropped1DayAgo;
+    uint256 nukesDropped2DayAgo;
+    uint256 nukesDropped3DayAgo;
+    uint256 nukesDropped4DayAgo;
+    uint256 nukesDropped5DayAgo;
+    uint256 nukesDropped6DayAgo;
     address countryMinter;
     address warAddress;
     address wonders1;
     address improvements3;
     address improvements4;
+    address infrastructure;
+    address forces;
 
     //Chainlik Variables
     uint256[] private s_randomWords;
@@ -30,6 +41,8 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     WondersContract1 won1;
     ImprovementsContract3 imp3;
     ImprovementsContract4 imp4;
+    InfrastructureContract inf;
+    ForcesContract force;
 
     struct NukeAttack {
         uint256 warId;
@@ -48,6 +61,8 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         address _wonders1,
         address _improvements3,
         address _improvements4,
+        address _infrastructure,
+        address _forces,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
@@ -61,8 +76,12 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         won1 = WondersContract1(_wonders1);
         improvements3 = _improvements3;
         imp3 = ImprovementsContract3(_improvements3);
-        improvemen4 = _improvements4;
+        improvements4 = _improvements4;
         imp4 = ImprovementsContract4(_improvements4);
+        infrastructure = _infrastructure;
+        inf = InfrastructureContract(_infrastructure);
+        forces = _forces;
+        force = ForcesContract(_forces);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
@@ -143,6 +162,8 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
         s_requestIndexToRandomWords[requestNumber] = randomWords;
         s_randomWords = randomWords;
+        uint256 attackerId = nukeAttackIdToNukeAttack[requestNumber].attackerId;
+        uint256 defenderId = nukeAttackIdToNukeAttack[requestNumber].defenderId;
         uint256 defenderMissileDefenses = imp4.getMissileDefenseCount(
             defenderId
         );
@@ -163,14 +184,14 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     }
 
     function inflictNukeDamage(uint256 attackId) internal {
-        uint256 attackTpye = nukeAttackIdToNukeAttack[attackId].attackType;
+        uint256 attackType = nukeAttackIdToNukeAttack[attackId].attackType;
         if (attackType == 1) {
             standardAttack(attackId);
         } else if (attackType == 2) {
             infrastructureAttack(attackId);
         } else if (attackType == 3) {
             landAttack(attackId);
-        } else {
+        } else if (attackType == 4) {
             technologyAttack(attackId);
         }
     }
@@ -180,35 +201,57 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         uint256 attackerId = nukeAttackIdToNukeAttack[attackId].attackerId;
         force.decreaseDefendingSoldierCountFromNukeAttack(defenderId);
         force.decreaseDefendingTankCountFromNukeContract(defenderId);
-        inf.decreaseLandFromNukeContract(defenderId);
+        inf.decreaseLandCountFromNukeContract(defenderId);
         inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId);
         inf.decreaseTechCountFromNukeContract(defenderId);
     }
 
     function infrastructureAttack(uint256 attackId) internal {
         uint256 defenderId = nukeAttackIdToNukeAttack[attackId].defenderId;
+        uint256 attackerId = nukeAttackIdToNukeAttack[attackId].attackerId;
         force.decreaseDefendingSoldierCountFromNukeAttack(defenderId);
         force.decreaseDefendingTankCountFromNukeContract(defenderId);
-        inf.decreaseLandFromNukeContract(defenderId);
-        inf.decreaseInfrastructureCountFromNukeContract(defenderId);
+        inf.decreaseLandCountFromNukeContract(defenderId);
+        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId);
         inf.decreaseTechCountFromNukeContract(defenderId);
     }
 
     function landAttack(uint256 attackId) internal {
         uint256 defenderId = nukeAttackIdToNukeAttack[attackId].defenderId;
+        uint256 attackerId = nukeAttackIdToNukeAttack[attackId].attackerId;
         force.decreaseDefendingSoldierCountFromNukeAttack(defenderId);
         force.decreaseDefendingTankCountFromNukeContract(defenderId);
-        inf.decreaseLandFromNukeContract(defenderId);
-        inf.decreaseInfrastructureCountFromNukeContract(defenderId);
+        inf.decreaseLandCountFromNukeContract(defenderId);
+        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId);
         inf.decreaseTechCountFromNukeContract(defenderId);
     }
 
     function technologyAttack(uint256 attackId) internal {
         uint256 defenderId = nukeAttackIdToNukeAttack[attackId].defenderId;
+        uint256 attackerId = nukeAttackIdToNukeAttack[attackId].attackerId;
         force.decreaseDefendingSoldierCountFromNukeAttack(defenderId);
         force.decreaseDefendingTankCountFromNukeContract(defenderId);
-        inf.decreaseLandFromNukeContract(defenderId);
-        inf.decreaseInfrastructureCountFromNukeContract(defenderId);
+        inf.decreaseLandCountFromNukeContract(defenderId);
+        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId);
         inf.decreaseTechCountFromNukeContract(defenderId);
+    }
+
+    function calculateNukesLandedLastSevenDays() public view returns (uint256) {
+        uint256 sum = (nukesDroppedToday +
+            nukesDropped1DayAgo +
+            nukesDropped2DayAgo +
+            nukesDropped3DayAgo +
+            nukesDropped4DayAgo +
+            nukesDropped5DayAgo +
+            nukesDropped6DayAgo);
+        return sum;
+    }
+
+    function getGlobalRadiation() public view returns (uint256) {
+        uint256 countries = mint.getCountryCount();
+        uint256 nukesLanded = calculateNukesLandedLastSevenDays();
+        uint256 mod = 300;
+        uint256 globalRadiation = ((nukesLanded * mod) / countries);
+        return globalRadiation;
     }
 }

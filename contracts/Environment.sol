@@ -1,16 +1,19 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.7;
 
+import "./CountryMinter.sol";
 import "./Resources.sol";
 import "./Infrastructure.sol";
 import "./Improvements.sol";
 import "./Wonders.sol";
 import "./Forces.sol";
 import "./Taxes.sol";
+import "./Nuke.sol";
 import "./CountryParameters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract EnvironmentContract is Ownable {
+    address public countryMinter;
     address public resources;
     address public infrastructure;
     address public improvements1;
@@ -22,7 +25,9 @@ contract EnvironmentContract is Ownable {
     address public parameters;
     address public taxes;
     address public missiles;
+    address public nukes;
 
+    CountryMinter mint;
     ResourcesContract res;
     InfrastructureContract inf;
     ImprovementsContract1 imp1;
@@ -34,8 +39,10 @@ contract EnvironmentContract is Ownable {
     CountryParametersContract param;
     TaxesContract tax;
     MissilesContract mis;
+    NukeContract nuke;
 
     constructor(
+        address _countryMinter,
         address _resources,
         address _infrastructure,
         address _wonders3,
@@ -43,8 +50,11 @@ contract EnvironmentContract is Ownable {
         address _forces,
         address _parameters,
         address _taxes,
-        address _missiles
+        address _missiles,
+        address _nukes
     ) {
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
         resources = _resources;
         res = ResourcesContract(_resources);
         infrastructure = _infrastructure;
@@ -61,6 +71,8 @@ contract EnvironmentContract is Ownable {
         tax = TaxesContract(_taxes);
         missiles = _missiles;
         mis = MissilesContract(_missiles);
+        nukes = _nukes;
+        nuke = NukeContract(_nukes);
     }
 
     function constructorContinued(
@@ -119,6 +131,13 @@ contract EnvironmentContract is Ownable {
     function getEnvironmentScore(uint256 id) public view returns (uint256) {
         uint256 environmentScore;
         int256 grossScore = getGrossEnvironmentScore(id);
+        uint256 countries = mint.getCountryCount();
+        uint256 nukesLanded = nuke.calculateNukesLandedLastSevenDays();
+        uint256 mod = 300;
+        uint256 globalRadiation = ((nukesLanded * mod) / countries);
+        if (globalRadiation > 5) {
+            globalRadiation == 5;
+        }
         if (grossScore <= 0) {
             environmentScore = 0;
         } else if (grossScore <= 10) {
@@ -141,6 +160,11 @@ contract EnvironmentContract is Ownable {
             environmentScore = 9;
         } else if (grossScore > 90) {
             environmentScore = 10;
+        }
+        if (globalRadiation >= environmentScore) {
+            environmentScore = 0;
+        } else {
+            environmentScore -= globalRadiation;
         }
         return environmentScore;
     }

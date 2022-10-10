@@ -146,4 +146,9 @@ contract CountryMinter is ERC721, Ownable {
         }
         return false;
     }
+
+    function getCountryCount() public view returns (uint256) {
+        uint256 countryCount = countryId;
+        return countryCount;
+    }
 }
