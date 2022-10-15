@@ -138,6 +138,11 @@ contract EnvironmentContract is Ownable {
         if (globalRadiation > 5) {
             globalRadiation == 5;
         }
+        uint256 radiationContainmentChambers = imp3
+            .getRadiationContainmentChamberCount(id);
+        if (radiationContainmentChambers >= 0) {
+            globalRadiation -= radiationContainmentChambers;
+        }
         if (grossScore <= 0) {
             environmentScore = 0;
         } else if (grossScore <= 10) {

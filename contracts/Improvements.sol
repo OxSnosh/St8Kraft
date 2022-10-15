@@ -1964,6 +1964,15 @@ contract ImprovementsContract3 is Ownable {
         return count;
     }
 
+    function getRadiationContainmentChamberCount(uint256 countryId)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 count = idToImprovements3[countryId].radiationContainmentChamberCount;
+        return count;
+    }
+
     function getRedLightDistrictCount(uint256 countryId)
         public
         view
