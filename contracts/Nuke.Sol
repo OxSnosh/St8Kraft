@@ -6,6 +6,7 @@ import "./War.sol";
 import "./Wonders.sol";
 import "./Infrastructure.sol";
 import "./Forces.sol";
+import "./Navy.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
@@ -26,6 +27,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     address improvements4;
     address infrastructure;
     address forces;
+    address navy;
     address keeper;
 
     //Chainlik Variables
@@ -44,6 +46,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     ImprovementsContract4 imp4;
     InfrastructureContract inf;
     ForcesContract force;
+    NavyContract nav;
 
     struct NukeAttack {
         uint256 warId;
@@ -86,12 +89,15 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     function constructorContinued (
         address _infrastructure,
         address _forces,
+        address _navy,
         address _keeper 
     ) public onlyOwner {
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
         forces = _forces;
         force = ForcesContract(_forces);
+        navy = _navy;
+        nav = NavyContract(_navy);
         keeper = _keeper;
     }
 
@@ -208,9 +214,10 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         uint256 attackerId = nukeAttackIdToNukeAttack[attackId].attackerId;
         force.decreaseDefendingSoldierCountFromNukeAttack(defenderId);
         force.decreaseDefendingTankCountFromNukeContract(defenderId);
-        inf.decreaseLandCountFromNukeContract(defenderId);
-        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId);
-        inf.decreaseTechCountFromNukeContract(defenderId);
+        nav.decreaseNavyFromNukeContract(defenderId);
+        inf.decreaseLandCountFromNukeContract(defenderId , 35);
+        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId, 35);
+        inf.decreaseTechCountFromNukeContract(defenderId, 35);
     }
 
     function infrastructureAttack(uint256 attackId) internal {
@@ -218,9 +225,10 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         uint256 attackerId = nukeAttackIdToNukeAttack[attackId].attackerId;
         force.decreaseDefendingSoldierCountFromNukeAttack(defenderId);
         force.decreaseDefendingTankCountFromNukeContract(defenderId);
-        inf.decreaseLandCountFromNukeContract(defenderId);
-        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId);
-        inf.decreaseTechCountFromNukeContract(defenderId);
+        nav.decreaseNavyFromNukeContract(defenderId);
+        inf.decreaseLandCountFromNukeContract(defenderId, 25);
+        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId, 45);
+        inf.decreaseTechCountFromNukeContract(defenderId, 25);
     }
 
     function landAttack(uint256 attackId) internal {
@@ -228,9 +236,10 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         uint256 attackerId = nukeAttackIdToNukeAttack[attackId].attackerId;
         force.decreaseDefendingSoldierCountFromNukeAttack(defenderId);
         force.decreaseDefendingTankCountFromNukeContract(defenderId);
-        inf.decreaseLandCountFromNukeContract(defenderId);
-        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId);
-        inf.decreaseTechCountFromNukeContract(defenderId);
+        nav.decreaseNavyFromNukeContract(defenderId);
+        inf.decreaseLandCountFromNukeContract(defenderId, 45);
+        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId, 25);
+        inf.decreaseTechCountFromNukeContract(defenderId, 25);
     }
 
     function technologyAttack(uint256 attackId) internal {
@@ -238,9 +247,10 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         uint256 attackerId = nukeAttackIdToNukeAttack[attackId].attackerId;
         force.decreaseDefendingSoldierCountFromNukeAttack(defenderId);
         force.decreaseDefendingTankCountFromNukeContract(defenderId);
-        inf.decreaseLandCountFromNukeContract(defenderId);
-        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId);
-        inf.decreaseTechCountFromNukeContract(defenderId);
+        nav.decreaseNavyFromNukeContract(defenderId);
+        inf.decreaseLandCountFromNukeContract(defenderId, 25);
+        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId, 25);
+        inf.decreaseTechCountFromNukeContract(defenderId, 45);
     }
 
     function calculateNukesLandedLastSevenDays() public view returns (uint256) {

@@ -7,6 +7,7 @@ import "./Military.sol";
 import "./NationStrength.sol";
 import "./Treasury.sol";
 import "./CountryParameters.sol";
+import "./Wonders.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
@@ -20,6 +21,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
     address public treasury;
     address public parameters;
     address public missiles;
+    address public wonders1;
 
     //Chainlik Variables
     uint256[] private s_randomWords;
@@ -37,6 +39,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
     TreasuryContract tsy;
     CountryParametersContract params;
     MissilesContract mis;
+    WondersContract1 won1;
 
     struct SpyAttack {
         uint256 attackerId;
@@ -53,6 +56,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         address _forces,
         address _military,
         address _nationStrength,
+        address _wonders1,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
@@ -66,6 +70,8 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         mil = MilitaryContract(_military);
         nationStrength = _nationStrength;
         strength = NationStrengthContract(_nationStrength);
+        wonders1 = _wonders1;
+        won1 = WondersContract1(_wonders1);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
@@ -174,6 +180,10 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         uint256 spyCount = force.getSpyCount(countryId);
         uint256 techAmount = inf.getTechnologyCount(countryId);
         uint256 attackSuccessScore = (spyCount + (techAmount / 20));
+        bool cia = won1.getCentralIntelligenceAgency(countryId);
+        if (cia) {
+            attackSuccessScore = ((attackSuccessScore * 110) / 100);
+        }
         return attackSuccessScore;
     }
 

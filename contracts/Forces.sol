@@ -467,7 +467,12 @@ contract ForcesContract is Ownable {
         onlyNukeContract
     {
         uint256 defendingTanks = idToForces[id].defendingTanks;
-        uint256 defendingTanksToDecrease = ((defendingTanks * 35) / 100);
+        uint256 percentage = 35;
+        bool falloutShelter = won1.getFalloutShelterSystem(id);
+        if (falloutShelter) {
+            percentage = 25;
+        }
+        uint256 defendingTanksToDecrease = ((defendingTanks * percentage) / 100);
         idToForces[id].numberOfTanks -= defendingTanksToDecrease;
         idToForces[id].defendingTanks -= defendingTanksToDecrease;
     }
@@ -538,6 +543,10 @@ contract ForcesContract is Ownable {
         if (maxSpyCount > 0) {
             maxSpyCount += (intelAgencies * 100);
         }
+        bool cia = won1.getCentralIntelligenceAgency(id);
+        if (cia) {
+            maxSpyCount += 250;
+        }
         return maxSpyCount;
     }
 
@@ -598,7 +607,7 @@ contract MissilesContract is Ownable {
     address public resources;
     address public improvements1;
     // address public improvements2;
-    // address public wonders1;
+    address public wonders1;
     address public nukeAddress;
     address public airBattle;
     // address public groundBattle;
@@ -648,15 +657,15 @@ contract MissilesContract is Ownable {
         address _resources,
         address _improvements1,
         // address _improvements2,
-        // address _wonders1,
+        address _wonders1,
         address _countryMinter
     ) public onlyOwner {
         // infrastructure = _infrastructure;
         // inf = InfrastructureContract(_infrastructure);
         resources = _resources;
         res = ResourcesContract(_resources);
-        // wonders1 = _wonders1;
-        // won1 = WondersContract1(_wonders1);
+        wonders1 = _wonders1;
+        won1 = WondersContract1(_wonders1);
         improvements1 = _improvements1;
         imp1 = ImprovementsContract1(_improvements1);
         // improvements2 = _improvements2;
@@ -758,6 +767,11 @@ contract MissilesContract is Ownable {
         onlyNukeContract
     {
         uint256 cruiseMissiles = idToMissiles[id].cruiseMissiles;
+        uint256 percentage = 35;
+        bool falloutShelter = won1.getFalloutShelterSystem(id);
+        if (falloutShelter) {
+            percentage = 25;
+        }
         uint256 cruiseMissilesToDecrease = ((cruiseMissiles * 35) / 100);
         idToMissiles[id].cruiseMissiles -= cruiseMissilesToDecrease;
     }

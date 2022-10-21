@@ -7,6 +7,7 @@ import "./Improvements.sol";
 import "./Wonders.sol";
 import "./Treasury.sol";
 import "./Forces.sol";
+import "./Wonders.sol";
 import "./CountryParameters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -41,6 +42,7 @@ contract InfrastructureContract is Ownable {
     ImprovementsContract2 imp2;
     ImprovementsContract3 imp3;
     ImprovementsContract4 imp4;
+    WondersContract1 won1;
 
     struct Infrastructure {
         uint256 landArea;
@@ -89,6 +91,7 @@ contract InfrastructureContract is Ownable {
         address _aid
     ) public onlyOwner {
         wonders1 = _wonders1;
+        won1 = WondersContract1(_wonders1);
         wonders2 = _wonders2;
         wonders3 = _wonders3;
         wonders4 = _wonders4;
@@ -237,6 +240,11 @@ contract InfrastructureContract is Ownable {
         if (spices) {
             landModifier += 8;
         }
+        bool agriculturalDevelopmentProgram = won1
+            .getAgriculturalDevelopmentProgram(id);
+        if (agriculturalDevelopmentProgram) {
+            landModifier += 15;
+        }
         uint256 areaOfInfluence = ((currentLand * landModifier) / 100);
         return areaOfInfluence;
     }
@@ -288,12 +296,12 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[countryId].landArea -= amount;
     }
 
-    function decreaseLandCountFromNukeContract(uint256 countryId)
+    function decreaseLandCountFromNukeContract(uint256 countryId, uint256 percentage)
         public
         onlyNukeContract
     {
         uint256 landAmount = idToInfrastructure[countryId].landArea;
-        uint256 landAmountToDecrease = ((landAmount * 35) / 100);
+        uint256 landAmountToDecrease = ((landAmount * percentage) / 100);
         if (landAmountToDecrease > 150) {
             idToInfrastructure[countryId].landArea -= 150;
         } else {
@@ -332,12 +340,12 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[countryId].technologyCount -= amount;
     }
 
-    function decreaseTechCountFromNukeContract(uint256 countryId)
+    function decreaseTechCountFromNukeContract(uint256 countryId, uint256 percentage)
         public
         onlyNukeContract
     {
         uint256 techAmount = idToInfrastructure[countryId].technologyCount;
-        uint256 techAmountToDecrease = ((techAmount * 35) / 100);
+        uint256 techAmountToDecrease = ((techAmount * percentage) / 100);
         if (techAmountToDecrease > 50) {
             idToInfrastructure[countryId].technologyCount -= 50;
         } else {
@@ -386,22 +394,26 @@ contract InfrastructureContract is Ownable {
         if (amountToDecrease >= infrastructureAmount) {
             idToInfrastructure[countryId].infrastructureCount = 0;
         } else {
-            idToInfrastructure[countryId].infrastructureCount -= amountToDecrease;
+            idToInfrastructure[countryId]
+                .infrastructureCount -= amountToDecrease;
         }
     }
 
-    function decreaseInfrastructureCountFromNukeContract(uint256 defenderId, uint256 attackerId)
-        public
-        onlyNukeContract
-    {
+    function decreaseInfrastructureCountFromNukeContract(
+        uint256 defenderId,
+        uint256 attackerId,
+        uint256 percentage
+    ) public onlyNukeContract {
         uint256 infrastructureAmount = idToInfrastructure[defenderId]
             .infrastructureCount;
-        uint256 damagePercentage = 35;
+        uint256 damagePercentage = percentage;
         uint256 bunkerCount = imp1.getBunkerCount(defenderId);
         if (bunkerCount > 0) {
             damagePercentage -= (bunkerCount * 3);
         }
-        uint256 attackerMunitionsFactory = imp4.getMunitionsFactoryCount(attackerId);
+        uint256 attackerMunitionsFactory = imp4.getMunitionsFactoryCount(
+            attackerId
+        );
         if (attackerMunitionsFactory > 0) {
             damagePercentage += (attackerMunitionsFactory * 3);
         }
@@ -541,6 +553,10 @@ contract InfrastructureContract is Ownable {
         uint256 hospitals = imp2.getHospitalCount(id);
         if (hospitals > 0) {
             additionalPoints += 6;
+        }
+        bool disasterReliefAgency = won1.getDisasterReliefAgency(id);
+        if (disasterReliefAgency) {
+            additionalPoints += 3;
         }
         return additionalPoints;
     }

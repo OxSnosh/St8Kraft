@@ -6,6 +6,8 @@ import "./Improvements.sol";
 import "./War.sol";
 import "./Resources.sol";
 import "./Military.sol";
+import "./Nuke.sol";
+import "./Wonders.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract NavyContract is Ownable {
@@ -17,6 +19,8 @@ contract NavyContract is Ownable {
     address public navyBattleAddress;
     address public warAddress;
     address public military;
+    address public nukes;
+    address public wonders1;
     uint256 public corvetteCost;
     uint256 public landingShipCost;
     uint256 public battleshipCost;
@@ -48,6 +52,8 @@ contract NavyContract is Ownable {
     ResourcesContract res;
     MilitaryContract mil;
     ImprovementsContract4 imp4;
+    NukeContract nuke;
+    WondersContract1 won1;
 
     constructor(
         address _treasuryAddress,
@@ -56,7 +62,9 @@ contract NavyContract is Ownable {
         address _improvements4,
         address _warAddress,
         address _resources,
-        address _military
+        address _military,
+        address _nukes,
+        address _wonders1
     ) {
         treasuryAddress = _treasuryAddress;
         improvementsContract1Address = _improvementsContract1Address;
@@ -69,6 +77,10 @@ contract NavyContract is Ownable {
         res = ResourcesContract(_resources);
         military = _military;
         mil = MilitaryContract(_military);
+        nukes = _nukes;
+        nuke = NukeContract(_nukes);
+        wonders1 = _wonders1;
+        won1 = WondersContract1(_wonders1);
         corvetteCost = 300000;
         landingShipCost = 300000;
         battleshipCost = 300000;
@@ -524,6 +536,28 @@ contract NavyContract is Ownable {
     function decreaseAircraftCarrierCount(uint256 amount, uint256 id) public {
         idToNavy[id].aircraftCarrierCount -= amount;
         idToNavy[id].navyVessels -= amount;
+    }
+
+    modifier onlyNukeContract() {
+        require(msg.sender == nukes, "only callable from nuke contract");
+        _;
+    }
+
+    function decreaseNavyFromNukeContract(uint256 defenderId) public onlyNukeContract {
+        //corvettes, landing ships, cruisers, frigates
+        uint256 corvetteCount = idToNavy[defenderId].corvetteCount;
+        uint256 landingShipCount = idToNavy[defenderId].landingShipCount;
+        uint256 cruiserCount = idToNavy[defenderId].cruiserCount;
+        uint256 frigateCount = idToNavy[defenderId].frigateCount;
+        uint256 percentage = 25;
+        bool falloutShelter = won1.getFalloutShelterSystem(defenderId);
+        if (falloutShelter) {
+            percentage = 12;
+        }
+        idToNavy[defenderId].corvetteCount -= ((corvetteCount * percentage) / 100);
+        idToNavy[defenderId].landingShipCount -= ((landingShipCount * percentage) / 100);
+        idToNavy[defenderId].cruiserCount -= ((cruiserCount * percentage) / 100);
+        idToNavy[defenderId].frigateCount -= ((frigateCount * percentage) / 100);
     }
 
     function getAvailablePurchases(uint256 id) public view returns (uint256) {

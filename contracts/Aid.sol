@@ -4,26 +4,38 @@ pragma solidity 0.8.7;
 import "./Infrastructure.sol";
 import "./Forces.sol";
 import "./Treasury.sol";
+import "./Wonders.sol";
+import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract AidContract is Ownable {
     address public countryMinter;
     address public treasury;
     address public forces;
+    address public keeper;
     address public infrastructure;
+    address public wonder1;
     uint256 public aidProposalId;
 
     constructor(
         address _countryMinter,
         address _treasury,
         address _forces,
-        address _infrastructure
+        address _infrastructure,
+        address _keeper,
+        address _wonder1
     ) {
         countryMinter = _countryMinter;
         treasury = _treasury;
         forces = _forces;
         infrastructure = _infrastructure;
+        keeper = _keeper;
+        wonder1 = _wonder1;
+        won1 = WondersContract1(_wonder1);
     }
+
+    CountryMinter mint;
+    WondersContract1 won1;
 
     struct Proposal {
         uint256 timeProposed;
@@ -37,6 +49,7 @@ contract AidContract is Ownable {
     }
 
     mapping(uint256 => address) public idToOwnerAid;
+    mapping(uint256 => uint256) public idToAidSlots;
     mapping(uint256 => Proposal) public idToProposal;
 
     function updateCountryMinterAddress(address _newAddress) public onlyOwner {
@@ -81,6 +94,9 @@ contract AidContract is Ownable {
         require(idToOwnerAid[idSender] == msg.sender, "!nation ruler");
         uint256 techAvailable = InfrastructureContract(infrastructure)
             .getTechnologyCount(idSender);
+        uint256 maxAidSlots = getMaxAidSlots(idSender);
+        uint256 aidSlotsUsedToday = idToAidSlots[idSender];
+        require ((aidSlotsUsedToday + 1) <= maxAidSlots, "already used all aid slots");
         uint256 balanceAvailable = TreasuryContract(treasury).checkBalance(
             idSender
         );
@@ -110,6 +126,15 @@ contract AidContract is Ownable {
         );
         idToProposal[aidProposalId] = newProposal;
         aidProposalId++;
+    }
+
+    function getMaxAidSlots(uint256 id) public view returns (uint256) {
+        uint256 maxAidSlotsPerDay = 1;
+        bool disasterReliefAgency = won1.getDisasterReliefAgency(id);
+        if (disasterReliefAgency) {
+            maxAidSlotsPerDay += 1;
+        }
+        return (maxAidSlotsPerDay);
     }
 
     function proposalExpired(uint256 proposalId) public view returns (bool) {
@@ -170,5 +195,18 @@ contract AidContract is Ownable {
         bool expired = proposalExpired(proposalId);
         require(expired == false, "trade already expired");
         idToProposal[proposalId].cancelled = true;
+    }
+
+    modifier onlyKeeper() {
+        require (msg.sender == keeper, "only callable from keeper contract");
+        _;
+    }
+
+    function resetAidProposals() public onlyKeeper {
+        uint256 countryCount = mint.getCountryCount();
+        countryCount -= 1;
+        for (uint i = 0; i < countryCount; i++) {
+            idToAidSlots[i] = 0;
+        }
     }
 }

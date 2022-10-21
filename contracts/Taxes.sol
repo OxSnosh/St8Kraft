@@ -20,6 +20,7 @@ contract TaxesContract is Ownable {
     address public improvements2;
     address public improvements3;
     address public parameters;
+    address public wonders1;
     address public wonders2;
     address public wonders3;
     address public wonders4;
@@ -34,6 +35,7 @@ contract TaxesContract is Ownable {
     ImprovementsContract2 imp2;
     ImprovementsContract3 imp3;
     CountryParametersContract params;
+    WondersContract1 won1;
     WondersContract2 won2;
     WondersContract3 won3;
     WondersContract4 won4;
@@ -65,6 +67,7 @@ contract TaxesContract is Ownable {
 
     function constructorContinued(
         address _parameters,
+        address _wonders1,
         address _wonders2,
         address _wonders3,
         address _wonders4,
@@ -75,6 +78,8 @@ contract TaxesContract is Ownable {
     ) public onlyOwner {
         parameters = _parameters;
         params = CountryParametersContract(_parameters);
+        wonders1 = _wonders1;
+        won1 = WondersContract1(_wonders1);
         wonders2 = _wonders2;
         won2 = WondersContract2(_wonders2);
         wonders3 = _wonders3;
@@ -704,6 +709,10 @@ contract TaxesContract is Ownable {
         bool scholars = res.viewScholars(id);
         if (scholars) {
             adjustments += 3;
+        }
+        bool agriDevProgram = won1.getAgriculturalDevelopmentProgram(id);
+        if (agriDevProgram) {
+            adjustments += 2;
         }
         return adjustments;
     }

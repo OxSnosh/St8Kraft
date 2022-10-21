@@ -28,39 +28,39 @@ contract WondersContract1 is Ownable {
         uint256 wonderCount;
         //Agriculture Development Program
         //$30,000,000
-        //Increases land size by 15%
-        //Increases citizen income +$2.00,
+        //DONE //Increases land size by 15%
+        //DONE //Increases citizen income +$2.00,
         //Increases the citizen-bonus for land from 0.2 to 0.5.
         //Requires 3,000 land purchased, 500 technology.
         bool agricultureDevelopmentProgram;
         //Anti-Air Defense Network
         //$50,000,000
         //Reduces odds of incoming aircraft attacks against your nation -25%.
-        //Reduces aircraft attack damages against your nation -10%.
+        //DONE //Reduces aircraft attack damages against your nation -15%.
         bool antiAirDefenseNetwork;
         //Central Intelligence Agency
         //$40,000,000
-        //Increases the number of spies that your nation can support +250 and
-        //increases your nation's spy attack strength +10%.
+        //DONE //Increases the number of spies that your nation can support +250 and
+        //DONE //increases your nation's spy attack strength +10%.
         //Only viewable by the user who owns it.
         bool centralIntelligenceAgency;
         //Disaster Relief Agency
         //$40,000,000
         //The disaster relief agency helps restore your nation and its people after emergency situations
-        //Increases population +3%
-        //and opens one extra foreign aid slot.
+        //DONE //Increases population +3%
+        //DONE //and opens one extra foreign aid slot.
         bool disasterReliefAgency;
         //EMP Weaponization
         //$200,000,000 + (Nation Strength * 2,000)
         //Provides attackers with 5,000 or more technology the option to launch a targeted EMP nuclear attack.
-        //Nuclear weapons can target higher infrastructure, higher land, or higher technology damage based on player choice when launching nukes.
+        //DONE //Nuclear weapons can target higher infrastructure, higher land, or higher technology damage based on player choice when launching nukes.
         //When you choose to target infrastructure, land, or technology you are trading more damage to your target for less damage for the other two.
         //For instance, if you choose to target infrastructure you will do more base damage to infrastructure but less damage to land and technology.
         //Requires 5,000 technology and a Weapons Research Complex to purchase.
         bool empWeaponization;
         //Fallout Shelter System
         //$40,000,000
-        //Allows 50% of your defending soldiers to survive a nuclear strike
+        //DONE //Allows 50% of your defending soldiers to survive a nuclear strike
         //(Does not prevent nuclear Anarchy but does prevent troops from being totally depleted),
         //Reduces tank, cruise missile, and aircraft, losses from a nuclear strike by -25%,
         //Reduces nuclear vulnerable navy losses by 12%,
@@ -508,6 +508,15 @@ contract WondersContract1 is Ownable {
         returns (bool)
     {
         bool isWonder = idToWonders1[id].centralIntelligenceAgency;
+        return isWonder;
+    }
+
+    function getDisasterReliefAgency(uint256 id)
+        public
+        view
+        returns (bool)
+    {
+        bool isWonder = idToWonders1[id].disasterReliefAgency;
         return isWonder;
     }
 

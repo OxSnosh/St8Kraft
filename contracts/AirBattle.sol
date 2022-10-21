@@ -6,6 +6,7 @@ import "./Fighters.sol";
 import "./Bombers.sol";
 import "./Infrastructure.sol";
 import "./Forces.sol";
+import "./Wonders.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
@@ -18,6 +19,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
     address infrastructure;
     address forces;
     address missiles;
+    address wonders1;
     //fighter strength
     uint256 yak9Strength = 1;
     uint256 p51MustangStrength = 2;
@@ -45,6 +47,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
     InfrastructureContract inf;
     ForcesContract force;
     MissilesContract mis;
+    WondersContract1 won1;
 
     struct FightersToBattle {
         uint256 yak9Count;
@@ -112,9 +115,14 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         i_callbackGasLimit = callbackGasLimit;
     }
 
-    function constructorContinued(address _missiles) public onlyOwner {
+    function constructorContinued(address _missiles, address _wonders1)
+        public
+        onlyOwner
+    {
         missiles = _missiles;
         mis = MissilesContract(_missiles);
+        wonders1 = _wonders1;
+        won1 = WondersContract1(_wonders1);
     }
 
     function airBattle(
@@ -878,13 +886,21 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 randomNumberForInfrastructure = ((randomNumbers[97] % 5) + 1);
         uint256 randomNumberForTanks = ((randomNumbers[98] % 5) + 1);
         uint256 randomNumberForCruiseMissiles = ((randomNumbers[99] % 2));
-        uint256 infrastructureToDeduct = ((attackerBomberStrength / 20) +
+        uint256 infrastructureToDeduct = ((attackerBomberStrength / 30) +
             randomNumberForInfrastructure);
         uint256 tanksToDeduct = ((attackerBomberStrength / 15) +
             randomNumberForTanks);
         uint256 cruiseMissilesToDeduct = ((attackerBomberStrength / 50) +
             randomNumberForCruiseMissiles);
+        uint256 mod = 100;
         uint256 defenderId = airBattleIdToDefenderFighters[battleId].countryId;
+        bool antiAirDefenseNetwork = won1.getAntiAirDefenseNewtwork(defenderId);
+        if (antiAirDefenseNetwork) {
+            mod = 85;
+        }
+        infrastructureToDeduct = ((infrastructureToDeduct * mod) / 100);
+        tanksToDeduct = ((tanksToDeduct * mod) / 100);
+        cruiseMissilesToDeduct = ((cruiseMissilesToDeduct * mod) / 100);
         inf.decreaseInfrastructureCountFromAirBattleContract(
             defenderId,
             infrastructureToDeduct
