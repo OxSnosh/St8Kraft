@@ -62,8 +62,8 @@ contract WondersContract1 is Ownable {
         //$40,000,000
         //DONE //Allows 50% of your defending soldiers to survive a nuclear strike
         //(Does not prevent nuclear Anarchy but does prevent troops from being totally depleted),
-        //Reduces tank, cruise missile, and aircraft, losses from a nuclear strike by -25%,
-        //Reduces nuclear vulnerable navy losses by 12%,
+        //DONE (not aircraft) //Reduces tank, cruise missile, and aircraft, losses from a nuclear strike by -25%,
+        //DONE //Reduces nuclear vulnerable navy losses by 12%,
         //Reduces nuclear anarchy effects by 1 day.
         //Requires 6,000 infrastructure, 2,000 technology.
         bool falloutShelterSystem;

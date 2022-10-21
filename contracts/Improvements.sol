@@ -259,7 +259,12 @@ contract ImprovementsContract1 is Ownable {
             uint256 purchasePrice = bankCost * amount;
             require(balance >= purchasePrice, "Insufficient balance");
             uint256 existingCount = idToImprovements1[countryId].bankCount;
-            require((existingCount + amount) <= 5, "Cannot own more than 5");
+            uint256 maxAmount = 5;
+            bool federalReserve = won1.getFederalReserve(countryId);
+            if (federalReserve) {
+                maxAmount = 7;
+            }
+            require((existingCount + amount) <= maxAmount, "Cannot own more than 5");
             idToImprovements1[countryId].bankCount += amount;
             idToImprovements1[countryId].improvementCount += amount;
             TreasuryContract(treasuryAddress).spendBalance(

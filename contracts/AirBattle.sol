@@ -20,6 +20,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
     address forces;
     address missiles;
     address wonders1;
+    address fighterLosses;
     //fighter strength
     uint256 yak9Strength = 1;
     uint256 p51MustangStrength = 2;
@@ -48,6 +49,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
     ForcesContract force;
     MissilesContract mis;
     WondersContract1 won1;
+    FighterLosses fighterLoss;
 
     struct FightersToBattle {
         uint256 yak9Count;
@@ -95,6 +97,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         address _bomber,
         address _infrastructure,
         address _forces,
+        address _fighterLosses,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
@@ -109,6 +112,8 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         inf = InfrastructureContract(_infrastructure);
         forces = _forces;
         force = ForcesContract(_forces);
+        fighterLosses = _fighterLosses;
+        fighterLoss = FighterLosses(_fighterLosses);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
@@ -569,7 +574,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
             .countryId;
         uint256 defenderId = airBattleIdToDefenderFighters[requestNumber]
             .countryId;
-        fighter.decrementLosses(
+        fighterLoss.decrementLosses(
             defenderLosses,
             defenderId,
             attackerLosses,
