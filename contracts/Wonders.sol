@@ -69,28 +69,28 @@ contract WondersContract1 is Ownable {
         bool falloutShelterSystem;
         //Federal Aid Commission
         //$25,000,000
-        //Raises the cap on foreign money aid +50% provided that the foreign aid recipient also has a Federal Aid Commission wonder.
+        //DONE //Raises the cap on foreign money aid +50% provided that the foreign aid recipient also has a Federal Aid Commission wonder.
         //Allows two nations with the Federal Aid Commission wonder to send secret foreign aid.
         //Secret foreign aid costs the sender 200% the value of the items that are sent.
         bool federalAidCommission;
         //Federal Reserve
         //$100,000,000 + (Nation Strength * 1,000)
-        //Increases the number of banks that can be purchased +2.
+        //DONE //Increases the number of banks that can be purchased +2.
         //Requires Stock Market.
         bool federalReserve;
         //Foreign Air Force Base -
         //$35,000,000 -
-        //Raises the aircraft limit +20 for your nation and
+        //DONE //Raises the aircraft limit +20 for your nation and
         //increases the number of aircraft that can be sent in each attack mission +20.
         bool foreignAirForceBase;
         //Foreign Army Base -
         //$200,000,000 -
-        //Adds an extra +1 offensive war slot.
+        //DONE //Adds an extra +1 offensive war slot.
         //Requires 8,000 technology to purchase.
         bool foreignArmyBase;
         //Foreign Naval Base -
         //$200,000,000 -
-        //Allows +2 naval vessels to be purchased per day (+1 in Peace Mode)
+        //DONE //Allows +2 naval vessels to be purchased per day (+1 in Peace Mode)
         //and also allows +1 naval deployment per day.
         //Requires 20,000 infrastructure.
         bool foreignNavalBase;
@@ -550,7 +550,7 @@ contract WondersContract1 is Ownable {
         return isWonder;
     }
 
-    function getNavyBase(uint256 id) public view returns (bool) {
+    function getForeignNavalBase(uint256 id) public view returns (bool) {
         bool isWonder = idToWonders1[id].foreignNavalBase;
         return isWonder;
     }

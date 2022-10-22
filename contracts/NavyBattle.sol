@@ -5,6 +5,7 @@ import "./CountryMinter.sol";
 import "./Navy.sol";
 import "./War.sol";
 import "./Improvements.sol";
+import "./War.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
@@ -12,6 +13,10 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
     uint256 public blockadeId;
     address public navy;
+    address public navalAction;
+    address public warContract;
+
+    WarContract war;
 
     //Chainlik Variables
     uint256[] private s_randomWords;
@@ -23,6 +28,7 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
     uint32 private constant NUM_WORDS = 1;
 
     NavyContract nav;
+    NavalActionsContract navAct;
 
     struct Blockade {
         uint256 blockadeId;
@@ -33,6 +39,7 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
         bool blockadeActive;
     }
 
+
     mapping(uint256 => Blockade) public blockadeIdToBlockade;
     mapping(uint256 => uint256[]) public idToActiveBlockadesAgainst;
     mapping(uint256 => uint256[]) public idToActiveBlockadesFor;
@@ -41,6 +48,8 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
 
     constructor(
         address _navy,
+        address _navalAction,
+        address _war,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
@@ -48,6 +57,10 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
     ) VRFConsumerBaseV2(vrfCoordinatorV2) {
         navy = _navy;
         nav = NavyContract(_navy);
+        navalAction = _navalAction;
+        navAct = NavalActionsContract(_navalAction);
+        warContract = _war;
+        war = WarContract(_war);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
@@ -59,9 +72,13 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
         nav = NavyContract(newAddress);
     }
 
-    function blockade(uint256 attackerId, uint256 defenderId) public {
-        bool blockadedAlready = nav.getBlockadedToday(defenderId);
+    function blockade(uint256 attackerId, uint256 defenderId, uint256 warId) public {
+        bool blockadedAlready = navAct.getBlockadedToday(defenderId);
         require(blockadedAlready == false, "nation already blockaded today");
+        bool warActive = war.isWarActive(warId);
+        require (warActive, "war !active");
+        uint256 slotsUsed = navAct.getActionSlotsUsed(attackerId);
+        require ((slotsUsed + 1) <= 3, "max slots used");
         uint256 activeBlockadesAgainstCount = idToActiveBlockadesAgainst[
             attackerId
         ].length;
@@ -194,6 +211,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     address public navy;
     address public warAddress;
     address public improvements4;
+    address public navalActions;
     uint256 battleshipStrength = 5;
     uint256 cruiserStrength = 6;
     uint256 frigateStrength = 8;
@@ -219,6 +237,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     NavyContract nav;
     WarContract war;
     ImprovementsContract4 imp4;
+    NavalActionsContract navAct;
 
     struct BreakBlockade {
         uint256 battleshipCount;
@@ -259,6 +278,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         address _navy,
         address _warAddress,
         address _improvements4,
+        address _navalActions,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
@@ -274,6 +294,8 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         war = WarContract(_warAddress);
         improvements4 = _improvements4;
         imp4 = ImprovementsContract4(_improvements4);
+        navalActions = _navalActions;
+        navAct = NavalActionsContract(_navalActions);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
@@ -287,6 +309,10 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     ) public {
         bool isOwner = mint.checkOwnership(attackerId, msg.sender);
         require(isOwner, "caller not nation owner");
+        bool warActive = war.isWarActive(warId);
+        require (warActive, "war !active");
+        uint256 slotsUsed = navAct.getActionSlotsUsed(attackerId);
+        require ((slotsUsed + 1) <= 3, "max slots used");
         uint256[] memory attackerBlockades = navBlock.getActiveBlockadesAgainst(
             attackerId
         );
@@ -742,6 +768,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
     address public navyBlockade;
     address public warAddress;
     address public improvements4;
+    address public navalActions;
     uint256 corvetteStrength = 1;
     uint256 landingShipStrength = 3;
     uint256 battleshipStrength = 5;
@@ -772,6 +799,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
     NavalBlockadeContract navBlock;
     WarContract war;
     ImprovementsContract4 imp4;
+    NavalActionsContract navAct;
 
     struct NavyForces {
         uint256 corvetteCount;
@@ -804,6 +832,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         address _navy,
         address _war,
         address _improvements4,
+        address _navalActions,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
@@ -815,6 +844,8 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         war = WarContract(_war);
         improvements4 = _improvements4;
         imp4 = ImprovementsContract4(_improvements4);
+        navalActions = _navalActions;
+        navAct = NavalActionsContract(_navalActions);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
@@ -837,7 +868,9 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         uint256 defenderId
     ) public {
         bool isActiveWar = war.isWarActive(warId);
-        require(isActiveWar, "!not active war");
+        require(isActiveWar, "!active war");
+        uint256 slotsUsed = navAct.getActionSlotsUsed(attackerId);
+        require ((slotsUsed + 1) <= 3, "max slots used");
         (uint256 warOffense, uint256 warDefense) = war.getInvolvedParties(
             warId
         );

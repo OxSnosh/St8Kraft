@@ -91,29 +91,27 @@ contract AidContract is Ownable {
         uint256 balanceAid,
         uint256 soldiersAid
     ) public {
-        require(idToOwnerAid[idSender] == msg.sender, "!nation ruler");
-        uint256 techAvailable = InfrastructureContract(infrastructure)
-            .getTechnologyCount(idSender);
-        uint256 maxAidSlots = getMaxAidSlots(idSender);
-        uint256 aidSlotsUsedToday = idToAidSlots[idSender];
-        require ((aidSlotsUsedToday + 1) <= maxAidSlots, "already used all aid slots");
-        uint256 balanceAvailable = TreasuryContract(treasury).checkBalance(
-            idSender
+        bool isOwner = mint.checkOwnership(idSender, msg.sender);
+        require(isOwner, "!nation ruler");
+        bool availableAidSlot = checkAidSlots(idSender);
+        require(availableAidSlot, "aid slot not available");
+        bool aidAvailable = checkAvailability(idSender, techAid, balanceAid, soldiersAid);
+        require (aidAvailable, "aid not available");
+        uint256 maxTech = 100;
+        uint256 maxBalance = 6000000;
+        uint256 maxSoldiers = 4000;
+        bool federalAidEligable = getFederalAidEligability(
+            idSender,
+            idRecipient
         );
-        uint256 soldiersAvailable = ForcesContract(forces)
-            .getDefendingSoldierCount(idSender);
-        require(techAvailable >= techAid, "not enough tech for this proposal");
-        require(
-            balanceAvailable >= balanceAid,
-            "not enough funds for this porposal"
-        );
-        require(
-            soldiersAvailable >= soldiersAid,
-            "not enough soldiers for this porposal"
-        );
-        require(techAid <= 100, "max tech aid is 100");
-        require(balanceAid <= 6000000, "max balance aid is 6,000,000");
-        require(soldiersAid <= 4000, "max soldier aid is 4000");
+        if (federalAidEligable) {
+            maxTech = 150;
+            maxBalance = 9000000;
+            maxSoldiers = 6000;
+        }
+        require(techAid <= maxTech, "max tech exceeded");
+        require(balanceAid <= maxBalance, "max balance excedded");
+        require(soldiersAid <= maxSoldiers, "max soldier aid is excedded");
         Proposal memory newProposal = Proposal(
             block.timestamp,
             idSender,
@@ -128,6 +126,41 @@ contract AidContract is Ownable {
         aidProposalId++;
     }
 
+    function checkAidSlots(uint256 idSender) public view returns (bool) {
+        uint256 maxAidSlots = getMaxAidSlots(idSender);
+        uint256 aidSlotsUsedToday = idToAidSlots[idSender];
+        if ((aidSlotsUsedToday + 1) <= maxAidSlots) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function checkAvailability(
+        uint256 idSender,
+        uint256 techAid,
+        uint256 balanceAid,
+        uint256 soldiersAid
+    ) public view returns (bool) {
+        uint256 techAvailable = InfrastructureContract(infrastructure)
+            .getTechnologyCount(idSender);
+        uint256 balanceAvailable = TreasuryContract(treasury).checkBalance(
+            idSender
+        );
+        uint256 soldiersAvailable = ForcesContract(forces)
+            .getDefendingSoldierCount(idSender);
+        require(techAvailable >= techAid, "not enough tech for this proposal");
+        require(
+            balanceAvailable >= balanceAid,
+            "not enough funds for this porposal"
+        );
+        require(
+            soldiersAvailable >= soldiersAid,
+            "not enough soldiers for this porposal"
+        );
+        return true;
+    }
+
     function getMaxAidSlots(uint256 id) public view returns (uint256) {
         uint256 maxAidSlotsPerDay = 1;
         bool disasterReliefAgency = won1.getDisasterReliefAgency(id);
@@ -135,6 +168,20 @@ contract AidContract is Ownable {
             maxAidSlotsPerDay += 1;
         }
         return (maxAidSlotsPerDay);
+    }
+
+    function getFederalAidEligability(uint256 idSender, uint256 idRecipient)
+        public
+        view
+        returns (bool)
+    {
+        bool senderEligable = won1.getFederalAidComission(idSender);
+        bool recipientEligable = won1.getFederalAidComission(idRecipient);
+        if (senderEligable && recipientEligable) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     function proposalExpired(uint256 proposalId) public view returns (bool) {
@@ -198,14 +245,14 @@ contract AidContract is Ownable {
     }
 
     modifier onlyKeeper() {
-        require (msg.sender == keeper, "only callable from keeper contract");
+        require(msg.sender == keeper, "only callable from keeper contract");
         _;
     }
 
     function resetAidProposals() public onlyKeeper {
         uint256 countryCount = mint.getCountryCount();
         countryCount -= 1;
-        for (uint i = 0; i < countryCount; i++) {
+        for (uint256 i = 0; i < countryCount; i++) {
             idToAidSlots[i] = 0;
         }
     }

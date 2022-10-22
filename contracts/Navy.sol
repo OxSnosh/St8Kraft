@@ -8,7 +8,106 @@ import "./Resources.sol";
 import "./Military.sol";
 import "./Nuke.sol";
 import "./Wonders.sol";
+import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract NavalActionsContract is Ownable {
+    address public keeper;
+    address public navy;
+    address public navalBlockade;
+    address public breakBlockade;
+    address public navalAttack;
+    address public countryMinter;
+
+    CountryMinter mint;
+
+
+    struct NavalActions {
+        bool blockadedToday;
+        uint256 purchasesToday;
+        uint256 actionSlotsUsedToday;
+    }
+
+    mapping(uint256 => NavalActions) idToNavalActions;
+
+    constructor(
+        address _navalBlockade,
+        address _breakBlockade,
+        address _navalAttack,
+        address _keeper,
+        address _navy,
+        address _countryMinter
+    ) {
+        navalBlockade = _navalBlockade;
+        breakBlockade = _breakBlockade;
+        navalAttack = _navalAttack;
+        navy = _navy;
+        keeper = _keeper;
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
+    }
+
+    modifier onlyNavalAction() {
+        require(
+            msg.sender == navalBlockade ||
+                msg.sender == breakBlockade ||
+                msg.sender == navalAttack,
+            "!valid caller"
+        );
+        _;
+    }
+
+    function increaseAction(uint256 id) public onlyNavalAction {
+        idToNavalActions[id].actionSlotsUsedToday += 1;
+    }
+
+    modifier onlyNavy() {
+        require(msg.sender == navy, "!valid caller");
+        _;
+    }
+
+    function increasePurchases(uint256 id, uint256 amount) public onlyNavy {
+        idToNavalActions[id].purchasesToday += amount;
+    }
+
+    modifier onlyBlockade() {
+        require(msg.sender == navalBlockade, "!valid caller");
+        _;
+    }
+
+    function toggleBlockaded(uint256 id) public onlyNavy {
+        idToNavalActions[id].blockadedToday = true;
+    }
+
+    modifier onlyKeeper() {
+        require(msg.sender == keeper, "only callable from keeper");
+        _;
+    }
+
+    function resetActionsToday() public onlyKeeper {
+        uint256 countryCount = mint.getCountryCount();
+        for (uint256 i = 0; i <= countryCount; i++) {
+            idToNavalActions[i].purchasesToday = 0;
+            idToNavalActions[i].actionSlotsUsedToday = 0;
+            idToNavalActions[i].blockadedToday = false;
+        }
+    }
+
+    function getPurchasesToday(uint256 id) public view returns (uint256) {
+        uint256 purchasesToday = idToNavalActions[id].purchasesToday;
+        return purchasesToday;
+    }
+
+    function getActionSlotsUsed(uint256 id) public view returns (uint256) {
+        uint256 actionSlotsUsed = idToNavalActions[id].actionSlotsUsedToday;
+        return actionSlotsUsed;
+    }
+
+    function getBlockadedToday(uint256 id) public view returns (bool) {
+        bool blockadedToday = idToNavalActions[id].blockadedToday;
+        return blockadedToday; 
+    }
+}
 
 contract NavyContract is Ownable {
     address public treasuryAddress;
@@ -21,6 +120,7 @@ contract NavyContract is Ownable {
     address public military;
     address public nukes;
     address public wonders1;
+    address public navalActions;
     uint256 public corvetteCost;
     uint256 public landingShipCost;
     uint256 public battleshipCost;
@@ -40,9 +140,6 @@ contract NavyContract is Ownable {
         uint256 destroyerCount;
         uint256 submarineCount;
         uint256 aircraftCarrierCount;
-        //need keeper to reset to 0
-        bool blockadedToday;
-        uint256 purchasesToday;
     }
 
     mapping(uint256 => Navy) public idToNavy;
@@ -54,6 +151,7 @@ contract NavyContract is Ownable {
     ImprovementsContract4 imp4;
     NukeContract nuke;
     WondersContract1 won1;
+    NavalActionsContract navAct;
 
     constructor(
         address _treasuryAddress,
@@ -64,7 +162,8 @@ contract NavyContract is Ownable {
         address _resources,
         address _military,
         address _nukes,
-        address _wonders1
+        address _wonders1,
+        address _navalActions
     ) {
         treasuryAddress = _treasuryAddress;
         improvementsContract1Address = _improvementsContract1Address;
@@ -81,6 +180,11 @@ contract NavyContract is Ownable {
         nuke = NukeContract(_nukes);
         wonders1 = _wonders1;
         won1 = WondersContract1(_wonders1);
+        navalActions = _navalActions;
+        navAct = NavalActionsContract(_navalActions);
+    }
+
+    function initiateCosts() public onlyOwner {
         corvetteCost = 300000;
         landingShipCost = 300000;
         battleshipCost = 300000;
@@ -92,7 +196,7 @@ contract NavyContract is Ownable {
     }
 
     function generateNavy(uint256 id, address nationOwner) public {
-        Navy memory newNavy = Navy(0, 0, 0, 0, 0, 0, 0, 0, 0, false, 0);
+        Navy memory newNavy = Navy(0, 0, 0, 0, 0, 0, 0, 0, 0);
         idToNavy[id] = newNavy;
         idToOwnerNavy[id] = nationOwner;
     }
@@ -241,6 +345,7 @@ contract NavyContract is Ownable {
         require(balance >= purchasePrice);
         idToNavy[id].corvetteCount += amount;
         idToNavy[id].navyVessels += amount;
+        navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
@@ -279,6 +384,7 @@ contract NavyContract is Ownable {
         require(balance >= purchasePrice);
         idToNavy[id].landingShipCount += amount;
         idToNavy[id].navyVessels += amount;
+        navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
@@ -317,6 +423,7 @@ contract NavyContract is Ownable {
         require(balance >= purchasePrice);
         idToNavy[id].battleshipCount += amount;
         idToNavy[id].navyVessels += amount;
+        navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
@@ -355,6 +462,7 @@ contract NavyContract is Ownable {
         require(balance >= purchasePrice);
         idToNavy[id].cruiserCount += amount;
         idToNavy[id].navyVessels += amount;
+        navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
@@ -397,6 +505,7 @@ contract NavyContract is Ownable {
         require(balance >= purchasePrice);
         idToNavy[id].frigateCount += amount;
         idToNavy[id].navyVessels += amount;
+        navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
@@ -439,6 +548,7 @@ contract NavyContract is Ownable {
         require(balance >= purchasePrice);
         idToNavy[id].destroyerCount += amount;
         idToNavy[id].navyVessels += amount;
+        navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
@@ -481,6 +591,7 @@ contract NavyContract is Ownable {
         require(balance >= purchasePrice);
         idToNavy[id].submarineCount += amount;
         idToNavy[id].navyVessels += amount;
+        navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
@@ -523,6 +634,7 @@ contract NavyContract is Ownable {
         require(balance >= purchasePrice);
         idToNavy[id].aircraftCarrierCount += amount;
         idToNavy[id].navyVessels += amount;
+        navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
@@ -543,7 +655,10 @@ contract NavyContract is Ownable {
         _;
     }
 
-    function decreaseNavyFromNukeContract(uint256 defenderId) public onlyNukeContract {
+    function decreaseNavyFromNukeContract(uint256 defenderId)
+        public
+        onlyNukeContract
+    {
         //corvettes, landing ships, cruisers, frigates
         uint256 corvetteCount = idToNavy[defenderId].corvetteCount;
         uint256 landingShipCount = idToNavy[defenderId].landingShipCount;
@@ -554,20 +669,33 @@ contract NavyContract is Ownable {
         if (falloutShelter) {
             percentage = 12;
         }
-        idToNavy[defenderId].corvetteCount -= ((corvetteCount * percentage) / 100);
-        idToNavy[defenderId].landingShipCount -= ((landingShipCount * percentage) / 100);
-        idToNavy[defenderId].cruiserCount -= ((cruiserCount * percentage) / 100);
-        idToNavy[defenderId].frigateCount -= ((frigateCount * percentage) / 100);
+        idToNavy[defenderId].corvetteCount -= ((corvetteCount * percentage) /
+            100);
+        idToNavy[defenderId].landingShipCount -= ((landingShipCount *
+            percentage) / 100);
+        idToNavy[defenderId].cruiserCount -= ((cruiserCount * percentage) /
+            100);
+        idToNavy[defenderId].frigateCount -= ((frigateCount * percentage) /
+            100);
     }
 
     function getAvailablePurchases(uint256 id) public view returns (uint256) {
-        uint256 purchasesToday = idToNavy[id].purchasesToday;
+        uint256 purchasesToday = navAct.getPurchasesToday(id);
         uint256 maxDailyPurchases;
         bool isWar = mil.getWarPeacePreference(id);
+        bool foreignNavalBase = won1.getForeignNavalBase(id);
         if (isWar) {
-            maxDailyPurchases = 5;
-        } else {
-            maxDailyPurchases = 2;
+            if (foreignNavalBase) {
+                maxDailyPurchases = 7;
+            } else if (!foreignNavalBase) {
+                maxDailyPurchases = 5;
+            }
+        } else if (!isWar) {
+            if (foreignNavalBase) {
+                maxDailyPurchases = 4;
+            } else if (!foreignNavalBase) {
+                maxDailyPurchases = 2;
+            }
         }
         uint256 navalConstructionYards = imp4.getNavalConstructionYardCount(id);
         if (navalConstructionYards > 0) {
@@ -575,11 +703,6 @@ contract NavyContract is Ownable {
         }
         uint256 availablePurchases = (maxDailyPurchases - purchasesToday);
         return availablePurchases;
-    }
-
-    function getBlockadedToday(uint256 id) public view returns (bool) {
-        bool blockadedToday = idToNavy[id].blockadedToday;
-        return blockadedToday;
     }
 
     function getBlockadeCapableShips(uint256 id) public view returns (uint256) {

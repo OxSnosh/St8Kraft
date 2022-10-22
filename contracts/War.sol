@@ -3,6 +3,7 @@ pragma solidity 0.8.7;
 
 import "./NationStrength.sol";
 import "./Military.sol";
+import "./Wonders.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract WarContract is Ownable {
@@ -15,10 +16,13 @@ contract WarContract is Ownable {
     address public groundBattle;
     address public cruiseMissile;
     address public forces;
+    address public wonders1;
+    address public keeper;
     uint256[] public activeWars;
 
     NationStrengthContract nsc;
     MilitaryContract mil;
+    WondersContract1 won1;
 
     struct War {
         uint256 warId;
@@ -122,6 +126,7 @@ contract WarContract is Ownable {
     mapping(uint256 => OffenseLosses) public warIdToOffenseLosses;
     mapping(uint256 => DefenseLosses) public warIdToDefenseLosses;
     mapping(uint256 => uint256[]) public idToActiveWars;
+    mapping(uint256 => uint256[]) public idToOffensiveWars;
 
     constructor(
         address _countryMinter,
@@ -131,7 +136,9 @@ contract WarContract is Ownable {
         address _airBattleAddress,
         address _groundBattle,
         address _cruiseMissile,
-        address _forces
+        address _forces,
+        address _wonders1,
+        address _keeper
     ) {
         countryMinter = _countryMinter;
         nationStrength = _nationStrength;
@@ -143,6 +150,9 @@ contract WarContract is Ownable {
         mil = MilitaryContract(_military);
         cruiseMissile = _cruiseMissile;
         forces = _forces;
+        wonders1 = _wonders1;
+        won1 = WondersContract1(_wonders1);
+        keeper = _keeper;
     }
 
     function updateCountryMinterContract(address newAddress) public onlyOwner {
@@ -234,11 +244,19 @@ contract WarContract is Ownable {
             0
         );
         warIdToDefenseLosses[warId] = newDefenseLosses;
+        uint256[] storage offensiveWars = idToOffensiveWars[offenseId];
+        uint256 maxOffensiveWars = 4;
+        bool foreignArmyBase = won1.getForeignArmyBase(offenseId);
+        if(foreignArmyBase) {
+            maxOffensiveWars = 5;
+        }
+        require (offensiveWars.length <= maxOffensiveWars, "you do not have a war slot available");
         uint256[] storage offenseActiveWars = idToActiveWars[offenseId];
         offenseActiveWars.push(warId);
         uint256[] storage defenseActiveWars = idToActiveWars[defenseId];
         defenseActiveWars.push(warId);
         initializeDeployments(warId);
+        activeWars[warId] = warId;
         warId++;
     }
 
@@ -333,15 +351,14 @@ contract WarContract is Ownable {
         if (offensePeaceOffered == true && defensePeaceOffered == true) {
             warIdToWar[_warId].peaceDeclared = true;
             warIdToWar[_warId].active = false;
-            removeActiveWar(offenseNation, defenseNation, _warId);
+            removeActiveWar(_warId);
         }
     }
 
     function removeActiveWar(
-        uint256 offenseId,
-        uint256 defenseId,
         uint256 _warId
     ) internal {
+        (uint256 offenseId, uint256 defenseId) = getInvolvedParties(_warId);
         uint256[] storage offenseActiveWars = idToActiveWars[offenseId];
         for (uint256 i = 0; i < offenseActiveWars.length; i++) {
             if (offenseActiveWars[i] == _warId) {
@@ -352,6 +369,16 @@ contract WarContract is Ownable {
                 idToActiveWars[offenseId] = offenseActiveWars;
             }
         }
+        uint256[] storage offensiveWars = idToOffensiveWars[offenseId];
+        for (uint256 i = 0; i < offensiveWars.length; i++) {
+            if (offensiveWars[i] == _warId) {
+                offensiveWars[i] = offensiveWars[
+                    offenseActiveWars.length - 1
+                ];
+                offensiveWars.pop();
+                idToOffensiveWars[offenseId] = offenseActiveWars;
+            }
+        }
         uint256[] storage defenseActiveWars = idToActiveWars[defenseId];
         for (uint256 i = 0; i < defenseActiveWars.length; i++) {
             if (defenseActiveWars[i] == _warId) {
@@ -360,6 +387,22 @@ contract WarContract is Ownable {
                 ];
                 defenseActiveWars.pop();
                 idToActiveWars[defenseId] = defenseActiveWars;
+            }
+        }
+        delete activeWars[_warId];
+    }
+
+    modifier onlyKeeper() {
+        require(msg.sender == keeper, "function only callable from keeper file");
+        _;
+    }
+
+    function decrementWarDaysLeft() public onlyKeeper {
+        for(uint256 i = 1; i < activeWars.length; i++) {
+            uint256 war = activeWars[i];
+            warIdToWar[war].daysLeft -= 1;
+            if (warIdToWar[war].daysLeft == 0) {
+                removeActiveWar(war);
             }
         }
     }
