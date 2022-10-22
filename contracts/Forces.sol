@@ -8,6 +8,7 @@ import "./Wonders.sol";
 import "./Improvements.sol";
 import "./CountryMinter.sol";
 import "./War.sol";
+import "./NationStrength.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract ForcesContract is Ownable {
@@ -614,6 +615,7 @@ contract MissilesContract is Ownable {
     // address public groundBattle;
     // address public warAddress;
     address public countryinter;
+    address public strength;
 
     CountryMinter mint;
     InfrastructureContract inf;
@@ -624,6 +626,7 @@ contract MissilesContract is Ownable {
     WarContract war;
     TreasuryContract tsy;
     WondersContract2 won2;
+    NationStrengthContract stren;
 
     struct Missiles {
         uint256 cruiseMissiles;
@@ -638,7 +641,8 @@ contract MissilesContract is Ownable {
         // address _cruiseMissile,
         address _nukeAddress,
         address _airBattle,
-        address _wonders2
+        address _wonders2,
+        address _strength
         // address _groundBattle,
         // address _warAddress
     ) {
@@ -651,6 +655,8 @@ contract MissilesContract is Ownable {
         airBattle = _airBattle;
         wonders2 = _wonders2;
         won2 = WondersContract2(_wonders2);
+        strength = _strength;
+        stren = NationStrengthContract(_strength);
         // warAddress = _warAddress;
         // war = WarContract(_warAddress);
         // groundBattle = _groundBattle;
@@ -803,6 +809,9 @@ contract MissilesContract is Ownable {
         require(infrastructureAmount >= 1000, "insufficient infrastructure");
         bool isUranium = res.viewUranium(id);
         require(isUranium, "no uranium");
+        uint256 nationStrength = stren.getNationStrength(id);
+        bool manhattanProject = won2.getManhattanProject(id);
+        require (nationStrength > 150000 || manhattanProject, "nation strength too low");
         uint256 nukesPurchasedToday = idToMissiles[id].nukesPurchasedToday;
         require(nukesPurchasedToday < 1, "already purchased nuke today");
         idToMissiles[id].nukesPurchasedToday += 1;

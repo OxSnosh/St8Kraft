@@ -27,6 +27,8 @@ contract KeeperContract is Ownable {
     function keeperFunctionToCall() public {
         shiftNukeDays();
         resetAidProposals();
+        decremenWarDays();
+        resetCruiseMissileLaunches();
     }
 
     function shiftNukeDays() public {
@@ -39,5 +41,9 @@ contract KeeperContract is Ownable {
 
     function decremenWarDays() public {
         war.decrementWarDaysLeft();
+    }
+
+    function resetCruiseMissileLaunches() public {
+        war.resetCruiseMissileLaunches();
     }
 }

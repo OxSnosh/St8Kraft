@@ -159,7 +159,7 @@ contract InfrastructureMarketContract is Ownable {
             constructionMultiplier = 5;
         }
         if (isInterstateSystem) {
-            insterstateSystemMultiplier = 6;
+            insterstateSystemMultiplier = 8;
         }
         if (isAccomodativeGovernment) {
             accomodativeGovernmentMultiplier = 5;

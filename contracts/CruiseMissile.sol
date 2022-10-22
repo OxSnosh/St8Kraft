@@ -5,6 +5,7 @@ import "./Forces.sol";
 import "./CountryMinter.sol";
 import "./War.sol";
 import "./Infrastructure.sol";
+import "./Wonders.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
@@ -19,6 +20,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
     address public improvements1;
     address public improvements3;
     address public improvements4;
+    address public wonders2;
 
     //Chainlik Variables
     uint256[] private s_randomWords;
@@ -37,6 +39,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
     ImprovementsContract1 imp1;
     ImprovementsContract3 imp3;
     ImprovementsContract4 imp4;
+    WondersContract2 won2;
 
     struct CruiseMissileAttack {
         uint256 warId;
@@ -81,7 +84,8 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
     function constructorContinued(
         address _improvements1,
         address _improvements3,
-        address _improvements4
+        address _improvements4,
+        address _wonders2
     ) public onlyOwner {
         improvements1 = _improvements1;
         imp1 = ImprovementsContract1(_improvements1);
@@ -89,6 +93,8 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         imp3 = ImprovementsContract3(_improvements3);
         improvements4 = _improvements4;
         imp4 = ImprovementsContract4(_improvements4);
+        wonders2 = _wonders2;
+        won2 = WondersContract2(_wonders2);
     }
 
     function updateForcesContract(address newAddress) public onlyOwner {
@@ -146,6 +152,10 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         );
         uint256 attackerSattelites = imp3.getSatelliteCount(attackerId);
         uint256 successOdds = 75;
+        bool interceptor = won2.getInterceptorMissileSystem(defenderId);
+        if (interceptor) {
+            successOdds -= 25;
+        }
         if (defenderMissileDefenses > 0) {
             successOdds -= (5 * defenderMissileDefenses);
         }
@@ -155,11 +165,16 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         uint256[] memory randomNumbers = s_requestIndexToRandomWords[
             requestNumber
         ];
-        uint256 randomNumber = (randomNumbers[0] % 100);
-        if (randomNumber < successOdds) {
-            destroyTanks(requestNumber);
-            destroyTech(requestNumber);
-            destroyInfrastructure(requestNumber);
+        uint256 successNumber = (randomNumbers[0] % 100);
+        uint256 damageTypeNumber = (randomNumbers[1] % 3);
+        if (successNumber < successOdds) {
+            if (damageTypeNumber == 0) {
+                destroyTanks(requestNumber);
+            } else if (damageTypeNumber == 1) {
+                destroyTech(requestNumber);
+            } else if (damageTypeNumber == 2) {
+                destroyInfrastructure(requestNumber);
+            }
         } else {
             /* emit thwarted event */
         }
@@ -175,7 +190,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
             attackerId
         );
         uint256 randomTankCount = (10 +
-            (randomNumbers[1] % 5) +
+            (randomNumbers[2] % 5) +
             attackerMunitionsFactory -
             defenderBunkerCount);
         if (tankCount <= randomTankCount) {
@@ -224,7 +239,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
                 attackerId
             );
             uint256 randomInfrastructureCount = (5 +
-                (randomNumbers[2] % 5) +
+                (randomNumbers[3] % 5) +
                 attackerMunitionsFactory -
                 defenderBunkerCount);
             inf.decreaseInfrastructureCountFromCruiseMissileContract(

@@ -398,12 +398,20 @@ contract WarContract is Ownable {
     }
 
     function decrementWarDaysLeft() public onlyKeeper {
-        for(uint256 i = 1; i < activeWars.length; i++) {
+        for(uint256 i = 0; i < activeWars.length; i++) {
             uint256 war = activeWars[i];
             warIdToWar[war].daysLeft -= 1;
             if (warIdToWar[war].daysLeft == 0) {
                 removeActiveWar(war);
             }
+        }
+    }
+
+    function resetCruiseMissileLaunches() public onlyKeeper {
+        for (uint256 i = 0; i < activeWars.length; i++) {
+            uint256 war = activeWars[i];
+            warIdToWar[war].offenseCruiseMissileLaunchesToday = 0;
+            warIdToWar[war].defenseCruiseMissileLaunchesToday = 0;
         }
     }
 

@@ -15,6 +15,7 @@ contract BillsContract is Ownable {
     address public countryMinter;
     address public treasury;
     address public wonders1;
+    address public wonders2;
     address public infrastructure;
     address public forces;
     address public fighters;
@@ -26,6 +27,7 @@ contract BillsContract is Ownable {
 
     TreasuryContract tsy;
     WondersContract1 won1;
+    WondersContract2 won2;
     InfrastructureContract inf;
     ForcesContract frc;
     FightersContract fight;
@@ -41,6 +43,7 @@ contract BillsContract is Ownable {
         address _countryMinter,
         address _treasury,
         address _wonders1,
+        address _wonders2,
         address _infrastructure,
         address _forces,
         address _fighters,
@@ -52,6 +55,8 @@ contract BillsContract is Ownable {
         tsy = TreasuryContract(_treasury);
         wonders1 = _wonders1;
         won1 = WondersContract1(_wonders1);
+        wonders2 = _wonders2;
+        won2 = WondersContract2(_wonders2);
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
         forces = _forces;
@@ -240,6 +245,10 @@ contract BillsContract is Ownable {
         uint256 laborCamps = imp2.getLaborCampCount(id);
         if (laborCamps > 0) {
             infrastructureUpkeepModifier -= (laborCamps * 10);
+        }
+        bool interstate = won2.getInterstateSystem(id);
+        if (interstate) {
+            infrastructureUpkeepModifier -= 8;
         }
         uint256 dailyInfrastructureBillsDue = ((baseDailyInfrastructureUpkeep *
             infrastructureUpkeepModifier) / 100);

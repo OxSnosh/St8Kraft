@@ -594,28 +594,28 @@ contract WondersContract2 is Ownable {
         bool greatUniversity;
         //Hidden Nuclear Missile Silo -
         //$30,000,000 -
-        //Allows your nation to develop +5 nuclear missiles that cannot be destroyed in spy attacks.
+        //DONE //Allows your nation to develop +5 nuclear missiles that cannot be destroyed in spy attacks.
         //(Nations must first be nuclear capable in order to purchase nukes.)
         bool hiddenNuclearMissileSilo;
         //Interceptor Missile System (IMS) -
         //$50,000,000 -
-        //Thwarts Cruise Missile Attacks, 50% of the time (removes 1 attackers CM strike chance for that day when successful).
+        //DONE //Thwarts Cruise Missile Attacks, 50% of the time (removes 1 attackers CM strike chance for that day when successful).
         //Requires 5,000 technology and a Strategic Defense Initiative (SDI).
         bool interceptorMissileSystem;
         //Internet -
         //$35,000,000 -
-        //Provides Internet infrastructure throughout your nation.
+        //DONE //Provides Internet infrastructure throughout your nation.
         //Increases population happiness +5.
         bool internet;
         //Interstate System -
         //$45,000,000 -
         //The interstate system allows goods and materials to be transported throughout your nation with greater ease.
-        //Decreases initial infrastructure cost -8% and
-        //decreases infrastructure upkeep costs -8%.
+        //DONE //Decreases initial infrastructure cost -8% and
+        //DONE //decreases infrastructure upkeep costs -8%.
         bool interstateSystem;
         //Manhattan Project -
         //$100,000,000 -
-        //The Manhattan Project allows nations below 5% of the top nations in the game to develop nuclear weapons.
+        //DONE //The Manhattan Project allows nations below (150k strength) 5% of the top nations in the game to develop nuclear weapons.
         //The Manhattan Project cannot be destroyed once it is created.
         //The wonder requires 3,000 infrastructure, 300 technology, and a uranium resource.
         bool manhattanProject;
@@ -647,7 +647,7 @@ contract WondersContract2 is Ownable {
         bool marsMine;
         //Mining Industry Consortium -
         //$25,000,000 -
-        //Increases population income by $2.00 for the resources Coal, Lead, Oil, Uranium that your nation has access to.
+        //DONE //Increases population income by $2.00 for the resources Coal, Lead, Oil, Uranium that your nation has access to.
         //Requires 5,000 infrastructure, 3,000 land purchased, 1,000 technology.
         bool miningIndustryConsortium;
     }
@@ -1104,6 +1104,11 @@ contract WondersContract2 is Ownable {
         return isWonder;
     }
 
+    function getInterceptorMissileSystem(uint256 countryId) public view returns (bool) {
+        bool isWonder = idToWonders2[countryId].interceptorMissileSystem;
+        return isWonder;
+    }
+
     function getInternet(uint256 countryId) public view returns (bool) {
         bool isWonder = idToWonders2[countryId].internet;
         return isWonder;
@@ -1131,6 +1136,11 @@ contract WondersContract2 is Ownable {
 
     function getMarsMine(uint256 countryId) public view returns (bool) {
         bool isWonder = idToWonders2[countryId].marsMine;
+        return isWonder;
+    }
+
+    function getMiningIndustryConsortium(uint256 countryId) public view returns (bool) {
+        bool isWonder = idToWonders2[countryId].miningIndustryConsortium;
         return isWonder;
     }
 }

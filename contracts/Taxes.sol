@@ -28,6 +28,7 @@ contract TaxesContract is Ownable {
     address public forces;
     address public military;
     address public crime;
+    address public additionalTaxes;
 
     InfrastructureContract inf;
     TreasuryContract tsy;
@@ -43,6 +44,7 @@ contract TaxesContract is Ownable {
     ForcesContract frc;
     MilitaryContract mil;
     CrimeContract crm;
+    AdditionalTaxesContract addTax;
 
     constructor(
         address _countryMinter,
@@ -50,7 +52,8 @@ contract TaxesContract is Ownable {
         address _treasury,
         address _improvements1,
         address _improvements2,
-        address _improvements3
+        address _improvements3,
+        address _additionalTaxes
     ) {
         countryMinter = _countryMinter;
         infrastructure = _infrastructure;
@@ -63,6 +66,8 @@ contract TaxesContract is Ownable {
         imp2 = ImprovementsContract2(_improvements2);
         improvements3 = _improvements3;
         imp3 = ImprovementsContract3(_improvements3);
+        additionalTaxes = _additionalTaxes;
+        addTax = AdditionalTaxesContract(_additionalTaxes);
     }
 
     function constructorContinued(
@@ -211,7 +216,7 @@ contract TaxesContract is Ownable {
             (casinos * 1));
         uint256 baseDailyIncomePerCitizen = (35 +
             (((2 * happiness) * multipliers) / 100));
-        uint256 incomeAdjustments = getIncomeAdjustments(id);
+        uint256 incomeAdjustments = addTax.getIncomeAdjustments(id);
         uint256 dailyIncomePerCitizen = baseDailyIncomePerCitizen +
             incomeAdjustments;
         return dailyIncomePerCitizen;
@@ -287,7 +292,7 @@ contract TaxesContract is Ownable {
         uint256 govType = params.getGovernmentType(id);
         uint256 preferredReligion = params.getReligionPreference(id);
         uint256 preferredGovernment = params.getGovernmentPreference(id);
-        (bool monument, bool temple,,,) = wonderChecks1(id);
+        (bool monument, bool temple, , , ) = wonderChecks1(id);
         uint256 religionPoints;
         uint256 governmentPoints;
         if (religion == preferredReligion || temple) {
@@ -710,6 +715,91 @@ contract TaxesContract is Ownable {
         }
         return pointsToSubtractFromImprovements;
     }
+}
+
+contract AdditionalTaxesContract is Ownable {
+    // address public countryMinter;
+    // address public infrastructure;
+    // address public treasury;
+    // address public improvements1;
+    // address public improvements2;
+    // address public improvements3;
+    // address public parameters;
+    address public wonders1;
+    address public wonders2;
+    // address public wonders3;
+    // address public wonders4;
+    address public resources;
+    // address public forces;
+    // address public military;
+    // address public crime;
+
+    // InfrastructureContract inf;
+    // TreasuryContract tsy;
+    // ImprovementsContract1 imp1;
+    // ImprovementsContract2 imp2;
+    // ImprovementsContract3 imp3;
+    // CountryParametersContract params;
+    WondersContract1 won1;
+    WondersContract2 won2;
+    // WondersContract3 won3;
+    // WondersContract4 won4;
+    ResourcesContract res;
+    // ForcesContract frc;
+    // MilitaryContract mil;
+    // CrimeContract crm;
+
+    constructor(
+        // address _countryMinter,
+        // address _infrastructure,
+        // address _treasury,
+        // address _improvements1,
+        // address _improvements2,
+        // address _improvements3
+    ) {
+        // countryMinter = _countryMinter;
+        // infrastructure = _infrastructure;
+        // inf = InfrastructureContract(_infrastructure);
+        // treasury = _treasury;
+        // tsy = TreasuryContract(_treasury);
+        // improvements1 = _improvements1;
+        // imp1 = ImprovementsContract1(_improvements1);
+        // improvements2 = _improvements2;
+        // imp2 = ImprovementsContract2(_improvements2);
+        // improvements3 = _improvements3;
+        // imp3 = ImprovementsContract3(_improvements3);
+    }
+
+    function constructorContinued(
+        // address _parameters,
+        address _wonders1,
+        address _wonders2,
+        // address _wonders3,
+        // address _wonders4,
+        address _resources
+        // address _forces,
+        // address _military,
+        // address _crime
+    ) public onlyOwner {
+        // parameters = _parameters;
+        // params = CountryParametersContract(_parameters);
+        wonders1 = _wonders1;
+        won1 = WondersContract1(_wonders1);
+        wonders2 = _wonders2;
+        won2 = WondersContract2(_wonders2);
+        // wonders3 = _wonders3;
+        // won3 = WondersContract3(_wonders3);
+        // wonders4 = _wonders4;
+        // won4 = WondersContract4(_wonders4);
+        resources = _resources;
+        res = ResourcesContract(_resources);
+        // forces = _forces;
+        // frc = ForcesContract(_forces);
+        // military = _military;
+        // mil = MilitaryContract(_military);
+        // crime = _crime;
+        // crm = CrimeContract(_crime);
+    }
 
     function getIncomeAdjustments(uint256 id) public view returns (uint256) {
         uint256 adjustments = 0;
@@ -737,6 +827,36 @@ contract TaxesContract is Ownable {
         if (agriDevProgram) {
             adjustments += 2;
         }
+        bool miningIndustryConsortium = won2.getMiningIndustryConsortium(id);
+        if (miningIndustryConsortium) {
+            uint256 points = getResourcePointsForMiningConsortium(id);
+            adjustments += (2 * points);
+        }
         return adjustments;
+    }
+
+    function getResourcePointsForMiningConsortium(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 points = 0;
+        bool coal = res.viewCoal(id);
+        if (coal) {
+            points += 1;
+        }
+        bool lead = res.viewLead(id);
+        if (lead) {
+            points += 1;
+        }
+        bool oil = res.viewOil(id);
+        if (oil) {
+            points += 1;
+        }
+        bool uranium = res.viewUranium(id);
+        if (uranium) {
+            points += 1;
+        }
+        return points;
     }
 }
