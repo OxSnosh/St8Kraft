@@ -209,10 +209,11 @@ contract TaxesContract is Ownable {
             (universities * 8) -
             (guerillaCamp * 8) -
             (casinos * 1));
-        uint256 baseDailyIncomePerCitizen = (35 + (((2 * happiness) *
-            multipliers) / 100));
+        uint256 baseDailyIncomePerCitizen = (35 +
+            (((2 * happiness) * multipliers) / 100));
         uint256 incomeAdjustments = getIncomeAdjustments(id);
-        uint256 dailyIncomePerCitizen = baseDailyIncomePerCitizen + incomeAdjustments;
+        uint256 dailyIncomePerCitizen = baseDailyIncomePerCitizen +
+            incomeAdjustments;
         return dailyIncomePerCitizen;
     }
 
@@ -230,27 +231,31 @@ contract TaxesContract is Ownable {
         uint256 pointsFromResources = getPointsFromResources(id);
         uint256 pointsFromImprovements = getPointsFromImprovements(id);
         uint256 wonderPoints = getHappinessFromWonders(id);
-        uint256 additionalHappinessPoints = getAdditionalHappinessPointsToAdd(id);
+        uint256 additionalHappinessPoints = getAdditionalHappinessPointsToAdd(
+            id
+        );
         uint256 happinessPointsToAdd = (compatabilityPoints +
             densityPoints +
             pointsFromResources +
             pointsFromImprovements +
-            wonderPoints+
+            wonderPoints +
             additionalHappinessPoints);
         return happinessPointsToAdd;
     }
 
-    function getAdditionalHappinessPointsToAdd(uint256 id) internal view returns (uint256) {
+    function getAdditionalHappinessPointsToAdd(uint256 id)
+        internal
+        view
+        returns (uint256)
+    {
         uint256 technologyPoints = getTechnologyPoints(id);
         uint256 pointsFromAge = getPointsFromNationAge(id);
         uint256 pointsFromTrades = getPointsFromTrades(id);
         uint256 pointsFromDefcon = getPointsFromDefcon(id);
-        uint256 additonalHappinessPointsToAdd = (
-            technologyPoints +
+        uint256 additonalHappinessPointsToAdd = (technologyPoints +
             pointsFromAge +
             pointsFromTrades +
-            pointsFromDefcon
-        );
+            pointsFromDefcon);
         return additonalHappinessPointsToAdd;
     }
 
@@ -262,10 +267,12 @@ contract TaxesContract is Ownable {
         uint256 taxRatePoints = getTaxRatePoints(id);
         uint256 pointsFromStability = getPointsFromMilitary(id);
         uint256 pointsFromCrime = getPointsFromCriminals(id);
-        uint256 pointsFromImprovements = getPointsToSubtractFromImprovements(id);
+        uint256 pointsFromImprovements = getPointsToSubtractFromImprovements(
+            id
+        );
         uint256 happinessPointsToSubtract = (35 -
             taxRatePoints -
-            pointsFromCrime - 
+            pointsFromCrime -
             pointsFromImprovements -
             pointsFromStability);
         return happinessPointsToSubtract;
@@ -280,12 +287,13 @@ contract TaxesContract is Ownable {
         uint256 govType = params.getGovernmentType(id);
         uint256 preferredReligion = params.getReligionPreference(id);
         uint256 preferredGovernment = params.getGovernmentPreference(id);
+        (bool monument, bool temple,,,) = wonderChecks1(id);
         uint256 religionPoints;
         uint256 governmentPoints;
-        if (religion == preferredReligion) {
+        if (religion == preferredReligion || temple) {
             religionPoints = 1;
         }
-        if (govType == preferredGovernment) {
+        if (govType == preferredGovernment || monument) {
             governmentPoints = 1;
         }
         uint256 compatabilityPoints = (religionPoints + governmentPoints);
@@ -360,20 +368,28 @@ contract TaxesContract is Ownable {
         return pointsFromResources;
     }
 
-    function getAdditionalPointsFromResources(uint256 id) public view returns (uint256) {
+    function getAdditionalPointsFromResources(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 additionalPointsFromResources;
         bool automobiles = res.viewAutomobiles(id);
         if (automobiles) {
             additionalPointsFromResources += 3;
         }
         bool microchips = res.viewMicrochips(id);
-        if(microchips) {
+        if (microchips) {
             additionalPointsFromResources += 2;
         }
         return additionalPointsFromResources;
     }
 
-    function getPointsFromImprovements(uint256 id) public view returns (uint256) {
+    function getPointsFromImprovements(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 pointsFromImprovements;
         uint256 borderWalls = imp1.getBorderWallCount(id);
         if (borderWalls > 0) {
@@ -410,7 +426,7 @@ contract TaxesContract is Ownable {
         (
             bool monument,
             bool temple,
-            bool university,
+            bool greatUniversity,
             bool internet,
             bool movieIndustry
         ) = wonderChecks1(id);
@@ -427,7 +443,7 @@ contract TaxesContract is Ownable {
         if (temple) {
             wonderPoints += 5;
         }
-        if (university) {
+        if (greatUniversity) {
             uint256 tech = inf.getTechnologyCount(id);
             uint256 techDivided = (tech / 1000);
             uint256 points;
@@ -564,9 +580,12 @@ contract TaxesContract is Ownable {
     function getPointsFromNationAge(uint256 id) public view returns (uint256) {
         uint256 nationCreated = params.getTimeCreated(id);
         uint256 agePoints = 0;
-        if ((block.timestamp - nationCreated) <= 90 days) {
+        if ((block.timestamp - nationCreated) < 90 days) {
             agePoints = 0;
-        } else if ((block.timestamp - nationCreated) <= 180 days) {
+        } else if (
+            (block.timestamp - nationCreated) >= 90 days &&
+            (block.timestamp - nationCreated) < 180
+        ) {
             agePoints = 2;
         } else {
             agePoints = 4;
@@ -577,9 +596,9 @@ contract TaxesContract is Ownable {
     function getPointsFromTrades(uint256 id) public view returns (uint256) {
         uint256[] memory partners = res.getTradingPartners(id);
         uint256 pointsFromTeamTrades = 0;
+        uint256 callerNationTeam = params.getTeam(id);
         for (uint256 i = 0; i < partners.length; i++) {
             uint256 partnerId = partners[i];
-            uint256 callerNationTeam = params.getTeam(id);
             uint256 partnerTeam = params.getTeam(partnerId);
             if (callerNationTeam == partnerTeam) {
                 pointsFromTeamTrades++;
@@ -679,7 +698,11 @@ contract TaxesContract is Ownable {
         return pointsFromCrime;
     }
 
-    function getPointsToSubtractFromImprovements(uint256 id) public view returns (uint256) {
+    function getPointsToSubtractFromImprovements(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
         uint256 pointsToSubtractFromImprovements;
         uint256 laborCamps = imp2.getLaborCampCount(id);
         if (laborCamps > 0) {

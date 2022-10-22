@@ -28,6 +28,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     address infrastructure;
     address forces;
     address navy;
+    address missiles;
     address keeper;
 
     //Chainlik Variables
@@ -47,6 +48,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     InfrastructureContract inf;
     ForcesContract force;
     NavyContract nav;
+    MissilesContract mis;
 
     struct NukeAttack {
         uint256 warId;
@@ -90,6 +92,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         address _infrastructure,
         address _forces,
         address _navy,
+        address _missiles,
         address _keeper 
     ) public onlyOwner {
         infrastructure = _infrastructure;
@@ -98,6 +101,8 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         force = ForcesContract(_forces);
         navy = _navy;
         nav = NavyContract(_navy);
+        missiles = _missiles;
+        mis = MissilesContract(_missiles);
         keeper = _keeper;
     }
 
@@ -137,6 +142,8 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         );
         uint256 daysLeft = war.getDaysLeft(warId);
         require(daysLeft < 6, "not at war long enough to launch a nuke");
+        uint256 count = mis.getNukeCount(attackerId);
+        require (count >= 1, "need to own a nuke");
         bool emp = won1.getEmpWeaponization(attackerId);
         if (!emp) {
             require(
@@ -191,6 +198,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         uint256 randomNukeSuccessNumber = ((s_randomWords[0] % 100) + 1);
         if (randomNukeSuccessNumber > thwartOdds) {
             inflictNukeDamage(requestNumber);
+            mis.decreaseNukeCountFromNukeContract(attackerId);
         } else {
             //thwart event
         }

@@ -608,6 +608,7 @@ contract MissilesContract is Ownable {
     address public improvements1;
     // address public improvements2;
     address public wonders1;
+    address public wonders2;
     address public nukeAddress;
     address public airBattle;
     // address public groundBattle;
@@ -622,6 +623,7 @@ contract MissilesContract is Ownable {
     ImprovementsContract2 imp2;
     WarContract war;
     TreasuryContract tsy;
+    WondersContract2 won2;
 
     struct Missiles {
         uint256 cruiseMissiles;
@@ -635,7 +637,8 @@ contract MissilesContract is Ownable {
         address _spyAddress,
         // address _cruiseMissile,
         address _nukeAddress,
-        address _airBattle
+        address _airBattle,
+        address _wonders2
         // address _groundBattle,
         // address _warAddress
     ) {
@@ -646,6 +649,8 @@ contract MissilesContract is Ownable {
         // aid = _aid;
         nukeAddress = _nukeAddress;
         airBattle = _airBattle;
+        wonders2 = _wonders2;
+        won2 = WondersContract2(_wonders2);
         // warAddress = _warAddress;
         // war = WarContract(_warAddress);
         // groundBattle = _groundBattle;
@@ -814,10 +819,25 @@ contract MissilesContract is Ownable {
 
     //need to decrease nuke count when launched
 
+    function decreaseNukeCountFromNukeContract(uint256 id)
+        public
+        onlyNukeContract
+    {
+
+        idToMissiles[id].nuclearWeapons -= 1;
+    }
+
     function decreaseNukeCountFromSpyContract(uint256 id)
         public
         onlySpyContract
     {
+        bool silo = won2.getHiddenNuclearMissileSilo(id);
+        uint256 nukeCount = getNukeCount(id);
+        uint256 requiredNukeAmount = 1;
+        if (silo) {
+            requiredNukeAmount = 6;
+        }
+        require (nukeCount >= requiredNukeAmount, "no nukes to destroy");
         idToMissiles[id].nuclearWeapons -= 1;
     }
 }

@@ -578,19 +578,19 @@ contract WondersContract2 is Ownable {
     struct Wonders2 {
         //Great Monument -
         //$35,000,000 -
-        //The great monument is a testament to your great leadership.
-        //Increases happiness +4 and your population will always be happy with your government choice.
+        //DONE //The great monument is a testament to your great leadership.
+        //DONE //Increases happiness +4 and your population will always be happy with your government choice.
         bool greatMonument;
         //Great Temple -
         //$35,000,000 -
-        //The great temple is a dedicated shrine to your national religion.
-        //Increases happiness +5 and your population will always be happy with your religion choice.
+        //DONE //The great temple is a dedicated shrine to your national religion.
+        //DONE //Increases happiness +5 and your population will always be happy with your religion choice.
         bool greatTemple;
         //Great University -
         //$35,000,000 -
         //The great university is a central location for scholars within your nation.
-        //Decreases technology costs -10% and
-        //increases population happiness +.2% (+2 for every 1000) of your nation's technology level over 200 up to 3,000 tech.
+        //DONE //Decreases technology costs -10% and
+        //DONE //increases population happiness +.2% (+2 for every 1000) of your nation's technology level over 200 up to 3,000 tech.
         bool greatUniversity;
         //Hidden Nuclear Missile Silo -
         //$30,000,000 -
@@ -1095,7 +1095,7 @@ contract WondersContract2 is Ownable {
         return isWonder;
     }
 
-    function hiddenNuclearMissileSilo(uint256 countryId)
+    function getHiddenNuclearMissileSilo(uint256 countryId)
         public
         view
         returns (bool)

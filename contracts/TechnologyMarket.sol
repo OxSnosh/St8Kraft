@@ -14,6 +14,7 @@ contract TechnologyMarketContract is Ownable {
     address public infrastructure;
     address public resources;
     address public improvements3;
+    address public wonders2;
     address public wonders3;
     address public wonders4;
     address public treasury;
@@ -22,6 +23,7 @@ contract TechnologyMarketContract is Ownable {
     ResourcesContract res;
     TreasuryContract tsy;
     ImprovementsContract3 imp3;
+    WondersContract2 won2;
     WondersContract3 won3;
     WondersContract4 won4;
     InfrastructureContract inf;
@@ -30,6 +32,7 @@ contract TechnologyMarketContract is Ownable {
         address _resources,
         address _improvements3,
         address _infrastructure,
+        address _wonders2,
         address _wonders3,
         address _wonders4,
         address _treasury,
@@ -41,6 +44,8 @@ contract TechnologyMarketContract is Ownable {
         imp3 = ImprovementsContract3(_improvements3);
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
+        wonders2 = _wonders2;
+        won2 = WondersContract2(_wonders2);
         wonders3 = _wonders3;
         won3 = WondersContract3(_wonders3);
         wonders4 = _wonders4;
@@ -130,37 +135,32 @@ contract TechnologyMarketContract is Ownable {
     }
 
     function getTechCostMultiplier(uint256 id) public view returns (uint256) {
-        uint256 goldMultiplier = 0;
-        uint256 microchipMultiplier = 0;
-        uint256 universityMultiplier = 0;
-        uint256 nationalResearchLabMultiplier = 0;
-        uint256 spaceProgramMultiplier = 0;
+        uint256 numberToSubtract = 0;
         bool isGold = res.viewGold(id);
         bool isMicrochips = res.viewMicrochips(id);
         uint256 universityCount = imp3.getUniversityCount(id);
+        bool greatUniversity = won2.getGreatUniversity(id);
         bool isSpaceProgram = won4.getSpaceProgram(id);
         bool isNationalResearchLab = won3.getNationalResearchLab(id);
         if (isGold) {
-            goldMultiplier = 5;
+            numberToSubtract += 5;
         }
         if (isMicrochips) {
-            microchipMultiplier = 8;
+            numberToSubtract += 8;
         }
         if (universityCount > 0) {
-            universityMultiplier = (universityCount * 10);
+            numberToSubtract += (universityCount * 10);
+        }
+        if (greatUniversity) {
+            numberToSubtract += 10;
         }
         if (isNationalResearchLab) {
-            nationalResearchLabMultiplier = 3;
+            numberToSubtract += 3;
         }
         if (isSpaceProgram) {
-            spaceProgramMultiplier = 3;
+            numberToSubtract += 3;
         }
-        uint256 sumOfAdjustments = goldMultiplier +
-            microchipMultiplier +
-            universityMultiplier +
-            nationalResearchLabMultiplier +
-            spaceProgramMultiplier;
-        uint256 multiplier = (100 - sumOfAdjustments);
+        uint256 multiplier = (100 - numberToSubtract);
         return multiplier;
     }
 }

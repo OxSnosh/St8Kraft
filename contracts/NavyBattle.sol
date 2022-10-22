@@ -111,6 +111,7 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
         );
         blockadeIdToBlockade[blockadeId] = newBlockade;
         //need keeper to increment blockade days
+        navAct.increaseAction(attackerId);
         fulfillRequest(blockadeId);
         uint256[]
             storage newActiveBlockadesAgainst = idToActiveBlockadesAgainst[
@@ -325,6 +326,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
             }
         }
         require(isBlockader, "!blockaded by this nation");
+        navAct.increaseAction(attackerId);
         generateBreakBlockadeStruct(warId, attackerId, breakBlockadeId);
         generateDefendBlockadeStruct(warId, blockaderId, breakBlockadeId);
         generateBreakBlockadeChanceArray(breakBlockadeId);
@@ -887,6 +889,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         generateAttackerChanceArray(navyBattleId);
         generateDefenderChanceArray(navyBattleId);
         fulfillRequest(navyBattleId);
+        navAct.increaseAction(attackerId);
         navyBattleId++;
     }
 
