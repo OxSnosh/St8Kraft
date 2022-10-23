@@ -43,6 +43,7 @@ contract InfrastructureContract is Ownable {
     ImprovementsContract3 imp3;
     ImprovementsContract4 imp4;
     WondersContract1 won1;
+    WondersContract3 won3;
 
     struct Infrastructure {
         uint256 landArea;
@@ -94,6 +95,7 @@ contract InfrastructureContract is Ownable {
         won1 = WondersContract1(_wonders1);
         wonders2 = _wonders2;
         wonders3 = _wonders3;
+        won3 = WondersContract3(_wonders3);
         wonders4 = _wonders4;
         treasury = _treasury;
         parameters = _parameters;
@@ -557,6 +559,14 @@ contract InfrastructureContract is Ownable {
         bool disasterReliefAgency = won1.getDisasterReliefAgency(id);
         if (disasterReliefAgency) {
             additionalPoints += 3;
+        }
+        bool nationalEnvironmentOffice = won3.getNationalEnvironmentOffice(id);
+        if (nationalEnvironmentOffice) {
+            additionalPoints += 5;
+        }
+        bool nationalResearchLab = won3.getNationalResearchLab(id);
+        if (nationalResearchLab) {
+            additionalPoints += 5;
         }
         return additionalPoints;
     }

@@ -6,6 +6,7 @@ import "./Infrastructure.sol";
 import "./Forces.sol";
 import "./Treasury.sol";
 import "./Improvements.sol";
+import "./Wonders.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
@@ -18,6 +19,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     address treasury;
     address improvements2;
     address improvements3;
+    address wonders3;
 
     WarContract war;
     InfrastructureContract inf;
@@ -25,6 +27,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     TreasuryContract tsy;
     ImprovementsContract2 imp2;
     ImprovementsContract3 imp3;
+    WondersContract3 won3;
 
     struct GroundForcesToBattle {
         uint256 attackType;
@@ -57,6 +60,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         address _treasury,
         address _improvements2,
         address _improvements3,
+        address _wonders3,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
@@ -73,6 +77,8 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         imp2 = ImprovementsContract2(_improvements2);
         improvements3 = _improvements3;
         imp3 = ImprovementsContract3(_improvements3);
+        wonders3 = _wonders3;
+        won3 = WondersContract3(_wonders3);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
@@ -166,6 +172,10 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             100);
         uint256 tankStrength = (15 * tanksDeployed);
         uint256 attackerForcesStrength = (soldierStrength + tankStrength);
+        bool pentagon = won3.getPentagon(attackerId);
+        if (pentagon) {
+            attackerForcesStrength = ((attackerForcesStrength * 120) / 100);
+        }
         return (attackerForcesStrength, soldierStrength, tankStrength);
     }
 
@@ -192,6 +202,10 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         }
         uint256 tankStrength = (17 * tanks);
         uint256 defenderForcesStrength = (soldierStrength + tankStrength);
+        bool pentagon = won3.getPentagon(defenderId);
+        if (pentagon) {
+            defenderForcesStrength = ((defenderForcesStrength * 120) / 100);
+        }
         return (defenderForcesStrength, soldierStrength, tankStrength);
     }
 
@@ -217,9 +231,8 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             .strength;
         uint256 defenderStrength = groundBattleIdToDefenderForces[requestNumber]
             .strength;
-        uint256 cumulativeStrength = (attackerStrength + defenderStrength);
         uint256 randomNumberForOutcomeSelection = (s_randomWords[0] %
-            cumulativeStrength);
+            (attackerStrength + defenderStrength));
         uint256 attackerSoldierLosses;
         uint256 attackerTankLosses;
         uint256 defenderSoldierLosses;

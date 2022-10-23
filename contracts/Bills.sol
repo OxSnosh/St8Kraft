@@ -16,6 +16,7 @@ contract BillsContract is Ownable {
     address public treasury;
     address public wonders1;
     address public wonders2;
+    address public wonders3;
     address public infrastructure;
     address public forces;
     address public fighters;
@@ -28,6 +29,7 @@ contract BillsContract is Ownable {
     TreasuryContract tsy;
     WondersContract1 won1;
     WondersContract2 won2;
+    WondersContract3 won3;
     InfrastructureContract inf;
     ForcesContract frc;
     FightersContract fight;
@@ -44,6 +46,7 @@ contract BillsContract is Ownable {
         address _treasury,
         address _wonders1,
         address _wonders2,
+        address _wonders3,
         address _infrastructure,
         address _forces,
         address _fighters,
@@ -58,6 +61,8 @@ contract BillsContract is Ownable {
         wonders2 = _wonders2;
         won2 = WondersContract2(_wonders2);
         infrastructure = _infrastructure;
+        wonders3 = _wonders3;
+        won3 = WondersContract3(_wonders3);
         inf = InfrastructureContract(_infrastructure);
         forces = _forces;
         frc = ForcesContract(_forces);
@@ -160,6 +165,10 @@ contract BillsContract is Ownable {
         );
         uint256 wonderCount = won1.getWonderCount(id);
         uint256 wonderBillsPayable = (wonderCount * 5000);
+        bool nuclearPowerPlant = won3.getNuclearPowerPlant(id);
+        if (nuclearPowerPlant) {
+            wonderBillsPayable = ((wonderBillsPayable * 95) / 100);
+        }
         uint256 dailyBillsPayable = infrastructureBillsPayable +
             militaryBillsPayable +
             improvementBillsPayable +
@@ -249,6 +258,14 @@ contract BillsContract is Ownable {
         bool interstate = won2.getInterstateSystem(id);
         if (interstate) {
             infrastructureUpkeepModifier -= 8;
+        }
+        bool nationalEnvironmentOffice = won3.getNationalEnvironmentOffice(id);
+        if (nationalEnvironmentOffice) {
+            infrastructureUpkeepModifier -= 3;
+        }
+        bool nuclearPowerPlant = won3.getNuclearPowerPlant(id);
+        if (nuclearPowerPlant) {
+            infrastructureUpkeepModifier -= 5;
         }
         uint256 dailyInfrastructureBillsDue = ((baseDailyInfrastructureUpkeep *
             infrastructureUpkeepModifier) / 100);
@@ -472,6 +489,10 @@ contract BillsContract is Ownable {
             upkeepPerLevel = 3000;
         }
         uint256 dailyImprovementBillsDue = (improvementCount * upkeepPerLevel);
+        bool nuclearPowerPlant = won3.getNuclearPowerPlant(id);
+        if (nuclearPowerPlant) {
+            dailyImprovementBillsDue = ((dailyImprovementBillsDue * 95) / 100);
+        }
         return dailyImprovementBillsDue;
     }
 }

@@ -236,6 +236,7 @@ contract TaxesContract is Ownable {
         uint256 pointsFromResources = getPointsFromResources(id);
         uint256 pointsFromImprovements = getPointsFromImprovements(id);
         uint256 wonderPoints = getHappinessFromWonders(id);
+        uint256 casualtyPoints = getCasualtyPoints(id);
         uint256 additionalHappinessPoints = getAdditionalHappinessPointsToAdd(
             id
         );
@@ -244,6 +245,7 @@ contract TaxesContract is Ownable {
             pointsFromResources +
             pointsFromImprovements +
             wonderPoints +
+            casualtyPoints +
             additionalHappinessPoints);
         return happinessPointsToAdd;
     }
@@ -548,6 +550,26 @@ contract TaxesContract is Ownable {
         );
     }
 
+    function getCasualtyPoints(uint256 id) public view returns (uint256) {
+        bool nationalCemetary = won3.getNationalCemetary(id);
+        uint256 casualties = frc.getCasualties(id);
+        uint256 casualtyPoints = 0;
+        if (nationalCemetary) {
+            if(casualties > 5000000) {
+                casualtyPoints = 1;
+            } else if (casualties > 10000000) {
+                casualtyPoints = 2;
+            } else if (casualties > 15000000) {
+                casualtyPoints = 3;
+            } else if (casualties > 20000000) {
+                casualtyPoints = 4;
+            } else if (casualties > 25000000) {
+                casualtyPoints = 5;
+            }
+        }
+        return casualtyPoints;
+    }
+
     function getTechnologyPoints(uint256 id) public view returns (uint256) {
         uint256 pointsFromTechnology;
         uint256 tech = inf.getTechnologyCount(id);
@@ -719,7 +741,7 @@ contract TaxesContract is Ownable {
 
 contract AdditionalTaxesContract is Ownable {
     // address public countryMinter;
-    // address public infrastructure;
+    address public infrastructure;
     // address public treasury;
     // address public improvements1;
     // address public improvements2;
@@ -727,14 +749,14 @@ contract AdditionalTaxesContract is Ownable {
     // address public parameters;
     address public wonders1;
     address public wonders2;
-    // address public wonders3;
+    address public wonders3;
     // address public wonders4;
     address public resources;
     // address public forces;
     // address public military;
     // address public crime;
 
-    // InfrastructureContract inf;
+    InfrastructureContract inf;
     // TreasuryContract tsy;
     // ImprovementsContract1 imp1;
     // ImprovementsContract2 imp2;
@@ -742,7 +764,7 @@ contract AdditionalTaxesContract is Ownable {
     // CountryParametersContract params;
     WondersContract1 won1;
     WondersContract2 won2;
-    // WondersContract3 won3;
+    WondersContract3 won3;
     // WondersContract4 won4;
     ResourcesContract res;
     // ForcesContract frc;
@@ -751,15 +773,15 @@ contract AdditionalTaxesContract is Ownable {
 
     constructor(
         // address _countryMinter,
-        // address _infrastructure,
+        address _infrastructure
         // address _treasury,
         // address _improvements1,
         // address _improvements2,
         // address _improvements3
     ) {
         // countryMinter = _countryMinter;
-        // infrastructure = _infrastructure;
-        // inf = InfrastructureContract(_infrastructure);
+        infrastructure = _infrastructure;
+        inf = InfrastructureContract(_infrastructure);
         // treasury = _treasury;
         // tsy = TreasuryContract(_treasury);
         // improvements1 = _improvements1;
@@ -774,7 +796,7 @@ contract AdditionalTaxesContract is Ownable {
         // address _parameters,
         address _wonders1,
         address _wonders2,
-        // address _wonders3,
+        address _wonders3,
         // address _wonders4,
         address _resources
         // address _forces,
@@ -787,8 +809,8 @@ contract AdditionalTaxesContract is Ownable {
         won1 = WondersContract1(_wonders1);
         wonders2 = _wonders2;
         won2 = WondersContract2(_wonders2);
-        // wonders3 = _wonders3;
-        // won3 = WondersContract3(_wonders3);
+        wonders3 = _wonders3;
+        won3 = WondersContract3(_wonders3);
         // wonders4 = _wonders4;
         // won4 = WondersContract4(_wonders4);
         resources = _resources;
@@ -832,6 +854,8 @@ contract AdditionalTaxesContract is Ownable {
             uint256 points = getResourcePointsForMiningConsortium(id);
             adjustments += (2 * points);
         }
+        uint256 uraniumAndNuclearPowerBonus = getNuclearAndUraniumBonus(id);
+        adjustments += uraniumAndNuclearPowerBonus;
         return adjustments;
     }
 
@@ -858,5 +882,25 @@ contract AdditionalTaxesContract is Ownable {
             points += 1;
         }
         return points;
+    }
+
+    function getNuclearAndUraniumBonus(uint256 id) public view returns (uint256) {
+        bool nuclearPowerPlant = won3.getNuclearPowerPlant(id);
+        bool uranium = res.viewUranium(id);
+        uint256 techAmount = inf.getTechnologyCount(id);
+        uint256 adjustment = 0;
+        if (nuclearPowerPlant && uranium) {
+            adjustment += 3;
+            if (techAmount >= 10 && techAmount < 20) {
+                adjustment += 1;
+            } else if (techAmount >= 20 && techAmount < 30) {
+                adjustment += 2;
+            } else if (techAmount >= 30 && techAmount < 40) {
+                adjustment += 3;
+            } else if (techAmount >= 40) {
+                adjustment += 4;
+            }
+        }
+        return adjustment;
     }
 }

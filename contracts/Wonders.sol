@@ -4,6 +4,7 @@ pragma solidity 0.8.7;
 import "./Treasury.sol";
 import "./Infrastructure.sol";
 import "./Improvements.sol";
+import "./Forces.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract WondersContract1 is Ownable {
@@ -511,11 +512,7 @@ contract WondersContract1 is Ownable {
         return isWonder;
     }
 
-    function getDisasterReliefAgency(uint256 id)
-        public
-        view
-        returns (bool)
-    {
+    function getDisasterReliefAgency(uint256 id) public view returns (bool) {
         bool isWonder = idToWonders1[id].disasterReliefAgency;
         return isWonder;
     }
@@ -1104,7 +1101,11 @@ contract WondersContract2 is Ownable {
         return isWonder;
     }
 
-    function getInterceptorMissileSystem(uint256 countryId) public view returns (bool) {
+    function getInterceptorMissileSystem(uint256 countryId)
+        public
+        view
+        returns (bool)
+    {
         bool isWonder = idToWonders2[countryId].interceptorMissileSystem;
         return isWonder;
     }
@@ -1139,7 +1140,11 @@ contract WondersContract2 is Ownable {
         return isWonder;
     }
 
-    function getMiningIndustryConsortium(uint256 countryId) public view returns (bool) {
+    function getMiningIndustryConsortium(uint256 countryId)
+        public
+        view
+        returns (bool)
+    {
         bool isWonder = idToWonders2[countryId].miningIndustryConsortium;
         return isWonder;
     }
@@ -1151,6 +1156,7 @@ contract WondersContract3 is Ownable {
     address public wonderContract1Address;
     address public wonderContract2Address;
     address public wonderContract4Address;
+    address public forces;
     uint256 public moonBaseCost = 50000000;
     uint256 public moonColonyCost = 50000000;
     uint256 public moonMineCost = 50000000;
@@ -1163,6 +1169,8 @@ contract WondersContract3 is Ownable {
     uint256 public pentagonCost = 30000000;
     uint256 public politicalLobbyistsCost = 50000000;
     uint256 public scientificDevelopmentCenterCost = 150000000;
+
+    ForcesContract frc;
 
     struct Wonders3 {
         //Moon Base -
@@ -1194,46 +1202,48 @@ contract WondersContract3 is Ownable {
         //Movie Industry -
         //$26,000,000 -
         //The movie industry provides a great source of entertainment to your people.
-        //Increases population happiness +3.
+        //DONE //Increases population happiness +3.
         bool movieIndustry;
         //National Cemetery -
         //$150,000,000 -
-        //Provides +0.20 Happiness per 1,000,000 soldier casualties up to +5 happiness.
+        //DONE //Provides +0.20 Happiness per 1,000,000 soldier casualties up to +5 happiness.
         //Requires 5 million soldier casualties and a National War Memorial.
         bool nationalCemetary;
         //National Environment Office -
         //$100,000,000 -
-        //The national environment office removes the penalties for Coal, Oil, and Uranium,
-        //improves environment by 1 point,
-        //increases population +3%,
-        //and reduces infrastructure upkeep -3%.
+        //DONE //The national environment office removes the penalties for Coal, Oil, and Uranium,
+        //DONE //improves environment by 1 point,
+        //DONE //increases population +3%,
+        //DONE //and reduces infrastructure upkeep -3%.
         //Requires 13,000 infrastructure.
         bool nationalEnvironmentOffice;
         //National Research Lab -
         //$35,000,000 -
         //The national research lab is a central location for scientists seeking cures for common diseases among your population.
-        //Increases population +5% and
-        //decreases technology costs -3%.
+        //DONE //Increases population +5% and
+        //DONE //decreases technology costs -3%.
         bool nationalResearchLab;
         //National War Memorial -
         //$27,000,000 -
         //The war memorial allows your citizens to remember its fallen soldiers.
         //This wonder is only available to nations that have lost over 50,000 soldiers during war throughout the life of your nation.
-        //Increases population happiness +4.
+        //DONE //Increases population happiness +4.
         bool nationalWarMemorial;
         //Nuclear Power Plant -
         //$75,000,000 -
         //The nuclear power plant allows nations to receive Uranium financial bonus
-        //(+$3 citizen income +$0.15 per technology level up to 30 technology levels. Requires an active Uranium trade.)
+        //DONE //(+$3 citizen income +$0.15 per technology level up to 30 technology levels. Requires an active Uranium trade.)
         //even when maintaining nuclear weaponry.
-        //The nuclear power plant by itself, even without a Uranium trade, reduces infrastructure upkeep -5%, national wonder upkeep -5%, and improvement upkeep -5%.
+        //DONE //The nuclear power plant by itself, even without a Uranium trade, reduces infrastructure upkeep -5%, 
+        //DONE //national wonder upkeep -5%, 
+        //DONE //and improvement upkeep -5%.
         //Requires 12,000 infrastructure, 1,000 technology, and a Uranium resource to build.
         //Nations that develop the Nuclear Power Plant must keep their government position on nuclear weapons set to option 2 or 3.
         bool nuclearPowerPlant;
         //Pentagon -
         //$30,000,000 -
         //The Pentagon serves as your nation's headquarters for military operations.
-        //Increases attacking and defending ground battle strength +20%.
+        //DONE //Increases attacking and defending ground battle strength +20%.
         bool pentagon;
         //Political Lobbyists -
         //$50,000,000 -
@@ -1253,9 +1263,15 @@ contract WondersContract3 is Ownable {
     mapping(uint256 => Wonders3) public idToWonders3;
     mapping(uint256 => address) public idToOwnerWonders3;
 
-    constructor(address _treasuryAddress, address _infrastructureAddress) {
+    constructor(
+        address _treasuryAddress,
+        address _infrastructureAddress,
+        address _forces
+    ) {
         treasuryAddress = _treasuryAddress;
         infrastructureAddress = _infrastructureAddress;
+        forces = _forces;
+        frc = ForcesContract(_forces);
     }
 
     function updateTreasuryAddress(address _newTreasuryAddress)
@@ -1453,7 +1469,8 @@ contract WondersContract3 is Ownable {
                 nationalWarMemorial = true,
                 "Must own National War Memorial wonder to purchase"
             );
-            //require casualties >= 5000000
+            uint256 casualties = frc.getCasualties(countryId);
+            require(casualties >= 5000000, "not enough casualties to purchase");
             idToWonders3[countryId].nationalCemetary = true;
             WondersContract1(wonderContract1Address).addWonderCount(countryId);
             TreasuryContract(treasuryAddress).spendBalance(
@@ -1495,7 +1512,8 @@ contract WondersContract3 is Ownable {
             require(balance >= nationalWarMemorialCost, "Insufficient balance");
             bool existingWonder = idToWonders3[countryId].nationalWarMemorial;
             require(existingWonder = false, "Already owned");
-            //require casualties >= 50000
+            uint256 casualties = frc.getCasualties(countryId);
+            require (casualties > 50000, "not enough casualties");
             idToWonders3[countryId].nationalWarMemorial = true;
             WondersContract1(wonderContract1Address).addWonderCount(countryId);
             TreasuryContract(treasuryAddress).spendBalance(

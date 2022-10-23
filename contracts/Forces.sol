@@ -43,6 +43,7 @@ contract ForcesContract is Ownable {
         uint256 numberOfSoldiers;
         uint256 defendingSoldiers;
         uint256 deployedSoldiers;
+        uint256 soldierCasualties;
         uint256 numberOfTanks;
         uint256 defendingTanks;
         uint256 deployedTanks;
@@ -103,7 +104,7 @@ contract ForcesContract is Ownable {
     mapping(uint256 => address) public idToOwnerForces;
 
     function generateForces(uint256 id, address nationOwner) public {
-        Forces memory newForces = Forces(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, true);
+        Forces memory newForces = Forces(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, true);
         idToForces[id] = newForces;
         idToOwnerForces[id] = nationOwner;
     }
@@ -279,6 +280,7 @@ contract ForcesContract is Ownable {
         idToForces[id].deployedSoldiers -= amountToWithdraw;
     }
 
+    //need?
     function decreaseDefendingSoldierCount(uint256 amount, uint256 id) public {
         idToForces[id].defendingSoldiers -= amount;
         idToForces[id].numberOfSoldiers -= amount;
@@ -294,6 +296,7 @@ contract ForcesContract is Ownable {
                 .defendingSoldiers;
             idToForces[id].defendingSoldiers = 0;
             idToForces[id].numberOfSoldiers -= numberOfDefendingSoldiers;
+            idToForces[id].soldierCasualties += numberOfDefendingSoldiers;
         }
         /* falloutShelter */
         else {
@@ -304,6 +307,7 @@ contract ForcesContract is Ownable {
                 .defendingSoldiers = numberOfDefendingSoldierCasualties;
             idToForces[id]
                 .numberOfSoldiers -= numberOfDefendingSoldierCasualties;
+            idToForces[id].soldierCasualties += numberOfDefendingSoldierCasualties;
         }
     }
 
@@ -551,8 +555,6 @@ contract ForcesContract is Ownable {
         return maxSpyCount;
     }
 
-    //called during a battle
-    //how can I make sure that only the fighting contract can call this (modifier?)
     function decreaseAttackerSpyCount(uint256 id) public onlySpyContract {
         idToForces[id].numberOfSpies -= 1;
     }
@@ -580,6 +582,7 @@ contract ForcesContract is Ownable {
     ) public onlyGroundBattle {
         idToForces[attackerId].numberOfSoldiers -= attackerSoldierLosses;
         idToForces[attackerId].deployedSoldiers -= attackerSoldierLosses;
+        idToForces[attackerId].soldierCasualties += attackerSoldierLosses;
         idToForces[attackerId].numberOfTanks -= attackerTankLosses;
         idToForces[attackerId].deployedTanks -= attackerTankLosses;
     }
@@ -591,8 +594,14 @@ contract ForcesContract is Ownable {
     ) public onlyGroundBattle {
         idToForces[defenderId].numberOfSoldiers -= defenderSoldierLosses;
         idToForces[defenderId].defendingSoldiers -= defenderSoldierLosses;
+        idToForces[defenderId].soldierCasualties += defenderSoldierLosses;
         idToForces[defenderId].numberOfTanks -= defenderTankLosses;
         idToForces[defenderId].defendingTanks -= defenderTankLosses;
+    }
+
+    function getCasualties(uint256 id) public view returns (uint256) {
+        uint256 casualties = idToForces[id].soldierCasualties;
+        return casualties;
     }
 }
 

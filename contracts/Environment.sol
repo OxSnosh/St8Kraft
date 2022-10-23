@@ -209,13 +209,14 @@ contract EnvironmentContract is Ownable {
         bool isUranium = res.viewUranium(id);
         bool isWater = res.viewWater(id);
         bool isRadiationCleanup = res.viewRadiationCleanup(id);
-        if (isCoal) {
+        bool nationalEnvironmentalOffice = won3.getNationalEnvironmentOffice(id);
+        if (isCoal && !nationalEnvironmentalOffice) {
             pointsFromResources -= 10;
         }
-        if (isOil) {
+        if (isOil && !nationalEnvironmentalOffice) {
             pointsFromResources -= 10;
         }
-        if (isUranium) {
+        if (isUranium && !nationalEnvironmentalOffice) {
             pointsFromResources -= 10;
         }
         if (isWater) {
