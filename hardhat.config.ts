@@ -7,6 +7,7 @@ import "hardhat-contract-sizer"
 import "dotenv/config"
 import "@nomiclabs/hardhat-solhint"
 import "@typechain/hardhat"
+import { HardhatUserConfig } from "hardhat/types"
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -35,7 +36,7 @@ const POLYGONSCAN_API_KEY =
   process.env.POLYGONSCAN_API_KEY || "Your polygonscan API key"
 const REPORT_GAS = process.env.REPORT_GAS || false
 
-module.exports = {
+const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
@@ -61,7 +62,7 @@ module.exports = {
       url: RINKEBY_RPC_URL,
       accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
       //   accounts: {
-      //     mnemonic: MNEMONIC,
+      //     mnemonic: MNEMONIC,  
       //   },
       saveDeployments: true,
       chainId: 4,
@@ -91,7 +92,7 @@ module.exports = {
     },
   },
   gasReporter: {
-    enabled: REPORT_GAS,
+    enabled: true,
     currency: "USD",
     outputFile: "gas-report.txt",
     noColors: true,
@@ -121,3 +122,5 @@ module.exports = {
     timeout: 200000, // 200 seconds max for running tests
   },
 }
+
+export default config;

@@ -8,6 +8,7 @@ import "./Bombers.sol";
 import "./Resources.sol";
 import "./Improvements.sol";
 import "./Wonders.sol";
+import "./Navy.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract FightersContract is Ownable {
@@ -22,11 +23,14 @@ contract FightersContract is Ownable {
     address public airBattle;
     address public wonders1;
     address public losses;
+    address public navy;
 
     CountryMinter mint;
     ResourcesContract res;
     ImprovementsContract1 imp1;
     WondersContract1 won1;
+    NavyContract nav;
+    BombersContract bomb;
 
     struct DefendingFighters {
         uint256 defendingAircraft;
@@ -60,7 +64,6 @@ contract FightersContract is Ownable {
 
     constructor(
         address _countryMinter,
-        address _bombers,
         address _fightersMarket,
         address _treasuryAddress,
         address _war,
@@ -77,7 +80,6 @@ contract FightersContract is Ownable {
         res = ResourcesContract(_resources);
         improvements1 = _improvements1;
         imp1 = ImprovementsContract1(_improvements1);
-        bombers = _bombers;
         fightersMarket = _fightersMarket;
         treasuryAddress = _treasuryAddress;
         war = _war;
@@ -86,6 +88,16 @@ contract FightersContract is Ownable {
         wonders1 = _wonders1;
         won1 = WondersContract1(_wonders1);
         losses = _losses;
+    }
+
+    function constructorContinued(address _navy, address _bombers)
+        public
+        onlyOwner
+    {
+        navy = _navy;
+        nav = NavyContract(_navy);
+        bombers = _bombers;
+        bomb = BombersContract(_bombers);
     }
 
     modifier onlyCountryMinter() {
@@ -171,7 +183,8 @@ contract FightersContract is Ownable {
     function getAircraftCount(uint256 id) public view returns (uint256) {
         uint256 defendingCount = idToDefendingFighters[id].defendingAircraft;
         uint256 deployedCount = idToDeployedFighters[id].deployedAircraft;
-        uint256 count = (defendingCount + deployedCount);
+        uint256 bomberCount = bomb.getBomberCount(id);
+        uint256 count = (defendingCount + deployedCount + bomberCount);
         return count;
     }
 
@@ -194,6 +207,13 @@ contract FightersContract is Ownable {
         bool foreignAirForceBase = won1.getForeignAirforceBase(id);
         if (foreignAirForceBase) {
             maxAircraftCount += 20;
+        }
+        uint256 aircraftCarrierCount = nav.getAircraftCarrierCount(id);
+        if (aircraftCarrierCount > 5) {
+            aircraftCarrierCount = 5;
+        }
+        if (aircraftCarrierCount > 0) {
+            maxAircraftCount += (aircraftCarrierCount * 5);
         }
         return maxAircraftCount;
     }
@@ -773,7 +793,10 @@ contract FighterLosses is Ownable {
                 fight.decreaseDefendingF22RaptorCount(1, defenderId);
             }
         }
-        fight.decreaseDeployedAircraftCountFromLosses(attackerLosses.length, attackerId);
+        fight.decreaseDeployedAircraftCountFromLosses(
+            attackerLosses.length,
+            attackerId
+        );
         for (uint256 i; i < attackerLosses.length; i++) {
             if (attackerLosses[i] == 1) {
                 fight.decreaseDeployedYak9Count(1, attackerId);
@@ -828,6 +851,7 @@ contract FightersMarketplace1 is Ownable {
     ResourcesContract res;
     ImprovementsContract1 imp1;
     WondersContract4 won4;
+    FightersContract fight;
 
     constructor(
         address _countryMinter,
@@ -851,6 +875,7 @@ contract FightersMarketplace1 is Ownable {
         won4 = WondersContract4(_wonders4);
         treasury = _treasury;
         fighters = _fighters;
+        fight = FightersContract(_fighters);
         infrastructure = _infrastructure;
     }
 
@@ -946,12 +971,8 @@ contract FightersMarketplace1 is Ownable {
     function buyYak9(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
-        uint256 fighterCount = FightersContract(fighters).getAircraftCount(id);
-        uint256 bomberCount = bomb.getAircraftCount(id);
-        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
-            id
-        );
-        uint256 aircraftCount = (fighterCount + bomberCount);
+        uint256 aircraftCount = fight.getAircraftCount(id);
+        uint256 maxAircraft = fight.getMaxAircraftCount(id);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -972,12 +993,8 @@ contract FightersMarketplace1 is Ownable {
     function buyP51Mustang(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
-        uint256 fighterCount = FightersContract(fighters).getAircraftCount(id);
-        uint256 bomberCount = bomb.getAircraftCount(id);
-        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
-            id
-        );
-        uint256 aircraftCount = (fighterCount + bomberCount);
+        uint256 aircraftCount = fight.getAircraftCount(id);
+        uint256 maxAircraft = fight.getMaxAircraftCount(id);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -999,12 +1016,8 @@ contract FightersMarketplace1 is Ownable {
     function buyF86Sabre(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
-        uint256 fighterCount = FightersContract(fighters).getAircraftCount(id);
-        uint256 bomberCount = bomb.getAircraftCount(id);
-        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
-            id
-        );
-        uint256 aircraftCount = (fighterCount + bomberCount);
+        uint256 aircraftCount = fight.getAircraftCount(id);
+        uint256 maxAircraft = fight.getMaxAircraftCount(id);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -1026,12 +1039,8 @@ contract FightersMarketplace1 is Ownable {
     function buyMig15(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
-        uint256 fighterCount = FightersContract(fighters).getAircraftCount(id);
-        uint256 bomberCount = bomb.getAircraftCount(id);
-        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
-            id
-        );
-        uint256 aircraftCount = (fighterCount + bomberCount);
+        uint256 aircraftCount = fight.getAircraftCount(id);
+        uint256 maxAircraft = fight.getMaxAircraftCount(id);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -1053,12 +1062,8 @@ contract FightersMarketplace1 is Ownable {
     function buyF100SuperSabre(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
-        uint256 fighterCount = FightersContract(fighters).getAircraftCount(id);
-        uint256 bomberCount = bomb.getAircraftCount(id);
-        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
-            id
-        );
-        uint256 aircraftCount = (fighterCount + bomberCount);
+        uint256 aircraftCount = fight.getAircraftCount(id);
+        uint256 maxAircraft = fight.getMaxAircraftCount(id);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -1132,6 +1137,7 @@ contract FightersMarketplace2 is Ownable {
     BombersContract bomb;
     ResourcesContract res;
     ImprovementsContract1 imp1;
+    FightersContract fight;
 
     constructor(
         address _countryMinter,
@@ -1152,6 +1158,7 @@ contract FightersMarketplace2 is Ownable {
         imp1 = ImprovementsContract1(_improvements1);
         treasury = _treasury;
         fighters = _fighters;
+        fight = FightersContract(_fighters);
         infrastructure = _infrastructure;
     }
 
@@ -1237,12 +1244,8 @@ contract FightersMarketplace2 is Ownable {
     function buyF35Lightning(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
-        uint256 fighterCount = FightersContract(fighters).getAircraftCount(id);
-        uint256 bomberCount = bomb.getAircraftCount(id);
-        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
-            id
-        );
-        uint256 aircraftCount = (fighterCount + bomberCount);
+        uint256 aircraftCount = fight.getAircraftCount(id);
+        uint256 maxAircraft = fight.getMaxAircraftCount(id);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -1264,12 +1267,8 @@ contract FightersMarketplace2 is Ownable {
     function buyF15Eagle(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
-        uint256 fighterCount = FightersContract(fighters).getAircraftCount(id);
-        uint256 bomberCount = bomb.getAircraftCount(id);
-        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
-            id
-        );
-        uint256 aircraftCount = (fighterCount + bomberCount);
+        uint256 aircraftCount = fight.getAircraftCount(id);
+        uint256 maxAircraft = fight.getMaxAircraftCount(id);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -1291,12 +1290,8 @@ contract FightersMarketplace2 is Ownable {
     function buySu30Mki(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
-        uint256 fighterCount = FightersContract(fighters).getAircraftCount(id);
-        uint256 bomberCount = bomb.getAircraftCount(id);
-        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
-            id
-        );
-        uint256 aircraftCount = (fighterCount + bomberCount);
+        uint256 aircraftCount = fight.getAircraftCount(id);
+        uint256 maxAircraft = fight.getMaxAircraftCount(id);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);
@@ -1318,12 +1313,8 @@ contract FightersMarketplace2 is Ownable {
     function buyF22Raptor(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
-        uint256 fighterCount = FightersContract(fighters).getAircraftCount(id);
-        uint256 bomberCount = bomb.getAircraftCount(id);
-        uint256 maxAircraft = FightersContract(fighters).getMaxAircraftCount(
-            id
-        );
-        uint256 aircraftCount = (fighterCount + bomberCount);
+        uint256 aircraftCount = fight.getAircraftCount(id);
+        uint256 maxAircraft = fight.getMaxAircraftCount(id);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = InfrastructureContract(infrastructure)
             .getInfrastructureCount(id);

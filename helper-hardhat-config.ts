@@ -1,4 +1,4 @@
-export const networkConfig = {
+const config = {
     31337: {
       name: "localhost",
     },
@@ -9,12 +9,13 @@ export const networkConfig = {
       ethUsdPriceFeed: "0x9326BFA02ADD2366b30bacB125260Af641031331",
     },
   }
-  export const INITIAL_SUPPLY = "1000000000000000000000000" 
   
-  const developmentChains = ["hardhat", "localhost"]
+const INITIAL_SUPPLY = "1000000000000000000000000" 
   
-  module.exports = {
-    networkConfig,
-    developmentChains,
-    INITIAL_SUPPLY,
-  }
+const developmentChains = ["hardhat", "localhost"]
+
+export {
+  config,
+  INITIAL_SUPPLY,
+  developmentChains
+}

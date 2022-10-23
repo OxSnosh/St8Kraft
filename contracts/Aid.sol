@@ -26,6 +26,7 @@ contract AidContract is Ownable {
         address _wonder1
     ) {
         countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
         treasury = _treasury;
         forces = _forces;
         infrastructure = _infrastructure;

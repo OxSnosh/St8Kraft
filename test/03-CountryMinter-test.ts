@@ -1,52 +1,105 @@
 import { expect } from "chai"
-import { ethers, hardhatArguments } from "hardhat"
+import { ethers } from "hardhat"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { INITIAL_SUPPLY } from "../helper-hardhat-config"
 import { 
     WarBucks, 
-    MetaNationsGovToken, 
-    CountryParametersContract, 
-    TreasuryContract, 
-    InfrastructureContract, 
-    ResourcesContract, 
-    ImprovementsContract1, 
-    ImprovementsContract2, 
-    ImprovementsContract3, 
-    WondersContract1, 
-    WondersContract2, 
-    WondersContract3, 
-    WondersContract4, 
-    MilitaryContract, 
-    ForcesContract, 
-    NavyContract, 
-    FightersContract, 
-    BombersContract, 
-    CountryMinter } from "../typechain-types"
-import { Signer } from "ethers";
+    MetaNationsGovToken,
+    AidContract,
+    AirBattleContract,
+    BillsContract,
+    BombersContract,
+    BombersMarketplace1,
+    BombersMarketplace2,
+    CountryMinter,
+    CountryParametersContract,
+    CrimeContract,
+    CruiseMissileContract,
+    EnvironmentContract,
+    FightersContract,
+    FighterLosses,
+    FightersMarketplace1,
+    FightersMarketplace2,
+    ForcesContract,
+    MissilesContract,
+    GroundBattleContract,
+    ImprovementsContract1,
+    ImprovementsContract2,
+    ImprovementsContract3,
+    ImprovementsContract4,
+    InfrastructureContract,
+    InfrastructureMarketContract,
+    KeeperContract,
+    LandMarketContract,
+    MilitaryContract,
+    NationStrengthContract,
+    NavalActionsContract,
+    NavyContract,
+    NavalBlockadeContract,
+    BreakBlocadeContract,
+    NavalAttackContract,
+    NukeContract,
+    ResourcesContract,
+    SenateContract,
+    SpyOperationsContract,
+    TaxesContract,
+    TechnologyMarketContract,
+    TreasuryContract,
+    WarContract,
+    WondersContract1,
+    WondersContract2,
+    WondersContract3,
+    WondersContract4
+} from "../typechain-types"
 
 describe("CountryMinter", function () {
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
+    let aidcontract: AidContract
+    let airbattlecontract: AirBattleContract
+    let billscontract: BillsContract
+    let bombersmarketplace1: BombersMarketplace1
+    let bombersmarketplace2: BombersMarketplace2
+    let bomberscontract: BombersContract
+    let countryminter: CountryMinter
     let countryparameterscontract: CountryParametersContract
-    let treasurycontract: TreasuryContract
-    let infrastructurecontract: InfrastructureContract
-    let resourcescontract: ResourcesContract
+    let crimecontract: CrimeContract
+    let cruisemissileconract: CruiseMissileContract
+    let EnvironmentContract: EnvironmentContract
+    let fighterscontract: FightersContract
+    let fighterlosses: FighterLosses
+    let fightersmarketplace1: FightersMarketplace1
+    let fightersmarketplace2: FightersMarketplace2
+    let forcescontract: ForcesContract
+    let missilescontract: MissilesContract
+    let groundbattlecontract: GroundBattleContract
     let improvementscontract1: ImprovementsContract1
-    let improvementscontract2: ImprovementsContract2 
+    let improvementscontract2: ImprovementsContract2
     let improvementscontract3: ImprovementsContract3
+    let improvementscontract4: ImprovementsContract4
+    let infrastructurecontract: InfrastructureContract
+    let infrastructuremarketplace: InfrastructureMarketContract
+    let keepercontract: KeeperContract
+    let landmarketcontract: LandMarketContract
+    let militarycontract: MilitaryContract
+    let nationstrengthcontract: NationStrengthContract
+    let navalactionscontract: NavalActionsContract
+    let navycontract: NavyContract
+    let navalblockadecontract: NavalBlockadeContract
+    let breakblockadecontract: BreakBlocadeContract
+    let navalattackcontract: NavalAttackContract
+    let nukecontract: NukeContract
+    let resourcescontract: ResourcesContract
+    let senatecontract: SenateContract
+    let spyoperationscontract: SpyOperationsContract
+    let taxescontract: TaxesContract
+    let technologymarketcontrat: TechnologyMarketContract
+    let treasurycontract: TreasuryContract
+    let warcontract: WarContract
     let wonderscontract1: WondersContract1
     let wonderscontract2: WondersContract2
     let wonderscontract3: WondersContract3
     let wonderscontract4: WondersContract4
-    let militarycontract: MilitaryContract
-    let forcescontract: ForcesContract 
-    let navycontract: NavyContract
-    let fighterscontract: FightersContract
-    let bomberscontract: BombersContract
-    let countrymintercontract: CountryMinter
-    let owner
-    let addr1: SignerWithAddress
-    let addr2: SignerWithAddress
     let signer0: SignerWithAddress
     let signer1: SignerWithAddress
     let signers: SignerWithAddress[]
@@ -164,7 +217,7 @@ describe("CountryMinter", function () {
     
         const CountryMinter = await ethers.getContractFactory("CountryMinter")
         ;[owner, addr1, addr2, ...addrs] = await ethers.getSigners()
-        countrymintercontract = await CountryMinter.deploy(
+        countryminter = await CountryMinter.deploy(
             warbucks.address,
             countryparameterscontract.address,
             treasurycontract.address,
@@ -177,7 +230,7 @@ describe("CountryMinter", function () {
             bomberscontract.address,
             )  as CountryMinter
         await countrymintercontract.deployed()
-        await countrymintercontract.constructorContinued(        
+        await countrymintercontract.constructorContinued1(        
             improvementscontract1.address,
             improvementscontract2.address,
             improvementscontract3.address,
@@ -190,19 +243,19 @@ describe("CountryMinter", function () {
 
     });
 
-    describe("Minting a Country", function () {
-        it("Tests that the nation parameters set correctly", async function () {
-            await countrymintercontract.connect(signer1).generateCountry(
-                    "TestRuler",
-                    "TestNationName",
-                    "TestCapitalCity",
-                    "TestNationSlogan"
-                );
-            const { rulerName, nationName, capitalCity, nationSlogan } = await countryparameterscontract.idToCountryParameters(0);    
-            expect(rulerName).to.equal("TestRuler");
-            expect(nationName).to.equal("TestNationName");
-            expect(capitalCity).to.equal("TestCapitalCity");
-            expect(nationSlogan).to.equal("TestNationSlogan");
-        });
-    });
+    // describe("Minting a Country", function () {
+    //     it("Tests that the nation parameters set correctly", async function () {
+    //         await countryminter.connect(signer1).generateCountry(
+    //                 "TestRuler",
+    //                 "TestNationName",
+    //                 "TestCapitalCity",
+    //                 "TestNationSlogan"
+    //             );
+    //         const { rulerName, nationName, capitalCity, nationSlogan } = await countryparameterscontract.idToCountryParameters(0);    
+    //         expect(rulerName).to.equal("TestRuler");
+    //         expect(nationName).to.equal("TestNationName");
+    //         expect(capitalCity).to.equal("TestCapitalCity");
+    //         expect(nationSlogan).to.equal("TestNationSlogan");
+    //     });
+    // });
 });

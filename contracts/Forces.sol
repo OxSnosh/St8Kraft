@@ -647,44 +647,31 @@ contract MissilesContract is Ownable {
 
     constructor(
         address _treasury,
-        // address _aid,
         address _spyAddress,
-        // address _cruiseMissile,
         address _nukeAddress,
         address _airBattle,
         address _wonders2,
         address _strength
-        // address _groundBattle,
-        // address _warAddress
     ) {
         treasury = _treasury;
         tsy = TreasuryContract(_treasury);
         spyAddress = _spyAddress;
-        // cruiseMissile = _cruiseMissile;
-        // aid = _aid;
         nukeAddress = _nukeAddress;
         airBattle = _airBattle;
         wonders2 = _wonders2;
         won2 = WondersContract2(_wonders2);
         strength = _strength;
         stren = NationStrengthContract(_strength);
-        // warAddress = _warAddress;
-        // war = WarContract(_warAddress);
-        // groundBattle = _groundBattle;
         cruiseMissileCost = 20000;
     }
 
     function constructorContinued(
-        // address _infrastructure,
         address _resources,
         address _improvements1,
-        // address _improvements2,
         address _wonders1,
         address _wonders4,
         address _countryMinter
     ) public onlyOwner {
-        // infrastructure = _infrastructure;
-        // inf = InfrastructureContract(_infrastructure);
         resources = _resources;
         res = ResourcesContract(_resources);
         wonders1 = _wonders1;
@@ -693,8 +680,6 @@ contract MissilesContract is Ownable {
         won4 = WondersContract4(_wonders4);
         improvements1 = _improvements1;
         imp1 = ImprovementsContract1(_improvements1);
-        // improvements2 = _improvements2;
-        // imp2 = ImprovementsContract2(_improvements2);
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
     }

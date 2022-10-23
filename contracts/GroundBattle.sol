@@ -60,7 +60,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         address _infrastructure,
         address _forces,
         address _treasury,
-
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
