@@ -44,6 +44,7 @@ contract InfrastructureContract is Ownable {
     ImprovementsContract4 imp4;
     WondersContract1 won1;
     WondersContract3 won3;
+    WondersContract4 won4;
 
     struct Infrastructure {
         uint256 landArea;
@@ -97,6 +98,7 @@ contract InfrastructureContract is Ownable {
         wonders3 = _wonders3;
         won3 = WondersContract3(_wonders3);
         wonders4 = _wonders4;
+        won4 = WondersContract4(_wonders4);
         treasury = _treasury;
         parameters = _parameters;
         forces = _forces;
@@ -470,7 +472,12 @@ contract InfrastructureContract is Ownable {
             idToInfrastructure[id].collectionNeededToChangeRate == false,
             "need to collect taxes before changing tax rate"
         );
-        require(newTaxRate <= 28, "cannot tax above 28%");
+        uint256 maximumTaxRate = 28;
+        bool socialSecurity = won4.getSocialSecuritySystem(id);
+        if (socialSecurity) {
+            maximumTaxRate = 30;
+        }
+        require(newTaxRate <= maximumTaxRate, "cannot tax above maximum rate");
         require(newTaxRate >= 15, "cannot tax below 15%");
         idToInfrastructure[id].taxRate = newTaxRate;
     }

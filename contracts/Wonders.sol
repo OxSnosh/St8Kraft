@@ -1247,15 +1247,17 @@ contract WondersContract3 is Ownable {
         bool pentagon;
         //Political Lobbyists -
         //$50,000,000 -
-        //Your vote counts as two votes in your team's senate.
+        //DONE //Your vote counts as two votes in your team's senate.
         //Must be re-purchased every time you switch teams.
         bool politicalLobbyists;
         //Scientific Development Center -
         //$150,000,000 -
-        //The scientific development center increases the productivity of your factories from -8% infrastructure cost to -10% infrastructure cost,
-        //increases the productivity of your universities from +8% citizen income to +10% citizen income,
-        //allows the Great University to give its technology happiness bonus up to 5,000 technology levels
-        //(+2 happiness each 1,000 technology levels).
+        //DONE //The scientific development center increases the productivity of your factories from 
+        //DONE //-8% infrastructure cost to -10% infrastructure cost,
+        //DONE //increases the productivity of your universities from 
+        //DONE //+8% citizen income to +10% citizen income,
+        //DONE //allows the Great University to give its technology happiness bonus up to 5,000 technology levels
+        //DONE //(+2 happiness each 1,000 technology levels).
         //Requires 14,000 infrastructure, 3,000 technology, Great University, National Research Lab.
         bool scientificDevelopmentCenter;
     }

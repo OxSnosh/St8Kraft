@@ -202,7 +202,7 @@ contract TaxesContract is Ownable {
         uint256 ministries = imp2.getForeignMinistryCount(id);
         uint256 harbors = imp2.getHarborCount(id);
         uint256 schools = imp3.getSchoolCount(id);
-        uint256 universities = imp3.getUniversityCount(id);
+        uint256 universityPoints = getUniversityPoints(id);
         //detractors (subtracted)
         uint256 casinos = imp1.getCasinoCount(id);
         uint256 guerillaCamp = imp2.getGuerillaCampCount(id);
@@ -211,7 +211,7 @@ contract TaxesContract is Ownable {
             (ministries * 5) +
             (harbors * 1) +
             (schools * 5) +
-            (universities * 8) -
+            universityPoints -
             (guerillaCamp * 8) -
             (casinos * 1));
         uint256 baseDailyIncomePerCitizen = (35 +
@@ -450,9 +450,9 @@ contract TaxesContract is Ownable {
         if (temple) {
             wonderPoints += 5;
         }
-        if (greatUniversity) {
-            uint256 tech = inf.getTechnologyCount(id);
-            uint256 techDivided = (tech / 1000);
+        uint256 tech = inf.getTechnologyCount(id);
+        uint256 techDivided = (tech / 1000);
+        if (greatUniversity && !scientificDevCenter) {
             uint256 points;
             if (techDivided == 0) {
                 points = 0;
@@ -462,6 +462,22 @@ contract TaxesContract is Ownable {
                 points = 2;
             } else {
                 points = 3;
+            }
+            wonderPoints += points;
+        } else if (greatUniversity && scientificDevCenter) {
+            uint256 points;
+            if (techDivided == 0) {
+                points = 0;
+            } else if (techDivided == 1) {
+                points = 1;
+            } else if (techDivided == 2) {
+                points = 2;
+            } else if (techDivided == 3) {
+                points = 3;
+            } else if (techDivided == 4) {
+                points = 4;
+            } else {
+                points = 5;
             }
             wonderPoints += points;
         }
@@ -473,25 +489,6 @@ contract TaxesContract is Ownable {
         }
         if (warMemorial) {
             wonderPoints += 4;
-        }
-        if (scientificDevCenter) {
-            uint256 tech = inf.getTechnologyCount(id);
-            uint256 techDivided = (tech / 1000);
-            uint256 points;
-            if (techDivided == 0) {
-                points = 0;
-            } else if (techDivided == 1) {
-                points = 1;
-            } else if (techDivided == 2) {
-                points = 2;
-            } else if (techDivided == 3) {
-                points = 3;
-            } else if (techDivided == 3) {
-                points = 3;
-            } else {
-                points = 5;
-            }
-            wonderPoints += points;
         }
         if (spaceProgram) {
             wonderPoints += 3;
@@ -736,6 +733,20 @@ contract TaxesContract is Ownable {
             pointsToSubtractFromImprovements += (laborCamps * 1);
         }
         return pointsToSubtractFromImprovements;
+    }
+
+    function getUniversityPoints(uint256 id) public view returns (uint256) {
+        uint256 universities = imp3.getUniversityCount(id);
+        uint256 universityPoints = 0;
+        bool scientificDevelopmentCenter = won3.getScientificDevelopmentCenter(id);
+        if (universities > 0) {
+            if (!scientificDevelopmentCenter) {
+                universityPoints = (universities * 8);
+            } else if (scientificDevelopmentCenter) {
+                universityPoints = (universities * 10);
+            }
+        }
+        return universityPoints;
     }
 }
 

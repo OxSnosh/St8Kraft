@@ -16,6 +16,7 @@ contract InfrastructureMarketContract is Ownable {
     address public infrastructure;
     address public improvements1;
     address public wonders2;
+    address public wonders3;
     address public treasury;
     address public parameters;
 
@@ -23,6 +24,7 @@ contract InfrastructureMarketContract is Ownable {
     ResourcesContract res;
     ImprovementsContract1 imp1;
     WondersContract2 won2;
+    WondersContract3 won3;
     CountryParametersContract param;
     InfrastructureContract inf;
     TreasuryContract tsy;
@@ -33,6 +35,7 @@ contract InfrastructureMarketContract is Ownable {
         address _improvements1,
         address _countryMinter,
         address _wonders2,
+        address _wonders3,
         address _treasury,
         address _infrastructure
     ) {
@@ -46,6 +49,8 @@ contract InfrastructureMarketContract is Ownable {
         mint = CountryMinter(_countryMinter);
         wonders2 = _wonders2;
         won2 = WondersContract2(_wonders2);
+        wonders3 = _wonders3;
+        won3 = WondersContract3(_wonders3);
         treasury = _treasury;
         tsy = TreasuryContract(_treasury);
         infrastructure = _infrastructure;
@@ -152,6 +157,7 @@ contract InfrastructureMarketContract is Ownable {
         bool isInterstateSystem = won2.getInterstateSystem(id);
         bool isAccomodativeGovernment = checkAccomodativeGovernment(id);
         uint256 factoryCount = imp1.getFactoryCount(id);
+        bool scientificDevelopmentCenter = won3.getScientificDevelopmentCenter(id);
         if (isRubber) {
             rubberMultiplier = 3;
         }
@@ -165,7 +171,11 @@ contract InfrastructureMarketContract is Ownable {
             accomodativeGovernmentMultiplier = 5;
         }
         if (factoryCount > 0) {
-            factoryMultiplier = (factoryCount * 8);
+            if (!scientificDevelopmentCenter) {
+                factoryMultiplier = (factoryCount * 8);
+            } else if (scientificDevelopmentCenter) {
+                factoryMultiplier = (factoryCount * 10);
+            }
         }
         uint256 sumOfAdjustments = rubberMultiplier +
             constructionMultiplier +
