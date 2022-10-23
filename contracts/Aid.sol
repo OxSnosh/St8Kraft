@@ -55,6 +55,7 @@ contract AidContract is Ownable {
 
     function updateCountryMinterAddress(address _newAddress) public onlyOwner {
         countryMinter = _newAddress;
+        mint = CountryMinter(_newAddress);
     }
 
     function updateTreasuryAddress(address _newAddress) public onlyOwner {
@@ -67,6 +68,10 @@ contract AidContract is Ownable {
 
     function updateInfrastructureAddress(address _newAddress) public onlyOwner {
         infrastructure = _newAddress;
+    }
+
+    function updateKeeperAddress(address _newAddress) public onlyOwner {
+        keeper = _newAddress;
     }
 
     modifier onlyCountryMinter() {

@@ -114,15 +114,62 @@ describe("CountryMinter", function () {
         const WarBucks = await ethers.getContractFactory("WarBucks")
         warbucks = await WarBucks.deploy(INITIAL_SUPPLY) as WarBucks
         await warbucks.deployed()
-        // console.log(`WarBuks token deployed to ${warbucks.address}`)
+        console.log(`WarBuks token deployed to ${warbucks.address}`)
     
         const MetaNatonsGovToken = await ethers.getContractFactory(
             "MetaNationsGovToken"
         )
         metanationsgovtoken = await MetaNatonsGovToken.deploy(INITIAL_SUPPLY) as MetaNationsGovToken
         await metanationsgovtoken.deployed()
-        // console.log(`MetaNationsGovToken deployed to ${metanationsgvtoken.address}`)
+        console.log(`MetaNationsGovToken deployed to ${metanationsgovtoken.address}`)
     
+        const AidContract = await ethers.getContractFactory("AidContract")
+        aidcontract = await AidContract.deploy() as AidContract
+        await aidcontract.deployed()
+        console.log(`AidContract deployed tp ${aidcontract.address}`)
+            //countryminter
+            //treasury
+            //forces
+            //infrastructure
+            //keeper
+            //wonder1
+        
+        const AirBattleContract = await ethers.getContractFactory("AirBattleContract")
+        airbattlecontract = await AirBattleContract.deploy() as AirBattleContract
+        await airbattlecontract.deployed()
+        console.log(`AirBattleContract deployed tp ${airbattlecontract.address}`)
+            //war
+            //fighter
+            //bomber
+            //infrastructure
+            //forces
+            //fighterlosses
+            //vrfCoordinatorV2
+            //subscriptionId
+            //gasLAne
+            //callbackGasLimit
+            //missiles
+            //wonders1
+
+        const BillsContract = await ethers.getContractFactory("BillsContract")
+        billscontract = await BillsContract.deploy() as BillsContract
+        await billscontract.deployed()
+        console.log(`BillsContract deployed tp ${billscontract.address}`)
+            //countryminter
+            //treasury
+            //wonders1
+            //wonders2
+            //wonders3
+            //wonders4
+            //infrastructure
+            //forces
+            //fighters
+            //navy
+            //resources
+            //improvements1
+            //improvements2
+            //missiles
+
         const CountryParameters = await ethers.getContractFactory("CountryParametersContract")
         countryparameterscontract = await CountryParameters.deploy() as CountryParametersContract
         await countryparameterscontract.deployed()

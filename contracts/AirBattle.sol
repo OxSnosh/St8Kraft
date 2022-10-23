@@ -92,42 +92,71 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
     constructor(
-        address _warAddress,
-        address _fighter,
-        address _bomber,
-        address _infrastructure,
-        address _forces,
-        address _fighterLosses,
+        // address _warAddress,
+        // address _fighter,
+        // address _bomber,
+        // address _infrastructure,
+        // address _forces,
+        // address _fighterLosses,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
         uint32 callbackGasLimit
     ) VRFConsumerBaseV2(vrfCoordinatorV2) {
-        warAddress = _warAddress;
-        fighterAddress = _fighter;
-        fighter = FightersContract(_fighter);
-        bomberAddress = _bomber;
-        bomber = BombersContract(_bomber);
-        infrastructure = _infrastructure;
-        inf = InfrastructureContract(_infrastructure);
-        forces = _forces;
-        force = ForcesContract(_forces);
-        fighterLosses = _fighterLosses;
-        fighterLoss = FighterLosses(_fighterLosses);
+        // warAddress = _warAddress;
+        // fighterAddress = _fighter;
+        // fighter = FightersContract(_fighter);
+        // bomberAddress = _bomber;
+        // bomber = BombersContract(_bomber);
+        // infrastructure = _infrastructure;
+        // inf = InfrastructureContract(_infrastructure);
+        // forces = _forces;
+        // force = ForcesContract(_forces);
+        // fighterLosses = _fighterLosses;
+        // fighterLoss = FighterLosses(_fighterLosses);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
     }
 
-    function constructorContinued(address _missiles, address _wonders1)
-        public
-        onlyOwner
-    {
-        missiles = _missiles;
-        mis = MissilesContract(_missiles);
-        wonders1 = _wonders1;
-        won1 = WondersContract1(_wonders1);
+    function updateWarAddress(address newAddress) public onlyOwner {
+        warAddress = newAddress;
+    }
+
+    function updateFighterAddress(address newAddress) public onlyOwner {
+        fighterAddress = newAddress;
+        fighter = FightersContract(newAddress);
+    }
+
+    function updateBomberAddress(address newAddress) public onlyOwner {
+        bomberAddress = newAddress;
+        bomber = BombersContract(newAddress);
+    }
+
+    function updateInfrastructureAddress(address newAddress) public onlyOwner {
+        infrastructure = newAddress;
+        inf = InfrastructureContract(newAddress);
+    }
+
+    function updateForcesAddress(address newAddress) public onlyOwner {
+        forces = newAddress;
+        force = ForcesContract(newAddress);
+    }
+
+    function updateFighterLossesAddress(address newAddress) public onlyOwner {
+        fighterLosses = newAddress;
+        fighterLoss = FighterLosses(newAddress);
+    }
+
+    function updateMissilesAddress(address newAddress) public onlyOwner {
+        missiles = newAddress;
+        mis = MissilesContract(newAddress);
+    }
+
+    function updateWonders1Address(address newAddress) public onlyOwner {
+        wonders1 = newAddress;
+        won1 = WondersContract1(newAddress);
     }
 
     function airBattle(
