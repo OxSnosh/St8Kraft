@@ -136,7 +136,7 @@ contract EnvironmentContract is Ownable {
         uint256 mod = 300;
         uint256 globalRadiation = ((nukesLanded * mod) / countries);
         if (globalRadiation > 5) {
-            globalRadiation == 5;
+            globalRadiation = 5;
         }
         uint256 radiationContainmentChambers = imp3
             .getRadiationContainmentChamberCount(id);
@@ -166,10 +166,10 @@ contract EnvironmentContract is Ownable {
         } else if (grossScore > 90) {
             environmentScore = 10;
         }
-        if (globalRadiation >= environmentScore) {
-            environmentScore = 0;
+        if ((globalRadiation + environmentScore) > 10) {
+            environmentScore = 10;
         } else {
-            environmentScore -= globalRadiation;
+            environmentScore += globalRadiation;
         }
         return environmentScore;
     }
@@ -211,19 +211,19 @@ contract EnvironmentContract is Ownable {
         bool isRadiationCleanup = res.viewRadiationCleanup(id);
         bool nationalEnvironmentalOffice = won3.getNationalEnvironmentOffice(id);
         if (isCoal && !nationalEnvironmentalOffice) {
-            pointsFromResources -= 10;
+            pointsFromResources += 10;
         }
         if (isOil && !nationalEnvironmentalOffice) {
-            pointsFromResources -= 10;
+            pointsFromResources += 10;
         }
         if (isUranium && !nationalEnvironmentalOffice) {
-            pointsFromResources -= 10;
+            pointsFromResources += 10;
         }
         if (isWater) {
-            pointsFromResources += 10;
+            pointsFromResources -= 10;
         }
         if (isRadiationCleanup) {
-            pointsFromResources += 10;
+            pointsFromResources -= 10;
         }
         return pointsFromResources;
     }
@@ -244,41 +244,41 @@ contract EnvironmentContract is Ownable {
         if (borderWallCount == 0) {
             pointsFromWondersAndImprovements += 0;
         } else if (borderWallCount == 1) {
-            pointsFromWondersAndImprovements += 10;
+            pointsFromWondersAndImprovements -= 10;
         } else if (borderWallCount == 2) {
-            pointsFromWondersAndImprovements += 20;
+            pointsFromWondersAndImprovements -= 20;
         } else if (borderWallCount == 3) {
-            pointsFromWondersAndImprovements += 30;
+            pointsFromWondersAndImprovements -= 30;
         } else if (borderWallCount == 4) {
-            pointsFromWondersAndImprovements += 40;
+            pointsFromWondersAndImprovements -= 40;
         } else if (borderWallCount == 5) {
-            pointsFromWondersAndImprovements += 50;
+            pointsFromWondersAndImprovements -= 50;
         }
         if (munitionsFactories == 0) {
-            pointsFromWondersAndImprovements -= 0;
+            pointsFromWondersAndImprovements += 0;
         } else if (munitionsFactories == 1) {
-            pointsFromWondersAndImprovements -= 3;
+            pointsFromWondersAndImprovements += 3;
         } else if (munitionsFactories == 2) {
-            pointsFromWondersAndImprovements -= 6;
+            pointsFromWondersAndImprovements += 6;
         } else if (munitionsFactories == 3) {
-            pointsFromWondersAndImprovements -= 9;
+            pointsFromWondersAndImprovements += 9;
         } else if (munitionsFactories == 4) {
-            pointsFromWondersAndImprovements -= 12;
+            pointsFromWondersAndImprovements += 12;
         } else if (munitionsFactories == 5) {
-            pointsFromWondersAndImprovements -= 15;
+            pointsFromWondersAndImprovements += 15;
         }
         if (redLightDistricts == 0) {
-            pointsFromWondersAndImprovements -= 0;
+            pointsFromWondersAndImprovements += 0;
         } else if (redLightDistricts == 1) {
-            pointsFromWondersAndImprovements -= 5;
+            pointsFromWondersAndImprovements += 5;
         } else if (redLightDistricts == 2) {
-            pointsFromWondersAndImprovements -= 10;
-        }
-        if (isNationalEnvironmentOffice) {
             pointsFromWondersAndImprovements += 10;
         }
-        if (isWeaponsResearchCenter) {
+        if (isNationalEnvironmentOffice) {
             pointsFromWondersAndImprovements -= 10;
+        }
+        if (isWeaponsResearchCenter) {
+            pointsFromWondersAndImprovements += 10;
         }
         return pointsFromWondersAndImprovements;
     }
@@ -290,7 +290,7 @@ contract EnvironmentContract is Ownable {
     {
         uint256 techCount = inf.getTechnologyCount(id);
         int256 pointsFromTech;
-        if (techCount >= 6) {
+        if (techCount <= 6) {
             pointsFromTech = 10;
         }
         return pointsFromTech;
@@ -303,7 +303,7 @@ contract EnvironmentContract is Ownable {
     {
         int256 pointsFromMilitaryRatiio;
         (, bool environmentPenalty) = tax.soldierToPopulationRatio(id);
-        if (environmentPenalty == false) {
+        if (environmentPenalty) {
             pointsFromMilitaryRatiio += 10;
         }
         return pointsFromMilitaryRatiio;
@@ -317,7 +317,7 @@ contract EnvironmentContract is Ownable {
         int256 pointsFromInfrastructure;
         uint256 land = inf.getLandCount(id);
         uint256 infra = inf.getInfrastructureCount(id);
-        if ((infra / 2) <= land) {
+        if ((infra / 2) >= land) {
             pointsFromInfrastructure += 10;
         }
         return pointsFromInfrastructure;
@@ -327,7 +327,7 @@ contract EnvironmentContract is Ownable {
         int256 pointsFromNukes;
         uint256 nukeCount = mis.getNukeCount(id);
         if (nukeCount > 0) {
-            pointsFromNukes -= (int256(nukeCount));
+            pointsFromNukes = (int256(nukeCount / 10));
         }
         bool isLead = res.viewLead(id);
         if (isLead) {
@@ -340,10 +340,23 @@ contract EnvironmentContract is Ownable {
         int256 pointsFromGovernmentType;
         uint256 governmentType = param.getGovernmentType(id);
         if (
+            //anarchy
             governmentType == 0 ||
+            //communist            
             governmentType == 2 ||
+            //dictatorship
             governmentType == 4 ||
+            //transitional
             governmentType == 10
+        ) {
+            pointsFromGovernmentType += 10;
+        } else if (
+            //capitalist
+            governmentType == 1 ||
+            //democracy            
+            governmentType == 3 ||
+            //republic
+            governmentType == 7
         ) {
             pointsFromGovernmentType -= 10;
         }
