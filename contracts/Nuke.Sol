@@ -24,6 +24,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     address countryMinter;
     address warAddress;
     address wonders1;
+    address wonders4;
     address improvements3;
     address improvements4;
     address infrastructure;
@@ -44,6 +45,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     CountryMinter mint;
     WarContract war;
     WondersContract1 won1;
+    WondersContract4 won4;
     ImprovementsContract3 imp3;
     ImprovementsContract4 imp4;
     InfrastructureContract inf;
@@ -66,6 +68,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         address _countryMinter,
         address _warAddress,
         address _wonders1,
+        address _wonders4,
         address _improvements3,
         address _improvements4,
         address vrfCoordinatorV2,
@@ -79,6 +82,8 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         war = WarContract(_warAddress);
         wonders1 = _wonders1;
         won1 = WondersContract1(_wonders1);
+        wonders4 = _wonders4;
+        won4 = WondersContract4(_wonders4);
         improvements3 = _improvements3;
         imp3 = ImprovementsContract3(_improvements3);
         improvements4 = _improvements4;
@@ -188,8 +193,12 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         uint256 defenderMissileDefenses = imp4.getMissileDefenseCount(
             defenderId
         );
+        bool strategicDefenseInitiative = won4.getStrategicDefenseInitiative(defenderId);
         uint256 attackerSattelites = imp3.getSatelliteCount(attackerId);
-        uint256 thwartOdds = 60;
+        uint256 thwartOdds = 50;
+        if (strategicDefenseInitiative) {
+            thwartOdds += 20;
+        }
         if (defenderMissileDefenses > 0) {
             thwartOdds += (defenderMissileDefenses * 5);
         }

@@ -619,6 +619,7 @@ contract MissilesContract is Ownable {
     // address public improvements2;
     address public wonders1;
     address public wonders2;
+    address public wonders4;
     address public nukeAddress;
     address public airBattle;
     // address public groundBattle;
@@ -630,11 +631,12 @@ contract MissilesContract is Ownable {
     InfrastructureContract inf;
     ResourcesContract res;
     WondersContract1 won1;
+    WondersContract2 won2;
+    WondersContract4 won4;
     ImprovementsContract1 imp1;
     ImprovementsContract2 imp2;
     WarContract war;
     TreasuryContract tsy;
-    WondersContract2 won2;
     NationStrengthContract stren;
 
     struct Missiles {
@@ -678,6 +680,7 @@ contract MissilesContract is Ownable {
         address _improvements1,
         // address _improvements2,
         address _wonders1,
+        address _wonders4,
         address _countryMinter
     ) public onlyOwner {
         // infrastructure = _infrastructure;
@@ -686,6 +689,8 @@ contract MissilesContract is Ownable {
         res = ResourcesContract(_resources);
         wonders1 = _wonders1;
         won1 = WondersContract1(_wonders1);
+        wonders4 = _wonders4;
+        won4 = WondersContract4(_wonders4);
         improvements1 = _improvements1;
         imp1 = ImprovementsContract1(_improvements1);
         // improvements2 = _improvements2;
@@ -822,7 +827,12 @@ contract MissilesContract is Ownable {
         bool manhattanProject = won2.getManhattanProject(id);
         require (nationStrength > 150000 || manhattanProject, "nation strength too low");
         uint256 nukesPurchasedToday = idToMissiles[id].nukesPurchasedToday;
-        require(nukesPurchasedToday < 1, "already purchased nuke today");
+        uint256 maxNukesPerDay = 1;
+        bool weaponsResearchCenter = won4.getWeaponsResearchCenter(id);
+        if (weaponsResearchCenter) {
+            maxNukesPerDay = 2;
+        }
+        require(nukesPurchasedToday < maxNukesPerDay, "already purchased nuke today");
         idToMissiles[id].nukesPurchasedToday += 1;
         uint256 nukeCount = idToMissiles[id].nuclearWeapons;
         uint256 cost = (500000 + (nukeCount * 50000));

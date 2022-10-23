@@ -1808,42 +1808,44 @@ contract WondersContract4 is Ownable {
         //Social Security System -
         //$40,000,000-
         //The social security system provides benefits to aging members of your nation.
-        //Allows you to raise taxes above 28% up to 30% without additional happiness penalties.
+        //DONE //Allows you to raise taxes above 28% up to 30% without additional happiness penalties.
         bool socialSecuritySystem;
         //Space Program -
         //$30,000,000 -
         //The space program sends your astronauts to the moon and beyond.
-        //Increases happiness +3, lowers technology cost -3% and lowers aircraft cost -5%.
+        //DONE //Increases happiness +3, lowers technology cost -3% and lowers aircraft cost -5%.
         bool spaceProgram;
         //Stock Market -
         //$30,000,000 -
         //The stock market provides a boost to your economy.
-        //Increases citizen income +$10.00
+        //DONE //Increases citizen income +$10.00
         bool stockMarket;
         //Strategic Defense Initiative (SDI) -
         //$75,000,000 -
-        //Reduces odds of a successful nuclear attack against your nation by 60%.
+        //DONE //Reduces odds of a successful nuclear attack against your nation by 60%.
         //The SDI wonder also requires 3 satellites and 3 missile defenses
         //and those satellites and missile defenses cannot be deleted once the wonder is developed.
         bool strategicDefenseInitiative;
         //Superior Logistical Support -
         //$80,000,000 -
         //Provides supplies more efficiently to your nation's military.
-        //Reduces Aircraft and Naval Maintenance Cost by -10% and
-        //Tank Maintenance Cost by -5%.
-        //Increases attacking and defending ground battle strength +10%.
+        //DONE //Reduces Aircraft and Naval Maintenance Cost by -10% and
+        //DONE //Tank Maintenance Cost by -5%.
+        //DONE //Increases attacking and defending ground battle strength +10%.
         //Requires Pentagon.
         bool superiorLogisticalSupport;
         //Universal Health Care -
         //$100,000,000 -
-        //A Universal Health Care program increases population +3% and increases population happiness +2.
+        //A Universal Health Care program 
+        //DONE //increases population +3% and 
+        //DONE //increases population happiness +2.
         //Requires 11,000 infrastructure, Hospital, National Research Lab.
         bool universalHealthcare;
         //Weapons Research Complex -
         //$150,000,000 -
         //Increases the technology bonus to damage from 0.01% to 0.02% per technology level,
-        //Increases the number of nukes that can be purchased per day to 2,
-        //hurts environment by +1,
+        //DONE //Increases the number of nukes that can be purchased per day to 2,
+        //DONE //hurts environment by +1,
         //Increases the purchase costs of all military by 0.01% per technology level.
         //Requires 8,500 infrastructure, 2,000 technology, National Research Lab, Pentagon Wonder.
         bool weaponsResearchCenter;

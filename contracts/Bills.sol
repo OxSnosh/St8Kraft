@@ -17,6 +17,7 @@ contract BillsContract is Ownable {
     address public wonders1;
     address public wonders2;
     address public wonders3;
+    address public wonders4;
     address public infrastructure;
     address public forces;
     address public fighters;
@@ -30,6 +31,7 @@ contract BillsContract is Ownable {
     WondersContract1 won1;
     WondersContract2 won2;
     WondersContract3 won3;
+    WondersContract4 won4;
     InfrastructureContract inf;
     ForcesContract frc;
     FightersContract fight;
@@ -78,7 +80,8 @@ contract BillsContract is Ownable {
     function constructorContinued (
         address _improvements1,
         address _improvements2,
-        address _missiles
+        address _missiles,
+        address _wonders4
     ) public onlyOwner {
         improvements1 = _improvements1;
         imp1 = ImprovementsContract1(_improvements1);
@@ -86,6 +89,8 @@ contract BillsContract is Ownable {
         imp2 = ImprovementsContract2(_improvements2);
         missiles = _missiles;
         mis = MissilesContract(_missiles);
+        wonders4 = _wonders4;
+        won4 = WondersContract4(_wonders4);
     }
 
     function updateCountryMinter(address newAddress) public onlyOwner {
@@ -340,6 +345,10 @@ contract BillsContract is Ownable {
         if (oil) {
             tankUpkeepModifier -= 5;
         }
+        bool logisticalSupport = won4.getSuperiorLogisticalSupport(id);
+        if (logisticalSupport) {
+            tankUpkeepModifier -= 5;
+        }
         uint256 adjustedTankUpkeep = ((tankUpkeep *
             tankUpkeepModifier) / 100);
         return adjustedTankUpkeep;
@@ -395,6 +404,10 @@ contract BillsContract is Ownable {
         uint256 airports = imp1.getAirportCount(id);
         if (airports > 0) {
             aircraftUpkeepModifier -= (2 * airports);
+        }
+        bool logisticalSupport = won4.getSuperiorLogisticalSupport(id);
+        if (logisticalSupport) {
+            aircraftUpkeepModifier -= 10;
         }
         uint256 adjustedAircraftUpkeep = ((aircraftUpkeep *
             aircraftUpkeepModifier) / 100);
@@ -457,6 +470,10 @@ contract BillsContract is Ownable {
         }
         bool oil = res.viewOil(id);
         if (oil) {
+            navyUpkeepModifier -= 10;
+        }
+        bool logisticalSupport = won4.getSuperiorLogisticalSupport(id);
+        if (logisticalSupport) {
             navyUpkeepModifier -= 10;
         }
         uint256 adjustedNavyUpkeep = ((baseNavyUpkeep *

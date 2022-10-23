@@ -575,6 +575,10 @@ contract InfrastructureContract is Ownable {
         if (nationalResearchLab) {
             additionalPoints += 5;
         }
+        bool universalHealthcare = won4.getUniversalHealthcare(id);
+        if (universalHealthcare) {
+            additionalPoints += 3;
+        } 
         return additionalPoints;
     }
 

@@ -494,7 +494,7 @@ contract TaxesContract is Ownable {
             wonderPoints += 3;
         }
         if (universalHealthcare) {
-            wonderPoints += 3;
+            wonderPoints += 2;
         }
         return wonderPoints;
     }
@@ -663,10 +663,14 @@ contract TaxesContract is Ownable {
             subtractTaxPoints = 7;
         }
         uint256 intelAgencies = imp2.getIntelAgencyCount(id);
-        if (intelAgencies > 0 && taxRate <= 23) {
+        if (intelAgencies >= 1 && taxRate <= 20) {
             subtractTaxPoints = 0;
-        } else if (intelAgencies > 0 && taxRate <= 25) {
-            subtractTaxPoints -= 5;
+        } else if (intelAgencies <= 3 && taxRate > 20 && taxRate <= 23) {
+            subtractTaxPoints -= intelAgencies;
+        } else if (intelAgencies > 3 && taxRate > 20 && taxRate <= 23) {
+            subtractTaxPoints = 0;    
+        } else if (taxRate > 23) {
+            subtractTaxPoints -= intelAgencies;
         }
         return subtractTaxPoints;
     }
@@ -761,7 +765,7 @@ contract AdditionalTaxesContract is Ownable {
     address public wonders1;
     address public wonders2;
     address public wonders3;
-    // address public wonders4;
+    address public wonders4;
     address public resources;
     // address public forces;
     // address public military;
@@ -776,7 +780,7 @@ contract AdditionalTaxesContract is Ownable {
     WondersContract1 won1;
     WondersContract2 won2;
     WondersContract3 won3;
-    // WondersContract4 won4;
+    WondersContract4 won4;
     ResourcesContract res;
     // ForcesContract frc;
     // MilitaryContract mil;
@@ -808,7 +812,7 @@ contract AdditionalTaxesContract is Ownable {
         address _wonders1,
         address _wonders2,
         address _wonders3,
-        // address _wonders4,
+        address _wonders4,
         address _resources
         // address _forces,
         // address _military,
@@ -822,8 +826,8 @@ contract AdditionalTaxesContract is Ownable {
         won2 = WondersContract2(_wonders2);
         wonders3 = _wonders3;
         won3 = WondersContract3(_wonders3);
-        // wonders4 = _wonders4;
-        // won4 = WondersContract4(_wonders4);
+        wonders4 = _wonders4;
+        won4 = WondersContract4(_wonders4);
         resources = _resources;
         res = ResourcesContract(_resources);
         // forces = _forces;
@@ -864,6 +868,10 @@ contract AdditionalTaxesContract is Ownable {
         if (miningIndustryConsortium) {
             uint256 points = getResourcePointsForMiningConsortium(id);
             adjustments += (2 * points);
+        }
+        bool stockMarket = won4.getStockMarket(id);
+        if (stockMarket) {
+            adjustments += 10;
         }
         uint256 uraniumAndNuclearPowerBonus = getNuclearAndUraniumBonus(id);
         adjustments += uraniumAndNuclearPowerBonus;

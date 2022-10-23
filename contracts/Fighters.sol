@@ -806,6 +806,7 @@ contract FightersMarketplace1 is Ownable {
     address public infrastructure;
     address public resources;
     address public improvements1;
+    address public wonders4;
     uint256 public yak9Cost = 10000;
     uint256 public yak9RequiredInfrastructure = 100;
     uint256 public yak9RequiredTech = 30;
@@ -826,6 +827,7 @@ contract FightersMarketplace1 is Ownable {
     BombersContract bomb;
     ResourcesContract res;
     ImprovementsContract1 imp1;
+    WondersContract4 won4;
 
     constructor(
         address _countryMinter,
@@ -834,7 +836,8 @@ contract FightersMarketplace1 is Ownable {
         address _treasury,
         address _infrastructure,
         address _resources,
-        address _improvements1
+        address _improvements1,
+        address _wonders4
     ) {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
@@ -844,6 +847,8 @@ contract FightersMarketplace1 is Ownable {
         res = ResourcesContract(_resources);
         improvements1 = _improvements1;
         imp1 = ImprovementsContract1(_improvements1);
+        wonders4 = _wonders4;
+        won4 = WondersContract4(_wonders4);
         treasury = _treasury;
         fighters = _fighters;
         infrastructure = _infrastructure;
@@ -1093,6 +1098,10 @@ contract FightersMarketplace1 is Ownable {
         uint256 airports = imp1.getAirportCount(id);
         if (airports > 0) {
             aircraftPurchaseModifier -= (2 * airports);
+        }
+        bool spaceProgram = won4.getSpaceProgram(id);
+        if (spaceProgram) {
+            aircraftPurchaseModifier -= 5;
         }
         return aircraftPurchaseModifier;
     }

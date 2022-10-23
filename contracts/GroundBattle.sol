@@ -20,6 +20,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     address improvements2;
     address improvements3;
     address wonders3;
+    address wonders4;
 
     WarContract war;
     InfrastructureContract inf;
@@ -28,6 +29,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     ImprovementsContract2 imp2;
     ImprovementsContract3 imp3;
     WondersContract3 won3;
+    WondersContract4 won4;
 
     struct GroundForcesToBattle {
         uint256 attackType;
@@ -58,9 +60,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         address _infrastructure,
         address _forces,
         address _treasury,
-        address _improvements2,
-        address _improvements3,
-        address _wonders3,
+
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
@@ -73,16 +73,26 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         force = ForcesContract(_forces);
         treasury = _treasury;
         tsy = TreasuryContract(_treasury);
+        i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
+        i_gasLane = gasLane;
+        i_subscriptionId = subscriptionId;
+        i_callbackGasLimit = callbackGasLimit;
+    }
+
+    function constructorContinued(
+        address _improvements2,
+        address _improvements3,
+        address _wonders3,
+        address _wonders4
+    ) public onlyOwner {
         improvements2 = _improvements2;
         imp2 = ImprovementsContract2(_improvements2);
         improvements3 = _improvements3;
         imp3 = ImprovementsContract3(_improvements3);
         wonders3 = _wonders3;
         won3 = WondersContract3(_wonders3);
-        i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
-        i_gasLane = gasLane;
-        i_subscriptionId = subscriptionId;
-        i_callbackGasLimit = callbackGasLimit;
+        wonders4 = _wonders4;
+        won4 = WondersContract4(_wonders4);
     }
 
     function groundAttack(
@@ -124,7 +134,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         (uint256 soldiersDeployed, uint256 tanksDeployed) = war
             .getDeployedGroundForces(warId, attackerId);
         //need efficiency modifier
-        (uint256 attackerForcesStrength, , ) = getAttackerForcesStrength(attackerId, warId);
+        uint256 attackerForcesStrength = getAttackerForcesStrength(attackerId, warId);
         GroundForcesToBattle memory newGroundForces = GroundForcesToBattle(
             attackType,
             soldiersDeployed,
@@ -143,7 +153,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     ) internal {
         uint256 soldiers = force.getDefendingSoldierCount(defenderId);
         uint256 tanks = force.getDefendingTankCount(defenderId);
-        (uint256 defenderForcesStrength, , ) = getDefenderForcesStrength(defenderId, battleId);
+        uint256 defenderForcesStrength = getDefenderForcesStrength(defenderId, battleId);
         GroundForcesToBattle memory newGroundForces = GroundForcesToBattle(
             0,
             soldiers,
@@ -159,8 +169,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         public
         view
         returns (
-            uint256,
-            uint256,
             uint256
         )
     {
@@ -171,20 +179,24 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 soldierStrength = ((soldiersDeployed * efficiencyModifier) /
             100);
         uint256 tankStrength = (15 * tanksDeployed);
-        uint256 attackerForcesStrength = (soldierStrength + tankStrength);
+        uint256 strength = (soldierStrength + tankStrength);
+        uint256 mod = 100;
         bool pentagon = won3.getPentagon(attackerId);
         if (pentagon) {
-            attackerForcesStrength = ((attackerForcesStrength * 120) / 100);
+            mod += 20;
         }
-        return (attackerForcesStrength, soldierStrength, tankStrength);
+        bool logisticalSupport = won4.getSuperiorLogisticalSupport(attackerId);
+        if (logisticalSupport) {
+            mod += 10;
+        }
+        strength = ((strength * mod) / 100);
+        return strength;
     }
 
     function getDefenderForcesStrength(uint256 defenderId, uint256 battleId)
         public
         view
         returns (
-            uint256,
-            uint256,
             uint256
         )
     {
@@ -192,21 +204,24 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 tanks = force.getDefendingTankCount(defenderId);
         uint256 efficiencyModifier = force
             .getDefendingSoldierEfficiencyModifier(defenderId);
-        uint256 soldierStrength = ((soldiers * efficiencyModifier) /
-            100);
+        uint256 strength = ((soldiers * efficiencyModifier) /
+            100) + (17 * tanks);
         uint256 attackerId = groundBattleIdToAttackerForces[battleId].countryId;
         uint256 officeOfPropagandaCount = imp3.getOfficeOfPropagandaCount(attackerId);
-        if(officeOfPropagandaCount > 0) {
-            uint256 mod = (100 - (5 * officeOfPropagandaCount));
-            soldierStrength = ((soldierStrength * mod) / 100);
-        }
-        uint256 tankStrength = (17 * tanks);
-        uint256 defenderForcesStrength = (soldierStrength + tankStrength);
         bool pentagon = won3.getPentagon(defenderId);
-        if (pentagon) {
-            defenderForcesStrength = ((defenderForcesStrength * 120) / 100);
+        bool logisticalSupport = won4.getSuperiorLogisticalSupport(defenderId);
+        uint256 mod = 100;
+        if(officeOfPropagandaCount > 0) {
+            mod -= (5 * officeOfPropagandaCount);
         }
-        return (defenderForcesStrength, soldierStrength, tankStrength);
+        if (pentagon) {
+            mod += 20;
+        }
+        if (logisticalSupport) {
+            mod += 10;
+        }
+        strength = ((strength * mod) / 100);
+        return strength;
     }
 
     function fulfillRequest(uint256 battleId) public {
