@@ -17,23 +17,11 @@ contract AidContract is Ownable {
     address public wonder1;
     uint256 public aidProposalId;
 
-    constructor(
-        address _countryMinter,
-        address _treasury,
-        address _forces,
-        address _infrastructure,
-        address _keeper,
-        address _wonder1
-    ) {
-        countryMinter = _countryMinter;
-        mint = CountryMinter(_countryMinter);
-        treasury = _treasury;
-        forces = _forces;
-        infrastructure = _infrastructure;
-        keeper = _keeper;
-        wonder1 = _wonder1;
-        won1 = WondersContract1(_wonder1);
-    }
+    // constructor(
+
+    // ) {
+
+    // }
 
     CountryMinter mint;
     WondersContract1 won1;
@@ -72,6 +60,11 @@ contract AidContract is Ownable {
 
     function updateKeeperAddress(address _newAddress) public onlyOwner {
         keeper = _newAddress;
+    }
+
+    function updateWonderContract1Address(address _newAddress) public onlyOwner {
+        wonder1 = _newAddress;
+        won1 = WonderContract1(_newAddress);
     }
 
     modifier onlyCountryMinter() {

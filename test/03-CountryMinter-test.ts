@@ -65,7 +65,7 @@ describe("CountryMinter", function () {
     let countryparameterscontract: CountryParametersContract
     let crimecontract: CrimeContract
     let cruisemissileconract: CruiseMissileContract
-    let EnvironmentContract: EnvironmentContract
+    let environmentcontract: EnvironmentContract
     let fighterscontract: FightersContract
     let fighterlosses: FighterLosses
     let fightersmarketplace1: FightersMarketplace1
@@ -114,14 +114,14 @@ describe("CountryMinter", function () {
         const WarBucks = await ethers.getContractFactory("WarBucks")
         warbucks = await WarBucks.deploy(INITIAL_SUPPLY) as WarBucks
         await warbucks.deployed()
-        console.log(`WarBuks token deployed to ${warbucks.address}`)
+        // console.log(`WarBuks token deployed to ${warbucks.address}`)
     
         const MetaNatonsGovToken = await ethers.getContractFactory(
             "MetaNationsGovToken"
         )
         metanationsgovtoken = await MetaNatonsGovToken.deploy(INITIAL_SUPPLY) as MetaNationsGovToken
         await metanationsgovtoken.deployed()
-        console.log(`MetaNationsGovToken deployed to ${metanationsgovtoken.address}`)
+        // console.log(`MetaNationsGovToken deployed to ${metanationsgovtoken.address}`)
     
         const AidContract = await ethers.getContractFactory("AidContract")
         aidcontract = await AidContract.deploy() as AidContract
@@ -157,137 +157,227 @@ describe("CountryMinter", function () {
         console.log(`BillsContract deployed tp ${billscontract.address}`)
             //countryminter
             //treasury
-            //wonders1
-            //wonders2
-            //wonders3
-            //wonders4
             //infrastructure
             //forces
             //fighters
             //navy
-            //resources
             //improvements1
             //improvements2
             //missiles
+            //resources
+            //wonders1
+            //wonders2
+            //wonders3
+            //wonders4
+            
+        const Bombers = await ethers.getContractFactory("BombersContract")
+        bomberscontract = await Bombers.deploy() as BombersContract
+        await bomberscontract.deployed()
+        // console.log(`Bombers deployed to ${bombers.address}`) 
+            
+        const BombersMarketplace1 = await ethers.getContractFactory("BombersMarketplace1")
+        bombersmarketplace1 = await Bombers.deploy() as BombersMarketplace1
+        await bombersmarketplace1.deployed()
+        // console.log(`Bombers deployed to ${bombers.address}`) 
+            
+        const BombersMarketplace2 = await ethers.getContractFactory("BombersMarketplace2")
+        bombersmarketplace2 = await Bombers.deploy() as BombersMarketplace2
+        await bombersmarketplace2.deployed()
+        // console.log(`Bombers deployed to ${bombers.address}`) 
+
+        const CountryMinter = await ethers.getContractFactory("CountryMinter")
+        countryminter = await CountryMinter.deploy()  as CountryMinter
+        await countryminter.deployed()
 
         const CountryParameters = await ethers.getContractFactory("CountryParametersContract")
         countryparameterscontract = await CountryParameters.deploy() as CountryParametersContract
         await countryparameterscontract.deployed()
         // console.log(`CountryParameters deployed to ${countryparameterscontract.address}`)  
+
+        const CrimeContract = await ethers.getContractFactory("CrimeContract")
+        crimecontract = await CrimeContract.deploy() as CrimeContract
+        await crimecontract.deployed()
+        // console.log(`CountryParameters deployed to ${countryparameterscontract.address}`)  
+
+        const CruiseMissileContract = await ethers.getContractFactory("CruiseMissileContract")
+        cruisemissileconract = await CruiseMissileContract.deploy() as CruiseMissileContract
+        await cruisemissileconract.deployed()
+        // console.log(`CountryParameters deployed to ${countryparameterscontract.address}`)         
+
+        const EnvironmentContract = await ethers.getContractFactory("EnvironmentContract")
+        environmentcontract = await EnvironmentContract.deploy() as EnvironmentContract
+        await environmentcontract.deployed()
+        // console.log(`CountryParameters deployed to ${countryparameterscontract.address}`)         
     
-        const Treasury = await ethers.getContractFactory("TreasuryContract")
-        treasurycontract = await Treasury.deploy(warbucks.address) as TreasuryContract
-        await treasurycontract.deployed()
+        const FightersContract = await ethers.getContractFactory("FightersContract")
+        fighterscontract = await FightersContract.deploy() as FightersContract
+        await fighterscontract.deployed()
+        // console.log(`Fighters deployed to ${fighters.address}`) 
+    
+        const FighterLosses = await ethers.getContractFactory("FighterLosses")
+        fighterlosses = await FighterLosses.deploy() as FighterLosses
+        await fighterlosses.deployed()
+        // console.log(`Fighters deployed to ${fighters.address}`) 
+    
+        const FightersMarketplace1 = await ethers.getContractFactory("FightersMarketplace1")
+        fightersmarketplace1 = await FightersMarketplace1.deploy() as FightersMarketplace1
+        await fightersmarketplace1.deployed()
+        // console.log(`Fighters deployed to ${fighters.address}`) 
+    
+        const FightersMarketplace2 = await ethers.getContractFactory("FightersMarketplace2")
+        fightersmarketplace2 = await FightersMarketplace2.deploy() as FightersMarketplace2
+        await fightersmarketplace2.deployed()
+        // console.log(`Fighters deployed to ${fighters.address}`) 
+            
+        const ForcesContract = await ethers.getContractFactory("ForcesContract")
+        forcescontract = await ForcesContract.deploy() as ForcesContract
+        await forcescontract.deployed()
+        // console.log(`Forces deployed to ${forces.address}`) 
+
+        const MissilesContract = await ethers.getContractFactory("MissilesContract")
+        missilescontract = await MissilesContract.deploy() as MissilesContract
+        await missilescontract.deployed()
         // console.log(`Treasury deployed to ${treasury.address}`) 
-    
-        const Infrastructure = await ethers.getContractFactory("InfrastructureContract")
-        infrastructurecontract = await Infrastructure.deploy() as InfrastructureContract
-        await infrastructurecontract.deployed()
-        // console.log(`Infrastructure deployed to ${infrastructure.address}`) 
-    
-        const Resources = await ethers.getContractFactory("ResourcesContract")
-        resourcescontract = await Resources.deploy() as ResourcesContract
-        await resourcescontract.deployed()
-        // console.log(`Resources deployed to ${resources.address}`) 
-    
-        const Improvements2 = await ethers.getContractFactory("ImprovementsContract2")
-        improvementscontract2 = await Improvements2.deploy(treasurycontract.address) as ImprovementsContract2
-        await improvementscontract2.deployed()
-        // console.log(`Improvements deployed to ${improvements2.address}`) 
-    
-        const Improvements3 = await ethers.getContractFactory("ImprovementsContract3")
-        improvementscontract3 = await Improvements3.deploy(treasurycontract.address) as ImprovementsContract3
-        await improvementscontract3.deployed()
-        // console.log(`Improvements deployed to ${improvements3.address}`) 
-    
-        const Improvements1 = await ethers.getContractFactory("ImprovementsContract1")
-        improvementscontract1 = await Improvements1.deploy(treasurycontract.address, improvementscontract2.address, improvementscontract3.address) as ImprovementsContract1
+
+        const GroundBattleContract = await ethers.getContractFactory("GroundBattleContract")
+        groundbattlecontract = await GroundBattleContract.deploy() as GroundBattleContract
+        await groundbattlecontract.deployed()
+        // console.log(`Treasury deployed to ${treasury.address}`) 
+        
+        const ImprovementsContract1 = await ethers.getContractFactory("ImprovementsContract1")
+        improvementscontract1 = await ImprovementsContract1.deploy() as ImprovementsContract1
         await improvementscontract1.deployed()
         // console.log(`Improvements deployed to ${improvements1.address}`)
     
-        await improvementscontract2.updateImprovementContract1Address(improvementscontract1.address)
-        // console.log(`Improvements2 updated with Improvements1 address`)
-        await improvementscontract3.updateImprovementContract1Address(improvementscontract1.address)
-        // console.log(`Improvements3 updated with Improvements1 address`)
+        const ImprovementsContract2 = await ethers.getContractFactory("ImprovementsContract2")
+        improvementscontract2 = await ImprovementsContract2.deploy() as ImprovementsContract2
+        await improvementscontract2.deployed()
+        // console.log(`Improvements deployed to ${improvements2.address}`) 
     
+        const ImprovementsContract3 = await ethers.getContractFactory("ImprovementsContract3")
+        improvementscontract3 = await ImprovementsContract3.deploy() as ImprovementsContract3
+        await improvementscontract3.deployed()
+        // console.log(`Improvements deployed to ${improvements3.address}`) 
+    
+        const ImprovementsContract4 = await ethers.getContractFactory("ImprovementsContract4")
+        improvementscontract4 = await ImprovementsContract4.deploy() as ImprovementsContract4
+        await improvementscontract4.deployed()
+        // console.log(`Improvements deployed to ${improvements3.address}`) 
+        
+        const InfrastructureContract = await ethers.getContractFactory("InfrastructureContract")
+        infrastructurecontract = await InfrastructureContract.deploy() as InfrastructureContract
+        await infrastructurecontract.deployed()
+        // console.log(`Infrastructure deployed to ${infrastructure.address}`) 
+        
+        const InfrastructureMarketplace = await ethers.getContractFactory("InfrastructureMarketplace")
+        infrastructuremarketplace = await InfrastructureMarketplace.deploy() as InfrastructureMarketContract
+        await infrastructuremarketplace.deployed()
+        // console.log(`Infrastructure deployed to ${infrastructure.address}`) 
+
+        const KeeperContract = await ethers.getContractFactory("KeeperContract")
+        keepercontract = await KeeperContract.deploy() as KeeperContract
+        await keepercontract.deployed()
+        // console.log(`Treasury deployed to ${treasury.address}`) 
+        
+        const LandMarketContract = await ethers.getContractFactory("LandMarketContract")
+        landmarketcontract = await LandMarketContract.deploy() as LandMarketContract
+        await landmarketcontract.deployed()
+        // console.log(`Treasury deployed to ${treasury.address}`) 
+
+        const MilitaryContract = await ethers.getContractFactory("MilitaryContract")
+        militarycontract = await MilitaryContract.deploy() as MilitaryContract
+        await militarycontract.deployed()
+        // console.log(`Treasury deployed to ${treasury.address}`) 
+
+        const NationStrengthContract = await ethers.getContractFactory("NationStrengthContract")
+        nationstrengthcontract = await NationStrengthContract.deploy() as NationStrengthContract
+        await nationstrengthcontract.deployed()
+        // console.log(`Treasury deployed to ${treasury.address}`) 
+
+        const NavyContract = await ethers.getContractFactory("NavyContract")
+        navycontract = await NavyContract.deploy() as NavyContract
+        await navycontract.deployed()
+        // console.log(`Navy deployed to ${navy.address}`) 
+        
+        const NavalActionsContract = await ethers.getContractFactory("NavalActionsContract")
+        navalactionscontract = await NavalActionsContract.deploy() as NavalActionsContract
+        await navalactionscontract.deployed()
+        // console.log(`Navy deployed to ${navy.address}`) 
+        
+        const NavalBlockadeContract = await ethers.getContractFactory("NavalBlockadeContract")
+        navalblockadecontract = await NavalBlockadeContract.deploy() as NavalBlockadeContract
+        await navalblockadecontract.deployed()
+        // console.log(`Navy deployed to ${navy.address}`) 
+        
+        const BreakBlocadeContract = await ethers.getContractFactory("BreakBlocadeContract")
+        breakblockadecontract = await BreakBlocadeContract.deploy() as BreakBlocadeContract
+        await breakblockadecontract.deployed()
+        // console.log(`Navy deployed to ${navy.address}`) 
+        
+        const NavalAttackContract = await ethers.getContractFactory("NavalAttackContract")
+        navalattackcontract = await NavalAttackContract.deploy() as NavalAttackContract
+        await navalattackcontract.deployed()
+        // console.log(`Navy deployed to ${navy.address}`) 
+        
+        const NukeContract = await ethers.getContractFactory("NukeContract")
+        nukecontract = await NukeContract.deploy() as NukeContract
+        await nukecontract.deployed()
+        // console.log(`Navy deployed to ${navy.address}`) 
+        
+        const ResourcesContract = await ethers.getContractFactory("ResourcesContract")
+        resourcescontract = await ResourcesContract.deploy() as ResourcesContract
+        await resourcescontract.deployed()
+        // console.log(`Navy deployed to ${navy.address}`) 
+        
+        const SenateContract = await ethers.getContractFactory("SenateContract")
+        senatecontract = await SenateContract.deploy() as SenateContract
+        await senatecontract.deployed()
+        // console.log(`Navy deployed to ${navy.address}`) 
+        
+        const SpyOperationsContract = await ethers.getContractFactory("SpyOperationsContract")
+        spyoperationscontract = await SpyOperationsContract.deploy() as SpyOperationsContract
+        await spyoperationscontract.deployed()
+        // console.log(`Navy deployed to ${navy.address}`) 
+
+        const TaxesContract = await ethers.getContractFactory("TaxesContract")
+        taxescontract = await TaxesContract.deploy() as TaxesContract
+        await taxescontract.deployed()
+        // console.log(`Treasury deployed to ${treasury.address}`) 
+
+        const TechnologyMarketContract = await ethers.getContractFactory("TechnologyMarketContract")
+        technologymarketcontrat = await TechnologyMarketContract.deploy() as TechnologyMarketContract
+        await technologymarketcontrat.deployed()
+        // console.log(`Treasury deployed to ${treasury.address}`) 
+
+        const TreasuryContract = await ethers.getContractFactory("TreasuryContract")
+        treasurycontract = await TreasuryContract.deploy() as TreasuryContract
+        await treasurycontract.deployed()
+        // console.log(`Treasury deployed to ${treasury.address}`) 
+        
+        const WarContract = await ethers.getContractFactory("WarContract")
+        warcontract = await WarContract.deploy() as WarContract
+        await warcontract.deployed()
+        // console.log(`Resources deployed to ${resources.address}`) 
+
+        const Wonders1 = await ethers.getContractFactory("WondersContract1")
+        wonderscontract1 = await Wonders1.deploy() as WondersContract1
+        await wonderscontract1.deployed()
+        // console.log(`Wonders deployed to ${wonders1.address}`) 
+  
         const Wonders2 = await ethers.getContractFactory("WondersContract2")
-        wonderscontract2 = await Wonders2.deploy(treasurycontract.address) as WondersContract2
+        wonderscontract2 = await Wonders2.deploy() as WondersContract2
         await wonderscontract2.deployed()
         // console.log(`Wonders deployed to ${wonders2.address}`) 
     
         const Wonders3 = await ethers.getContractFactory("WondersContract3")
-        wonderscontract3 = await Wonders3.deploy(treasurycontract.address) as WondersContract3
+        wonderscontract3 = await Wonders3.deploy() as WondersContract3
         await wonderscontract3.deployed()
         // console.log(`Wonders deployed to ${wonders3.address}`) 
     
         const Wonders4 = await ethers.getContractFactory("WondersContract4")
-        wonderscontract4 = await Wonders4.deploy(treasurycontract.address) as WondersContract4
+        wonderscontract4 = await Wonders4.deploy() as WondersContract4
         await wonderscontract4.deployed()
         // console.log(`Wonders deployed to ${wonders4.address}`) 
-    
-        const Wonders1 = await ethers.getContractFactory("WondersContract1")
-        wonderscontract1 = await Wonders1.deploy(treasurycontract.address, wonderscontract2.address, wonderscontract3.address, wonderscontract4.address) as WondersContract1
-        await wonderscontract1.deployed()
-        // console.log(`Wonders deployed to ${wonders1.address}`) 
-    
-        await wonderscontract2.updateWonderContract1Address(wonderscontract1.address)
-        // console.log(`wonders1 address set in contract wonders2`)
-        await wonderscontract3.updateWonderContract1Address(wonderscontract1.address)
-        // console.log(`wonders1 address set in contract wonders3`)
-        await wonderscontract4.updateWonderContract1Address(wonderscontract1.address)
-        // console.log(`wonders1 address set in contract wonders4`)
-    
-        const Military = await ethers.getContractFactory("MilitaryContract")
-        militarycontract = await Military.deploy() as MilitaryContract
-        await militarycontract.deployed()
-        // console.log(`Military deployed to ${military.address}`) 
-    
-        const Forces = await ethers.getContractFactory("ForcesContract")
-        forcescontract = await Forces.deploy(treasurycontract.address) as ForcesContract
-        await forcescontract.deployed()
-        // console.log(`Forces deployed to ${forces.address}`) 
-    
-        const Navy = await ethers.getContractFactory("NavyContract")
-        navycontract = await Navy.deploy(treasurycontract.address) as NavyContract
-        await navycontract.deployed()
-        // console.log(`Navy deployed to ${navy.address}`) 
-    
-        const Fighters = await ethers.getContractFactory("FightersContract")
-        fighterscontract = await Fighters.deploy(treasurycontract.address) as FightersContract
-        await fighterscontract.deployed()
-        // console.log(`Fighters deployed to ${fighters.address}`) 
-    
-        const Bombers = await ethers.getContractFactory("BombersContract")
-        bomberscontract = await Bombers.deploy(treasurycontract.address, fighterscontract.address) as BombersContract
-        await bomberscontract.deployed()
-        // console.log(`Bombers deployed to ${bombers.address}`) 
-    
-        const CountryMinter = await ethers.getContractFactory("CountryMinter")
-        ;[owner, addr1, addr2, ...addrs] = await ethers.getSigners()
-        countryminter = await CountryMinter.deploy(
-            warbucks.address,
-            countryparameterscontract.address,
-            treasurycontract.address,
-            infrastructurecontract.address,
-            resourcescontract.address,
-            militarycontract.address,
-            forcescontract.address,
-            navycontract.address,
-            fighterscontract.address,
-            bomberscontract.address,
-            )  as CountryMinter
-        await countrymintercontract.deployed()
-        await countrymintercontract.constructorContinued1(        
-            improvementscontract1.address,
-            improvementscontract2.address,
-            improvementscontract3.address,
-            wonderscontract1.address,
-            wonderscontract2.address,
-            wonderscontract3.address,
-            wonderscontract4.address
-            )
-        // console.log(`CountryMinter deployed to ${countryminter.address}`)
-
     });
 
     // describe("Minting a Country", function () {
