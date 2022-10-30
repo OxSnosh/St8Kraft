@@ -62,43 +62,43 @@ contract FightersContract is Ownable {
     mapping(uint256 => DeployedFighters) public idToDeployedFighters;
     mapping(uint256 => address) public idToOwnerFighters;
 
-    constructor(
-        address _countryMinter,
-        address _fightersMarket,
-        address _treasuryAddress,
-        address _war,
-        address _infrastructure,
-        address _resources,
-        address _improvements1,
-        address _airBattle,
-        address _wonders1,
-        address _losses
-    ) {
-        countryMinter = _countryMinter;
-        mint = CountryMinter(_countryMinter);
-        resources = _resources;
-        res = ResourcesContract(_resources);
-        improvements1 = _improvements1;
-        imp1 = ImprovementsContract1(_improvements1);
-        fightersMarket = _fightersMarket;
-        treasuryAddress = _treasuryAddress;
-        war = _war;
-        infrastructure = _infrastructure;
-        airBattle = _airBattle;
-        wonders1 = _wonders1;
-        won1 = WondersContract1(_wonders1);
-        losses = _losses;
-    }
+    // constructor(
+    //     address _countryMinter,
+    //     address _fightersMarket,
+    //     address _treasuryAddress,
+    //     address _war,
+    //     address _infrastructure,
+    //     address _resources,
+    //     address _improvements1,
+    //     address _airBattle,
+    //     address _wonders1,
+    //     address _losses
+    // ) {
+    //     countryMinter = _countryMinter;
+    //     mint = CountryMinter(_countryMinter);
+    //     resources = _resources;
+    //     res = ResourcesContract(_resources);
+    //     improvements1 = _improvements1;
+    //     imp1 = ImprovementsContract1(_improvements1);
+    //     fightersMarket = _fightersMarket;
+    //     treasuryAddress = _treasuryAddress;
+    //     war = _war;
+    //     infrastructure = _infrastructure;
+    //     airBattle = _airBattle;
+    //     wonders1 = _wonders1;
+    //     won1 = WondersContract1(_wonders1);
+    //     losses = _losses;
+    // }
 
-    function constructorContinued(address _navy, address _bombers)
-        public
-        onlyOwner
-    {
-        navy = _navy;
-        nav = NavyContract(_navy);
-        bombers = _bombers;
-        bomb = BombersContract(_bombers);
-    }
+    // function constructorContinued(address _navy, address _bombers)
+    //     public
+    //     onlyOwner
+    // {
+    //     navy = _navy;
+    //     nav = NavyContract(_navy);
+    //     bombers = _bombers;
+    //     bomb = BombersContract(_bombers);
+    // }
 
     modifier onlyCountryMinter() {
         require(msg.sender == countryMinter, "only countryMinter can call");
@@ -128,6 +128,7 @@ contract FightersContract is Ownable {
 
     function updateCountryMinterAddress(address _newAddress) public onlyOwner {
         countryMinter = _newAddress;
+        mint = CountryMinter(_newAddress);
     }
 
     function updateFightersMarketAddress(address _newAddress) public onlyOwner {
@@ -146,8 +147,37 @@ contract FightersContract is Ownable {
         infrastructure = _newAddress;
     }
 
+    function updateResourcesAddress(address _newAddress) public onlyOwner {
+        resources = _newAddress;
+        res = ResourcesContract(_newAddress);
+    }
+
+    function updateImprovementsContract1Address(address _newAddress) public onlyOwner {
+        improvements1 = _newAddress;
+        imp1 = ImprovementsContract1(_newAddress);
+    }
+
+    function updateAirBattleAddress(address _newAddress) public onlyOwner {
+        airBattle = _newAddress;
+    }
+
+    function updateWondersContract1Address(address _newAddress) public onlyOwner {
+        wonders1 = _newAddress;
+        won1 = WondersContract1(_newAddress);
+    }
+
+    function updateFighterLossesAddress(address _newAddress) public onlyOwner {
+        losses = _newAddress;
+    }
+
+    function updateNavyAddress(address _newAddress) public onlyOwner {
+        navy = _newAddress;
+        nav = NavyContract(_newAddress);
+    }
+
     function updateBombersAddress(address _newAddress) public onlyOwner {
         bombers = _newAddress;
+        bomb = BombersContract(_newAddress);
     }
 
     function generateFighters(uint256 id, address nationOwner) public {
@@ -748,11 +778,11 @@ contract FighterLosses is Ownable {
 
     FightersContract fight;
 
-    constructor(address _fighters, address _airBattle) {
-        fighters = _fighters;
-        fight = FightersContract(_fighters);
-        airBattle = _airBattle;
-    }
+    // constructor(address _fighters, address _airBattle) {
+    //     fighters = _fighters;
+    //     fight = FightersContract(_fighters);
+    //     airBattle = _airBattle;
+    // }
 
     modifier onlyAirBattle() {
         require(
@@ -760,6 +790,15 @@ contract FighterLosses is Ownable {
             "this function can only be called by air battle"
         );
         _;
+    }
+
+    function updateFightersAddress(address _newAddress) public onlyOwner {
+        fighters = _newAddress;
+        fight = FightersContract(_newAddress);
+    }
+
+    function updateAirBattleAddress(address _newAddress) public onlyOwner {
+        airBattle = _newAddress;
     }
 
     function decrementLosses(
@@ -853,31 +892,31 @@ contract FightersMarketplace1 is Ownable {
     WondersContract4 won4;
     FightersContract fight;
 
-    constructor(
-        address _countryMinter,
-        address _bombers,
-        address _fighters,
-        address _treasury,
-        address _infrastructure,
-        address _resources,
-        address _improvements1,
-        address _wonders4
-    ) {
-        countryMinter = _countryMinter;
-        mint = CountryMinter(_countryMinter);
-        bombers = _bombers;
-        bomb = BombersContract(_bombers);
-        resources = _resources;
-        res = ResourcesContract(_resources);
-        improvements1 = _improvements1;
-        imp1 = ImprovementsContract1(_improvements1);
-        wonders4 = _wonders4;
-        won4 = WondersContract4(_wonders4);
-        treasury = _treasury;
-        fighters = _fighters;
-        fight = FightersContract(_fighters);
-        infrastructure = _infrastructure;
-    }
+    // constructor(
+    //     address _countryMinter,
+    //     address _bombers,
+    //     address _fighters,
+    //     address _treasury,
+    //     address _infrastructure,
+    //     address _resources,
+    //     address _improvements1,
+    //     address _wonders4
+    // ) {
+    //     countryMinter = _countryMinter;
+    //     mint = CountryMinter(_countryMinter);
+    //     bombers = _bombers;
+    //     bomb = BombersContract(_bombers);
+    //     resources = _resources;
+    //     res = ResourcesContract(_resources);
+    //     improvements1 = _improvements1;
+    //     imp1 = ImprovementsContract1(_improvements1);
+    //     wonders4 = _wonders4;
+    //     won4 = WondersContract4(_wonders4);
+    //     treasury = _treasury;
+    //     fighters = _fighters;
+    //     fight = FightersContract(_fighters);
+    //     infrastructure = _infrastructure;
+    // }
 
     mapping(uint256 => address) public idToOwnerFightersMarket;
 
@@ -896,16 +935,16 @@ contract FightersMarketplace1 is Ownable {
         bomb = BombersContract(newAddress);
     }
 
-    function updateFighters1Address(address newAddress) public onlyOwner {
+    function updateFightersAddress(address newAddress) public onlyOwner {
         fighters = newAddress;
-    }
-
-    function updateInfrastructureAddress(address newAddress) public onlyOwner {
-        infrastructure = newAddress;
     }
 
     function updateTreasuryAddress(address newAddress) public onlyOwner {
         treasury = newAddress;
+    }
+
+    function updateInfrastructureAddress(address newAddress) public onlyOwner {
+        infrastructure = newAddress;
     }
 
     function updateResourcesAddress(address newAddress) public onlyOwner {
@@ -916,6 +955,11 @@ contract FightersMarketplace1 is Ownable {
     function updateImprovements1Address(address newAddress) public onlyOwner {
         improvements1 = newAddress;
         imp1 = ImprovementsContract1(newAddress);
+    }
+
+    function updateWonders4Address(address newAddress) public onlyOwner {
+        wonders4 = newAddress;
+        won4 = WondersContract4(newAddress);
     }
 
     function updateYak9Specs(
@@ -1139,28 +1183,28 @@ contract FightersMarketplace2 is Ownable {
     ImprovementsContract1 imp1;
     FightersContract fight;
 
-    constructor(
-        address _countryMinter,
-        address _bombers,
-        address _fighters,
-        address _treasury,
-        address _infrastructure,
-        address _resources,
-        address _improvements1
-    ) {
-        countryMinter = _countryMinter;
-        mint = CountryMinter(_countryMinter);
-        bombers = _bombers;
-        bomb = BombersContract(_bombers);
-        resources = _resources;
-        res = ResourcesContract(_resources);
-        improvements1 = _improvements1;
-        imp1 = ImprovementsContract1(_improvements1);
-        treasury = _treasury;
-        fighters = _fighters;
-        fight = FightersContract(_fighters);
-        infrastructure = _infrastructure;
-    }
+    // constructor(
+    //     address _countryMinter,
+    //     address _bombers,
+    //     address _fighters,
+    //     address _treasury,
+    //     address _infrastructure,
+    //     address _resources,
+    //     address _improvements1
+    // ) {
+    //     countryMinter = _countryMinter;
+    //     mint = CountryMinter(_countryMinter);
+    //     bombers = _bombers;
+    //     bomb = BombersContract(_bombers);
+    //     resources = _resources;
+    //     res = ResourcesContract(_resources);
+    //     improvements1 = _improvements1;
+    //     imp1 = ImprovementsContract1(_improvements1);
+    //     treasury = _treasury;
+    //     fighters = _fighters;
+    //     fight = FightersContract(_fighters);
+    //     infrastructure = _infrastructure;
+    // }
 
     mapping(uint256 => address) public idToOwnerFightersMarket;
 
@@ -1179,16 +1223,16 @@ contract FightersMarketplace2 is Ownable {
         bomb = BombersContract(newAddress);
     }
 
-    function updateFighters1Address(address newAddress) public onlyOwner {
+    function updateFightersAddress(address newAddress) public onlyOwner {
         fighters = newAddress;
-    }
-
-    function updateInfrastructureAddress(address newAddress) public onlyOwner {
-        infrastructure = newAddress;
     }
 
     function updateTreasuryAddress(address newAddress) public onlyOwner {
         treasury = newAddress;
+    }
+
+    function updateInfrastructureAddress(address newAddress) public onlyOwner {
+        infrastructure = newAddress;
     }
 
     function updateResourcesAddress(address newAddress) public onlyOwner {

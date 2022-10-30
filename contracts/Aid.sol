@@ -64,7 +64,7 @@ contract AidContract is Ownable {
 
     function updateWonderContract1Address(address _newAddress) public onlyOwner {
         wonder1 = _newAddress;
-        won1 = WonderContract1(_newAddress);
+        won1 = WondersContract1(_newAddress);
     }
 
     modifier onlyCountryMinter() {

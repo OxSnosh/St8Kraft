@@ -41,51 +41,56 @@ contract EnvironmentContract is Ownable {
     MissilesContract mis;
     NukeContract nuke;
 
-    constructor(
-        address _countryMinter,
-        address _resources,
-        address _infrastructure,
-        address _wonders3,
-        address _wonders4,
-        address _forces,
-        address _parameters,
-        address _taxes,
-        address _missiles,
-        address _nukes
-    ) {
-        countryMinter = _countryMinter;
-        mint = CountryMinter(_countryMinter);
-        resources = _resources;
-        res = ResourcesContract(_resources);
-        infrastructure = _infrastructure;
-        inf = InfrastructureContract(_infrastructure);
-        wonders3 = _wonders3;
-        won3 = WondersContract3(_wonders3);
-        wonders4 = _wonders4;
-        won4 = WondersContract4(_wonders4);
-        forces = _forces;
-        force = ForcesContract(_forces);
-        parameters = _parameters;
-        param = CountryParametersContract(_parameters);
-        taxes = _taxes;
-        tax = TaxesContract(_taxes);
-        missiles = _missiles;
-        mis = MissilesContract(_missiles);
-        nukes = _nukes;
-        nuke = NukeContract(_nukes);
-    }
+    // constructor(
+    //     address _countryMinter,
+    //     address _resources,
+    //     address _infrastructure,
+    //     address _wonders3,
+    //     address _wonders4,
+    //     address _forces,
+    //     address _parameters,
+    //     address _taxes,
+    //     address _missiles,
+    //     address _nukes
+    // ) {
+    //     countryMinter = _countryMinter;
+    //     mint = CountryMinter(_countryMinter);
+    //     resources = _resources;
+    //     res = ResourcesContract(_resources);
+    //     infrastructure = _infrastructure;
+    //     inf = InfrastructureContract(_infrastructure);
+    //     wonders3 = _wonders3;
+    //     won3 = WondersContract3(_wonders3);
+    //     wonders4 = _wonders4;
+    //     won4 = WondersContract4(_wonders4);
+    //     forces = _forces;
+    //     force = ForcesContract(_forces);
+    //     parameters = _parameters;
+    //     param = CountryParametersContract(_parameters);
+    //     taxes = _taxes;
+    //     tax = TaxesContract(_taxes);
+    //     missiles = _missiles;
+    //     mis = MissilesContract(_missiles);
+    //     nukes = _nukes;
+    //     nuke = NukeContract(_nukes);
+    // }
 
-    function constructorContinued(
-        address _improvements1,
-        address _improvements3,
-        address _improvements4
-    ) public onlyOwner {
-        improvements1 = _improvements1;
-        imp1 = ImprovementsContract1(_improvements1);
-        improvements3 = _improvements3;
-        imp3 = ImprovementsContract3(_improvements3);
-        improvements4 = _improvements4;
-        imp4 = ImprovementsContract4(_improvements4);
+    // function constructorContinued(
+    //     address _improvements1,
+    //     address _improvements3,
+    //     address _improvements4
+    // ) public onlyOwner {
+    //     improvements1 = _improvements1;
+    //     imp1 = ImprovementsContract1(_improvements1);
+    //     improvements3 = _improvements3;
+    //     imp3 = ImprovementsContract3(_improvements3);
+    //     improvements4 = _improvements4;
+    //     imp4 = ImprovementsContract4(_improvements4);
+    // }
+
+    function updateCountryMinter(address newAddress) public onlyOwner {
+        countryMinter = newAddress;
+        mint = CountryMinter(newAddress);
     }
 
     function updateResourcesContract(address newAddress) public onlyOwner {
@@ -96,11 +101,6 @@ contract EnvironmentContract is Ownable {
     function updateInfrastructureContract(address newAddress) public onlyOwner {
         infrastructure = newAddress;
         inf = InfrastructureContract(newAddress);
-    }
-
-    function updateImprovementsContract1(address newAddress) public onlyOwner {
-        improvements1 = newAddress;
-        imp1 = ImprovementsContract1(newAddress);
     }
 
     function updateWondersContract3(address newAddress) public onlyOwner {
@@ -126,6 +126,31 @@ contract EnvironmentContract is Ownable {
     function updateTaxesContract(address newAddress) public onlyOwner {
         taxes = newAddress;
         tax = TaxesContract(newAddress);
+    }
+
+    function updateMissilesContract(address newAddress) public onlyOwner {
+        missiles = newAddress;
+        mis = MissilesContract(newAddress);
+    }
+
+    function updateNukeContract(address newAddress) public onlyOwner {
+        nukes = newAddress;
+        nuke = NukeContract(newAddress);
+    }
+
+    function updateImprovementsContract1(address newAddress) public onlyOwner {
+        improvements1 = newAddress;
+        imp1 = ImprovementsContract1(newAddress);
+    }
+
+    function updateImprovementsContract3(address newAddress) public onlyOwner {
+        improvements3 = newAddress;
+        imp3 = ImprovementsContract3(newAddress);
+    }
+
+    function updateImprovementsContract4(address newAddress) public onlyOwner {
+        improvements4 = newAddress;
+        imp4 = ImprovementsContract4(newAddress);
     }
 
     function getEnvironmentScore(uint256 id) public view returns (uint256) {
