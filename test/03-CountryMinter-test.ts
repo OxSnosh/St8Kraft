@@ -300,17 +300,51 @@ describe("CountryMinter", function () {
         const ForcesContract = await ethers.getContractFactory("ForcesContract")
         forcescontract = await ForcesContract.deploy() as ForcesContract
         await forcescontract.deployed()
-            
+            // address _treasuryAddress,
+            // address _aid,
+            // address _spyAddress,
+            // address _cruiseMissile,
+            // address _nukeAddress,
+            // address _airBattle,
+            // address _groundBattle,
+            // address _warAddress
+            // address _infrastructure,
+            // address _resources,
+            // address _improvements1,
+            // address _improvements2,
+            // address _wonders1,
+            // address _countryMinter
 
         const MissilesContract = await ethers.getContractFactory("MissilesContract")
         missilescontract = await MissilesContract.deploy() as MissilesContract
         await missilescontract.deployed()
-        // console.log(`Treasury deployed to ${treasury.address}`) 
+            // address _treasury,
+            // address _spyAddress,
+            // address _nukeAddress,
+            // address _airBattle,
+            // address _strength
+            // address _resources,
+            // address _improvements1,
+            // address _wonders1,
+            // address _wonders2,
+            // address _wonders4,
+            // address _countryMinter
 
         const GroundBattleContract = await ethers.getContractFactory("GroundBattleContract")
         groundbattlecontract = await GroundBattleContract.deploy() as GroundBattleContract
         await groundbattlecontract.deployed()
-        // console.log(`Treasury deployed to ${treasury.address}`) 
+            // address _warAddress,
+            // address _infrastructure,
+            // address _forces,
+            // address _treasury,
+            // address _improvements2,
+            // address _improvements3,
+            // address _wonders3,
+            // address _wonders4
+            // address vrfCoordinatorV2,
+            // uint64 subscriptionId,
+            // bytes32 gasLane, // keyHash
+            // uint32 callbackGasLimit
         
         const ImprovementsContract1 = await ethers.getContractFactory("ImprovementsContract1")
         improvementscontract1 = await ImprovementsContract1.deploy() as ImprovementsContract1

@@ -55,50 +55,49 @@ contract ForcesContract is Ownable {
     }
 
     constructor(
-        address _treasuryAddress,
-        address _aid,
-        address _spyAddress,
-        address _cruiseMissile,
-        address _nukeAddress,
-        address _airBattle,
-        address _groundBattle,
-        address _warAddress
+        // address _treasuryAddress,
+        // address _aid,
+        // address _spyAddress,
+        // address _cruiseMissile,
+        // address _nukeAddress,
+        // address _airBattle,
+        // address _groundBattle,
+        // address _warAddress
     ) {
-        treasuryAddress = _treasuryAddress;
-        spyAddress = _spyAddress;
-        cruiseMissile = _cruiseMissile;
-        aid = _aid;
-        nukeAddress = _nukeAddress;
-        airBattle = _airBattle;
-        warAddress = _warAddress;
-        war = WarContract(_warAddress);
-        groundBattle = _groundBattle;
-        tankCost = 480;
-        cruiseMissileCost = 20000;
-        spyCost = 500;
+        // treasuryAddress = _treasuryAddress;
+        // spyAddress = _spyAddress;
+        // cruiseMissile = _cruiseMissile;
+        // aid = _aid;
+        // nukeAddress = _nukeAddress;
+        // airBattle = _airBattle;
+        // warAddress = _warAddress;
+        // war = WarContract(_warAddress);
+        // groundBattle = _groundBattle;
+        // tankCost = 480;
+        // spyCost = 500;
     }
 
-    function constructorContinued(
-        address _infrastructure,
-        address _resources,
-        address _improvements1,
-        address _improvements2,
-        address _wonders1,
-        address _countryMinter
-    ) public onlyOwner {
-        infrastructure = _infrastructure;
-        inf = InfrastructureContract(_infrastructure);
-        resources = _resources;
-        res = ResourcesContract(_resources);
-        wonders1 = _wonders1;
-        won1 = WondersContract1(_wonders1);
-        improvements1 = _improvements1;
-        imp1 = ImprovementsContract1(_improvements1);
-        improvements2 = _improvements2;
-        imp2 = ImprovementsContract2(_improvements2);
-        countryMinter = _countryMinter;
-        mint = CountryMinter(_countryMinter);
-    }
+    // function constructorContinued(
+    //     address _infrastructure,
+    //     address _resources,
+    //     address _improvements1,
+    //     address _improvements2,
+    //     address _wonders1,
+    //     address _countryMinter
+    // ) public onlyOwner {
+    //     infrastructure = _infrastructure;
+    //     inf = InfrastructureContract(_infrastructure);
+    //     resources = _resources;
+    //     res = ResourcesContract(_resources);
+    //     wonders1 = _wonders1;
+    //     won1 = WondersContract1(_wonders1);
+    //     improvements1 = _improvements1;
+    //     imp1 = ImprovementsContract1(_improvements1);
+    //     improvements2 = _improvements2;
+    //     imp2 = ImprovementsContract2(_improvements2);
+    //     countryMinter = _countryMinter;
+    //     mint = CountryMinter(_countryMinter);
+    // }
 
     mapping(uint256 => Forces) public idToForces;
     mapping(uint256 => address) public idToOwnerForces;
@@ -693,24 +692,61 @@ contract MissilesContract is Ownable {
         idToOwnerMissiles[id] = nationOwner;
     }
 
-    // function updateInfrastructureContract(address newAddress) public onlyOwner {
-    //     infrastructure = newAddress;
-    //     inf = InfrastructureContract(newAddress);
-    // }
+    function updateTreasuryContract(address newAddress) public onlyOwner {
+        treasury = newAddress;
+        tsy = TreasuryContract(newAddress);
+    }
 
-    // function updateResourcesContract(address newAddress) public onlyOwner {
-    //     resources = newAddress;
-    //     res = ResourcesContract(newAddress);
-    // }
+    function updateSpyContract(address newAddress) public onlyOwner {
+        spyAddress = newAddress;
+    }
 
-    // function updateImprovementsContract1(address newAddress) public onlyOwner {
-    //     improvements1 = newAddress;
-    //     imp1 = ImprovementsContract1(newAddress);
-    // }
+    function updateNukeContract(address newAddress) public onlyOwner {
+        nukeAddress = newAddress;
+    }
 
-    // function updateCruiseMissileCost(uint256 newPrice) public onlyOwner {
-    //     cruiseMissileCost = newPrice;
-    // }
+    function updateAirBattleContract(address newAddress) public onlyOwner {
+        airBattle = newAddress;
+    }
+
+    function updateNationStrengthContract(address newAddress) public onlyOwner {
+        strength = newAddress;
+        stren = NationStrengthContract(newAddress);
+    }
+
+    function updateResourcesContract(address newAddress) public onlyOwner {
+        resources = newAddress;
+        res = ResourcesContract(newAddress);
+    }
+
+    function updateImprovementsContract1(address newAddress) public onlyOwner {
+        improvements1 = newAddress;
+        imp1 = ImprovementsContract1(newAddress);
+    }
+
+    function updateWondersContract1(address newAddress) public onlyOwner {
+        wonders1 = newAddress;
+        won1 = WondersContract1(newAddress);
+    }
+
+    function updateWondersContract2(address newAddress) public onlyOwner {
+        wonders2 = newAddress;
+        won2 = WondersContract2(newAddress);
+    }
+
+    function updateWondersContract4(address newAddress) public onlyOwner {
+        wonders4 = newAddress;
+        won4 = WondersContract4(newAddress);
+    }
+
+    function updateCountryMinter(address newAddress) public onlyOwner {
+        countryMinter = newAddress;
+        mint = CountryMinter(newAddress);
+    }
+
+    function updateCruiseMissileCost(uint256 newPrice) public onlyOwner {
+        cruiseMissileCost = newPrice;
+    }
 
     modifier onlySpyContract() {
         require(msg.sender == spyAddress, "only callable from spy contract");
