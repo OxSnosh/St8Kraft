@@ -349,12 +349,18 @@ describe("CountryMinter", function () {
         const ImprovementsContract1 = await ethers.getContractFactory("ImprovementsContract1")
         improvementscontract1 = await ImprovementsContract1.deploy() as ImprovementsContract1
         await improvementscontract1.deployed()
-        // console.log(`Improvements deployed to ${improvements1.address}`)
+            // address _treasury,
+            // address _improvements2,
+            // address _improvements3,
+            // address _improvements4,
+            // address _navy
     
         const ImprovementsContract2 = await ethers.getContractFactory("ImprovementsContract2")
         improvementscontract2 = await ImprovementsContract2.deploy() as ImprovementsContract2
         await improvementscontract2.deployed()
-        // console.log(`Improvements deployed to ${improvements2.address}`) 
+            // address _treasury,
+            // address _forces,
+            // address _improvements1
     
         const ImprovementsContract3 = await ethers.getContractFactory("ImprovementsContract3")
         improvementscontract3 = await ImprovementsContract3.deploy() as ImprovementsContract3
@@ -364,7 +370,10 @@ describe("CountryMinter", function () {
         const ImprovementsContract4 = await ethers.getContractFactory("ImprovementsContract4")
         improvementscontract4 = await ImprovementsContract4.deploy() as ImprovementsContract4
         await improvementscontract4.deployed()
-        // console.log(`Improvements deployed to ${improvements3.address}`) 
+            // treasury
+            // improvements 1
+            // improvements 2
+            // forces
         
         const InfrastructureContract = await ethers.getContractFactory("InfrastructureContract")
         infrastructurecontract = await InfrastructureContract.deploy() as InfrastructureContract
