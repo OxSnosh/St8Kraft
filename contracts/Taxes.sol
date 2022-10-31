@@ -786,37 +786,15 @@ contract AdditionalTaxesContract is Ownable {
     MilitaryContract mil;
     // CrimeContract crm;
 
-    constructor(
-        // address _countryMinter,
-        address _infrastructure
-        // address _treasury,
-        // address _improvements1,
-        // address _improvements2,
-        // address _improvements3
-    ) {
-        // countryMinter = _countryMinter;
-        infrastructure = _infrastructure;
-        inf = InfrastructureContract(_infrastructure);
-        // treasury = _treasury;
-        // tsy = TreasuryContract(_treasury);
-        // improvements1 = _improvements1;
-        // imp1 = ImprovementsContract1(_improvements1);
-        // improvements2 = _improvements2;
-        // imp2 = ImprovementsContract2(_improvements2);
-        // improvements3 = _improvements3;
-        // imp3 = ImprovementsContract3(_improvements3);
-    }
-
-    function constructorContinued(
+    function settings (
         address _parameters,
         address _wonders1,
         address _wonders2,
         address _wonders3,
         address _wonders4,
         address _resources,
-        // address _forces,
-        address _military
-        // address _crime
+        address _military,
+        address _infrastructure
     ) public onlyOwner {
         parameters = _parameters;
         params = CountryParametersContract(_parameters);
@@ -830,12 +808,10 @@ contract AdditionalTaxesContract is Ownable {
         won4 = WondersContract4(_wonders4);
         resources = _resources;
         res = ResourcesContract(_resources);
-        // forces = _forces;
-        // frc = ForcesContract(_forces);
         military = _military;
         mil = MilitaryContract(_military);
-        // crime = _crime;
-        // crm = CrimeContract(_crime);
+        infrastructure = _infrastructure;
+        inf = InfrastructureContract(_infrastructure);
     }
 
     function getIncomeAdjustments(uint256 id) public view returns (uint256) {

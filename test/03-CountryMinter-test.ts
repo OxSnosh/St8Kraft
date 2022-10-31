@@ -43,6 +43,7 @@ import {
     SenateContract,
     SpyOperationsContract,
     TaxesContract,
+    AdditionalTaxesContract,
     TechnologyMarketContract,
     TreasuryContract,
     WarContract,
@@ -51,7 +52,7 @@ import {
     WondersContract3,
     WondersContract4
 } from "../typechain-types"
-import { nukeSol } from "../typechain-types/contracts";
+import { networkConfig } from "../helper-hardhat-config"
 
 describe("CountryMinter", function () {
     let warbucks: WarBucks  
@@ -94,6 +95,7 @@ describe("CountryMinter", function () {
     let senatecontract: SenateContract
     let spyoperationscontract: SpyOperationsContract
     let taxescontract: TaxesContract
+    let additionaltaxescontract: AdditionalTaxesContract
     let technologymarketcontrat: TechnologyMarketContract
     let treasurycontract: TreasuryContract
     let warcontract: WarContract
@@ -106,28 +108,33 @@ describe("CountryMinter", function () {
     let signers: SignerWithAddress[]
     let addrs
 
+    let vrfCoordinatorV2 = networkConfig[31337].vrfCoordinatorV2
+    let subscriptionId = networkConfig[31337].subscriptionId
+    let gasLane = networkConfig[31337].gasLane
+    let callbackGasLimit = networkConfig[31337].callbackGasLimit
+
     beforeEach(async function () {
 
         signers = await ethers.getSigners();
         signer0 = signers[0];
         signer1 = signers[1];
-
+    
         const WarBucks = await ethers.getContractFactory("WarBucks")
         warbucks = await WarBucks.deploy(INITIAL_SUPPLY) as WarBucks
         await warbucks.deployed()
-        // console.log(`WarBuks token deployed to ${warbucks.address}`)
+        console.log(`WarBuks token deployed to ${warbucks.address}`)
     
         const MetaNatonsGovToken = await ethers.getContractFactory(
             "MetaNationsGovToken"
         )
         metanationsgovtoken = await MetaNatonsGovToken.deploy(INITIAL_SUPPLY) as MetaNationsGovToken
         await metanationsgovtoken.deployed()
-        // console.log(`MetaNationsGovToken deployed to ${metanationsgovtoken.address}`)
+        console.log(`MetaNationsGovToken deployed to ${metanationsgovtoken.address}`)
     
         const AidContract = await ethers.getContractFactory("AidContract")
         aidcontract = await AidContract.deploy() as AidContract
         await aidcontract.deployed()
-        //console.log(`AidContract deployed tp ${aidcontract.address}`)
+        console.log(`AidContract deployed tp ${aidcontract.address}`)
             //countryminter
             //treasury
             //forces
@@ -136,9 +143,9 @@ describe("CountryMinter", function () {
             //wonder1
         
         const AirBattleContract = await ethers.getContractFactory("AirBattleContract")
-        airbattlecontract = await AirBattleContract.deploy() as AirBattleContract
+        airbattlecontract = await AirBattleContract.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as AirBattleContract
         await airbattlecontract.deployed()
-        //console.log(`AirBattleContract deployed tp ${airbattlecontract.address}`)
+        console.log(`AirBattleContract deployed tp ${airbattlecontract.address}`)
             //war
             //fighter
             //bomber
@@ -151,11 +158,11 @@ describe("CountryMinter", function () {
             //subscriptionId
             //gasLAne
             //callbackGasLimit
-
+    
         const BillsContract = await ethers.getContractFactory("BillsContract")
         billscontract = await BillsContract.deploy() as BillsContract
         await billscontract.deployed()
-        //console.log(`BillsContract deployed tp ${billscontract.address}`)
+        console.log(`BillsContract deployed tp ${billscontract.address}`)
             //countryminter
             //treasury
             //infrastructure
@@ -174,6 +181,7 @@ describe("CountryMinter", function () {
         const BombersContract = await ethers.getContractFactory("BombersContract")
         bomberscontract = await BombersContract.deploy() as BombersContract
         await bomberscontract.deployed()
+        console.log(`BomberContract deployed tp ${bomberscontract.address}`)
             //address _countryMinter,
             //address _bombersMarket,
             //address _airBattle,
@@ -185,6 +193,7 @@ describe("CountryMinter", function () {
         const BombersMarketplace1 = await ethers.getContractFactory("BombersMarketplace1")
         bombersmarketplace1 = await BombersMarketplace1.deploy() as BombersMarketplace1
         await bombersmarketplace1.deployed()
+        console.log(`BomberMarketplace1 deployed tp ${bombersmarketplace1.address}`)
             //address _countryMinter,
             //address _bombers1,
             //address _fighters,
@@ -195,33 +204,38 @@ describe("CountryMinter", function () {
         const BombersMarketplace2 = await ethers.getContractFactory("BombersMarketplace2")
         bombersmarketplace2 = await BombersMarketplace2.deploy() as BombersMarketplace2
         await bombersmarketplace2.deployed()
+        console.log(`BomberMarketplace2 deployed tp ${bombersmarketplace2.address}`)
             //address _countryMinter,
             //address _bombers1,
             //address _fighters,
             //address _infrastructure,
             //address _treasury
-
+    
         const CountryMinter = await ethers.getContractFactory("CountryMinter")
         countryminter = await CountryMinter.deploy()  as CountryMinter
         await countryminter.deployed()
-
+        console.log(`CountryMinter deployed tp ${countryminter.address}`)
+    
         const CountryParameters = await ethers.getContractFactory("CountryParametersContract")
-        countryparameterscontract = await CountryParameters.deploy() as CountryParametersContract
+        countryparameterscontract = await CountryParameters.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as CountryParametersContract
         await countryparameterscontract.deployed()
+        console.log(`CountryParameters deployed to ${countryparameterscontract.address}`)
             // spyAddress  
-
+    
         const CrimeContract = await ethers.getContractFactory("CrimeContract")
         crimecontract = await CrimeContract.deploy() as CrimeContract
         await crimecontract.deployed()
+        console.log(`CrimeContract deployed tp ${crimecontract.address}`)
             // address _infrastructure,
             // address _improvements1,
             // address _improvements2,
             // address _improvements3,
             // address _parameters  
-
+    
         const CruiseMissileContract = await ethers.getContractFactory("CruiseMissileContract")
-        cruisemissileconract = await CruiseMissileContract.deploy() as CruiseMissileContract
+        cruisemissileconract = await CruiseMissileContract.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as CruiseMissileContract
         await cruisemissileconract.deployed()
+        console.log(`CruiseMissile deployed to ${cruisemissileconract.address}`)
             // address _forces,
             // address _countryMinter,
             // address _war,
@@ -235,10 +249,11 @@ describe("CountryMinter", function () {
             // uint64 subscriptionId,
             // bytes32 gasLane, // keyHash
             // uint32 callbackGasLimit 
-
+    
         const EnvironmentContract = await ethers.getContractFactory("EnvironmentContract")
         environmentcontract = await EnvironmentContract.deploy() as EnvironmentContract
         await environmentcontract.deployed()
+        console.log(`EnvironmentContract deployed to ${environmentcontract.address}`)
             // address _countryMinter,
             // address _resources,
             // address _infrastructure,
@@ -256,6 +271,7 @@ describe("CountryMinter", function () {
         const FightersContract = await ethers.getContractFactory("FightersContract")
         fighterscontract = await FightersContract.deploy() as FightersContract
         await fighterscontract.deployed()
+        console.log(`FightersContract deployed to ${fighterscontract.address}`)
             // address _countryMinter,
             // address _fightersMarket,
             // address _treasuryAddress,
@@ -272,12 +288,14 @@ describe("CountryMinter", function () {
         const FighterLosses = await ethers.getContractFactory("FighterLosses")
         fighterlosses = await FighterLosses.deploy() as FighterLosses
         await fighterlosses.deployed()
+        console.log(`FighterLosses deployed to ${fighterlosses.address}`)
             // fighters
             // air batle
     
         const FightersMarketplace1 = await ethers.getContractFactory("FightersMarketplace1")
         fightersmarketplace1 = await FightersMarketplace1.deploy() as FightersMarketplace1
         await fightersmarketplace1.deployed()
+        console.log(`FightersMarket1 deployed to ${fightersmarketplace1.address}`)
             // address _countryMinter,
             // address _bombers,
             // address _fighters,
@@ -290,6 +308,7 @@ describe("CountryMinter", function () {
         const FightersMarketplace2 = await ethers.getContractFactory("FightersMarketplace2")
         fightersmarketplace2 = await FightersMarketplace2.deploy() as FightersMarketplace2
         await fightersmarketplace2.deployed()
+        console.log(`FightersMarket2 deployed to ${fightersmarketplace2.address}`)
             // address _countryMinter,
             // address _bombers,
             // address _fighters,
@@ -301,6 +320,7 @@ describe("CountryMinter", function () {
         const ForcesContract = await ethers.getContractFactory("ForcesContract")
         forcescontract = await ForcesContract.deploy() as ForcesContract
         await forcescontract.deployed()
+        console.log(`ForcesContract deployed to ${forcescontract.address}`)
             // address _treasuryAddress,
             // address _aid,
             // address _spyAddress,
@@ -315,10 +335,11 @@ describe("CountryMinter", function () {
             // address _improvements2,
             // address _wonders1,
             // address _countryMinter
-
+    
         const MissilesContract = await ethers.getContractFactory("MissilesContract")
         missilescontract = await MissilesContract.deploy() as MissilesContract
         await missilescontract.deployed()
+        console.log(`MissilesContract deployed to ${missilescontract.address}`)
             // address _treasury,
             // address _spyAddress,
             // address _nukeAddress,
@@ -330,10 +351,11 @@ describe("CountryMinter", function () {
             // address _wonders2,
             // address _wonders4,
             // address _countryMinter
-
+    
         const GroundBattleContract = await ethers.getContractFactory("GroundBattleContract")
-        groundbattlecontract = await GroundBattleContract.deploy() as GroundBattleContract
+        groundbattlecontract = await GroundBattleContract.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as GroundBattleContract
         await groundbattlecontract.deployed()
+        console.log(`GroundBattleContract deployed to ${groundbattlecontract.address}`)
             // address _warAddress,
             // address _infrastructure,
             // address _forces,
@@ -350,6 +372,7 @@ describe("CountryMinter", function () {
         const ImprovementsContract1 = await ethers.getContractFactory("ImprovementsContract1")
         improvementscontract1 = await ImprovementsContract1.deploy() as ImprovementsContract1
         await improvementscontract1.deployed()
+        console.log(`ImprovementsContract1 deployed to ${improvementscontract1.address}`)
             // address _treasury,
             // address _improvements2,
             // address _improvements3,
@@ -359,6 +382,7 @@ describe("CountryMinter", function () {
         const ImprovementsContract2 = await ethers.getContractFactory("ImprovementsContract2")
         improvementscontract2 = await ImprovementsContract2.deploy() as ImprovementsContract2
         await improvementscontract2.deployed()
+        console.log(`ImprovementsContract2 deployed to ${improvementscontract2.address}`)
             // address _treasury,
             // address _forces,
             // address _improvements1
@@ -366,6 +390,7 @@ describe("CountryMinter", function () {
         const ImprovementsContract3 = await ethers.getContractFactory("ImprovementsContract3")
         improvementscontract3 = await ImprovementsContract3.deploy() as ImprovementsContract3
         await improvementscontract3.deployed()
+        console.log(`ImprovementsContract3 deployed to ${improvementscontract3.address}`)
             // treasury
             // improvements 1
             // improvements 2
@@ -374,6 +399,7 @@ describe("CountryMinter", function () {
         const ImprovementsContract4 = await ethers.getContractFactory("ImprovementsContract4")
         improvementscontract4 = await ImprovementsContract4.deploy() as ImprovementsContract4
         await improvementscontract4.deployed()
+        console.log(`ImprovementsContract4 deployed to ${improvementscontract4.address}`)
             // treasury
             // improvements 1
             // improvements 2
@@ -382,6 +408,7 @@ describe("CountryMinter", function () {
         const InfrastructureContract = await ethers.getContractFactory("InfrastructureContract")
         infrastructurecontract = await InfrastructureContract.deploy() as InfrastructureContract
         await infrastructurecontract.deployed()
+        console.log(`InfrastructureContract deployed to ${infrastructurecontract.address}`)
             // address _resources,
             // address _improvements1,
             // address _improvements2,
@@ -405,10 +432,11 @@ describe("CountryMinter", function () {
             // address _airBattle,
             // address _groundBattle,
             // address _countryMinter
-
-        const InfrastructureMarketplace = await ethers.getContractFactory("InfrastructureMarketplace")
-        infrastructuremarketplace = await InfrastructureMarketplace.deploy() as InfrastructureMarketContract
+    
+        const InfrastructureMarketContract = await ethers.getContractFactory("InfrastructureMarketContract")
+        infrastructuremarketplace = await InfrastructureMarketContract.deploy() as InfrastructureMarketContract
         await infrastructuremarketplace.deployed()
+        console.log(`InfrastructureMarketplace deployed to ${infrastructuremarketplace.address}`)
             // address _resources,
             // address _parameters,
             // address _improvements1,
@@ -417,10 +445,11 @@ describe("CountryMinter", function () {
             // address _wonders3,
             // address _treasury,
             // address _infrastructure
-
+    
         const KeeperContract = await ethers.getContractFactory("KeeperContract")
         keepercontract = await KeeperContract.deploy() as KeeperContract
         await keepercontract.deployed()
+        console.log(`KeeperContract deployed to ${keepercontract.address}`)
             // address _nukes,
             // address _aid,
             // address _war 
@@ -428,29 +457,34 @@ describe("CountryMinter", function () {
         const LandMarketContract = await ethers.getContractFactory("LandMarketContract")
         landmarketcontract = await LandMarketContract.deploy() as LandMarketContract
         await landmarketcontract.deployed()
+        console.log(`LandMarketContract deployed to ${landmarketcontract.address}`)
             // address _resources,
             // address _countryMinter,
             // address _infrastructure,
             // address _treasury
-
+    
         const MilitaryContract = await ethers.getContractFactory("MilitaryContract")
         militarycontract = await MilitaryContract.deploy() as MilitaryContract
         await militarycontract.deployed()
+        console.log(`MilitaryContract deployed to ${militarycontract.address}`)
             // spy
-
+    
         const NationStrengthContract = await ethers.getContractFactory("NationStrengthContract")
         nationstrengthcontract = await NationStrengthContract.deploy() as NationStrengthContract
         await nationstrengthcontract.deployed()
+        console.log(`NationStrengthContract deployed to ${nationstrengthcontract.address}`)
             // address _infrastructure,
             // address _forces,
             // address _fighters,
             // address _bombers,
             // address _navy,
             // address _missiles
-
+    
         const NavyContract = await ethers.getContractFactory("NavyContract")
         navycontract = await NavyContract.deploy() as NavyContract
         await navycontract.deployed()
+        console.log(`NavyContract deployed to ${navycontract.address}`)
+    
             // address _treasuryAddress,
             // address _improvementsContract1Address,
             // address _improvementsContract3Address,
@@ -461,12 +495,11 @@ describe("CountryMinter", function () {
             // address _nukes,
             // address _wonders1,
             // address _navalActions
-
-            //initiate costs
         
         const NavalActionsContract = await ethers.getContractFactory("NavalActionsContract")
         navalactionscontract = await NavalActionsContract.deploy() as NavalActionsContract
         await navalactionscontract.deployed()
+        console.log(`NavalActionsContract deployed to ${navalactionscontract.address}`)
             // address _navalBlockade,
             // address _breakBlockade,
             // address _navalAttack,
@@ -475,8 +508,9 @@ describe("CountryMinter", function () {
             // address _countryMinter
         
         const NavalBlockadeContract = await ethers.getContractFactory("NavalBlockadeContract")
-        navalblockadecontract = await NavalBlockadeContract.deploy() as NavalBlockadeContract
+        navalblockadecontract = await NavalBlockadeContract.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as NavalBlockadeContract
         await navalblockadecontract.deployed()
+        console.log(`NavalBlockadeContract deployed to ${navalblockadecontract.address}`)
             // need randomness
             
             // address _navy,
@@ -484,10 +518,12 @@ describe("CountryMinter", function () {
             // address _war
         
         const BreakBlocadeContract = await ethers.getContractFactory("BreakBlocadeContract")
-        breakblockadecontract = await BreakBlocadeContract.deploy() as BreakBlocadeContract
+        breakblockadecontract = await BreakBlocadeContract.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as BreakBlocadeContract
         await breakblockadecontract.deployed()
+        console.log(`BreakBlocadeContract deployed to ${breakblockadecontract.address}`)
+    
             //randomness
-
+    
             // address _countryMinter,
             // address _navalBlockade,
             // address _navy,
@@ -496,8 +532,9 @@ describe("CountryMinter", function () {
             // address _navalActions
             
         const NavalAttackContract = await ethers.getContractFactory("NavalAttackContract")
-        navalattackcontract = await NavalAttackContract.deploy() as NavalAttackContract
+        navalattackcontract = await NavalAttackContract.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as NavalAttackContract
         await navalattackcontract.deployed()
+        console.log(`NavalAttackContract deployed to ${navalattackcontract.address}`)
             //randomness
             
             // address _navy,
@@ -506,8 +543,10 @@ describe("CountryMinter", function () {
             // address _navalActions
         
         const NukeContract = await ethers.getContractFactory("NukeContract")
-        nukecontract = await NukeContract.deploy() as NukeContract
+        nukecontract = await NukeContract.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as NukeContract
         await nukecontract.deployed()
+        console.log(`NukeContract deployed to ${nukecontract.address}`)
+    
             // randomness
             
             // address _countryMinter,
@@ -523,24 +562,30 @@ describe("CountryMinter", function () {
             // address _keeper 
         
         const ResourcesContract = await ethers.getContractFactory("ResourcesContract")
-        resourcescontract = await ResourcesContract.deploy() as ResourcesContract
+        resourcescontract = await ResourcesContract.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as ResourcesContract
         await resourcescontract.deployed()
+        console.log(`ResourcesContract deployed to ${resourcescontract.address}`)
+    
             // randomness 
             // address _infrastructure,
             // address _improvements
-
+    
         const SenateContract = await ethers.getContractFactory("SenateContract")
         senatecontract = await SenateContract.deploy() as SenateContract
         await senatecontract.deployed()
+        console.log(`SenateContract deployed to ${senatecontract.address}`)
+    
             // address _countryMinter,
             // address _parameters,
             // address _wonders3
         
         const SpyOperationsContract = await ethers.getContractFactory("SpyOperationsContract")
-        spyoperationscontract = await SpyOperationsContract.deploy() as SpyOperationsContract
+        spyoperationscontract = await SpyOperationsContract.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as SpyOperationsContract
         await spyoperationscontract.deployed()
+        console.log(`SpyOperationsContract deployed to ${spyoperationscontract.address}`)
+    
             //randomness
-
+    
             // address _infrastructure,
             // address _forces,
             // address _military,
@@ -549,10 +594,12 @@ describe("CountryMinter", function () {
             // address _treasury,
             // address _parameters,
             // address _missiles
-
+    
         const TaxesContract = await ethers.getContractFactory("TaxesContract")
         taxescontract = await TaxesContract.deploy() as TaxesContract
         await taxescontract.deployed()
+        console.log(`TaxesContract deployed to ${taxescontract.address}`)
+    
             // address _countryMinter,
             // address _infrastructure,
             // address _treasury,
@@ -569,12 +616,26 @@ describe("CountryMinter", function () {
             // address _forces,
             // address _military,
             // address _crime
-
-        //ADDITIONAL TAXES
-
+    
+        const AdditionalTaxesContract = await ethers.getContractFactory("AdditionalTaxesContract")
+        additionaltaxescontract = await AdditionalTaxesContract.deploy() as AdditionalTaxesContract
+        await additionaltaxescontract.deployed()
+        console.log(`AdditionalTaxesContract deployed to ${additionaltaxescontract.address}`)
+    
+            // countryparameterscontract.address,
+            // wonderscontract1.address,
+            // wonderscontract2.address,
+            // wonderscontract3.address,
+            // wonderscontract4.address,
+            // resourcescontract.address,
+            // militarycontract.address,
+            // infrastructurecontract.address
+    
         const TechnologyMarketContract = await ethers.getContractFactory("TechnologyMarketContract")
         technologymarketcontrat = await TechnologyMarketContract.deploy() as TechnologyMarketContract
         await technologymarketcontrat.deployed()
+        console.log(`TechnologyMarketContract deployed to ${technologymarketcontrat.address}`)
+    
             // address _resources,
             // address _improvements3,
             // address _infrastructure,
@@ -583,10 +644,12 @@ describe("CountryMinter", function () {
             // address _wonders4,
             // address _treasury,
             // address _countryMinter
-
+    
         const TreasuryContract = await ethers.getContractFactory("TreasuryContract")
         treasurycontract = await TreasuryContract.deploy() as TreasuryContract
         await treasurycontract.deployed()
+        console.log(`TreasuryContract deployed to ${treasurycontract.address}`)
+    
             // address _warBucksAddress,
             // address _wonders1,
             // address _improvements1,
@@ -603,6 +666,8 @@ describe("CountryMinter", function () {
         const WarContract = await ethers.getContractFactory("WarContract")
         warcontract = await WarContract.deploy() as WarContract
         await warcontract.deployed()
+        console.log(`WarContract deployed to ${warcontract.address}`)
+    
             // address _countryMinter,
             // address _nationStrength,
             // address _military,
@@ -613,19 +678,21 @@ describe("CountryMinter", function () {
             // address _forces,
             // address _wonders1,
             // address _keeper        
-
+    
         const Wonders1 = await ethers.getContractFactory("WondersContract1")
         wonderscontract1 = await Wonders1.deploy() as WondersContract1
         await wonderscontract1.deployed()
+        console.log(`Wonders1 deployed to ${wonderscontract1.address}`)
             // address _treasuryAddress,
             // address _wonderContract2Address,
             // address _wonderContract3Address,
             // address _wonderContract4Address,
             // address _infrastructureAddress
-  
+    
         const Wonders2 = await ethers.getContractFactory("WondersContract2")
         wonderscontract2 = await Wonders2.deploy() as WondersContract2
         await wonderscontract2.deployed()
+        console.log(`Wonders2 deployed to ${wonderscontract2.address}`)
             // address _treasury,
             // address _infrastructure,
             // address _wonders1,
@@ -635,6 +702,7 @@ describe("CountryMinter", function () {
         const Wonders3 = await ethers.getContractFactory("WondersContract3")
         wonderscontract3 = await Wonders3.deploy() as WondersContract3
         await wonderscontract3.deployed()
+        console.log(`Wonders3 deployed to ${wonderscontract3.address}`)
             // address _treasuryAddress,
             // address _infrastructureAddress,
             // address _forces,
@@ -645,13 +713,16 @@ describe("CountryMinter", function () {
         const Wonders4 = await ethers.getContractFactory("WondersContract4")
         wonderscontract4 = await Wonders4.deploy() as WondersContract4
         await wonderscontract4.deployed()
+        console.log(`Wonders4 deployed to ${wonderscontract4.address}`)
             // address _treasuryAddress,
             // address _improvementsContract2Address,
             // address _improvementsContract3Address,
             // address _infrastructureAddress,
             // address _wonders1,
             // address _wonders3
-
+    
+        console.log("contracts deployed")
+    
         aidcontract.settings(
             countryminter.address, 
             treasurycontract.address, 
@@ -659,7 +730,7 @@ describe("CountryMinter", function () {
             infrastructurecontract.address, 
             keepercontract.address, 
             wonderscontract1.address)
-
+    
         airbattlecontract.settings(
             warcontract.address, 
             fighterscontract.address, 
@@ -694,7 +765,7 @@ describe("CountryMinter", function () {
             fighterscontract.address,
             infrastructurecontract.address,
             warcontract.address)
-
+    
         bombersmarketplace1.settings(
             countryminter.address,
             bomberscontract.address,
@@ -702,7 +773,7 @@ describe("CountryMinter", function () {
             fightersmarketplace1.address,
             infrastructurecontract.address,
             treasurycontract.address)
-
+    
         bombersmarketplace2.settings(
             countryminter.address,
             bomberscontract.address,
@@ -739,7 +810,7 @@ describe("CountryMinter", function () {
         countryparameterscontract.updateSpyAddress(
             spyoperationscontract.address
         )
-
+    
         crimecontract.settings(
             infrastructurecontract.address,
             improvementscontract1.address,
@@ -879,25 +950,276 @@ describe("CountryMinter", function () {
             forcescontract.address,
             improvementscontract2.address)
         
+        infrastructurecontract.settings1(
+            resourcescontract.address,
+            improvementscontract1.address,
+            improvementscontract2.address,
+            improvementscontract3.address,
+            improvementscontract4.address,
+            infrastructuremarketplace.address,
+            technologymarketcontrat.address,
+            landmarketcontract.address
+        )
+        infrastructurecontract.settings2(
+            wonderscontract1.address,
+            wonderscontract2.address,
+            wonderscontract3.address,
+            wonderscontract4.address,
+            treasurycontract.address,
+            countryparameterscontract.address,
+            forcescontract.address,
+            aidcontract.address
+        )
+        infrastructurecontract.settings3(
+            spyoperationscontract.address,
+            taxescontract.address,
+            cruisemissileconract.address,
+            nukecontract.address,
+            airbattlecontract.address,
+            groundbattlecontract.address,
+            countryminter.address
+        )
+    
+        infrastructuremarketplace.settings(
+            resourcescontract.address,
+            countryparameterscontract.address,
+            improvementscontract1.address,
+            countryminter.address,
+            wonderscontract2.address,
+            wonderscontract3.address,
+            treasurycontract.address,
+            infrastructurecontract.address
+        )
+    
+        keepercontract.settings(
+            nukecontract.address,
+            aidcontract.address,
+            warcontract.address
+        )
+    
+        landmarketcontract.settings(
+            resourcescontract.address,
+            countryminter.address,
+            infrastructurecontract.address,
+            treasurycontract.address
+        )
+    
+        militarycontract.settings(
+            spyoperationscontract.address
+        )
+    
+        nationstrengthcontract.settings(
+            infrastructurecontract.address,
+            forcescontract.address,
+            fighterscontract.address,
+            bomberscontract.address,
+            navycontract.address,
+            missilescontract.address
+        )
+    
+        navycontract.settings(
+            treasurycontract.address,
+            improvementscontract1.address,
+            improvementscontract3.address,
+            improvementscontract4.address,
+            resourcescontract.address,
+            militarycontract.address,
+            nukecontract.address,
+            wonderscontract1.address,
+            navalactionscontract.address
+        )
         
-
-
-
+        navalactionscontract.settings(
+            navalblockadecontract.address,
+            breakblockadecontract.address,
+            navalattackcontract.address,
+            keepercontract.address,
+            navycontract.address,
+            countryminter.address
+        )
+    
+        navalblockadecontract.settings(
+            navycontract.address,
+            navalactionscontract.address,
+            warcontract.address
+        )
+    
+        breakblockadecontract.settings(
+            countryminter.address,
+            navalblockadecontract.address,
+            navycontract.address,
+            warcontract.address,
+            improvementscontract4.address,
+            navalactionscontract.address
+        )
+    
+        navalattackcontract.settings(
+            navycontract.address,
+            warcontract.address,
+            improvementscontract4.address,
+            navalactionscontract.address
+        )
+    
+        nukecontract.settings(
+            countryminter.address,
+            warcontract.address,
+            wonderscontract1.address,
+            wonderscontract4.address,
+            improvementscontract3.address,
+            improvementscontract4.address,
+            infrastructurecontract.address,
+            forcescontract.address,
+            navycontract.address,
+            missilescontract.address,
+            keepercontract.address
+        )
+    
+        resourcescontract.settings(
+            infrastructurecontract.address,
+            improvementscontract2.address
+        )
+    
+        senatecontract.settings(
+            countryminter.address,
+            countryparameterscontract.address,
+            wonderscontract3.address
+        )
+    
+        spyoperationscontract.settings(
+            infrastructurecontract.address,
+            forcescontract.address,
+            militarycontract.address,
+            nationstrengthcontract.address,
+            wonderscontract1.address,
+            treasurycontract.address,
+            countryparameterscontract.address,
+            missilescontract.address
+        )
+    
+        taxescontract.settings1(
+            countryminter.address,
+            infrastructurecontract.address,
+            treasurycontract.address,
+            improvementscontract1.address,
+            improvementscontract2.address,
+            improvementscontract3.address,
+            additionaltaxescontract.address
+        )
+        taxescontract.settings2(
+            countryparameterscontract.address,
+            wonderscontract1.address,
+            wonderscontract2.address,
+            wonderscontract3.address,
+            wonderscontract4.address,
+            resourcescontract.address,
+            forcescontract.address,
+            militarycontract.address,
+            crimecontract.address
+        )
+    
+        additionaltaxescontract.settings(
+            countryparameterscontract.address,
+            wonderscontract1.address,
+            wonderscontract2.address,
+            wonderscontract3.address,
+            wonderscontract4.address,
+            resourcescontract.address,
+            militarycontract.address,
+            infrastructurecontract.address
+        )
+    
+        technologymarketcontrat.settings(
+            resourcescontract.address,
+            improvementscontract3.address,
+            infrastructurecontract.address,
+            wonderscontract2.address,
+            wonderscontract3.address,
+            wonderscontract4.address,
+            treasurycontract.address,
+            countryminter.address
+        )
+    
+        treasurycontract.settings1(
+            warbucks.address,
+            wonderscontract1.address,
+            improvementscontract1.address,
+            infrastructurecontract.address,
+            forcescontract.address,
+            navycontract.address,
+            fighterscontract.address,
+            aidcontract.address,
+            taxescontract.address,
+            billscontract.address,
+            spyoperationscontract.address
+        )
+        treasurycontract.settings2(
+            groundbattlecontract.address
+        )
+    
+        warcontract.settings(
+            countryminter.address,
+            nationstrengthcontract.address,
+            militarycontract.address,
+            breakblockadecontract.address,
+            navalattackcontract.address,
+            airbattlecontract.address,
+            groundbattlecontract.address,
+            cruisemissileconract.address,
+            forcescontract.address,
+            wonderscontract1.address,
+            keepercontract.address
+        )
+    
+        wonderscontract1.settings(
+            treasurycontract.address,
+            wonderscontract2.address,
+            wonderscontract3.address,
+            wonderscontract4.address,
+            infrastructurecontract.address
+        )
+    
+        wonderscontract2.settings(
+            treasurycontract.address,
+            infrastructurecontract.address,
+            wonderscontract1.address,
+            wonderscontract3.address,
+            wonderscontract4.address
+        )
+    
+        wonderscontract3.settings(
+            treasurycontract.address,
+            infrastructurecontract.address,
+            forcescontract.address,
+            wonderscontract1.address,
+            wonderscontract2.address,
+            wonderscontract4.address
+        )
+    
+        wonderscontract4.settings(
+            treasurycontract.address,
+            improvementscontract2.address,
+            improvementscontract3.address,
+            infrastructurecontract.address,
+            wonderscontract1.address,
+            wonderscontract3.address
+        )
+    
+        console.log("settings initiated");
     });
 
-    // describe("Minting a Country", function () {
-    //     it("Tests that the nation parameters set correctly", async function () {
-    //         await countryminter.connect(signer1).generateCountry(
-    //                 "TestRuler",
-    //                 "TestNationName",
-    //                 "TestCapitalCity",
-    //                 "TestNationSlogan"
-    //             );
-    //         const { rulerName, nationName, capitalCity, nationSlogan } = await countryparameterscontract.idToCountryParameters(0);    
-    //         expect(rulerName).to.equal("TestRuler");
-    //         expect(nationName).to.equal("TestNationName");
-    //         expect(capitalCity).to.equal("TestCapitalCity");
-    //         expect(nationSlogan).to.equal("TestNationSlogan");
-    //     });
-    // });
+    describe("Minting a Country", function () {
+        it("Tests that the nation parameters set correctly", async function () {
+            await countryminter.connect(signer1).generateCountry(
+                    "TestRuler",
+                    "TestNationName",
+                    "TestCapitalCity",
+                    "TestNationSlogan"
+                );
+            const { rulerName, nationName, capitalCity, nationSlogan } = await countryparameterscontract.idToCountryParameters(0);    
+            expect(rulerName).to.equal("TestRuler");
+            expect(nationName).to.equal("TestNationName");
+            expect(capitalCity).to.equal("TestCapitalCity");
+            expect(nationSlogan).to.equal("TestNationSlogan");
+        });
+    });
 });

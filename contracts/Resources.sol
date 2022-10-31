@@ -15,7 +15,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
     uint256[] public proposedTrades;
     uint256[] public trades;
     address public infrastructure;
-    address public improvements;
+    address public improvements2;
 
     //Chainlik Variables
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
@@ -263,12 +263,12 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         i_callbackGasLimit = callbackGasLimit;
     }
 
-    function settings(address _infrastructure, address _improvements)
+    function settings(address _infrastructure, address _improvements2)
         public
         onlyOwner
     {
         infrastructure = _infrastructure;
-        improvements = _improvements;
+        improvements2 = _improvements2;
     }
 
     function generateResources(uint256 id, address nationOwner) public {
@@ -671,7 +671,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         uint256 requestorProposedTrades = proposedTradesOfRequestor.length;
         uint256 requestorTotalTrades = requestorTradesActive +
             requestorProposedTrades;
-        uint256 requestorHarborAmount = ImprovementsContract2(improvements)
+        uint256 requestorHarborAmount = ImprovementsContract2(improvements2)
             .getHarborCount(requestorId);
         uint256 requestorMaxTrades = 3;
         if (requestorHarborAmount > 0) {
@@ -700,7 +700,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         uint256 recipientProposedTrades = proposedTradesOfRecipient.length;
         uint256 recipientTotalTrades = recipientTradesActive +
             recipientProposedTrades;
-        uint256 recipientHarborAmount = ImprovementsContract2(improvements)
+        uint256 recipientHarborAmount = ImprovementsContract2(improvements2)
             .getHarborCount(recipientId);
         uint256 recipientMaxTrades = 4;
         if (recipientHarborAmount > 0) {

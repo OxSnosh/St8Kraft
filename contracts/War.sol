@@ -11,7 +11,8 @@ contract WarContract is Ownable {
     address public countryMinter;
     address public nationStrength;
     address public military;
-    address public navyBattleAddress;
+    address public breakBlockadeAddress;
+    address public navalAttackAddress;
     address public airBattleAddress;
     address public groundBattle;
     address public cruiseMissile;
@@ -132,7 +133,8 @@ contract WarContract is Ownable {
         address _countryMinter,
         address _nationStrength,
         address _military,
-        address _navyBattleAddress,
+        address _breakBlockadeAddress,
+        address _navalAttackAddress,
         address _airBattleAddress,
         address _groundBattle,
         address _cruiseMissile,
@@ -142,7 +144,8 @@ contract WarContract is Ownable {
     ) public onlyOwner {
         countryMinter = _countryMinter;
         nationStrength = _nationStrength;
-        navyBattleAddress = _navyBattleAddress;
+        breakBlockadeAddress = _breakBlockadeAddress;
+        navalAttackAddress = _navalAttackAddress;
         airBattleAddress = _airBattleAddress;
         groundBattle = _groundBattle;
         nsc = NationStrengthContract(_nationStrength);
@@ -417,7 +420,7 @@ contract WarContract is Ownable {
 
     modifier onlyNavyBattle() {
         require(
-            msg.sender == navyBattleAddress,
+            msg.sender == breakBlockadeAddress || msg.sender == navalAttackAddress,
             "function only callable from navy battle contract"
         );
         _;
