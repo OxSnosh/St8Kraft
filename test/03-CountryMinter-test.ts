@@ -817,7 +817,67 @@ describe("CountryMinter", function () {
             resourcescontract.address,
             improvementscontract1.address)
         
+        forcescontract.settings(
+            treasurycontract.address,
+            aidcontract.address,
+            spyoperationscontract.address,
+            cruisemissileconract.address,
+            nukecontract.address,
+            airbattlecontract.address,
+            groundbattlecontract.address,
+            warcontract.address)
+        forcescontract.settings2(
+            infrastructurecontract.address,
+            resourcescontract.address,
+            improvementscontract1.address,
+            improvementscontract2.address,
+            wonderscontract1.address,
+            countryminter.address)
         
+        missilescontract.settings(
+            treasurycontract.address,
+            spyoperationscontract.address,
+            nukecontract.address,
+            airbattlecontract.address,
+            wonderscontract2.address,
+            nationstrengthcontract.address)
+        missilescontract.settings2(
+            resourcescontract.address,
+            improvementscontract1.address,
+            wonderscontract1.address,
+            wonderscontract4.address,
+            countryminter.address)
+            
+        groundbattlecontract.settings(
+            warcontract.address,
+            infrastructurecontract.address,
+            forcescontract.address,
+            treasurycontract.address)
+        groundbattlecontract.settings2(
+            improvementscontract2.address,
+            improvementscontract3.address,
+            wonderscontract3.address,
+            wonderscontract4.address)
+        
+        improvementscontract1.settings(
+            treasurycontract.address,
+            improvementscontract2.address,
+            improvementscontract3.address,
+            improvementscontract4.address,
+            navycontract.address)
+        
+        improvementscontract2.settings(
+            treasurycontract.address,
+            forcescontract.address,
+            wonderscontract1.address)
+        
+        improvementscontract3.settings(
+            treasurycontract.address)
+        
+        improvementscontract4.settings(
+            treasurycontract.address,
+            forcescontract.address,
+            improvementscontract2.address)
         
         
 

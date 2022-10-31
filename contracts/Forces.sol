@@ -12,10 +12,9 @@ import "./NationStrength.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract ForcesContract is Ownable {
-    uint256 public tankCost;
     uint256 public cruiseMissileCost;
     uint256 public nukeCost;
-    uint256 public spyCost;
+    uint256 public spyCost = 100000;
     address public countryMinter;
     address public treasuryAddress;
     address public aid;
@@ -54,50 +53,48 @@ contract ForcesContract is Ownable {
         bool nationExists;
     }
 
-    constructor(
-        // address _treasuryAddress,
-        // address _aid,
-        // address _spyAddress,
-        // address _cruiseMissile,
-        // address _nukeAddress,
-        // address _airBattle,
-        // address _groundBattle,
-        // address _warAddress
-    ) {
-        // treasuryAddress = _treasuryAddress;
-        // spyAddress = _spyAddress;
-        // cruiseMissile = _cruiseMissile;
-        // aid = _aid;
-        // nukeAddress = _nukeAddress;
-        // airBattle = _airBattle;
-        // warAddress = _warAddress;
-        // war = WarContract(_warAddress);
-        // groundBattle = _groundBattle;
-        // tankCost = 480;
-        // spyCost = 500;
+    function settings (
+        address _treasuryAddress,
+        address _aid,
+        address _spyAddress,
+        address _cruiseMissile,
+        address _nukeAddress,
+        address _airBattle,
+        address _groundBattle,
+        address _warAddress
+    ) public onlyOwner {
+        treasuryAddress = _treasuryAddress;
+        spyAddress = _spyAddress;
+        cruiseMissile = _cruiseMissile;
+        aid = _aid;
+        nukeAddress = _nukeAddress;
+        airBattle = _airBattle;
+        warAddress = _warAddress;
+        war = WarContract(_warAddress);
+        groundBattle = _groundBattle;
     }
 
-    // function constructorContinued(
-    //     address _infrastructure,
-    //     address _resources,
-    //     address _improvements1,
-    //     address _improvements2,
-    //     address _wonders1,
-    //     address _countryMinter
-    // ) public onlyOwner {
-    //     infrastructure = _infrastructure;
-    //     inf = InfrastructureContract(_infrastructure);
-    //     resources = _resources;
-    //     res = ResourcesContract(_resources);
-    //     wonders1 = _wonders1;
-    //     won1 = WondersContract1(_wonders1);
-    //     improvements1 = _improvements1;
-    //     imp1 = ImprovementsContract1(_improvements1);
-    //     improvements2 = _improvements2;
-    //     imp2 = ImprovementsContract2(_improvements2);
-    //     countryMinter = _countryMinter;
-    //     mint = CountryMinter(_countryMinter);
-    // }
+    function settings2 (
+        address _infrastructure,
+        address _resources,
+        address _improvements1,
+        address _improvements2,
+        address _wonders1,
+        address _countryMinter
+    ) public onlyOwner {
+        infrastructure = _infrastructure;
+        inf = InfrastructureContract(_infrastructure);
+        resources = _resources;
+        res = ResourcesContract(_resources);
+        wonders1 = _wonders1;
+        won1 = WondersContract1(_wonders1);
+        improvements1 = _improvements1;
+        imp1 = ImprovementsContract1(_improvements1);
+        improvements2 = _improvements2;
+        imp2 = ImprovementsContract2(_improvements2);
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
+    }
 
     mapping(uint256 => Forces) public idToForces;
     mapping(uint256 => address) public idToOwnerForces;
@@ -121,10 +118,6 @@ contract ForcesContract is Ownable {
     function updateImprovementsContract1(address newAddress) public onlyOwner {
         improvements1 = newAddress;
         imp1 = ImprovementsContract1(newAddress);
-    }
-
-    function updateTankCost(uint256 newPrice) public onlyOwner {
-        tankCost = newPrice;
     }
 
     function updateCruiseMissileCost(uint256 newPrice) public onlyOwner {
@@ -414,7 +407,8 @@ contract ForcesContract is Ownable {
             idToOwnerForces[id] == msg.sender,
             "You are not the nation ruler"
         );
-        uint256 purchasePrice = tankCost;
+        uint256 soldierCost = getSoldierCost(id);
+        uint256 purchasePrice = soldierCost * 40;
         uint256 factoryCount = imp1.getFactoryCount(id);
         uint256 costModifier = 100;
         if (factoryCount > 0) {
@@ -605,7 +599,7 @@ contract ForcesContract is Ownable {
 }
 
 contract MissilesContract is Ownable {
-    uint256 public cruiseMissileCost;
+    uint256 public cruiseMissileCost = 20000;
     uint256 public nukeCost;
     address public countryMinter;
     address public treasury;
@@ -644,14 +638,14 @@ contract MissilesContract is Ownable {
         uint256 nukesPurchasedToday;
     }
 
-    constructor(
+    function settings (
         address _treasury,
         address _spyAddress,
         address _nukeAddress,
         address _airBattle,
         address _wonders2,
         address _strength
-    ) {
+    ) public onlyOwner {
         treasury = _treasury;
         tsy = TreasuryContract(_treasury);
         spyAddress = _spyAddress;
@@ -661,10 +655,9 @@ contract MissilesContract is Ownable {
         won2 = WondersContract2(_wonders2);
         strength = _strength;
         stren = NationStrengthContract(_strength);
-        cruiseMissileCost = 20000;
     }
 
-    function constructorContinued(
+    function settings2 (
         address _resources,
         address _improvements1,
         address _wonders1,

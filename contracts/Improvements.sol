@@ -105,19 +105,19 @@ contract ImprovementsContract1 is Ownable {
     mapping(uint256 => Improvements1) public idToImprovements1;
     mapping(uint256 => address) public idToOwnerImprovements1;
 
-    // constructor(
-    //     address _treasury,
-    //     address _improvements2,
-    //     address _improvements3,
-    //     address _improvements4,
-    //     address _navy
-    // ) {
-    //     treasury = _treasury;
-    //     improvements2 = _improvements2;
-    //     improvements3 = _improvements3;
-    //     improvements4 = _improvements4;
-    //     navy = _navy;
-    // }
+    function settings (
+        address _treasury,
+        address _improvements2,
+        address _improvements3,
+        address _improvements4,
+        address _navy
+    ) public onlyOwner {
+        treasury = _treasury;
+        improvements2 = _improvements2;
+        improvements3 = _improvements3;
+        improvements4 = _improvements4;
+        navy = _navy;
+    }
 
     modifier approvedAddress() {
         require(
@@ -592,6 +592,7 @@ contract ImprovementsContract2 is Ownable {
     address public treasury;
     address public improvements1;
     address public forces;
+    address public wonders1;
     uint256 public foreignMinistryCost = 120000;
     uint256 public forwardOperatingBaseCost = 125000;
     uint256 public guerillaCampCost = 20000;
@@ -662,15 +663,16 @@ contract ImprovementsContract2 is Ownable {
     mapping(uint256 => Improvements2) public idToImprovements2;
     mapping(uint256 => address) public idToOwnerImprovements2;
 
-    // constructor(
-    //     address _treasury,
-    //     address _forces,
-    //     address _wonders1
-    // ) {
-    //     treasury = _treasury;
-    //     forces = _forces;
-    //     wonders1 = _wonders1;
-    // }
+    function settings (
+        address _treasury,
+        address _forces,
+        address _wonders1
+    ) public onlyOwner {
+        treasury = _treasury;
+        forces = _forces;
+        wonders1 = _wonders1;
+        won1 = WondersContract1(_wonders1);
+    }
 
     function updateTreasuryAddress(address _treasury)
         public
@@ -683,6 +685,12 @@ contract ImprovementsContract2 is Ownable {
         address _improvements1
     ) public onlyOwner {
         improvements1 = _improvements1;
+    }
+
+    function updateWondersContract1Address(
+        address _wonders1
+    ) public onlyOwner {
+        wonders1 = _wonders1;
     }
 
     function updateForcesAddress(address _forces) public onlyOwner {
@@ -1141,18 +1149,16 @@ contract ImprovementsContract4 is Ownable {
     mapping(uint256 => Improvements4) public idToImprovements4;
     mapping(uint256 => address) public idToOwnerImprovements4;
 
-    // constructor(
-    //     address _treasury,
-    //     address _forces,
-    //     address _wonders1,
-    //     address _improvements2
-    // ) {
-    //     treasury = _treasury;
-    //     forces = _forces;
-    //     wonders1 = _wonders1;
-    //     improvements2 = _improvements2;
-    //     imp2 = ImprovementsContract2(_improvements2);
-    // }
+    function settings (
+        address _treasury,
+        address _forces,
+        address _improvements2
+    ) public onlyOwner  {
+        treasury = _treasury;
+        forces = _forces;
+        improvements2 = _improvements2;
+        imp2 = ImprovementsContract2(_improvements2);
+    }
 
     function updateTreasuryAddress(address _newTreasuryAddress)
         public
@@ -1485,7 +1491,7 @@ contract ImprovementsContract3 is Ownable {
     mapping(uint256 => Improvements3) public idToImprovements3;
     mapping(uint256 => address) public idToOwnerImprovements3;
 
-    constructor(address _treasury) {
+    function settings (address _treasury) public onlyOwner {
         treasury = _treasury;
     }
 

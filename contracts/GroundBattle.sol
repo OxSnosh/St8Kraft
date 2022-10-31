@@ -56,43 +56,47 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
     constructor(
-        // address _warAddress,
-        // address _infrastructure,
-        // address _forces,
-        // address _treasury,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
         uint32 callbackGasLimit
     ) VRFConsumerBaseV2(vrfCoordinatorV2) {
-        // warAddress = _warAddress;
-        // infrastructure = _infrastructure;
-        // inf = InfrastructureContract(_infrastructure);
-        // forces = _forces;
-        // force = ForcesContract(_forces);
-        // treasury = _treasury;
-        // tsy = TreasuryContract(_treasury);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
     }
 
-    // function constructorContinued(
-    //     address _improvements2,
-    //     address _improvements3,
-    //     address _wonders3,
-    //     address _wonders4
-    // ) public onlyOwner {
-    //     improvements2 = _improvements2;
-    //     imp2 = ImprovementsContract2(_improvements2);
-    //     improvements3 = _improvements3;
-    //     imp3 = ImprovementsContract3(_improvements3);
-    //     wonders3 = _wonders3;
-    //     won3 = WondersContract3(_wonders3);
-    //     wonders4 = _wonders4;
-    //     won4 = WondersContract4(_wonders4);
-    // }
+    function settings (
+        address _warAddress,
+        address _infrastructure,
+        address _forces,
+        address _treasury
+    ) public onlyOwner {
+        warAddress = _warAddress;
+        infrastructure = _infrastructure;
+        inf = InfrastructureContract(_infrastructure);
+        forces = _forces;
+        force = ForcesContract(_forces);
+        treasury = _treasury;
+        tsy = TreasuryContract(_treasury);
+    }
+
+    function settings2 (
+        address _improvements2,
+        address _improvements3,
+        address _wonders3,
+        address _wonders4
+    ) public onlyOwner {
+        improvements2 = _improvements2;
+        imp2 = ImprovementsContract2(_improvements2);
+        improvements3 = _improvements3;
+        imp3 = ImprovementsContract3(_improvements3);
+        wonders3 = _wonders3;
+        won3 = WondersContract3(_wonders3);
+        wonders4 = _wonders4;
+        won4 = WondersContract4(_wonders4);
+    }
 
     function updateWarContract(address newAddress) public onlyOwner {
         warAddress = newAddress;
