@@ -24,7 +24,7 @@ contract TreasuryContract is Ownable {
     address public bills;
     address public spyAddress;
     address public groundBattle;
-    uint256 public daysToInactive;
+    uint256 public daysToInactive = 20;
     uint256 private gameTaxPercentage = 0;
     uint256 public seedMoney = 2000000;
 
@@ -44,7 +44,7 @@ contract TreasuryContract is Ownable {
     mapping(uint256 => Treasury) public idToTreasury;
     mapping(uint256 => address) public idToOwnerTreasury;
 
-    constructor(
+    function settings1 (
         address _warBucksAddress,
         address _wonders1,
         address _improvements1,
@@ -56,7 +56,7 @@ contract TreasuryContract is Ownable {
         address _taxes,
         address _bills,
         address _spyAddress
-    ) {
+    ) public onlyOwner {
         warBucksAddress = _warBucksAddress;
         wonders1 = _wonders1;
         improvements1 = _improvements1;
@@ -68,10 +68,9 @@ contract TreasuryContract is Ownable {
         taxes = _taxes;
         bills = _bills;
         spyAddress = _spyAddress;
-        daysToInactive = 20;
     }
 
-    function constructorContinued (address _groundBattle) public onlyOwner {
+    function settings2 (address _groundBattle) public onlyOwner {
         groundBattle = _groundBattle;
     }
 
@@ -161,8 +160,10 @@ contract TreasuryContract is Ownable {
     }
 
     modifier onlyGroundBattle() {
-        require (msg.sender == groundBattle,
-        "function only callable from ground battle");
+        require(
+            msg.sender == groundBattle,
+            "function only callable from ground battle"
+        );
         _;
     }
 
@@ -173,12 +174,12 @@ contract TreasuryContract is Ownable {
     ) public onlyGroundBattle {
         uint256 defenderBalance = idToTreasury[defenderId].balance;
         uint256 fundsToTransfer = ((defenderBalance * randomNumber) / 100);
-        if(fundsToTransfer < 2000000) {
+        if (fundsToTransfer < 2000000) {
             idToTreasury[defenderId].balance -= fundsToTransfer;
             idToTreasury[attackerId].balance += fundsToTransfer;
         } else {
             idToTreasury[defenderId].balance -= 2000000;
-            idToTreasury[attackerId].balance += 2000000;   
+            idToTreasury[attackerId].balance += 2000000;
         }
     }
 

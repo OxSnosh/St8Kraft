@@ -65,17 +65,30 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
     constructor(
+        address vrfCoordinatorV2,
+        uint64 subscriptionId,
+        bytes32 gasLane, // keyHash
+        uint32 callbackGasLimit
+    ) VRFConsumerBaseV2(vrfCoordinatorV2) {
+        i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
+        i_gasLane = gasLane;
+        i_subscriptionId = subscriptionId;
+        i_callbackGasLimit = callbackGasLimit;
+    }
+
+    function settings (
         address _countryMinter,
         address _warAddress,
         address _wonders1,
         address _wonders4,
         address _improvements3,
         address _improvements4,
-        address vrfCoordinatorV2,
-        uint64 subscriptionId,
-        bytes32 gasLane, // keyHash
-        uint32 callbackGasLimit
-    ) VRFConsumerBaseV2(vrfCoordinatorV2) {
+        address _infrastructure,
+        address _forces,
+        address _navy,
+        address _missiles,
+        address _keeper 
+    ) public onlyOwner {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
         warAddress = _warAddress;
@@ -88,19 +101,6 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         imp3 = ImprovementsContract3(_improvements3);
         improvements4 = _improvements4;
         imp4 = ImprovementsContract4(_improvements4);
-        i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
-        i_gasLane = gasLane;
-        i_subscriptionId = subscriptionId;
-        i_callbackGasLimit = callbackGasLimit;
-    }
-
-    function constructorContinued (
-        address _infrastructure,
-        address _forces,
-        address _navy,
-        address _missiles,
-        address _keeper 
-    ) public onlyOwner {
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
         forces = _forces;

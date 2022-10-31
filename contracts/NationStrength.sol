@@ -23,14 +23,14 @@ contract NationStrengthContract is Ownable {
     NavyContract nav;
     MissilesContract mis;
 
-    constructor(
+    function settings (
         address _infrastructure,
         address _forces,
         address _fighters,
         address _bombers,
         address _navy,
         address _missiles
-    ) {
+    ) public onlyOwner {
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
         forces = _forces;

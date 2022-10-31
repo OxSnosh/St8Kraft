@@ -15,11 +15,15 @@ contract KeeperContract is Ownable {
     AidContract aid;
     WarContract war;
 
-    constructor (address _nukes, address _aid, address _war) {
+    function settings (
+        address _nukes,
+        address _aid,
+        address _war
+    ) public onlyOwner {
         nukes = _nukes;
         nuke = NukeContract(_nukes);
         aidContract = _aid;
-        aid = AidContract(_aid); 
+        aid = AidContract(_aid);
         warContract = _war;
         war = WarContract(_war);
     }

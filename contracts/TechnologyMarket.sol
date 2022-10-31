@@ -28,7 +28,7 @@ contract TechnologyMarketContract is Ownable {
     WondersContract4 won4;
     InfrastructureContract inf;
 
-    constructor(
+    function settings (
         address _resources,
         address _improvements3,
         address _infrastructure,
@@ -37,7 +37,7 @@ contract TechnologyMarketContract is Ownable {
         address _wonders4,
         address _treasury,
         address _countryMinter
-    ) {
+    ) public onlyOwner {
         resources = _resources;
         res = ResourcesContract(_resources);
         improvements3 = _improvements3;

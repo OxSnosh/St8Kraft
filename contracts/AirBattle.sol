@@ -92,32 +92,36 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
     constructor(
-        // address _warAddress,
-        // address _fighter,
-        // address _bomber,
-        // address _infrastructure,
-        // address _forces,
-        // address _fighterLosses,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
         uint32 callbackGasLimit
     ) VRFConsumerBaseV2(vrfCoordinatorV2) {
-        // warAddress = _warAddress;
-        // fighterAddress = _fighter;
-        // fighter = FightersContract(_fighter);
-        // bomberAddress = _bomber;
-        // bomber = BombersContract(_bomber);
-        // infrastructure = _infrastructure;
-        // inf = InfrastructureContract(_infrastructure);
-        // forces = _forces;
-        // force = ForcesContract(_forces);
-        // fighterLosses = _fighterLosses;
-        // fighterLoss = FighterLosses(_fighterLosses);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
+    }
+
+    function settings (
+        address _warAddress,
+        address _fighter,
+        address _bomber,
+        address _infrastructure,
+        address _forces,
+        address _fighterLosses
+    ) public onlyOwner {
+        warAddress = _warAddress;
+        fighterAddress = _fighter;
+        fighter = FightersContract(_fighter);
+        bomberAddress = _bomber;
+        bomber = BombersContract(_bomber);
+        infrastructure = _infrastructure;
+        inf = InfrastructureContract(_infrastructure);
+        forces = _forces;
+        force = ForcesContract(_forces);
+        fighterLosses = _fighterLosses;
+        fighterLoss = FighterLosses(_fighterLosses);
     }
 
     function updateWarAddress(address newAddress) public onlyOwner {

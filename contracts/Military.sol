@@ -2,8 +2,9 @@
 pragma solidity 0.8.7;
 
 import "./SpyOperations.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract MilitaryContract {
+contract MilitaryContract is Ownable {
     address public spyAddress;
 
     SpyOperationsContract spy;
@@ -12,9 +13,6 @@ contract MilitaryContract {
         uint256 defconLevel;
         uint256 threatLevel;
         bool warPeacePreference;
-        uint256 nationStrength;
-        uint16 environment;
-        uint256 efficiency;
     }
 
     mapping(uint256 => Military) public idToMilitary;
@@ -25,13 +23,13 @@ contract MilitaryContract {
         _;
     }
 
-    constructor(address _spyAddress) {
+    function settings (address _spyAddress) public onlyOwner {
         spyAddress = _spyAddress;
         spy = SpyOperationsContract(_spyAddress);
     }
 
     function generateMilitary(uint256 id, address nationOwner) public {
-        Military memory newMilitary = Military(5, 1, false, 0, 0, 0);
+        Military memory newMilitary = Military(5, 1, false);
         idToMilitary[id] = newMilitary;
         idToOwnerMilitary[id] = nationOwner;
     }

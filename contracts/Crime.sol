@@ -19,24 +19,24 @@ contract CrimeContract is Ownable {
     ImprovementsContract3 imp3;
     CountryParametersContract cp;
 
-    // constructor(
-    //     address _infrastructure,
-    //     address _improvements1,
-    //     address _improvements2,
-    //     address _improvements3,
-    //     address _parameters
-    // ) {
-    //     infrastructure = _infrastructure;
-    //     inf = InfrastructureContract(_infrastructure);
-    //     improvements1 = _improvements1;
-    //     imp1 = ImprovementsContract1(_improvements1);
-    //     improvements2 = _improvements2;
-    //     imp2 = ImprovementsContract2(_improvements2);
-    //     improvements3 = _improvements3;
-    //     imp3 = ImprovementsContract3(_improvements3);
-    //     parameters = _parameters;
-    //     cp = CountryParametersContract(_parameters);
-    // }
+    function settings (
+        address _infrastructure,
+        address _improvements1,
+        address _improvements2,
+        address _improvements3,
+        address _parameters
+    ) public onlyOwner {
+        infrastructure = _infrastructure;
+        inf = InfrastructureContract(_infrastructure);
+        improvements1 = _improvements1;
+        imp1 = ImprovementsContract1(_improvements1);
+        improvements2 = _improvements2;
+        imp2 = ImprovementsContract2(_improvements2);
+        improvements3 = _improvements3;
+        imp3 = ImprovementsContract3(_improvements3);
+        parameters = _parameters;
+        cp = CountryParametersContract(_parameters);
+    }
 
     function updateInfrastructureContract(address _newAddress)
         public

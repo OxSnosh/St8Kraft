@@ -57,7 +57,7 @@ contract InfrastructureContract is Ownable {
     mapping(uint256 => Infrastructure) public idToInfrastructure;
     mapping(uint256 => address) public idToOwnerInfrastructure;
 
-    constructor(
+    function settings1 (
         address _resources,
         address _improvements1,
         address _improvements2,
@@ -66,7 +66,7 @@ contract InfrastructureContract is Ownable {
         address _infrastructureMarket,
         address _techMarket,
         address _landMarket
-    ) {
+    ) public onlyOwner {
         resources = _resources;
         res = ResourcesContract(_resources);
         improvements1 = _improvements1;
@@ -82,7 +82,7 @@ contract InfrastructureContract is Ownable {
         landMarket = _landMarket;
     }
 
-    function constructorContinued(
+    function settings2 (
         address _wonders1,
         address _wonders2,
         address _wonders3,
@@ -105,7 +105,7 @@ contract InfrastructureContract is Ownable {
         aid = _aid;
     }
 
-    function constructorContinued2(
+    function settings3 (
         address _spyAddress,
         address _tax,
         address _cruiseMissile,
@@ -195,6 +195,8 @@ contract InfrastructureContract is Ownable {
         );
         _;
     }
+
+
 
     function generateInfrastructure(uint256 id, address nationOwner) public {
         Infrastructure memory newInfrastrusture = Infrastructure(

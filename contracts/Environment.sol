@@ -41,52 +41,52 @@ contract EnvironmentContract is Ownable {
     MissilesContract mis;
     NukeContract nuke;
 
-    // constructor(
-    //     address _countryMinter,
-    //     address _resources,
-    //     address _infrastructure,
-    //     address _wonders3,
-    //     address _wonders4,
-    //     address _forces,
-    //     address _parameters,
-    //     address _taxes,
-    //     address _missiles,
-    //     address _nukes
-    // ) {
-    //     countryMinter = _countryMinter;
-    //     mint = CountryMinter(_countryMinter);
-    //     resources = _resources;
-    //     res = ResourcesContract(_resources);
-    //     infrastructure = _infrastructure;
-    //     inf = InfrastructureContract(_infrastructure);
-    //     wonders3 = _wonders3;
-    //     won3 = WondersContract3(_wonders3);
-    //     wonders4 = _wonders4;
-    //     won4 = WondersContract4(_wonders4);
-    //     forces = _forces;
-    //     force = ForcesContract(_forces);
-    //     parameters = _parameters;
-    //     param = CountryParametersContract(_parameters);
-    //     taxes = _taxes;
-    //     tax = TaxesContract(_taxes);
-    //     missiles = _missiles;
-    //     mis = MissilesContract(_missiles);
-    //     nukes = _nukes;
-    //     nuke = NukeContract(_nukes);
-    // }
+    function settings (
+        address _countryMinter,
+        address _resources,
+        address _infrastructure,
+        address _wonders3,
+        address _wonders4,
+        address _forces,
+        address _parameters,
+        address _taxes,
+        address _missiles,
+        address _nukes
+    ) public onlyOwner {
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
+        resources = _resources;
+        res = ResourcesContract(_resources);
+        infrastructure = _infrastructure;
+        inf = InfrastructureContract(_infrastructure);
+        wonders3 = _wonders3;
+        won3 = WondersContract3(_wonders3);
+        wonders4 = _wonders4;
+        won4 = WondersContract4(_wonders4);
+        forces = _forces;
+        force = ForcesContract(_forces);
+        parameters = _parameters;
+        param = CountryParametersContract(_parameters);
+        taxes = _taxes;
+        tax = TaxesContract(_taxes);
+        missiles = _missiles;
+        mis = MissilesContract(_missiles);
+        nukes = _nukes;
+        nuke = NukeContract(_nukes);
+    }
 
-    // function constructorContinued(
-    //     address _improvements1,
-    //     address _improvements3,
-    //     address _improvements4
-    // ) public onlyOwner {
-    //     improvements1 = _improvements1;
-    //     imp1 = ImprovementsContract1(_improvements1);
-    //     improvements3 = _improvements3;
-    //     imp3 = ImprovementsContract3(_improvements3);
-    //     improvements4 = _improvements4;
-    //     imp4 = ImprovementsContract4(_improvements4);
-    // }
+    function settings2 (
+        address _improvements1,
+        address _improvements3,
+        address _improvements4
+    ) public onlyOwner {
+        improvements1 = _improvements1;
+        imp1 = ImprovementsContract1(_improvements1);
+        improvements3 = _improvements3;
+        imp3 = ImprovementsContract3(_improvements3);
+        improvements4 = _improvements4;
+        imp4 = ImprovementsContract4(_improvements4);
+    }
 
     function updateCountryMinter(address newAddress) public onlyOwner {
         countryMinter = newAddress;

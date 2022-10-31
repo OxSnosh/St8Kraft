@@ -30,14 +30,14 @@ contract NavalActionsContract is Ownable {
 
     mapping(uint256 => NavalActions) idToNavalActions;
 
-    constructor(
+    function settings (
         address _navalBlockade,
         address _breakBlockade,
         address _navalAttack,
         address _keeper,
         address _navy,
         address _countryMinter
-    ) {
+    ) public onlyOwner {
         navalBlockade = _navalBlockade;
         breakBlockade = _breakBlockade;
         navalAttack = _navalAttack;
@@ -116,19 +116,18 @@ contract NavyContract is Ownable {
     address public improvements4;
     address public resources;
     address public navyBattleAddress;
-    address public warAddress;
     address public military;
     address public nukes;
     address public wonders1;
     address public navalActions;
-    uint256 public corvetteCost;
-    uint256 public landingShipCost;
-    uint256 public battleshipCost;
-    uint256 public cruiserCost;
-    uint256 public frigateCost;
-    uint256 public destroyerCost;
-    uint256 public submarineCost;
-    uint256 public aircraftCarrierCost;
+    uint256 public corvetteCost = 300000;
+    uint256 public landingShipCost = 300000;
+    uint256 public battleshipCost = 300000;
+    uint256 public cruiserCost = 500000;
+    uint256 public frigateCost = 750000;
+    uint256 public destroyerCost = 1000000;
+    uint256 public submarineCost = 1500000;
+    uint256 public aircraftCarrierCost = 2000000;
 
     struct Navy {
         uint256 navyVessels;
@@ -145,7 +144,6 @@ contract NavyContract is Ownable {
     mapping(uint256 => Navy) public idToNavy;
     mapping(uint256 => address) public idToOwnerNavy;
 
-    WarContract war;
     ResourcesContract res;
     MilitaryContract mil;
     ImprovementsContract4 imp4;
@@ -153,25 +151,22 @@ contract NavyContract is Ownable {
     WondersContract1 won1;
     NavalActionsContract navAct;
 
-    constructor(
+    function settings (
         address _treasuryAddress,
         address _improvementsContract1Address,
         address _improvementsContract3Address,
         address _improvements4,
-        address _warAddress,
         address _resources,
         address _military,
         address _nukes,
         address _wonders1,
         address _navalActions
-    ) {
+    ) public onlyOwner {
         treasuryAddress = _treasuryAddress;
         improvementsContract1Address = _improvementsContract1Address;
         improvementsContract3Address = _improvementsContract3Address;
         improvements4 = _improvements4;
         imp4 = ImprovementsContract4(_improvements4);
-        warAddress = _warAddress;
-        war = WarContract(_warAddress);
         resources = _resources;
         res = ResourcesContract(_resources);
         military = _military;
@@ -184,26 +179,10 @@ contract NavyContract is Ownable {
         navAct = NavalActionsContract(_navalActions);
     }
 
-    function initiateCosts() public onlyOwner {
-        corvetteCost = 300000;
-        landingShipCost = 300000;
-        battleshipCost = 300000;
-        cruiserCost = 500000;
-        frigateCost = 750000;
-        destroyerCost = 1000000;
-        submarineCost = 1500000;
-        aircraftCarrierCost = 2000000;
-    }
-
     function generateNavy(uint256 id, address nationOwner) public {
         Navy memory newNavy = Navy(0, 0, 0, 0, 0, 0, 0, 0, 0);
         idToNavy[id] = newNavy;
         idToOwnerNavy[id] = nationOwner;
-    }
-
-    function updateWarContract(address newAddress) public onlyOwner {
-        warAddress = newAddress;
-        war = WarContract(newAddress);
     }
 
     function updateCorvetteCost(uint256 newPrice) public onlyOwner {

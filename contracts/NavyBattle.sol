@@ -39,7 +39,6 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
         bool blockadeActive;
     }
 
-
     mapping(uint256 => Blockade) public blockadeIdToBlockade;
     mapping(uint256 => uint256[]) public idToActiveBlockadesAgainst;
     mapping(uint256 => uint256[]) public idToActiveBlockadesFor;
@@ -47,38 +46,41 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
     constructor(
-        address _navy,
-        address _navalAction,
-        address _war,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
         uint32 callbackGasLimit
     ) VRFConsumerBaseV2(vrfCoordinatorV2) {
-        navy = _navy;
-        nav = NavyContract(_navy);
-        navalAction = _navalAction;
-        navAct = NavalActionsContract(_navalAction);
-        warContract = _war;
-        war = WarContract(_war);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
     }
 
-    function updateNavyContract(address newAddress) public onlyOwner {
-        navy = newAddress;
-        nav = NavyContract(newAddress);
+    function settings(
+        address _navy,
+        address _navalAction,
+        address _war
+    ) public onlyOwner {
+        navy = _navy;
+        nav = NavyContract(_navy);
+        navalAction = _navalAction;
+        navAct = NavalActionsContract(_navalAction);
+        warContract = _war;
+        war = WarContract(_war);
     }
 
-    function blockade(uint256 attackerId, uint256 defenderId, uint256 warId) public {
+    function blockade(
+        uint256 attackerId,
+        uint256 defenderId,
+        uint256 warId
+    ) public {
         bool blockadedAlready = navAct.getBlockadedToday(defenderId);
         require(blockadedAlready == false, "nation already blockaded today");
         bool warActive = war.isWarActive(warId);
-        require (warActive, "war !active");
+        require(warActive, "war !active");
         uint256 slotsUsed = navAct.getActionSlotsUsed(attackerId);
-        require ((slotsUsed + 1) <= 3, "max slots used");
+        require((slotsUsed + 1) <= 3, "max slots used");
         uint256 activeBlockadesAgainstCount = idToActiveBlockadesAgainst[
             attackerId
         ].length;
@@ -274,17 +276,25 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
     constructor(
-        address _countryMinter,
-        address _navalBlockade,
-        address _navy,
-        address _warAddress,
-        address _improvements4,
-        address _navalActions,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
         uint32 callbackGasLimit
     ) VRFConsumerBaseV2(vrfCoordinatorV2) {
+        i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
+        i_gasLane = gasLane;
+        i_subscriptionId = subscriptionId;
+        i_callbackGasLimit = callbackGasLimit;
+    }
+
+    function settings(
+        address _countryMinter,
+        address _navalBlockade,
+        address _navy,
+        address _warAddress,
+        address _improvements4,
+        address _navalActions
+    ) public onlyOwner {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
         navalBlockade = _navalBlockade;
@@ -297,10 +307,6 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         imp4 = ImprovementsContract4(_improvements4);
         navalActions = _navalActions;
         navAct = NavalActionsContract(_navalActions);
-        i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
-        i_gasLane = gasLane;
-        i_subscriptionId = subscriptionId;
-        i_callbackGasLimit = callbackGasLimit;
     }
 
     function breakBlockade(
@@ -311,9 +317,9 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         bool isOwner = mint.checkOwnership(attackerId, msg.sender);
         require(isOwner, "caller not nation owner");
         bool warActive = war.isWarActive(warId);
-        require (warActive, "war !active");
+        require(warActive, "war !active");
         uint256 slotsUsed = navAct.getActionSlotsUsed(attackerId);
-        require ((slotsUsed + 1) <= 3, "max slots used");
+        require((slotsUsed + 1) <= 3, "max slots used");
         uint256[] memory attackerBlockades = navBlock.getActiveBlockadesAgainst(
             attackerId
         );
@@ -500,7 +506,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
             _destroyerStrength);
         uint256 breakerId = breakBlockadeIdToBreakBlockade[battleId].breakerId;
         uint256 navalAcademyCount = imp4.getNavalAcademyCount(breakerId);
-        if(navalAcademyCount > 0) {
+        if (navalAcademyCount > 0) {
             uint256 breakerShipCount = getBreakerShipCount(breakerId);
             strength += (breakerShipCount * navalAcademyCount);
         }
@@ -524,9 +530,10 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
             _cruiserStrength +
             _frigateStrength +
             _submarineStrength);
-        uint256 defenderId = breakBlockadeIdToDefendBlockade[battleId].defenderId;
+        uint256 defenderId = breakBlockadeIdToDefendBlockade[battleId]
+            .defenderId;
         uint256 navalAcademyCount = imp4.getNavalAcademyCount(defenderId);
-        if(navalAcademyCount > 0) {
+        if (navalAcademyCount > 0) {
             uint256 defenderShipCount = getDefenderShipCount(defenderId);
             strength += (defenderShipCount * navalAcademyCount);
         }
@@ -831,15 +838,23 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
     constructor(
-        address _navy,
-        address _war,
-        address _improvements4,
-        address _navalActions,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
         uint32 callbackGasLimit
     ) VRFConsumerBaseV2(vrfCoordinatorV2) {
+        i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
+        i_gasLane = gasLane;
+        i_subscriptionId = subscriptionId;
+        i_callbackGasLimit = callbackGasLimit;
+    }
+
+    function settings (
+        address _navy,
+        address _war,
+        address _improvements4,
+        address _navalActions
+    ) public onlyOwner {
         navy = _navy;
         nav = NavyContract(_navy);
         warAddress = _war;
@@ -848,20 +863,6 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         imp4 = ImprovementsContract4(_improvements4);
         navalActions = _navalActions;
         navAct = NavalActionsContract(_navalActions);
-        i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
-        i_gasLane = gasLane;
-        i_subscriptionId = subscriptionId;
-        i_callbackGasLimit = callbackGasLimit;
-    }
-
-    function updateNavyContract(address newAddress) public onlyOwner {
-        navy = newAddress;
-        nav = NavyContract(newAddress);
-    }
-
-    function updateWarContract(address newAddress) public onlyOwner {
-        warAddress = newAddress;
-        war = WarContract(newAddress);
     }
 
     function navalAttack(
@@ -872,7 +873,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         bool isActiveWar = war.isWarActive(warId);
         require(isActiveWar, "!active war");
         uint256 slotsUsed = navAct.getActionSlotsUsed(attackerId);
-        require ((slotsUsed + 1) <= 3, "max slots used");
+        require((slotsUsed + 1) <= 3, "max slots used");
         (uint256 warOffense, uint256 warDefense) = war.getInvolvedParties(
             warId
         );
@@ -1146,7 +1147,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
             _aircraftCarrierStrength);
         uint256 attackerId = idToAttackerNavy[battleId].countryId;
         uint256 navalAcademyCount = imp4.getNavalAcademyCount(attackerId);
-        if(navalAcademyCount > 0) {
+        if (navalAcademyCount > 0) {
             uint256 shipCount = getShipCount(attackerId);
             strength += (shipCount * navalAcademyCount);
         }
@@ -1184,7 +1185,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
             _aircraftCarrierStrength);
         uint256 defenderId = idToDefenderNavy[battleId].countryId;
         uint256 navalAcademyCount = imp4.getNavalAcademyCount(defenderId);
-        if(navalAcademyCount > 0) {
+        if (navalAcademyCount > 0) {
             uint256 shipCount = getShipCount(defenderId);
             strength += (shipCount * navalAcademyCount);
         }

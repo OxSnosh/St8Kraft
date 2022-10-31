@@ -36,8 +36,10 @@ contract CountryMinter is ERC721, Ownable {
     address public aid;
     address public navy;
     address public fighters;
-    address public fightersMarket;
-    address public bombersMarket;
+    address public fightersMarket1;
+    address public fightersMarket2;
+    address public bombersMarket1;
+    address public bombersMarket2;
     address public bombers;
 
     mapping(uint256 => address) public idToOwner;
@@ -49,13 +51,27 @@ contract CountryMinter is ERC721, Ownable {
         string indexed ruler
     );
 
-    constructor(
+    constructor (
+        // address _countryParameters,
+        // address _treasury,
+        // address _infrastructure,
+        // address _resources,
+        // address _aid
+    ) ERC721("MetaNations", "MNS") {
+        // countryParameters = _countryParameters;
+        // treasury = _treasury;
+        // infrastructure = _infrastructure;
+        // resources = _resources;
+        // aid = _aid;
+    }
+
+    function settings (
         address _countryParameters,
         address _treasury,
         address _infrastructure,
         address _resources,
         address _aid
-    ) ERC721("MetaNations", "MNS") {
+    ) public onlyOwner {
         countryParameters = _countryParameters;
         treasury = _treasury;
         infrastructure = _infrastructure;
@@ -63,7 +79,7 @@ contract CountryMinter is ERC721, Ownable {
         aid = _aid;
     }
 
-    function constructorContinued1(
+    function settings2 (
         address _improvements1,
         address _improvements2,
         address _improvements3,
@@ -81,22 +97,26 @@ contract CountryMinter is ERC721, Ownable {
         wonders4 = _wonders4;
     }
 
-    function constructorContinued2(
+    function settings3 (
         address _military,
         address _forces,
         address _navy,
         address _fighters,
-        address _fightersMarket,
+        address _fightersMarket1,
+        address _fightersMarket2,
         address _bombers,
-        address _bombersMarket
+        address _bombersMarket1,
+        address _bombersMarket2
     ) public onlyOwner {
         military = _military;
         forces = _forces;
         navy = _navy;
         fighters = _fighters;
-        fightersMarket = _fightersMarket;
+        fightersMarket1 = _fightersMarket1;
+        fightersMarket2 = _fightersMarket2;
         bombers = _bombers;
-        bombersMarket = _bombersMarket;
+        bombersMarket1 = _bombersMarket1;
+        bombersMarket2 = _bombersMarket2;
     }
 
     function generateCountry(
@@ -131,7 +151,7 @@ contract CountryMinter is ERC721, Ownable {
         MilitaryContract(military).generateMilitary(countryId, msg.sender);
         ForcesContract(forces).generateForces(countryId, msg.sender);
         NavyContract(navy).generateNavy(countryId, msg.sender);
-        FightersContract(fighters).generateFighters(countryId, msg.sender);
+        FightersContract(fighters).generateFighters(countryId);
         BombersContract(bombers).generateBombers(countryId, msg.sender);
         // BombersMarketplace(bombersMarket).initiateBombersMarket(countryId, msg.sender);        
         idToOwner[countryId] = msg.sender;

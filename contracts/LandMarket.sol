@@ -18,12 +18,12 @@ contract LandMarketContract is Ownable {
     InfrastructureContract inf;
     TreasuryContract tsy;
 
-    constructor(
+    function settings (
         address _resources,
         address _countryMinter,
         address _infrastructure,
         address _treasury
-    ) {
+    ) public onlyOwner {
         resources = _resources;
         res = ResourcesContract(_resources);
         countryMinter = _countryMinter;

@@ -46,7 +46,7 @@ contract TaxesContract is Ownable {
     CrimeContract crm;
     AdditionalTaxesContract addTax;
 
-    constructor(
+    function settings1 (
         address _countryMinter,
         address _infrastructure,
         address _treasury,
@@ -54,7 +54,7 @@ contract TaxesContract is Ownable {
         address _improvements2,
         address _improvements3,
         address _additionalTaxes
-    ) {
+    ) public onlyOwner {
         countryMinter = _countryMinter;
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
@@ -70,7 +70,7 @@ contract TaxesContract is Ownable {
         addTax = AdditionalTaxesContract(_additionalTaxes);
     }
 
-    function constructorContinued(
+    function settings2 (
         address _parameters,
         address _wonders1,
         address _wonders2,
@@ -257,8 +257,8 @@ contract TaxesContract is Ownable {
     {
         uint256 technologyPoints = getTechnologyPoints(id);
         uint256 pointsFromAge = getPointsFromNationAge(id);
-        uint256 pointsFromTrades = getPointsFromTrades(id);
-        uint256 pointsFromDefcon = getPointsFromDefcon(id);
+        uint256 pointsFromTrades = addTax.getPointsFromTrades(id);
+        uint256 pointsFromDefcon = addTax.getPointsFromDefcon(id);
         uint256 additonalHappinessPointsToAdd = (technologyPoints +
             pointsFromAge +
             pointsFromTrades +
@@ -617,36 +617,36 @@ contract TaxesContract is Ownable {
         return agePoints;
     }
 
-    function getPointsFromTrades(uint256 id) public view returns (uint256) {
-        uint256[] memory partners = res.getTradingPartners(id);
-        uint256 pointsFromTeamTrades = 0;
-        uint256 callerNationTeam = params.getTeam(id);
-        for (uint256 i = 0; i < partners.length; i++) {
-            uint256 partnerId = partners[i];
-            uint256 partnerTeam = params.getTeam(partnerId);
-            if (callerNationTeam == partnerTeam) {
-                pointsFromTeamTrades++;
-            }
-        }
-        return pointsFromTeamTrades;
-    }
+    // function getPointsFromTrades(uint256 id) public view returns (uint256) {
+    //     uint256[] memory partners = res.getTradingPartners(id);
+    //     uint256 pointsFromTeamTrades = 0;
+    //     uint256 callerNationTeam = params.getTeam(id);
+    //     for (uint256 i = 0; i < partners.length; i++) {
+    //         uint256 partnerId = partners[i];
+    //         uint256 partnerTeam = params.getTeam(partnerId);
+    //         if (callerNationTeam == partnerTeam) {
+    //             pointsFromTeamTrades++;
+    //         }
+    //     }
+    //     return pointsFromTeamTrades;
+    // }
 
-    function getPointsFromDefcon(uint256 id) public view returns (uint256) {
-        uint256 defconLevel = mil.getDefconLevel(id);
-        uint256 pointsFromDefcon;
-        if (defconLevel == 5) {
-            pointsFromDefcon = 4;
-        } else if (defconLevel == 4) {
-            pointsFromDefcon = 3;
-        } else if (defconLevel == 3) {
-            pointsFromDefcon = 2;
-        } else if (defconLevel == 2) {
-            pointsFromDefcon = 1;
-        } else {
-            pointsFromDefcon = 0;
-        }
-        return pointsFromDefcon;
-    }
+    // function getPointsFromDefcon(uint256 id) public view returns (uint256) {
+    //     uint256 defconLevel = mil.getDefconLevel(id);
+    //     uint256 pointsFromDefcon;
+    //     if (defconLevel == 5) {
+    //         pointsFromDefcon = 4;
+    //     } else if (defconLevel == 4) {
+    //         pointsFromDefcon = 3;
+    //     } else if (defconLevel == 3) {
+    //         pointsFromDefcon = 2;
+    //     } else if (defconLevel == 2) {
+    //         pointsFromDefcon = 1;
+    //     } else {
+    //         pointsFromDefcon = 0;
+    //     }
+    //     return pointsFromDefcon;
+    // }
 
     function getTaxRatePoints(uint256 id) public view returns (uint256) {
         uint256 subtractTaxPoints;
@@ -761,14 +761,14 @@ contract AdditionalTaxesContract is Ownable {
     // address public improvements1;
     // address public improvements2;
     // address public improvements3;
-    // address public parameters;
+    address public parameters;
     address public wonders1;
     address public wonders2;
     address public wonders3;
     address public wonders4;
     address public resources;
     // address public forces;
-    // address public military;
+    address public military;
     // address public crime;
 
     InfrastructureContract inf;
@@ -776,14 +776,14 @@ contract AdditionalTaxesContract is Ownable {
     // ImprovementsContract1 imp1;
     // ImprovementsContract2 imp2;
     // ImprovementsContract3 imp3;
-    // CountryParametersContract params;
+    CountryParametersContract params;
     WondersContract1 won1;
     WondersContract2 won2;
     WondersContract3 won3;
     WondersContract4 won4;
     ResourcesContract res;
     // ForcesContract frc;
-    // MilitaryContract mil;
+    MilitaryContract mil;
     // CrimeContract crm;
 
     constructor(
@@ -808,18 +808,18 @@ contract AdditionalTaxesContract is Ownable {
     }
 
     function constructorContinued(
-        // address _parameters,
+        address _parameters,
         address _wonders1,
         address _wonders2,
         address _wonders3,
         address _wonders4,
-        address _resources
+        address _resources,
         // address _forces,
-        // address _military,
+        address _military
         // address _crime
     ) public onlyOwner {
-        // parameters = _parameters;
-        // params = CountryParametersContract(_parameters);
+        parameters = _parameters;
+        params = CountryParametersContract(_parameters);
         wonders1 = _wonders1;
         won1 = WondersContract1(_wonders1);
         wonders2 = _wonders2;
@@ -832,8 +832,8 @@ contract AdditionalTaxesContract is Ownable {
         res = ResourcesContract(_resources);
         // forces = _forces;
         // frc = ForcesContract(_forces);
-        // military = _military;
-        // mil = MilitaryContract(_military);
+        military = _military;
+        mil = MilitaryContract(_military);
         // crime = _crime;
         // crm = CrimeContract(_crime);
     }
@@ -921,5 +921,36 @@ contract AdditionalTaxesContract is Ownable {
             }
         }
         return adjustment;
+    }
+
+    function getPointsFromTrades(uint256 id) public view returns (uint256) {
+        uint256[] memory partners = res.getTradingPartners(id);
+        uint256 pointsFromTeamTrades = 0;
+        uint256 callerNationTeam = params.getTeam(id);
+        for (uint256 i = 0; i < partners.length; i++) {
+            uint256 partnerId = partners[i];
+            uint256 partnerTeam = params.getTeam(partnerId);
+            if (callerNationTeam == partnerTeam) {
+                pointsFromTeamTrades++;
+            }
+        }
+        return pointsFromTeamTrades;
+    }
+
+    function getPointsFromDefcon(uint256 id) public view returns (uint256) {
+        uint256 defconLevel = mil.getDefconLevel(id);
+        uint256 pointsFromDefcon;
+        if (defconLevel == 5) {
+            pointsFromDefcon = 4;
+        } else if (defconLevel == 4) {
+            pointsFromDefcon = 3;
+        } else if (defconLevel == 3) {
+            pointsFromDefcon = 2;
+        } else if (defconLevel == 2) {
+            pointsFromDefcon = 1;
+        } else {
+            pointsFromDefcon = 0;
+        }
+        return pointsFromDefcon;
     }
 }

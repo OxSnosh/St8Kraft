@@ -29,7 +29,7 @@ contract InfrastructureMarketContract is Ownable {
     InfrastructureContract inf;
     TreasuryContract tsy;
 
-    constructor(
+    function settings (
         address _resources,
         address _parameters,
         address _improvements1,
@@ -38,7 +38,7 @@ contract InfrastructureMarketContract is Ownable {
         address _wonders3,
         address _treasury,
         address _infrastructure
-    ) {
+    ) public onlyOwner {
         resources = _resources;
         res = ResourcesContract(_resources);
         parameters = _parameters;

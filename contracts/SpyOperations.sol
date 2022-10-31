@@ -52,16 +52,27 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
     constructor(
-        address _infrastructure,
-        address _forces,
-        address _military,
-        address _nationStrength,
-        address _wonders1,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
         uint32 callbackGasLimit
     ) VRFConsumerBaseV2(vrfCoordinatorV2) {
+        i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
+        i_gasLane = gasLane;
+        i_subscriptionId = subscriptionId;
+        i_callbackGasLimit = callbackGasLimit;
+    }
+
+    function settings (
+        address _infrastructure,
+        address _forces,
+        address _military,
+        address _nationStrength,
+        address _wonders1,
+        address _treasury,
+        address _parameters,
+        address _missiles
+    ) public onlyOwner {
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
         forces = _forces;
@@ -72,17 +83,6 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         strength = NationStrengthContract(_nationStrength);
         wonders1 = _wonders1;
         won1 = WondersContract1(_wonders1);
-        i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
-        i_gasLane = gasLane;
-        i_subscriptionId = subscriptionId;
-        i_callbackGasLimit = callbackGasLimit;
-    }
-
-    function constructorContinued (
-        address _treasury,
-        address _parameters,
-        address _missiles
-    ) public onlyOwner {
         treasury = _treasury;
         tsy = TreasuryContract(_treasury);
         parameters = _parameters;
@@ -322,7 +322,10 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         uint256 landAmount = inf.getLandCount(defenderId);
         require(landAmount >= 15, "defender does not have enough land");
         inf.decreaseLandCount(defenderId, randomNumberToDecreaseFromDefender);
-        inf.increaseLandCountFromSpyContract(attackerId, randomNumberToAddToAttacker);
+        inf.increaseLandCountFromSpyContract(
+            attackerId,
+            randomNumberToAddToAttacker
+        );
     }
 
     function changeGovernment(uint256 defenderId, uint256 attackId) internal {
@@ -411,8 +414,14 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
             randomNumberToDecreaseFromDefender);
         uint256 techAmount = inf.getTechnologyCount(defenderId);
         require(techAmount >= 15, "defender does not have enough tech");
-        inf.decreaseTechCountFromSpyContract(defenderId, randomNumberToDecreaseFromDefender);
-        inf.increaseTechCountFromSpyContract(attackerId, randomNumberToAddToAttacker);
+        inf.decreaseTechCountFromSpyContract(
+            defenderId,
+            randomNumberToDecreaseFromDefender
+        );
+        inf.increaseTechCountFromSpyContract(
+            attackerId,
+            randomNumberToAddToAttacker
+        );
     }
 
     function sabotogeTaxes(uint256 defenderId, uint256 attackId) internal {
@@ -421,10 +430,9 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         inf.setTaxRateFromSpyContract(defenderId, randomNumberToSetTaxes);
     }
 
-    function captureMoneyReserves(
-        uint256 attackerId,
-        uint256 defenderId
-    ) internal {
+    function captureMoneyReserves(uint256 attackerId, uint256 defenderId)
+        internal
+    {
         //max 5% or $10 million
         uint256 defenderBalance = tsy.checkBalance(defenderId);
         uint256 amountToTransfer;

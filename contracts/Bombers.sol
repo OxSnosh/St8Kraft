@@ -9,7 +9,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract BombersContract is Ownable {
     address public countryMinter;
-    address public bombersMarket;
+    address public bombersMarket1;
+    address public bombersMarket2;
     address public airBattle;
     address public fighters;
     address public treasury;
@@ -48,24 +49,26 @@ contract BombersContract is Ownable {
     mapping(uint256 => DeployedBombers) public idToDeployedBombers;
     mapping(uint256 => address) public idToOwnerBombers;
 
-    // constructor(
-    //     address _countryMinter,
-    //     address _bombersMarket,
-    //     address _airBattle,
-    //     address _treasuryAddress,
-    //     address _fightersAddress,
-    //     address _infrastructure,
-    //     address _war
-    // ) {
-    //     countryMinter = _countryMinter;
-    //     mint = CountryMinter(_countryMinter);
-    //     bombersMarket = _bombersMarket;
-    //     airBattle = _airBattle;
-    //     treasury = _treasuryAddress;
-    //     fighters = _fightersAddress;
-    //     infrastructure = _infrastructure;
-    //     war = _war;
-    // }
+    function settings (
+        address _countryMinter,
+        address _bombersMarket1,
+        address _bombersMarket2,
+        address _airBattle,
+        address _treasuryAddress,
+        address _fightersAddress,
+        address _infrastructure,
+        address _war
+    ) public onlyOwner {
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
+        bombersMarket1 = _bombersMarket1;
+        bombersMarket2 = _bombersMarket2;
+        airBattle = _airBattle;
+        treasury = _treasuryAddress;
+        fighters = _fightersAddress;
+        infrastructure = _infrastructure;
+        war = _war;
+    }
 
     modifier onlyCountryMinter() {
         require(msg.sender == countryMinter, "only countryMinter can call");
@@ -90,7 +93,7 @@ contract BombersContract is Ownable {
 
     modifier onlyMarket() {
         require(
-            msg.sender == bombersMarket,
+            msg.sender == bombersMarket1 || msg.sender == bombersMarket2,
             "this function can only be called by market"
         );
         _;
@@ -104,11 +107,12 @@ contract BombersContract is Ownable {
         mint = CountryMinter(_countryMinter);
     }
 
-    function updateBombersMarketAddress(address _bombersMarket)
+    function updateBombersMarketAddresses(address _bombersMarket1, address _bombersMarket2)
         public
         onlyOwner
     {
-        bombersMarket = _bombersMarket;
+        bombersMarket1 = _bombersMarket1;
+        bombersMarket2 = _bombersMarket2;
     }
 
     function updateAirBattleAddress(address _airBattle) public onlyOwner {
@@ -664,6 +668,7 @@ contract BombersMarketplace1 is Ownable {
     address public countryMinter;
     address public bombers1;
     address public fighters;
+    address public fightersMarket1;
     address public infrastructure;
     address public treasury;
     uint256 public ah1CobraCost = 10000;
@@ -684,28 +689,32 @@ contract BombersMarketplace1 is Ownable {
 
     CountryMinter mint;
     FightersContract fight;
+    FightersMarketplace1 fightMarket1;
     InfrastructureContract inf;
     TreasuryContract tsy;
     BombersContract bomb1;
 
-    // constructor(
-    //     address _countryMinter,
-    //     address _bombers1,
-    //     address _fighters,
-    //     address _infrastructure,
-    //     address _treasury
-    // ) {
-    //     countryMinter = _countryMinter;
-    //     mint = CountryMinter(_countryMinter);
-    //     bombers1 = _bombers1;
-    //     bomb1 = BombersContract(_bombers1);
-    //     fighters = _fighters;
-    //     fight = FightersContract(_fighters);
-    //     infrastructure = _infrastructure;
-    //     inf = InfrastructureContract(_infrastructure);
-    //     treasury = _treasury;
-    //     tsy = TreasuryContract(_treasury);
-    // }
+    function settings (
+        address _countryMinter,
+        address _bombers1,
+        address _fighters,
+        address _fightersMarket1,
+        address _infrastructure,
+        address _treasury
+    ) public onlyOwner {
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
+        bombers1 = _bombers1;
+        bomb1 = BombersContract(_bombers1);
+        fighters = _fighters;
+        fight = FightersContract(_fighters);
+        fightersMarket1 = _fightersMarket1;
+        fightMarket1 = FightersMarketplace1(_fightersMarket1);
+        infrastructure = _infrastructure;
+        inf = InfrastructureContract(_infrastructure);
+        treasury = _treasury;
+        tsy = TreasuryContract(_treasury);
+    }
 
     mapping(uint256 => address) public idToOwnerBombersMarket;
 
@@ -800,7 +809,7 @@ contract BombersMarketplace1 is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 aircraftCount = fight.getAircraftCount(id);
-        uint256 maxAircraft = fight.getMaxAircraftCount(id);
+        uint256 maxAircraft = fightMarket1.getMaxAircraftCount(id);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = inf.getInfrastructureCount(id);
         require(
@@ -821,7 +830,7 @@ contract BombersMarketplace1 is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 aircraftCount = fight.getAircraftCount(id);
-        uint256 maxAircraft = fight.getMaxAircraftCount(id);
+        uint256 maxAircraft = fightMarket1.getMaxAircraftCount(id);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = inf.getInfrastructureCount(id);
         require(
@@ -842,7 +851,7 @@ contract BombersMarketplace1 is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 aircraftCount = fight.getAircraftCount(id);
-        uint256 maxAircraft = fight.getMaxAircraftCount(id);
+        uint256 maxAircraft = fightMarket1.getMaxAircraftCount(id);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = inf.getInfrastructureCount(id);
         require(
@@ -863,7 +872,7 @@ contract BombersMarketplace1 is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 aircraftCount = fight.getAircraftCount(id);
-        uint256 maxAircraft = fight.getMaxAircraftCount(id);
+        uint256 maxAircraft = fightMarket1.getMaxAircraftCount(id);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = inf.getInfrastructureCount(id);
         require(
@@ -884,7 +893,7 @@ contract BombersMarketplace1 is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 aircraftCount = fight.getAircraftCount(id);
-        uint256 maxAircraft = fight.getMaxAircraftCount(id);
+        uint256 maxAircraft = fightMarket1.getMaxAircraftCount(id);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = inf.getInfrastructureCount(id);
         require(
@@ -906,6 +915,7 @@ contract BombersMarketplace2 is Ownable {
     address public countryMinter;
     address public bombers1;
     address public fighters;
+    address public fightersMarket1;
     address public infrastructure;
     address public treasury;
     uint256 public b52StratofortressCost = 35000;
@@ -923,23 +933,27 @@ contract BombersMarketplace2 is Ownable {
 
     CountryMinter mint;
     FightersContract fight;
+    FightersMarketplace1 fightMarket1;
     InfrastructureContract inf;
     TreasuryContract tsy;
     BombersContract bomb1;
 
-    constructor(
+    function settings (
         address _countryMinter,
         address _bombers1,
         address _fighters,
+        address _fightersMarket1,
         address _infrastructure,
         address _treasury
-    ) {
+    ) public onlyOwner {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
         bombers1 = _bombers1;
         bomb1 = BombersContract(_bombers1);
         fighters = _fighters;
         fight = FightersContract(_fighters);
+        fightersMarket1 = _fightersMarket1;
+        fightMarket1 = FightersMarketplace1(_fightersMarket1);
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
         treasury = _treasury;
@@ -1029,7 +1043,7 @@ contract BombersMarketplace2 is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 aircraftCount = fight.getAircraftCount(id);
-        uint256 maxAircraft = fight.getMaxAircraftCount(id);
+        uint256 maxAircraft = fightMarket1.getMaxAircraftCount(id);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = inf.getInfrastructureCount(id);
         require(
@@ -1050,7 +1064,7 @@ contract BombersMarketplace2 is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 aircraftCount = fight.getAircraftCount(id);
-        uint256 maxAircraft = fight.getMaxAircraftCount(id);
+        uint256 maxAircraft = fightMarket1.getMaxAircraftCount(id);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = inf.getInfrastructureCount(id);
         require(
@@ -1071,7 +1085,7 @@ contract BombersMarketplace2 is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 aircraftCount = fight.getAircraftCount(id);
-        uint256 maxAircraft = fight.getMaxAircraftCount(id);
+        uint256 maxAircraft = fightMarket1.getMaxAircraftCount(id);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = inf.getInfrastructureCount(id);
         require(
@@ -1092,7 +1106,7 @@ contract BombersMarketplace2 is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 aircraftCount = fight.getAircraftCount(id);
-        uint256 maxAircraft = fight.getMaxAircraftCount(id);
+        uint256 maxAircraft = fightMarket1.getMaxAircraftCount(id);
         require((aircraftCount + amount) <= maxAircraft, "too many aircraft");
         uint256 callerInfra = inf.getInfrastructureCount(id);
         require(

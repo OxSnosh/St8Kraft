@@ -110,13 +110,13 @@ contract WondersContract1 is Ownable {
         _;
     }
 
-    constructor(
+    function settings(
         address _treasuryAddress,
         address _wonderContract2Address,
         address _wonderContract3Address,
         address _wonderContract4Address,
         address _infrastructureAddress
-    ) {
+    ) public onlyOwner {
         treasuryAddress = _treasuryAddress;
         wondersContract2Address = _wonderContract2Address;
         wondersContract3Address = _wonderContract3Address;
@@ -652,9 +652,18 @@ contract WondersContract2 is Ownable {
     mapping(uint256 => Wonders2) public idToWonders2;
     mapping(uint256 => address) public idToOwnerWonders2;
 
-    constructor(address _treasuryAddress, address _infrastructureAddress) {
-        treasuryAddress = _treasuryAddress;
-        infrastructureAddress = _infrastructureAddress;
+    function settings(
+        address _treasury,
+        address _infrastructure,
+        address _wonders1,
+        address _wonders3,
+        address _wonders4
+    ) public onlyOwner {
+        treasuryAddress = _treasury;
+        infrastructureAddress = _infrastructure;
+        wonderContract1Address = _wonders1;
+        wonderContract3Address = _wonders3;
+        wonderContract4Address = _wonders4;
     }
 
     function updateTreasuryAddress(address _newTreasuryAddress)
@@ -1234,8 +1243,8 @@ contract WondersContract3 is Ownable {
         //The nuclear power plant allows nations to receive Uranium financial bonus
         //DONE //(+$3 citizen income +$0.15 per technology level up to 30 technology levels. Requires an active Uranium trade.)
         //even when maintaining nuclear weaponry.
-        //DONE //The nuclear power plant by itself, even without a Uranium trade, reduces infrastructure upkeep -5%, 
-        //DONE //national wonder upkeep -5%, 
+        //DONE //The nuclear power plant by itself, even without a Uranium trade, reduces infrastructure upkeep -5%,
+        //DONE //national wonder upkeep -5%,
         //DONE //and improvement upkeep -5%.
         //Requires 12,000 infrastructure, 1,000 technology, and a Uranium resource to build.
         //Nations that develop the Nuclear Power Plant must keep their government position on nuclear weapons set to option 2 or 3.
@@ -1252,9 +1261,9 @@ contract WondersContract3 is Ownable {
         bool politicalLobbyists;
         //Scientific Development Center -
         //$150,000,000 -
-        //DONE //The scientific development center increases the productivity of your factories from 
+        //DONE //The scientific development center increases the productivity of your factories from
         //DONE //-8% infrastructure cost to -10% infrastructure cost,
-        //DONE //increases the productivity of your universities from 
+        //DONE //increases the productivity of your universities from
         //DONE //+8% citizen income to +10% citizen income,
         //DONE //allows the Great University to give its technology happiness bonus up to 5,000 technology levels
         //DONE //(+2 happiness each 1,000 technology levels).
@@ -1265,15 +1274,21 @@ contract WondersContract3 is Ownable {
     mapping(uint256 => Wonders3) public idToWonders3;
     mapping(uint256 => address) public idToOwnerWonders3;
 
-    constructor(
+    function settings (
         address _treasuryAddress,
         address _infrastructureAddress,
-        address _forces
-    ) {
+        address _forces,
+        address _wonders1,
+        address _wonders2,
+        address _wonders4
+    ) public onlyOwner {
         treasuryAddress = _treasuryAddress;
         infrastructureAddress = _infrastructureAddress;
         forces = _forces;
         frc = ForcesContract(_forces);
+        wonderContract1Address = _wonders1;
+        wonderContract2Address = _wonders2;
+        wonderContract4Address = _wonders4;
     }
 
     function updateTreasuryAddress(address _newTreasuryAddress)
@@ -1515,7 +1530,7 @@ contract WondersContract3 is Ownable {
             bool existingWonder = idToWonders3[countryId].nationalWarMemorial;
             require(existingWonder = false, "Already owned");
             uint256 casualties = frc.getCasualties(countryId);
-            require (casualties > 50000, "not enough casualties");
+            require(casualties > 50000, "not enough casualties");
             idToWonders3[countryId].nationalWarMemorial = true;
             WondersContract1(wonderContract1Address).addWonderCount(countryId);
             TreasuryContract(treasuryAddress).spendBalance(
@@ -1836,8 +1851,8 @@ contract WondersContract4 is Ownable {
         bool superiorLogisticalSupport;
         //Universal Health Care -
         //$100,000,000 -
-        //A Universal Health Care program 
-        //DONE //increases population +3% and 
+        //A Universal Health Care program
+        //DONE //increases population +3% and
         //DONE //increases population happiness +2.
         //Requires 11,000 infrastructure, Hospital, National Research Lab.
         bool universalHealthcare;
@@ -1854,16 +1869,20 @@ contract WondersContract4 is Ownable {
     mapping(uint256 => Wonders4) public idToWonders4;
     mapping(uint256 => address) public idToOwnerWonders4;
 
-    constructor(
+    function settings (
         address _treasuryAddress,
         address _improvementsContract2Address,
         address _improvementsContract3Address,
-        address _infrastructureAddress
-    ) {
+        address _infrastructureAddress,
+        address _wonders1,
+        address _wonders3
+    ) public onlyOwner {
         treasuryAddress = _treasuryAddress;
         improvementsContract2Address = _improvementsContract2Address;
         improvementsContract3Address = _improvementsContract3Address;
         infrastructureAddress = _infrastructureAddress;
+        wonderContract1Address = _wonders1;
+        wonderContract3Address = _wonders3;
     }
 
     function updateTreasuryAddress(address _newTreasuryAddress)

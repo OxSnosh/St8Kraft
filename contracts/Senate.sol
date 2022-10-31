@@ -22,11 +22,11 @@ contract SenateContract is Ownable {
 
     uint256[] public sanctionVotes;
 
-    constructor(
+    function settings (
         address _countryMinter,
         address _parameters,
         address _wonders3
-    ) {
+    ) public onlyOwner {
         countryMinter = _countryMinter;
         parameters = _parameters;
         wonders3 = _wonders3;

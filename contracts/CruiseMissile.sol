@@ -55,47 +55,51 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
     constructor(
-        // address _forces,
-        // address _countryMinter,
-        // address _war,
-        // address _infrastructure,
-        // address _missiles,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
         bytes32 gasLane, // keyHash
         uint32 callbackGasLimit
     ) VRFConsumerBaseV2(vrfCoordinatorV2) {
-        // forces = _forces;
-        // force = ForcesContract(_forces);
-        // countryMinter = _countryMinter;
-        // mint = CountryMinter(_countryMinter);
-        // warAddress = _war;
-        // war = WarContract(_war);
-        // infrastructure = _infrastructure;
-        // inf = InfrastructureContract(_infrastructure);
-        // missiles = _missiles;
-        // mis = MissilesContract(_missiles);
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
         i_callbackGasLimit = callbackGasLimit;
     }
 
-    // function constructorContinued(
-    //     address _improvements1,
-    //     address _improvements3,
-    //     address _improvements4,
-    //     address _wonders2
-    // ) public onlyOwner {
-    //     improvements1 = _improvements1;
-    //     imp1 = ImprovementsContract1(_improvements1);
-    //     improvements3 = _improvements3;
-    //     imp3 = ImprovementsContract3(_improvements3);
-    //     improvements4 = _improvements4;
-    //     imp4 = ImprovementsContract4(_improvements4);
-    //     wonders2 = _wonders2;
-    //     won2 = WondersContract2(_wonders2);
-    // }
+    function settings (
+        address _forces,
+        address _countryMinter,
+        address _war,
+        address _infrastructure,
+        address _missiles
+    ) public onlyOwner {
+        forces = _forces;
+        force = ForcesContract(_forces);
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
+        warAddress = _war;
+        war = WarContract(_war);
+        infrastructure = _infrastructure;
+        inf = InfrastructureContract(_infrastructure);
+        missiles = _missiles;
+        mis = MissilesContract(_missiles);
+    }
+
+    function settings2 (
+        address _improvements1,
+        address _improvements3,
+        address _improvements4,
+        address _wonders2
+    ) public onlyOwner {
+        improvements1 = _improvements1;
+        imp1 = ImprovementsContract1(_improvements1);
+        improvements3 = _improvements3;
+        imp3 = ImprovementsContract3(_improvements3);
+        improvements4 = _improvements4;
+        imp4 = ImprovementsContract4(_improvements4);
+        wonders2 = _wonders2;
+        won2 = WondersContract2(_wonders2);
+    }
 
     function updateForcesContract(address newAddress) public onlyOwner {
         forces = newAddress;

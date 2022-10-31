@@ -128,7 +128,7 @@ contract WarContract is Ownable {
     mapping(uint256 => uint256[]) public idToActiveWars;
     mapping(uint256 => uint256[]) public idToOffensiveWars;
 
-    constructor(
+    function settings (
         address _countryMinter,
         address _nationStrength,
         address _military,
@@ -139,7 +139,7 @@ contract WarContract is Ownable {
         address _forces,
         address _wonders1,
         address _keeper
-    ) {
+    ) public onlyOwner {
         countryMinter = _countryMinter;
         nationStrength = _nationStrength;
         navyBattleAddress = _navyBattleAddress;

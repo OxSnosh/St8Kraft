@@ -43,54 +43,53 @@ contract BillsContract is Ownable {
 
     mapping(uint256 => address) public idToOwnerBills;
 
-    constructor(
-        // address _countryMinter,
-        // address _treasury,
-        // address _wonders1,
-        // address _wonders2,
-        // address _wonders3,
-        // address _infrastructure,
-        // address _forces,
-        // address _fighters
-        // address _navy,
-        // address _resources
-    ) {
-        // countryMinter = _countryMinter;
-        // treasury = _treasury;
-        // tsy = TreasuryContract(_treasury);
-        // wonders1 = _wonders1;
-        // won1 = WondersContract1(_wonders1);
-        // wonders2 = _wonders2;
-        // won2 = WondersContract2(_wonders2);
-        // wonders3 = _wonders3;
-        // won3 = WondersContract3(_wonders3);
-        // infrastructure = _infrastructure;
-        // inf = InfrastructureContract(_infrastructure);
-        // forces = _forces;
-        // frc = ForcesContract(_forces);
-        // fighters = _fighters;
-        // fight = FightersContract(_fighters);
-        // navy = _navy;
-        // nav = NavyContract(_navy);
-        // resources = _resources;
-        // res = ResourcesContract(_resources);
-
+    function settings (
+        address _countryMinter,
+        address _treasury,
+        address _wonders1,
+        address _wonders2,
+        address _wonders3,
+        address _infrastructure,
+        address _forces,
+        address _fighters,
+        address _navy,
+        address _resources
+    ) public onlyOwner {
+        countryMinter = _countryMinter;
+        treasury = _treasury;
+        tsy = TreasuryContract(_treasury);
+        wonders1 = _wonders1;
+        won1 = WondersContract1(_wonders1);
+        wonders2 = _wonders2;
+        won2 = WondersContract2(_wonders2);
+        wonders3 = _wonders3;
+        won3 = WondersContract3(_wonders3);
+        infrastructure = _infrastructure;
+        inf = InfrastructureContract(_infrastructure);
+        forces = _forces;
+        frc = ForcesContract(_forces);
+        fighters = _fighters;
+        fight = FightersContract(_fighters);
+        navy = _navy;
+        nav = NavyContract(_navy);
+        resources = _resources;
+        res = ResourcesContract(_resources);
     }
 
-    function constructorContinued (
-        // address _improvements1,
-        // address _improvements2,
-        // address _missiles,
-        // address _wonders4
+    function settings2 (
+        address _improvements1,
+        address _improvements2,
+        address _missiles,
+        address _wonders4
     ) public onlyOwner {
-        // improvements1 = _improvements1;
-        // imp1 = ImprovementsContract1(_improvements1);
-        // improvements2 = _improvements2;
-        // imp2 = ImprovementsContract2(_improvements2);
-        // missiles = _missiles;
-        // mis = MissilesContract(_missiles);
-        // wonders4 = _wonders4;
-        // won4 = WondersContract4(_wonders4);
+        improvements1 = _improvements1;
+        imp1 = ImprovementsContract1(_improvements1);
+        improvements2 = _improvements2;
+        imp2 = ImprovementsContract2(_improvements2);
+        missiles = _missiles;
+        mis = MissilesContract(_missiles);
+        wonders4 = _wonders4;
+        won4 = WondersContract4(_wonders4);
     }
 
     function updateCountryMinter(address newAddress) public onlyOwner {
