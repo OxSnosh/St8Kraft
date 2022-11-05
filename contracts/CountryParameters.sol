@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity 0.8.7;
 
+import "./CountryMinter.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -9,6 +10,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     uint256 private parametersId;
     address public spyAddress;
     uint256[] private s_randomWords;
+    address public countryMinter;
 
     //chainlink variables
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
@@ -17,6 +19,8 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     uint32 private immutable i_callbackGasLimit;
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
     uint32 private constant NUM_WORDS = 2;
+
+    CountryMinter mint;
 
     struct CountryParameters {
         uint256 id;
@@ -43,17 +47,14 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
     mapping(uint256 => uint256) private idToReligionPreference;
     mapping(uint256 => uint256) private idToGovernmentPreference;
-    mapping(uint256 => address) public idToOwnerParameters;
+    // mapping(uint256 => address) public idToOwnerParameters;
 
-    /* Functions */
     constructor(
-        // address _spyAddress,
         address vrfCoordinatorV2,
         uint64 subscriptionId,
-        bytes32 gasLane, // keyHash
+        bytes32 gasLane,
         uint32 callbackGasLimit
     ) VRFConsumerBaseV2(vrfCoordinatorV2) {
-        // spyAddress = _spyAddress;
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
         i_gasLane = gasLane;
         i_subscriptionId = subscriptionId;
@@ -87,7 +88,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         );
         CountrySettings memory newCountrySettings = CountrySettings(
             block.timestamp,
-            "Alliance",
+            "No Alliance Yet",
             0,
             0,
             0,
@@ -96,7 +97,6 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         );
         idToCountryParameters[id] = newCountryParameters;
         idToCountrySettings[id] = newCountrySettings;
-        idToOwnerParameters[id] = nationOwner;
         fulfillRequest(id);
     }
 
@@ -126,63 +126,49 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     }
 
     function setRulerName(string memory newRulerName, uint256 id) public {
-        require(
-            idToOwnerParameters[id] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require (isOwner, "!nation owner");
         idToCountryParameters[id].rulerName = newRulerName;
     }
 
     function setNationName(string memory newNationName, uint256 id) public {
-        require(
-            idToOwnerParameters[id] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require (isOwner, "!nation owner");
         idToCountryParameters[id].nationName = newNationName;
     }
 
     function setCapitalCity(string memory newCapitalCity, uint256 id) public {
-        require(
-            idToOwnerParameters[id] == msg.sender,
-            "This account is not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require (isOwner, "!nation owner");
         idToCountryParameters[id].capitalCity = newCapitalCity;
     }
 
     function setNationSlogan(string memory newNationSlogan, uint256 id) public {
-        require(
-            idToOwnerParameters[id] == msg.sender,
-            "This account is not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require (isOwner, "!nation owner");
         idToCountryParameters[id].nationSlogan = newNationSlogan;
     }
 
     function setAlliance(string memory newAlliance, uint256 id) public {
-        require(
-            idToOwnerParameters[id] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require (isOwner, "!nation owner");
         idToCountrySettings[id].alliance = newAlliance;
     }
 
     function setTeam(uint256 id, uint256 newTeam) public {
-        require(
-            idToOwnerParameters[id] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require (isOwner, "!nation owner");
         idToCountrySettings[id].nationTeam = newTeam;
     }
 
     function setGovernment(uint256 id, uint256 newType) public {
-        require(
-            idToOwnerParameters[id] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require (isOwner, "!nation owner");
         uint256 daysSinceChange = idToCountrySettings[id]
             .daysSinceGovernmentChenge;
         require(daysSinceChange >= 3, "need to wait 3 days before changing");
         require(newType <= 10, "invalid type");
-        idToCountrySettings[id].governmentType = newType;
+        idToCountrySettings[id].governmentType = newType;        
         idToCountrySettings[id].daysSinceGovernmentChenge = 0;
     }
 
@@ -191,10 +177,8 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     }
 
     function setReligion(uint256 id, uint256 newType) public {
-        require(
-            idToOwnerParameters[id] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require (isOwner, "!nation owner");
         uint256 daysSinceChange = idToCountrySettings[id]
             .daysSinceReligionChange;
         require(daysSinceChange >= 3, "need to wait 3 days before changing");
@@ -217,27 +201,27 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     }
 
     function getRulerName(uint256 countryId) public view returns (string memory) {
-        string storage ruler = idToCountryParameters[countryId].rulerName;
+        string memory ruler = idToCountryParameters[countryId].rulerName;
         return ruler;
     }
 
     function getNationName(uint256 countryId) public view returns (string memory) {
-        string storage nationName = idToCountryParameters[countryId].nationName;
+        string memory nationName = idToCountryParameters[countryId].nationName;
         return nationName;
     }
 
     function getCapital(uint256 countryId) public view returns (string memory) {
-        string storage capital = idToCountryParameters[countryId].capitalCity;
+        string memory capital = idToCountryParameters[countryId].capitalCity;
         return capital;
     }
 
     function getSlogan(uint256 countryId) public view returns (string memory) {
-        string storage slogan = idToCountryParameters[countryId].nationSlogan;
+        string memory slogan = idToCountryParameters[countryId].nationSlogan;
         return slogan;
     }
 
     function getAlliance(uint256 countryId) public view returns (string memory) {
-        string storage alliance = idToCountrySettings[countryId].alliance;
+        string memory alliance = idToCountrySettings[countryId].alliance;
         return alliance;
     }
 

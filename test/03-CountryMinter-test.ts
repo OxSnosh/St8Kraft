@@ -787,11 +787,13 @@ describe("CountryMinter", function () {
             treasurycontract.address,
             infrastructurecontract.address,
             resourcescontract.address,
-            aidcontract.address)
+            aidcontract.address,
+            missilescontract.address)
         countryminter.settings2(
             improvementscontract1.address,
             improvementscontract2.address,
             improvementscontract3.address,
+            improvementscontract4.address,
             wonderscontract1.address,
             wonderscontract2.address,
             wonderscontract3.address,

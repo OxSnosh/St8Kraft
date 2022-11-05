@@ -5,6 +5,7 @@ import "./Treasury.sol";
 import "./Navy.sol";
 import "./Forces.sol";
 import "./Wonders.sol";
+import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract ImprovementsContract1 is Ownable {
@@ -14,6 +15,7 @@ contract ImprovementsContract1 is Ownable {
     address public improvements4;
     address public wonders1;
     address public navy;
+    address public countryMinter;
     uint256 public airportCost = 100000;
     uint256 public bankCost = 100000;
     uint256 public barracksCost = 50000;
@@ -27,6 +29,7 @@ contract ImprovementsContract1 is Ownable {
     uint256 public factoryCost = 150000;
 
     WondersContract1 won1;
+    CountryMinter mint;
 
     struct Improvements1 {
         uint256 improvementCount;
@@ -103,7 +106,6 @@ contract ImprovementsContract1 is Ownable {
     }
 
     mapping(uint256 => Improvements1) public idToImprovements1;
-    mapping(uint256 => address) public idToOwnerImprovements1;
 
     function settings (
         address _treasury,
@@ -153,7 +155,7 @@ contract ImprovementsContract1 is Ownable {
         navy = _navy;
     }
 
-    function generateImprovements(uint256 id, address nationOwner) public {
+    function generateImprovements(uint256 id) public {
         Improvements1 memory newImprovements1 = Improvements1(
             0,
             0,
@@ -169,7 +171,6 @@ contract ImprovementsContract1 is Ownable {
             0
         );
         idToImprovements1[id] = newImprovements1;
-        idToOwnerImprovements1[id] = nationOwner;
     }
 
     function updateAirportCost(uint256 newPrice) public onlyOwner {
@@ -237,10 +238,8 @@ contract ImprovementsContract1 is Ownable {
         uint256 countryId,
         uint256 improvementId
     ) public {
-        require(
-            idToOwnerImprovements1[countryId] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(countryId, msg.sender);
+        require (isOwner, "!nation owner");
         require(improvementId <= 11, "Invalid improvement ID");
         uint256 balance = TreasuryContract(treasury).checkBalance(
             countryId
@@ -421,10 +420,8 @@ contract ImprovementsContract1 is Ownable {
         uint256 countryId,
         uint256 improvementId
     ) public {
-        require(
-            idToOwnerImprovements1[countryId] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(countryId, msg.sender);
+        require (isOwner, "!nation owner");
         require(improvementId <= 11, "Invalid improvement ID");
         if (improvementId == 1) {
             uint256 existingCount = idToImprovements1[countryId].airportCount;
@@ -593,6 +590,7 @@ contract ImprovementsContract2 is Ownable {
     address public improvements1;
     address public forces;
     address public wonders1;
+    address public countryMinter;
     uint256 public foreignMinistryCost = 120000;
     uint256 public forwardOperatingBaseCost = 125000;
     uint256 public guerillaCampCost = 20000;
@@ -603,6 +601,7 @@ contract ImprovementsContract2 is Ownable {
     uint256 public laborCampCost = 150000;
 
     WondersContract1 won1;
+    CountryMinter mint;
 
     struct Improvements2 {
         //Foreign Ministry
@@ -661,7 +660,6 @@ contract ImprovementsContract2 is Ownable {
     }
 
     mapping(uint256 => Improvements2) public idToImprovements2;
-    mapping(uint256 => address) public idToOwnerImprovements2;
 
     function settings (
         address _treasury,
@@ -697,7 +695,7 @@ contract ImprovementsContract2 is Ownable {
         forces = _forces;
     }
 
-    function generateImprovements(uint256 id, address nationOwner) public {
+    function generateImprovements(uint256 id) public {
         Improvements2 memory newImprovements2 = Improvements2(
             0,
             0,
@@ -709,7 +707,6 @@ contract ImprovementsContract2 is Ownable {
             0
         );
         idToImprovements2[id] = newImprovements2;
-        idToOwnerImprovements2[id] = nationOwner;
     }
 
     function updateForeignMinistryCost(uint256 newPrice) public onlyOwner {
@@ -749,10 +746,8 @@ contract ImprovementsContract2 is Ownable {
         uint256 countryId,
         uint256 improvementId
     ) public {
-        require(
-            idToOwnerImprovements2[countryId] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(countryId, msg.sender);
+        require (isOwner, "!nation owner");
         require(improvementId <= 12, "Invalid improvement ID");
         uint256 balance = TreasuryContract(treasury).checkBalance(
             countryId
@@ -912,10 +907,8 @@ contract ImprovementsContract2 is Ownable {
         uint256 countryId,
         uint256 improvementId
     ) public {
-        require(
-            idToOwnerImprovements2[countryId] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(countryId, msg.sender);
+        require (isOwner, "!nation owner");
         require(improvementId <= 12, "Invalid improvement ID");
         if (improvementId == 1) {
             uint256 existingCount = idToImprovements2[countryId]
@@ -1107,6 +1100,7 @@ contract ImprovementsContract4 is Ownable {
     address public improvements1;
     address public improvements2;
     address public forces;
+    address public countryMinter;
     uint256 public missileDefenseCost = 90000;
     uint256 public munitionsFactoryCost = 200000;
     uint256 public navalAcademyCost = 300000;
@@ -1114,6 +1108,7 @@ contract ImprovementsContract4 is Ownable {
 
     WondersContract1 won1;
     ImprovementsContract2 imp2;
+    CountryMinter mint;
 
     struct Improvements4 {
         //Missile Defense
@@ -1147,7 +1142,6 @@ contract ImprovementsContract4 is Ownable {
     }
 
     mapping(uint256 => Improvements4) public idToImprovements4;
-    mapping(uint256 => address) public idToOwnerImprovements4;
 
     function settings (
         address _treasury,
@@ -1184,10 +1178,9 @@ contract ImprovementsContract4 is Ownable {
         forces = _forces;
     }
 
-    function generateImprovements(uint256 id, address nationOwner) public {
+    function generateImprovements(uint256 id) public {
         Improvements4 memory newImprovements4 = Improvements4(0, 0, 0, 0);
         idToImprovements4[id] = newImprovements4;
-        idToOwnerImprovements4[id] = nationOwner;
     }
 
     function updateMissileDefenseCost(uint256 newPrice) public onlyOwner {
@@ -1214,10 +1207,8 @@ contract ImprovementsContract4 is Ownable {
         uint256 countryId,
         uint256 improvementId
     ) public {
-        require(
-            idToOwnerImprovements4[countryId] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(countryId, msg.sender);
+        require (isOwner, "!nation owner");
         require(improvementId <= 12, "Invalid improvement ID");
         uint256 balance = TreasuryContract(treasury).checkBalance(
             countryId
@@ -1307,10 +1298,8 @@ contract ImprovementsContract4 is Ownable {
         uint256 countryId,
         uint256 improvementId
     ) public {
-        require(
-            idToOwnerImprovements4[countryId] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(countryId, msg.sender);
+        require (isOwner, "!nation owner");
         require(improvementId <= 12, "Invalid improvement ID");
         if (improvementId == 1) {
             uint256 existingCount = idToImprovements4[countryId]
@@ -1406,6 +1395,7 @@ contract ImprovementsContract3 is Ownable {
     address public improvements1;
     address public improvements2;
     address public navy;
+    address public countryMinter;
     uint256 public officeOfPropagandaCost = 200000;
     uint256 public policeHeadquartersCost = 75000;
     uint256 public prisonCost = 200000;
@@ -1417,6 +1407,8 @@ contract ImprovementsContract3 is Ownable {
     uint256 public shipyardCost = 100000;
     uint256 public stadiumCost = 110000;
     uint256 public universityCost = 180000;
+
+    CountryMinter mint;
 
     struct Improvements3 {
         //Office of Propoganda
@@ -1489,7 +1481,6 @@ contract ImprovementsContract3 is Ownable {
     }
 
     mapping(uint256 => Improvements3) public idToImprovements3;
-    mapping(uint256 => address) public idToOwnerImprovements3;
 
     function settings (address _treasury) public onlyOwner {
         treasury = _treasury;
@@ -1521,7 +1512,7 @@ contract ImprovementsContract3 is Ownable {
         navy = _navy;
     }
 
-    function generateImprovements(uint256 id, address nationOwner) public {
+    function generateImprovements(uint256 id) public {
         Improvements3 memory newImprovements3 = Improvements3(
             0,
             0,
@@ -1536,7 +1527,6 @@ contract ImprovementsContract3 is Ownable {
             0
         );
         idToImprovements3[id] = newImprovements3;
-        idToOwnerImprovements3[id] = nationOwner;
     }
 
     function updateOfficeOfPropagandaCost(uint256 newPrice) public onlyOwner {
@@ -1594,10 +1584,8 @@ contract ImprovementsContract3 is Ownable {
         uint256 countryId,
         uint256 improvementId
     ) public {
-        require(
-            idToOwnerImprovements3[countryId] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(countryId, msg.sender);
+        require (isOwner, "!nation owner");
         require(improvementId <= 12, "Invalid improvement ID");
         uint256 balance = TreasuryContract(treasury).checkBalance(
             countryId
@@ -1813,10 +1801,8 @@ contract ImprovementsContract3 is Ownable {
         uint256 countryId,
         uint256 improvementId
     ) public {
-        require(
-            idToOwnerImprovements3[countryId] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(countryId, msg.sender);
+        require (isOwner, "!nation owner");
         require(improvementId <= 12, "Invalid improvement ID");
         if (improvementId == 1) {
             uint256 existingCount = idToImprovements3[countryId]

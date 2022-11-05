@@ -7,6 +7,7 @@ import "./Bombers.sol";
 import "./Infrastructure.sol";
 import "./Forces.sol";
 import "./Wonders.sol";
+import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
@@ -21,6 +22,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
     address missiles;
     address wonders1;
     address fighterLosses;
+    address countryMinter;
     //fighter strength
     uint256 yak9Strength = 1;
     uint256 p51MustangStrength = 2;
@@ -50,6 +52,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
     MissilesContract mis;
     WondersContract1 won1;
     FighterLosses fighterLoss;
+    CountryMinter mint;
 
     struct FightersToBattle {
         uint256 yak9Count;
@@ -168,6 +171,8 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 attackerId,
         uint256 defenderId
     ) internal {
+        bool isOwner = mint.checkOwnership(attackerId, msg.sender);
+        require (isOwner, "!nation owner");
         bool isActiveWar = war.isWarActive(warId);
         require(isActiveWar, "!not active war");
         (uint256 warOffense, uint256 warDefense) = war.getInvolvedParties(

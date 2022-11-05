@@ -249,7 +249,7 @@ contract AidContract is Ownable {
         );
         bool cancelled = idToProposal[proposalId].cancelled;
         require(cancelled == false, "trade already cancelled");
-        bool accepted = idToProposal[proposalId].cancelled;
+        bool accepted = idToProposal[proposalId].accepted;
         require(accepted == false, "trade already accepted");
         bool expired = proposalExpired(proposalId);
         require(expired == false, "trade already expired");

@@ -9,6 +9,7 @@ import "./Fighters.sol";
 import "./Navy.sol";
 import "./Improvements.sol";
 import "./Resources.sol";
+import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract BillsContract is Ownable {
@@ -40,6 +41,7 @@ contract BillsContract is Ownable {
     ImprovementsContract2 imp2;
     ResourcesContract res;
     MissilesContract mis;
+    CountryMinter mint;
 
     mapping(uint256 => address) public idToOwnerBills;
 
@@ -56,6 +58,7 @@ contract BillsContract is Ownable {
         address _resources
     ) public onlyOwner {
         countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
         treasury = _treasury;
         tsy = TreasuryContract(_treasury);
         wonders1 = _wonders1;
@@ -169,16 +172,10 @@ contract BillsContract is Ownable {
         _;
     }
 
-    function initiateBills(uint256 id, address nationOwner)
-        public
-        onlyCountryMinter
-    {
-        idToOwnerBills[id] = nationOwner;
-    }
-
     //need to reduce by a percentage for blockades
     function payBills(uint256 id) public {
-        require(idToOwnerBills[id] == msg.sender, "!nation owner");
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require (isOwner, "!nation owner");
         uint256 availableFunds = tsy.checkBalance(id);
         uint256 billsPayable = getBillsPayable(id);
         require(

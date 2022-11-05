@@ -47,7 +47,6 @@ contract BombersContract is Ownable {
 
     mapping(uint256 => DefendingBombers) public idToDefendingBombers;
     mapping(uint256 => DeployedBombers) public idToDeployedBombers;
-    mapping(uint256 => address) public idToOwnerBombers;
 
     function settings (
         address _countryMinter,
@@ -138,7 +137,7 @@ contract BombersContract is Ownable {
         war = _war;
     }
 
-    function generateBombers(uint256 id, address nationOwner)
+    function generateBombers(uint256 id)
         public
         onlyCountryMinter
     {
@@ -168,7 +167,6 @@ contract BombersContract is Ownable {
             0
         );
         idToDeployedBombers[id] = newDeployedBombers;
-        idToOwnerBombers[id] = nationOwner;
     }
 
     function getBomberCount(uint256 id) public view returns (uint256) {
@@ -716,18 +714,9 @@ contract BombersMarketplace1 is Ownable {
         tsy = TreasuryContract(_treasury);
     }
 
-    mapping(uint256 => address) public idToOwnerBombersMarket;
-
     modifier onlyCountryMinter() {
         require(msg.sender == countryMinter, "only countryMinter can call");
         _;
-    }
-
-    function initiateBombersMarket(uint256 id, address nationOwner)
-        public
-        onlyCountryMinter
-    {
-        idToOwnerBombersMarket[id] = nationOwner;
     }
 
     function updateCountryMinterAddress(address newAddress) public onlyOwner {
@@ -960,18 +949,9 @@ contract BombersMarketplace2 is Ownable {
         tsy = TreasuryContract(_treasury);
     }
 
-    mapping(uint256 => address) public idToOwnerBombersMarket;
-
     modifier onlyCountryMinter() {
         require(msg.sender == countryMinter, "only countryMinter can call");
         _;
-    }
-
-    function initiateBombersMarket(uint256 id, address nationOwner)
-        public
-        onlyCountryMinter
-    {
-        idToOwnerBombersMarket[id] = nationOwner;
     }
 
     function updateCountryMinterAddress(address newAddress) public onlyOwner {

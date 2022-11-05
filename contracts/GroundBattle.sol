@@ -7,6 +7,7 @@ import "./Forces.sol";
 import "./Treasury.sol";
 import "./Improvements.sol";
 import "./Wonders.sol";
+import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
@@ -21,6 +22,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     address improvements3;
     address wonders3;
     address wonders4;
+    address countryMinter;
 
     WarContract war;
     InfrastructureContract inf;
@@ -30,6 +32,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     ImprovementsContract3 imp3;
     WondersContract3 won3;
     WondersContract4 won4;
+    CountryMinter mint;
 
     struct GroundForcesToBattle {
         uint256 attackType;
@@ -144,6 +147,8 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 defenderId,
         uint256 attackType
     ) internal {
+        bool isOwner = mint.checkOwnership(attackerId, msg.sender);
+        require (isOwner, "!nation owner");
         bool isActiveWar = war.isWarActive(warId);
         require(isActiveWar, "!not active war");
         (uint256 warOffense, uint256 warDefense) = war.getInvolvedParties(
@@ -176,7 +181,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     ) internal {
         (uint256 soldiersDeployed, uint256 tanksDeployed) = war
             .getDeployedGroundForces(warId, attackerId);
-        //need efficiency modifier
         uint256 attackerForcesStrength = getAttackerForcesStrength(attackerId, warId);
         GroundForcesToBattle memory newGroundForces = GroundForcesToBattle(
             attackType,

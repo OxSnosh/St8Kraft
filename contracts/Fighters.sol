@@ -125,67 +125,7 @@ contract FightersContract is Ownable {
         _;
     }
 
-    // function updateCountryMinterAddress(address _newAddress) public onlyOwner {
-    //     countryMinter = _newAddress;
-    //     mint = CountryMinter(_newAddress);
-    // }
-
-    // function updateFightersMarketAddress(address _newAddress) public onlyOwner {
-    //     fightersMarket = _newAddress;
-    // }
-
-    // function updateTreasuryAddress(address _newAddress) public onlyOwner {
-    //     treasuryAddress = _newAddress;
-    // }
-
-    // function updateWarAddress(address _newAddress) public onlyOwner {
-    //     war = _newAddress;
-    // }
-
-    // function updateInfrastructureAddress(address _newAddress) public onlyOwner {
-    //     infrastructure = _newAddress;
-    // }
-
-    // function updateResourcesAddress(address _newAddress) public onlyOwner {
-    //     resources = _newAddress;
-    //     res = ResourcesContract(_newAddress);
-    // }
-
-    // function updateImprovementsContract1Address(address _newAddress)
-    //     public
-    //     onlyOwner
-    // {
-    //     improvements1 = _newAddress;
-    //     imp1 = ImprovementsContract1(_newAddress);
-    // }
-
-    // function updateAirBattleAddress(address _newAddress) public onlyOwner {
-    //     airBattle = _newAddress;
-    // }
-
-    // function updateWondersContract1Address(address _newAddress)
-    //     public
-    //     onlyOwner
-    // {
-    //     wonders1 = _newAddress;
-    //     won1 = WondersContract1(_newAddress);
-    // }
-
-    // function updateFighterLossesAddress(address _newAddress) public onlyOwner {
-    //     losses = _newAddress;
-    // }
-
-    // function updateNavyAddress(address _newAddress) public onlyOwner {
-    //     navy = _newAddress;
-    //     nav = NavyContract(_newAddress);
-    // }
-
-    // function updateBombersAddress(address _newAddress) public onlyOwner {
-    //     bombers = _newAddress;
-    //     bomb = BombersContract(_newAddress);
-    // }
-
-    function generateFighters(uint256 id) public {
+    function generateFighters(uint256 id) public onlyCountryMinter {
         DefendingFighters memory newDefendingFighters = DefendingFighters(
             0,
             0,
@@ -231,26 +171,6 @@ contract FightersContract is Ownable {
         uint256 deployedCount = idToDeployedFighters[id].deployedAircraft;
         return deployedCount;
     }
-
-    // function getMaxAircraftCount(uint256 id) public view returns (uint256) {
-    //     uint256 maxAircraftCount = 50;
-    //     bool construction = res.viewConstruction(id);
-    //     if (construction) {
-    //         maxAircraftCount += 10;
-    //     }
-    //     bool foreignAirForceBase = won1.getForeignAirforceBase(id);
-    //     if (foreignAirForceBase) {
-    //         maxAircraftCount += 20;
-    //     }
-    //     uint256 aircraftCarrierCount = nav.getAircraftCarrierCount(id);
-    //     if (aircraftCarrierCount > 5) {
-    //         aircraftCarrierCount = 5;
-    //     }
-    //     if (aircraftCarrierCount > 0) {
-    //         maxAircraftCount += (aircraftCarrierCount * 5);
-    //     }
-    //     return maxAircraftCount;
-    // }
 
     modifier onlyBomberContract() {
         require(msg.sender == bombers);

@@ -97,12 +97,10 @@ contract ForcesContract is Ownable {
     }
 
     mapping(uint256 => Forces) public idToForces;
-    mapping(uint256 => address) public idToOwnerForces;
 
-    function generateForces(uint256 id, address nationOwner) public {
+    function generateForces(uint256 id) public {
         Forces memory newForces = Forces(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, true);
         idToForces[id] = newForces;
-        idToOwnerForces[id] = nationOwner;
     }
 
     function updateInfrastructureContract(address newAddress) public onlyOwner {
@@ -172,10 +170,8 @@ contract ForcesContract is Ownable {
     }
 
     function buySoldiers(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerForces[id] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
         uint256 soldierCost = getSoldierCost(id);
         uint256 purchasePrice = soldierCost * amount;
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
@@ -262,20 +258,12 @@ contract ForcesContract is Ownable {
     }
 
     function withdrawSoldiers(uint256 amountToWithdraw, uint256 id) public {
-        require(
-            idToOwnerForces[id] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
         uint256 deployedSoldierCount = idToForces[id].deployedSoldiers;
         require(deployedSoldierCount >= amountToWithdraw);
         idToForces[id].defendingSoldiers += amountToWithdraw;
         idToForces[id].deployedSoldiers -= amountToWithdraw;
-    }
-
-    //need?
-    function decreaseDefendingSoldierCount(uint256 amount, uint256 id) public {
-        idToForces[id].defendingSoldiers -= amount;
-        idToForces[id].numberOfSoldiers -= amount;
     }
 
     function decreaseDefendingSoldierCountFromNukeAttack(uint256 id)
@@ -301,13 +289,6 @@ contract ForcesContract is Ownable {
                 .numberOfSoldiers -= numberOfDefendingSoldierCasualties;
             idToForces[id].soldierCasualties += numberOfDefendingSoldierCasualties;
         }
-    }
-
-    //called during battle
-    //also needs modifier
-    function decreaseDeployedSoldierCount(uint256 amount, uint256 id) public {
-        idToForces[id].deployedSoldiers -= amount;
-        idToForces[id].numberOfSoldiers -= amount;
     }
 
     function getSoldierCount(uint256 id)
@@ -403,10 +384,8 @@ contract ForcesContract is Ownable {
     }
 
     function buyTanks(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerForces[id] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
         uint256 soldierCost = getSoldierCost(id);
         uint256 purchasePrice = soldierCost * 40;
         uint256 factoryCount = imp1.getFactoryCount(id);
@@ -423,10 +402,8 @@ contract ForcesContract is Ownable {
     }
 
     function deployTanks(uint256 amountToDeploy, uint256 id) public {
-        require(
-            idToOwnerForces[id] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
         uint256 defendingTankCount = idToForces[id].defendingTanks;
         require(defendingTankCount >= amountToDeploy);
         idToForces[id].defendingTanks -= amountToDeploy;
@@ -434,10 +411,8 @@ contract ForcesContract is Ownable {
     }
 
     function withdrawTanks(uint256 amountToWithdraw, uint256 id) public {
-        require(
-            idToOwnerForces[id] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
         uint256 deployedTankCount = idToForces[id].deployedTanks;
         require(deployedTankCount >= amountToWithdraw);
         idToForces[id].defendingTanks += amountToWithdraw;
@@ -489,11 +464,6 @@ contract ForcesContract is Ownable {
         }
     }
 
-    function decreaseDeployedTankCount(uint256 amount, uint256 id) public {
-        idToForces[id].deployedTanks -= amount;
-        idToForces[id].numberOfTanks -= amount;
-    }
-
     function getTankCount(uint256 id) public view returns (uint256 tanks) {
         uint256 tankAmount = idToForces[id].numberOfTanks;
         return tankAmount;
@@ -518,10 +488,8 @@ contract ForcesContract is Ownable {
     }
 
     function buySpies(uint256 amount, uint256 id) public {
-        require(
-            idToOwnerForces[id] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
         uint256 maxSpyCount = getMaxSpyCount(id);
         uint256 currentSpyCount = idToForces[id].numberOfSpies;
         require(
@@ -603,20 +571,14 @@ contract MissilesContract is Ownable {
     uint256 public nukeCost;
     address public countryMinter;
     address public treasury;
-    // address public aid;
     address public spyAddress;
-    // address public cruiseMissile;
-    // address public infrastructure;
     address public resources;
     address public improvements1;
-    // address public improvements2;
     address public wonders1;
     address public wonders2;
     address public wonders4;
     address public nukeAddress;
     address public airBattle;
-    // address public groundBattle;
-    // address public warAddress;
     address public countryinter;
     address public strength;
 
@@ -677,12 +639,10 @@ contract MissilesContract is Ownable {
     }
 
     mapping(uint256 => Missiles) public idToMissiles;
-    mapping(uint256 => address) public idToOwnerMissiles;
 
-    function generateMissiles(uint256 id, address nationOwner) public {
+    function generateMissiles(uint256 id) public {
         Missiles memory newMissiles = Missiles(0, 0, 0);
         idToMissiles[id] = newMissiles;
-        idToOwnerMissiles[id] = nationOwner;
     }
 
     function updateTreasuryContract(address newAddress) public onlyOwner {
@@ -746,14 +706,6 @@ contract MissilesContract is Ownable {
         _;
     }
 
-    // modifier onlyCruiseMissileContract() {
-    //     require(
-    //         msg.sender == cruiseMissile,
-    //         "only callable from cruise missile contract"
-    //     );
-    //     _;
-    // }
-
     modifier onlyNukeContract() {
         require(msg.sender == nukeAddress, "only callable from nuke contract");
         _;
@@ -766,14 +718,6 @@ contract MissilesContract is Ownable {
         );
         _;
     }
-
-    // modifier onlyGroundBattle() {
-    //     require(
-    //         msg.sender == groundBattle,
-    //         "only callable from air battle contract"
-    //     );
-    //     _;
-    // }
 
     function buyCruiseMissiles(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
