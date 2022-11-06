@@ -74,7 +74,7 @@ contract TreasuryContract is Ownable {
         groundBattle = _groundBattle;
     }
 
-    function generateTreasury(uint256 id, address nationOwner) public {
+    function generateTreasury(uint256 id) public {
         Treasury memory newTreasury = Treasury(
             0,
             0,
@@ -88,7 +88,6 @@ contract TreasuryContract is Ownable {
             false
         );
         idToTreasury[id] = newTreasury;
-        idToOwnerTreasury[id] = nationOwner;
         idToTreasury[id].balance += seedMoney;
         counter++;
     }

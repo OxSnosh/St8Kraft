@@ -4,6 +4,7 @@ pragma solidity 0.8.7;
 import "./NationStrength.sol";
 import "./Military.sol";
 import "./Wonders.sol";
+import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract WarContract is Ownable {
@@ -24,6 +25,7 @@ contract WarContract is Ownable {
     NationStrengthContract nsc;
     MilitaryContract mil;
     WondersContract1 won1;
+    CountryMinter mint;
 
     struct War {
         uint256 warId;
@@ -118,7 +120,6 @@ contract WarContract is Ownable {
         uint256 landLost;
     }
 
-    mapping(uint256 => address) public idToOwnerWar;
     mapping(uint256 => War) public warIdToWar;
     mapping(uint256 => OffenseDeployed1) public warIdToOffenseDeployed1;
     mapping(uint256 => OffenseDeployed2) public warIdToOffenseDeployed2;
@@ -143,6 +144,7 @@ contract WarContract is Ownable {
         address _keeper
     ) public onlyOwner {
         countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
         nationStrength = _nationStrength;
         breakBlockadeAddress = _breakBlockadeAddress;
         navalAttackAddress = _navalAttackAddress;
@@ -188,15 +190,9 @@ contract WarContract is Ownable {
         _;
     }
 
-    function initiateNationForWar(uint256 id, address nationOwner)
-        public
-        onlyCountryMinter
-    {
-        idToOwnerWar[id] = nationOwner;
-    }
-
     function declareWar(uint256 offenseId, uint256 defenseId) public {
-        require(idToOwnerWar[offenseId] == msg.sender, "!nation ruler");
+        bool isOwner = mint.checkOwnership(offenseId, msg.sender);
+        require (isOwner, "!nation owner");
         bool isWarOkOffense = mil.getWarPeacePreference(offenseId);
         require(isWarOkOffense == true, "you are in peace mode");
         bool isWarOkDefense = mil.getWarPeacePreference(offenseId);
@@ -336,7 +332,8 @@ contract WarContract is Ownable {
     }
 
     function offerPeace(uint256 offerId, uint256 _warId) public {
-        require(idToOwnerWar[offerId] == msg.sender, "!nation owner");
+        bool isOwner = mint.checkOwnership(offerId, msg.sender);
+        require (isOwner, "!nation owner");
         uint256 offenseNation = warIdToWar[_warId].offenseId;
         uint256 defenseNation = warIdToWar[_warId].defenseId;
         require(

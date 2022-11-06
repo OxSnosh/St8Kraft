@@ -10,6 +10,7 @@ import "./CountryParameters.sol";
 import "./Forces.sol";
 import "./Military.sol";
 import "./Crime.sol";
+import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract TaxesContract is Ownable {
@@ -45,6 +46,7 @@ contract TaxesContract is Ownable {
     MilitaryContract mil;
     CrimeContract crm;
     AdditionalTaxesContract addTax;
+    CountryMinter mint;
 
     function settings1 (
         address _countryMinter,
@@ -56,6 +58,7 @@ contract TaxesContract is Ownable {
         address _additionalTaxes
     ) public onlyOwner {
         countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
         treasury = _treasury;
@@ -181,7 +184,8 @@ contract TaxesContract is Ownable {
     }
 
     function collectTaxes(uint256 id) public {
-        require(idToOwnerTaxes[id] == msg.sender, "!nation owner");
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require (isOwner, "!nation owner");
         uint256 dailyIncomePerCitizen = getDailyIncome(id);
         uint256 daysSinceLastTaxCollection = tsy.getDaysSinceLastTaxCollection(
             id

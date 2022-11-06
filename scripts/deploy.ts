@@ -794,7 +794,8 @@ async function main() {
         infrastructurecontract.address,
         resourcescontract.address,
         aidcontract.address,
-        missilescontract.address)
+        missilescontract.address,
+        senatecontract.address)
     countryminter.settings2(
         improvementscontract1.address,
         improvementscontract2.address,
@@ -1006,7 +1007,8 @@ async function main() {
     keepercontract.settings(
         nukecontract.address,
         aidcontract.address,
-        warcontract.address
+        warcontract.address,
+        treasurycontract.address
     )
 
     landmarketcontract.settings(
@@ -1190,7 +1192,8 @@ async function main() {
         wonderscontract2.address,
         wonderscontract3.address,
         wonderscontract4.address,
-        infrastructurecontract.address
+        infrastructurecontract.address,
+        countryminter.address
     )
 
     wonderscontract2.settings(
@@ -1198,7 +1201,8 @@ async function main() {
         infrastructurecontract.address,
         wonderscontract1.address,
         wonderscontract3.address,
-        wonderscontract4.address
+        wonderscontract4.address,
+        countryminter.address
     )
 
     wonderscontract3.settings(
@@ -1207,7 +1211,8 @@ async function main() {
         forcescontract.address,
         wonderscontract1.address,
         wonderscontract2.address,
-        wonderscontract4.address
+        wonderscontract4.address,
+        countryminter.address
     )
 
     wonderscontract4.settings(
@@ -1216,7 +1221,8 @@ async function main() {
         improvementscontract3.address,
         infrastructurecontract.address,
         wonderscontract1.address,
-        wonderscontract3.address
+        wonderscontract3.address,
+        countryminter.address
     )
 
     console.log("settings initiated");

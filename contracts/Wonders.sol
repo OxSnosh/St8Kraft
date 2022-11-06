@@ -5,6 +5,7 @@ import "./Treasury.sol";
 import "./Infrastructure.sol";
 import "./Improvements.sol";
 import "./Forces.sol";
+import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract WondersContract1 is Ownable {
@@ -13,6 +14,7 @@ contract WondersContract1 is Ownable {
     address public wondersContract3Address;
     address public wondersContract4Address;
     address public infrastructureAddress;
+    address public countryMinter;
     uint256 public agricultureDevelopmentCost = 30000000;
     uint256 public antiAirDefenseNetworkCost = 50000000;
     uint256 public centralIntelligenceAgencyCost = 40000000;
@@ -24,6 +26,8 @@ contract WondersContract1 is Ownable {
     uint256 public foreignAirForceBaseCost = 35000000;
     uint256 public foreignArmyBaseCost = 200000000;
     uint256 public foreignNavalBaseCost = 200000000;
+
+    CountryMinter mint;
 
     struct Wonders1 {
         uint256 wonderCount;
@@ -98,7 +102,6 @@ contract WondersContract1 is Ownable {
     }
 
     mapping(uint256 => Wonders1) public idToWonders1;
-    mapping(uint256 => address) public idToOwnerWonders1;
 
     modifier approvedAddress() {
         require(
@@ -110,18 +113,28 @@ contract WondersContract1 is Ownable {
         _;
     }
 
+    modifier onlyCountryMinter() {
+        require(
+            msg.sender == countryMinter,
+            "only callable from countryMinter"
+        );
+        _;
+    }
+
     function settings(
         address _treasuryAddress,
         address _wonderContract2Address,
         address _wonderContract3Address,
         address _wonderContract4Address,
-        address _infrastructureAddress
+        address _infrastructureAddress,
+        address _countryMinter
     ) public onlyOwner {
         treasuryAddress = _treasuryAddress;
         wondersContract2Address = _wonderContract2Address;
         wondersContract3Address = _wonderContract3Address;
         wondersContract4Address = _wonderContract4Address;
         infrastructureAddress = _infrastructureAddress;
+        countryMinter = _countryMinter;
     }
 
     function updateTreasuryAddress(address _newTreasuryAddress)
@@ -161,7 +174,7 @@ contract WondersContract1 is Ownable {
         idToWonders1[id].wonderCount -= 1;
     }
 
-    function generateWonders1(uint256 id, address nationOwner) public {
+    function generateWonders1(uint256 id) public onlyCountryMinter {
         Wonders1 memory newWonders1 = Wonders1(
             0,
             false,
@@ -177,7 +190,6 @@ contract WondersContract1 is Ownable {
             false
         );
         idToWonders1[id] = newWonders1;
-        idToOwnerWonders1[id] = nationOwner;
     }
 
     function updateAgricultureDevelopmentCost(uint256 newPrice)
@@ -234,10 +246,8 @@ contract WondersContract1 is Ownable {
     }
 
     function buyWonder1(uint256 countryId, uint256 wonderId) public {
-        require(
-            idToOwnerWonders1[countryId] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(countryId, msg.sender);
+        require (isOwner, "!nation owner");
         require(wonderId <= 11, "Invalid improvement ID");
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(
             countryId
@@ -424,10 +434,8 @@ contract WondersContract1 is Ownable {
     }
 
     function deleteWonder1(uint256 countryId, uint256 wonderId) public {
-        require(
-            idToOwnerWonders1[countryId] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(countryId, msg.sender);
+        require (isOwner, "!nation owner");
         require(wonderId <= 11, "Invalid wonder ID");
         if (wonderId == 1) {
             bool existingWonder = idToWonders1[countryId]
@@ -559,6 +567,7 @@ contract WondersContract2 is Ownable {
     address public wonderContract1Address;
     address public wonderContract3Address;
     address public wonderContract4Address;
+    address public countryMinter;
     uint256 public greatMonumentCost = 35000000;
     uint256 public greatTempleCost = 35000000;
     uint256 public greatUniversityCost = 35000000;
@@ -571,6 +580,8 @@ contract WondersContract2 is Ownable {
     uint256 public marsColonyCost = 100000000;
     uint256 public marsMineCost = 100000000;
     uint256 public miningIndustryConsortiumCost = 25000000;
+
+    CountryMinter mint;
 
     struct Wonders2 {
         //Great Monument -
@@ -650,20 +661,22 @@ contract WondersContract2 is Ownable {
     }
 
     mapping(uint256 => Wonders2) public idToWonders2;
-    mapping(uint256 => address) public idToOwnerWonders2;
 
     function settings(
         address _treasury,
         address _infrastructure,
         address _wonders1,
         address _wonders3,
-        address _wonders4
+        address _wonders4,
+        address _countryMinter
     ) public onlyOwner {
         treasuryAddress = _treasury;
         infrastructureAddress = _infrastructure;
         wonderContract1Address = _wonders1;
         wonderContract3Address = _wonders3;
         wonderContract4Address = _wonders4;
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
     }
 
     function updateTreasuryAddress(address _newTreasuryAddress)
@@ -701,7 +714,15 @@ contract WondersContract2 is Ownable {
         infrastructureAddress = _infrastructureAddress;
     }
 
-    function generateWonders2(uint256 id, address nationOwner) public {
+    modifier onlyCountryMinter() {
+        require(
+            msg.sender == countryMinter,
+            "only callable from countryMinter"
+        );
+        _;
+    }
+
+    function generateWonders2(uint256 id) public onlyCountryMinter {
         Wonders2 memory newWonders2 = Wonders2(
             false,
             false,
@@ -717,7 +738,6 @@ contract WondersContract2 is Ownable {
             false
         );
         idToWonders2[id] = newWonders2;
-        idToOwnerWonders2[id] = nationOwner;
     }
 
     function updateGreatMonumentCost(uint256 newPrice) public onlyOwner {
@@ -778,10 +798,8 @@ contract WondersContract2 is Ownable {
     }
 
     function buyWonder2(uint256 countryId, uint256 wonderId) public {
-        require(
-            idToOwnerWonders2[countryId] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(countryId, msg.sender);
+        require (isOwner, "!nation owner");
         require(wonderId <= 12, "Invalid improvement ID");
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(
             countryId
@@ -990,10 +1008,8 @@ contract WondersContract2 is Ownable {
     }
 
     function deleteWonder2(uint256 countryId, uint256 wonderId) public {
-        require(
-            idToOwnerWonders2[countryId] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(countryId, msg.sender);
+        require (isOwner, "!nation owner");
         require(wonderId <= 12, "Invalid wonder ID");
         if (wonderId == 1) {
             bool existingWonder = idToWonders2[countryId].greatMonument;
@@ -1166,6 +1182,7 @@ contract WondersContract3 is Ownable {
     address public wonderContract2Address;
     address public wonderContract4Address;
     address public forces;
+    address public countryMinter;
     uint256 public moonBaseCost = 50000000;
     uint256 public moonColonyCost = 50000000;
     uint256 public moonMineCost = 50000000;
@@ -1180,6 +1197,7 @@ contract WondersContract3 is Ownable {
     uint256 public scientificDevelopmentCenterCost = 150000000;
 
     ForcesContract frc;
+    CountryMinter mint;
 
     struct Wonders3 {
         //Moon Base -
@@ -1272,15 +1290,15 @@ contract WondersContract3 is Ownable {
     }
 
     mapping(uint256 => Wonders3) public idToWonders3;
-    mapping(uint256 => address) public idToOwnerWonders3;
 
-    function settings (
+    function settings(
         address _treasuryAddress,
         address _infrastructureAddress,
         address _forces,
         address _wonders1,
         address _wonders2,
-        address _wonders4
+        address _wonders4,
+        address _countryMinter
     ) public onlyOwner {
         treasuryAddress = _treasuryAddress;
         infrastructureAddress = _infrastructureAddress;
@@ -1289,6 +1307,8 @@ contract WondersContract3 is Ownable {
         wonderContract1Address = _wonders1;
         wonderContract2Address = _wonders2;
         wonderContract4Address = _wonders4;
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
     }
 
     function updateTreasuryAddress(address _newTreasuryAddress)
@@ -1326,7 +1346,15 @@ contract WondersContract3 is Ownable {
         wonderContract4Address = _wonderContract4Address;
     }
 
-    function generateWonders3(uint256 id, address nationOwner) public {
+    modifier onlyCountryMinter() {
+        require(
+            msg.sender == countryMinter,
+            "only callable from countryMinter"
+        );
+        _;
+    }
+
+    function generateWonders3(uint256 id) public onlyCountryMinter {
         Wonders3 memory newWonders3 = Wonders3(
             false,
             false,
@@ -1342,68 +1370,65 @@ contract WondersContract3 is Ownable {
             false
         );
         idToWonders3[id] = newWonders3;
-        idToOwnerWonders3[id] = nationOwner;
     }
 
-    function updateMoonBaseCost(uint256 newPrice) public onlyOwner {
-        moonBaseCost = newPrice;
-    }
+    // function updateMoonBaseCost(uint256 newPrice) public onlyOwner {
+    //     moonBaseCost = newPrice;
+    // }
 
-    function updateMoonColonyCost(uint256 newPrice) public onlyOwner {
-        moonColonyCost = newPrice;
-    }
+    // function updateMoonColonyCost(uint256 newPrice) public onlyOwner {
+    //     moonColonyCost = newPrice;
+    // }
 
-    function updateMoonMineCost(uint256 newPrice) public onlyOwner {
-        moonMineCost = newPrice;
-    }
+    // function updateMoonMineCost(uint256 newPrice) public onlyOwner {
+    //     moonMineCost = newPrice;
+    // }
 
-    function updateMovieIndustryCost(uint256 newPrice) public onlyOwner {
-        movieIndustryCost = newPrice;
-    }
+    // function updateMovieIndustryCost(uint256 newPrice) public onlyOwner {
+    //     movieIndustryCost = newPrice;
+    // }
 
-    function updateNationalCemetaryCost(uint256 newPrice) public onlyOwner {
-        nationalCemetaryCost = newPrice;
-    }
+    // function updateNationalCemetaryCost(uint256 newPrice) public onlyOwner {
+    //     nationalCemetaryCost = newPrice;
+    // }
 
-    function updateNationalEnvironmentOfficeCost(uint256 newPrice)
-        public
-        onlyOwner
-    {
-        nationalEnvironmentOfficeCost = newPrice;
-    }
+    // function updateNationalEnvironmentOfficeCost(uint256 newPrice)
+    //     public
+    //     onlyOwner
+    // {
+    //     nationalEnvironmentOfficeCost = newPrice;
+    // }
 
-    function updateNationalResearchLabCost(uint256 newPrice) public onlyOwner {
-        nationalResearchLabCost = newPrice;
-    }
+    // function updateNationalResearchLabCost(uint256 newPrice) public onlyOwner {
+    //     nationalResearchLabCost = newPrice;
+    // }
 
-    function updateNationalWarMemorialCost(uint256 newPrice) public onlyOwner {
-        nationalWarMemorialCost = newPrice;
-    }
+    // function updateNationalWarMemorialCost(uint256 newPrice) public onlyOwner {
+    //     nationalWarMemorialCost = newPrice;
+    // }
 
-    function updateNuclearPowerPlantCost(uint256 newPrice) public onlyOwner {
-        nuclearPowerPlantCost = newPrice;
-    }
+    // function updateNuclearPowerPlantCost(uint256 newPrice) public onlyOwner {
+    //     nuclearPowerPlantCost = newPrice;
+    // }
 
-    function updatePentagonCost(uint256 newPrice) public onlyOwner {
-        pentagonCost = newPrice;
-    }
+    // function updatePentagonCost(uint256 newPrice) public onlyOwner {
+    //     pentagonCost = newPrice;
+    // }
 
-    function updatePoliticalLobbyistsCost(uint256 newPrice) public onlyOwner {
-        politicalLobbyistsCost = newPrice;
-    }
+    // function updatePoliticalLobbyistsCost(uint256 newPrice) public onlyOwner {
+    //     politicalLobbyistsCost = newPrice;
+    // }
 
-    function updateScientificDevelopmentCenterCost(uint256 newPrice)
-        public
-        onlyOwner
-    {
-        scientificDevelopmentCenterCost = newPrice;
-    }
+    // function updateScientificDevelopmentCenterCost(uint256 newPrice)
+    //     public
+    //     onlyOwner
+    // {
+    //     scientificDevelopmentCenterCost = newPrice;
+    // }
 
     function buyWonder3(uint256 countryId, uint256 wonderId) public {
-        require(
-            idToOwnerWonders3[countryId] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(countryId, msg.sender);
+        require (isOwner, "!nation owner");
         require(wonderId <= 12, "Invalid improvement ID");
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(
             countryId
@@ -1624,10 +1649,8 @@ contract WondersContract3 is Ownable {
     }
 
     function deleteWonder3(uint256 countryId, uint256 wonderId) public {
-        require(
-            idToOwnerWonders3[countryId] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(countryId, msg.sender);
+        require (isOwner, "!nation owner");
         require(wonderId <= 12, "Invalid wonder ID");
         if (wonderId == 1) {
             bool existingWonder = idToWonders3[countryId].moonBase;
@@ -1804,13 +1827,13 @@ contract WondersContract3 is Ownable {
 }
 
 contract WondersContract4 is Ownable {
-    uint256 private wondersId4;
     address public treasuryAddress;
     address public infrastructureAddress;
     address public improvementsContract2Address;
     address public improvementsContract3Address;
     address public wonderContract1Address;
     address public wonderContract3Address;
+    address public countryMinter;
     uint256 public socialSecuritySystemCost = 40000000;
     uint256 public spaceProgramCost = 30000000;
     uint256 public stockMarketCost = 30000000;
@@ -1818,6 +1841,8 @@ contract WondersContract4 is Ownable {
     uint256 public superiorLogisticalSupportCost = 80000000;
     uint256 public universalHealthcareCost = 100000000;
     uint256 public weaponsResearchCenterCost = 150000000;
+
+    CountryMinter mint;
 
     struct Wonders4 {
         //Social Security System -
@@ -1867,15 +1892,15 @@ contract WondersContract4 is Ownable {
     }
 
     mapping(uint256 => Wonders4) public idToWonders4;
-    mapping(uint256 => address) public idToOwnerWonders4;
 
-    function settings (
+    function settings(
         address _treasuryAddress,
         address _improvementsContract2Address,
         address _improvementsContract3Address,
         address _infrastructureAddress,
         address _wonders1,
-        address _wonders3
+        address _wonders3,
+        address _countryMinter
     ) public onlyOwner {
         treasuryAddress = _treasuryAddress;
         improvementsContract2Address = _improvementsContract2Address;
@@ -1883,6 +1908,8 @@ contract WondersContract4 is Ownable {
         infrastructureAddress = _infrastructureAddress;
         wonderContract1Address = _wonders1;
         wonderContract3Address = _wonders3;
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
     }
 
     function updateTreasuryAddress(address _newTreasuryAddress)
@@ -1921,7 +1948,15 @@ contract WondersContract4 is Ownable {
         improvementsContract3Address = _improvementsContract3Address;
     }
 
-    function generateWonders4(uint256 id, address nationOwner) public {
+    modifier onlyCountryMinter() {
+        require(
+            msg.sender == countryMinter,
+            "only callable from countryMinter"
+        );
+        _;
+    }
+
+    function generateWonders4(uint256 id) public onlyCountryMinter {
         Wonders4 memory newWonders4 = Wonders4(
             false,
             false,
@@ -1932,8 +1967,6 @@ contract WondersContract4 is Ownable {
             false
         );
         idToWonders4[id] = newWonders4;
-        idToOwnerWonders4[id] = nationOwner;
-        wondersId4++;
     }
 
     function updateSocialSecuritySystemCost(uint256 newPrice) public onlyOwner {
@@ -1974,10 +2007,8 @@ contract WondersContract4 is Ownable {
     }
 
     function buyWonder4(uint256 countryId, uint256 wonderId) public {
-        require(
-            idToOwnerWonders4[countryId] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(countryId, msg.sender);
+        require (isOwner, "!nation owner");
         require(wonderId <= 7, "Invalid improvement ID");
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(
             countryId
@@ -2135,10 +2166,8 @@ contract WondersContract4 is Ownable {
     }
 
     function deleteImprovement4(uint256 countryId, uint256 wonderId) public {
-        require(
-            idToOwnerWonders4[countryId] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(countryId, msg.sender);
+        require (isOwner, "!nation owner");
         require(wonderId <= 7, "Invalid improvement ID");
         if (wonderId == 1) {
             bool existingWonder = idToWonders4[countryId].socialSecuritySystem;

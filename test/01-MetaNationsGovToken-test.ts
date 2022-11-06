@@ -437,7 +437,8 @@ describe("MetaNationsGovToken", function () {
           infrastructurecontract.address,
           resourcescontract.address,
           aidcontract.address,
-          missilescontract.address)
+          missilescontract.address,
+          senatecontract.address)
       countryminter.settings2(
           improvementscontract1.address,
           improvementscontract2.address,
@@ -648,7 +649,8 @@ describe("MetaNationsGovToken", function () {
       keepercontract.settings(
           nukecontract.address,
           aidcontract.address,
-          warcontract.address
+          warcontract.address,
+          treasurycontract.address
       )
   
       landmarketcontract.settings(
@@ -832,7 +834,8 @@ describe("MetaNationsGovToken", function () {
           wonderscontract2.address,
           wonderscontract3.address,
           wonderscontract4.address,
-          infrastructurecontract.address
+          infrastructurecontract.address,
+          countryminter.address
       )
   
       wonderscontract2.settings(
@@ -840,7 +843,8 @@ describe("MetaNationsGovToken", function () {
           infrastructurecontract.address,
           wonderscontract1.address,
           wonderscontract3.address,
-          wonderscontract4.address
+          wonderscontract4.address,
+          countryminter.address
       )
   
       wonderscontract3.settings(
@@ -849,7 +853,8 @@ describe("MetaNationsGovToken", function () {
           forcescontract.address,
           wonderscontract1.address,
           wonderscontract2.address,
-          wonderscontract4.address
+          wonderscontract4.address,
+          countryminter.address
       )
   
       wonderscontract4.settings(
@@ -858,7 +863,8 @@ describe("MetaNationsGovToken", function () {
           improvementscontract3.address,
           infrastructurecontract.address,
           wonderscontract1.address,
-          wonderscontract3.address
+          wonderscontract3.address,
+          countryminter.address
       )
   
       // console.log("settings initiated");

@@ -155,11 +155,11 @@ contract CountryMinter is ERC721, Ownable {
         NavyContract(navy).generateNavy(countryId);
         ResourcesContract(resources).generateResources(countryId);
         SenateContract(senate).generateVoter(countryId);
-        // WondersContract1(wonders1).generateWonders1(countryId, msg.sender);
-        // WondersContract2(wonders2).generateWonders2(countryId, msg.sender);
-        // WondersContract3(wonders3).generateWonders3(countryId, msg.sender);
-        // WondersContract4(wonders4).generateWonders4(countryId, msg.sender);
-        // TreasuryContract(treasury).generateTreasury(countryId, msg.sender);
+        TreasuryContract(treasury).generateTreasury(countryId);
+        WondersContract1(wonders1).generateWonders1(countryId);
+        WondersContract2(wonders2).generateWonders2(countryId);
+        WondersContract3(wonders3).generateWonders3(countryId);
+        WondersContract4(wonders4).generateWonders4(countryId);
         idToOwner[countryId] = msg.sender;
         ownerCountryCount[msg.sender]++;
         emit nationCreated(msg.sender, nationName, ruler);
