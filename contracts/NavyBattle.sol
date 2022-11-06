@@ -13,10 +13,10 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
     uint256 public blockadeId;
     address public navy;
+    address public additionalNavy;
     address public navalAction;
     address public warContract;
-
-    WarContract war;
+    address public countryMinter;
 
     //Chainlik Variables
     uint256[] private s_randomWords;
@@ -27,8 +27,11 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
     uint32 private constant NUM_WORDS = 1;
 
+    WarContract war;
+    CountryMinter mint;
     NavyContract nav;
     NavalActionsContract navAct;
+    AdditionalNavyContract addNav;
 
     struct Blockade {
         uint256 blockadeId;
@@ -59,11 +62,14 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
 
     function settings(
         address _navy,
+        address _additionalNavy,
         address _navalAction,
         address _war
     ) public onlyOwner {
         navy = _navy;
         nav = NavyContract(_navy);
+        additionalNavy = _additionalNavy;
+        addNav = AdditionalNavyContract(_additionalNavy);
         navalAction = _navalAction;
         navAct = NavalActionsContract(_navalAction);
         warContract = _war;
@@ -75,10 +81,8 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
         uint256 defenderId,
         uint256 warId
     ) public {
-        bool blockadedAlready = navAct.getBlockadedToday(defenderId);
-        require(blockadedAlready == false, "nation already blockaded today");
-        bool warActive = war.isWarActive(warId);
-        require(warActive, "war !active");
+        bool requirementsMet = checkRequirements(attackerId, defenderId, warId);
+        require (requirementsMet);
         uint256 slotsUsed = navAct.getActionSlotsUsed(attackerId);
         require((slotsUsed + 1) <= 3, "max slots used");
         uint256 activeBlockadesAgainstCount = idToActiveBlockadesAgainst[
@@ -88,9 +92,9 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
             activeBlockadesAgainstCount == 0,
             "you cannot blockade while being blockaded"
         );
-        uint256 attackerShips = nav.getBlockadeCapableShips(attackerId);
+        uint256 attackerShips = addNav.getBlockadeCapableShips(attackerId);
         require(attackerShips >= 5, "not enough blockade capable ships");
-        uint256 defenderShips = nav.getBreakBlockadeCapableShips(defenderId);
+        uint256 defenderShips = addNav.getBreakBlockadeCapableShips(defenderId);
         require(
             defenderShips == 0,
             "defender has ships that can break blockade"
@@ -127,6 +131,20 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
         newActiveBlockadesFor.push(blockadeId);
         idToActiveBlockadesFor[attackerId] = newActiveBlockadesFor;
         blockadeId++;
+    }
+
+    function checkRequirements(uint256 attackerId, uint256 defenderId, uint256 warId) internal view returns (bool) {
+        bool isOwner = mint.checkOwnership(attackerId, msg.sender);
+        require (isOwner, "!nation owner");
+        bool blockadedAlready = navAct.getBlockadedToday(defenderId);
+        require(blockadedAlready == false, "nation already blockaded today");
+        bool warActive = war.isWarActive(warId);
+        require(warActive, "war !active");
+        bool requirementsMet = false;
+        if (isOwner && !blockadedAlready && warActive) {
+            requirementsMet = true;
+        }
+        return requirementsMet;
     }
 
     function checkIfAttackerAlreadyBlockaded(
@@ -183,7 +201,7 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
     }
 
     function checkIfBlockadeCapable(uint256 countryId) public {
-        uint256 blockadeCapableShips = nav.getBlockadeCapableShips(countryId);
+        uint256 blockadeCapableShips = addNav.getBlockadeCapableShips(countryId);
         if (blockadeCapableShips == 0) {
             uint256[] storage blockadesFor = idToActiveBlockadesFor[countryId];
             for (uint256 i = 0; i < blockadesFor.length; i++) {
@@ -778,6 +796,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
     address public warAddress;
     address public improvements4;
     address public navalActions;
+
     uint256 corvetteStrength = 1;
     uint256 landingShipStrength = 3;
     uint256 battleshipStrength = 5;

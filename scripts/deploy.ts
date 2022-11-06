@@ -33,6 +33,7 @@ import {
     NationStrengthContract,
     NavalActionsContract,
     NavyContract,
+    AdditionalNavyContract,
     NavalBlockadeContract,
     BreakBlocadeContract,
     NavalAttackContract,
@@ -87,6 +88,7 @@ async function main() {
     let nationstrengthcontract: NationStrengthContract
     let navalactionscontract: NavalActionsContract
     let navycontract: NavyContract
+    let additionalnavycontract: AdditionalNavyContract
     let navalblockadecontract: NavalBlockadeContract
     let breakblockadecontract: BreakBlocadeContract
     let navalattackcontract: NavalAttackContract
@@ -484,6 +486,11 @@ async function main() {
     await navycontract.deployed()
     console.log(`NavyContract deployed to ${navycontract.address}`)
 
+    const AdditionalNavyContract = await ethers.getContractFactory("AdditionalNavyContract")
+    additionalnavycontract = await AdditionalNavyContract.deploy() as AdditionalNavyContract
+    await additionalnavycontract.deployed()
+    console.log(`NavyContract deployed to ${additionalnavycontract.address}`)
+
         // address _treasuryAddress,
         // address _improvementsContract1Address,
         // address _improvementsContract3Address,
@@ -801,6 +808,7 @@ async function main() {
         militarycontract.address,
         forcescontract.address,
         navycontract.address,
+        navalactionscontract.address,
         fighterscontract.address,
         fightersmarketplace1.address,
         fightersmarketplace2.address,
@@ -936,7 +944,9 @@ async function main() {
         improvementscontract2.address,
         improvementscontract3.address,
         improvementscontract4.address,
-        navycontract.address)
+        navycontract.address,
+        additionalnavycontract.address
+        )
     
     improvementscontract2.settings(
         treasurycontract.address,
@@ -944,7 +954,8 @@ async function main() {
         wonderscontract1.address)
     
     improvementscontract3.settings(
-        treasurycontract.address)
+        treasurycontract.address,
+        additionalnavycontract.address)
     
     improvementscontract4.settings(
         treasurycontract.address,
@@ -1027,7 +1038,8 @@ async function main() {
         militarycontract.address,
         nukecontract.address,
         wonderscontract1.address,
-        navalactionscontract.address
+        navalactionscontract.address,
+        additionalnavycontract.address
     )
     
     navalactionscontract.settings(
@@ -1041,6 +1053,7 @@ async function main() {
 
     navalblockadecontract.settings(
         navycontract.address,
+        additionalnavycontract.address,
         navalactionscontract.address,
         warcontract.address
     )
@@ -1077,7 +1090,8 @@ async function main() {
 
     resourcescontract.settings(
         infrastructurecontract.address,
-        improvementscontract2.address
+        improvementscontract2.address,
+        countryminter.address
     )
 
     senatecontract.settings(

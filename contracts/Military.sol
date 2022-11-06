@@ -2,12 +2,15 @@
 pragma solidity 0.8.7;
 
 import "./SpyOperations.sol";
+import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MilitaryContract is Ownable {
     address public spyAddress;
+    address public countryMinter;
 
     SpyOperationsContract spy;
+    CountryMinter mint;
 
     struct Military {
         uint256 defconLevel;
@@ -16,7 +19,6 @@ contract MilitaryContract is Ownable {
     }
 
     mapping(uint256 => Military) public idToMilitary;
-    mapping(uint256 => address) public idToOwnerMilitary;
 
     modifier onlySpyContract() {
         require(msg.sender == spyAddress, "only callable from spy contract");
@@ -28,17 +30,14 @@ contract MilitaryContract is Ownable {
         spy = SpyOperationsContract(_spyAddress);
     }
 
-    function generateMilitary(uint256 id, address nationOwner) public {
+    function generateMilitary(uint256 id) public {
         Military memory newMilitary = Military(5, 1, false);
         idToMilitary[id] = newMilitary;
-        idToOwnerMilitary[id] = nationOwner;
     }
 
     function updateDefconLevel(uint256 newDefcon, uint256 id) public {
-        require(
-            idToOwnerMilitary[id] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require (isOwner, "!nation owner");
         require(
             newDefcon == 1 ||
                 newDefcon == 2 ||
@@ -60,10 +59,8 @@ contract MilitaryContract is Ownable {
     }
 
     function updateThreatLevel(uint256 newThreatLevel, uint256 id) public {
-        require(
-            idToOwnerMilitary[id] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require (isOwner, "!nation owner");
         require(
             newThreatLevel == 1 ||
                 newThreatLevel == 2 ||
@@ -76,10 +73,8 @@ contract MilitaryContract is Ownable {
     }
 
     function toggleWarPeacePreference(uint256 id) public {
-        require(
-            idToOwnerMilitary[id] == msg.sender,
-            "You are not the nation ruler"
-        );
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require (isOwner, "!nation owner");
         if (idToMilitary[id].warPeacePreference = true) {
             idToMilitary[id].warPeacePreference = false;
         } else {

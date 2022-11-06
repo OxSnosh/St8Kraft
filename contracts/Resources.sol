@@ -3,6 +3,7 @@ pragma solidity 0.8.7;
 
 import "./Infrastructure.sol";
 import "./Improvements.sol";
+import "./CountryMinter.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -16,6 +17,9 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
     uint256[] public trades;
     address public infrastructure;
     address public improvements2;
+    address public countryMinter;
+
+    CountryMinter mint;
 
     //Chainlik Variables
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
@@ -248,7 +252,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
     mapping(uint256 => uint256[]) public idToProposedTradingPartners;
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
-    mapping(uint256 => address) public idToOwnerResources;
+    // mapping(uint256 => address) public idToOwnerResources;
 
     /* Functions */
     constructor(
@@ -263,15 +267,17 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         i_callbackGasLimit = callbackGasLimit;
     }
 
-    function settings(address _infrastructure, address _improvements2)
+    function settings(address _infrastructure, address _improvements2, address _countryMinter)
         public
         onlyOwner
     {
         infrastructure = _infrastructure;
         improvements2 = _improvements2;
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
     }
 
-    function generateResources(uint256 id, address nationOwner) public {
+    function generateResources(uint256 id) public {
         Resources1 memory newResources1 = Resources1(
             false,
             false,
@@ -327,7 +333,6 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         idToBonusResources[id] = newBonusResources;
         idToMoonResources[id] = newMoonResources;
         idToMarsResources[id] = newMarsResources;
-        idToOwnerResources[id] = nationOwner;
         fulfillRequest(id);
     }
 
@@ -634,10 +639,8 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
     }
 
     function proposeTrade(uint256 requestorId, uint256 recipientId) public {
-        require(
-            idToOwnerResources[requestorId] == msg.sender,
-            "requestor is not nation owner"
-        );
+        bool isOwner = mint.checkOwnership(requestorId, msg.sender);
+        require (isOwner, "!nation owner");
         bool isPossibleRequestor = isTradePossibleForRequestor(requestorId);
         bool isPossibleRecipient = isTradePossibleForRecipient(recipientId);
         require(isPossibleRequestor = true, "trade is not possible");
@@ -716,10 +719,8 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
     function fulfillTradingPartner(uint256 recipientId, uint256 requestorId)
         public
     {
-        require(
-            idToOwnerResources[recipientId] == msg.sender,
-            "you are not the nation owner of the request"
-        );
+        bool isOwner = mint.checkOwnership(recipientId, msg.sender);
+        require (isOwner, "!nation owner");
         bool isProposed = isProposedTrade(recipientId, requestorId);
         require(isProposed == true, "Not an active trade proposal");
         uint256[]
@@ -753,10 +754,8 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
     }
 
     function removeTradingPartner(uint256 nationId, uint256 partnerId) public {
-        require(
-            idToOwnerResources[nationId] == msg.sender,
-            "you are not the nation owner of the request"
-        );
+        bool isOwner = mint.checkOwnership(nationId, msg.sender);
+        require (isOwner, "!nation owner");
         bool isActive = isActiveTrade(nationId, partnerId);
         require(isActive == true, "this is not an active trade");
         uint256[] storage tradesOfNation = idToTradingPartners[nationId];

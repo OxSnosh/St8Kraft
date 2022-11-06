@@ -16,6 +16,7 @@ import "./Navy.sol";
 import "./Fighters.sol";
 import "./Bombers.sol";
 import "./Aid.sol";
+import "./Senate.sol";
 
 contract CountryMinter is ERC721, Ownable {
     uint256 public countryId;
@@ -36,6 +37,7 @@ contract CountryMinter is ERC721, Ownable {
     address public treasury;
     address public aid;
     address public navy;
+    address public navalActions;
     address public fighters;
     address public fightersMarket1;
     address public fightersMarket2;
@@ -43,6 +45,7 @@ contract CountryMinter is ERC721, Ownable {
     address public bombersMarket2;
     address public bombers;
     address public missiles;
+    address public senate;
 
     mapping(uint256 => address) public idToOwner;
     mapping(address => uint256) public ownerCountryCount;
@@ -63,7 +66,8 @@ contract CountryMinter is ERC721, Ownable {
         address _infrastructure,
         address _resources,
         address _aid,
-        address _missiles
+        address _missiles,
+        address _senate
     ) public onlyOwner {
         countryParameters = _countryParameters;
         treasury = _treasury;
@@ -71,6 +75,7 @@ contract CountryMinter is ERC721, Ownable {
         resources = _resources;
         aid = _aid;
         missiles = _missiles;
+        senate = _senate;
     }
 
     function settings2 (
@@ -97,6 +102,7 @@ contract CountryMinter is ERC721, Ownable {
         address _military,
         address _forces,
         address _navy,
+        address _navalActions,
         address _fighters,
         address _fightersMarket1,
         address _fightersMarket2,
@@ -107,6 +113,7 @@ contract CountryMinter is ERC721, Ownable {
         military = _military;
         forces = _forces;
         navy = _navy;
+        navalActions = _navalActions;
         fighters = _fighters;
         fightersMarket1 = _fightersMarket1;
         fightersMarket2 = _fightersMarket2;
@@ -142,15 +149,17 @@ contract CountryMinter is ERC721, Ownable {
         ImprovementsContract2(improvements2).generateImprovements(countryId);
         ImprovementsContract3(improvements3).generateImprovements(countryId);
         ImprovementsContract4(improvements4).generateImprovements(countryId);
-        InfrastructureContract(infrastructure).generateInfrastructure(countryId, msg.sender);
-        ResourcesContract(resources).generateResources(countryId, msg.sender);
-        WondersContract1(wonders1).generateWonders1(countryId, msg.sender);
-        WondersContract2(wonders2).generateWonders2(countryId, msg.sender);
-        WondersContract3(wonders3).generateWonders3(countryId, msg.sender);
-        WondersContract4(wonders4).generateWonders4(countryId, msg.sender);
-        TreasuryContract(treasury).generateTreasury(countryId, msg.sender);
-        MilitaryContract(military).generateMilitary(countryId, msg.sender);
-        NavyContract(navy).generateNavy(countryId, msg.sender); 
+        InfrastructureContract(infrastructure).generateInfrastructure(countryId);
+        MilitaryContract(military).generateMilitary(countryId);
+        NavalActionsContract(navalActions).generateNavalActions(countryId);
+        NavyContract(navy).generateNavy(countryId);
+        ResourcesContract(resources).generateResources(countryId);
+        SenateContract(senate).generateVoter(countryId);
+        // WondersContract1(wonders1).generateWonders1(countryId, msg.sender);
+        // WondersContract2(wonders2).generateWonders2(countryId, msg.sender);
+        // WondersContract3(wonders3).generateWonders3(countryId, msg.sender);
+        // WondersContract4(wonders4).generateWonders4(countryId, msg.sender);
+        // TreasuryContract(treasury).generateTreasury(countryId, msg.sender);
         idToOwner[countryId] = msg.sender;
         ownerCountryCount[msg.sender]++;
         emit nationCreated(msg.sender, nationName, ruler);

@@ -3,6 +3,7 @@ pragma solidity 0.8.7;
 
 import "./CountryParameters.sol";
 import "./Wonders.sol";
+import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract SenateContract is Ownable {
@@ -11,6 +12,7 @@ contract SenateContract is Ownable {
     address public wonders3;
 
     WondersContract3 won3;
+    CountryMinter mint;
 
     struct Voter {
         uint256 votes;
@@ -28,6 +30,7 @@ contract SenateContract is Ownable {
         address _wonders3
     ) public onlyOwner {
         countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
         parameters = _parameters;
         wonders3 = _wonders3;
         won3 = WondersContract3(_wonders3);
@@ -37,7 +40,6 @@ contract SenateContract is Ownable {
 
     mapping(uint256 => Voter) public idToVoter;
     mapping(uint256 => uint256[]) public idToSanctionVotes;
-    mapping(uint256 => address) public idToOwnerVoter;
 
     function updateCountryMinter(address newAddress) public onlyOwner {
         countryMinter = newAddress;
@@ -51,14 +53,14 @@ contract SenateContract is Ownable {
         params = CountryParametersContract(newAddress);
     }
 
-    function generateForces(uint256 id, address nationOwner) public {
+    function generateVoter(uint256 id) public {
         Voter memory newVoter = Voter(0, false, false, 0, false);
         idToVoter[id] = newVoter;
-        idToOwnerVoter[id] = nationOwner;
     }
 
     function voteForSenator(uint256 idVoter, uint256 idOfSenateVote) public {
-        require(idToOwnerVoter[idVoter] == msg.sender, "!nation owner");
+        bool isOwner = mint.checkOwnership(idVoter, msg.sender);
+        require (isOwner, "!nation owner");
         require(idToVoter[idVoter].voted == false, "already voted");
         uint256 voterTeam = params.getTeam(idVoter);
         uint256 teamOfVote = params.getTeam(idOfSenateVote);

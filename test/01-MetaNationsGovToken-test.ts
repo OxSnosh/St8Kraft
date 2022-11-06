@@ -35,6 +35,7 @@ import {
   NationStrengthContract,
   NavalActionsContract,
   NavyContract,
+  AdditionalNavyContract,
   NavalBlockadeContract,
   BreakBlocadeContract,
   NavalAttackContract,
@@ -87,6 +88,7 @@ describe("MetaNationsGovToken", function () {
   let nationstrengthcontract: NationStrengthContract
   let navalactionscontract: NavalActionsContract
   let navycontract: NavyContract
+  let additionalnavycontract: AdditionalNavyContract
   let navalblockadecontract: NavalBlockadeContract
   let breakblockadecontract: BreakBlocadeContract
   let navalattackcontract: NavalAttackContract
@@ -277,6 +279,11 @@ describe("MetaNationsGovToken", function () {
       navycontract = await NavyContract.deploy() as NavyContract
       await navycontract.deployed()
       // console.log(`NavyContract deployed to ${navycontract.address}`)
+
+      const AdditionalNavyContract = await ethers.getContractFactory("AdditionalNavyContract")
+      additionalnavycontract = await AdditionalNavyContract.deploy() as AdditionalNavyContract
+      await additionalnavycontract.deployed()
+      // console.log(`NavyContract deployed to ${additionalnavycontract.address}`)
       
       const NavalActionsContract = await ethers.getContractFactory("NavalActionsContract")
       navalactionscontract = await NavalActionsContract.deploy() as NavalActionsContract
@@ -444,6 +451,7 @@ describe("MetaNationsGovToken", function () {
           militarycontract.address,
           forcescontract.address,
           navycontract.address,
+          navalactionscontract.address,
           fighterscontract.address,
           fightersmarketplace1.address,
           fightersmarketplace2.address,
@@ -579,7 +587,8 @@ describe("MetaNationsGovToken", function () {
           improvementscontract2.address,
           improvementscontract3.address,
           improvementscontract4.address,
-          navycontract.address)
+          navycontract.address,
+          additionalnavycontract.address)
       
       improvementscontract2.settings(
           treasurycontract.address,
@@ -587,7 +596,8 @@ describe("MetaNationsGovToken", function () {
           wonderscontract1.address)
       
       improvementscontract3.settings(
-          treasurycontract.address)
+          treasurycontract.address,
+          additionalnavycontract.address)
       
       improvementscontract4.settings(
           treasurycontract.address,
@@ -670,7 +680,8 @@ describe("MetaNationsGovToken", function () {
           militarycontract.address,
           nukecontract.address,
           wonderscontract1.address,
-          navalactionscontract.address
+          navalactionscontract.address,
+          additionalnavycontract.address
       )
       
       navalactionscontract.settings(
@@ -684,6 +695,7 @@ describe("MetaNationsGovToken", function () {
   
       navalblockadecontract.settings(
           navycontract.address,
+          additionalnavycontract.address,
           navalactionscontract.address,
           warcontract.address
       )
@@ -720,7 +732,8 @@ describe("MetaNationsGovToken", function () {
   
       resourcescontract.settings(
           infrastructurecontract.address,
-          improvementscontract2.address
+          improvementscontract2.address,
+          countryminter.address
       )
   
       senatecontract.settings(

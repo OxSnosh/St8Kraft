@@ -196,9 +196,7 @@ contract InfrastructureContract is Ownable {
         _;
     }
 
-
-
-    function generateInfrastructure(uint256 id, address nationOwner) public {
+    function generateInfrastructure(uint256 id) public {
         Infrastructure memory newInfrastrusture = Infrastructure(
             20,
             0,
@@ -207,7 +205,6 @@ contract InfrastructureContract is Ownable {
             false
         );
         idToInfrastructure[id] = newInfrastrusture;
-        idToOwnerInfrastructure[id] = nationOwner;
     }
 
     function increaseInfrastructureFromMarket(uint256 id, uint256 amount)
@@ -388,13 +385,6 @@ contract InfrastructureContract is Ownable {
         uint256 countryId,
         uint256 amountToDecrease
     ) public onlyCruiseMissileContract {
-        // uint256 infrastructureDamageModifier = 100;
-        // uint256 bunkerCount = imp1.getBunkerCount(countryId);
-        // if (bunkerCount > 0) {
-        //     infrastructureDamageModifier -= (5 * bunkerCount);
-        // }
-        // uint256 damage = ((amountToDecrease * infrastructureDamageModifier) /
-        //     100);
         uint256 infrastructureAmount = idToInfrastructure[countryId]
             .infrastructureCount;
         if (amountToDecrease >= infrastructureAmount) {
@@ -488,8 +478,8 @@ contract InfrastructureContract is Ownable {
         public
         onlySpyContract
     {
-        require(newTaxRate <= 28, "cannot tax above 28%");
-        require(newTaxRate >= 15, "cannot tax below 15%");
+        require(newTaxRate >= 28, "cannot tax above 28%");
+        require(newTaxRate <= 15, "cannot tax below 15%");
         idToInfrastructure[id].taxRate = newTaxRate;
         idToInfrastructure[id].collectionNeededToChangeRate = true;
     }
