@@ -333,7 +333,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         idToBonusResources[id] = newBonusResources;
         idToMoonResources[id] = newMoonResources;
         idToMarsResources[id] = newMarsResources;
-        fulfillRequest(id);
+        // fulfillRequest(id);
     }
 
     function fulfillRequest(uint256 id) public {

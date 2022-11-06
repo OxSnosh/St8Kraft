@@ -47,6 +47,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
     mapping(uint256 => uint256) private idToReligionPreference;
     mapping(uint256 => uint256) private idToGovernmentPreference;
+
     // mapping(uint256 => address) public idToOwnerParameters;
 
     constructor(
@@ -65,8 +66,11 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         spyAddress = newAddress;
     }
 
-    modifier onlySpyContract {
-        require(msg.sender == spyAddress, "function only callable from spy contract");
+    modifier onlySpyContract() {
+        require(
+            msg.sender == spyAddress,
+            "function only callable from spy contract"
+        );
         _;
     }
 
@@ -97,7 +101,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         );
         idToCountryParameters[id] = newCountryParameters;
         idToCountrySettings[id] = newCountrySettings;
-        fulfillRequest(id);
+        // fulfillRequest(id);
     }
 
     function fulfillRequest(uint256 id) public {
@@ -127,58 +131,61 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
 
     function setRulerName(string memory newRulerName, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         idToCountryParameters[id].rulerName = newRulerName;
     }
 
     function setNationName(string memory newNationName, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         idToCountryParameters[id].nationName = newNationName;
     }
 
     function setCapitalCity(string memory newCapitalCity, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         idToCountryParameters[id].capitalCity = newCapitalCity;
     }
 
     function setNationSlogan(string memory newNationSlogan, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         idToCountryParameters[id].nationSlogan = newNationSlogan;
     }
 
     function setAlliance(string memory newAlliance, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         idToCountrySettings[id].alliance = newAlliance;
     }
 
     function setTeam(uint256 id, uint256 newTeam) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         idToCountrySettings[id].nationTeam = newTeam;
     }
 
     function setGovernment(uint256 id, uint256 newType) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         uint256 daysSinceChange = idToCountrySettings[id]
             .daysSinceGovernmentChenge;
         require(daysSinceChange >= 3, "need to wait 3 days before changing");
         require(newType <= 10, "invalid type");
-        idToCountrySettings[id].governmentType = newType;        
+        idToCountrySettings[id].governmentType = newType;
         idToCountrySettings[id].daysSinceGovernmentChenge = 0;
     }
 
-    function updateDesiredGovernment(uint256 id, uint256 newType) public onlySpyContract {
+    function updateDesiredGovernment(uint256 id, uint256 newType)
+        public
+        onlySpyContract
+    {
         idToGovernmentPreference[id] = newType;
     }
 
     function setReligion(uint256 id, uint256 newType) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         uint256 daysSinceChange = idToCountrySettings[id]
             .daysSinceReligionChange;
         require(daysSinceChange >= 3, "need to wait 3 days before changing");
@@ -187,7 +194,10 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         idToCountrySettings[id].daysSinceReligionChange = 0;
     }
 
-    function updateDesiredReligion(uint256 id, uint256 newType) public onlySpyContract {
+    function updateDesiredReligion(uint256 id, uint256 newType)
+        public
+        onlySpyContract
+    {
         idToReligionPreference[id] = newType;
     }
 
@@ -200,12 +210,20 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         }
     }
 
-    function getRulerName(uint256 countryId) public view returns (string memory) {
+    function getRulerName(uint256 countryId)
+        public
+        view
+        returns (string memory)
+    {
         string memory ruler = idToCountryParameters[countryId].rulerName;
         return ruler;
     }
 
-    function getNationName(uint256 countryId) public view returns (string memory) {
+    function getNationName(uint256 countryId)
+        public
+        view
+        returns (string memory)
+    {
         string memory nationName = idToCountryParameters[countryId].nationName;
         return nationName;
     }
@@ -220,7 +238,11 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         return slogan;
     }
 
-    function getAlliance(uint256 countryId) public view returns (string memory) {
+    function getAlliance(uint256 countryId)
+        public
+        view
+        returns (string memory)
+    {
         string memory alliance = idToCountrySettings[countryId].alliance;
         return alliance;
     }
@@ -249,14 +271,21 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         return timeCreated;
     }
 
-    function getGovernmentPreference(uint256 id) public view returns (uint256 preference) {
+    function getGovernmentPreference(uint256 id)
+        public
+        view
+        returns (uint256 preference)
+    {
         uint256 preferredGovernment = idToGovernmentPreference[id];
         return preferredGovernment;
     }
 
-    function getReligionPreference(uint256 id) public view returns (uint256 preference) {
+    function getReligionPreference(uint256 id)
+        public
+        view
+        returns (uint256 preference)
+    {
         uint256 preferredReligion = idToReligionPreference[id];
         return preferredReligion;
     }
-
 }
