@@ -19,7 +19,7 @@ import "./Aid.sol";
 import "./Senate.sol";
 
 contract CountryMinter is ERC721, Ownable {
-    uint256 public countryId;
+    uint256 public countryId = 0;
     address public countryParameters;
     address public infrastructure;
     address public resources;
@@ -162,8 +162,8 @@ contract CountryMinter is ERC721, Ownable {
         WondersContract4(wonders4).generateWonders4(countryId);
         idToOwner[countryId] = msg.sender;
         ownerCountryCount[msg.sender]++;
+        countryId+=1;
         emit nationCreated(msg.sender, nationName, ruler);
-        countryId++;
     }
 
     function checkOwnership(uint256 id, address caller) public view returns (bool) {

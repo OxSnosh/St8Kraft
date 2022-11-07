@@ -98,10 +98,10 @@ const config: HardhatUserConfig = {
     noColors: true,
     // coinmarketcap: process.env.COINMARKETCAP_API_KEY,
   },
-  contractSizer: {
-    runOnCompile: false,
-    only: ["Raffle"],
-  },
+  // contractSizer: {
+  //   runOnCompile: true,
+  //   only: ["Raffle"],
+  // },
   namedAccounts: {
     deployer: {
       default: 0, // here this will by default take the first account as deployer

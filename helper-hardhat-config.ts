@@ -14,8 +14,6 @@ const INITIAL_SUPPLY = "1000000000000000000000000"
   
 const developmentChains = ["hardhat", "localhost"]
 
-const { ethers } = require("hardhat")
-
 const networkConfig = {
   default: {
       name: "hardhat",
@@ -43,9 +41,12 @@ const networkConfig = {
   },
 }
 
+const VERIFICATION_BLOCK_CONFIRMATIONS = 6
+
 export {
   config,
   INITIAL_SUPPLY,
+  VERIFICATION_BLOCK_CONFIRMATIONS,
   developmentChains,
   networkConfig
 }

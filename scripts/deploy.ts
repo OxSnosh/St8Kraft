@@ -1,4 +1,4 @@
-import { ethers } from "hardhat"
+import { network, ethers } from "hardhat"
 import { INITIAL_SUPPLY } from "../helper-hardhat-config"
 import { 
     WarBucks, 
@@ -49,12 +49,43 @@ import {
     WondersContract1,
     WondersContract2,
     WondersContract3,
-    WondersContract4
+    WondersContract4,
+    VRFConsumerBaseV2,
+    VRFCoordinatorV2Mock
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
 
 async function main() {
+    
+    let chainId = network.config.chainId
+    let subscriptionId    
+    let vrfCoordinatorV2Mock
+    let vrfCoordinatorV2Address    
+
+    const FUND_AMOUNT = ethers.utils.parseEther("1")
+
+    if (chainId == 31337) {
+        console.log("local network detected")
+        const BASE_FEE = "250000000000000000" // 0.25 is this the premium in LINK?
+        const GAS_PRICE_LINK = 1e9 // link per gas, is this the gas lane? // 0.000000001 LINK per gas
+        // create VRFV2 Subscription
+        const VRFCoordinatorV2Mock = await ethers.getContractFactory("VRFCoordinatorV2Mock")
+        vrfCoordinatorV2Mock = await VRFCoordinatorV2Mock.deploy(BASE_FEE, GAS_PRICE_LINK)
+        vrfCoordinatorV2Address = vrfCoordinatorV2Mock.address
+        const transactionResponse = await vrfCoordinatorV2Mock.createSubscription()
+        const transactionReceipt = await transactionResponse.wait()
+        subscriptionId = transactionReceipt.events[0].args.subId
+        // Fund the subscription
+        // Our mock makes it so we don't actually have to worry about sending fund
+        await vrfCoordinatorV2Mock.fundSubscription(subscriptionId, FUND_AMOUNT)
+    } else {
+        // vrfCoordinatorV2Address = networkConfig[chainId]["vrfCoordinatorV2"]
+        // subscriptionId = networkConfig[chainId]["subscriptionId"]
+    }
+
+    var gasLane = networkConfig[31337]["gasLane"]
+    var callbackGasLimit =  networkConfig[31337]["callbackGasLimit"]
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -110,12 +141,7 @@ async function main() {
     let signers: SignerWithAddress[]
     let addrs
     console.log("imported types");
-
-    let vrfCoordinatorV2 = networkConfig[31337].vrfCoordinatorV2
-    let subscriptionId = networkConfig[31337].subscriptionId
-    let gasLane = networkConfig[31337].gasLane
-    let callbackGasLimit = networkConfig[31337].callbackGasLimit
-
+    
     signers = await ethers.getSigners();
     signer0 = signers[0];
     signer1 = signers[1];
@@ -144,7 +170,7 @@ async function main() {
         //wonder1
     
     const AirBattleContract = await ethers.getContractFactory("AirBattleContract")
-    airbattlecontract = await AirBattleContract.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as AirBattleContract
+    airbattlecontract = await AirBattleContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as AirBattleContract
     await airbattlecontract.deployed()
     console.log(`AirBattleContract deployed tp ${airbattlecontract.address}`)
         //war
@@ -218,7 +244,7 @@ async function main() {
     console.log(`CountryMinter deployed tp ${countryminter.address}`)
 
     const CountryParameters = await ethers.getContractFactory("CountryParametersContract")
-    countryparameterscontract = await CountryParameters.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as CountryParametersContract
+    countryparameterscontract = await CountryParameters.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as CountryParametersContract
     await countryparameterscontract.deployed()
     console.log(`CountryParameters deployed to ${countryparameterscontract.address}`)
         // spyAddress  
@@ -234,7 +260,7 @@ async function main() {
         // address _parameters  
 
     const CruiseMissileContract = await ethers.getContractFactory("CruiseMissileContract")
-    cruisemissileconract = await CruiseMissileContract.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as CruiseMissileContract
+    cruisemissileconract = await CruiseMissileContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as CruiseMissileContract
     await cruisemissileconract.deployed()
     console.log(`CruiseMissile deployed to ${cruisemissileconract.address}`)
         // address _forces,
@@ -354,7 +380,7 @@ async function main() {
         // address _countryMinter
 
     const GroundBattleContract = await ethers.getContractFactory("GroundBattleContract")
-    groundbattlecontract = await GroundBattleContract.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as GroundBattleContract
+    groundbattlecontract = await GroundBattleContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as GroundBattleContract
     await groundbattlecontract.deployed()
     console.log(`GroundBattleContract deployed to ${groundbattlecontract.address}`)
         // address _warAddress,
@@ -514,7 +540,7 @@ async function main() {
         // address _countryMinter
     
     const NavalBlockadeContract = await ethers.getContractFactory("NavalBlockadeContract")
-    navalblockadecontract = await NavalBlockadeContract.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as NavalBlockadeContract
+    navalblockadecontract = await NavalBlockadeContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as NavalBlockadeContract
     await navalblockadecontract.deployed()
     console.log(`NavalBlockadeContract deployed to ${navalblockadecontract.address}`)
         // need randomness
@@ -524,7 +550,7 @@ async function main() {
         // address _war
     
     const BreakBlocadeContract = await ethers.getContractFactory("BreakBlocadeContract")
-    breakblockadecontract = await BreakBlocadeContract.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as BreakBlocadeContract
+    breakblockadecontract = await BreakBlocadeContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as BreakBlocadeContract
     await breakblockadecontract.deployed()
     console.log(`BreakBlocadeContract deployed to ${breakblockadecontract.address}`)
 
@@ -538,7 +564,7 @@ async function main() {
         // address _navalActions
         
     const NavalAttackContract = await ethers.getContractFactory("NavalAttackContract")
-    navalattackcontract = await NavalAttackContract.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as NavalAttackContract
+    navalattackcontract = await NavalAttackContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as NavalAttackContract
     await navalattackcontract.deployed()
     console.log(`NavalAttackContract deployed to ${navalattackcontract.address}`)
         //randomness
@@ -549,7 +575,7 @@ async function main() {
         // address _navalActions
     
     const NukeContract = await ethers.getContractFactory("NukeContract")
-    nukecontract = await NukeContract.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as NukeContract
+    nukecontract = await NukeContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as NukeContract
     await nukecontract.deployed()
     console.log(`NukeContract deployed to ${nukecontract.address}`)
 
@@ -568,7 +594,7 @@ async function main() {
         // address _keeper 
     
     const ResourcesContract = await ethers.getContractFactory("ResourcesContract")
-    resourcescontract = await ResourcesContract.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as ResourcesContract
+    resourcescontract = await ResourcesContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as ResourcesContract
     await resourcescontract.deployed()
     console.log(`ResourcesContract deployed to ${resourcescontract.address}`)
 
@@ -586,7 +612,7 @@ async function main() {
         // address _wonders3
     
     const SpyOperationsContract = await ethers.getContractFactory("SpyOperationsContract")
-    spyoperationscontract = await SpyOperationsContract.deploy(vrfCoordinatorV2, subscriptionId, gasLane, callbackGasLimit) as SpyOperationsContract
+    spyoperationscontract = await SpyOperationsContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as SpyOperationsContract
     await spyoperationscontract.deployed()
     console.log(`SpyOperationsContract deployed to ${spyoperationscontract.address}`)
 

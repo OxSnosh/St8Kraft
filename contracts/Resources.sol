@@ -252,6 +252,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
     mapping(uint256 => uint256[]) public idToProposedTradingPartners;
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
+
     // mapping(uint256 => address) public idToOwnerResources;
 
     /* Functions */
@@ -267,10 +268,11 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         i_callbackGasLimit = callbackGasLimit;
     }
 
-    function settings(address _infrastructure, address _improvements2, address _countryMinter)
-        public
-        onlyOwner
-    {
+    function settings(
+        address _infrastructure,
+        address _improvements2,
+        address _countryMinter
+    ) public onlyOwner {
         infrastructure = _infrastructure;
         improvements2 = _improvements2;
         countryMinter = _countryMinter;
@@ -333,7 +335,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         idToBonusResources[id] = newBonusResources;
         idToMoonResources[id] = newMoonResources;
         idToMarsResources[id] = newMarsResources;
-        // fulfillRequest(id);
+        fulfillRequest(id);
     }
 
     function fulfillRequest(uint256 id) public {
@@ -640,7 +642,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
 
     function proposeTrade(uint256 requestorId, uint256 recipientId) public {
         bool isOwner = mint.checkOwnership(requestorId, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         bool isPossibleRequestor = isTradePossibleForRequestor(requestorId);
         bool isPossibleRecipient = isTradePossibleForRecipient(recipientId);
         require(isPossibleRequestor = true, "trade is not possible");
@@ -720,7 +722,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         public
     {
         bool isOwner = mint.checkOwnership(recipientId, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         bool isProposed = isProposedTrade(recipientId, requestorId);
         require(isProposed == true, "Not an active trade proposal");
         uint256[]
@@ -755,7 +757,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
 
     function removeTradingPartner(uint256 nationId, uint256 partnerId) public {
         bool isOwner = mint.checkOwnership(nationId, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         bool isActive = isActiveTrade(nationId, partnerId);
         require(isActive == true, "this is not an active trade");
         uint256[] storage tradesOfNation = idToTradingPartners[nationId];
@@ -974,6 +976,15 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
     function viewWine(uint256 id) public view returns (bool) {
         bool isWine = idToResources2[id].wine;
         return isWine;
+    }
+
+    function getPlayerResources(uint256 id)
+        public
+        view
+        returns (uint256[] memory)
+    {
+        uint256[] memory resources = idToPlayerResources[id];
+        return resources;
     }
 
     function getTradingPartners(uint256 id)

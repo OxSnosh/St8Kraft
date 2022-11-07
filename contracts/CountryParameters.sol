@@ -101,7 +101,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         );
         idToCountryParameters[id] = newCountryParameters;
         idToCountrySettings[id] = newCountrySettings;
-        // fulfillRequest(id);
+        fulfillRequest(id);
     }
 
     function fulfillRequest(uint256 id) public {

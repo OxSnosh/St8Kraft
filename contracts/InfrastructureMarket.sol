@@ -55,7 +55,6 @@ contract InfrastructureMarketContract is Ownable {
         tsy = TreasuryContract(_treasury);
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
-
     }
 
     function buyInfrastructure(uint256 id, uint256 buyAmount) public {
