@@ -57,7 +57,7 @@ import {
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("CountryMinter", function () {
+describe("ResourcesContract", function () {
 
     
     let warbucks: WarBucks  
@@ -122,11 +122,11 @@ describe("CountryMinter", function () {
         signer1 = signers[1];
         signer2 = signers[2];
         
-
-        let chainId = network.config.chainId
-        let subscriptionId: any    
+        let chainId: any
+        chainId = network.config.chainId
+        let subscriptionId   
         let vrfCoordinatorV2Mock
-        let vrfCoordinatorV2Address    
+        let vrfCoordinatorV2Address
 
         
         if (chainId == 31337) {
@@ -145,8 +145,8 @@ describe("CountryMinter", function () {
             // Our mock makes it so we don't actually have to worry about sending fund
             await vrfCoordinatorV2Mock.fundSubscription(subscriptionId, FUND_AMOUNT)
         } else {
-            // vrfCoordinatorV2Address = networkConfig[chainId]["vrfCoordinatorV2"]
-            // subscriptionId = networkConfig[chainId]["subscriptionId"]
+            vrfCoordinatorV2Address = networkConfig[chainId]["vrfCoordinatorV2"]
+            subscriptionId = networkConfig[chainId]["subscriptionId"]
         }
 
         var gasLane = networkConfig[31337]["gasLane"]
@@ -900,37 +900,16 @@ describe("CountryMinter", function () {
     });
 
     describe("Minting a Country", function () {
-        it("Tests that the nation parameters set correctly", async function () {
+        it("Tests that two resources were randomly selected", async function () {
             await countryminter.connect(signer1).generateCountry(
                     "TestRuler",
                     "TestNationName",
                     "TestCapitalCity",
                     "TestNationSlogan"
                 );
-            const { rulerName, nationName, capitalCity, nationSlogan } = await countryparameterscontract.idToCountryParameters(0);    
-            expect(rulerName).to.equal("TestRuler");
-            expect(nationName).to.equal("TestNationName");
-            expect(capitalCity).to.equal("TestCapitalCity");
-            expect(nationSlogan).to.equal("TestNationSlogan");
+            let randomWords = await resourcescontract.getRandomWords(0);
+            console.log(randomWords[0]);
+            console.log(randomWords[1]);
         });
-
-        it("Tests that the countryId increments correctly", async function () {
-            await countryminter.connect(signer1).generateCountry(
-                "TestRuler",
-                "TestNationName",
-                "TestCapitalCity",
-                "TestNationSlogan"
-            )
-            const countryId = await countryminter.getCountryCount();
-            expect(countryId).to.equal(1);
-            await countryminter.connect(signer2).generateCountry(
-                "TestRuler2",
-                "TestNationName2",
-                "TestCapitalCity2",
-                "TestNationSlogan2"
-            )
-            const countryId2 = await countryminter.getCountryCount();
-            expect(countryId2).to.equal(2);
-        });  
     });
 });

@@ -14,7 +14,7 @@ const INITIAL_SUPPLY = "1000000000000000000000000"
   
 const developmentChains = ["hardhat", "localhost"]
 
-const networkConfig = {
+const networkConfig: any = {
   default: {
       name: "hardhat",
       keepersUpdateInterval: "30",
