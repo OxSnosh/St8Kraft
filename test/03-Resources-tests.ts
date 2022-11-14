@@ -54,6 +54,7 @@ import {
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
+import { connect } from "http2";
 
 describe("ResourcesContract", async function () {
 
@@ -892,78 +893,86 @@ describe("ResourcesContract", async function () {
             wonderscontract3.address,
             countryminter.address
         )
-  
+
+        // console.log("country 1");
+        await countryminter.connect(signer1).generateCountry(
+            "TestRuler",
+            "TestNationName",
+            "TestCapitalCity",
+            "TestNationSlogan"
+        )
+        const tx1 = await resourcescontract.fulfillRequest(0);
+        let txReceipt1 = await tx1.wait(1);
+        let requestId1 = txReceipt1?.events?.[1].args?.requestId;
+        // console.log("requestId", (txReceipt1.events?.[1].args?.requestId).toNumber());
+        await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, resourcescontract.address);
+        let resources1 = await resourcescontract.getPlayerResources(0);
+        console.log("resources", resources1[0].toNumber(), resources1[1].toNumber());
+        
+        // console.log("country 2");
+        await countryminter.connect(signer2).generateCountry(
+            "TestRuler2",
+            "TestNationName2",
+            "TestCapitalCity2",
+            "TestNationSlogan2"
+        )
+        const tx2 = await resourcescontract.fulfillRequest(1);
+        let txReceipt2 = await tx2.wait(1);
+        let requestId2 = txReceipt2?.events?.[1].args?.requestId;
+        // console.log("requestId", (txReceipt2.events?.[1].args?.requestId).toNumber());
+        await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, resourcescontract.address);
+        let resources2 = await resourcescontract.getPlayerResources(1);
+        console.log("resources", resources2[0].toNumber(), resources2[1].toNumber());
+
+        // console.log("country 3");
+        // const tx3 = await resourcescontract.fulfillRequest(2);
+        // let txReceipt3 = await tx3.wait(1);
+        // let requestId3 = txReceipt3?.events?.[1].args?.requestId;
+        // console.log("requestId", (txReceipt3.events?.[1].args?.requestId).toNumber());
+        // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId3, resourcescontract.address);
+        // let resources3 = await resourcescontract.getPlayerResources(2);
+        // console.log("resources", resources3[0].toNumber(), resources3[1].toNumber());
+        
         // console.log("settings initiated");
     });
 
     describe("Resources Setup", function () {
         it("Tests that two resources were randomly selected and set to true", async function () {
-            // console.log("country 1");
-            const tx1 = await resourcescontract.fulfillRequest(0);
-            let txReceipt1 = await tx1.wait(1);
-            let requestId1 = txReceipt1?.events?.[1].args?.requestId;
-            // console.log("requestId", (txReceipt1.events?.[1].args?.requestId).toNumber());
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, resourcescontract.address);
-            let resources1 = await resourcescontract.getPlayerResources(0);
-            // console.log("resources", resources1[0].toNumber(), resources1[1].toNumber());
-            var cattle1 = await resourcescontract.viewCattle(0);
-            expect(cattle1).to.equal(true);
             var wheat1 = await resourcescontract.viewWheat(0);
             expect(wheat1).to.equal(true);
+            var oil1 = await resourcescontract.viewOil(0);
+            expect(oil1).to.equal(true);
             var fish1 = await resourcescontract.viewFish(0);
             expect(fish1).to.equal(false);
 
-            // console.log("country 2");
-            const tx2 = await resourcescontract.fulfillRequest(1);
-            let txReceipt2 = await tx2.wait(1);
-            let requestId2 = txReceipt2?.events?.[1].args?.requestId;
-            // console.log("requestId", (txReceipt2.events?.[1].args?.requestId).toNumber());
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, resourcescontract.address);
-            let resources2 = await resourcescontract.getPlayerResources(1);
-            // console.log("resources", resources2[0].toNumber(), resources2[1].toNumber());
-            var cattle2 = await resourcescontract.viewCattle(1);
-            expect(cattle2).to.equal(true);
-            var iron2 = await resourcescontract.viewIron(1);
-            expect(iron2).to.equal(true);
+            var gems2 = await resourcescontract.viewGems(1);
+            expect(gems2).to.equal(true);
+            var water2 = await resourcescontract.viewWater(1);
+            expect(water2).to.equal(true);
             var coal2 = await resourcescontract.viewCoal(1);
             expect(coal2).to.equal(false);
-            
-            // console.log("country 3");
-            const tx3 = await resourcescontract.fulfillRequest(2);
-            let txReceipt3 = await tx3.wait(1);
-            let requestId3 = txReceipt3?.events?.[1].args?.requestId;
-            // console.log("requestId", (txReceipt3.events?.[1].args?.requestId).toNumber());
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId3, resourcescontract.address);
-            let resources3 = await resourcescontract.getPlayerResources(2);
-            // console.log("resources", resources3[0].toNumber(), resources3[1].toNumber());
-            var wheat3 = await resourcescontract.viewWheat(2);
-            expect(wheat3).to.equal(true);
-            var oil3 = await resourcescontract.viewOil(2);
-            expect(oil3).to.equal(true);
-            var pigs3 = await resourcescontract.viewPigs(2);
-            expect(pigs3).to.equal(false);
         });
     });
 
     describe("Accept Trading Partner", function () {
-        it("Test that partners recieve each others resources", async function () {
-            console.log("partner 1");
-            const tx3 = await resourcescontract.connect(signer1).fulfillRequest(3);
-            let txReceipt3 = await tx3.wait(1);
-            let requestId3 = txReceipt3?.events?.[1].args?.requestId;
-            // console.log("requestId", (txReceipt1.events?.[1].args?.requestId).toNumber());
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId3, resourcescontract.address);
-            let resources3 = await resourcescontract.getPlayerResources(3);
-            console.log("resources", resources3[0].toNumber(), resources3[1].toNumber());
+        it.only("Test that partners recieve each others resources", async function () {
+            resourcescontract.connect(signer1).proposeTrade(0, 1);
+            var proposedPartners0 = await resourcescontract.getProposedTradingPartners(0);
+            console.log(proposedPartners0);
+            // resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
+            // var wheat1 = await resourcescontract.viewWheat(0);
+            // expect(wheat1).to.equal(true);
+            // console.log("country 0 has wheat", wheat1);
+            // var oil1 = await resourcescontract.viewOil(0);
+            // expect(oil1).to.equal(true);
+            // console.log("country 0 has oil", oil1);
+            // var gems1 = await resourcescontract.viewGems(0);
+            // expect(gems1).to.equal(false);
+            // console.log("country 0 has gems", gems1)
+            // var water1 = await resourcescontract.viewWater(0);
+            // expect(water1).to.equal(true);
+            // console.log("country 0 has water", water1);
 
-            console.log("partner 2");
-            const tx4 = await resourcescontract.connect(signer2).fulfillRequest(4);
-            let txReceipt4 = await tx4.wait(1);
-            let requestId4 = txReceipt4?.events?.[1].args?.requestId;
-            // console.log("requestId", (txReceipt1.events?.[1].args?.requestId).toNumber());
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId4, resourcescontract.address);
-            let resources4 = await resourcescontract.getPlayerResources(4);
-            console.log("resources", resources4[0].toNumber(), resources4[1].toNumber());
         })
     })
 });

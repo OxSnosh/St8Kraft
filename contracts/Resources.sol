@@ -1003,4 +1003,13 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         uint256[] memory partners = idToTradingPartners[id];
         return partners;
     }
+
+    function getProposedTradingPartners(uint256 id)
+        public
+        view
+        returns (uint256[] memory)
+    {
+        uint256[] memory proposedPartners = idToProposedTradingPartners[id];
+        return proposedPartners;
+    }
 }
