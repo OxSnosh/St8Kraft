@@ -11,7 +11,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract ResourcesContract is VRFConsumerBaseV2, Ownable {
     uint256 public resourcesLength = 21;
     uint256[] private s_randomWords;
-    uint256[] public playerResources;
     uint256[] public tradingPartners;
     uint256[] public proposedTrades;
     uint256[] public trades;
@@ -248,12 +247,19 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
     mapping(uint256 => MoonResources) public idToMoonResources;
     mapping(uint256 => MarsResources) public idToMarsResources;
     mapping(uint256 => uint256[]) public idToPlayerResources;
+    mapping(uint256 => uint256[]) public idToRandomResourceSelection;
     mapping(uint256 => uint256[]) public idToTradingPartners;
     mapping(uint256 => uint256[]) public idToProposedTradingPartners;
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
     // mapping(uint256 => address) public idToOwnerResources;
+
+    event randomNumbersRequested(uint256 indexed requestId);
+    event randomNumbersFulfilled(
+        uint256 indexed randomResource1,
+        uint256 indexed randomResource2
+    );
 
     /* Functions */
     constructor(
@@ -347,6 +353,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
             NUM_WORDS
         );
         s_requestIdToRequestIndex[requestId] = id;
+        emit randomNumbersRequested(requestId);
     }
 
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords)
@@ -358,6 +365,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         s_randomWords = s_requestIndexToRandomWords[requestNumber];
         uint256 randomResource1 = (s_randomWords[0] % 20);
         uint256 randomResource2 = (s_randomWords[1] % 20);
+        emit randomNumbersFulfilled(randomResource1, randomResource2);
         //handle 2 of the same randomly generated numbers
         if (randomResource1 == randomResource2 && randomResource2 == 20) {
             randomResource2 == 0;
@@ -365,7 +373,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         if (randomResource1 == randomResource2) {
             randomResource2 = randomResource2 + 1;
         }
-        playerResources = [randomResource1, randomResource2];
+        uint256[2] memory playerResources = [randomResource1, randomResource2];
         idToPlayerResources[requestNumber] = playerResources;
         setResources(requestNumber);
     }
@@ -995,10 +1003,4 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         uint256[] memory partners = idToTradingPartners[id];
         return partners;
     }
-
-    function getRandomWords(uint256 id) public view returns (uint256[] memory) {
-        uint256[] memory randomWords = s_requestIndexToRandomWords[id];
-        return randomWords;
-    }
-
 }
