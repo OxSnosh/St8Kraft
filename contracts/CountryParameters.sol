@@ -22,6 +22,12 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
 
     CountryMinter mint;
 
+    event randomNumbersRequested(uint256 indexed requestId);
+    event randomNumbersFulfilled(
+        uint256 indexed preferredReligion,
+        uint256 indexed preferredGovernment
+    );
+
     struct CountryParameters {
         uint256 id;
         address rulerAddress;
@@ -114,6 +120,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         );
         //should this be resourcesID?
         s_requestIdToRequestIndex[requestId] = id;
+        emit randomNumbersRequested(requestId);
     }
 
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords)
@@ -122,9 +129,10 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     {
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
         s_requestIndexToRandomWords[requestNumber] = randomWords;
-        s_randomWords = randomWords;
-        uint256 religionPreference = ((s_randomWords[0] % 14) + 1);
-        uint256 governmentPreference = ((s_randomWords[1] % 10) + 1);
+        s_randomWords = s_requestIndexToRandomWords[requestNumber];
+        uint256 religionPreference = ((randomWords[0] % 14) + 1);
+        uint256 governmentPreference = ((randomWords[1] % 10) + 1);
+        emit randomNumbersFulfilled(religionPreference, governmentPreference);
         idToReligionPreference[requestNumber] = religionPreference;
         idToGovernmentPreference[requestNumber] = governmentPreference;
     }
@@ -276,8 +284,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         view
         returns (uint256 preference)
     {
-        uint256 preferredGovernment = idToGovernmentPreference[id];
-        return preferredGovernment;
+        return idToGovernmentPreference[id];
     }
 
     function getReligionPreference(uint256 id)
@@ -285,7 +292,6 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         view
         returns (uint256 preference)
     {
-        uint256 preferredReligion = idToReligionPreference[id];
-        return preferredReligion;
+        return idToReligionPreference[id];
     }
 }

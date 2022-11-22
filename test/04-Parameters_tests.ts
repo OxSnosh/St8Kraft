@@ -54,9 +54,8 @@ import {
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
-import { connect } from "http2";
 
-describe("ResourcesContract", async function () {
+describe("ParametersContract", async function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -901,13 +900,14 @@ describe("ResourcesContract", async function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        const tx1 = await resourcescontract.fulfillRequest(0);
+        const tx1 = await countryparameterscontract.fulfillRequest(0);
         let txReceipt1 = await tx1.wait(1);
         let requestId1 = txReceipt1?.events?.[1].args?.requestId;
-        // console.log("requestId", (txReceipt1.events?.[1].args?.requestId).toNumber());
-        await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, resourcescontract.address);
-        let resources1 = await resourcescontract.getPlayerResources(0);
-        // console.log("resources", resources1[0].toNumber(), resources1[1].toNumber());
+        await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, countryparameterscontract.address);
+        let preferredReligion1 = await countryparameterscontract.getReligionPreference(0);
+        console.log("Rel 1", preferredReligion1.toNumber());
+        let preferredGovernment1 = await countryparameterscontract.getGovernmentPreference(0);
+        console.log("Gov 1", preferredGovernment1.toNumber());
         
         // console.log("country 2");
         await countryminter.connect(signer2).generateCountry(
@@ -919,72 +919,42 @@ describe("ResourcesContract", async function () {
         const tx2 = await resourcescontract.fulfillRequest(1);
         let txReceipt2 = await tx2.wait(1);
         let requestId2 = txReceipt2?.events?.[1].args?.requestId;
-        // console.log("requestId", (txReceipt2.events?.[1].args?.requestId).toNumber());
-        await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, resourcescontract.address);
-        let resources2 = await resourcescontract.getPlayerResources(1);
-        // console.log("resources", resources2[0].toNumber(), resources2[1].toNumber());
+        await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, countryparameterscontract.address);
+        let preferredReligion2 = await countryparameterscontract.getReligionPreference(1);
+        console.log("Rel 2", preferredReligion2.toNumber());
+        let preferredGovernment2 = await countryparameterscontract.getGovernmentPreference(1);
+        console.log("Gov 2", preferredGovernment2.toNumber());
     });
 
-    describe("Resources Setup", function () {
-        it("Tests that two resources were randomly selected and set to true", async function () {
-            var wheat1 = await resourcescontract.viewWheat(0);
-            expect(wheat1).to.equal(true);
-            var oil1 = await resourcescontract.viewOil(0);
-            expect(oil1).to.equal(true);
-            var fish1 = await resourcescontract.viewFish(0);
-            expect(fish1).to.equal(false);
+    describe("Preferences Setup", function () {
+        it.only("Tests that religion and government preference were randomly selected", async function () {
+            const tx1 = await countryparameterscontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, countryparameterscontract.address);
+            let preferredReligion1 = await countryparameterscontract.getReligionPreference(0);
+            console.log("Rel 1", preferredReligion1.toNumber());
+            let preferredGovernment1 = await countryparameterscontract.getGovernmentPreference(0);
+            console.log("Gov 1", preferredGovernment1.toNumber());
 
-            var gems2 = await resourcescontract.viewGems(1);
-            expect(gems2).to.equal(true);
-            var water2 = await resourcescontract.viewWater(1);
-            expect(water2).to.equal(true);
-            var coal2 = await resourcescontract.viewCoal(1);
-            expect(coal2).to.equal(false);
+            const tx2 = await resourcescontract.fulfillRequest(1);
+            let txReceipt2 = await tx2.wait(1);
+            let requestId2 = txReceipt2?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, countryparameterscontract.address);
+            let preferredReligion2 = await countryparameterscontract.getReligionPreference(1);
+            console.log("Rel 2", preferredReligion2.toNumber());
+            let preferredGovernment2 = await countryparameterscontract.getGovernmentPreference(1);
+            console.log("Gov 2", preferredGovernment2.toNumber());
+
+            const tx3 = await resourcescontract.fulfillRequest(2);
+            let txReceipt3 = await tx3.wait(1);
+            let requestId3 = txReceipt3?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId3, countryparameterscontract.address);
+            let preferredReligion3 = await countryparameterscontract.getReligionPreference(2);
+            console.log("Rel 3", preferredReligion3.toNumber());
+            let preferredGovernment3 = await countryparameterscontract.getGovernmentPreference(2);
+            console.log("Gov 3", preferredGovernment3.toNumber());
+            console.log("done");
         });
     });
-
-    describe("Accept Trading Partner", function () {
-        it("Test that partners recieve each others resources", async function () {
-            await resourcescontract.connect(signer1).proposeTrade(0, 1);
-            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
-            var wheat1 = await resourcescontract.viewWheat(0);
-            expect(wheat1).to.equal(true);
-            var oil1 = await resourcescontract.viewOil(0);
-            expect(oil1).to.equal(true)
-            var gems1 = await resourcescontract.viewGems(0);
-            expect(gems1).to.equal(true);
-            var water1 = await resourcescontract.viewWater(0);
-            expect(water1).to.equal(true);
-            var wheat2 = await resourcescontract.viewWheat(1);
-            expect(wheat2).to.equal(true);
-            var oil2 = await resourcescontract.viewOil(1);
-            expect(oil2).to.equal(true)
-            var gems2 = await resourcescontract.viewGems(1);
-            expect(gems2).to.equal(true);
-            var water2 = await resourcescontract.viewWater(1);
-            expect(water2).to.equal(true);
-        })
-    })
-
-    describe("Remove Trading Partners", async function () {
-        it("Nation one in a trade can remove the trade", async function () {
-            await resourcescontract.connect(signer1).proposeTrade(0, 1);
-            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
-            var nation1TradingPartnersFirst = await resourcescontract.getTradingPartners(0);
-            expect(nation1TradingPartnersFirst.length).to.equal(1);
-            await resourcescontract.connect(signer1).removeTradingPartner(0, 1);
-            var nation1TradingPartners = await resourcescontract.getTradingPartners(0);
-            expect(nation1TradingPartners.length).to.equal(0);
-        })
-
-        it("Nation two in a trade can remove the trade", async function () {
-            await resourcescontract.connect(signer1).proposeTrade(0, 1);
-            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
-            var nation1TradingPartnersFirst = await resourcescontract.getTradingPartners(1);
-            expect(nation1TradingPartnersFirst.length).to.equal(1);
-            await resourcescontract.connect(signer2).removeTradingPartner(1, 0);
-            var nation1TradingPartners = await resourcescontract.getTradingPartners(1);
-            expect(nation1TradingPartners.length).to.equal(0);
-        })
-    })
 });
