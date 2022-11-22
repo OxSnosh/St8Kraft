@@ -4,6 +4,7 @@ pragma solidity 0.8.7;
 import "./Infrastructure.sol";
 import "./Improvements.sol";
 import "./CountryMinter.sol";
+import "hardhat/console.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -194,58 +195,58 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         //requires Construction, Microchips, Steel and Technology > 15
     }
 
-    struct MoonResources {
-        bool calcium;
-        //Calcium
-        //Mined from Lunar surface.
-        //Increases population income by $3.00 for the resources
-        //Rubber, Furs, Spices & Wine that your nation has access to.
-        bool radon;
-        //radon
-        //Mined from Lunar surface.
-        //Increases population income by $3.00 for the resources
-        //Lead, Gold, Water & Uranium that your nation has access to.
-        bool silicon;
-        //Silicon
-        //Mined from Lunar surface.
-        //Increases population income by $3.00 for the resources
-        //Rubber, Furs, Gems & Silver that your nation has access to.
-        bool titanium;
-        //Titanium
-        //Mined from Lunar surface.
-        //Increases population income by $3.00 for the resources
-        //Gold, Lead, Coal & Oil that your nation has access to.
-    }
+    // struct MoonResources {
+    //     bool calcium;
+    //     //Calcium
+    //     //Mined from Lunar surface.
+    //     //Increases population income by $3.00 for the resources
+    //     //Rubber, Furs, Spices & Wine that your nation has access to.
+    //     bool radon;
+    //     //radon
+    //     //Mined from Lunar surface.
+    //     //Increases population income by $3.00 for the resources
+    //     //Lead, Gold, Water & Uranium that your nation has access to.
+    //     bool silicon;
+    //     //Silicon
+    //     //Mined from Lunar surface.
+    //     //Increases population income by $3.00 for the resources
+    //     //Rubber, Furs, Gems & Silver that your nation has access to.
+    //     bool titanium;
+    //     //Titanium
+    //     //Mined from Lunar surface.
+    //     //Increases population income by $3.00 for the resources
+    //     //Gold, Lead, Coal & Oil that your nation has access to.
+    // }
 
-    struct MarsResources {
-        bool basalt;
-        //basalt
-        //+3 happiness if nation has Automobiles,
-        //–5% infra upkeep if nation has Asphalt,
-        //–5% infra purchase cost if nation has Construction.
-        bool magnesium;
-        //magnesium
-        //Mined from Martian surface.
-        //+4 happiness if nation has Microchips,
-        //–4% infra upkeep if nation has Steel.
-        bool potassium;
-        //Mined from Martian surface.
-        //+3 happiness if nation has Fine Jewelry,
-        //+$3 citizen income if nation has Scholars,
-        //+$3 citizen income if nation has Affluent Population.
-        bool sodium;
-        //Sodium
-        //Mined from Martian surface.
-        //+2 happiness if nation has Fast Food,
-        //+2 happiness if nation has Beer,
-        //Decreases GRL by an additional 50% (75% total) if you have Radiation Cleanup.
-    }
+    // struct MarsResources {
+    //     bool basalt;
+    //     //basalt
+    //     //+3 happiness if nation has Automobiles,
+    //     //–5% infra upkeep if nation has Asphalt,
+    //     //–5% infra purchase cost if nation has Construction.
+    //     bool magnesium;
+    //     //magnesium
+    //     //Mined from Martian surface.
+    //     //+4 happiness if nation has Microchips,
+    //     //–4% infra upkeep if nation has Steel.
+    //     bool potassium;
+    //     //Mined from Martian surface.
+    //     //+3 happiness if nation has Fine Jewelry,
+    //     //+$3 citizen income if nation has Scholars,
+    //     //+$3 citizen income if nation has Affluent Population.
+    //     bool sodium;
+    //     //Sodium
+    //     //Mined from Martian surface.
+    //     //+2 happiness if nation has Fast Food,
+    //     //+2 happiness if nation has Beer,
+    //     //Decreases GRL by an additional 50% (75% total) if you have Radiation Cleanup.
+    // }
 
     mapping(uint256 => Resources1) public idToResources1;
     mapping(uint256 => Resources2) public idToResources2;
     mapping(uint256 => BonusResources) public idToBonusResources;
-    mapping(uint256 => MoonResources) public idToMoonResources;
-    mapping(uint256 => MarsResources) public idToMarsResources;
+    // mapping(uint256 => MoonResources) public idToMoonResources;
+    // mapping(uint256 => MarsResources) public idToMarsResources;
     mapping(uint256 => uint256[]) public idToPlayerResources;
     mapping(uint256 => uint256[]) public idToRandomResourceSelection;
     mapping(uint256 => uint256[]) public idToTradingPartners;
@@ -324,23 +325,23 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
             false,
             false
         );
-        MoonResources memory newMoonResources = MoonResources(
-            false,
-            false,
-            false,
-            false
-        );
-        MarsResources memory newMarsResources = MarsResources(
-            false,
-            false,
-            false,
-            false
-        );
+        // MoonResources memory newMoonResources = MoonResources(
+        //     false,
+        //     false,
+        //     false,
+        //     false
+        // );
+        // MarsResources memory newMarsResources = MarsResources(
+        //     false,
+        //     false,
+        //     false,
+        //     false
+        // );
         idToResources1[id] = newResources1;
         idToResources2[id] = newResources2;
         idToBonusResources[id] = newBonusResources;
-        idToMoonResources[id] = newMoonResources;
-        idToMarsResources[id] = newMarsResources;
+        // idToMoonResources[id] = newMoonResources;
+        // idToMarsResources[id] = newMarsResources;
         fulfillRequest(id);
     }
 
@@ -472,7 +473,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         uint256[] memory activeTrades = idToTradingPartners[id];
         uint256 i;
         for (i = 0; i < activeTrades.length; i++) {
-            uint256 tradingPartner = i;
+            uint256 tradingPartner = activeTrades[i];
             (
                 uint256 resource1,
                 uint256 resource2
@@ -655,17 +656,16 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         bool isPossibleRecipient = isTradePossibleForRecipient(recipientId);
         require(isPossibleRequestor = true, "trade is not possible");
         require(isPossibleRecipient = true, "trade is not possible");
-        uint256[]
-            storage proposedTradesOfRecipient = idToProposedTradingPartners[
-                recipientId
-            ];
-        uint256[]
-            storage proposedTradesOfRequestor = idToProposedTradingPartners[
-                requestorId
-            ];
-        proposedTradesOfRecipient.push(requestorId);
-        proposedTradesOfRequestor.push(recipientId);
-        // pushProposals(requestorId, recipientId);
+        idToProposedTradingPartners[recipientId].push(requestorId);
+        idToProposedTradingPartners[requestorId].push(recipientId);
+    }
+
+    function getProposedTradingPartners(uint256 id)
+        public
+        view
+        returns (uint256[] memory)
+    {
+        return idToProposedTradingPartners[id];
     }
 
     function isTradePossibleForRequestor(uint256 requestorId)
@@ -768,16 +768,16 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         require(isOwner, "!nation owner");
         bool isActive = isActiveTrade(nationId, partnerId);
         require(isActive == true, "this is not an active trade");
-        uint256[] storage tradesOfNation = idToTradingPartners[nationId];
-        for (uint256 i = 0; i < tradesOfNation.length; i++) {
-            if (tradesOfNation[i] == partnerId) {
-                delete tradesOfNation[i];
+        for (uint256 i = 0; i < idToTradingPartners[nationId].length; i++) {
+            if (idToTradingPartners[nationId][i] == partnerId) {
+                idToTradingPartners[nationId][i] = idToTradingPartners[nationId][idToTradingPartners[nationId].length - 1];
+                idToTradingPartners[nationId].pop();
             }
         }
-        uint256[] storage tradesOfPartner = idToTradingPartners[partnerId];
-        for (uint256 i = 0; i < tradesOfPartner.length; i++) {
-            if (tradesOfPartner[i] == nationId) {
-                delete tradesOfPartner[i];
+        for (uint256 i = 0; i < idToTradingPartners[partnerId].length; i++) {
+            if (idToTradingPartners[partnerId][i] == nationId) {
+                idToTradingPartners[partnerId][i] = idToTradingPartners[partnerId][idToTradingPartners[partnerId].length - 1];
+                idToTradingPartners[partnerId].pop();
             }
         }
         setResources(nationId);
@@ -1002,14 +1002,5 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
     {
         uint256[] memory partners = idToTradingPartners[id];
         return partners;
-    }
-
-    function getProposedTradingPartners(uint256 id)
-        public
-        view
-        returns (uint256[] memory)
-    {
-        uint256[] memory proposedPartners = idToProposedTradingPartners[id];
-        return proposedPartners;
     }
 }

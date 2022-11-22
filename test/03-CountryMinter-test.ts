@@ -932,5 +932,20 @@ describe("CountryMinter", function () {
             const countryId2 = await countryminter.getCountryCount();
             expect(countryId2).to.equal(2);
         });  
+
+        it("Tests that country mint will be reverted if the wallet already contains a country", async function () {
+            await countryminter.connect(signer1).generateCountry(
+                "TestRuler",
+                "TestNationName",
+                "TestCapitalCity",
+                "TestNationSlogan"
+            )
+            await expect(countryminter.connect(signer1).generateCountry(
+                "TestRuler",
+                "TestNationName",
+                "TestCapitalCity",
+                "TestNationSlogan"
+            )).to.be.revertedWith("Wallet already contains a country");
+        })
     });
 });

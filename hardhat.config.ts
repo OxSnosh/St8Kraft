@@ -45,6 +45,7 @@ const config: HardhatUserConfig = {
       //   url: MAINNET_RPC_URL
       // }
       chainId: 31337,
+      // allowUnlimitedContractSize: true,
     },
     localhost: {
       chainId: 31337,
