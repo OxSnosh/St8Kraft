@@ -843,8 +843,9 @@ async function main() {
         bombersmarketplace1.address,
         bombersmarketplace2.address)
     
-    countryparameterscontract.updateSpyAddress(
-        spyoperationscontract.address
+    countryparameterscontract.settings(
+        spyoperationscontract.address,
+        countryminter.address
     )
 
     crimecontract.settings(

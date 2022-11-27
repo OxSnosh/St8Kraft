@@ -7,7 +7,6 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
-    uint256 private parametersId;
     address public spyAddress;
     uint256[] private s_randomWords;
     address public countryMinter;
@@ -68,8 +67,10 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         i_callbackGasLimit = callbackGasLimit;
     }
 
-    function updateSpyAddress(address newAddress) public onlyOwner {
-        spyAddress = newAddress;
+    function settings(address _spy, address _countryMinter) public onlyOwner {
+        spyAddress = _spy;
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
     }
 
     modifier onlySpyContract() {
@@ -180,6 +181,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
             .daysSinceGovernmentChenge;
         require(daysSinceChange >= 3, "need to wait 3 days before changing");
         require(newType <= 10, "invalid type");
+        require(newType > 0, "invalid type");
         idToCountrySettings[id].governmentType = newType;
         idToCountrySettings[id].daysSinceGovernmentChenge = 0;
     }
@@ -197,8 +199,9 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         uint256 daysSinceChange = idToCountrySettings[id]
             .daysSinceReligionChange;
         require(daysSinceChange >= 3, "need to wait 3 days before changing");
+        require(newType > 0, "invalid type");
         require(newType <= 14, "invalid type");
-        idToCountrySettings[id].daysSinceReligionChange = newType;
+        idToCountrySettings[id].nationalReligion = newType;
         idToCountrySettings[id].daysSinceReligionChange = 0;
     }
 
@@ -211,8 +214,9 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
 
     //needs to be called by a keeper
     function incrementDaysSince() external {
+        uint256 countryCount = mint.getCountryCount();
         uint256 i;
-        for (i = 0; i < parametersId; i++) {
+        for (i = 0; i < countryCount; i++) {
             idToCountrySettings[i].daysSinceGovernmentChenge++;
             idToCountrySettings[i].daysSinceReligionChange++;
         }
@@ -293,5 +297,11 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         returns (uint256 preference)
     {
         return idToReligionPreference[id];
+    }
+
+    function getDaysSince(uint256 id) public view returns (uint256, uint256) {
+        uint256 daysSinceGovChange = idToCountrySettings[id].daysSinceGovernmentChenge;
+        uint256 daysSinceReligionChange = idToCountrySettings[id].daysSinceReligionChange;
+        return (daysSinceGovChange, daysSinceReligionChange);
     }
 }

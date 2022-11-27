@@ -486,8 +486,9 @@ describe("ParametersContract", async function () {
             bombersmarketplace1.address,
             bombersmarketplace2.address)
         
-        countryparameterscontract.updateSpyAddress(
-            spyoperationscontract.address
+        countryparameterscontract.settings(
+            spyoperationscontract.address,
+            countryminter.address
         )
 
         crimecontract.settings(
@@ -905,9 +906,9 @@ describe("ParametersContract", async function () {
         let requestId1 = txReceipt1?.events?.[1].args?.requestId;
         await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, countryparameterscontract.address);
         let preferredReligion1 = await countryparameterscontract.getReligionPreference(0);
-        console.log("Rel 1", preferredReligion1.toNumber());
+        console.log("Rel 1 top", preferredReligion1.toNumber());
         let preferredGovernment1 = await countryparameterscontract.getGovernmentPreference(0);
-        console.log("Gov 1", preferredGovernment1.toNumber());
+        console.log("Gov 1 top", preferredGovernment1.toNumber());
         
         // console.log("country 2");
         await countryminter.connect(signer2).generateCountry(
@@ -921,13 +922,13 @@ describe("ParametersContract", async function () {
         let requestId2 = txReceipt2?.events?.[1].args?.requestId;
         await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, countryparameterscontract.address);
         let preferredReligion2 = await countryparameterscontract.getReligionPreference(1);
-        console.log("Rel 2", preferredReligion2.toNumber());
+        console.log("Rel 2 top", preferredReligion2.toNumber());
         let preferredGovernment2 = await countryparameterscontract.getGovernmentPreference(1);
-        console.log("Gov 2", preferredGovernment2.toNumber());
+        console.log("Gov 2 top", preferredGovernment2.toNumber());
     });
 
     describe("Preferences Setup", function () {
-        it.only("Tests that religion and government preference were randomly selected", async function () {
+        it("Tests that religion and government preference were randomly selected", async function () {
             const tx1 = await countryparameterscontract.fulfillRequest(0);
             let txReceipt1 = await tx1.wait(1);
             let requestId1 = txReceipt1?.events?.[1].args?.requestId;
@@ -957,4 +958,130 @@ describe("ParametersContract", async function () {
             console.log("done");
         });
     });
+
+    describe("Preferences Functions", function () {
+        it("Tests that the setRulerName() function works", async function () {
+            let rulerName = await countryparameterscontract.connect(signer1).getRulerName(0);
+            expect(rulerName).to.equal("TestRuler");
+            await countryparameterscontract.connect(signer1).setRulerName("newName", 0);
+            let newRulerName = await countryparameterscontract.connect(signer1).getRulerName(0);
+            expect(newRulerName).to.equal("newName");
+        })
+
+        it("Tests that the setRulerName() function reverts correctly", async function () {
+            expect(countryparameterscontract.connect(signer2).setRulerName("newName", 0)).to.be.revertedWith("!nation owner");
+        })
+
+        it("Tests that the setNationName() function works", async function () {
+            let nationName = await countryparameterscontract.connect(signer1).getNationName(0);
+            expect(nationName).to.equal("TestCapitalCity");
+            await countryparameterscontract.connect(signer1).setNationName("newCapital", 0);
+            let newNationName = await countryparameterscontract.connect(signer1).getNationName(0);
+            expect(newNationName).to.equal("newNationName");
+        })
+
+        it("Tests that the setNationName() function reverts correctly", async function () {
+            expect(countryparameterscontract.connect(signer2).setRulerName("newNationName", 0)).to.be.revertedWith("!nation owner");
+        })
+
+        it("Tests that the setCapitalCity() function works", async function () {
+            let capital = await countryparameterscontract.connect(signer1).getCapital(0);
+            expect(capital).to.equal("TestCapitalCity");
+            await countryparameterscontract.connect(signer1).setCapitalCity("newCapital", 0);
+            let newCapital = await countryparameterscontract.connect(signer1).getCapital(0);
+            expect(newCapital).to.equal("newCapital");
+        })
+
+        it("Tests that the setCapitalCity() function reverts correctly", async function () {
+            expect(countryparameterscontract.connect(signer2).setCapitalCity("newCap", 0)).to.be.revertedWith("!nation owner");
+        })
+
+        it("Tests that the setSlogan() function works", async function () {
+            let slogan = await countryparameterscontract.connect(signer1).getSlogan(0);
+            expect(slogan).to.equal("TestNationSlogan");
+            await countryparameterscontract.connect(signer1).setNationSlogan("newSlogan", 0);
+            let newSlogan = await countryparameterscontract.connect(signer1).getSlogan(0);
+            expect(newSlogan).to.equal("newSlogan");
+        })
+
+        it("Tests that the setSlogan() function reverts correctly", async function () {
+            expect(countryparameterscontract.connect(signer2).setNationSlogan("newSlogan", 0)).to.be.revertedWith("!nation owner");
+        })
+
+        it("Tests that the setAlliance() function works", async function () {
+            let alliance = await countryparameterscontract.connect(signer1).getAlliance(0);
+            expect(alliance).to.equal("No Alliance Yet");
+            await countryparameterscontract.connect(signer1).setAlliance("newAlliance", 0);
+            let newAlliance = await countryparameterscontract.connect(signer1).getAlliance(0);
+            expect(newAlliance).to.equal("newAlliance");
+        })
+
+        it("Tests that the setAlliance() function reverts correctly", async function () {
+            expect(countryparameterscontract.connect(signer2).setAlliance("newAlliance", 0)).to.be.revertedWith("!nation owner");
+        })
+
+        it("Tests that the setTeam() function works", async function () {
+            let team = await countryparameterscontract.connect(signer1).getTeam(0);
+            expect(team).to.equal(0);
+            await countryparameterscontract.connect(signer1).setTeam(0, 6);
+            let newTeam = await countryparameterscontract.connect(signer1).getTeam(0);
+            expect(newTeam).to.equal(6);
+        })
+
+        it("Tests that the setTeam() function reverts correctly", async function () {
+            expect(countryparameterscontract.connect(signer2).setAlliance("newAlliance", 0)).to.be.revertedWith("!nation owner");
+        })
+
+        it.only("Tests that the setGovernment() function works", async function () {
+            let government = await countryparameterscontract.connect(signer1).getGovernmentType(0);
+            expect(government).to.equal(0);
+            await countryparameterscontract.incrementDaysSince();
+            await countryparameterscontract.incrementDaysSince();
+            await countryparameterscontract.incrementDaysSince();
+            let daysSince = await countryparameterscontract.getDaysSince(0);
+            expect(daysSince[0].toNumber()).to.equal(3);
+            await countryparameterscontract.connect(signer1).setGovernment(0, 4);
+            let newGovernment = await countryparameterscontract.connect(signer1).getGovernmentType(0);
+            expect(newGovernment).to.equal(4);
+        })
+
+        it.only("Tests that the setGovernment() function reverts correctly when called by !owner", async function () {
+            expect(countryparameterscontract.connect(signer2).setGovernment(5, 0)).to.be.revertedWith("!nation owner");
+        })
+
+        it.only("Tests that the setGovernment() function reverts correctly when called too soon", async function () {
+            expect(countryparameterscontract.connect(signer1).setGovernment(0, 4)).to.be.revertedWith("need to wait 3 days before changing");
+        })
+
+        it.only("Tests that the setGovernment() function reverts correctly when called with wrong type", async function () {
+            expect(countryparameterscontract.connect(signer1).setGovernment(0, -1)).to.be.revertedWith("invalid type");
+            expect(countryparameterscontract.connect(signer1).setGovernment(0, 15)).to.be.revertedWith("invalid type");
+        })
+
+        it.only("Tests that the setReligion() function works", async function () {
+            let religion = await countryparameterscontract.connect(signer1).getReligionType(0);
+            expect(religion).to.equal(0);
+            await countryparameterscontract.incrementDaysSince();
+            await countryparameterscontract.incrementDaysSince();
+            await countryparameterscontract.incrementDaysSince();
+            let daysSince = await countryparameterscontract.getDaysSince(0);
+            expect(daysSince[1].toNumber()).to.equal(3);
+            await countryparameterscontract.connect(signer1).setReligion(0, 5);
+            let newReligion = await countryparameterscontract.connect(signer1).getReligionType(0);
+            expect(newReligion).to.equal(5);
+        })
+
+        it.only("Tests that the setReligion() function reverts correctly when called by !owner", async function () {
+            expect(countryparameterscontract.connect(signer2).setReligion(5, 0)).to.be.revertedWith("!nation owner");
+        })
+
+        it.only("Tests that the setReligion() function reverts correctly when called too soon", async function () {
+            expect(countryparameterscontract.connect(signer1).setReligion(0, 4)).to.be.revertedWith("need to wait 3 days before changing");
+        })
+
+        it.only("Tests that the setReligion() function reverts correctly when called with worng type", async function () {
+            expect(countryparameterscontract.connect(signer1).setReligion(0, -1)).to.be.revertedWith("invalid type");
+            expect(countryparameterscontract.connect(signer1).setReligion(0, 11)).to.be.revertedWith("invalid type");
+        })
+    })
 });
