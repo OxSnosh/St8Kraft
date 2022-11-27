@@ -397,6 +397,9 @@ describe("ResourcesContract", async function () {
         // console.log(`Wonders4 deployed to ${wonderscontract4.address}`)
     
         // console.log("contracts deployed")
+        warbucks.settings(
+            treasurycontract.address
+        )
   
         aidcontract.settings(
             countryminter.address, 
@@ -839,7 +842,8 @@ describe("ResourcesContract", async function () {
             spyoperationscontract.address
         )
         treasurycontract.settings2(
-            groundbattlecontract.address
+            groundbattlecontract.address,
+            countryminter.address
         )
 
         warcontract.settings(

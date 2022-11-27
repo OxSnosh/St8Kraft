@@ -1197,7 +1197,8 @@ async function main() {
         spyoperationscontract.address
     )
     treasurycontract.settings2(
-        groundbattlecontract.address
+        groundbattlecontract.address,
+        countryminter.address
     )
 
     warcontract.settings(

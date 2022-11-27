@@ -8,6 +8,7 @@ import "./Infrastructure.sol";
 import "./Forces.sol";
 import "./Navy.sol";
 import "./Fighters.sol";
+import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract TreasuryContract is Ownable {
@@ -24,9 +25,12 @@ contract TreasuryContract is Ownable {
     address public bills;
     address public spyAddress;
     address public groundBattle;
+    address public countryMinter;
     uint256 public daysToInactive = 20;
     uint256 private gameTaxPercentage = 0;
-    uint256 public seedMoney = 2000000;
+    uint256 public seedMoney = 2000000*(10**18);
+
+    CountryMinter mint;
 
     struct Treasury {
         uint256 grossIncomePerCitizenPerDay;
@@ -42,7 +46,6 @@ contract TreasuryContract is Ownable {
     }
 
     mapping(uint256 => Treasury) public idToTreasury;
-    mapping(uint256 => address) public idToOwnerTreasury;
 
     function settings1 (
         address _warBucksAddress,
@@ -70,8 +73,10 @@ contract TreasuryContract is Ownable {
         spyAddress = _spyAddress;
     }
 
-    function settings2 (address _groundBattle) public onlyOwner {
+    function settings2 (address _groundBattle, address _countryMinter) public onlyOwner {
         groundBattle = _groundBattle;
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
     }
 
     function generateTreasury(uint256 id) public {
@@ -185,7 +190,8 @@ contract TreasuryContract is Ownable {
     //NEED FUNCTION TO WITHDRAW TAXES COLLECTED BY GAME
 
     function withdrawFunds(uint256 amount, uint256 id) public {
-        require(idToOwnerTreasury[id] == msg.sender);
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
         uint256 balance = idToTreasury[id].balance;
         require(balance >= amount);
         idToTreasury[id].balance -= amount;
@@ -193,7 +199,8 @@ contract TreasuryContract is Ownable {
     }
 
     function addFunds(uint256 amount, uint256 id) public {
-        require(idToOwnerTreasury[id] == msg.sender);
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
         idToTreasury[id].balance += amount;
         IWarBucks(warBucksAddress).burn(msg.sender, amount);
     }
