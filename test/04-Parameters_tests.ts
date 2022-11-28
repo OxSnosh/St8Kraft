@@ -976,7 +976,7 @@ describe("ParametersContract", async function () {
             expect(countryparameterscontract.connect(signer2).setRulerName("newName", 0)).to.be.revertedWith("!nation owner");
         })
 
-        it.only("Tests that the setNationName() function works", async function () {
+        it("Tests that the setNationName() function works", async function () {
             let nationName = await countryparameterscontract.connect(signer1).getNationName(0);
             expect(nationName).to.equal("TestNationName");
             await countryparameterscontract.connect(signer1).setNationName("newNationName", 0);

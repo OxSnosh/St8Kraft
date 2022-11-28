@@ -54,6 +54,7 @@ import {
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
+import { BigNumber } from "ethers";
 
 describe("Treasury", async function () {
 
@@ -909,20 +910,74 @@ describe("Treasury", async function () {
     });
 
     describe("Deposit and Withdraw Functionality", function () {
-        it("Tests that depositing WarBucks increases balance", async function () {
-            let deployerBalance = await warbucks.balanceOf(signer0.address);
-            console.log("deployer balance", BigInt(deployerBalance.toString()));
+        it("deployer balance is initiated correctly", async function () {
+            let deployerBalanceGross : any = (await (warbucks.balanceOf(signer0.address))).toString();
+            let deployerBalance = (BigInt(deployerBalanceGross / (10**18)));
+            // console.log("deployer balance", deployerBalance);
+            expect(deployerBalance.toString()).to.equal("1000000000");
+            // console.log("hello");
+            // await warbucks.connect(signer0).approve(warbucks.address, BigInt(500000000*(10**18)));
+            // await warbucks.connect(signer0).transfer(signer1.address, BigInt(500000000*(10**18)));
+            // let updatedSigner1CoinBalance = await warbucks.balanceOf(signer1.address);
+            // console.log("Signer1 New Coin Balance", BigInt(updatedSigner1CoinBalance.toString()));
+            // let signer1InitialGameBalance = await treasurycontract.checkBalance(0);
+            // console.log("signer1 initial game balance", BigInt(signer1InitialGameBalance.toString()));
+            // await treasurycontract.connect(signer1).addFunds(BigInt(500000000*(10**18)), 0);
+            // let signer1UpdatedGameBalance = await treasurycontract.checkBalance(0);
+            // console.log("signer1 game balance after adding funds", BigInt(signer1UpdatedGameBalance.toString()));
+            // let signer1UpdatedCoinBalanceAfterBurn = await warbucks.balanceOf(signer1.address);
+            // console.log("signer1 updates coin balance after burn", BigInt(signer1UpdatedCoinBalanceAfterBurn.toString()));
+        })
+
+        it("tests addFunds() will increase game balance and burn coins", async function () {
             await warbucks.connect(signer0).approve(warbucks.address, BigInt(500000000*(10**18)));
             await warbucks.connect(signer0).transfer(signer1.address, BigInt(500000000*(10**18)));
-            let updatedSigner1CoinBalance = await warbucks.balanceOf(signer1.address);
-            console.log("Signer1 New Coin Balance", BigInt(updatedSigner1CoinBalance.toString()));
-            let signer1InitialGameBalance = await treasurycontract.checkBalance(0);
-            console.log("signer1 initial game balance", BigInt(signer1InitialGameBalance.toString()));
+            let updatedSigner1CoinBalanceGross : any = await warbucks.balanceOf(signer1.address);
+            let updatedSigner1CoinBalance = (BigInt(updatedSigner1CoinBalanceGross / (10**18)));
+            // console.log("Signer1 New Coin Balance", BigInt(updatedSigner1CoinBalance.toString()));
+            expect(updatedSigner1CoinBalance.toString()).to.equal("500000000");
+            let signer1InitialGameBalanceGross : any = await treasurycontract.checkBalance(0);
+            let signer1InitialGameBalance = (BigInt(signer1InitialGameBalanceGross / (10**18)));
+            expect(signer1InitialGameBalance.toString()).to.equal("2000000");
+            // console.log("signer1 initial game balance", BigInt(signer1InitialGameBalance.toString()));
             await treasurycontract.connect(signer1).addFunds(BigInt(500000000*(10**18)), 0);
-            let signer1UpdatedGameBalance = await treasurycontract.checkBalance(0);
-            console.log("signer1 game balance after adding funds", BigInt(signer1UpdatedGameBalance.toString()));
+            let signer1UpdatedGameBalanceGross : any = await treasurycontract.checkBalance(0);
+            let signer1UpdatedGameBalance = (BigInt(signer1UpdatedGameBalanceGross / (10**18)));
+            expect(signer1UpdatedGameBalance.toString()).to.equal("502000000");
+            // console.log("signer1 game balance after adding funds", BigInt(signer1UpdatedGameBalance.toString()));
             let signer1UpdatedCoinBalanceAfterBurn = await warbucks.balanceOf(signer1.address);
-            console.log("signer1 updates coin balance after burn", BigInt(signer1UpdatedCoinBalanceAfterBurn.toString()));
+            expect(signer1UpdatedCoinBalanceAfterBurn.toString()).to.equal("0");
+            // console.log("signer1 updates coin balance after burn", BigInt(signer1UpdatedCoinBalanceAfterBurn.toString()));
+        })
+
+        it("tests withdrawFunds() will decrease game balance and mint coins", async function () {
+            await warbucks.connect(signer0).approve(warbucks.address, BigInt(500000000*(10**18)));
+            await warbucks.connect(signer0).transfer(signer1.address, BigInt(500000000*(10**18)));
+            let updatedSigner1CoinBalanceGross : any = await warbucks.balanceOf(signer1.address);
+            let updatedSigner1CoinBalance = (BigInt(updatedSigner1CoinBalanceGross / (10**18)));
+            // console.log("Signer1 New Coin Balance", BigInt(updatedSigner1CoinBalance.toString()));
+            expect(updatedSigner1CoinBalance.toString()).to.equal("500000000");
+            let signer1InitialGameBalanceGross : any = await treasurycontract.checkBalance(0);
+            let signer1InitialGameBalance = (BigInt(signer1InitialGameBalanceGross / (10**18)));
+            expect(signer1InitialGameBalance.toString()).to.equal("2000000");
+            // console.log("signer1 initial game balance", BigInt(signer1InitialGameBalance.toString()));
+            await treasurycontract.connect(signer1).addFunds(BigInt(500000000*(10**18)), 0);
+            let signer1UpdatedGameBalanceGross : any = await treasurycontract.checkBalance(0);
+            let signer1UpdatedGameBalance = (BigInt(signer1UpdatedGameBalanceGross / (10**18)));
+            expect(signer1UpdatedGameBalance.toString()).to.equal("502000000");
+            // console.log("signer1 game balance after adding funds", BigInt(signer1UpdatedGameBalance.toString()));
+            let signer1UpdatedCoinBalanceAfterBurn = await warbucks.balanceOf(signer1.address);
+            expect(signer1UpdatedCoinBalanceAfterBurn.toString()).to.equal("0");
+            // console.log("signer1 updates coin balance after burn", BigInt(signer1UpdatedCoinBalanceAfterBurn.toString()));
+            await treasurycontract.connect(signer1).withdrawFunds(BigInt(500000000*(10**18)), 0);
+            let coinBalanceAfterWithdrawGross : any = await warbucks.balanceOf(signer1.address);
+            let coinBalanceAfterWithdraw = (BigInt(coinBalanceAfterWithdrawGross / (10**18)));
+            // console.log("coin balance after withdraw", coinBalanceAfterWithdraw);
+            expect (coinBalanceAfterWithdraw.toString()).to.equal("500000000");
+            let gameBalanceAfterWithdrawGross : any = await treasurycontract.checkBalance(0);
+            let gameBalanceAfterWithdraw = (BigInt(gameBalanceAfterWithdrawGross / (10**18)));
+            // console.log("game balance after withdraw", gameBalanceAfterWithdraw);
+            expect(gameBalanceAfterWithdraw.toString()).to.equal("2000000");
         })
     })
 });

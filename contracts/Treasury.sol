@@ -28,7 +28,7 @@ contract TreasuryContract is Ownable {
     address public countryMinter;
     uint256 public daysToInactive = 20;
     uint256 private gameTaxPercentage = 0;
-    uint256 public seedMoney = 2000000*(10**18);
+    uint256 public seedMoney = 2000000 * (10**18);
 
     CountryMinter mint;
 
@@ -47,7 +47,7 @@ contract TreasuryContract is Ownable {
 
     mapping(uint256 => Treasury) public idToTreasury;
 
-    function settings1 (
+    function settings1(
         address _warBucksAddress,
         address _wonders1,
         address _improvements1,
@@ -73,7 +73,10 @@ contract TreasuryContract is Ownable {
         spyAddress = _spyAddress;
     }
 
-    function settings2 (address _groundBattle, address _countryMinter) public onlyOwner {
+    function settings2(address _groundBattle, address _countryMinter)
+        public
+        onlyOwner
+    {
         groundBattle = _groundBattle;
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
@@ -120,6 +123,14 @@ contract TreasuryContract is Ownable {
         _;
     }
 
+    modifier onlyInfrastructure() {
+        require(
+            msg.sender == infrastructure,
+            "only callable from infrastructure contract"
+        );
+        _;
+    }
+
     function decreaseBalanceOnBillsPaid(uint256 id, uint256 amount)
         public
         onlyBillsContract
@@ -137,12 +148,23 @@ contract TreasuryContract is Ownable {
         //TAXES here
         uint256 taxLevied = ((cost * gameTaxPercentage) / 100);
         if (taxLevied > 0) {
-            IWarBucks(warBucksAddress).mint(address(this), taxLevied);
+            IWarBucks(warBucksAddress).mintFromTreasury(
+                address(this),
+                taxLevied
+            );
         }
     }
 
+    function viewTaxRevenues() public view returns (uint256) {
+        return (WarBucks(warBucksAddress).balanceOf(address(this)));
+    }
+
+    function withdrawTaxRevenues(uint256 amount) public onlyOwner {
+        WarBucks(warBucksAddress).transfer(msg.sender, amount);
+    }
+
     // need modifier
-    function returnBalance(uint256 id, uint256 cost) public {
+    function returnBalance(uint256 id, uint256 cost) public onlyInfrastructure {
         //need a way to only allow the nation owner to do this
         idToTreasury[id].balance += cost;
     }
@@ -192,17 +214,22 @@ contract TreasuryContract is Ownable {
     function withdrawFunds(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
-        uint256 balance = idToTreasury[id].balance;
-        require(balance >= amount);
+        uint256 gameBalance = idToTreasury[id].balance;
+        require(gameBalance >= amount, "insufficient game balance");
         idToTreasury[id].balance -= amount;
-        IWarBucks(warBucksAddress).mint(msg.sender, amount);
+        IWarBucks(warBucksAddress).mintFromTreasury(msg.sender, amount);
     }
 
     function addFunds(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
+        uint256 coinBalance = IWarBucks(warBucksAddress).balanceOf(msg.sender);
+        require(
+            coinBalance >= amount,
+            "deposit amount exceeds balance in wallet"
+        );
         idToTreasury[id].balance += amount;
-        IWarBucks(warBucksAddress).burn(msg.sender, amount);
+        IWarBucks(warBucksAddress).burnFromTreasury(msg.sender, amount);
     }
 
     //need way for only chainlink keeper to call this

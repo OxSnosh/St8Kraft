@@ -25,11 +25,11 @@ contract WarBucks is ERC20, Ownable {
         treasury = _treasury;
     }
 
-    function mint(address account, uint256 amount) external onlyTreasury{
+    function mintFromTreasury(address account, uint256 amount) external onlyTreasury{
         _mint(account, amount);
     }
 
-    function burn(address account, uint256 amount) external onlyTreasury {
+    function burnFromTreasury(address account, uint256 amount) external onlyTreasury {
         _burn(account, amount);
     }
 }
