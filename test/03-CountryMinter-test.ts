@@ -847,7 +847,8 @@ describe("CountryMinter", function () {
         )
         treasurycontract.settings2(
             groundbattlecontract.address,
-            countryminter.address
+            countryminter.address,
+            keepercontract.address
         )
 
         warcontract.settings(

@@ -755,6 +755,10 @@ async function main() {
 
     console.log("contracts deployed")
 
+    warbucks.settings(
+        treasurycontract.address
+    )
+
     aidcontract.settings(
         countryminter.address, 
         treasurycontract.address, 
@@ -1198,7 +1202,8 @@ async function main() {
     )
     treasurycontract.settings2(
         groundbattlecontract.address,
-        countryminter.address
+        countryminter.address,
+        keepercontract.address
     )
 
     warcontract.settings(

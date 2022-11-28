@@ -26,6 +26,7 @@ contract TreasuryContract is Ownable {
     address public spyAddress;
     address public groundBattle;
     address public countryMinter;
+    address public keeper;
     uint256 public daysToInactive = 20;
     uint256 private gameTaxPercentage = 0;
     uint256 public seedMoney = 2000000 * (10**18);
@@ -73,13 +74,15 @@ contract TreasuryContract is Ownable {
         spyAddress = _spyAddress;
     }
 
-    function settings2(address _groundBattle, address _countryMinter)
-        public
-        onlyOwner
-    {
+    function settings2(
+        address _groundBattle,
+        address _countryMinter,
+        address _keeper
+    ) public onlyOwner {
         groundBattle = _groundBattle;
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
+        keeper = _keeper;
     }
 
     function generateTreasury(uint256 id) public {
@@ -128,6 +131,11 @@ contract TreasuryContract is Ownable {
             msg.sender == infrastructure,
             "only callable from infrastructure contract"
         );
+        _;
+    }
+
+    modifier onlyKeeper() {
+        require(msg.sender == keeper, "function only callable from keeper");
         _;
     }
 
@@ -209,8 +217,6 @@ contract TreasuryContract is Ownable {
         }
     }
 
-    //NEED FUNCTION TO WITHDRAW TAXES COLLECTED BY GAME
-
     function withdrawFunds(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
@@ -232,14 +238,9 @@ contract TreasuryContract is Ownable {
         IWarBucks(warBucksAddress).burnFromTreasury(msg.sender, amount);
     }
 
-    //need way for only chainlink keeper to call this
-    function incrementDaysSince() external {
+    function incrementDaysSince() external onlyKeeper {
         uint256 i;
         for (i = 0; i < counter; i++) {
-            require(
-                idToTreasury[i].inactive == false,
-                "nation needs to pay bills"
-            );
             idToTreasury[i].daysSinceLastBillPaid++;
             idToTreasury[i].daysSinceLastTaxCollection++;
             if (idToTreasury[i].daysSinceLastBillPaid > daysToInactive) {
@@ -265,8 +266,7 @@ contract TreasuryContract is Ownable {
         view
         returns (uint256)
     {
-        uint256 daysSince = idToTreasury[id].daysSinceLastTaxCollection;
-        return daysSince;
+        return idToTreasury[id].daysSinceLastTaxCollection;
     }
 
     function getDaysSinceLastBillsPaid(uint256 id)
@@ -274,13 +274,11 @@ contract TreasuryContract is Ownable {
         view
         returns (uint256)
     {
-        uint256 daysSince = idToTreasury[id].daysSinceLastBillPaid;
-        return daysSince;
+        return idToTreasury[id].daysSinceLastBillPaid;
     }
 
     function checkBalance(uint256 id) public view returns (uint256) {
-        uint256 balance = idToTreasury[id].balance;
-        return balance;
+        return idToTreasury[id].balance;
     }
 
     function transferBalance(
@@ -293,7 +291,6 @@ contract TreasuryContract is Ownable {
     }
 
     function checkInactive(uint256 id) public view returns (bool) {
-        bool isInactive = idToTreasury[id].inactive;
-        return isInactive;
+        return idToTreasury[id].inactive;
     }
 }
