@@ -168,7 +168,8 @@ contract TreasuryContract is Ownable {
     }
 
     function withdrawTaxRevenues(uint256 amount) public onlyOwner {
-        WarBucks(warBucksAddress).transfer(msg.sender, amount);
+        WarBucks(warBucksAddress).approve(address(this), amount);
+        WarBucks(warBucksAddress).transferFrom(address(this), msg.sender, amount);
     }
 
     // need modifier
@@ -249,11 +250,11 @@ contract TreasuryContract is Ownable {
         }
     }
 
-    function setTaxRate(uint256 newPercentage) public onlyOwner {
+    function setGameTaxRate(uint256 newPercentage) public onlyOwner {
         gameTaxPercentage = newPercentage;
     }
 
-    function getTaxRate() public view onlyOwner returns (uint256) {
+    function getGameTaxRate() public view onlyOwner returns (uint256) {
         return gameTaxPercentage;
     }
 

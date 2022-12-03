@@ -621,21 +621,28 @@ describe("Treasury", async function () {
             improvementscontract3.address,
             improvementscontract4.address,
             navycontract.address,
-            additionalnavycontract.address)
+            additionalnavycontract.address,
+            countryminter.address,
+            wonderscontract1.address)
         
         improvementscontract2.settings(
             treasurycontract.address,
             forcescontract.address,
-            wonderscontract1.address)
+            wonderscontract1.address,
+            countryminter.address,
+            improvementscontract1.address)
         
         improvementscontract3.settings(
             treasurycontract.address,
-            additionalnavycontract.address)
+            additionalnavycontract.address,
+            countryminter.address)
         
         improvementscontract4.settings(
             treasurycontract.address,
             forcescontract.address,
-            improvementscontract2.address)
+            improvementscontract1.address,
+            improvementscontract2.address,
+            countryminter.address)
         
         infrastructurecontract.settings1(
             resourcescontract.address,
@@ -993,6 +1000,44 @@ describe("Treasury", async function () {
             await warbucks.connect(signer0).transfer(signer1.address, BigInt(500000000*(10**18)));
             await treasurycontract.connect(signer1).addFunds(BigInt(500000000*(10**18)), 0);
             expect(treasurycontract.connect(signer1).withdrawFunds(BigInt(50000000000*(10**18)), 0)).to.be.revertedWith("insufficient game balance");
+        })
+    })
+
+    describe("Game Tax Rate Functionality", function () {
+        it("Tests that the setGameTaxRate() function works correctly", async function () {
+            let gameTaxRate1 = await treasurycontract.getGameTaxRate();
+            // console.log("Tax Rate Initial", gameTaxRate1.toNumber());
+            expect(gameTaxRate1.toNumber()).to.equal(0);
+            await treasurycontract.setGameTaxRate(50);
+            let gameTaxRate2 = await treasurycontract.getGameTaxRate();
+            expect(gameTaxRate2.toNumber()).to.equal(50);
+            // console.log("Tax Rate Updated", gameTaxRate2.toNumber());
+            let initialTaxRevenue = await treasurycontract.viewTaxRevenues();
+            // console.log("Initial Balance", initialTaxRevenue.toNumber());
+            expect(initialTaxRevenue.toNumber()).to.equal(0);
+            await warbucks.connect(signer0).approve(warbucks.address, BigInt(500000000*(10**18)));
+            await warbucks.connect(signer0).transfer(signer1.address, BigInt(500000000*(10**18)));
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 100);
+            let afterTaxRevenue = await treasurycontract.viewTaxRevenues();
+            // console.log("After Transaction Tax Balance", afterTaxRevenue.toNumber());
+            expect(afterTaxRevenue.toNumber()).to.equal(3700000);
+        })
+
+        it("Tests that the owner can withdraw game taxes from the treasury contract", async function () {
+            await treasurycontract.setGameTaxRate(50);
+            let ownerInitialWarBucksBalance : any = await warbucks.balanceOf(signer0.address);
+            // console.log("First Balance", BigInt(ownerInitialWarBucksBalance));
+            await warbucks.connect(signer0).approve(warbucks.address, BigInt(ownerInitialWarBucksBalance));
+            await warbucks.connect(signer0).transfer(signer1.address, BigInt(ownerInitialWarBucksBalance));
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 100);
+            let taxRevenue = await treasurycontract.viewTaxRevenues();
+            await treasurycontract.connect(signer0).withdrawTaxRevenues(1000000);
+            let taxRevenueAfterWithdrawal = await treasurycontract.viewTaxRevenues();
+            // console.log(taxRevenueAfterWithdrawal.toNumber());
+            // expect(taxRevenueAfterWithdrawal.toNumber()).to.equal(0);
+            let ownerWarBucksBalance : any = await warbucks.balanceOf(signer0.address);
+            expect(ownerWarBucksBalance.toNumber()).to.equal(1000000);
+            // console.log("Second Balance", ownerWarBucksBalance.toNumber());
         })
     })
 });

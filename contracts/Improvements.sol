@@ -114,7 +114,9 @@ contract ImprovementsContract1 is Ownable {
         address _improvements3,
         address _improvements4,
         address _navy,
-        address _additionalNavy
+        address _additionalNavy,
+        address _countryMinter,
+        address _wonders1
     ) public onlyOwner {
         treasury = _treasury;
         improvements2 = _improvements2;
@@ -122,6 +124,10 @@ contract ImprovementsContract1 is Ownable {
         improvements4 = _improvements4;
         navy = _navy;
         additionalNavy = _additionalNavy;
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
+        wonders1 = _wonders1;
+        won1 = WondersContract1(_wonders1);
     }
 
     modifier approvedAddress() {
@@ -213,6 +219,34 @@ contract ImprovementsContract1 is Ownable {
     function updateFactoryCost(uint256 newPrice) public onlyOwner {
         factoryCost = newPrice;
     }
+
+    function getCost1() public view returns (
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256
+        ) {
+            return (
+                airportCost,
+                bankCost,
+                barracksCost,
+                borderFortificationCost,
+                borderWallCost,
+                bunkerCost,
+                casinoCost,
+                churchCost,
+                clinicCost,
+                drydockCost,
+                factoryCost
+            );
+        }
 
     function getImprovementCount(uint256 id)
         public
@@ -325,7 +359,7 @@ contract ImprovementsContract1 is Ownable {
                 .getMunitionsFactoryCount(countryId);
             require(
                 munitionsFactoryCount == 0,
-                "Cannot own if munitions factory base is owned"
+                "Cannot own if munitions factory is owned"
             );
             idToImprovements1[countryId].bunkerCount += amount;
             idToImprovements1[countryId].improvementCount += amount;
@@ -624,12 +658,17 @@ contract ImprovementsContract2 is Ownable {
     function settings(
         address _treasury,
         address _forces,
-        address _wonders1
+        address _wonders1,
+        address _countryMinter,
+        address _improvements1
     ) public onlyOwner {
         treasury = _treasury;
         forces = _forces;
         wonders1 = _wonders1;
         won1 = WondersContract1(_wonders1);
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
+        improvements1 = _improvements1;
     }
 
     function updateTreasuryAddress(address _treasury) public onlyOwner {
@@ -1103,12 +1142,17 @@ contract ImprovementsContract4 is Ownable {
     function settings(
         address _treasury,
         address _forces,
-        address _improvements2
+        address _improvements1,
+        address _improvements2,
+        address _countryMinter
     ) public onlyOwner {
         treasury = _treasury;
         forces = _forces;
+        improvements1 = _improvements1;
         improvements2 = _improvements2;
         imp2 = ImprovementsContract2(_improvements2);
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
     }
 
     function updateTreasuryAddress(address _newTreasuryAddress)
@@ -1443,9 +1487,15 @@ contract ImprovementsContract3 is Ownable {
 
     mapping(uint256 => Improvements3) public idToImprovements3;
 
-    function settings(address _treasury, address _additionalNavy) public onlyOwner {
+    function settings(
+        address _treasury,
+        address _additionalNavy,
+        address _countryMinter
+    ) public onlyOwner {
         treasury = _treasury;
         additionalNavy = _additionalNavy;
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
     }
 
     function updateTreasuryAddress(address _treasury) public onlyOwner {

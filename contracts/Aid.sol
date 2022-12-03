@@ -24,7 +24,6 @@ contract AidContract is Ownable {
         address _infrastructure,
         address _keeper,
         address _wonder1
-
     ) public onlyOwner {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
@@ -92,7 +91,7 @@ contract AidContract is Ownable {
         public
         onlyCountryMinter
     {
-        idToOwnerAid[id] = nationOwner;
+        // idToOwnerAid[id] = nationOwner;
     }
 
     //check for sanctions

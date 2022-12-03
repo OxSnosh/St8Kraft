@@ -977,22 +977,28 @@ async function main() {
         improvementscontract3.address,
         improvementscontract4.address,
         navycontract.address,
-        additionalnavycontract.address
-        )
+        additionalnavycontract.address,
+        countryminter.address,
+        wonderscontract1.address)
     
     improvementscontract2.settings(
         treasurycontract.address,
         forcescontract.address,
-        wonderscontract1.address)
+        wonderscontract1.address,
+        countryminter.address,
+        improvementscontract1.address)
     
     improvementscontract3.settings(
         treasurycontract.address,
-        additionalnavycontract.address)
+        additionalnavycontract.address,
+        countryminter.address)
     
     improvementscontract4.settings(
         treasurycontract.address,
         forcescontract.address,
-        improvementscontract2.address)
+        improvementscontract1.address,
+        improvementscontract2.address,
+        countryminter.address)
     
     infrastructurecontract.settings1(
         resourcescontract.address,

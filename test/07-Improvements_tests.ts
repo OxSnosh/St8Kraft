@@ -55,7 +55,7 @@ import {
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("ResourcesContract", async function () {
+describe("Improvements", async function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -848,6 +848,7 @@ describe("ResourcesContract", async function () {
             billscontract.address,
             spyoperationscontract.address
         )
+
         treasurycontract.settings2(
             groundbattlecontract.address,
             countryminter.address,
@@ -913,90 +914,135 @@ describe("ResourcesContract", async function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        const tx1 = await resourcescontract.fulfillRequest(0);
-        let txReceipt1 = await tx1.wait(1);
-        let requestId1 = txReceipt1?.events?.[1].args?.requestId;
-        // console.log("requestId", (txReceipt1.events?.[1].args?.requestId).toNumber());
-        await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, resourcescontract.address);
-        let resources1 = await resourcescontract.getPlayerResources(0);
-        // console.log("resources", resources1[0].toNumber(), resources1[1].toNumber());
-        
-        // console.log("country 2");
-        await countryminter.connect(signer2).generateCountry(
-            "TestRuler2",
-            "TestNationName2",
-            "TestCapitalCity2",
-            "TestNationSlogan2"
-        )
-        const tx2 = await resourcescontract.fulfillRequest(1);
-        let txReceipt2 = await tx2.wait(1);
-        let requestId2 = txReceipt2?.events?.[1].args?.requestId;
-        // console.log("requestId", (txReceipt2.events?.[1].args?.requestId).toNumber());
-        await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, resourcescontract.address);
-        let resources2 = await resourcescontract.getPlayerResources(1);
-        // console.log("resources", resources2[0].toNumber(), resources2[1].toNumber());
+        let ownerInitialWarBucksBalance : any = await warbucks.balanceOf(signer0.address);
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(ownerInitialWarBucksBalance));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(ownerInitialWarBucksBalance));
+        await treasurycontract.connect(signer1).addFunds(50000000, 0);
+        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500);
     });
 
-    describe("Resources Setup", function () {
-        it("Tests that two resources were randomly selected and set to true", async function () {
-            var wheat1 = await resourcescontract.viewWheat(0);
-            expect(wheat1).to.equal(true);
-            var oil1 = await resourcescontract.viewOil(0);
-            expect(oil1).to.equal(true);
-            var fish1 = await resourcescontract.viewFish(0);
-            expect(fish1).to.equal(false);
-
-            var gems2 = await resourcescontract.viewGems(1);
-            expect(gems2).to.equal(true);
-            var water2 = await resourcescontract.viewWater(1);
-            expect(water2).to.equal(true);
-            var coal2 = await resourcescontract.viewCoal(1);
-            expect(coal2).to.equal(false);
-        });
-    });
-
-    describe("Accept Trading Partner", function () {
-        it("Test that partners recieve each others resources", async function () {
-            await resourcescontract.connect(signer1).proposeTrade(0, 1);
-            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
-            var wheat1 = await resourcescontract.viewWheat(0);
-            expect(wheat1).to.equal(true);
-            var oil1 = await resourcescontract.viewOil(0);
-            expect(oil1).to.equal(true)
-            var gems1 = await resourcescontract.viewGems(0);
-            expect(gems1).to.equal(true);
-            var water1 = await resourcescontract.viewWater(0);
-            expect(water1).to.equal(true);
-            var wheat2 = await resourcescontract.viewWheat(1);
-            expect(wheat2).to.equal(true);
-            var oil2 = await resourcescontract.viewOil(1);
-            expect(oil2).to.equal(true)
-            var gems2 = await resourcescontract.viewGems(1);
-            expect(gems2).to.equal(true);
-            var water2 = await resourcescontract.viewWater(1);
-            expect(water2).to.equal(true);
-        })
-    })
-
-    describe("Remove Trading Partners", async function () {
-        it("Nation one in a trade can remove the trade", async function () {
-            await resourcescontract.connect(signer1).proposeTrade(0, 1);
-            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
-            var nation1TradingPartnersFirst = await resourcescontract.getTradingPartners(0);
-            expect(nation1TradingPartnersFirst.length).to.equal(1);
-            await resourcescontract.connect(signer1).removeTradingPartner(0, 1);
-            var nation1TradingPartners = await resourcescontract.getTradingPartners(0);
-            expect(nation1TradingPartners.length).to.equal(0);
+    describe("Improvements Contract 1", function () {
+        //airport
+        it("improvement1 airport tests", async function () {
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 1);
+            var count = await improvementscontract1.getAirportCount(0);
+            expect(count.toNumber()).to.equal(1);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 1);
+            var newCount = await improvementscontract1.getAirportCount(0);
+            expect(newCount.toNumber()).to.equal(2);
         })
 
-        it("Nation two in a trade can remove the trade", async function () {
-            await resourcescontract.connect(signer1).proposeTrade(0, 1);
-            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
-            var nation1TradingPartnersFirst = await resourcescontract.getTradingPartners(1);
-            expect(nation1TradingPartnersFirst.length).to.equal(1);
-            await resourcescontract.connect(signer2).removeTradingPartner(1, 0);
-            var nation1TradingPartners = await resourcescontract.getTradingPartners(1);
-            expect(nation1TradingPartners.length).to.equal(0);
+        it("improvement1 airport purchase errors", async function () {
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 1, 1)).to.be.revertedWith("!nation owner");
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 15)).to.be.revertedWith("Invalid Improvement ID");
+            expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 1)).to.be.revertedWith("Cannot own more than 3");
+            await improvementscontract1.connect(signer0).updateAirportCost(BigInt(10*10**30));
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 1)).to.be.revertedWith("Insufficient Balance");
+        })
+
+        it("improvement1 tests airport price can be updated", async function () {
+            let prices = await improvementscontract1.getCost1();
+            var cost = prices[0];
+            expect(cost.toNumber()).to.equal(100000);
+            await improvementscontract1.connect(signer0).updateAirportCost(100);
+            let newPrices = await improvementscontract1.getCost1();
+            var newCost = newPrices[0];
+            expect(newCost.toNumber()).to.equal(100);
+        })
+
+        //bank
+        it("improvement1 bank tests", async function () {
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 2);
+            var count = await improvementscontract1.getBankCount(0);
+            expect(count.toNumber()).to.equal(1);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 2);
+            var newCount = await improvementscontract1.getBankCount(0);
+            expect(newCount.toNumber()).to.equal(2);
+        })
+
+        it("improvement1 bank purchase errors", async function () {
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 1, 2)).to.be.revertedWith("!nation owner");
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 15)).to.be.revertedWith("Invalid Improvement ID");
+            expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 2)).to.be.revertedWith("Cannot own more than 5");
+            await improvementscontract1.connect(signer0).updateAirportCost(BigInt(10*10**30));
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 2)).to.be.revertedWith("Insufficient Balance");
+        })
+
+        it("improvement1 tests bank price can be updated", async function () {
+            let prices = await improvementscontract1.getCost1();
+            var cost = prices[1];
+            expect(cost.toNumber()).to.equal(100000);
+            await improvementscontract1.connect(signer0).updateBankCost(100);
+            let newPrices = await improvementscontract1.getCost1();
+            var newCost = newPrices[1];
+            expect(newCost.toNumber()).to.equal(100);
+        })
+
+        //barracks
+        it("improvement1 barracks tests", async function () {
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 3);
+            var count = await improvementscontract1.getBarracksCount(0);
+            expect(count.toNumber()).to.equal(1);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 3);
+            var newCount = await improvementscontract1.getBarracksCount(0);
+            expect(newCount.toNumber()).to.equal(2);
+        })
+
+        it("improvement1 barracks purchase errors", async function () {
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 1, 3)).to.be.revertedWith("!nation owner");
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 15)).to.be.revertedWith("Invalid Improvement ID");
+            expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 3)).to.be.revertedWith("Cannot own more than 3");
+            await improvementscontract1.connect(signer0).updateAirportCost(BigInt(10*10**30));
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 3)).to.be.revertedWith("Insufficient Balance");
+        })
+
+        it("improvement1 tests barracks price can be updated", async function () {
+            let prices = await improvementscontract1.getCost1();
+            var cost = prices[2];
+            expect(cost.toNumber()).to.equal(50000);
+            await improvementscontract1.connect(signer0).updateBarracksCost(100);
+            let newPrices = await improvementscontract1.getCost1();
+            var newCost = newPrices[2];
+            expect(newCost.toNumber()).to.equal(100);
+        })
+
+        //border fortification
+        it("improvement1 boarder fortification tests", async function () {
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 4);
+            var count = await improvementscontract1.getBorderFortificationCount(0);
+            expect(count.toNumber()).to.equal(1);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 4);
+            var newCount = await improvementscontract1.getBorderFortificationCount(0);
+            expect(newCount.toNumber()).to.equal(2);
+        })
+
+        it("improvement1 border fortification purchase errors", async function () {
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 4)).to.be.revertedWith("Must own a border wall for every fortification");
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 2);
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 4)).to.be.revertedWith("Cannot own if forward operating base is owned");
+            await improvementscontract2.connect(signer1).deleteImprovement2(1, 0, 2);
+            await improvementscontract4.connect(signer1).buyImprovement4(1, 0, 2);
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 4)).to.be.revertedWith("Cannot own if munitions factory is owned");
+            await improvementscontract4.connect(signer1).deleteImprovement4(1, 0, 2);
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 1, 3)).to.be.revertedWith("!nation owner");
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 15)).to.be.revertedWith("Invalid Improvement ID");
+            expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 3)).to.be.revertedWith("Cannot own more than 3");
+            await improvementscontract1.connect(signer0).updateAirportCost(BigInt(10*10**30));
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 3)).to.be.revertedWith("Insufficient Balance");
+        })
+
+        it("improvement1 tests border fortification price can be updated", async function () {
+            let prices = await improvementscontract1.getCost1();
+            var cost = prices[3];
+            expect(cost.toNumber()).to.equal(125000);
+            await improvementscontract1.connect(signer0).updateBorderFortificationCost(100);
+            let newPrices = await improvementscontract1.getCost1();
+            var newCost = newPrices[3];
+            expect(newCost.toNumber()).to.equal(100);
         })
     })
 });

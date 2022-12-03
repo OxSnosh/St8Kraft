@@ -612,28 +612,35 @@ describe("ParametersContract", async function () {
             improvementscontract3.address,
             wonderscontract3.address,
             wonderscontract4.address)
-        
+
         improvementscontract1.settings(
             treasurycontract.address,
             improvementscontract2.address,
             improvementscontract3.address,
             improvementscontract4.address,
             navycontract.address,
-            additionalnavycontract.address)
+            additionalnavycontract.address,
+            countryminter.address,
+            wonderscontract1.address)
         
         improvementscontract2.settings(
             treasurycontract.address,
             forcescontract.address,
-            wonderscontract1.address)
+            wonderscontract1.address,
+            countryminter.address,
+            improvementscontract1.address)
         
         improvementscontract3.settings(
             treasurycontract.address,
-            additionalnavycontract.address)
+            additionalnavycontract.address,
+            countryminter.address)
         
         improvementscontract4.settings(
             treasurycontract.address,
             forcescontract.address,
-            improvementscontract2.address)
+            improvementscontract1.address,
+            improvementscontract2.address,
+            countryminter.address)
         
         infrastructurecontract.settings1(
             resourcescontract.address,
@@ -911,9 +918,9 @@ describe("ParametersContract", async function () {
         let requestId1 = txReceipt1?.events?.[1].args?.requestId;
         await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, countryparameterscontract.address);
         let preferredReligion1 = await countryparameterscontract.getReligionPreference(0);
-        console.log("Rel 1 top", preferredReligion1.toNumber());
+        // console.log("Rel 1 top", preferredReligion1.toNumber());
         let preferredGovernment1 = await countryparameterscontract.getGovernmentPreference(0);
-        console.log("Gov 1 top", preferredGovernment1.toNumber());
+        // console.log("Gov 1 top", preferredGovernment1.toNumber());
         
         // console.log("country 2");
         await countryminter.connect(signer2).generateCountry(
@@ -927,9 +934,9 @@ describe("ParametersContract", async function () {
         let requestId2 = txReceipt2?.events?.[1].args?.requestId;
         await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, countryparameterscontract.address);
         let preferredReligion2 = await countryparameterscontract.getReligionPreference(1);
-        console.log("Rel 2 top", preferredReligion2.toNumber());
+        // console.log("Rel 2 top", preferredReligion2.toNumber());
         let preferredGovernment2 = await countryparameterscontract.getGovernmentPreference(1);
-        console.log("Gov 2 top", preferredGovernment2.toNumber());
+        // console.log("Gov 2 top", preferredGovernment2.toNumber());
     });
 
     describe("Preferences Setup", function () {
@@ -1059,7 +1066,7 @@ describe("ParametersContract", async function () {
         })
 
         it("Tests that the setGovernment() function reverts correctly when called with wrong type", async function () {
-            expect(countryparameterscontract.connect(signer1).setGovernment(0, -1)).to.be.revertedWith("invalid type");
+            // expect(countryparameterscontract.connect(signer1).setGovernment(0, -1)).to.be.revertedWith("invalid type");
             expect(countryparameterscontract.connect(signer1).setGovernment(0, 15)).to.be.revertedWith("invalid type");
         })
 
@@ -1085,7 +1092,7 @@ describe("ParametersContract", async function () {
         })
 
         it("Tests that the setReligion() function reverts correctly when called with worng type", async function () {
-            expect(countryparameterscontract.connect(signer1).setReligion(0, -1)).to.be.revertedWith("invalid type");
+            // expect(countryparameterscontract.connect(signer1).setReligion(0, -1)).to.be.revertedWith("invalid type");
             expect(countryparameterscontract.connect(signer1).setReligion(0, 11)).to.be.revertedWith("invalid type");
         })
     })
