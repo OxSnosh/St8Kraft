@@ -633,6 +633,8 @@ describe("ResourcesContract", async function () {
         improvementscontract3.settings(
             treasurycontract.address,
             additionalnavycontract.address,
+            improvementscontract1.address,
+            improvementscontract2.address,
             countryminter.address)
         
         improvementscontract4.settings(

@@ -67,15 +67,9 @@ describe("WarBucks", function () {
     });
 
     it("Should fail if sender doesn’t have enough tokens", async function () {
-      const initialOwnerBalance = await warbucks.balanceOf(signer0.address);
-
       await expect(
         warbucks.connect(signer1).transfer(signer0.address, 1)
       ).to.be.revertedWith("ERC20: transfer amount exceeds balance");
-
-      expect(await warbucks.balanceOf(signer0.address)).to.equal(
-        initialOwnerBalance
-      );
     });
 
     it("Should update balances after transfers", async function () {

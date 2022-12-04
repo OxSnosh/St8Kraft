@@ -635,6 +635,8 @@ describe("Treasury", async function () {
         improvementscontract3.settings(
             treasurycontract.address,
             additionalnavycontract.address,
+            improvementscontract1.address,
+            improvementscontract2.address,
             countryminter.address)
         
         improvementscontract4.settings(
@@ -949,13 +951,13 @@ describe("Treasury", async function () {
         it("tests addFunds() will revert with insufficient coin balance", async function () {
             await warbucks.connect(signer0).approve(warbucks.address, BigInt(500000000*(10**18)));
             await warbucks.connect(signer0).transfer(signer1.address, BigInt(500000000*(10**18)));
-            expect(treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0)).to.be.revertedWith("deposit amount exceeds balance in wallet");
+            await expect(treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0)).to.be.revertedWith("deposit amount exceeds balance in wallet");
         })
 
         it("tests addFunds() will revert with !nation owner caller", async function () {
             await warbucks.connect(signer0).approve(warbucks.address, BigInt(500000000*(10**18)));
             await warbucks.connect(signer0).transfer(signer1.address, BigInt(500000000*(10**18)));
-            expect(treasurycontract.connect(signer1).addFunds(BigInt(500000000*(10**18)), 1)).to.be.revertedWith("!nation owner");
+            await expect(treasurycontract.connect(signer1).addFunds(BigInt(500000000*(10**18)), 1)).to.be.revertedWith("!nation owner");
         })
 
         it("tests withdrawFunds() will decrease game balance and mint coins", async function () {
@@ -992,14 +994,14 @@ describe("Treasury", async function () {
             await warbucks.connect(signer0).approve(warbucks.address, BigInt(500000000*(10**18)));
             await warbucks.connect(signer0).transfer(signer1.address, BigInt(500000000*(10**18)));
             await treasurycontract.connect(signer1).addFunds(BigInt(500000000*(10**18)), 0);
-            expect(treasurycontract.connect(signer1).withdrawFunds(BigInt(500000000*(10**18)), 1)).to.be.revertedWith("!nation owner");
+            await expect(treasurycontract.connect(signer1).withdrawFunds(BigInt(500000000*(10**18)), 1)).to.be.revertedWith("!nation owner");
         })
 
         it("tests withdrawFunds() will revert with insufficient game balance", async function () {
             await warbucks.connect(signer0).approve(warbucks.address, BigInt(500000000*(10**18)));
             await warbucks.connect(signer0).transfer(signer1.address, BigInt(500000000*(10**18)));
             await treasurycontract.connect(signer1).addFunds(BigInt(500000000*(10**18)), 0);
-            expect(treasurycontract.connect(signer1).withdrawFunds(BigInt(50000000000*(10**18)), 0)).to.be.revertedWith("insufficient game balance");
+            await expect(treasurycontract.connect(signer1).withdrawFunds(BigInt(50000000000*(10**18)), 0)).to.be.revertedWith("insufficient game balance");
         })
     })
 

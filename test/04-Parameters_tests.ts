@@ -633,6 +633,8 @@ describe("ParametersContract", async function () {
         improvementscontract3.settings(
             treasurycontract.address,
             additionalnavycontract.address,
+            improvementscontract1.address,
+            improvementscontract2.address,
             countryminter.address)
         
         improvementscontract4.settings(
@@ -981,7 +983,7 @@ describe("ParametersContract", async function () {
         })
 
         it("Tests that the setRulerName() function reverts correctly", async function () {
-            expect(countryparameterscontract.connect(signer2).setRulerName("newName", 0)).to.be.revertedWith("!nation owner");
+            await expect(countryparameterscontract.connect(signer2).setRulerName("newName", 0)).to.be.revertedWith("!nation owner");
         })
 
         it("Tests that the setNationName() function works", async function () {
@@ -993,7 +995,7 @@ describe("ParametersContract", async function () {
         })
 
         it("Tests that the setNationName() function reverts correctly", async function () {
-            expect(countryparameterscontract.connect(signer2).setRulerName("newNationName", 0)).to.be.revertedWith("!nation owner");
+            await expect(countryparameterscontract.connect(signer2).setRulerName("newNationName", 0)).to.be.revertedWith("!nation owner");
         })
 
         it("Tests that the setCapitalCity() function works", async function () {
@@ -1005,7 +1007,7 @@ describe("ParametersContract", async function () {
         })
 
         it("Tests that the setCapitalCity() function reverts correctly", async function () {
-            expect(countryparameterscontract.connect(signer2).setCapitalCity("newCap", 0)).to.be.revertedWith("!nation owner");
+            await expect(countryparameterscontract.connect(signer2).setCapitalCity("newCap", 0)).to.be.revertedWith("!nation owner");
         })
 
         it("Tests that the setSlogan() function works", async function () {
@@ -1017,7 +1019,7 @@ describe("ParametersContract", async function () {
         })
 
         it("Tests that the setSlogan() function reverts correctly", async function () {
-            expect(countryparameterscontract.connect(signer2).setNationSlogan("newSlogan", 0)).to.be.revertedWith("!nation owner");
+            await expect(countryparameterscontract.connect(signer2).setNationSlogan("newSlogan", 0)).to.be.revertedWith("!nation owner");
         })
 
         it("Tests that the setAlliance() function works", async function () {
@@ -1041,7 +1043,7 @@ describe("ParametersContract", async function () {
         })
 
         it("Tests that the setTeam() function reverts correctly", async function () {
-            expect(countryparameterscontract.connect(signer2).setAlliance("newAlliance", 0)).to.be.revertedWith("!nation owner");
+            await expect(countryparameterscontract.connect(signer2).setAlliance("newAlliance", 0)).to.be.revertedWith("!nation owner");
         })
 
         it("Tests that the setGovernment() function works", async function () {
@@ -1058,16 +1060,18 @@ describe("ParametersContract", async function () {
         })
 
         it("Tests that the setGovernment() function reverts correctly when called by !owner", async function () {
-            expect(countryparameterscontract.connect(signer2).setGovernment(5, 0)).to.be.revertedWith("!nation owner");
+            await expect(countryparameterscontract.connect(signer2).setGovernment(5, 0)).to.be.revertedWith("!nation owner");
         })
 
         it("Tests that the setGovernment() function reverts correctly when called too soon", async function () {
-            expect(countryparameterscontract.connect(signer1).setGovernment(0, 4)).to.be.revertedWith("need to wait 3 days before changing");
+            await expect(countryparameterscontract.connect(signer1).setGovernment(0, 4)).to.be.revertedWith("need to wait 3 days before changing");
         })
 
         it("Tests that the setGovernment() function reverts correctly when called with wrong type", async function () {
-            // expect(countryparameterscontract.connect(signer1).setGovernment(0, -1)).to.be.revertedWith("invalid type");
-            expect(countryparameterscontract.connect(signer1).setGovernment(0, 15)).to.be.revertedWith("invalid type");
+            await countryparameterscontract.incrementDaysSince();
+            await countryparameterscontract.incrementDaysSince();
+            await countryparameterscontract.incrementDaysSince();
+            await expect(countryparameterscontract.connect(signer1).setGovernment(0, 15)).to.be.revertedWith("invalid type");
         })
 
         it("Tests that the setReligion() function works", async function () {
@@ -1084,16 +1088,18 @@ describe("ParametersContract", async function () {
         })
 
         it("Tests that the setReligion() function reverts correctly when called by !owner", async function () {
-            expect(countryparameterscontract.connect(signer2).setReligion(5, 0)).to.be.revertedWith("!nation owner");
+            await expect(countryparameterscontract.connect(signer2).setReligion(5, 0)).to.be.revertedWith("!nation owner");
         })
 
         it("Tests that the setReligion() function reverts correctly when called too soon", async function () {
-            expect(countryparameterscontract.connect(signer1).setReligion(0, 4)).to.be.revertedWith("need to wait 3 days before changing");
+            await expect(countryparameterscontract.connect(signer1).setReligion(0, 4)).to.be.revertedWith("need to wait 3 days before changing");
         })
 
         it("Tests that the setReligion() function reverts correctly when called with worng type", async function () {
-            // expect(countryparameterscontract.connect(signer1).setReligion(0, -1)).to.be.revertedWith("invalid type");
-            expect(countryparameterscontract.connect(signer1).setReligion(0, 11)).to.be.revertedWith("invalid type");
+            await countryparameterscontract.incrementDaysSince();
+            await countryparameterscontract.incrementDaysSince();
+            await countryparameterscontract.incrementDaysSince();
+            await expect(countryparameterscontract.connect(signer1).setReligion(0, 15)).to.be.revertedWith("invalid type");
         })
     })
 });

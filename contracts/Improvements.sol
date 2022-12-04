@@ -232,21 +232,21 @@ contract ImprovementsContract1 is Ownable {
         uint256,
         uint256,
         uint256
-        ) {
-            return (
-                airportCost,
-                bankCost,
-                barracksCost,
-                borderFortificationCost,
-                borderWallCost,
-                bunkerCost,
-                casinoCost,
-                churchCost,
-                clinicCost,
-                drydockCost,
-                factoryCost
-            );
-        }
+    ) {
+        return (
+            airportCost,
+            bankCost,
+            barracksCost,
+            borderFortificationCost,
+            borderWallCost,
+            bunkerCost,
+            casinoCost,
+            churchCost,
+            clinicCost,
+            drydockCost,
+            factoryCost
+        );
+    }
 
     function getImprovementCount(uint256 id)
         public
@@ -395,7 +395,7 @@ contract ImprovementsContract1 is Ownable {
             require((existingCount + amount) <= 5, "Cannot own more than 5");
             uint256 harborCount = ImprovementsContract2(improvements2)
                 .getHarborCount(countryId);
-            require(harborCount < 0, "Must own a harbor first");
+            require(harborCount > 0, "Must own a harbor first");
             idToImprovements1[countryId].drydockCount += amount;
             idToImprovements1[countryId].improvementCount += amount;
             TreasuryContract(treasury).spendBalance(countryId, purchasePrice);
@@ -704,11 +704,33 @@ contract ImprovementsContract2 is Ownable {
         idToImprovements2[id] = newImprovements2;
     }
 
+    function getCost2() public view returns (
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256
+    ) {
+        return (
+            foreignMinistryCost,
+            forwardOperatingBaseCost,
+            guerillaCampCost,
+            harborCost,
+            hospitalCost,
+            intelligenceAgencyCost,
+            jailCost,
+            laborCampCost
+        );
+    }
+
     function updateForeignMinistryCost(uint256 newPrice) public onlyOwner {
         foreignMinistryCost = newPrice;
     }
 
-    function updateforwardOperatingBaseCost(uint256 newPrice) public onlyOwner {
+    function updateForwardOperatingBaseCost(uint256 newPrice) public onlyOwner {
         forwardOperatingBaseCost = newPrice;
     }
 
@@ -1186,6 +1208,20 @@ contract ImprovementsContract4 is Ownable {
         idToImprovements4[id] = newImprovements4;
     }
 
+    function getCost4() public view returns (
+        uint256,
+        uint256,
+        uint256,
+        uint256
+    ) {
+        return (
+            missileDefenseCost,
+            munitionsFactoryCost,
+            navalAcademyCost,
+            navalConstructionYardCost
+        );
+    }
+
     function updateMissileDefenseCost(uint256 newPrice) public onlyOwner {
         missileDefenseCost = newPrice;
     }
@@ -1257,7 +1293,7 @@ contract ImprovementsContract4 is Ownable {
                 .navalAcademyCount;
             require((existingCount + amount) <= 2, "Cannot own more than 2");
             uint256 harborAmount = imp2.getHarborCount(countryId);
-            require(harborAmount < 0, "must own a harbor to purchase");
+            require(harborAmount > 0, "must own a harbor to purchase");
             idToImprovements4[countryId].navalAcademyCount += amount;
             uint256 existingImprovementTotal = ImprovementsContract1(
                 improvements1
@@ -1275,7 +1311,7 @@ contract ImprovementsContract4 is Ownable {
                 .navalConstructionYardCount;
             require((existingCount + amount) <= 3, "Cannot own more than 3");
             uint256 harborAmount = imp2.getHarborCount(countryId);
-            require(harborAmount < 0, "must own a harbor to purchase");
+            require(harborAmount > 0, "must own a harbor to purchase");
             idToImprovements4[countryId].navalConstructionYardCount += amount;
             uint256 existingImprovementTotal = ImprovementsContract1(
                 improvements1
@@ -1489,11 +1525,15 @@ contract ImprovementsContract3 is Ownable {
 
     function settings(
         address _treasury,
-        address _additionalNavy,
+        address _additionalNavy, 
+        address _improvements1,
+        address _improvements2,
         address _countryMinter
     ) public onlyOwner {
         treasury = _treasury;
         additionalNavy = _additionalNavy;
+        improvements1 = _improvements1;
+        improvements2 = _improvements2;
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
     }
@@ -1537,6 +1577,34 @@ contract ImprovementsContract3 is Ownable {
         idToImprovements3[id] = newImprovements3;
     }
 
+    function getCost3() public view returns (
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256
+    ) {
+        return (
+            officeOfPropagandaCost,
+            policeHeadquartersCost,
+            prisonCost,
+            radiationContainmentChamberCost,
+            redLightDistrictCost,
+            rehabilitationFacilityCost,
+            satteliteCost,
+            schoolCost,
+            shipyardCost,
+            stadiumCost,
+            universityCost
+        );
+    }
+
     function updateOfficeOfPropagandaCost(uint256 newPrice) public onlyOwner {
         officeOfPropagandaCost = newPrice;
     }
@@ -1567,7 +1635,7 @@ contract ImprovementsContract3 is Ownable {
         rehabilitationFacilityCost = newPrice;
     }
 
-    function updateSatteliteCost(uint256 newPrice) public onlyOwner {
+    function updateSatelliteCost(uint256 newPrice) public onlyOwner {
         satteliteCost = newPrice;
     }
 
@@ -1774,7 +1842,7 @@ contract ImprovementsContract3 is Ownable {
             require((existingCount + amount) <= 2, "Cannot own more than 2");
             uint256 schoolAmount = idToImprovements3[countryId].schoolCount;
             require(
-                schoolAmount <= 3,
+                schoolAmount >= 3,
                 "Must own 3 schools to own a university"
             );
             idToImprovements3[countryId].universityCount += amount;
@@ -1993,6 +2061,15 @@ contract ImprovementsContract3 is Ownable {
         returns (uint256)
     {
         uint256 count = idToImprovements3[countryId].redLightDistrictCount;
+        return count;
+    }
+
+    function getRehabilitationFacilityCount(uint256 countryId)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 count = idToImprovements3[countryId].rehabilitationFacilityCount;
         return count;
     }
 
