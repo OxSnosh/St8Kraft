@@ -946,28 +946,28 @@ describe("ParametersContract", async function () {
             let requestId1 = txReceipt1?.events?.[1].args?.requestId;
             await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, countryparameterscontract.address);
             let preferredReligion1 = await countryparameterscontract.getReligionPreference(0);
-            console.log("Rel 1", preferredReligion1.toNumber());
+            // console.log("Rel 1", preferredReligion1.toNumber());
             let preferredGovernment1 = await countryparameterscontract.getGovernmentPreference(0);
-            console.log("Gov 1", preferredGovernment1.toNumber());
+            // console.log("Gov 1", preferredGovernment1.toNumber());
 
             const tx2 = await resourcescontract.fulfillRequest(1);
             let txReceipt2 = await tx2.wait(1);
             let requestId2 = txReceipt2?.events?.[1].args?.requestId;
             await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, countryparameterscontract.address);
             let preferredReligion2 = await countryparameterscontract.getReligionPreference(1);
-            console.log("Rel 2", preferredReligion2.toNumber());
+            // console.log("Rel 2", preferredReligion2.toNumber());
             let preferredGovernment2 = await countryparameterscontract.getGovernmentPreference(1);
-            console.log("Gov 2", preferredGovernment2.toNumber());
+            // console.log("Gov 2", preferredGovernment2.toNumber());
 
             const tx3 = await resourcescontract.fulfillRequest(2);
             let txReceipt3 = await tx3.wait(1);
             let requestId3 = txReceipt3?.events?.[1].args?.requestId;
             await vrfCoordinatorV2Mock.fulfillRandomWords(requestId3, countryparameterscontract.address);
             let preferredReligion3 = await countryparameterscontract.getReligionPreference(2);
-            console.log("Rel 3", preferredReligion3.toNumber());
+            // console.log("Rel 3", preferredReligion3.toNumber());
             let preferredGovernment3 = await countryparameterscontract.getGovernmentPreference(2);
-            console.log("Gov 3", preferredGovernment3.toNumber());
-            console.log("done");
+            // console.log("Gov 3", preferredGovernment3.toNumber());
+            // console.log("done");
         });
     });
 

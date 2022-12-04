@@ -192,7 +192,7 @@ contract ImprovementsContract1 is Ownable {
         borderFortificationCost = newPrice;
     }
 
-    function updateaBorderWallCost(uint256 newPrice) public onlyOwner {
+    function updateBorderWallCost(uint256 newPrice) public onlyOwner {
         borderWallCost = newPrice;
     }
 

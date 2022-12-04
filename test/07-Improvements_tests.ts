@@ -964,7 +964,7 @@ describe("Improvements", async function () {
             expect(improvementscontract1.connect(signer1).buyImprovement1(1, 1, 2)).to.be.revertedWith("!nation owner");
             expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 15)).to.be.revertedWith("Invalid Improvement ID");
             expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 2)).to.be.revertedWith("Cannot own more than 5");
-            await improvementscontract1.connect(signer0).updateAirportCost(BigInt(10*10**30));
+            await improvementscontract1.connect(signer0).updateBankCost(BigInt(10*10**30));
             expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 2)).to.be.revertedWith("Insufficient Balance");
         })
 
@@ -992,7 +992,7 @@ describe("Improvements", async function () {
             expect(improvementscontract1.connect(signer1).buyImprovement1(1, 1, 3)).to.be.revertedWith("!nation owner");
             expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 15)).to.be.revertedWith("Invalid Improvement ID");
             expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 3)).to.be.revertedWith("Cannot own more than 3");
-            await improvementscontract1.connect(signer0).updateAirportCost(BigInt(10*10**30));
+            await improvementscontract1.connect(signer0).updateBarracksCost(BigInt(10*10**30));
             expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 3)).to.be.revertedWith("Insufficient Balance");
         })
 
@@ -1031,7 +1031,7 @@ describe("Improvements", async function () {
             expect(improvementscontract1.connect(signer1).buyImprovement1(1, 1, 3)).to.be.revertedWith("!nation owner");
             expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 15)).to.be.revertedWith("Invalid Improvement ID");
             expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 3)).to.be.revertedWith("Cannot own more than 3");
-            await improvementscontract1.connect(signer0).updateAirportCost(BigInt(10*10**30));
+            await improvementscontract1.connect(signer0).updateBorderFortificationCost(BigInt(10*10**30));
             expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 3)).to.be.revertedWith("Insufficient Balance");
         })
 
@@ -1044,5 +1044,78 @@ describe("Improvements", async function () {
             var newCost = newPrices[3];
             expect(newCost.toNumber()).to.equal(100);
         })
+
+        //border wall
+        it("improvement1 border wall tests", async function () {
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            var count = await improvementscontract1.getBorderWallCount(0);
+            expect(count.toNumber()).to.equal(1);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            var newCount = await improvementscontract1.getBorderWallCount(0);
+            expect(newCount.toNumber()).to.equal(2);
+        })
+
+        it("improvement1 border wall purchase errors", async function () {
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 1, 5)).to.be.revertedWith("!nation owner");
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 15)).to.be.revertedWith("Invalid Improvement ID");
+            expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 5)).to.be.revertedWith("Boarder walls can only be purchased 1 at a time");
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5)).to.be.revertedWith("Cannot own more than 5");
+            await improvementscontract1.connect(signer0).updateBorderWallCost(BigInt(10*10**30));
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5)).to.be.revertedWith("Insufficient Balance");
+        })
+
+        it("improvement1 tests border wall price can be updated", async function () {
+            let prices = await improvementscontract1.getCost1();
+            var cost = prices[4];
+            expect(cost.toNumber()).to.equal(60000);
+            await improvementscontract1.connect(signer0).updateBorderWallCost(100);
+            let newPrices = await improvementscontract1.getCost1();
+            var newCost = newPrices[4];
+            expect(newCost.toNumber()).to.equal(100);
+        })
+
+        //bunker
+        it("improvement1 bunker tests", async function () {
+            await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 3);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 6);
+            var count = await improvementscontract1.getBunkerCount(0);
+            expect(count.toNumber()).to.equal(1);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 6);
+            var newCount = await improvementscontract1.getBunkerCount(0);
+            expect(newCount.toNumber()).to.equal(2);
+        })
+
+        it("improvement1 bunker purchase errors", async function () {
+            expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 6)).to.be.revertedWith("");
+            console.log("hello");
+            // await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 3);
+            // expect(improvementscontract1.connect(signer1).buyImprovement1(1, 1, 6)).to.be.revertedWith("!nation owner");
+            // expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 15)).to.be.revertedWith("Invalid Improvement ID");
+            // expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 6)).to.be.revertedWith("Cannot own more than 5");
+            // await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 2);
+            // expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 6)).to.be.revertedWith("Cannot own if forward operating base is owned");
+            // await improvementscontract2.connect(signer1).deleteImprovement2(1, 0, 2);
+            // await improvementscontract4.connect(signer1).buyImprovement4(1, 0, 2);
+            // expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 6)).to.be.revertedWith("Cannot own if munitions factory is owned");
+            // await improvementscontract4.connect(signer1).deleteImprovement4(1, 0, 2);
+            // await improvementscontract1.connect(signer0).updateBunkerCost(BigInt(10*10**30));
+            // expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 6)).to.be.revertedWith("Insufficient Balance");
+        })
+
+        it("improvement1 tests bunker price can be updated", async function () {
+            let prices = await improvementscontract1.getCost1();
+            var cost = prices[5];
+            expect(cost.toNumber()).to.equal(200000);
+            await improvementscontract1.connect(signer0).updateBunkerCost(100);
+            let newPrices = await improvementscontract1.getCost1();
+            var newCost = newPrices[5];
+            expect(newCost.toNumber()).to.equal(100);
+        })
+
     })
 });
