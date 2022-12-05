@@ -560,9 +560,12 @@ contract ForcesContract is Ownable {
         idToForces[defenderId].defendingTanks -= defenderTankLosses;
     }
 
+    function increaseSoldierCasualties(uint256 id, uint256 amount) public onlyOwner {
+        idToForces[id].soldierCasualties += amount;
+    }
+
     function getCasualties(uint256 id) public view returns (uint256) {
-        uint256 casualties = idToForces[id].soldierCasualties;
-        return casualties;
+        return idToForces[id].soldierCasualties;
     }
 }
 
