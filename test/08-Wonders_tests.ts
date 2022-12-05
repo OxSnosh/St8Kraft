@@ -1065,7 +1065,7 @@ describe("Wonders", async function () {
             await landmarketcontract.connect(signer1).buyLand(0, 10000);
             await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
             await wonderscontract3.connect(signer1).buyWonder3(0, 7);
-            await wonderscontract3.connect(signer1).buyWonder3(0, 10);
+            await wonderscontract3.connect(signer1).buyWonder3(0, 4);
             await wonderscontract4.connect(signer1).buyWonder4(0, 7);
             await wonderscontract1.connect(signer1).buyWonder1(0, 5);
             var isWonder = await wonderscontract1.getEmpWeaponization(0);
@@ -1085,7 +1085,7 @@ describe("Wonders", async function () {
             await wonderscontract1.connect(signer0).updateEmpWeaponizationCost(100);
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 5)).to.be.revertedWith("Must own Weapons Research Center to purchase");
             await wonderscontract3.connect(signer1).buyWonder3(0, 7);
-            await wonderscontract3.connect(signer1).buyWonder3(0, 10);
+            await wonderscontract3.connect(signer1).buyWonder3(0, 4);
             await wonderscontract4.connect(signer1).buyWonder4(0, 7);
             await wonderscontract1.connect(signer1).buyWonder1(0, 5);
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 5)).to.be.revertedWith("Already owned");
