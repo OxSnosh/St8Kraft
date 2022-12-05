@@ -906,6 +906,7 @@ describe("CountryMinter", function () {
             treasurycontract.address,
             improvementscontract2.address,
             improvementscontract3.address,
+            improvementscontract4.address,
             infrastructurecontract.address,
             wonderscontract1.address,
             wonderscontract3.address,
