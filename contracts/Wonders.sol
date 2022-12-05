@@ -316,7 +316,7 @@ contract WondersContract1 is Ownable {
             bool isWrcThere = WondersContract4(wondersContract4Address)
                 .getWeaponsResearchCenter(countryId);
             require(
-                isWrcThere = true,
+                isWrcThere == true,
                 "Must own Weapons Research Center to purchase"
             );
             uint256 techAmount = InfrastructureContract(infrastructureAddress)
@@ -342,7 +342,7 @@ contract WondersContract1 is Ownable {
                 infrastructureAddress
             ).getInfrastructureCount(countryId);
             require(
-                infrastructureAmount <= 6000,
+                infrastructureAmount >= 6000,
                 "Requires 6000 Infrastructure to purchase"
             );
             uint256 technologyAmount = InfrastructureContract(
@@ -375,7 +375,7 @@ contract WondersContract1 is Ownable {
             bool isStockMarket = WondersContract4(wondersContract4Address)
                 .getStockMarket(countryId);
             require(
-                isStockMarket = true,
+                isStockMarket == true,
                 "Required to own stock market to purchase"
             );
             idToWonders1[countryId].federalReserve = true;
@@ -2068,7 +2068,7 @@ contract WondersContract4 is Ownable {
                 .getNationalResearchLab(countryId);
             require(
                 researchLab = true,
-                "National Research Lab requires to Purchase"
+                "National Research Lab required to Purchase"
             );
             idToWonders4[countryId].universalHealthcare = true;
             WondersContract1(wonderContract1Address).addWonderCount(countryId);
@@ -2086,14 +2086,14 @@ contract WondersContract4 is Ownable {
             bool isPentagon = WondersContract3(wonderContract3Address)
                 .getPentagon(countryId);
             require(
-                isPentagon = true,
+                isPentagon == true,
                 "Pentagon required in order to purchase"
             );
             bool researchLab = WondersContract3(wonderContract3Address)
                 .getNationalResearchLab(countryId);
             require(
-                researchLab = true,
-                "National Research Lab requires to Purchase"
+                researchLab == true,
+                "National Research Lab required to Purchase"
             );
             uint256 infrastructureAmount = InfrastructureContract(
                 infrastructureAddress
@@ -2186,7 +2186,7 @@ contract WondersContract4 is Ownable {
     }
 
     function getStockMarket(uint256 countryId) public view returns (bool) {
-        return idToWonders4[countryId].spaceProgram;
+        return idToWonders4[countryId].stockMarket;
     }
 
     function getStrategicDefenseInitiative(
