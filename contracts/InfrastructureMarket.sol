@@ -29,7 +29,7 @@ contract InfrastructureMarketContract is Ownable {
     InfrastructureContract inf;
     TreasuryContract tsy;
 
-    function settings (
+    function settings(
         address _resources,
         address _parameters,
         address _improvements1,
@@ -78,11 +78,9 @@ contract InfrastructureMarketContract is Ownable {
         tsy.spendBalance(id, cost);
     }
 
-    function getInfrastructureCostPerLevel(uint256 currentInfrastructureAmount)
-        public
-        pure
-        returns (uint256)
-    {
+    function getInfrastructureCostPerLevel(
+        uint256 currentInfrastructureAmount
+    ) public pure returns (uint256) {
         if (currentInfrastructureAmount < 20) {
             return 500;
         } else if (currentInfrastructureAmount < 100) {
@@ -115,11 +113,9 @@ contract InfrastructureMarketContract is Ownable {
         }
     }
 
-    function getInfrastructureCostMultiplier1(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
+    function getInfrastructureCostMultiplier1(
+        uint256 id
+    ) public view returns (uint256) {
         uint256 lumberMultiplier = 0;
         uint256 ironMultiplier = 0;
         uint256 marbleMultiplier = 0;
@@ -141,11 +137,9 @@ contract InfrastructureMarketContract is Ownable {
         return sumOfAdjustments;
     }
 
-    function getInfrastructureCostMultiplier2(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
+    function getInfrastructureCostMultiplier2(
+        uint256 id
+    ) public view returns (uint256) {
         uint256 rubberMultiplier = 0;
         uint256 constructionMultiplier = 0;
         uint256 insterstateSystemMultiplier = 0;
@@ -156,7 +150,9 @@ contract InfrastructureMarketContract is Ownable {
         bool isInterstateSystem = won2.getInterstateSystem(id);
         bool isAccomodativeGovernment = checkAccomodativeGovernment(id);
         uint256 factoryCount = imp1.getFactoryCount(id);
-        bool scientificDevelopmentCenter = won3.getScientificDevelopmentCenter(id);
+        bool scientificDevelopmentCenter = won3.getScientificDevelopmentCenter(
+            id
+        );
         if (isRubber) {
             rubberMultiplier = 3;
         }
@@ -184,11 +180,9 @@ contract InfrastructureMarketContract is Ownable {
         return sumOfAdjustments;
     }
 
-    function getInfrastructureCostMultiplier3(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
+    function getInfrastructureCostMultiplier3(
+        uint256 id
+    ) public view returns (uint256) {
         uint256 aluminiumMultiplier = 0;
         uint256 coalMultiplier = 0;
         uint256 steelMultiplier = 0;
@@ -216,11 +210,9 @@ contract InfrastructureMarketContract is Ownable {
         return sumOfAdjustments;
     }
 
-    function checkAccomodativeGovernment(uint256 countryId)
-        public
-        view
-        returns (bool)
-    {
+    function checkAccomodativeGovernment(
+        uint256 countryId
+    ) public view returns (bool) {
         uint256 governmentType = param.getGovernmentType(countryId);
         if (
             governmentType == 2 ||
@@ -233,5 +225,16 @@ contract InfrastructureMarketContract is Ownable {
             return true;
         }
         return false;
+    }
+
+    function destroyInfrastructure(uint256 id, uint256 amount) public {
+        bool owner = mint.checkOwnership(id, msg.sender);
+        require(owner, "!nation owner");
+        uint256 currentInfrastructureAmount = inf.getInfrastructureCount(id);
+        require(
+            (currentInfrastructureAmount - amount) >= 0,
+            "not enough infrastructure"
+        );
+        inf.decreaseInfrastructureFromMarket(id, amount);
     }
 }

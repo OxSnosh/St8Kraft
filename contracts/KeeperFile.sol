@@ -58,6 +58,10 @@ contract KeeperContract is Ownable {
         aid.resetAidProposals();
     }
 
+    function resetAidProposalsByOwner() public onlyOwner {
+        aid.resetAidProposals();
+    }
+
     function decremenWarDays() internal {
         war.decrementWarDaysLeft();
     }

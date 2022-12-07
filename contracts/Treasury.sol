@@ -29,7 +29,7 @@ contract TreasuryContract is Ownable {
     address public keeper;
     uint256 public daysToInactive = 20;
     uint256 private gameTaxPercentage = 0;
-    uint256 public seedMoney = 2000000;
+    uint256 public seedMoney = 2000000*10**18;
 
     CountryMinter mint;
 

@@ -369,7 +369,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         emit randomNumbersFulfilled(randomResource1, randomResource2);
         //handle 2 of the same randomly generated numbers
         if (randomResource1 == randomResource2 && randomResource2 == 20) {
-            randomResource2 == 0;
+            randomResource2 = 0;
         }
         if (randomResource1 == randomResource2) {
             randomResource2 = randomResource2 + 1;
@@ -654,8 +654,8 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         require(isOwner, "!nation owner");
         bool isPossibleRequestor = isTradePossibleForRequestor(requestorId);
         bool isPossibleRecipient = isTradePossibleForRecipient(recipientId);
-        require(isPossibleRequestor = true, "trade is not possible");
-        require(isPossibleRecipient = true, "trade is not possible");
+        require(isPossibleRequestor == true, "trade is not possible");
+        require(isPossibleRecipient == true, "trade is not possible");
         idToProposedTradingPartners[recipientId].push(requestorId);
         idToProposedTradingPartners[requestorId].push(recipientId);
     }

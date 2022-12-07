@@ -18,7 +18,7 @@ contract LandMarketContract is Ownable {
     InfrastructureContract inf;
     TreasuryContract tsy;
 
-    function settings (
+    function settings(
         address _resources,
         address _countryMinter,
         address _infrastructure,
@@ -28,10 +28,10 @@ contract LandMarketContract is Ownable {
         res = ResourcesContract(_resources);
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
-        infrastructure = _infrastructure;    
-        inf = InfrastructureContract(_infrastructure);  
+        infrastructure = _infrastructure;
+        inf = InfrastructureContract(_infrastructure);
         treasury = _treasury;
-        tsy = TreasuryContract(_treasury);  
+        tsy = TreasuryContract(_treasury);
     }
 
     function buyLand(uint256 id, uint256 amount) public {
@@ -94,5 +94,13 @@ contract LandMarketContract is Ownable {
             multiplier -= 10;
         }
         return multiplier;
+    }
+
+    function destroyLand(uint256 id, uint256 amount) public {
+        bool owner = mint.checkOwnership(id, msg.sender);
+        require(owner, "!nation owner");
+        uint256 currentLandAmount = inf.getLandCount(id);
+        require((currentLandAmount - amount) >= 0, "not enough land");
+        inf.decreaseLandCountFromMarket(id, amount);
     }
 }

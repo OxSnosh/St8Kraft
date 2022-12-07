@@ -383,6 +383,15 @@ contract ForcesContract is Ownable {
         return efficiencyModifier;
     }
 
+    function decomissionSoldiers(uint256 amount, uint256 id) public {
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
+        uint256 defendingSoldierCount = getDefendingSoldierCount(id);
+        require((defendingSoldierCount - amount) >= 0, "not enough defending soldiers");
+        idToForces[id].defendingSoldiers -= amount;
+        idToForces[id].numberOfSoldiers -= amount;
+    }
+
     function buyTanks(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");

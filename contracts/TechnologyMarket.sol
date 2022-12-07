@@ -163,4 +163,12 @@ contract TechnologyMarketContract is Ownable {
         uint256 multiplier = (100 - numberToSubtract);
         return multiplier;
     }
+
+    function destroyTech(uint256 id, uint256 amount) public {
+        bool owner = mint.checkOwnership(id, msg.sender);
+        require(owner, "!nation owner");
+        uint256 currentTech = inf.getTechnologyCount(id);
+        require((currentTech - amount) >= 0, "not enough tech");
+        inf.decreaseTechnologyFromMarket(id, amount);
+    }
 }

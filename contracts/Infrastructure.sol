@@ -214,6 +214,13 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[id].infrastructureCount += amount;
     }
 
+    function decreaseInfrastructureFromMarket(uint256 id, uint256 amount)
+        public
+        onlyInfrastructureMarket
+    {
+        idToInfrastructure[id].infrastructureCount -= amount;
+    }
+
     function increaseTechnologyFromMarket(uint256 id, uint256 amount)
         public
         onlyTechMarket
@@ -221,11 +228,25 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[id].technologyCount += amount;
     }
 
+    function decreaseTechnologyFromMarket(uint256 id, uint256 amount)
+        public
+        onlyTechMarket
+    {
+        idToInfrastructure[id].technologyCount -= amount;
+    }
+
     function increaseLandCountFromMarket(uint256 id, uint256 amount)
         public
         onlyLandMarket
     {
         idToInfrastructure[id].landArea += amount;
+    }
+
+    function decreaseLandCountFromMarket(uint256 id, uint256 amount)
+        public
+        onlyLandMarket
+    {
+        idToInfrastructure[id].landArea -= amount;
     }
 
     function getAreaOfInfluence(uint256 id) public view returns (uint256) {
@@ -288,8 +309,7 @@ contract InfrastructureContract is Ownable {
         view
         returns (uint256 count)
     {
-        uint256 landAmount = idToInfrastructure[countryId].landArea;
-        return landAmount;
+        return idToInfrastructure[countryId].landArea;
     }
 
     function decreaseLandCount(uint256 countryId, uint256 amount)

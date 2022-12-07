@@ -16,6 +16,7 @@ contract AidContract is Ownable {
     address public infrastructure;
     address public wonder1;
     uint256 public aidProposalId;
+    uint256 proposalExpiration = 7 days;
 
     function settings (
         address _countryMinter,
@@ -39,6 +40,7 @@ contract AidContract is Ownable {
     WondersContract1 won1;
 
     struct Proposal {
+        uint256 proposalId;
         uint256 timeProposed;
         uint256 idSender;
         uint256 idRecipient;
@@ -91,7 +93,7 @@ contract AidContract is Ownable {
         public
         onlyCountryMinter
     {
-        // idToOwnerAid[id] = nationOwner;
+        idToOwnerAid[id] = nationOwner;
     }
 
     //check for sanctions
@@ -109,7 +111,7 @@ contract AidContract is Ownable {
         bool aidAvailable = checkAvailability(idSender, techAid, balanceAid, soldiersAid);
         require (aidAvailable, "aid not available");
         uint256 maxTech = 100;
-        uint256 maxBalance = 6000000;
+        uint256 maxBalance = 6000000 * (10**18);
         uint256 maxSoldiers = 4000;
         bool federalAidEligable = getFederalAidEligability(
             idSender,
@@ -117,13 +119,14 @@ contract AidContract is Ownable {
         );
         if (federalAidEligable) {
             maxTech = 150;
-            maxBalance = 9000000;
+            maxBalance = 9000000 * (10**18);
             maxSoldiers = 6000;
         }
         require(techAid <= maxTech, "max tech exceeded");
         require(balanceAid <= maxBalance, "max balance excedded");
         require(soldiersAid <= maxSoldiers, "max soldier aid is excedded");
         Proposal memory newProposal = Proposal(
+            aidProposalId,
             block.timestamp,
             idSender,
             idRecipient,
@@ -133,6 +136,7 @@ contract AidContract is Ownable {
             false,
             false
         );
+        idToAidSlots[idSender] += 1;
         idToProposal[aidProposalId] = newProposal;
         aidProposalId++;
     }
@@ -195,11 +199,19 @@ contract AidContract is Ownable {
         }
     }
 
+    function setProposalExpiration(uint256 newExpiration) public onlyOwner {
+        proposalExpiration = newExpiration;
+    }
+
+    function getProposalExpiration() public view returns (uint256) {
+        return proposalExpiration;
+    }
+
     function proposalExpired(uint256 proposalId) public view returns (bool) {
         uint256 timeProposed = idToProposal[proposalId].timeProposed;
         uint256 timeElapsed = (block.timestamp - timeProposed);
         bool expired = false;
-        if (timeElapsed > 7 days) {
+        if (timeElapsed > proposalExpiration) {
             expired = true;
         }
         return expired;
@@ -223,6 +235,8 @@ contract AidContract is Ownable {
             addressRecipient == msg.sender,
             "you are not the recipient of this proposal"
         );
+        bool available = checkAvailability(idSender, tech, balance, soldiers);
+        require(available, "balances not available");
         InfrastructureContract(infrastructure).sendTech(
             idSender,
             idRecipient,
@@ -263,8 +277,38 @@ contract AidContract is Ownable {
     function resetAidProposals() public onlyKeeper {
         uint256 countryCount = mint.getCountryCount();
         countryCount -= 1;
-        for (uint256 i = 0; i < countryCount; i++) {
+        for (uint256 i = 0; i <= countryCount; i++) {
             idToAidSlots[i] = 0;
         }
+    }
+
+    function getProposal(uint256 proposalId) public view returns(
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256,
+        uint256
+    ) {
+        return (
+            idToProposal[proposalId].proposalId,
+            idToProposal[proposalId].timeProposed,
+            idToProposal[proposalId].idSender,
+            idToProposal[proposalId].idRecipient,
+            idToProposal[proposalId].techAid,
+            idToProposal[proposalId].balanceAid,
+            idToProposal[proposalId].soldierAid
+        );
+    }
+
+    function checkCancelledOrAccepted(uint256 proposalId) public view returns(
+        bool,
+        bool
+    ) {
+        return (
+            idToProposal[proposalId].accepted,
+            idToProposal[proposalId].cancelled
+        );
     }
 }
