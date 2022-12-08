@@ -700,7 +700,8 @@ describe("Aid Contract", async function () {
         )
 
         militarycontract.settings(
-            spyoperationscontract.address
+            spyoperationscontract.address,
+            countryminter.address
         )
 
         nationstrengthcontract.settings(
@@ -1023,7 +1024,7 @@ describe("Aid Contract", async function () {
             expect(array[4]).to.equal(50);
         })
 
-        it.only("aid1 tests setProposalExpiration()", async function () {
+        it("aid1 tests setProposalExpiration()", async function () {
             let oneWeek : any = await aidcontract.getProposalExpiration();
             await aidcontract.setProposalExpiration(oneWeek+5);
             var newOneWeek = await aidcontract.getProposalExpiration();

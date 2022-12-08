@@ -55,7 +55,7 @@ import {
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("ResourcesContract", async function () {
+describe("Military Contract", async function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -851,6 +851,7 @@ describe("ResourcesContract", async function () {
             billscontract.address,
             spyoperationscontract.address
         )
+
         treasurycontract.settings2(
             groundbattlecontract.address,
             countryminter.address,
@@ -910,97 +911,62 @@ describe("ResourcesContract", async function () {
             countryminter.address
         )
 
-        // console.log("country 1");
         await countryminter.connect(signer1).generateCountry(
             "TestRuler",
             "TestNationName",
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        const tx1 = await resourcescontract.fulfillRequest(0);
-        let txReceipt1 = await tx1.wait(1);
-        let requestId1 = txReceipt1?.events?.[1].args?.requestId;
-        // console.log("requestId", (txReceipt1.events?.[1].args?.requestId).toNumber());
-        await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, resourcescontract.address);
-        let resources1 = await resourcescontract.getPlayerResources(0);
-        // console.log("resources", resources1[0].toNumber(), resources1[1].toNumber());
-        
-        // console.log("country 2");
+
         await countryminter.connect(signer2).generateCountry(
-            "TestRuler2",
-            "TestNationName2",
-            "TestCapitalCity2",
-            "TestNationSlogan2"
+            "NextRuler",
+            "NextNationName",
+            "NextCapitalCity",
+            "NextNationSlogan"
         )
-        const tx2 = await resourcescontract.fulfillRequest(1);
-        let txReceipt2 = await tx2.wait(1);
-        let requestId2 = txReceipt2?.events?.[1].args?.requestId;
-        // console.log("requestId", (txReceipt2.events?.[1].args?.requestId).toNumber());
-        await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, resourcescontract.address);
-        let resources2 = await resourcescontract.getPlayerResources(1);
-        // console.log("resources", resources2[0].toNumber(), resources2[1].toNumber());
     });
 
-    describe("Resources Setup", function () {
-        it("Tests that two resources were randomly selected and set to true", async function () {
-            var wheat1 = await resourcescontract.viewWheat(0);
-            expect(wheat1).to.equal(true);
-            var oil1 = await resourcescontract.viewOil(0);
-            expect(oil1).to.equal(true);
-            var fish1 = await resourcescontract.viewFish(0);
-            expect(fish1).to.equal(false);
-
-            var gems2 = await resourcescontract.viewGems(1);
-            expect(gems2).to.equal(true);
-            var water2 = await resourcescontract.viewWater(1);
-            expect(water2).to.equal(true);
-            var coal2 = await resourcescontract.viewCoal(1);
-            expect(coal2).to.equal(false);
-        });
-    });
-
-    describe("Accept Trading Partner", function () {
-        it("Test that partners recieve each others resources", async function () {
-            await resourcescontract.connect(signer1).proposeTrade(0, 1);
-            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
-            var wheat1 = await resourcescontract.viewWheat(0);
-            expect(wheat1).to.equal(true);
-            var oil1 = await resourcescontract.viewOil(0);
-            expect(oil1).to.equal(true)
-            var gems1 = await resourcescontract.viewGems(0);
-            expect(gems1).to.equal(true);
-            var water1 = await resourcescontract.viewWater(0);
-            expect(water1).to.equal(true);
-            var wheat2 = await resourcescontract.viewWheat(1);
-            expect(wheat2).to.equal(true);
-            var oil2 = await resourcescontract.viewOil(1);
-            expect(oil2).to.equal(true)
-            var gems2 = await resourcescontract.viewGems(1);
-            expect(gems2).to.equal(true);
-            var water2 = await resourcescontract.viewWater(1);
-            expect(water2).to.equal(true);
-        })
-    })
-
-    describe("Remove Trading Partners", async function () {
-        it("Nation one in a trade can remove the trade", async function () {
-            await resourcescontract.connect(signer1).proposeTrade(0, 1);
-            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
-            var nation1TradingPartnersFirst = await resourcescontract.getTradingPartners(0);
-            expect(nation1TradingPartnersFirst.length).to.equal(1);
-            await resourcescontract.connect(signer1).removeTradingPartner(0, 1);
-            var nation1TradingPartners = await resourcescontract.getTradingPartners(0);
-            expect(nation1TradingPartners.length).to.equal(0);
+    describe("Military Contract", function () {
+        it("military1 tests if country initializes correctly", async function () {
+            var defcon = await militarycontract.getDefconLevel(0);
+            var threatLevel = await militarycontract.getThreatLevel(0);
+            var war = await militarycontract.getWarPeacePreference(0);
+            expect(defcon.toNumber()).to.equal(5);
+            expect(threatLevel.toNumber()).to.equal(1);
+            expect(war).to.equal(false);
         })
 
-        it("Nation two in a trade can remove the trade", async function () {
-            await resourcescontract.connect(signer1).proposeTrade(0, 1);
-            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
-            var nation1TradingPartnersFirst = await resourcescontract.getTradingPartners(1);
-            expect(nation1TradingPartnersFirst.length).to.equal(1);
-            await resourcescontract.connect(signer2).removeTradingPartner(1, 0);
-            var nation1TradingPartners = await resourcescontract.getTradingPartners(1);
-            expect(nation1TradingPartners.length).to.equal(0);
+        it("military1 tests if updateDefconLevel() works correctly", async function () {
+            await militarycontract.connect(signer1).updateDefconLevel(4, 0);
+            var defcon = await militarycontract.getDefconLevel(0);
+            expect(defcon).to.equal(4);
+            await militarycontract.connect(signer1).updateDefconLevel(1, 0);
+            var defconUpdated = await militarycontract.getDefconLevel(0);
+            expect(defconUpdated).to.equal(1);
+            await expect(militarycontract.connect(signer1).updateDefconLevel(0, 0)).to.be.revertedWith("New DEFCON level is not an integer between 1 and 5");
+            await expect(militarycontract.connect(signer1).updateDefconLevel(6, 0)).to.be.revertedWith("New DEFCON level is not an integer between 1 and 5");
         })
+
+        it("military1 tests if updateThreatLevel() works correctly", async function () {
+            await militarycontract.connect(signer1).updateThreatLevel(2, 0);
+            var threat = await militarycontract.getThreatLevel(0);
+            expect(threat).to.equal(2);
+            await militarycontract.connect(signer1).updateThreatLevel(5, 0);
+            var threatUpated = await militarycontract.getThreatLevel(0);
+            expect(threatUpated).to.equal(5);
+            await expect(militarycontract.connect(signer1).updateThreatLevel(0, 0)).to.be.revertedWith("Not a valid threat level");
+            await expect(militarycontract.connect(signer1).updateThreatLevel(6, 0)).to.be.revertedWith("Not a valid threat level");
+        })
+
+        it("military1 tests if toggleWarPeacePreference() works correctly", async function () {
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0);
+            var war = await militarycontract.getWarPeacePreference(0);
+            expect(war).to.equal(true);
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0);
+            var war2 = await militarycontract.getWarPeacePreference(0);
+            expect(war2).to.equal(false);
+        })
+
+
     })
 });

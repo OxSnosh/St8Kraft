@@ -25,9 +25,11 @@ contract MilitaryContract is Ownable {
         _;
     }
 
-    function settings (address _spyAddress) public onlyOwner {
+    function settings (address _spyAddress, address _countryMinter) public onlyOwner {
         spyAddress = _spyAddress;
         spy = SpyOperationsContract(_spyAddress);
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
     }
 
     function generateMilitary(uint256 id) public {
@@ -49,11 +51,6 @@ contract MilitaryContract is Ownable {
         idToMilitary[id].defconLevel = newDefcon;
     }
 
-    function getDefconLevel(uint256 id) public view returns (uint256) {
-        uint256 defcon = idToMilitary[id].defconLevel;
-        return defcon;
-    }
-
     function setDefconLevelFromSpyContract(uint256 id, uint256 newLevel) public onlySpyContract {
         idToMilitary[id].defconLevel = newLevel;
     }
@@ -72,19 +69,26 @@ contract MilitaryContract is Ownable {
         idToMilitary[id].threatLevel = newThreatLevel;
     }
 
+    function setThreatLevelFromSpyContract(uint256 id, uint256 newLevel)
+        public
+        onlySpyContract
+    {
+        idToMilitary[id].threatLevel = newLevel;
+    }
+
     function toggleWarPeacePreference(uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require (isOwner, "!nation owner");
-        if (idToMilitary[id].warPeacePreference = true) {
+        if (idToMilitary[id].warPeacePreference == true) {
             idToMilitary[id].warPeacePreference = false;
         } else {
             idToMilitary[id].warPeacePreference = true;
         }
     }
 
-    function getWarPeacePreference(uint256 id) public view returns (bool) {
-        bool war = idToMilitary[id].warPeacePreference;
-        return war;
+    function getDefconLevel(uint256 id) public view returns (uint256) {
+        uint256 defcon = idToMilitary[id].defconLevel;
+        return defcon;
     }
 
     function getThreatLevel(uint256 id) public view returns (uint256) {
@@ -92,10 +96,8 @@ contract MilitaryContract is Ownable {
         return threatLevel;
     }
 
-    function setThreatLevelFromSpyContract(uint256 id, uint256 newLevel)
-        public
-        onlySpyContract
-    {
-        idToMilitary[id].threatLevel = newLevel;
+    function getWarPeacePreference(uint256 id) public view returns (bool) {
+        bool war = idToMilitary[id].warPeacePreference;
+        return war;
     }
 }

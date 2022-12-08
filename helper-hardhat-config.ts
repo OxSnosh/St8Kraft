@@ -10,7 +10,7 @@ const config = {
     },
   }
 
-const INITIAL_SUPPLY = "1000000000000000000000000000" 
+const INITIAL_SUPPLY = "10000000000000000000000000000" 
   
 const developmentChains = ["hardhat", "localhost"]
 

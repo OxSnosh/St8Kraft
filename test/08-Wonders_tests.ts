@@ -700,7 +700,8 @@ describe("Wonders", async function () {
         )
 
         militarycontract.settings(
-            spyoperationscontract.address
+            spyoperationscontract.address,
+            countryminter.address
         )
 
         nationstrengthcontract.settings(
@@ -917,9 +918,9 @@ describe("Wonders", async function () {
             "TestNationSlogan"
         )
         let ownerInitialWarBucksBalance : any = await warbucks.balanceOf(signer0.address);
-        await warbucks.connect(signer0).approve(warbucks.address, BigInt(ownerInitialWarBucksBalance));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(ownerInitialWarBucksBalance));
-        await treasurycontract.connect(signer1).addFunds(10000000000000, 0);
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(3000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(3000000000*(10**18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(2000000000*(10**18)), 0);
         // await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 10000);
         // await landmarketcontract.connect(signer1).buyLand(0, 10000);
         // await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
@@ -943,7 +944,7 @@ describe("Wonders", async function () {
         it("wonder1 agriculture development program purchase errors", async function () {
             await expect(wonderscontract1.connect(signer1).buyWonder1(1, 1)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract1.connect(signer0).updateAgricultureDevelopmentCost(1000000000000000);
+            await wonderscontract1.connect(signer0).updateAgricultureDevelopmentCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 1)).to.be.revertedWith("Insufficient balance");
             await wonderscontract1.connect(signer0).updateAgricultureDevelopmentCost(100);
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 1)).to.be.revertedWith("Requires 500 Tech");
@@ -978,7 +979,7 @@ describe("Wonders", async function () {
         it("wonder1 anti air defense network purchase errors", async function () {
             await expect(wonderscontract1.connect(signer1).buyWonder1(1, 2)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract1.connect(signer0).updateAntiAirDefenseNetworkCost(1000000000000000);
+            await wonderscontract1.connect(signer0).updateAntiAirDefenseNetworkCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 2)).to.be.revertedWith("Insufficient balance");
             await wonderscontract1.connect(signer0).updateAntiAirDefenseNetworkCost(100);
             await wonderscontract1.connect(signer1).buyWonder1(0, 2);
@@ -1009,7 +1010,7 @@ describe("Wonders", async function () {
         it("wonder1 central intelligence agency purchase errors", async function () {
             await expect(wonderscontract1.connect(signer1).buyWonder1(1, 3)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract1.connect(signer0).updateCentralIntelligenceAgencyCost(1000000000000000);
+            await wonderscontract1.connect(signer0).updateCentralIntelligenceAgencyCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 3)).to.be.revertedWith("Insufficient balance");
             await wonderscontract1.connect(signer0).updateCentralIntelligenceAgencyCost(100);
             await wonderscontract1.connect(signer1).buyWonder1(0, 3);
@@ -1040,7 +1041,7 @@ describe("Wonders", async function () {
         it("wonder1 disaster relief agency purchase errors", async function () {
             await expect(wonderscontract1.connect(signer1).buyWonder1(1, 4)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract1.connect(signer0).updateDisasterReliefAgencyCost(1000000000000000);
+            await wonderscontract1.connect(signer0).updateDisasterReliefAgencyCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 4)).to.be.revertedWith("Insufficient balance");
             await wonderscontract1.connect(signer0).updateDisasterReliefAgencyCost(100);
             await wonderscontract1.connect(signer1).buyWonder1(0, 4);
@@ -1080,7 +1081,7 @@ describe("Wonders", async function () {
             await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
             await expect(wonderscontract1.connect(signer1).buyWonder1(1, 5)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract1.connect(signer0).updateEmpWeaponizationCost(1000000000000000);
+            await wonderscontract1.connect(signer0).updateEmpWeaponizationCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 5)).to.be.revertedWith("Insufficient balance");
             await wonderscontract1.connect(signer0).updateEmpWeaponizationCost(100);
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 5)).to.be.revertedWith("Must own Weapons Research Center to purchase");
@@ -1121,7 +1122,7 @@ describe("Wonders", async function () {
             await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
             await expect(wonderscontract1.connect(signer1).buyWonder1(1, 6)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract1.connect(signer0).updateFalloutShelterSystemCost(1000000000000000);
+            await wonderscontract1.connect(signer0).updateFalloutShelterSystemCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 6)).to.be.revertedWith("Insufficient balance");
             await wonderscontract1.connect(signer0).updateFalloutShelterSystemCost(100);
             await wonderscontract1.connect(signer1).buyWonder1(0, 6);
@@ -1152,7 +1153,7 @@ describe("Wonders", async function () {
         it("wonder1 federal aid commission purchase errors", async function () {
             await expect(wonderscontract1.connect(signer1).buyWonder1(1, 7)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract1.connect(signer0).updateFederalAidCommissionCost(1000000000000000);
+            await wonderscontract1.connect(signer0).updateFederalAidCommissionCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 7)).to.be.revertedWith("Insufficient balance");
             await wonderscontract1.connect(signer0).updateFederalAidCommissionCost(100);
             await wonderscontract1.connect(signer1).buyWonder1(0, 7);
@@ -1186,7 +1187,7 @@ describe("Wonders", async function () {
             await wonderscontract4.connect(signer1).buyWonder4(0, 3);
             await expect(wonderscontract1.connect(signer1).buyWonder1(1, 8)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract1.connect(signer0).updateFederalReserveCost(1000000000000000);
+            await wonderscontract1.connect(signer0).updateFederalReserveCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 8)).to.be.revertedWith("Insufficient balance");
             await wonderscontract1.connect(signer0).updateFederalReserveCost(100);
             await wonderscontract1.connect(signer1).buyWonder1(0, 8);
@@ -1217,7 +1218,7 @@ describe("Wonders", async function () {
         it("wonder1 foreign air force base purchase errors", async function () {
             await expect(wonderscontract1.connect(signer1).buyWonder1(1, 9)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract1.connect(signer0).updateForeignAirForceBaseCost(1000000000000000);
+            await wonderscontract1.connect(signer0).updateForeignAirForceBaseCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 9)).to.be.revertedWith("Insufficient balance");
             await wonderscontract1.connect(signer0).updateForeignAirForceBaseCost(100);
             await wonderscontract1.connect(signer1).buyWonder1(0, 9);
@@ -1251,7 +1252,7 @@ describe("Wonders", async function () {
             await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
             await expect(wonderscontract1.connect(signer1).buyWonder1(1, 10)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract1.connect(signer0).updateForeignArmyBaseCost(1000000000000000);
+            await wonderscontract1.connect(signer0).updateForeignArmyBaseCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 10)).to.be.revertedWith("Insufficient balance");
             await wonderscontract1.connect(signer0).updateForeignArmyBaseCost(100);
             await wonderscontract1.connect(signer1).buyWonder1(0, 10);
@@ -1285,7 +1286,7 @@ describe("Wonders", async function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000);
             await expect(wonderscontract1.connect(signer1).buyWonder1(1, 11)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract1.connect(signer0).updateForeignNavalBaseCost(1000000000000000);
+            await wonderscontract1.connect(signer0).updateForeignNavalBaseCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract1.connect(signer1).buyWonder1(0, 11)).to.be.revertedWith("Insufficient balance");
             await wonderscontract1.connect(signer0).updateForeignNavalBaseCost(100);
             await wonderscontract1.connect(signer1).buyWonder1(0, 11);
@@ -1318,7 +1319,7 @@ describe("Wonders", async function () {
         it("wonder2 great monument purchase errors", async function () {
             await expect(wonderscontract2.connect(signer1).buyWonder2(1, 1)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract2.connect(signer0).updateGreatMonumentCost(1000000000000000);
+            await wonderscontract2.connect(signer0).updateGreatMonumentCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 1)).to.be.revertedWith("Insufficient balance");
             await wonderscontract2.connect(signer0).updateGreatMonumentCost(100);
             await wonderscontract2.connect(signer1).buyWonder2(0, 1);
@@ -1349,7 +1350,7 @@ describe("Wonders", async function () {
         it("wonder2 great temple purchase errors", async function () {
             await expect(wonderscontract2.connect(signer1).buyWonder2(1, 2)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract2.connect(signer0).updateGreatTempleCost(1000000000000000);
+            await wonderscontract2.connect(signer0).updateGreatTempleCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 2)).to.be.revertedWith("Insufficient balance");
             await wonderscontract2.connect(signer0).updateGreatTempleCost(100);
             await wonderscontract2.connect(signer1).buyWonder2(0, 2);
@@ -1380,7 +1381,7 @@ describe("Wonders", async function () {
         it("wonder2 great university purchase errors", async function () {
             await expect(wonderscontract2.connect(signer1).buyWonder2(1, 3)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract2.connect(signer0).updateGreatUniversityCost(1000000000000000);
+            await wonderscontract2.connect(signer0).updateGreatUniversityCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 3)).to.be.revertedWith("Insufficient balance");
             await wonderscontract2.connect(signer0).updateGreatUniversityCost(100);
             await wonderscontract2.connect(signer1).buyWonder2(0, 3);
@@ -1411,7 +1412,7 @@ describe("Wonders", async function () {
         it("wonder2 hidden nuclear missile silo purchase errors", async function () {
             await expect(wonderscontract2.connect(signer1).buyWonder2(1, 4)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract2.connect(signer0).updateHiddenNuclearMissileSiloCost(1000000000000000);
+            await wonderscontract2.connect(signer0).updateHiddenNuclearMissileSiloCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 4)).to.be.revertedWith("Insufficient balance");
             await wonderscontract2.connect(signer0).updateHiddenNuclearMissileSiloCost(100);
             await wonderscontract2.connect(signer1).buyWonder2(0, 4);
@@ -1452,7 +1453,7 @@ describe("Wonders", async function () {
             await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
             await expect(wonderscontract2.connect(signer1).buyWonder2(1, 5)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract2.connect(signer0).updateInterceptorMissileSystemCost(1000000000000000);
+            await wonderscontract2.connect(signer0).updateInterceptorMissileSystemCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 5)).to.be.revertedWith("Insufficient balance");
             await wonderscontract2.connect(signer0).updateInterceptorMissileSystemCost(100);
             await wonderscontract2.connect(signer1).buyWonder2(0, 5);
@@ -1483,7 +1484,7 @@ describe("Wonders", async function () {
         it("wonder2 internet purchase errors", async function () {
             await expect(wonderscontract2.connect(signer1).buyWonder2(1, 6)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract2.connect(signer0).updateInternetCost(1000000000000000);
+            await wonderscontract2.connect(signer0).updateInternetCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 6)).to.be.revertedWith("Insufficient balance");
             await wonderscontract2.connect(signer0).updateInternetCost(100);
             await wonderscontract2.connect(signer1).buyWonder2(0, 6);
@@ -1514,7 +1515,7 @@ describe("Wonders", async function () {
         it("wonder2 interstate system purchase errors", async function () {
             await expect(wonderscontract2.connect(signer1).buyWonder2(1, 7)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract2.connect(signer0).updateInterstateSystemCost(1000000000000000);
+            await wonderscontract2.connect(signer0).updateInterstateSystemCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 7)).to.be.revertedWith("Insufficient balance");
             await wonderscontract2.connect(signer0).updateInterstateSystemCost(100);
             await wonderscontract2.connect(signer1).buyWonder2(0, 7);
@@ -1551,7 +1552,7 @@ describe("Wonders", async function () {
             await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
             await expect(wonderscontract2.connect(signer1).buyWonder2(1, 8)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract2.connect(signer0).updateManhattanProjectCost(1000000000000000);
+            await wonderscontract2.connect(signer0).updateManhattanProjectCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 8)).to.be.revertedWith("Insufficient balance");
             await wonderscontract2.connect(signer0).updateManhattanProjectCost(100);
             await wonderscontract2.connect(signer1).buyWonder2(0, 8);
@@ -1591,7 +1592,7 @@ describe("Wonders", async function () {
             await landmarketcontract.connect(signer1).buyLand(0, 10000);
             await expect(wonderscontract2.connect(signer1).buyWonder2(1, 9)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract2.connect(signer0).updateMiningIndustryConsortiumCost(1000000000000000);
+            await wonderscontract2.connect(signer0).updateMiningIndustryConsortiumCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 9)).to.be.revertedWith("Insufficient balance");
             await wonderscontract2.connect(signer0).updateMiningIndustryConsortiumCost(100);
             await wonderscontract2.connect(signer1).buyWonder2(0, 9);
@@ -1624,7 +1625,7 @@ describe("Wonders", async function () {
         it("wonder3 movie industry purchase errors", async function () {
             await expect(wonderscontract3.connect(signer1).buyWonder3(1, 1)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract3.connect(signer1).buyWonder3(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract3.connect(signer0).updateMovieIndustryCost(1000000000000000);
+            await wonderscontract3.connect(signer0).updateMovieIndustryCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract3.connect(signer1).buyWonder3(0, 1)).to.be.revertedWith("Insufficient balance");
             await wonderscontract3.connect(signer0).updateMovieIndustryCost(100);
             await wonderscontract3.connect(signer1).buyWonder3(0, 1);
@@ -1661,7 +1662,7 @@ describe("Wonders", async function () {
             await wonderscontract3.connect(signer1).buyWonder3(0, 5);
             await expect(wonderscontract3.connect(signer1).buyWonder3(1, 2)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract3.connect(signer1).buyWonder3(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract3.connect(signer0).updateNationalCemetaryCost(1000000000000000);
+            await wonderscontract3.connect(signer0).updateNationalCemetaryCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract3.connect(signer1).buyWonder3(0, 2)).to.be.revertedWith("Insufficient balance");
             await wonderscontract3.connect(signer0).updateNationalCemetaryCost(100);
             await wonderscontract3.connect(signer1).buyWonder3(0, 2);
@@ -1695,7 +1696,7 @@ describe("Wonders", async function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 13000);
             await expect(wonderscontract3.connect(signer1).buyWonder3(1, 3)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract3.connect(signer1).buyWonder3(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract3.connect(signer0).updateNationalEnvironmentOfficeCost(1000000000000000);
+            await wonderscontract3.connect(signer0).updateNationalEnvironmentOfficeCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract3.connect(signer1).buyWonder3(0, 3)).to.be.revertedWith("Insufficient balance");
             await wonderscontract3.connect(signer0).updateNationalEnvironmentOfficeCost(100);
             await wonderscontract3.connect(signer1).buyWonder3(0, 3);
@@ -1726,7 +1727,7 @@ describe("Wonders", async function () {
         it("wonder3 national research lab purchase errors", async function () {
             await expect(wonderscontract3.connect(signer1).buyWonder3(1, 4)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract3.connect(signer1).buyWonder3(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract3.connect(signer0).updateNationalResearchLabCost(1000000000000000);
+            await wonderscontract3.connect(signer0).updateNationalResearchLabCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract3.connect(signer1).buyWonder3(0, 4)).to.be.revertedWith("Insufficient balance");
             await wonderscontract3.connect(signer0).updateNationalResearchLabCost(100);
             await wonderscontract3.connect(signer1).buyWonder3(0, 4);
@@ -1760,7 +1761,7 @@ describe("Wonders", async function () {
             await forcescontract.connect(signer0).increaseSoldierCasualties(0, 100000);
             await expect(wonderscontract3.connect(signer1).buyWonder3(1, 5)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract3.connect(signer1).buyWonder3(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract3.connect(signer0).updateNationalWarMemorialCost(1000000000000000);
+            await wonderscontract3.connect(signer0).updateNationalWarMemorialCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract3.connect(signer1).buyWonder3(0, 5)).to.be.revertedWith("Insufficient balance");
             await wonderscontract3.connect(signer0).updateNationalWarMemorialCost(100);
             await wonderscontract3.connect(signer1).buyWonder3(0, 5);
@@ -1797,7 +1798,7 @@ describe("Wonders", async function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 12000);
             await expect(wonderscontract3.connect(signer1).buyWonder3(1, 6)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract3.connect(signer1).buyWonder3(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract3.connect(signer0).updateNuclearPowerPlantCost(1000000000000000);
+            await wonderscontract3.connect(signer0).updateNuclearPowerPlantCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract3.connect(signer1).buyWonder3(0, 6)).to.be.revertedWith("Insufficient balance");
             await wonderscontract3.connect(signer0).updateNuclearPowerPlantCost(100);
             await wonderscontract3.connect(signer1).buyWonder3(0, 6);
@@ -1828,7 +1829,7 @@ describe("Wonders", async function () {
         it("wonder3 pentagon purchase errors", async function () {
             await expect(wonderscontract3.connect(signer1).buyWonder3(1, 7)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract3.connect(signer1).buyWonder3(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract3.connect(signer0).updatePentagonCost(1000000000000000);
+            await wonderscontract3.connect(signer0).updatePentagonCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract3.connect(signer1).buyWonder3(0, 7)).to.be.revertedWith("Insufficient balance");
             await wonderscontract3.connect(signer0).updatePentagonCost(100);
             await wonderscontract3.connect(signer1).buyWonder3(0, 7);
@@ -1859,7 +1860,7 @@ describe("Wonders", async function () {
         it("wonder3 political lobbyists purchase errors", async function () {
             await expect(wonderscontract3.connect(signer1).buyWonder3(1, 8)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract3.connect(signer1).buyWonder3(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract3.connect(signer0).updatePoliticalLobbyistsCost(1000000000000000);
+            await wonderscontract3.connect(signer0).updatePoliticalLobbyistsCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract3.connect(signer1).buyWonder3(0, 8)).to.be.revertedWith("Insufficient balance");
             await wonderscontract3.connect(signer0).updatePoliticalLobbyistsCost(100);
             await wonderscontract3.connect(signer1).buyWonder3(0, 8);
@@ -1902,7 +1903,7 @@ describe("Wonders", async function () {
             await wonderscontract3.connect(signer1).buyWonder3(0, 4);
             await expect(wonderscontract3.connect(signer1).buyWonder3(1, 9)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract3.connect(signer1).buyWonder3(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract3.connect(signer0).updateScientificDevelopmentCenterCost(1000000000000000);
+            await wonderscontract3.connect(signer0).updateScientificDevelopmentCenterCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract3.connect(signer1).buyWonder3(0, 9)).to.be.revertedWith("Insufficient balance");
             await wonderscontract3.connect(signer0).updateScientificDevelopmentCenterCost(100);
             await wonderscontract3.connect(signer1).buyWonder3(0, 9);
@@ -1935,7 +1936,7 @@ describe("Wonders", async function () {
         it("wonder4 social security purchase errors", async function () {
             await expect(wonderscontract4.connect(signer1).buyWonder4(1, 1)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract4.connect(signer0).updateSocialSecuritySystemCost(1000000000000000);
+            await wonderscontract4.connect(signer0).updateSocialSecuritySystemCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 1)).to.be.revertedWith("Insufficient balance");
             await wonderscontract4.connect(signer0).updateSocialSecuritySystemCost(100);
             await wonderscontract4.connect(signer1).buyWonder4(0, 1);
@@ -1966,7 +1967,7 @@ describe("Wonders", async function () {
         it("wonder4 space program purchase errors", async function () {
             await expect(wonderscontract4.connect(signer1).buyWonder4(1, 2)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract4.connect(signer0).updateSpaceProgramCost(1000000000000000);
+            await wonderscontract4.connect(signer0).updateSpaceProgramCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 2)).to.be.revertedWith("Insufficient balance");
             await wonderscontract4.connect(signer0).updateSpaceProgramCost(100);
             await wonderscontract4.connect(signer1).buyWonder4(0, 2);
@@ -1997,7 +1998,7 @@ describe("Wonders", async function () {
         it("wonder4 stock market purchase errors", async function () {
             await expect(wonderscontract4.connect(signer1).buyWonder4(1, 3)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract4.connect(signer0).updateStockMarketCost(1000000000000000);
+            await wonderscontract4.connect(signer0).updateStockMarketCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 3)).to.be.revertedWith("Insufficient balance");
             await wonderscontract4.connect(signer0).updateStockMarketCost(100);
             await wonderscontract4.connect(signer1).buyWonder4(0, 3);
@@ -2034,7 +2035,7 @@ describe("Wonders", async function () {
             await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 7);
             await expect(wonderscontract4.connect(signer1).buyWonder4(1, 4)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract4.connect(signer0).updateStrategicDefenseInitiativeCost(1000000000000000);
+            await wonderscontract4.connect(signer0).updateStrategicDefenseInitiativeCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 4)).to.be.revertedWith("Insufficient balance");
             await wonderscontract4.connect(signer0).updateStrategicDefenseInitiativeCost(100);
             await wonderscontract4.connect(signer1).buyWonder4(0, 4);
@@ -2068,7 +2069,7 @@ describe("Wonders", async function () {
             await wonderscontract3.connect(signer1).buyWonder3(0, 7);
             await expect(wonderscontract4.connect(signer1).buyWonder4(1, 5)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract4.connect(signer0).updateSuperiorLogisticalSupportCost(1000000000000000);
+            await wonderscontract4.connect(signer0).updateSuperiorLogisticalSupportCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 5)).to.be.revertedWith("Insufficient balance");
             await wonderscontract4.connect(signer0).updateSuperiorLogisticalSupportCost(100);
             await wonderscontract4.connect(signer1).buyWonder4(0, 5);
@@ -2110,7 +2111,7 @@ describe("Wonders", async function () {
             await wonderscontract3.connect(signer1).buyWonder3(0, 4);
             await expect(wonderscontract4.connect(signer1).buyWonder4(1, 6)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract4.connect(signer0).updateUniversalHealthcareCost(1000000000000000);
+            await wonderscontract4.connect(signer0).updateUniversalHealthcareCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 6)).to.be.revertedWith("Insufficient balance");
             await wonderscontract4.connect(signer0).updateUniversalHealthcareCost(100);
             await wonderscontract4.connect(signer1).buyWonder4(0, 6);
@@ -2153,7 +2154,7 @@ describe("Wonders", async function () {
             await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
             await expect(wonderscontract4.connect(signer1).buyWonder4(1, 7)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 15)).to.be.revertedWith("Invalid wonder ID");
-            await wonderscontract4.connect(signer0).updateWeaponsResearchCenterCost(1000000000000000);
+            await wonderscontract4.connect(signer0).updateWeaponsResearchCenterCost(BigInt(100000000000*(10**18)));
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 7)).to.be.revertedWith("Insufficient balance");
             await wonderscontract4.connect(signer0).updateWeaponsResearchCenterCost(100);
             await wonderscontract4.connect(signer1).buyWonder4(0, 7);

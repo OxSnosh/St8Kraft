@@ -700,7 +700,8 @@ describe("ParametersContract", async function () {
         )
 
         militarycontract.settings(
-            spyoperationscontract.address
+            spyoperationscontract.address,
+            countryminter.address
         )
 
         nationstrengthcontract.settings(
