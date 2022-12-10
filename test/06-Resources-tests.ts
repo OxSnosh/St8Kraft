@@ -923,7 +923,7 @@ describe("ResourcesContract", async function () {
         // console.log("requestId", (txReceipt1.events?.[1].args?.requestId).toNumber());
         await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, resourcescontract.address);
         let resources1 = await resourcescontract.getPlayerResources(0);
-        // console.log("resources", resources1[0].toNumber(), resources1[1].toNumber());
+        console.log("resources", resources1[0].toNumber(), resources1[1].toNumber());
         
         // console.log("country 2");
         await countryminter.connect(signer2).generateCountry(
@@ -932,13 +932,13 @@ describe("ResourcesContract", async function () {
             "TestCapitalCity2",
             "TestNationSlogan2"
         )
-        const tx2 = await resourcescontract.fulfillRequest(1);
-        let txReceipt2 = await tx2.wait(1);
-        let requestId2 = txReceipt2?.events?.[1].args?.requestId;
-        // console.log("requestId", (txReceipt2.events?.[1].args?.requestId).toNumber());
-        await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, resourcescontract.address);
-        let resources2 = await resourcescontract.getPlayerResources(1);
-        // console.log("resources", resources2[0].toNumber(), resources2[1].toNumber());
+        // const tx2 = await resourcescontract.fulfillRequest(1);
+        // let txReceipt2 = await tx2.wait(1);
+        // let requestId2 = txReceipt2?.events?.[1].args?.requestId;
+        // // console.log("requestId", (txReceipt2.events?.[1].args?.requestId).toNumber());
+        // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, resourcescontract.address);
+        // let resources2 = await resourcescontract.getPlayerResources(1);
+        // // console.log("resources", resources2[0].toNumber(), resources2[1].toNumber());
     });
 
     describe("Resources Setup", function () {
@@ -1003,4 +1003,15 @@ describe("ResourcesContract", async function () {
             expect(nation1TradingPartners.length).to.equal(0);
         })
     })
-});
+
+    describe("Set Resources", async function () {
+        it("tests that the mock set resources functionality works", async function () {
+            await resourcescontract.mockResourcesForTesting(0, 0, 1);
+            // await resourcescontract.mockResourcesForTesting(0, 1, 2);
+            var resource1 = await resourcescontract.viewAluminium(0);
+            expect(resource1).to.equal(true);
+            var resource2 = await resourcescontract.viewCattle(0);
+            expect(resource2).to.equal(true);
+        })
+    })
+})

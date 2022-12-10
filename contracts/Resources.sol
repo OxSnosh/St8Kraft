@@ -379,6 +379,12 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         setResources(requestNumber);
     }
 
+    function mockResourcesForTesting(uint256 countryId, uint256 resource1, uint256 resource2) public onlyOwner {
+        uint256[2] memory playerResources = [resource1, resource2];
+        idToPlayerResources[countryId] = playerResources;
+        setResources(countryId);
+    }
+
     function setResources(uint256 id) internal {
         idToResources1[id].aluminium = false;
         idToResources1[id].cattle = false;
