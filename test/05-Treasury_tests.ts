@@ -926,7 +926,7 @@ describe("Treasury", async function () {
             let deployerBalanceGross : any = (await (warbucks.balanceOf(signer0.address))).toString();
             let deployerBalance = (BigInt(deployerBalanceGross / (10**18)));
             // console.log("deployer balance", deployerBalance);
-            expect(deployerBalance.toString()).to.equal("1000000000");
+            expect(deployerBalance.toString()).to.equal("10000000000");
         })
 
         it("tests addFunds() will increase game balance and burn coins", async function () {

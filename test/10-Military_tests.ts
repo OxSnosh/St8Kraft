@@ -966,7 +966,5 @@ describe("Military Contract", async function () {
             var war2 = await militarycontract.getWarPeacePreference(0);
             expect(war2).to.equal(false);
         })
-
-
     })
 });

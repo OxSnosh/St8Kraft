@@ -171,6 +171,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     function setTeam(uint256 id, uint256 newTeam) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
+        require(newTeam <= 15, "invalid team selection");
         idToCountrySettings[id].nationTeam = newTeam;
     }
 
@@ -260,8 +261,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     }
 
     function getTeam(uint256 countryId) public view returns (uint256) {
-        uint256 team = idToCountrySettings[countryId].nationTeam;
-        return team;
+        return idToCountrySettings[countryId].nationTeam;
     }
 
     function getGovernmentType(uint256 countryId)
@@ -269,18 +269,15 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         view
         returns (uint256)
     {
-        uint256 government = idToCountrySettings[countryId].governmentType;
-        return government;
+        return idToCountrySettings[countryId].governmentType;
     }
 
     function getReligionType(uint256 countryId) public view returns (uint256) {
-        uint256 religion = idToCountrySettings[countryId].nationalReligion;
-        return religion;
+        return idToCountrySettings[countryId].nationalReligion;
     }
 
     function getTimeCreated(uint256 countryId) public view returns (uint256) {
-        uint256 timeCreated = idToCountrySettings[countryId].timeCreated;
-        return timeCreated;
+        return idToCountrySettings[countryId].timeCreated;
     }
 
     function getGovernmentPreference(uint256 id)

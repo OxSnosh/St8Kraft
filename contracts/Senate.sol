@@ -10,6 +10,21 @@ contract SenateContract is Ownable {
     address public countryMinter;
     address public parameters;
     address public wonders3;
+    uint256[] public team1SenatorArray;
+    uint256[] public team2SenatorArray;
+    uint256[] public team3SenatorArray;
+    uint256[] public team4SenatorArray;
+    uint256[] public team5SenatorArray;
+    uint256[] public team6SenatorArray;
+    uint256[] public team7SenatorArray;
+    uint256[] public team8SenatorArray;
+    uint256[] public team9SenatorArray;
+    uint256[] public team10SenatorArray;
+    uint256[] public team11SenatorArray;
+    uint256[] public team12SenatorArray;
+    uint256[] public team13SenatorArray;
+    uint256[] public team14SenatorArray;
+    uint256[] public team15SenatorArray;
 
     WondersContract3 won3;
     CountryMinter mint;
@@ -20,6 +35,7 @@ contract SenateContract is Ownable {
         bool senator;
         uint256 votesToSanction;
         bool sanctioned;
+        uint256 team;
     }
 
     uint256[] public sanctionVotes;
@@ -40,6 +56,17 @@ contract SenateContract is Ownable {
 
     mapping(uint256 => Voter) public idToVoter;
     mapping(uint256 => uint256[]) public idToSanctionVotes;
+    mapping(uint256 => mapping(uint256 => uint256)) election;
+
+    modifier onlyCountryMinter() {
+        require(msg.sender == countryMinter, "function only callable from countryminter");
+        _;
+    }
+
+    modifier onlyCountryParameters() {
+        require(msg.sender == parameters, "function only callable from country paraeters contract");
+        _;
+    }
 
     function updateCountryMinter(address newAddress) public onlyOwner {
         countryMinter = newAddress;
@@ -53,17 +80,23 @@ contract SenateContract is Ownable {
         params = CountryParametersContract(newAddress);
     }
 
-    function generateVoter(uint256 id) public {
-        Voter memory newVoter = Voter(0, false, false, 0, false);
+    function generateVoter(uint256 id) public onlyCountryMinter {
+        Voter memory newVoter = Voter(0, false, false, 0, false, 0);
         idToVoter[id] = newVoter;
+    }
+
+    function updateTeam(uint256 id, uint256 newTeam) public onlyCountryParameters {
+        idToVoter[id].team = newTeam;
+        idToVoter[id].votes = 0;
     }
 
     function voteForSenator(uint256 idVoter, uint256 idOfSenateVote) public {
         bool isOwner = mint.checkOwnership(idVoter, msg.sender);
         require (isOwner, "!nation owner");
+        require (idVoter != idOfSenateVote, "cannot vote for yourself");
         require(idToVoter[idVoter].voted == false, "already voted");
-        uint256 voterTeam = params.getTeam(idVoter);
-        uint256 teamOfVote = params.getTeam(idOfSenateVote);
+        uint256 voterTeam = idToVoter[idVoter].team;
+        uint256 teamOfVote = idToVoter[idOfSenateVote].team;
         require(
             teamOfVote == voterTeam,
             "you can only vote for a fellow team member"

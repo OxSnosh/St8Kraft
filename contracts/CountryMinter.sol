@@ -19,7 +19,7 @@ import "./Aid.sol";
 import "./Senate.sol";
 
 contract CountryMinter is ERC721, Ownable {
-    uint256 public countryId = 0;
+    uint256 public countryId = 1;
     address public countryParameters;
     address public infrastructure;
     address public resources;
@@ -162,7 +162,7 @@ contract CountryMinter is ERC721, Ownable {
         WondersContract4(wonders4).generateWonders4(countryId);
         idToOwner[countryId] = msg.sender;
         ownerCountryCount[msg.sender]++;
-        countryId+=1;
+        countryId++;
         emit nationCreated(msg.sender, nationName, ruler);
     }
 
