@@ -491,7 +491,8 @@ describe("ResourcesContract", async function () {
         
         countryparameterscontract.settings(
             spyoperationscontract.address,
-            countryminter.address
+            countryminter.address,
+            senatecontract.address
         )
 
         crimecontract.settings(

@@ -38,9 +38,16 @@ contract SenateContract is Ownable {
         uint256 team;
     }
 
+    event Vote(
+        uint256 indexed voterId,
+        uint256 indexed team,
+        uint256 indexed voteCastFor,
+        address voter
+    );
+
     uint256[] public sanctionVotes;
 
-    function settings (
+    function settings(
         address _countryMinter,
         address _parameters,
         address _wonders3
@@ -59,12 +66,18 @@ contract SenateContract is Ownable {
     mapping(uint256 => mapping(uint256 => uint256)) election;
 
     modifier onlyCountryMinter() {
-        require(msg.sender == countryMinter, "function only callable from countryminter");
+        require(
+            msg.sender == countryMinter,
+            "function only callable from countryminter"
+        );
         _;
     }
 
     modifier onlyCountryParameters() {
-        require(msg.sender == parameters, "function only callable from country paraeters contract");
+        require(
+            msg.sender == parameters,
+            "function only callable from country paraeters contract"
+        );
         _;
     }
 
@@ -72,10 +85,9 @@ contract SenateContract is Ownable {
         countryMinter = newAddress;
     }
 
-    function updateCountryParametersContract(address newAddress)
-        public
-        onlyOwner
-    {
+    function updateCountryParametersContract(
+        address newAddress
+    ) public onlyOwner {
         parameters = newAddress;
         params = CountryParametersContract(newAddress);
     }
@@ -85,15 +97,18 @@ contract SenateContract is Ownable {
         idToVoter[id] = newVoter;
     }
 
-    function updateTeam(uint256 id, uint256 newTeam) public onlyCountryParameters {
+    function updateTeam(
+        uint256 id,
+        uint256 newTeam
+    ) public onlyCountryParameters {
         idToVoter[id].team = newTeam;
         idToVoter[id].votes = 0;
     }
 
     function voteForSenator(uint256 idVoter, uint256 idOfSenateVote) public {
         bool isOwner = mint.checkOwnership(idVoter, msg.sender);
-        require (isOwner, "!nation owner");
-        require (idVoter != idOfSenateVote, "cannot vote for yourself");
+        require(isOwner, "!nation owner");
+        require(idVoter != idOfSenateVote, "cannot vote for yourself");
         require(idToVoter[idVoter].voted == false, "already voted");
         uint256 voterTeam = idToVoter[idVoter].team;
         uint256 teamOfVote = idToVoter[idOfSenateVote].team;
@@ -107,11 +122,25 @@ contract SenateContract is Ownable {
             idToVoter[idOfSenateVote].votes++;
         }
         idToVoter[idVoter].voted = true;
+        emit Vote(idVoter, voterTeam, idOfSenateVote, msg.sender);
     }
 
-    function sanctionTeamMember(uint256 idSenator, uint256 idSanctioned)
-        public
-    {
+    function inaugurateTeam7Senators(uint256[] memory newSenatorArray) public {
+        for (uint256 i = 0; i < team7SenatorArray.length; i++) {
+            uint256 countryId = team7SenatorArray[i];
+            idToVoter[countryId].senator = false;
+        }
+        for (uint i = 0; i < newSenatorArray.length; i++) {
+            uint256 newSenatorId = newSenatorArray[i];
+            idToVoter[newSenatorId].senator = true;
+        }
+        team7SenatorArray = newSenatorArray;
+    }
+
+    function sanctionTeamMember(
+        uint256 idSenator,
+        uint256 idSanctioned
+    ) public {
         require(idToVoter[idSenator].senator == true, "!senator");
         require(
             idToVoter[idSanctioned].senator == false,
@@ -151,11 +180,9 @@ contract SenateContract is Ownable {
         }
     }
 
-    function getSanctionVotes(uint256 id)
-        internal
-        view
-        returns (uint256[] storage)
-    {
+    function getSanctionVotes(
+        uint256 id
+    ) internal view returns (uint256[] storage) {
         uint256[] storage sanctionVoteArray = idToSanctionVotes[id];
         return sanctionVoteArray;
     }
@@ -167,11 +194,10 @@ contract SenateContract is Ownable {
         idToSanctionVotes[idSanctioned] = sanctionArray;
     }
 
-    function checkIfSenatorVoted(uint256 senatorId, uint256 idSanctioned)
-        internal
-        view
-        returns (bool, uint256)
-    {
+    function checkIfSenatorVoted(
+        uint256 senatorId,
+        uint256 idSanctioned
+    ) internal view returns (bool, uint256) {
         uint256[] memory sanctionVoteCheck = getSanctionVotes(idSanctioned);
         for (uint256 i = 0; i < sanctionVoteCheck.length; i++) {
             if (sanctionVotes[i] == senatorId) {
@@ -179,5 +205,9 @@ contract SenateContract is Ownable {
             }
         }
         return (false, 0);
+    }
+
+    function isSenator(uint256 id) public view returns (bool) {
+        return idToVoter[id].senator;
     }
 }

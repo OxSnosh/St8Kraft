@@ -491,7 +491,8 @@ describe("Wonders", async function () {
         
         countryparameterscontract.settings(
             spyoperationscontract.address,
-            countryminter.address
+            countryminter.address,
+            senatecontract.address
         )
 
         crimecontract.settings(
@@ -917,7 +918,6 @@ describe("Wonders", async function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        let ownerInitialWarBucksBalance : any = await warbucks.balanceOf(signer0.address);
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(3000000000*(10**18)));
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(3000000000*(10**18)));
         await treasurycontract.connect(signer1).addFunds(BigInt(2000000000*(10**18)), 0);

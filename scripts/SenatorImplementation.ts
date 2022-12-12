@@ -1,10 +1,9 @@
 
 
-let nums = [1, 1, 2, 3, 5, 5, 1]
-
-const kMostFrequent = function(nums, k) {
+export function kMostFrequent(nums : any , k : any) {
     // Frequency counter
-    let freqs = {};
+    let freqs : any = {};
+    let num;
     for (num of nums) {
         if (freqs[num] === undefined) { 
             freqs[num] = 1; 
@@ -15,6 +14,7 @@ const kMostFrequent = function(nums, k) {
     
     // Convert to array with [frequency, number] elements
     let frequencyArray = [];
+    let key;
     for (key in freqs) {
         frequencyArray.push([freqs[key], key]);
     }
@@ -25,13 +25,10 @@ const kMostFrequent = function(nums, k) {
     });
     
     // Get most frequent element out of array
-    mostFreq = [];
+    let mostFreq = [];
     for (let i = 0; i < k; i++) {
         mostFreq.push(frequencyArray[i][1]);
     }
     
-    console.log(mostFreq);
     return mostFreq;
 };
-
-kMostFrequent(nums, 2);

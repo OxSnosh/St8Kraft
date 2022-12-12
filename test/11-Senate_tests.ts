@@ -54,6 +54,7 @@ import {
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
+import { kMostFrequent } from "../scripts/SenatorImplementation"; 
 
 describe("Senate Contract", async function () {
 
@@ -511,7 +512,8 @@ describe("Senate Contract", async function () {
         
         countryparameterscontract.settings(
             spyoperationscontract.address,
-            countryminter.address
+            countryminter.address,
+            senatecontract.address
         )
 
         crimecontract.settings(
@@ -1029,25 +1031,98 @@ describe("Senate Contract", async function () {
         await countryparameterscontract.connect(signer11).setTeam(10, 7);
         await countryparameterscontract.connect(signer12).setTeam(11, 7);
 
-        await senatecontract.connect(signer1).voteForSenator(0, 11)
-        await senatecontract.connect(signer2).voteForSenator(1, 11);
-        await senatecontract.connect(signer3).voteForSenator(2, 10);
-        await senatecontract.connect(signer4).voteForSenator(3, 10);
-        await senatecontract.connect(signer5).voteForSenator(4, 9);
-        await senatecontract.connect(signer6).voteForSenator(5, 9);
-        await senatecontract.connect(signer7).voteForSenator(6, 8);
-        await senatecontract.connect(signer8).voteForSenator(7, 8);
-        await senatecontract.connect(signer9).voteForSenator(8, 7);
-        await senatecontract.connect(signer10).voteForSenator(9, 7);
-        await senatecontract.connect(signer11).voteForSenator(10, 7);
-        await senatecontract.connect(signer12).voteForSenator(11, 6);
+
+
 
     });
 
     describe("Senate Election", function () {
         it("tests that senators are elected correctly", async function () {
+            const txResponse1 = await senatecontract.connect(signer1).voteForSenator(0, 11);
+            const txReceipt1 = await txResponse1.wait();
+            const signer1Vote = txReceipt1?.events?.[0].args?.voteCastFor.toNumber();
+            // console.log("signer 1 vote", txReceipt1?.events?.[0].args?.voteCastFor.toNumber());
+    
+            const txResponse2 = await senatecontract.connect(signer2).voteForSenator(1, 11);
+            const txReceipt2 = await txResponse2.wait();
+            const signer2Vote = txReceipt2?.events?.[0].args?.voteCastFor.toNumber();
+            // console.log("signer 2 vote", txReceipt2?.events?.[0].args?.voteCastFor.toNumber());
+    
+            const txResponse3 = await senatecontract.connect(signer3).voteForSenator(2, 10);
+            const txReceipt3 = await txResponse3.wait();
+            const signer3Vote = txReceipt3?.events?.[0].args?.voteCastFor.toNumber();
+            // console.log("signer 3 vote", txReceipt3?.events?.[0].args?.voteCastFor.toNumber());
+    
+            const txResponse4 = await senatecontract.connect(signer4).voteForSenator(3, 10);
+            const txReceipt4 = await txResponse4.wait();
+            const signer4Vote = txReceipt4?.events?.[0].args?.voteCastFor.toNumber();
+            // console.log("signer 4 vote", txReceipt4?.events?.[0].args?.voteCastFor.toNumber());
+    
+            const txResponse5 = await senatecontract.connect(signer5).voteForSenator(4, 9);
+            const txReceipt5 = await txResponse5.wait();
+            const signer5Vote = txReceipt5?.events?.[0].args?.voteCastFor.toNumber();
+            // console.log("signer 5 vote", txReceipt5?.events?.[0].args?.voteCastFor.toNumber());
+    
+            const txResponse6 = await senatecontract.connect(signer6).voteForSenator(5, 9);
+            const txReceipt6 = await txResponse6.wait();
+            const signer6Vote = txReceipt6?.events?.[0].args?.voteCastFor.toNumber();
+            // console.log("signer 6 vote", txReceipt6?.events?.[0].args?.voteCastFor.toNumber());
+    
+            const txResponse7 = await senatecontract.connect(signer7).voteForSenator(6, 8);
+            const txReceipt7 = await txResponse7.wait();
+            const signer7Vote = txReceipt7?.events?.[0].args?.voteCastFor.toNumber();
+            // console.log("signer 7 vote", txReceipt7?.events?.[0].args?.voteCastFor.toNumber());
+    
+            const txResponse8 = await senatecontract.connect(signer8).voteForSenator(7, 8);
+            const txReceipt8 = await txResponse8.wait();
+            const signer8Vote = txReceipt8?.events?.[0].args?.voteCastFor.toNumber();
+            // console.log("signer 8 vote", txReceipt8?.events?.[0].args?.voteCastFor.toNumber());
+    
+            const txResponse9 = await senatecontract.connect(signer9).voteForSenator(8, 7);
+            const txReceipt9 = await txResponse9.wait();
+            const signer9Vote = txReceipt9?.events?.[0].args?.voteCastFor.toNumber();
+            // console.log("signer 9 vote", txReceipt9?.events?.[0].args?.voteCastFor.toNumber());
+    
+            const txResponse10 = await senatecontract.connect(signer10).voteForSenator(9, 7);
+            const txReceipt10 = await txResponse10.wait();
+            const signer10Vote = txReceipt10?.events?.[0].args?.voteCastFor.toNumber();
+            // console.log("signer 10 vote", txReceipt10?.events?.[0].args?.voteCastFor.toNumber());
+    
+            const txResponse11 = await senatecontract.connect(signer11).voteForSenator(10, 7);
+            const txReceipt11 = await txResponse11.wait();
+            const signer11Vote = txReceipt11?.events?.[0].args?.voteCastFor.toNumber();
+            // console.log("signer 11 vote", txReceipt11?.events?.[0].args?.voteCastFor.toNumber());
+    
+            const txResponse12 = await senatecontract.connect(signer12).voteForSenator(11, 6);
+            const txReceipt12 = await txResponse12.wait();
+            const signer12Vote = txReceipt12?.events?.[0].args?.voteCastFor.toNumber();
+            // console.log("signer 12 vote", txReceipt12?.events?.[0].args?.voteCastFor.toNumber());
+    
+            let team7Votes = [];
+    
+            team7Votes.push(signer1Vote, signer2Vote, signer3Vote, signer4Vote, signer5Vote, signer6Vote, signer7Vote, signer8Vote, signer9Vote, signer10Vote, signer11Vote, signer12Vote);
+    
+            // console.log(team7Votes);
+    
+            const team7Senators = kMostFrequent(team7Votes, 5);
+    
+            // console.log("senators", team7Senators);
 
+            senatecontract.inaugurateTeam7Senators(team7Senators);
             
+            var isNation7ASenator = await senatecontract.isSenator(7);
+            var isNation8ASenator = await senatecontract.isSenator(8);
+            var isNation9ASenator = await senatecontract.isSenator(9);
+            var isNation10ASenator = await senatecontract.isSenator(10);
+            var isNation11ASenator = await senatecontract.isSenator(11);
+            var isNation6ASenator = await senatecontract.isSenator(6);
+
+            expect(isNation7ASenator).to.equal(true);
+            expect(isNation8ASenator).to.equal(true);
+            expect(isNation9ASenator).to.equal(true);
+            expect(isNation10ASenator).to.equal(true);
+            expect(isNation11ASenator).to.equal(true);
+            expect(isNation6ASenator).to.equal(false);
         })
     })
 });

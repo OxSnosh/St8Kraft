@@ -19,7 +19,7 @@ import "./Aid.sol";
 import "./Senate.sol";
 
 contract CountryMinter is ERC721, Ownable {
-    uint256 public countryId = 1;
+    uint256 public countryId = 0;
     address public countryParameters;
     address public infrastructure;
     address public resources;

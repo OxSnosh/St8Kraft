@@ -2,12 +2,14 @@
 pragma solidity 0.8.7;
 
 import "./CountryMinter.sol";
+import "./Senate.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     address public spyAddress;
+    address public senateAddress;
     uint256[] private s_randomWords;
     address public countryMinter;
 
@@ -20,6 +22,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     uint32 private constant NUM_WORDS = 2;
 
     CountryMinter mint;
+    SenateContract senate;
 
     event randomNumbersRequested(uint256 indexed requestId);
     event randomNumbersFulfilled(
@@ -67,10 +70,12 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         i_callbackGasLimit = callbackGasLimit;
     }
 
-    function settings(address _spy, address _countryMinter) public onlyOwner {
+    function settings(address _spy, address _countryMinter, address _senate) public onlyOwner {
         spyAddress = _spy;
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
+        senateAddress = _senate;
+        senate = SenateContract(_senate);
     }
 
     modifier onlySpyContract() {
@@ -172,6 +177,8 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         require(newTeam <= 15, "invalid team selection");
+        bool isSenator = senate.isSenator(id);
+        require (isSenator == false, "cannot chenge teams as a senator");
         idToCountrySettings[id].nationTeam = newTeam;
     }
 

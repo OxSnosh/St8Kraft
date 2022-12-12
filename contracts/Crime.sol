@@ -125,11 +125,10 @@ contract CrimeContract is Ownable {
             governmentPoints +
             getPointsFromInfrastructure +
             populationPoints);
-        //add government positions
         return cps;
     }
 
-    function getLiteracyPoints(uint256 id) public view returns (uint256) {
+    function getLiteracy(uint256 id) public view returns (uint256) {
         uint256 tech = inf.getTechnologyCount(id);
         uint256 litBeforeModifiers;
         if (tech <= 50) {
@@ -144,7 +143,15 @@ contract CrimeContract is Ownable {
         uint256 literacy = (litBeforeModifiers +
             schoolPoints +
             universityPoints);
-        uint256 litPoints = ((literacy * 80) / 100);
+        if (literacy > 100) {
+            literacy = 100;
+        }
+        return literacy;
+    }
+
+    function getLiteracyPoints(uint256 id) public view returns (uint256) {
+        uint256 literacyPercentage = getLiteracy(id);
+        uint256 litPoints = ((literacyPercentage * 80) / 100);
         return litPoints;
     }
 
@@ -268,7 +275,11 @@ contract CrimeContract is Ownable {
 
     function getPointsFromPopulation(uint256 id) public view returns (uint256) {
         uint256 population = inf.getTotalPopulationCount(id);
-        uint256 populationPoints = (600 - (population / 500));
+        uint256 populationPointsDeduction = (population / 250);
+        if (populationPointsDeduction >= 400) {
+            populationPointsDeduction = 400;
+        }
+        uint256 populationPoints = (400 - populationPointsDeduction);
         return populationPoints;
     }
 }
