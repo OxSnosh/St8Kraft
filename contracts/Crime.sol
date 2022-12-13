@@ -269,7 +269,7 @@ contract CrimeContract is Ownable {
         returns (uint256)
     {
         uint256 infra = inf.getInfrastructureCount(id);
-        uint256 infraPoints = (infra / 100);
+        uint256 infraPoints = (infra / 400);
         return infraPoints;
     }
 

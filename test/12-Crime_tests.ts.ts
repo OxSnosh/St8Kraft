@@ -945,13 +945,13 @@ describe("Crime Contract", async function () {
             var points1 = await crimecontract.getPointsFromPopulation(0);
             console.log("points from population 1", points1.toNumber());
             console.log("cps 1", cps1.toNumber());
-            expect(cps1.toNumber()).to.equal(493);
+            expect(cps1.toNumber()).to.equal(491);
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 30000); 
             var cps3 = await crimecontract.getCrimePreventionScore(0);
             var points3 = await crimecontract.getPointsFromPopulation(0);
             console.log("points from population 3", points3.toNumber());
             console.log("cps 3", cps3.toNumber());
-            expect(cps3.toNumber()).to.equal(520);
+            expect(cps3.toNumber()).to.equal(173);
         })
 
         it("crime1 tests that infrastructure affects cps", async function () {
