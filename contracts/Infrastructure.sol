@@ -549,6 +549,10 @@ contract InfrastructureContract is Ownable {
         if (affluentPopulation) {
             populationModifier += 5;
         }
+        uint256 borderWalls = imp1.getBorderWallCount(id);
+        if (borderWalls > 0) {
+            populationModifier -= (2 * borderWalls);
+        }
         uint256 additionalModifierPoints = getAdditionalPopulationModifierPoints(
                 id
             );
@@ -563,10 +567,6 @@ contract InfrastructureContract is Ownable {
         returns (uint256)
     {
         uint256 additionalPoints;
-        uint256 borderWalls = imp1.getBorderWallCount(id);
-        if (borderWalls > 0) {
-            additionalPoints -= (2 * borderWalls);
-        }
         uint256 clinicCount = imp1.getClinicCount(id);
         if (clinicCount > 0) {
             additionalPoints += (2 * clinicCount);

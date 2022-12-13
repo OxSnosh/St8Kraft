@@ -96,15 +96,15 @@ contract CrimeContract is Ownable {
     function getCrimeIndex(uint256 id) public view returns (uint256) {
         uint256 cps = getCrimePreventionScore(id);
         uint256 crimeIndex;
-        if (cps < 100) {
+        if (cps < 200) {
             crimeIndex = 6;
-        } else if (cps < 180) {
+        } else if (cps < 250) {
             crimeIndex = 5;
-        } else if (cps < 260) {
+        } else if (cps < 300) {
             crimeIndex = 4;
-        } else if (cps < 340) {
+        } else if (cps < 350) {
             crimeIndex = 3;
-        } else if (cps < 420) {
+        } else if (cps < 400) {
             crimeIndex = 2;
         } else if (cps < 500) {
             crimeIndex = 1;
@@ -276,10 +276,10 @@ contract CrimeContract is Ownable {
     function getPointsFromPopulation(uint256 id) public view returns (uint256) {
         uint256 population = inf.getTotalPopulationCount(id);
         uint256 populationPointsDeduction = (population / 250);
-        if (populationPointsDeduction >= 400) {
-            populationPointsDeduction = 400;
+        if (populationPointsDeduction >= 350) {
+            populationPointsDeduction = 350;
         }
-        uint256 populationPoints = (400 - populationPointsDeduction);
+        uint256 populationPoints = (350 - populationPointsDeduction);
         return populationPoints;
     }
 }

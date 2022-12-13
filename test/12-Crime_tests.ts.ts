@@ -927,7 +927,7 @@ describe("Crime Contract", async function () {
         it("crime1 tests that nation crime is inialized correctly", async function () {
             const cpsInitial = await crimecontract.getCrimePreventionScore(0);
             // console.log("initial CSP", cpsInitial.toNumber());
-            expect(cpsInitial.toNumber()).to.equal(498);
+            expect(cpsInitial.toNumber()).to.equal(448);
             const initialCrimeIndex = await crimecontract.getCrimeIndex(0);
             // console.log("initial crime index", initialCrimeIndex.toNumber());
             expect(initialCrimeIndex.toNumber()).to.equal(1);
@@ -939,37 +939,139 @@ describe("Crime Contract", async function () {
             expect(initialCriminalCount.toNumber()).to.equal(3);
         })
 
-        it("crime1 tests that population affects cps", async function () {
+        it("crime1 tests that population and infrastructure affects cps", async function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200);
+            var popPoints1 = await crimecontract.getPointsFromPopulation(0);
+            var infPoints1 = await crimecontract.getPointsFromInfrastruture(0);
             var cps1 = await crimecontract.getCrimePreventionScore(0);
-            var points1 = await crimecontract.getPointsFromPopulation(0);
-            console.log("points from population 1", points1.toNumber());
-            console.log("cps 1", cps1.toNumber());
-            expect(cps1.toNumber()).to.equal(491);
+            var crimeIndex1 = await crimecontract.getCrimeIndex(0);
+            var criminalCount1 = await crimecontract.getCriminalCount(0);
+            // console.log("points from population", popPoints1.toNumber());
+            // console.log("points from infrastructure", infPoints1.toNumber());
+            // console.log("cps 1", cps1.toNumber());
+            // console.log("crime index 1", crimeIndex1.toNumber());
+            // console.log("criminal count 1", criminalCount1.toNumber());
+            expect(popPoints1.toNumber()).to.equal(343);
+            expect(infPoints1.toNumber()).to.equal(0);
+            expect(cps1.toNumber()).to.equal(441);
+            expect(crimeIndex1.toNumber()).to.equal(1);
+            expect(criminalCount1.toNumber()).to.equal(35);
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 30000); 
+            var popPoints3 = await crimecontract.getPointsFromPopulation(0);
+            var infPoints3 = await crimecontract.getPointsFromInfrastruture(0);
             var cps3 = await crimecontract.getCrimePreventionScore(0);
-            var points3 = await crimecontract.getPointsFromPopulation(0);
-            console.log("points from population 3", points3.toNumber());
-            console.log("cps 3", cps3.toNumber());
+            var crimeIndex3 = await crimecontract.getCrimeIndex(0);
+            var criminalCount3 = await crimecontract.getCriminalCount(0);
+            // console.log("points from population", popPoints3.toNumber());
+            // console.log("points from infrastructure", infPoints3.toNumber());
+            // console.log("cps 3", cps3.toNumber());
+            // console.log("crime index 3", crimeIndex3.toNumber());
+            // console.log("criminal count 3", criminalCount3.toNumber());
+            expect(popPoints3.toNumber()).to.equal(0);
+            expect(infPoints3.toNumber()).to.equal(75);
             expect(cps3.toNumber()).to.equal(173);
+            expect(crimeIndex3.toNumber()).to.equal(6);
+            expect(criminalCount3.toNumber()).to.equal(16923);
         })
 
-        it("crime1 tests that infrastructure affects cps", async function () {
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200);
+        it("crime1 tests that government affects criminal count", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 25000); 
+            var govPoints1 = await crimecontract. getPointsFromGovernmentType(0);
             var cps1 = await crimecontract.getCrimePreventionScore(0);
-            var points1 = await crimecontract.getPointsFromInfrastruture(0);
-            console.log("points from infrastructure", points1.toNumber());
-            // expect(cps1.toNumber()).to.equal(647);
-            // expect(points1.toNumber()).to.equal(5);
-
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 30000); 
+            var crimeIndex1 = await crimecontract.getCrimeIndex(0);
+            var criminalCount1 = await crimecontract.getCriminalCount(0);
+            // console.log("points from population", popPoints3.toNumber());
+            // console.log("points from infrastructure", infPoints3.toNumber());
+            // console.log("cps 3", cps3.toNumber());
+            // console.log("crime index 3", crimeIndex3.toNumber());
+            // console.log("criminal count 3", criminalCount3.toNumber());
+            // console.log("gov points 1", govPoints1.toNumber());
+            expect(cps1.toNumber()).to.equal(160);
+            expect(crimeIndex1.toNumber()).to.equal(6);
+            expect(criminalCount1.toNumber()).to.equal(14011);
+            expect(govPoints1.toNumber()).to.equal(50);
+            await countryparameterscontract.incrementDaysSince();
+            await countryparameterscontract.incrementDaysSince();
+            await countryparameterscontract.incrementDaysSince();
+            await countryparameterscontract.connect(signer1).setGovernment(0, 4);
             var cps3 = await crimecontract.getCrimePreventionScore(0);
-            var points3 = await crimecontract.getPointsFromInfrastruture(0);
-            console.log("points from infrastructure", points3.toNumber());
-            // expect(cps3.toNumber()).to.equal(520);
-            // expect(points3.toNumber()).to.equal(6);
+            var crimeIndex3 = await crimecontract.getCrimeIndex(0);
+            var criminalCount3 = await crimecontract.getCriminalCount(0);
+            var govPoints2 = await crimecontract. getPointsFromGovernmentType(0);
+            // console.log("gov points 2", govPoints2.toNumber());
+            expect(cps3.toNumber()).to.equal(285);
+            expect(crimeIndex3.toNumber()).to.equal(4);
+            expect(criminalCount3.toNumber()).to.equal(10008);
+            expect(govPoints2.toNumber()).to.equal(175);
         })
 
+        it("crime1 tests that literacy affects criminal count", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 25000);
+            var initialLiteracyPercentage = await crimecontract.getLiteracy(0);
+            var initialLiteracyPoints = await crimecontract.getLiteracyPoints(0);
+            // console.log("initial literacy points", initialLiteracyPoints.toNumber());
+            // console.log("initial literacy percentage", initialLiteracyPercentage.toNumber());
+            var criminalCount1 = await crimecontract.getCriminalCount(0);
+            // console.log("criminal count 1", criminalCount1.toNumber());
+            expect(criminalCount1.toNumber()).to.equal(14011);
+            expect(initialLiteracyPercentage.toNumber()).to.equal(20);
+            expect(initialLiteracyPoints.toNumber()).to.equal(16);
+            await technologymarketcontrat.connect(signer1).buyTech(0, 200);
+            var updatedLiteracyPercentage = await crimecontract.getLiteracy(0);
+            var updatedLiteracyPoints = await crimecontract.getLiteracyPoints(0);
+            expect(updatedLiteracyPercentage.toNumber()).to.equal(70);
+            expect(updatedLiteracyPoints.toNumber()).to.equal(56);
+            var criminalCount3 = await crimecontract.getCriminalCount(0);
+            // console.log("criminal count 3", criminalCount3.toNumber());
+            expect(criminalCount3.toNumber()).to.equal(12009);
+            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 8);
+            await improvementscontract3.connect(signer1).buyImprovement3(2, 0, 11);
+            var literacyAfterSchools = await crimecontract.getLiteracy(0);
+            // console.log("lit after school and unis", literacyAfterSchools.toNumber());
+            expect(literacyAfterSchools.toNumber()).to.equal(79);
+        })
+
+        it("crime1 tests that tax rate affects criminal count", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 5000);
+            var criminalCount1 = await crimecontract.getCriminalCount(0);
+            // console.log(criminalCount1.toNumber());
+            var cps1 = await crimecontract.getCrimePreventionScore(0);
+            // console.log("cps 1", cps1.toNumber());
+            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 8);
+            await improvementscontract3.connect(signer1).buyImprovement3(2, 0, 11);
+            await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 2);
+            await improvementscontract3.connect(signer1).buyImprovement3(2, 0, 5);
+            await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 7);
+            var improvementPoints1 = await crimecontract.getImprovementPoints(0);
+            // console.log("imp points", improvementPoints1.toNumber());
+            expect(improvementPoints1.toNumber()).to.equal(159);
+            await infrastructurecontract.connect(signer1).setTaxRate(0, 28);
+            var improvementPoints2 = await crimecontract.getImprovementPoints(0);
+            // console.log("imp points 2", improvementPoints2.toNumber());
+            expect(improvementPoints2.toNumber()).to.equal(102);
+        })
         
+        it("crime1 tests that criminals get incarcerated", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 25000);          
+            var criminalCount1 = await crimecontract.getCriminalCount(0);
+            expect(criminalCount1.toNumber()).to.equal(14011);
+            
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 7);
+            var criminalCount2 = await crimecontract.getCriminalCount(0);
+            expect(criminalCount2.toNumber()).to.equal(13511);
+            
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 8);
+            var criminalCount3 = await crimecontract.getCriminalCount(0);
+            expect(criminalCount3.toNumber()).to.equal(13311);
+            
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 3);
+            var criminalCount4 = await crimecontract.getCriminalCount(0);
+            expect(criminalCount4.toNumber()).to.equal(8311);
+
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            var criminalCount5 = await crimecontract.getCriminalCount(0);
+            // console.log("criminal", criminalCount5.toNumber());
+            expect(criminalCount5.toNumber()).to.equal(7949);  
+        })    
     })
 });

@@ -281,11 +281,13 @@ contract TaxesContract is Ownable {
         uint256 pointsFromImprovements = getPointsToSubtractFromImprovements(
             id
         );
+        uint256 pointsFromIntelAgencies = getPointsFromIntelAgencies(id);
         uint256 happinessPointsToSubtract = (35 -
             taxRatePoints -
             pointsFromCrime -
             pointsFromImprovements -
-            pointsFromStability);
+            pointsFromStability -
+            pointsFromIntelAgencies);
         return happinessPointsToSubtract;
     }
 
@@ -666,18 +668,27 @@ contract TaxesContract is Ownable {
         } else if (taxRate <= 30) {
             subtractTaxPoints = 7;
         }
+        return subtractTaxPoints;
+    }
+
+    function getPointsFromIntelAgencies(uint256 id) public view returns (uint256) {
         uint256 intelAgencies = imp2.getIntelAgencyCount(id);
+        uint256 subtractTaxPoints;
+        uint256 taxRate = inf.getTaxRate(id);
         if (intelAgencies >= 1 && taxRate <= 20) {
             subtractTaxPoints = 0;
         } else if (intelAgencies <= 3 && taxRate > 20 && taxRate <= 23) {
-            subtractTaxPoints -= intelAgencies;
+            subtractTaxPoints = intelAgencies;
         } else if (intelAgencies > 3 && taxRate > 20 && taxRate <= 23) {
             subtractTaxPoints = 0;    
         } else if (taxRate > 23) {
-            subtractTaxPoints -= intelAgencies;
+            subtractTaxPoints = intelAgencies;
+        } else {
+            subtractTaxPoints = 0;
         }
         return subtractTaxPoints;
     }
+
 
     function getPointsFromMilitary(uint256 id) public view returns (uint256) {
         (uint256 ratio, ) = soldierToPopulationRatio(id);
@@ -716,13 +727,13 @@ contract TaxesContract is Ownable {
         uint256 pointsFromCrime;
         if (unincarceratedCriminals < 200) {
             pointsFromCrime = 0;
-        } else if (unincarceratedCriminals < 1000) {
-            pointsFromCrime = 1;
         } else if (unincarceratedCriminals < 2000) {
-            pointsFromCrime = 2;
-        } else if (unincarceratedCriminals < 3000) {
-            pointsFromCrime = 3;
+            pointsFromCrime = 1;
         } else if (unincarceratedCriminals < 4000) {
+            pointsFromCrime = 2;
+        } else if (unincarceratedCriminals < 6000) {
+            pointsFromCrime = 3;
+        } else if (unincarceratedCriminals < 8000) {
             pointsFromCrime = 4;
         } else {
             pointsFromCrime = 5;

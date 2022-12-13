@@ -107,9 +107,9 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
             "No Alliance Yet",
             0,
             0,
+            3,
             0,
-            0,
-            0
+            3
         );
         idToCountryParameters[id] = newCountryParameters;
         idToCountrySettings[id] = newCountrySettings;
