@@ -678,7 +678,8 @@ describe("CountryMinter", function () {
             nukecontract.address,
             airbattlecontract.address,
             groundbattlecontract.address,
-            countryminter.address
+            countryminter.address,
+            crimecontract.address
         )
 
         infrastructuremarketplace.settings(

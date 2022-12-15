@@ -1032,7 +1032,8 @@ async function main() {
         nukecontract.address,
         airbattlecontract.address,
         groundbattlecontract.address,
-        countryminter.address
+        countryminter.address,
+        crimecontract.address
     )
 
     infrastructuremarketplace.settings(

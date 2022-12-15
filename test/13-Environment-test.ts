@@ -681,7 +681,8 @@ describe("Environment Contract", async function () {
             nukecontract.address,
             airbattlecontract.address,
             groundbattlecontract.address,
-            countryminter.address
+            countryminter.address,
+            crimecontract.address
         )
 
         infrastructuremarketplace.settings(
@@ -979,17 +980,17 @@ describe("Environment Contract", async function () {
             expect(nukeScore).to.equal(0);
             const governmentScore = await environmentcontract.getScoreFromGovernment(0);
             expect(governmentScore).to.equal(10);
-            console.log(
-                "score", initialEnvironment.toNumber(),
-                "gross", initialEnvironmentGross.toNumber(),
-                "resources", resourcesScore.toNumber(),
-                "wonder", wondersScore.toNumber(),
-                "tech", techScore.toNumber(),
-                "density", densityScore.toNumber(),
-                "infrastructure", infrastructureScore.toNumber(),
-                "nuke", nukeScore.toNumber(),
-                "government", governmentScore.toNumber()
-            )
+            // console.log(
+            //     "score", initialEnvironment.toNumber(),
+            //     "gross", initialEnvironmentGross.toNumber(),
+            //     "resources", resourcesScore.toNumber(),
+            //     "wonder", wondersScore.toNumber(),
+            //     "tech", techScore.toNumber(),
+            //     "density", densityScore.toNumber(),
+            //     "infrastructure", infrastructureScore.toNumber(),
+            //     "nuke", nukeScore.toNumber(),
+            //     "government", governmentScore.toNumber()
+            // )
         })
 
         it("environment1 resources affect environment", async function () {
@@ -1007,7 +1008,7 @@ describe("Environment Contract", async function () {
             const construction = await resourcescontract.viewConstruction(0);
             // console.log("construction for nation 1", construction);
             const proposalsForNation1 = await resourcescontract.getProposedTradingPartners(0);
-            console.log(proposalsForNation1);
+            // console.log(proposalsForNation1);
             await resourcescontract.mockResourcesForTesting(3, 6, 8);
             await technologymarketcontrat.connect(signer1).buyTech(0, 15);
             await resourcescontract.connect(signer4).proposeTrade(3, 0);
@@ -1117,7 +1118,6 @@ describe("Environment Contract", async function () {
             await missilescontract.connect(signer1).buyNukes(0);
             await keepercontract.resetNukesPurchasedTodayByOwner();
             const nukeCount = await missilescontract.getNukeCount(0);
-            console.log(nukeCount.toNumber());
             const nukeScore = await environmentcontract.getScoreFromNukes(0);
             expect(nukeScore).to.equal(2);
             await resourcescontract.mockResourcesForTesting(0, 8, 9);

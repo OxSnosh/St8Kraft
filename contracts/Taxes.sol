@@ -186,17 +186,23 @@ contract TaxesContract is Ownable {
     function collectTaxes(uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require (isOwner, "!nation owner");
+        (, uint256 taxesCollectible) = getTaxesCollectible(id);
+        inf.toggleCollectionNeededToChangeRate(id);
+        tsy.increaseBalanceOnTaxCollection(id, taxesCollectible);
+    }
+
+    function getTaxesCollectible(uint256 id) public view returns (uint256, uint256) {
         uint256 dailyIncomePerCitizen = getDailyIncome(id);
         uint256 daysSinceLastTaxCollection = tsy.getDaysSinceLastTaxCollection(
             id
         );
+        uint256 citizenCount = inf.getTaxablePopulationCount(0);
         uint256 taxRate = inf.getTaxRate(id);
         uint256 dailyTaxesCollectiblePerCitizen = ((dailyIncomePerCitizen *
             taxRate) / 100);
         uint256 taxesCollectible = (dailyTaxesCollectiblePerCitizen *
-            daysSinceLastTaxCollection);
-        inf.toggleCollectionNeededToChangeRate(id);
-        tsy.increaseBalanceOnTaxCollection(id, taxesCollectible);
+            daysSinceLastTaxCollection * citizenCount) * (10**18);
+        return (dailyTaxesCollectiblePerCitizen, taxesCollectible);        
     }
 
     function getDailyIncome(uint256 id) public view returns (uint256) {

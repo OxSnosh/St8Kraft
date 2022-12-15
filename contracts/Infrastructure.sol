@@ -9,6 +9,7 @@ import "./Treasury.sol";
 import "./Forces.sol";
 import "./Wonders.sol";
 import "./CountryParameters.sol";
+import "./Crime.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract InfrastructureContract is Ownable {
@@ -35,6 +36,7 @@ contract InfrastructureContract is Ownable {
     address public nukeAddress;
     address public airBattle;
     address public groundBattle;
+    address public crime;
 
     CountryMinter mint;
     ResourcesContract res;
@@ -45,6 +47,7 @@ contract InfrastructureContract is Ownable {
     WondersContract1 won1;
     WondersContract3 won3;
     WondersContract4 won4;
+    CrimeContract crim;
 
     struct Infrastructure {
         uint256 landArea;
@@ -112,7 +115,8 @@ contract InfrastructureContract is Ownable {
         address _nukeAddress,
         address _airBattle,
         address _groundBattle,
-        address _countryMinter
+        address _countryMinter,
+        address _crime
     ) public onlyOwner {
         spyAddress = _spyAddress;
         taxes = _tax;
@@ -122,6 +126,8 @@ contract InfrastructureContract is Ownable {
         groundBattle = _groundBattle;
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
+        crime = _crime;
+        crim = CrimeContract(_crime);
     }
 
     modifier onlySpyContract() {
@@ -559,6 +565,12 @@ contract InfrastructureContract is Ownable {
         populationModifier += additionalModifierPoints;
         uint256 population = ((populationBaseCount * populationModifier) / 100);
         return population;
+    }
+
+    function getTaxablePopulationCount(uint256 id) public view returns (uint256) {
+        uint256 totalPop = getTotalPopulationCount(id);
+        uint256 criminals = crim.getCriminalCount(id);
+        return (totalPop - criminals);
     }
 
     function getAdditionalPopulationModifierPoints(uint256 id)

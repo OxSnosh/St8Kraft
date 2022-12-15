@@ -86,7 +86,7 @@ contract KeeperContract is Ownable {
         miss.resetNukesPurchasedToday();
     }
 
-    function resetNukesPurchasedTodayByOwner() internal onlyOwner {
+    function resetNukesPurchasedTodayByOwner() public onlyOwner {
         miss.resetNukesPurchasedToday();
     }
 }
