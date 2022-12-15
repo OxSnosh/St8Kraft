@@ -637,7 +637,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         uint256 techAmount = InfrastructureContract(infrastructure)
             .getTechnologyCount(id);
         if (
-            techAmount > 10 &&
+            techAmount >= 10 &&
             idToResources1[id].gold &&
             idToResources1[id].lead &&
             idToResources2[id].oil
@@ -646,7 +646,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         }
         //radiation cleanup (Construction, Microchips, Steel and Technology > 15)
         if (
-            techAmount > 15 &&
+            techAmount >= 15 &&
             idToBonusResources[id].construction &&
             idToBonusResources[id].microchips &&
             idToBonusResources[id].steel
@@ -745,7 +745,8 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
             ];
         for (uint256 i = 0; i < proposedTradesOfRequestor.length; i++) {
             if (proposedTradesOfRequestor[i] == recipientId) {
-                delete proposedTradesOfRequestor[i];
+                proposedTradesOfRequestor[i] = proposedTradesOfRequestor[proposedTradesOfRequestor.length - 1];
+                proposedTradesOfRequestor.pop();
             }
         }
         uint256[]
@@ -754,7 +755,8 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
             ];
         for (uint256 i = 0; i < proposedTradesOfRecipient.length; i++) {
             if (proposedTradesOfRecipient[i] == requestorId) {
-                delete proposedTradesOfRequestor[i];
+                proposedTradesOfRecipient[i] = proposedTradesOfRecipient[proposedTradesOfRecipient.length - 1];
+                proposedTradesOfRecipient.pop();
             }
         }
         uint256[] storage recipientTradeAgreements = idToTradingPartners[

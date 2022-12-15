@@ -595,13 +595,15 @@ describe("ParametersContract", async function () {
             nukecontract.address,
             airbattlecontract.address,
             wonderscontract2.address,
-            nationstrengthcontract.address)
+            nationstrengthcontract.address,
+            infrastructurecontract.address)
         missilescontract.settings2(
             resourcescontract.address,
             improvementscontract1.address,
             wonderscontract1.address,
             wonderscontract4.address,
-            countryminter.address)
+            countryminter.address,
+            keepercontract.address)
             
         groundbattlecontract.settings(
             warcontract.address,
@@ -690,7 +692,8 @@ describe("ParametersContract", async function () {
             nukecontract.address,
             aidcontract.address,
             warcontract.address,
-            treasurycontract.address
+            treasurycontract.address,
+            missilescontract.address
         )
 
         landmarketcontract.settings(
@@ -911,7 +914,7 @@ describe("ParametersContract", async function () {
             countryminter.address
         )
 
-        console.log("country 1");
+        // console.log("country 1");
         await countryminter.connect(signer1).generateCountry(
             "TestRuler",
             "TestNationName",
@@ -927,7 +930,7 @@ describe("ParametersContract", async function () {
         let preferredGovernment1 = await countryparameterscontract.getGovernmentPreference(0);
         // console.log("Gov 1 top", preferredGovernment1.toNumber());
         
-        console.log("country 2");
+        // console.log("country 2");
         await countryminter.connect(signer2).generateCountry(
             "TestRuler2",
             "TestNationName2",
@@ -1056,7 +1059,7 @@ describe("ParametersContract", async function () {
             await countryparameterscontract.incrementDaysSince();
             await countryparameterscontract.incrementDaysSince();
             let daysSince = await countryparameterscontract.getDaysSince(0);
-            expect(daysSince[0].toNumber()).to.equal(3);
+            expect(daysSince[0].toNumber()).to.equal(6);
             await countryparameterscontract.connect(signer1).setGovernment(0, 4);
             let newGovernment = await countryparameterscontract.connect(signer1).getGovernmentType(0);
             expect(newGovernment).to.equal(4);
@@ -1067,7 +1070,8 @@ describe("ParametersContract", async function () {
         })
 
         it("Tests that the setGovernment() function reverts correctly when called too soon", async function () {
-            await expect(countryparameterscontract.connect(signer1).setGovernment(0, 4)).to.be.revertedWith("need to wait 3 days before changing");
+            await countryparameterscontract.connect(signer1).setGovernment(0, 4);
+            await expect(countryparameterscontract.connect(signer1).setGovernment(0, 5)).to.be.revertedWith("need to wait 3 days before changing");
         })
 
         it("Tests that the setGovernment() function reverts correctly when called with wrong type", async function () {
@@ -1084,7 +1088,7 @@ describe("ParametersContract", async function () {
             await countryparameterscontract.incrementDaysSince();
             await countryparameterscontract.incrementDaysSince();
             let daysSince = await countryparameterscontract.getDaysSince(0);
-            expect(daysSince[1].toNumber()).to.equal(3);
+            expect(daysSince[1].toNumber()).to.equal(6);
             await countryparameterscontract.connect(signer1).setReligion(0, 5);
             let newReligion = await countryparameterscontract.connect(signer1).getReligionType(0);
             expect(newReligion).to.equal(5);
@@ -1095,7 +1099,8 @@ describe("ParametersContract", async function () {
         })
 
         it("Tests that the setReligion() function reverts correctly when called too soon", async function () {
-            await expect(countryparameterscontract.connect(signer1).setReligion(0, 4)).to.be.revertedWith("need to wait 3 days before changing");
+            await countryparameterscontract.connect(signer1).setReligion(0, 4);
+            await expect(countryparameterscontract.connect(signer1).setReligion(0, 5)).to.be.revertedWith("need to wait 3 days before changing");
         })
 
         it("Tests that the setReligion() function reverts correctly when called with worng type", async function () {

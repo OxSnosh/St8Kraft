@@ -713,8 +713,11 @@ contract TaxesContract is Ownable {
         returns (uint256, bool)
     {
         uint256 soldierCount = frc.getSoldierCount(id);
+        if(soldierCount == 0) {
+            soldierCount = 1;
+        }
         uint256 populationCount = inf.getTotalPopulationCount(id);
-        uint256 soldierPopulationRatio = (populationCount / soldierCount);
+        uint256 soldierPopulationRatio = ((soldierCount * 100 / populationCount));
         bool environmentPenalty = false;
         if (soldierPopulationRatio > 60) {
             environmentPenalty = true;

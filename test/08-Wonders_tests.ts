@@ -595,13 +595,15 @@ describe("Wonders", async function () {
             nukecontract.address,
             airbattlecontract.address,
             wonderscontract2.address,
-            nationstrengthcontract.address)
+            nationstrengthcontract.address,
+            infrastructurecontract.address)
         missilescontract.settings2(
             resourcescontract.address,
             improvementscontract1.address,
             wonderscontract1.address,
             wonderscontract4.address,
-            countryminter.address)
+            countryminter.address,
+            keepercontract.address)
             
         groundbattlecontract.settings(
             warcontract.address,
@@ -690,7 +692,8 @@ describe("Wonders", async function () {
             nukecontract.address,
             aidcontract.address,
             warcontract.address,
-            treasurycontract.address
+            treasurycontract.address,
+            missilescontract.address
         )
 
         landmarketcontract.settings(

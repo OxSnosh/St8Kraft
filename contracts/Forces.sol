@@ -99,7 +99,7 @@ contract ForcesContract is Ownable {
     mapping(uint256 => Forces) public idToForces;
 
     function generateForces(uint256 id) public {
-        Forces memory newForces = Forces(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, true);
+        Forces memory newForces = Forces(20, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, true);
         idToForces[id] = newForces;
     }
 
@@ -593,6 +593,8 @@ contract MissilesContract is Ownable {
     address public airBattle;
     address public countryinter;
     address public strength;
+    address public keeper;
+    address public infrastructure;
 
     CountryMinter mint;
     InfrastructureContract inf;
@@ -618,7 +620,8 @@ contract MissilesContract is Ownable {
         address _nukeAddress,
         address _airBattle,
         address _wonders2,
-        address _strength
+        address _strength,
+        address _infrastructure
     ) public onlyOwner {
         treasury = _treasury;
         tsy = TreasuryContract(_treasury);
@@ -629,6 +632,8 @@ contract MissilesContract is Ownable {
         won2 = WondersContract2(_wonders2);
         strength = _strength;
         stren = NationStrengthContract(_strength);
+        infrastructure = _infrastructure;
+        inf = InfrastructureContract(_infrastructure);
     }
 
     function settings2 (
@@ -636,7 +641,8 @@ contract MissilesContract is Ownable {
         address _improvements1,
         address _wonders1,
         address _wonders4,
-        address _countryMinter
+        address _countryMinter,
+        address _keeper
     ) public onlyOwner {
         resources = _resources;
         res = ResourcesContract(_resources);
@@ -648,9 +654,15 @@ contract MissilesContract is Ownable {
         imp1 = ImprovementsContract1(_improvements1);
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
+        keeper = _keeper;
     }
 
     mapping(uint256 => Missiles) public idToMissiles;
+
+    modifier onlyKeeper() {
+        require(msg.sender == keeper, "function only callable from keeper contract");
+        _;
+    }
 
     function generateMissiles(uint256 id) public {
         Missiles memory newMissiles = Missiles(0, 0, 0);
@@ -837,5 +849,12 @@ contract MissilesContract is Ownable {
         }
         require (nukeCount >= requiredNukeAmount, "no nukes to destroy");
         idToMissiles[id].nuclearWeapons -= 1;
+    }
+
+    function resetNukesPurchasedToday() public onlyKeeper {
+        uint256 countryCount = mint.getCountryCount();
+        for(uint i = 0; i < countryCount -1; i++) {
+            idToMissiles[i].nukesPurchasedToday = 0;
+        }
     }
 }

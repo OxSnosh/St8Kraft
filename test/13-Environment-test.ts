@@ -54,8 +54,9 @@ import {
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
+import { hasUncaughtExceptionCaptureCallback } from "process";
 
-describe("Aid Contract", async function () {
+describe("Environment Contract", async function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -109,6 +110,9 @@ describe("Aid Contract", async function () {
     let signer0: SignerWithAddress
     let signer1: SignerWithAddress
     let signer2: SignerWithAddress
+    let signer3: SignerWithAddress
+    let signer4: SignerWithAddress
+    let signer5: SignerWithAddress
     let signers: SignerWithAddress[]
     let addrs
 
@@ -120,6 +124,9 @@ describe("Aid Contract", async function () {
         signer0 = signers[0];
         signer1 = signers[1];
         signer2 = signers[2];
+        signer3 = signers[3];
+        signer4 = signers[4];
+        signer5 = signers[5];
         
         let chainId: any
         chainId = network.config.chainId
@@ -921,118 +928,201 @@ describe("Aid Contract", async function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(3000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(3000000000*(10**18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(2000000000*(10**18)), 0);
 
         await countryminter.connect(signer2).generateCountry(
-            "NextRuler",
-            "NextNationName",
-            "NextCapitalCity",
-            "NextNationSlogan"
+            "TestRuler2",
+            "TestNationName2",
+            "TestCapitalCity2",
+            "TestNationSlogan2"
         )
-        await warbucks.connect(signer0).approve(warbucks.address, BigInt(100000000*(10**18)));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(100000000*(10**18)));
-        await treasurycontract.connect(signer1).addFunds(BigInt(100000000*(10**18)), 0);
-        await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
-        await forcescontract.connect(signer1).buySoldiers(7000, 0);
+        await countryminter.connect(signer3).generateCountry(
+            "TestRuler3",
+            "TestNationName3",
+            "TestCapitalCity3",
+            "TestNationSlogan3"
+        )
+        await countryminter.connect(signer4).generateCountry(
+            "TestRuler4",
+            "TestNationName4",
+            "TestCapitalCity4",
+            "TestNationSlogan4"
+        )
+        await countryminter.connect(signer5).generateCountry(
+            "TestRuler5",
+            "TestNationName5",
+            "TestCapitalCity5",
+            "TestNationSlogan5"
+        )
+
     });
 
-    describe("Aid Contract", function () {
-        it("aid1 tests proposeAid() function", async function () {
-            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
-            var proposalDetails = await aidcontract.getProposal(0);
-            expect(proposalDetails[0].toNumber()).to.equal(0);
-            expect(proposalDetails[2].toNumber()).to.equal(0);
-            expect(proposalDetails[3].toNumber()).to.equal(1);
-            expect(proposalDetails[4].toNumber()).to.equal(100);
-            expect(proposalDetails[5]).to.equal(BigInt(5999999999999999899336704));
-            expect(proposalDetails[6].toNumber()).to.equal(4000);
+    describe("Environment Contract", function () {
+        it("environment1 country initialized correctly", async function () {
+            const initialEnvironment = await environmentcontract.getEnvironmentScore(0);
+            expect(initialEnvironment.toNumber()).to.equal(2);
+            const initialEnvironmentGross = await environmentcontract.getGrossEnvironmentScore(0);
+            expect(initialEnvironmentGross).to.equal(20);
+            const resourcesScore = await environmentcontract.getEnvironmentScoreFromResources(0);
+            expect(resourcesScore).to.equal(0);
+            const wondersScore = await environmentcontract.getEnvironmentScoreFromImprovementsAndWonders(0);
+            expect(wondersScore).to.equal(0);
+            const techScore = await environmentcontract.getEnvironmentScoreFromTech(0);
+            expect(techScore).to.equal(10);
+            const densityScore = await environmentcontract.getEnvironmentScoreFromMilitaryDensity(0);
+            expect(densityScore).to.equal(0);
+            const infrastructureScore = await environmentcontract.getEnvironmentScoreFromInfrastructure(0);
+            expect(infrastructureScore).to.equal(0);
+            const nukeScore = await environmentcontract.getScoreFromNukes(0);
+            expect(nukeScore).to.equal(0);
+            const governmentScore = await environmentcontract.getScoreFromGovernment(0);
+            expect(governmentScore).to.equal(10);
+            console.log(
+                "score", initialEnvironment.toNumber(),
+                "gross", initialEnvironmentGross.toNumber(),
+                "resources", resourcesScore.toNumber(),
+                "wonder", wondersScore.toNumber(),
+                "tech", techScore.toNumber(),
+                "density", densityScore.toNumber(),
+                "infrastructure", infrastructureScore.toNumber(),
+                "nuke", nukeScore.toNumber(),
+                "government", governmentScore.toNumber()
+            )
         })
 
-        it("aid1 tests acceptProposal() function", async function () {
-            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
-            await aidcontract.connect(signer2).acceptProposal(0);
-            await expect((await forcescontract.getSoldierCount(1)).toNumber()).to.equal(4000);
-            await expect((await infrastructurecontract.getTechnologyCount(1)).toNumber()).to.equal(100);
-            await expect((await (await treasurycontract.checkBalance(1)))).to.equal(BigInt("7999999999999999899336704"));
+        it("environment1 resources affect environment", async function () {
+            await resourcescontract.mockResourcesForTesting(0, 2, 11);
+            const resourcesScore = await environmentcontract.getEnvironmentScoreFromResources(0);
+            expect(resourcesScore).to.equal(20);
+            await resourcescontract.mockResourcesForTesting(1, 0, 7);
+            await resourcescontract.connect(signer2).proposeTrade(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 1);
+            const steel = await resourcescontract.viewSteel(0);
+            // console.log("steel for nation 1", steel);
+            await resourcescontract.mockResourcesForTesting(2, 9, 10);
+            await resourcescontract.connect(signer3).proposeTrade(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 2);
+            const construction = await resourcescontract.viewConstruction(0);
+            // console.log("construction for nation 1", construction);
+            const proposalsForNation1 = await resourcescontract.getProposedTradingPartners(0);
+            console.log(proposalsForNation1);
+            await resourcescontract.mockResourcesForTesting(3, 6, 8);
+            await technologymarketcontrat.connect(signer1).buyTech(0, 15);
+            await resourcescontract.connect(signer4).proposeTrade(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 3);
+            const microchips = await resourcescontract.viewMicrochips(0);
+            // console.log("microchips for nation 1", microchips);
+            const radiationCleanup = await resourcescontract.viewRadiationCleanup(0);
+            // console.log("radiation cleanup for nation 1", radiationCleanup);
+            const resourcesScore2 = await environmentcontract.getEnvironmentScoreFromResources(0);
+            expect(resourcesScore2).to.equal(10);
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4);
+            await resourcescontract.mockResourcesForTesting(4, 17, 18);
+            await resourcescontract.connect(signer5).proposeTrade(4, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 4);
+            const resourcesScore3 = await environmentcontract.getEnvironmentScoreFromResources(0);
+            expect(resourcesScore3).to.equal(10);
         })
 
-        it("aid1 tests proposeAid() function reverts correctly with slot not available", async function () {
-            await expect(aidcontract.connect(signer1).proposeAid(1, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("!nation ruler");
-            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
-            await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("aid slot not available");
+        it("environment1 improvements and wonders affect environemnt", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 13000);
+            const wondersScore = await environmentcontract.getEnvironmentScoreFromImprovementsAndWonders(0);
+            expect(wondersScore.toNumber()).to.equal(0);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            const wondersScore2 = await environmentcontract.getEnvironmentScoreFromImprovementsAndWonders(0);
+            expect(wondersScore2.toNumber()).to.equal(-20);
+            await improvementscontract4.connect(signer1).buyImprovement4(3, 0, 2);
+            const wondersScore3 = await environmentcontract.getEnvironmentScoreFromImprovementsAndWonders(0);
+            expect(wondersScore3.toNumber()).to.equal(-11);
+            await improvementscontract3.connect(signer1).buyImprovement3(2, 0, 5);
+            const wondersScore4 = await environmentcontract.getEnvironmentScoreFromImprovementsAndWonders(0);
+            expect(wondersScore4.toNumber()).to.equal(-1);
+            await wonderscontract3.connect(signer1).buyWonder3(0, 3);
+            const wondersScore5 = await environmentcontract.getEnvironmentScoreFromImprovementsAndWonders(0);
+            expect(wondersScore5.toNumber()).to.equal(-11);
+            await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
+            await wonderscontract3.connect(signer1).buyWonder3(0, 7);
+            await wonderscontract3.connect(signer1).buyWonder3(0, 4);
+            await wonderscontract4.connect(signer1).buyWonder4(0, 7);
+            const wondersScore6 = await environmentcontract.getEnvironmentScoreFromImprovementsAndWonders(0);
+            expect(wondersScore6.toNumber()).to.equal(-1);
         })
 
-        it("aid1 tests proposeAid() function reverts correctly when aid not available", async function () {
-            await treasurycontract.connect(signer1).withdrawFunds(BigInt(99999999*(10**18)), 0);
-            await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("not enough funds for this porposal");
-            await treasurycontract.connect(signer1).addFunds(BigInt(88888888*(10**18)), 0);
-            await forcescontract.connect(signer1).decomissionSoldiers(7000, 0);
-            await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("not enough soldiers for this porposal");
-            await forcescontract.connect(signer1).buySoldiers(5000, 0);
-            await technologymarketcontrat.connect(signer1).destroyTech(0, 10000);
-            await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("not enough tech for this proposal");            
+        it("environment1 government affect environment", async function () {
+            await countryparameterscontract.connect(signer1).setGovernment(0, 7);
+            const governmentScore = await environmentcontract.getScoreFromGovernment(0);
+            expect(governmentScore).to.equal(-10);
         })
 
-        it("aid1 tests proposeAid() function reverts when max amount exceeded (no frderal aid)", async function () {
-            await expect(aidcontract.connect(signer1).proposeAid(0, 1, 101, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("max tech exceeded");
-            await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000001*(10**18)), 4000)).to.be.revertedWith("max balance excedded");
-            await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4001)).to.be.revertedWith("max soldier aid is excedded");            
+        it("environment1 tech affect on environment", async function () {
+            await technologymarketcontrat.connect(signer1).buyTech(0, 20);
+            const techScore = await environmentcontract.getEnvironmentScoreFromTech(0);
+            expect(techScore).to.equal(0);
         })
+        
+        it("environment1 military density affects environment", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 100);
+            await forcescontract.connect(signer1).buySoldiers(700, 0);
+            const militaryDensityPenalty = await taxescontract.soldierToPopulationRatio(0);
+            expect(militaryDensityPenalty[1]).to.equal(true);
+            const densityScore = await environmentcontract.getEnvironmentScoreFromMilitaryDensity(0);
+            expect(densityScore).to.equal(10);
+        })    
 
-        it("aid1 tests proposeAid() function reverts when max amount exceeded (no frderal aid)", async function () {
-            await wonderscontract1.connect(signer1).buyWonder1(0, 7);
-            await wonderscontract1.connect(signer2).buyWonder1(1, 7);
-            await aidcontract.connect(signer1).proposeAid(0, 1, 101, BigInt(6000001*(10**18)), 4001);
-            var proposalDetails = await aidcontract.getProposal(0);
-            expect(proposalDetails[0].toNumber()).to.equal(0);
-            expect(proposalDetails[2].toNumber()).to.equal(0);
-            expect(proposalDetails[3].toNumber()).to.equal(1);
-            expect(proposalDetails[4].toNumber()).to.equal(101);
-            expect(proposalDetails[5]).to.equal(BigInt(6000001000000000312213504));
-            expect(proposalDetails[6].toNumber()).to.equal(4001);
-        })
-
-        it("aid1 tests acceptProposal() function reverts when proposal expires", async function () {
-            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
-            let interval = await aidcontract.getProposalExpiration();
-            await network.provider.send("evm_increaseTime", [interval.toNumber() + 1]);
-            await network.provider.request({ method: "evm_mine", params: [] });
-            await expect(aidcontract.connect(signer2).acceptProposal(0)).to.be.revertedWith("proposal expired");
-        })
-
-        it("aid1 tests acceptProposal() function reverts when proposal expires", async function () {
-            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
-            await aidcontract.connect(signer1).cancelAid(0);
-            let array = await aidcontract.checkCancelledOrAccepted(0);
-            expect(array[1]).to.equal(true);
-            await expect(aidcontract.connect(signer2).acceptProposal(0)).to.be.revertedWith("this offer has been cancelled");
-        })
-
-        it("aid1 tests acceptProposal() function reverts when proposal aleady accepted", async function () {
-            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
-            await aidcontract.connect(signer2).acceptProposal(0);
-            await expect(aidcontract.connect(signer2).acceptProposal(0)).to.be.revertedWith("this offer has been accepted already");
-        })
-
-        it("aid1 tests acceptProposal() function reverts when proposal aleady accepted", async function () {
-            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
-            await treasurycontract.connect(signer1).withdrawFunds(BigInt(99999999*(10**18)), 0);
-            await expect(aidcontract.connect(signer2).acceptProposal(0)).to.be.revertedWith("not enough funds for this porposal");
-        })
-
-        it("aid1 tests resetAidProposals()", async function () {
-            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
-            await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("aid slot not available");
-            await keepercontract.resetAidProposalsByOwner();
-            await aidcontract.connect(signer1).proposeAid(0, 1, 50, BigInt(6000000*(10**18)), 4000);
-            let array = await aidcontract.getProposal(1);
-            expect(array[4]).to.equal(50);
-        })
-
-        it("aid1 tests setProposalExpiration()", async function () {
-            let oneWeek : any = await aidcontract.getProposalExpiration();
-            await aidcontract.setProposalExpiration(oneWeek+5);
-            var newOneWeek = await aidcontract.getProposalExpiration();
-            expect(newOneWeek).to.equal(oneWeek+5);
-        })  
+        it("environment1 nuke count affects environment", async function () {
+            await technologymarketcontrat.connect(signer1).buyTech(0, 31000);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000);
+            await resourcescontract.mockResourcesForTesting(0, 17, 18);
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            const nukeCount = await missilescontract.getNukeCount(0);
+            console.log(nukeCount.toNumber());
+            const nukeScore = await environmentcontract.getScoreFromNukes(0);
+            expect(nukeScore).to.equal(2);
+            await resourcescontract.mockResourcesForTesting(0, 8, 9);
+            const nukeScore1 = await environmentcontract.getScoreFromNukes(0);
+            expect(nukeScore1).to.equal(1);
+        })    
     })
 });

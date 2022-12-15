@@ -224,7 +224,7 @@ contract EnvironmentContract is Ownable {
     }
 
     function getEnvironmentScoreFromResources(uint256 id)
-        internal
+        public
         view
         returns (int256)
     {
@@ -309,7 +309,7 @@ contract EnvironmentContract is Ownable {
     }
 
     function getEnvironmentScoreFromTech(uint256 id)
-        internal
+        public
         view
         returns (int256)
     {
@@ -322,7 +322,7 @@ contract EnvironmentContract is Ownable {
     }
 
     function getEnvironmentScoreFromMilitaryDensity(uint256 id)
-        internal
+        public
         view
         returns (int256)
     {
@@ -335,7 +335,7 @@ contract EnvironmentContract is Ownable {
     }
 
     function getEnvironmentScoreFromInfrastructure(uint256 id)
-        internal
+        public
         view
         returns (int256)
     {
@@ -348,7 +348,7 @@ contract EnvironmentContract is Ownable {
         return pointsFromInfrastructure;
     }
 
-    function getScoreFromNukes(uint256 id) internal view returns (int256) {
+    function getScoreFromNukes(uint256 id) public view returns (int256) {
         int256 pointsFromNukes;
         uint256 nukeCount = mis.getNukeCount(id);
         if (nukeCount > 0) {
@@ -361,8 +361,8 @@ contract EnvironmentContract is Ownable {
         return pointsFromNukes;
     }
 
-    function getScoreFromGovernment(uint256 id) internal view returns (int256) {
-        int256 pointsFromGovernmentType;
+    function getScoreFromGovernment(uint256 id) public view returns (int256) {
+        int256 pointsFromGovernmentType = 0;
         uint256 governmentType = param.getGovernmentType(id);
         if (
             //anarchy
