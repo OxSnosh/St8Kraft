@@ -960,7 +960,7 @@ describe("Taxes Contract", async function () {
 
     });
 
-    describe("Taxes Contract", function () {
+    describe("Taxes Contract Initialized", function () {
         it("taxes1 tests that taxes are initialized correctly", async function () {
             const initialPopulation = await infrastructurecontract.getTotalPopulationCount(0);
             const initialCriminals = await crimecontract.getCriminalCount(0);
@@ -1003,10 +1003,62 @@ describe("Taxes Contract", async function () {
             // console.log("updated taxes collectible", BigInt(updatedTaxesCollectible[1]/(10**18)));
             expect(updatedTaxesCollectible[1]).to.equal(0);
         })
+    })
 
-        // it("taxes1", async function () {
-        //     await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200);
-        // })
+    describe("Taxes Contract / Happiness Tests", function () {
+        it("taxes1 happiness initialized correctly", async function () {
+            const initialHappiness = await taxescontract.getHappiness(0);
+            console.log(initialHappiness.toNumber());
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200);
+            const happinessAt200 = await taxescontract.getHappiness(0);
+            console.log(happinessAt200.toNumber());
+            expect(initialHappiness.toNumber()).to.equal(37);
+            expect(happinessAt200.toNumber()).to.equal(27);
+        })
+
+        it("taxes1 happiness tests minimum happiness", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200000);
+            const happinessAt200000 = await taxescontract.getHappiness(0);
+            // console.log(happinessAt200000.toNumber());
+            await infrastructurecontract.connect(signer1).setTaxRate(0, 28);
+            const happinessAfterTax = await taxescontract.getHappiness(0)
+            // console.log(happinessAfterTax.toNumber());
+            const ratio : any = await taxescontract.soldierToPopulationRatio(0);
+            // console.log(BigInt(ratio[0]));
+            const pointsFromMilitary = await taxescontract.getPointsFromMilitary(0);
+            // console.log(pointsFromMilitary.toNumber());
+            const criminalCount = await crimecontract.getCriminalCount(0);
+            // console.log(criminalCount.toNumber());
+            const pointsFromCrime = await taxescontract.getPointsFromCriminals(0);
+            // console.log(pointsFromCrime.toNumber());
+            await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 8);
+            const minimumHappiness = await taxescontract.getHappiness(0)
+            // console.log(minimumHappiness.toNumber());
+            expect(minimumHappiness.toNumber()).to.equal(10);
+        })
+        
+        it("taxes1 happiness tests minimum happiness", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200000);
+            const happinessAt200000 = await taxescontract.getHappiness(0);
+            // console.log(happinessAt200000.toNumber());
+            await infrastructurecontract.connect(signer1).setTaxRate(0, 28);
+            const happinessAfterTax = await taxescontract.getHappiness(0)
+            // console.log(happinessAfterTax.toNumber());
+            const ratio : any = await taxescontract.soldierToPopulationRatio(0);
+            // console.log(BigInt(ratio[0]));
+            const pointsFromMilitary = await taxescontract.getPointsFromMilitary(0);
+            // console.log(pointsFromMilitary.toNumber());
+            const criminalCount = await crimecontract.getCriminalCount(0);
+            // console.log(criminalCount.toNumber());
+            const pointsFromCrime = await taxescontract.getPointsFromCriminals(0);
+            // console.log(pointsFromCrime.toNumber());
+            await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 8);
+            const minimumHappiness = await taxescontract.getHappiness(0)
+            // console.log(minimumHappiness.toNumber());
+            expect(minimumHappiness.toNumber()).to.equal(10);
+        })
+    })
+
 
         // it("taxes1", async function () {
 
@@ -1027,5 +1079,4 @@ describe("Taxes Contract", async function () {
         // it("taxes1", async function () {
 
         // })    
-    })
-});
+})

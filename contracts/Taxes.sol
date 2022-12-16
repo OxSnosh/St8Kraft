@@ -207,13 +207,13 @@ contract TaxesContract is Ownable {
 
     function getDailyIncome(uint256 id) public view returns (uint256) {
         uint256 happiness = getHappiness(id);
-        //incrementers (added)
+        //increasers
         uint256 banks = imp1.getBankCount(id);
         uint256 ministries = imp2.getForeignMinistryCount(id);
         uint256 harbors = imp2.getHarborCount(id);
         uint256 schools = imp3.getSchoolCount(id);
         uint256 universityPoints = getUniversityPoints(id);
-        //detractors (subtracted)
+        //detractors
         uint256 casinos = imp1.getCasinoCount(id);
         uint256 guerillaCamp = imp2.getGuerillaCampCount(id);
         uint256 multipliers = (100 +
@@ -232,7 +232,6 @@ contract TaxesContract is Ownable {
         return dailyIncomePerCitizen;
     }
 
-    //need to make sure happiness stays positive for overflow
     function getHappiness(uint256 id) public view returns (uint256) {
         uint256 happinessAdditions = getHappinessPointsToAdd(id);
         uint256 happinessSubtractions = getHappinessPointsToSubtract(id);
