@@ -1018,65 +1018,227 @@ describe("Taxes Contract", async function () {
 
         it("taxes1 happiness tests minimum happiness", async function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200000);
-            const happinessAt200000 = await taxescontract.getHappiness(0);
+            // const happinessAt200000 = await taxescontract.getHappiness(0);
             // console.log(happinessAt200000.toNumber());
             await infrastructurecontract.connect(signer1).setTaxRate(0, 28);
-            const happinessAfterTax = await taxescontract.getHappiness(0)
+            // const happinessAfterTax = await taxescontract.getHappiness(0)
             // console.log(happinessAfterTax.toNumber());
-            const ratio : any = await taxescontract.soldierToPopulationRatio(0);
+            // const ratio : any = await taxescontract.soldierToPopulationRatio(0);
             // console.log(BigInt(ratio[0]));
-            const pointsFromMilitary = await taxescontract.getPointsFromMilitary(0);
+            // const pointsFromMilitary = await taxescontract.getPointsFromMilitary(0);
             // console.log(pointsFromMilitary.toNumber());
-            const criminalCount = await crimecontract.getCriminalCount(0);
+            // const criminalCount = await crimecontract.getCriminalCount(0);
             // console.log(criminalCount.toNumber());
-            const pointsFromCrime = await taxescontract.getPointsFromCriminals(0);
+            // const pointsFromCrime = await taxescontract.getPointsFromCriminals(0);
             // console.log(pointsFromCrime.toNumber());
             await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 8);
+            // const happinessAfterImprovement = await taxescontract.getHappiness(0)
+            // console.log(happinessAfterImprovement.toNumber());
+            // const pointsToAdd = await taxescontract.getHappinessPointsToAdd(0);
+            // const pointsToSubtract = await taxescontract.getHappinessPointsToSubtract(0);
+            // console.log("add", pointsToAdd.toNumber(), "subtract", pointsToSubtract.toNumber());
+            await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 6);
             const minimumHappiness = await taxescontract.getHappiness(0)
             // console.log(minimumHappiness.toNumber());
             expect(minimumHappiness.toNumber()).to.equal(10);
         })
         
-        it("taxes1 happiness tests minimum happiness", async function () {
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200000);
-            const happinessAt200000 = await taxescontract.getHappiness(0);
-            // console.log(happinessAt200000.toNumber());
-            await infrastructurecontract.connect(signer1).setTaxRate(0, 28);
-            const happinessAfterTax = await taxescontract.getHappiness(0)
-            // console.log(happinessAfterTax.toNumber());
-            const ratio : any = await taxescontract.soldierToPopulationRatio(0);
-            // console.log(BigInt(ratio[0]));
-            const pointsFromMilitary = await taxescontract.getPointsFromMilitary(0);
-            // console.log(pointsFromMilitary.toNumber());
-            const criminalCount = await crimecontract.getCriminalCount(0);
-            // console.log(criminalCount.toNumber());
-            const pointsFromCrime = await taxescontract.getPointsFromCriminals(0);
-            // console.log(pointsFromCrime.toNumber());
-            await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 8);
-            const minimumHappiness = await taxescontract.getHappiness(0)
-            // console.log(minimumHappiness.toNumber());
-            expect(minimumHappiness.toNumber()).to.equal(10);
+        it("taxes1 happiness tests additions to happiness", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 50000);
+            await resourcescontract.mockResourcesForTesting(0, 5, 11);
+            await resourcescontract.mockResourcesForTesting(1, 14, 15);
+            await resourcescontract.connect(signer2).proposeTrade(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 1);
+            await resourcescontract.mockResourcesForTesting(2, 16, 18);
+            await resourcescontract.connect(signer3).proposeTrade(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 2);
+            await resourcescontract.mockResourcesForTesting(3, 20, 17);
+            await resourcescontract.connect(signer4).proposeTrade(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 3);
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4);
+            await resourcescontract.mockResourcesForTesting(4, 17, 18);
+            await resourcescontract.connect(signer5).proposeTrade(4, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 4);
+            const pointsFromTeamTrades = await additionaltaxescontract.getPointsFromTrades(0);
+            // console.log(pointsFromTeamTrades.toNumber());
+            const pointsFromDefcon = await additionaltaxescontract.getPointsFromDefcon(0);
+            // console.log(pointsFromDefcon.toNumber());
+            // const happiness1 = await taxescontract.getHappiness(0)
+            // console.log("happiness 1", happiness1.toNumber());
+            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 12000);
+            await wonderscontract3.connect(signer1).buyWonder3(0, 6);
+            // const nukeHappiness = await additionaltaxescontract.getNuclearAndUraniumBonus(0);
+            // console.log(nukeHappiness.toNumber(), "happiness from nuke / uranium");
+            // const happiness2 = await taxescontract.getHappiness(0)
+            // console.log("happiness 2", happiness2.toNumber());
+            // const compatabilityPoints = await taxescontract.checkCompatability(0);
+            // console.log(compatabilityPoints.toNumber());
+            await countryparameterscontract.connect(signer1).setReligion(0, 2);
+            await countryparameterscontract.connect(signer1).setGovernment(0, 2);
+            // const compatabilityPoints2 = await taxescontract.checkCompatability(0);
+            // console.log(compatabilityPoints2.toNumber());
+            await wonderscontract2.connect(signer1).buyWonder2(0, 1);
+            await wonderscontract2.connect(signer1).buyWonder2(0, 2);
+            // const compatabilityPoints3 = await taxescontract.checkCompatability(0);
+            // console.log(compatabilityPoints3.toNumber());
+            const happiness3 = await taxescontract.getHappiness(0)
+            console.log("happiness 3", happiness3.toNumber());
+            await landmarketcontract.connect(signer1).buyLand(0, 10000);
+            const densityPoints = await taxescontract.getDensityPoints(0);
+            console.log(densityPoints.toNumber());
+            const density = await taxescontract.checkPopulationDensity(0);
+            console.log("density", density.toNumber());
+            const technologyPoints = await taxescontract.getTechnologyPoints(0);
+            console.log("technology points", technologyPoints.toNumber());
+            const happiness4 = await taxescontract.getHappiness(0)
+            console.log("happiness 4", happiness4.toNumber());
+            expect(happiness4.toNumber()).to.equal(70);                        
+        })
+    
+        it("taxes1 happiness tests other additions to hapiness from wonders", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 15000);
+            // const happiness = await taxescontract.getHappiness(0)
+            // console.log("happiness", happiness.toNumber());
+            await wonderscontract2.connect(signer1).buyWonder2(0, 1);
+            await wonderscontract2.connect(signer1).buyWonder2(0, 2);
+            // const happiness2 = await taxescontract.getHappiness(0)
+            // console.log("happiness 2", happiness2.toNumber());
+            await technologymarketcontrat.connect(signer1).buyTech(0, 5500);
+            await wonderscontract2.connect(signer1).buyWonder2(0, 3);
+            // const happiness3 = await taxescontract.getHappiness(0)
+            // console.log("happiness 3", happiness3.toNumber());
+            await wonderscontract3.connect(signer1).buyWonder3(0, 4);
+            await wonderscontract3.connect(signer1).buyWonder3(0, 9);
+            // const happiness4 = await taxescontract.getHappiness(0)
+            // console.log("happiness 4", happiness4.toNumber());
+            //internet
+            await wonderscontract2.connect(signer1).buyWonder2(0, 6);
+            // const happiness5 = await taxescontract.getHappiness(0)
+            // console.log("happiness 5", happiness5.toNumber());
+            //movie 
+            await wonderscontract3.connect(signer1).buyWonder3(0, 1);
+            // const happiness6 = await taxescontract.getHappiness(0)
+            // console.log("happiness 6", happiness6.toNumber());
+            //warMemorial
+            await forcescontract.increaseSoldierCasualties(0, 1000000);
+            await wonderscontract3.connect(signer1).buyWonder3(0, 5);
+            // const happiness7 = await taxescontract.getHappiness(0)
+            // console.log("happiness 7", happiness7.toNumber());
+            //space
+            await wonderscontract4.connect(signer1).buyWonder4(0, 2);
+            // const happiness8 = await taxescontract.getHappiness(0)
+            // console.log("happiness 8", happiness8.toNumber());
+            //universal healthcare
+            await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 9);
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 5);
+            await wonderscontract4.connect(signer1).buyWonder4(0, 6);
+            const happiness9 = await taxescontract.getHappiness(0)
+            // console.log("happiness 9", happiness9.toNumber());
+            expect(happiness9.toNumber()).to.equal(67);                      
+        })
+        
+        it("taxes1 happiness tests other additions to happiness from improvements", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 15000);
+            // const happiness1 = await taxescontract.getHappiness(0)
+            // console.log("happiness 1", happiness1.toNumber());
+            //border wall
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            // const happiness2 = await taxescontract.getHappiness(0)
+            // console.log("happiness 2", happiness2.toNumber());
+            //casino
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 7);
+            // const happiness3 = await taxescontract.getHappiness(0)
+            // console.log("happiness 3", happiness3.toNumber());
+            //church
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 8);
+            // const happiness4 = await taxescontract.getHappiness(0)
+            // console.log("happiness 4", happiness4.toNumber());
+            //police hq
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 2);
+            // const happiness5 = await taxescontract.getHappiness(0)
+            // console.log("happiness 5", happiness5.toNumber());
+            //red light disrict
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 5);
+            // const happiness6 = await taxescontract.getHappiness(0)
+            // console.log("happiness 6", happiness6.toNumber());
+            //stadiums
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 10);
+            const happiness7 = await taxescontract.getHappiness(0)
+            // console.log("happiness 7", happiness7.toNumber());
+            expect(happiness7.toNumber()).to.equal(38);
         })
     })
 
+    describe("Taxes Contract / Income Tests", function () {
+        it("taxes1 tests multipliers to income", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 15000);
+            // const happiness1 = await taxescontract.getHappiness(0)
+            // console.log("happiness 1", happiness1.toNumber());
+            // const dailyIncome = await taxescontract.getDailyIncome(0);
+            // console.log("income", dailyIncome.toNumber());
+            //banks
+            await improvementscontract1.connect(signer1).buyImprovement1(5, 0, 2);
+            // const dailyIncome2 = await taxescontract.getDailyIncome(0);
+            // console.log("income2", dailyIncome2.toNumber());
+            //ministries
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 1);
+            // const dailyIncome3 = await taxescontract.getDailyIncome(0);
+            // console.log("income3", dailyIncome3.toNumber());
+            //harbors
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4);
+            // const dailyIncome4 = await taxescontract.getDailyIncome(0);
+            // console.log("income4", dailyIncome4.toNumber());
+            //schools
+            await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 8);
+            // const dailyIncome5 = await taxescontract.getDailyIncome(0);
+            // console.log("income5", dailyIncome5.toNumber());
+            //guerilla camps
+            await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 3)
+            // const dailyIncome6 = await taxescontract.getDailyIncome(0);
+            // console.log("income6", dailyIncome6.toNumber());
+            //casinos
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 7);
+            const dailyIncome7 = await taxescontract.getDailyIncome(0);
+            // console.log("income7", dailyIncome7.toNumber());
+            expect(dailyIncome7.toNumber()).to.equal(107);
+        })
 
-        // it("taxes1", async function () {
-
-        // })
-
-        // it("taxes1", async function () {
-
-        // })
-
-        // it("taxes1", async function () {
-
-        // })
-        
-        // it("taxes1", async function () {
-
-        // })    
-
-        // it("taxes1", async function () {
-
-        // })    
+        it("taxes1 tests additions to income", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 15000);
+            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
+            await landmarketcontract.connect(signer1).buyLand(0, 3000);
+            const happiness1 = await taxescontract.getHappiness(0)
+            console.log("happiness 1", happiness1.toNumber());
+            const dailyIncome2 = await taxescontract.getDailyIncome(0);
+            console.log("income 2", dailyIncome2.toNumber());
+            await resourcescontract.mockResourcesForTesting(0, 3, 5);
+            await resourcescontract.mockResourcesForTesting(1, 6, 14);
+            await resourcescontract.connect(signer2).proposeTrade(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 1);
+            const dailyIncome3 = await taxescontract.getDailyIncome(0);
+            console.log("income 3", dailyIncome3.toNumber());
+            await resourcescontract.mockResourcesForTesting(2, 9, 8);
+            await resourcescontract.connect(signer3).proposeTrade(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 2);
+            const dailyIncome4 = await taxescontract.getDailyIncome(0);
+            console.log("income 4", dailyIncome4.toNumber());
+            await resourcescontract.mockResourcesForTesting(3, 17, 11);
+            await resourcescontract.connect(signer4).proposeTrade(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 3);
+            const dailyIncome5 = await taxescontract.getDailyIncome(0);
+            console.log("income 5", dailyIncome5.toNumber());
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4);
+            await wonderscontract2.connect(signer1).buyWonder2(0, 9);
+            await resourcescontract.mockResourcesForTesting(4, 2, 18);
+            await resourcescontract.connect(signer5).proposeTrade(4, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 4);
+            const dailyIncome6 = await taxescontract.getDailyIncome(0);
+            console.log("income 6", dailyIncome6.toNumber());
+            await wonderscontract4.connect(signer1).buyWonder4(0, 3);
+            const dailyIncome7 = await taxescontract.getDailyIncome(0);
+            console.log("income 7", dailyIncome7.toNumber());
+            expect(dailyIncome7.toNumber()).to.equal(181);
+        })
+    })
 })

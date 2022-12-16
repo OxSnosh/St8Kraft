@@ -11,6 +11,7 @@ import "./Forces.sol";
 import "./Military.sol";
 import "./Crime.sol";
 import "./CountryMinter.sol";
+import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract TaxesContract is Ownable {
@@ -221,7 +222,7 @@ contract TaxesContract is Ownable {
             (ministries * 5) +
             (harbors * 1) +
             (schools * 5) +
-            universityPoints -
+            universityPoints - 
             (guerillaCamp * 8) -
             (casinos * 1));
         uint256 baseDailyIncomePerCitizen = (35 +
@@ -287,7 +288,7 @@ contract TaxesContract is Ownable {
             id
         );
         uint256 pointsFromIntelAgencies = getPointsFromIntelAgencies(id);
-        uint256 happinessPointsToSubtract = (35 -
+        uint256 happinessPointsToSubtract = (40 -
             taxRatePoints -
             pointsFromCrime -
             pointsFromImprovements -
@@ -333,8 +334,8 @@ contract TaxesContract is Ownable {
         if (water) {
             maxDensity = 120;
         }
-        if (density < maxDensity) {
-            densityPoints = 1;
+        if (density <= maxDensity) {
+            densityPoints = 5;
         }
         return densityPoints;
     }
@@ -678,20 +679,20 @@ contract TaxesContract is Ownable {
 
     function getPointsFromIntelAgencies(uint256 id) public view returns (uint256) {
         uint256 intelAgencies = imp2.getIntelAgencyCount(id);
-        uint256 subtractTaxPoints;
+        uint256 subtractPoints;
         uint256 taxRate = inf.getTaxRate(id);
         if (intelAgencies >= 1 && taxRate <= 20) {
-            subtractTaxPoints = 0;
+            subtractPoints = 0;
         } else if (intelAgencies <= 3 && taxRate > 20 && taxRate <= 23) {
-            subtractTaxPoints = intelAgencies;
+            subtractPoints = intelAgencies;
         } else if (intelAgencies > 3 && taxRate > 20 && taxRate <= 23) {
-            subtractTaxPoints = 0;    
+            subtractPoints = 0;    
         } else if (taxRate > 23) {
-            subtractTaxPoints = intelAgencies;
+            subtractPoints = intelAgencies;
         } else {
-            subtractTaxPoints = 0;
+            subtractPoints = 0;
         }
-        return subtractTaxPoints;
+        return subtractPoints;
     }
 
 

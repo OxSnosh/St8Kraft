@@ -908,6 +908,7 @@ contract WondersContract2 is Ownable {
                 countryId,
                 miningIndustryConsortiumCost
             );
+            //reset trades
         }
     }
 
