@@ -10,6 +10,7 @@ import "./Navy.sol";
 import "./Improvements.sol";
 import "./Resources.sol";
 import "./CountryMinter.sol";
+import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract BillsContract is Ownable {
@@ -45,7 +46,7 @@ contract BillsContract is Ownable {
 
     mapping(uint256 => address) public idToOwnerBills;
 
-    function settings (
+    function settings(
         address _countryMinter,
         address _treasury,
         address _wonders1,
@@ -79,11 +80,12 @@ contract BillsContract is Ownable {
         res = ResourcesContract(_resources);
     }
 
-    function settings2 (
+    function settings2(
         address _improvements1,
         address _improvements2,
         address _missiles,
-        address _wonders4
+        address _wonders4,
+        address _infrastructure
     ) public onlyOwner {
         improvements1 = _improvements1;
         imp1 = ImprovementsContract1(_improvements1);
@@ -93,6 +95,8 @@ contract BillsContract is Ownable {
         mis = MissilesContract(_missiles);
         wonders4 = _wonders4;
         won4 = WondersContract4(_wonders4);
+        infrastructure = _infrastructure;
+        inf = InfrastructureContract(_infrastructure);
     }
 
     function updateCountryMinter(address newAddress) public onlyOwner {
@@ -175,7 +179,7 @@ contract BillsContract is Ownable {
     //need to reduce by a percentage for blockades
     function payBills(uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         uint256 availableFunds = tsy.checkBalance(id);
         uint256 billsPayable = getBillsPayable(id);
         require(
@@ -194,12 +198,7 @@ contract BillsContract is Ownable {
         uint256 improvementBillsPayable = calculateDailyBillsFromImprovements(
             id
         );
-        uint256 wonderCount = won1.getWonderCount(id);
-        uint256 wonderBillsPayable = (wonderCount * 5000);
-        bool nuclearPowerPlant = won3.getNuclearPowerPlant(id);
-        if (nuclearPowerPlant) {
-            wonderBillsPayable = ((wonderBillsPayable * 95) / 100);
-        }
+        uint256 wonderBillsPayable = calculateWonderBillsPayable(id);
         uint256 dailyBillsPayable = infrastructureBillsPayable +
             militaryBillsPayable +
             improvementBillsPayable +
@@ -208,65 +207,67 @@ contract BillsContract is Ownable {
         return billsPayable;
     }
 
-    function calculateDailyBillsFromInfrastructure(uint256 id)
-        public
-        view
-        returns (uint256 infrastructureBills)
-    {
+    function calculateDailyBillsFromInfrastructure(
+        uint256 id
+    ) public view returns (uint256 dailyInfrastructureBills) {
+        uint256 costPerLevel = calculateInfrastructureCostPerLevel(id);
         uint256 infrastructureAmount = inf.getInfrastructureCount(id);
-        uint256 upkeep;
+        return (costPerLevel * infrastructureAmount);
+    }
+
+    function calculateInfrastructureCostPerLevel(
+        uint256 id
+    ) public view returns (uint256 infrastructureBillsPerLevel) {
+        uint256 infrastructureAmount = inf.getInfrastructureCount(id);
         uint256 infrastructureCostPerLevel;
         if (infrastructureAmount < 100) {
-            upkeep = ((400 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
+            infrastructureCostPerLevel = 20;
         } else if (infrastructureAmount < 200) {
-            upkeep = ((500 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
+            infrastructureCostPerLevel = (((5 * infrastructureAmount) / 100) +
+                20);
         } else if (infrastructureAmount < 300) {
-            upkeep = ((600 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
+            infrastructureCostPerLevel = (((6 * infrastructureAmount) / 100) +
+                20);
         } else if (infrastructureAmount < 500) {
-            upkeep = ((700 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
+            infrastructureCostPerLevel = (((7 * infrastructureAmount) / 100) +
+                20);
         } else if (infrastructureAmount < 700) {
-            upkeep = ((800 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
+            infrastructureCostPerLevel = (((8 * infrastructureAmount) / 100) +
+                20);
         } else if (infrastructureAmount < 1000) {
-            upkeep = ((900 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
+            infrastructureCostPerLevel = (((9 * infrastructureAmount) / 100) +
+                20);
         } else if (infrastructureAmount < 2000) {
-            upkeep = ((110 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
+            infrastructureCostPerLevel = (((11 * infrastructureAmount) / 100) +
+                20);
         } else if (infrastructureAmount < 3000) {
-            upkeep = ((130 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
+            infrastructureCostPerLevel = (((13 * infrastructureAmount) / 100) +
+                20);
         } else if (infrastructureAmount < 4000) {
-            upkeep = ((150 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
+            infrastructureCostPerLevel = (((15 * infrastructureAmount) / 100) +
+                20);
         } else if (infrastructureAmount < 5000) {
-            upkeep = ((170 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
+            infrastructureCostPerLevel = (((17 * infrastructureAmount) / 100) +
+                20);
         } else if (infrastructureAmount < 8000) {
-            upkeep = ((1725 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 1000);
+            infrastructureCostPerLevel = (((1725 * infrastructureAmount) /
+                10000) + 20);
         } else if (infrastructureAmount < 15000) {
-            upkeep = ((175 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
+            infrastructureCostPerLevel = (((175 * infrastructureAmount) /
+                1000) + 20);
         } else {
-            upkeep = ((180 * infrastructureAmount) + 20);
-            infrastructureCostPerLevel = (upkeep / 100);
+            infrastructureCostPerLevel = (((18 * infrastructureAmount) / 100) +
+                20);
         }
-        uint256 baseInfrastructureBillsDue = infrastructureCostPerLevel *
-            infrastructureAmount;
-        uint256 dailyInfrastructureBillsDue = calculateModifiedInfrastrucureUpkeep(
-                baseInfrastructureBillsDue,
+        uint256 adjustedInfrastructureCostPerLevel = calculateModifiedInfrastrucureUpkeep(
+                infrastructureCostPerLevel,
                 id
             );
-        return dailyInfrastructureBillsDue;
+        return adjustedInfrastructureCostPerLevel * (10 ** 18);
     }
 
     function calculateModifiedInfrastrucureUpkeep(
-        uint256 baseDailyInfrastructureUpkeep,
+        uint256 baseDailyInfrastructureCostPerLevel,
         uint256 id
     ) public view returns (uint256) {
         uint256 infrastructureUpkeepModifier = 100;
@@ -298,16 +299,14 @@ contract BillsContract is Ownable {
         if (nuclearPowerPlant) {
             infrastructureUpkeepModifier -= 5;
         }
-        uint256 dailyInfrastructureBillsDue = ((baseDailyInfrastructureUpkeep *
-            infrastructureUpkeepModifier) / 100);
-        return dailyInfrastructureBillsDue;
+        uint256 dailyInfrastructureCostPerLevel = ((baseDailyInfrastructureCostPerLevel *
+                infrastructureUpkeepModifier) / 100);
+        return dailyInfrastructureCostPerLevel;
     }
 
-    function calculateDailyBillsFromMilitary(uint256 id)
-        public
-        view
-        returns (uint256 militaryBills)
-    {
+    function calculateDailyBillsFromMilitary(
+        uint256 id
+    ) public view returns (uint256 militaryBills) {
         uint256 soldierCount = frc.getSoldierCount(id);
         uint256 soldierUpkeep = getSoldierUpkeep(id, soldierCount);
         uint256 tankCount = frc.getTankCount(id);
@@ -318,21 +317,23 @@ contract BillsContract is Ownable {
         uint256 nukeCount = mis.getNukeCount(id);
         uint256 nukeUpkeep = getNukeUpkeep(id, nukeCount);
         uint256 cruiseMissileCount = mis.getCruiseMissileCount(id);
-        uint256 cruiseMissileUpkeep = getCruiseMissileUpkeep(id, cruiseMissileCount);
+        uint256 cruiseMissileUpkeep = getCruiseMissileUpkeep(
+            id,
+            cruiseMissileCount
+        );
         uint256 dailyMilitaryUpkeep = soldierUpkeep +
             tankUpkeep +
             aircraftUpkeep +
             navyUpkeep +
             nukeUpkeep +
             cruiseMissileUpkeep;
-        return dailyMilitaryUpkeep;
+        return dailyMilitaryUpkeep * (10 ** 18);
     }
 
-    function getSoldierUpkeep(uint256 id, uint256 soldierCount)
-        public
-        view
-        returns (uint256)
-    {
+    function getSoldierUpkeep(
+        uint256 id,
+        uint256 soldierCount
+    ) public view returns (uint256) {
         uint256 soldierUpkeep = (soldierCount * 2);
         uint256 soldierUpkeepModifier = 100;
         bool lead = res.viewLead(id);
@@ -356,11 +357,10 @@ contract BillsContract is Ownable {
         return adjustedSoldierUpkeep;
     }
 
-    function getTankUpkeep(uint256 id, uint256 tankCount)
-        public
-        view
-        returns (uint256)
-    {
+    function getTankUpkeep(
+        uint256 id,
+        uint256 tankCount
+    ) public view returns (uint256) {
         uint256 tankUpkeep = (tankCount * 40);
         uint256 tankUpkeepModifier = 100;
         bool iron = res.viewIron(id);
@@ -375,24 +375,21 @@ contract BillsContract is Ownable {
         if (logisticalSupport) {
             tankUpkeepModifier -= 5;
         }
-        uint256 adjustedTankUpkeep = ((tankUpkeep *
-            tankUpkeepModifier) / 100);
+        uint256 adjustedTankUpkeep = ((tankUpkeep * tankUpkeepModifier) / 100);
         return adjustedTankUpkeep;
     }
 
-    function getNukeUpkeep(uint256 id, uint256 nukeCount)
-        public
-        view
-        returns (uint256)
-    {
+    function getNukeUpkeep(
+        uint256 id,
+        uint256 nukeCount
+    ) public view returns (uint256) {
         uint256 nukeUpkeep = (nukeCount * 5000);
         uint256 nukeUpkeepModifier = 100;
         bool lead = res.viewLead(id);
         if (lead) {
             nukeUpkeepModifier -= 20;
         }
-        uint256 adjustedNukeUpkeep = ((nukeUpkeep *
-            nukeUpkeepModifier) / 100);
+        uint256 adjustedNukeUpkeep = ((nukeUpkeep * nukeUpkeepModifier) / 100);
         bool uranium = res.viewUranium(id);
         if (!uranium) {
             adjustedNukeUpkeep = (adjustedNukeUpkeep * 2);
@@ -400,11 +397,10 @@ contract BillsContract is Ownable {
         return adjustedNukeUpkeep;
     }
 
-    function getCruiseMissileUpkeep(uint256 id, uint256 missileCount)
-        public
-        view
-        returns (uint256)
-    {
+    function getCruiseMissileUpkeep(
+        uint256 id,
+        uint256 missileCount
+    ) public view returns (uint256) {
         uint256 missileUpkeep = (missileCount * 500);
         uint256 missileUpkeepModifier = 100;
         bool lead = res.viewLead(id);
@@ -416,11 +412,10 @@ contract BillsContract is Ownable {
         return adjustedMissileUpkeep;
     }
 
-    function getAircraftUpkeep(uint256 id, uint256 aircraftCount)
-        public
-        view
-        returns (uint256)
-    {
+    function getAircraftUpkeep(
+        uint256 id,
+        uint256 aircraftCount
+    ) public view returns (uint256) {
         uint256 aircraftUpkeep = (aircraftCount * 200);
         uint256 aircraftUpkeepModifier = 100;
         bool lead = res.viewLead(id);
@@ -440,11 +435,9 @@ contract BillsContract is Ownable {
         return adjustedAircraftUpkeep;
     }
 
-    function getNavyUpkeep(uint256 id)
-        public
-        view
-        returns (uint256 navyUpkeep)
-    {
+    function getNavyUpkeep(
+        uint256 id
+    ) public view returns (uint256 navyUpkeep) {
         uint256 corvetteCount = nav.getCorvetteCount(id);
         uint256 corvetteUpkeep = (corvetteCount * 5000);
         uint256 landingShipCount = nav.getLandingShipCount(id);
@@ -484,11 +477,10 @@ contract BillsContract is Ownable {
         return additionalNavyUpkeep;
     }
 
-    function getAdjustedNavyUpkeep(uint256 id, uint256 baseNavyUpkeep)
-        public
-        view
-        returns (uint256)
-    {
+    function getAdjustedNavyUpkeep(
+        uint256 id,
+        uint256 baseNavyUpkeep
+    ) public view returns (uint256) {
         uint256 navyUpkeepModifier = 100;
         bool lead = res.viewLead(id);
         if (lead) {
@@ -502,16 +494,14 @@ contract BillsContract is Ownable {
         if (logisticalSupport) {
             navyUpkeepModifier -= 10;
         }
-        uint256 adjustedNavyUpkeep = ((baseNavyUpkeep *
-            navyUpkeepModifier) / 100);
+        uint256 adjustedNavyUpkeep = ((baseNavyUpkeep * navyUpkeepModifier) /
+            100);
         return adjustedNavyUpkeep;
     }
 
-    function calculateDailyBillsFromImprovements(uint256 id)
-        public
-        view
-        returns (uint256 improvementBills)
-    {
+    function calculateDailyBillsFromImprovements(
+        uint256 id
+    ) public view returns (uint256 improvementBills) {
         uint256 improvementCount = imp1.getImprovementCount(id);
         uint256 upkeepPerLevel;
         if (improvementCount < 5) {
@@ -536,6 +526,18 @@ contract BillsContract is Ownable {
         if (nuclearPowerPlant) {
             dailyImprovementBillsDue = ((dailyImprovementBillsDue * 95) / 100);
         }
-        return dailyImprovementBillsDue;
+        return dailyImprovementBillsDue * (10 ** 18);
+    }
+
+    function calculateWonderBillsPayable(
+        uint256 id
+    ) public view returns (uint256) {
+        uint256 wonderCount = won1.getWonderCount(id);
+        uint256 wonderBillsPayable = (wonderCount * 5000);
+        bool nuclearPowerPlant = won3.getNuclearPowerPlant(id);
+        if (nuclearPowerPlant) {
+            wonderBillsPayable = ((wonderBillsPayable * 95) / 100);
+        }
+        return wonderBillsPayable * (10 ** 18);
     }
 }

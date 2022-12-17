@@ -54,8 +54,9 @@ import {
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
+import { BigNumber } from "ethers";
 
-describe("Aid Contract", async function () {
+describe("Bills Contract", async function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -109,6 +110,9 @@ describe("Aid Contract", async function () {
     let signer0: SignerWithAddress
     let signer1: SignerWithAddress
     let signer2: SignerWithAddress
+    let signer3: SignerWithAddress
+    let signer4: SignerWithAddress
+    let signer5: SignerWithAddress
     let signers: SignerWithAddress[]
     let addrs
 
@@ -120,6 +124,9 @@ describe("Aid Contract", async function () {
         signer0 = signers[0];
         signer1 = signers[1];
         signer2 = signers[2];
+        signer3 = signers[3];
+        signer4 = signers[4];
+        signer5 = signers[5];
         
         let chainId: any
         chainId = network.config.chainId
@@ -923,118 +930,237 @@ describe("Aid Contract", async function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(3000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(3000000000*(10**18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(2000000000*(10**18)), 0);
 
         await countryminter.connect(signer2).generateCountry(
-            "NextRuler",
-            "NextNationName",
-            "NextCapitalCity",
-            "NextNationSlogan"
+            "TestRuler2",
+            "TestNationName2",
+            "TestCapitalCity2",
+            "TestNationSlogan2"
         )
-        await warbucks.connect(signer0).approve(warbucks.address, BigInt(100000000*(10**18)));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(100000000*(10**18)));
-        await treasurycontract.connect(signer1).addFunds(BigInt(100000000*(10**18)), 0);
-        await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
-        await forcescontract.connect(signer1).buySoldiers(7000, 0);
+        await countryminter.connect(signer3).generateCountry(
+            "TestRuler3",
+            "TestNationName3",
+            "TestCapitalCity3",
+            "TestNationSlogan3"
+        )
+        await countryminter.connect(signer4).generateCountry(
+            "TestRuler4",
+            "TestNationName4",
+            "TestCapitalCity4",
+            "TestNationSlogan4"
+        )
+        await countryminter.connect(signer5).generateCountry(
+            "TestRuler5",
+            "TestNationName5",
+            "TestCapitalCity5",
+            "TestNationSlogan5"
+        )
+
     });
 
-    describe("Aid Contract", function () {
-        it("aid1 tests proposeAid() function", async function () {
-            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
-            var proposalDetails = await aidcontract.getProposal(0);
-            expect(proposalDetails[0].toNumber()).to.equal(0);
-            expect(proposalDetails[2].toNumber()).to.equal(0);
-            expect(proposalDetails[3].toNumber()).to.equal(1);
-            expect(proposalDetails[4].toNumber()).to.equal(100);
-            expect(proposalDetails[5]).to.equal(BigInt(5999999999999999899336704));
-            expect(proposalDetails[6].toNumber()).to.equal(4000);
+    describe("Bills Contract Initialized", function () {
+        it("bills1 tests that bills are initialized correctly", async function () {
+            const initialBillsPayable1 : any = await billscontract.getBillsPayable(0);
+            // console.log("bills payable", BigInt(initialBillsPayable1/(10**18)).toString());
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200);
+            const daysSince = await treasurycontract.getDaysSinceLastBillsPaid(0);
+            // console.log("days since", daysSince.toNumber())
+            const dailyIncome : any = await taxescontract.getDailyIncome(0);
+            // console.log("daily income", BigInt(dailyIncome));
+            const taxRate = await infrastructurecontract.getTaxRate(0);
+            // console.log("tax rate", taxRate.toNumber());
+            const happiness = await taxescontract.getHappiness(0);
+            // console.log("happiness", happiness.toNumber());
+            const billsPayable : any = await billscontract.getBillsPayable(0);
+            // console.log("bills payable", BigInt(billsPayable/(10**18)));
+            // expect(BigInt(billsPayable/(10**18)).toString()).to.equal("25875");
+            const startingBalance : any = await treasurycontract.checkBalance(0);
+            // console.log("starting balance", BigInt(startingBalance/(10**18)));
+            expect(BigInt(startingBalance/(10**18)).toString()).to.equal("2002000000");
+            const initialBillsPayable : any = await billscontract.getBillsPayable(0);
+            // console.log("updated bills payable", BigInt(initialBillsPayable/(10**18)));
+            expect(BigInt(initialBillsPayable/(10**18)).toString()).to.equal("7300");
+            await billscontract.connect(signer1).payBills(0);
+            const endingBalance : any = await treasurycontract.checkBalance(0);
+            // console.log("ending balance", endingBalance/(10**18));
+            expect((endingBalance/(10**18)).toString()).to.equal("2001992700.0000002");
+            const updatedBillsPayable : any = await billscontract.getBillsPayable(0);
+            // console.log("updated bills payable", BigInt(updatedBillsPayable/(10**18)));
+            expect(BigInt(updatedBillsPayable/(10**18)).toString()).to.equal("0");
+            const infrastructureBills : any = await billscontract.calculateDailyBillsFromInfrastructure(0);
+            // console.log("daily inf bills", BigInt(infrastructureBills/(10**18)));
+            expect(BigInt(infrastructureBills/(10**18)).toString()).to.equal("7260");
+            const militaryBills : any = await billscontract.calculateDailyBillsFromMilitary(0);
+            // console.log("military bills", BigInt(militaryBills/(10**18)));
+            expect(BigInt(militaryBills/(10**18)).toString()).to.equal("40");
+            // const improvementBills : any = await billscontract.calculateDailyBillsFromImprovements(0);
+            // console.log("improvement bills", BigInt(improvementBills/(10**18)));
+            // const wonderBills : any = await billscontract.calculateWonderBillsPayable(0);
+            // console.log("wonder bills", BigInt(wonderBills/(10**18)));
         })
-
-        it("aid1 tests acceptProposal() function", async function () {
-            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
-            await aidcontract.connect(signer2).acceptProposal(0);
-            await expect((await forcescontract.getSoldierCount(1)).toNumber()).to.equal(4000);
-            await expect((await infrastructurecontract.getTechnologyCount(1)).toNumber()).to.equal(100);
-            await expect((await (await treasurycontract.checkBalance(1)))).to.equal(BigInt("7999999999999999899336704"));
-        })
-
-        it("aid1 tests proposeAid() function reverts correctly with slot not available", async function () {
-            await expect(aidcontract.connect(signer1).proposeAid(1, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("!nation ruler");
-            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
-            await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("aid slot not available");
-        })
-
-        it("aid1 tests proposeAid() function reverts correctly when aid not available", async function () {
-            await treasurycontract.connect(signer1).withdrawFunds(BigInt(99999999*(10**18)), 0);
-            await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("not enough funds for this porposal");
-            await treasurycontract.connect(signer1).addFunds(BigInt(88888888*(10**18)), 0);
-            await forcescontract.connect(signer1).decomissionSoldiers(7000, 0);
-            await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("not enough soldiers for this porposal");
-            await forcescontract.connect(signer1).buySoldiers(5000, 0);
-            await technologymarketcontrat.connect(signer1).destroyTech(0, 10000);
-            await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("not enough tech for this proposal");            
-        })
-
-        it("aid1 tests proposeAid() function reverts when max amount exceeded (no frderal aid)", async function () {
-            await expect(aidcontract.connect(signer1).proposeAid(0, 1, 101, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("max tech exceeded");
-            await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000001*(10**18)), 4000)).to.be.revertedWith("max balance excedded");
-            await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4001)).to.be.revertedWith("max soldier aid is excedded");            
-        })
-
-        it("aid1 tests proposeAid() function reverts when max amount exceeded (no frderal aid)", async function () {
-            await wonderscontract1.connect(signer1).buyWonder1(0, 7);
-            await wonderscontract1.connect(signer2).buyWonder1(1, 7);
-            await aidcontract.connect(signer1).proposeAid(0, 1, 101, BigInt(6000001*(10**18)), 4001);
-            var proposalDetails = await aidcontract.getProposal(0);
-            expect(proposalDetails[0].toNumber()).to.equal(0);
-            expect(proposalDetails[2].toNumber()).to.equal(0);
-            expect(proposalDetails[3].toNumber()).to.equal(1);
-            expect(proposalDetails[4].toNumber()).to.equal(101);
-            expect(proposalDetails[5]).to.equal(BigInt(6000001000000000312213504));
-            expect(proposalDetails[6].toNumber()).to.equal(4001);
-        })
-
-        it("aid1 tests acceptProposal() function reverts when proposal expires", async function () {
-            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
-            let interval = await aidcontract.getProposalExpiration();
-            await network.provider.send("evm_increaseTime", [interval.toNumber() + 1]);
-            await network.provider.request({ method: "evm_mine", params: [] });
-            await expect(aidcontract.connect(signer2).acceptProposal(0)).to.be.revertedWith("proposal expired");
-        })
-
-        it("aid1 tests acceptProposal() function reverts when proposal expires", async function () {
-            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
-            await aidcontract.connect(signer1).cancelAid(0);
-            let array = await aidcontract.checkCancelledOrAccepted(0);
-            expect(array[1]).to.equal(true);
-            await expect(aidcontract.connect(signer2).acceptProposal(0)).to.be.revertedWith("this offer has been cancelled");
-        })
-
-        it("aid1 tests acceptProposal() function reverts when proposal aleady accepted", async function () {
-            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
-            await aidcontract.connect(signer2).acceptProposal(0);
-            await expect(aidcontract.connect(signer2).acceptProposal(0)).to.be.revertedWith("this offer has been accepted already");
-        })
-
-        it("aid1 tests acceptProposal() function reverts when proposal aleady accepted", async function () {
-            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
-            await treasurycontract.connect(signer1).withdrawFunds(BigInt(99999999*(10**18)), 0);
-            await expect(aidcontract.connect(signer2).acceptProposal(0)).to.be.revertedWith("not enough funds for this porposal");
-        })
-
-        it("aid1 tests resetAidProposals()", async function () {
-            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
-            await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("aid slot not available");
-            await keepercontract.resetAidProposalsByOwner();
-            await aidcontract.connect(signer1).proposeAid(0, 1, 50, BigInt(6000000*(10**18)), 4000);
-            let array = await aidcontract.getProposal(1);
-            expect(array[4]).to.equal(50);
-        })
-
-        it("aid1 tests setProposalExpiration()", async function () {
-            let oneWeek : any = await aidcontract.getProposalExpiration();
-            await aidcontract.setProposalExpiration(oneWeek+5);
-            var newOneWeek = await aidcontract.getProposalExpiration();
-            expect(newOneWeek).to.equal(oneWeek+5);
-        })  
     })
-});
+
+    describe("Infrastructure Bills", function () {
+        it("bills2 tests that cost per level works appropriately", async function () {
+            const infrastructureAmountInitial = await infrastructurecontract.getInfrastructureCount(0);
+            // console.log("initial infrastructire", infrastructureAmountInitial.toNumber());
+            const costPerLevel20 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
+            console.log("level cost at 20", BigInt(costPerLevel20/(10**18)));
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 80);
+            const costPerLevel100 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
+            console.log("level cost at 100", BigInt(costPerLevel100/(10**18)));
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 60);
+            const costPerLevel160 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
+            console.log("level cost at 160", BigInt(costPerLevel160/(10**18)));
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 40);
+            const costPerLevel200 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
+            console.log("level cost at 200", BigInt(costPerLevel200/(10**18)));
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 100);
+            const costPerLevel300 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
+            console.log("level cost at 300", BigInt(costPerLevel300/(10**18)));
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200);
+            const costPerLevel500 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
+            console.log("level cost at 500", BigInt(costPerLevel500/(10**18)));
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200);
+            const costPerLevel700 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
+            console.log("level cost at 700", BigInt(costPerLevel700/(10**18)));
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 300);
+            const costPerLevel1000 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
+            console.log("level cost at 1000", BigInt(costPerLevel1000/(10**18)));
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
+            const costPerLevel2000 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
+            console.log("level cost at 2000", BigInt(costPerLevel2000/(10**18)));
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
+            const costPerLevel3000 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
+            console.log("level cost at 3000", BigInt(costPerLevel3000/(10**18)));
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
+            const costPerLevel4000 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
+            console.log("level cost at 4000", BigInt(costPerLevel4000/(10**18)));
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
+            const costPerLevel5000 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
+            console.log("level cost at 5000", BigInt(costPerLevel5000/(10**18)));
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 3000);
+            const costPerLevel8000 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
+            console.log("level cost at 8000", BigInt(costPerLevel8000/(10**18)));
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 7000);
+            const costPerLevel15000 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
+            console.log("level cost at 15000", BigInt(costPerLevel15000/(10**18)));
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 10000);
+            const costPerLevel25000 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
+            console.log("level cost at 25000", BigInt(costPerLevel25000/(10**18)));
+
+            await resourcescontract.mockResourcesForTesting(0, 5, 11);
+            await resourcescontract.mockResourcesForTesting(1, 14, 15);
+            await resourcescontract.connect(signer2).proposeTrade(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 1);
+            await resourcescontract.mockResourcesForTesting(2, 16, 18);
+            await resourcescontract.connect(signer3).proposeTrade(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 2);
+            await resourcescontract.mockResourcesForTesting(3, 20, 17);
+            await resourcescontract.connect(signer4).proposeTrade(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 3);
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4);
+            await resourcescontract.mockResourcesForTesting(4, 17, 18);
+            await resourcescontract.connect(signer5).proposeTrade(4, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 4);
+            const pointsFromTeamTrades = await additionaltaxescontract.getPointsFromTrades(0);
+            // console.log(pointsFromTeamTrades.toNumber());
+            const pointsFromDefcon = await additionaltaxescontract.getPointsFromDefcon(0);
+            // console.log(pointsFromDefcon.toNumber());
+            // const happiness1 = await taxescontract.getHappiness(0)
+            // console.log("happiness 1", happiness1.toNumber());
+            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
+            // await wonderscontract3.connect(signer1).buyWonder3(0, 6);
+            // const nukeHappiness = await additionaltaxescontract.getNuclearAndUraniumBonus(0);
+            // console.log(nukeHappiness.toNumber(), "happiness from nuke / uranium");
+            // const happiness2 = await taxescontract.getHappiness(0)
+            // console.log("happiness 2", happiness2.toNumber());
+            // const compatabilityPoints = await taxescontract.checkCompatability(0);
+            // console.log(compatabilityPoints.toNumber());
+            await countryparameterscontract.connect(signer1).setReligion(0, 2);
+            await countryparameterscontract.connect(signer1).setGovernment(0, 2);
+            // const compatabilityPoints2 = await taxescontract.checkCompatability(0);
+            // console.log(compatabilityPoints2.toNumber());
+            await wonderscontract2.connect(signer1).buyWonder2(0, 1);
+            await wonderscontract2.connect(signer1).buyWonder2(0, 2);
+            // const compatabilityPoints3 = await taxescontract.checkCompatability(0);
+            // console.log(compatabilityPoints3.toNumber());
+            // const happiness3 = await taxescontract.getHappiness(0)
+            // console.log("happiness 3", happiness3.toNumber());
+            await landmarketcontract.connect(signer1).buyLand(0, 10000);
+
+            // const happiness = await taxescontract.getHappiness(0)
+            // console.log("happiness", happiness.toNumber());
+            // await wonderscontract2.connect(signer1).buyWonder2(0, 1);
+            // await wonderscontract2.connect(signer1).buyWonder2(0, 2);
+            // const happiness2 = await taxescontract.getHappiness(0)
+            // console.log("happiness 2", happiness2.toNumber());
+            await technologymarketcontrat.connect(signer1).buyTech(0, 5500);
+            await wonderscontract2.connect(signer1).buyWonder2(0, 3);
+            // const happiness3 = await taxescontract.getHappiness(0)
+            // console.log("happiness 3", happiness3.toNumber());
+            await wonderscontract3.connect(signer1).buyWonder3(0, 4);
+            // await wonderscontract3.connect(signer1).buyWonder3(0, 9);
+            // const happiness4 = await taxescontract.getHappiness(0)
+            // console.log("happiness 4", happiness4.toNumber());
+            //internet
+            await wonderscontract2.connect(signer1).buyWonder2(0, 6);
+            // const happiness5 = await taxescontract.getHappiness(0)
+            // console.log("happiness 5", happiness5.toNumber());
+            //movie 
+            await wonderscontract3.connect(signer1).buyWonder3(0, 1);
+            // const happiness6 = await taxescontract.getHappiness(0)
+            // console.log("happiness 6", happiness6.toNumber());
+            //warMemorial
+            await forcescontract.increaseSoldierCasualties(0, 1000000);
+            await wonderscontract3.connect(signer1).buyWonder3(0, 5);
+            // const happiness7 = await taxescontract.getHappiness(0)
+            // console.log("happiness 7", happiness7.toNumber());
+            //space
+            await wonderscontract4.connect(signer1).buyWonder4(0, 2);
+            // const happiness8 = await taxescontract.getHappiness(0)
+            // console.log("happiness 8", happiness8.toNumber());
+            //universal healthcare
+            await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 9);
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 5);
+            // await wonderscontract4.connect(signer1).buyWonder4(0, 6);
+
+            // const happiness1 = await taxescontract.getHappiness(0)
+            // console.log("happiness 1", happiness1.toNumber());
+            //border wall
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            // const happiness2 = await taxescontract.getHappiness(0)
+            // console.log("happiness 2", happiness2.toNumber());
+            //casino
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 7);
+            // const happiness3 = await taxescontract.getHappiness(0)
+            // console.log("happiness 3", happiness3.toNumber());
+            //church
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 8);
+            // const happiness4 = await taxescontract.getHappiness(0)
+            // console.log("happiness 4", happiness4.toNumber());
+            //police hq
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 2);
+            // const happiness5 = await taxescontract.getHappiness(0)
+            // console.log("happiness 5", happiness5.toNumber());
+            //red light disrict
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 5);
+            // const happiness6 = await taxescontract.getHappiness(0)
+            // console.log("happiness 6", happiness6.toNumber());
+            //stadiums
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 10);
+            const happiness7 = await taxescontract.getHappiness(0)
+            console.log("happiness 7", happiness7.toNumber());
+
+            const infAmount = await infrastructurecontract.getInfrastructureCount(0);
+            console.log("infrastructure", infAmount.toNumber());
+            const infrastructureBills : any = await billscontract.calculateDailyBillsFromInfrastructure(0);
+            console.log("infrastructure bills", BigInt(infrastructureBills/(10**18)));
+            const taxesCollectible : any = await taxescontract.getTaxesCollectible(0);
+            console.log("taxes collectible", BigInt(taxesCollectible[1]/(10**18)));
+        })
+    })
+})

@@ -432,7 +432,8 @@ describe("ResourcesContract", async function () {
             improvementscontract1.address,
             improvementscontract2.address,
             missilescontract.address,
-            wonderscontract4.address)
+            wonderscontract4.address,
+            infrastructurecontract.address)
         
         bomberscontract.settings(
             countryminter.address, 

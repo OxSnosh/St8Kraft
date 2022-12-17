@@ -225,8 +225,8 @@ contract TaxesContract is Ownable {
             universityPoints - 
             (guerillaCamp * 8) -
             (casinos * 1));
-        uint256 baseDailyIncomePerCitizen = (35 +
-            (((2 * happiness) * multipliers) / 100));
+        uint256 baseDailyIncomePerCitizen = (((35 +
+            (2 * happiness)) * multipliers) / 100);
         uint256 incomeAdjustments = addTax.getIncomeAdjustments(id);
         uint256 dailyIncomePerCitizen = baseDailyIncomePerCitizen +
             incomeAdjustments;
