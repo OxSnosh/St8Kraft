@@ -395,6 +395,9 @@ contract ForcesContract is Ownable {
     function buyTanks(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
+        uint256 maxTanks = getMaxTankCount(id);
+        uint256 currentTanks = idToForces[id].numberOfTanks;
+        require((currentTanks + amount) <= maxTanks, "cannot own that many tanks");
         uint256 soldierCost = getSoldierCost(id);
         uint256 purchasePrice = soldierCost * 40;
         uint256 factoryCount = imp1.getFactoryCount(id);
@@ -408,6 +411,19 @@ contract ForcesContract is Ownable {
         idToForces[id].numberOfTanks += amount;
         idToForces[id].defendingTanks += amount;
         TreasuryContract(treasuryAddress).spendBalance(id, cost);
+    }
+
+    function getMaxTankCount(uint256 id) public view returns (uint256) {
+        uint256 soldiers = getSoldierCount(id);
+        uint256 efficiency = getDefendingSoldierEfficiencyModifier(id);
+        uint256 modifiedSoldierCount = ((soldiers * efficiency) / 100);
+        uint256 tankMax = (modifiedSoldierCount / 10);
+        uint256 citizenCount = inf.getTotalPopulationCount(id);
+        uint256 tankMaxByCitizen = ((citizenCount * 8) / 100);
+        if (tankMaxByCitizen < tankMax) {
+            tankMax = tankMaxByCitizen;
+        }
+        return tankMax;
     }
 
     function deployTanks(uint256 amountToDeploy, uint256 id) public {

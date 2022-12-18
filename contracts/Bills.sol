@@ -307,19 +307,14 @@ contract BillsContract is Ownable {
     function calculateDailyBillsFromMilitary(
         uint256 id
     ) public view returns (uint256 militaryBills) {
-        uint256 soldierCount = frc.getSoldierCount(id);
-        uint256 soldierUpkeep = getSoldierUpkeep(id, soldierCount);
-        uint256 tankCount = frc.getTankCount(id);
-        uint256 tankUpkeep = getTankUpkeep(id, tankCount);
+        uint256 soldierUpkeep = getSoldierUpkeep(id);
+        uint256 tankUpkeep = getTankUpkeep(id);
         uint256 aircraftCount = fight.getAircraftCount(id);
         uint256 aircraftUpkeep = getAircraftUpkeep(id, aircraftCount);
         uint256 navyUpkeep = getNavyUpkeep(id);
-        uint256 nukeCount = mis.getNukeCount(id);
-        uint256 nukeUpkeep = getNukeUpkeep(id, nukeCount);
-        uint256 cruiseMissileCount = mis.getCruiseMissileCount(id);
+        uint256 nukeUpkeep = getNukeUpkeep(id);
         uint256 cruiseMissileUpkeep = getCruiseMissileUpkeep(
-            id,
-            cruiseMissileCount
+            id
         );
         uint256 dailyMilitaryUpkeep = soldierUpkeep +
             tankUpkeep +
@@ -331,26 +326,26 @@ contract BillsContract is Ownable {
     }
 
     function getSoldierUpkeep(
-        uint256 id,
-        uint256 soldierCount
+        uint256 id
     ) public view returns (uint256) {
+        uint256 soldierCount = frc.getSoldierCount(id);
         uint256 soldierUpkeep = (soldierCount * 2);
         uint256 soldierUpkeepModifier = 100;
         bool lead = res.viewLead(id);
         if (lead) {
-            soldierUpkeepModifier -= 20;
+            soldierUpkeepModifier -= 15;
         }
         bool pigs = res.viewPigs(id);
         if (pigs) {
-            soldierUpkeepModifier -= 25;
+            soldierUpkeepModifier -= 10;
         }
         uint256 barracks = imp1.getBarracksCount(id);
         if (barracks > 0) {
-            soldierUpkeepModifier -= (10 * barracks);
+            soldierUpkeepModifier -= (8 * barracks);
         }
         uint256 guerillaCamps = imp2.getGuerillaCampCount(id);
         if (guerillaCamps > 0) {
-            soldierUpkeepModifier -= (10 * guerillaCamps);
+            soldierUpkeepModifier -= (5 * guerillaCamps);
         }
         uint256 adjustedSoldierUpkeep = ((soldierUpkeep *
             soldierUpkeepModifier) / 100);
@@ -358,31 +353,31 @@ contract BillsContract is Ownable {
     }
 
     function getTankUpkeep(
-        uint256 id,
-        uint256 tankCount
+        uint256 id
     ) public view returns (uint256) {
+        uint256 tankCount = frc.getTankCount(id);
         uint256 tankUpkeep = (tankCount * 40);
         uint256 tankUpkeepModifier = 100;
         bool iron = res.viewIron(id);
         if (iron) {
-            tankUpkeepModifier -= 5;
+            tankUpkeepModifier -= 10;
         }
         bool oil = res.viewOil(id);
         if (oil) {
-            tankUpkeepModifier -= 5;
+            tankUpkeepModifier -= 10;
         }
         bool logisticalSupport = won4.getSuperiorLogisticalSupport(id);
         if (logisticalSupport) {
-            tankUpkeepModifier -= 5;
+            tankUpkeepModifier -= 20;
         }
         uint256 adjustedTankUpkeep = ((tankUpkeep * tankUpkeepModifier) / 100);
         return adjustedTankUpkeep;
     }
 
     function getNukeUpkeep(
-        uint256 id,
-        uint256 nukeCount
+        uint256 id
     ) public view returns (uint256) {
+        uint256 nukeCount = mis.getNukeCount(id);
         uint256 nukeUpkeep = (nukeCount * 5000);
         uint256 nukeUpkeepModifier = 100;
         bool lead = res.viewLead(id);
@@ -398,10 +393,10 @@ contract BillsContract is Ownable {
     }
 
     function getCruiseMissileUpkeep(
-        uint256 id,
-        uint256 missileCount
+        uint256 id
     ) public view returns (uint256) {
-        uint256 missileUpkeep = (missileCount * 500);
+        uint256 cruiseMissileCount = mis.getCruiseMissileCount(id);
+        uint256 missileUpkeep = (cruiseMissileCount * 500);
         uint256 missileUpkeepModifier = 100;
         bool lead = res.viewLead(id);
         if (lead) {
