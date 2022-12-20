@@ -567,12 +567,6 @@ contract InfrastructureContract is Ownable {
         return population;
     }
 
-    function getTaxablePopulationCount(uint256 id) public view returns (uint256) {
-        uint256 totalPop = getTotalPopulationCount(id);
-        uint256 criminals = crim.getCriminalCount(id);
-        return (totalPop - criminals);
-    }
-
     function getAdditionalPopulationModifierPoints(uint256 id)
         internal
         view
@@ -604,6 +598,12 @@ contract InfrastructureContract is Ownable {
             additionalPoints += 3;
         } 
         return additionalPoints;
+    }
+
+    function getTaxablePopulationCount(uint256 id) public view returns (uint256) {
+        uint256 totalPop = getTotalPopulationCount(id);
+        uint256 criminals = crim.getCriminalCount(id);
+        return (totalPop - criminals);
     }
 
     function transferLandAndTech(
