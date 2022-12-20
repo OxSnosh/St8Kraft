@@ -695,7 +695,8 @@ describe("Aid Contract", async function () {
             aidcontract.address,
             warcontract.address,
             treasurycontract.address,
-            missilescontract.address
+            missilescontract.address,
+            navalactionscontract.address
         )
 
         landmarketcontract.settings(
@@ -731,6 +732,9 @@ describe("Aid Contract", async function () {
             navalactionscontract.address,
             additionalnavycontract.address
         )
+        navycontract.settings2(
+            countryminter.address
+        )
         
         navalactionscontract.settings(
             navalblockadecontract.address,
@@ -739,6 +743,14 @@ describe("Aid Contract", async function () {
             keepercontract.address,
             navycontract.address,
             countryminter.address
+        )
+
+        additionalnavycontract.settings(
+            navycontract.address,
+            navalactionscontract.address,
+            militarycontract.address,
+            wonderscontract1.address,
+            improvementscontract4.address
         )
 
         navalblockadecontract.settings(
@@ -952,7 +964,7 @@ describe("Aid Contract", async function () {
         it("aid1 tests acceptProposal() function", async function () {
             await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
             await aidcontract.connect(signer2).acceptProposal(0);
-            await expect((await forcescontract.getSoldierCount(1)).toNumber()).to.equal(4000);
+            await expect((await forcescontract.getSoldierCount(1)).toNumber()).to.equal(4020);
             await expect((await infrastructurecontract.getTechnologyCount(1)).toNumber()).to.equal(100);
             await expect((await (await treasurycontract.checkBalance(1)))).to.equal(BigInt("7999999999999999899336704"));
         })
@@ -1001,7 +1013,7 @@ describe("Aid Contract", async function () {
             await expect(aidcontract.connect(signer2).acceptProposal(0)).to.be.revertedWith("proposal expired");
         })
 
-        it("aid1 tests acceptProposal() function reverts when proposal expires", async function () {
+        it("aid1 tests acceptProposal() function reverts when proposal is cancelled", async function () {
             await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
             await aidcontract.connect(signer1).cancelAid(0);
             let array = await aidcontract.checkCancelledOrAccepted(0);
@@ -1015,7 +1027,7 @@ describe("Aid Contract", async function () {
             await expect(aidcontract.connect(signer2).acceptProposal(0)).to.be.revertedWith("this offer has been accepted already");
         })
 
-        it("aid1 tests acceptProposal() function reverts when proposal aleady accepted", async function () {
+        it("aid1 tests acceptProposal() function reverts when proposal is deficient", async function () {
             await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
             await treasurycontract.connect(signer1).withdrawFunds(BigInt(99999999*(10**18)), 0);
             await expect(aidcontract.connect(signer2).acceptProposal(0)).to.be.revertedWith("not enough funds for this porposal");

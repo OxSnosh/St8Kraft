@@ -716,7 +716,8 @@ describe("Senate Contract", async function () {
             aidcontract.address,
             warcontract.address,
             treasurycontract.address,
-            missilescontract.address
+            missilescontract.address,
+            navalactionscontract.address
         )
 
         landmarketcontract.settings(
@@ -752,6 +753,9 @@ describe("Senate Contract", async function () {
             navalactionscontract.address,
             additionalnavycontract.address
         )
+        navycontract.settings2(
+            countryminter.address
+        )
         
         navalactionscontract.settings(
             navalblockadecontract.address,
@@ -760,6 +764,14 @@ describe("Senate Contract", async function () {
             keepercontract.address,
             navycontract.address,
             countryminter.address
+        )
+
+        additionalnavycontract.settings(
+            navycontract.address,
+            navalactionscontract.address,
+            militarycontract.address,
+            wonderscontract1.address,
+            improvementscontract4.address
         )
 
         navalblockadecontract.settings(

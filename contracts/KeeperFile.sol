@@ -6,6 +6,7 @@ import "./Aid.sol";
 import "./War.sol";
 import "./Treasury.sol";
 import "./Forces.sol";
+import "./Navy.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract KeeperContract is Ownable {
@@ -14,19 +15,22 @@ contract KeeperContract is Ownable {
     address warContract;
     address treasury;
     address missiles;
+    address navalActions;
 
     NukeContract nuke;
     AidContract aid;
     WarContract war;
     TreasuryContract tres;
     MissilesContract miss;
+    NavalActionsContract navAct;
 
     function settings (
         address _nukes,
         address _aid,
         address _war,
         address _treasury,
-        address _missiles
+        address _missiles,
+        address _navalActions
     ) public onlyOwner {
         nukes = _nukes;
         nuke = NukeContract(_nukes);
@@ -38,6 +42,8 @@ contract KeeperContract is Ownable {
         tres = TreasuryContract(_treasury);
         missiles = _missiles;
         miss = MissilesContract(_missiles);
+        navalActions = _navalActions;
+        navAct = NavalActionsContract(_navalActions);
     }
 
     function keeperFunctionToCall() public {
@@ -47,6 +53,7 @@ contract KeeperContract is Ownable {
         resetCruiseMissileLaunches();
         incrementDaysSince();
         resetNukesPurchasedToday();
+        resetActionsToday();
     }
 
     function keeperFunctionToCallManually() public onlyOwner {
@@ -56,6 +63,7 @@ contract KeeperContract is Ownable {
         resetCruiseMissileLaunches();
         incrementDaysSince();
         resetNukesPurchasedToday();
+        resetActionsToday();
     }
 
     function shiftNukeDays() internal {
@@ -88,5 +96,13 @@ contract KeeperContract is Ownable {
 
     function resetNukesPurchasedTodayByOwner() public onlyOwner {
         miss.resetNukesPurchasedToday();
+    }
+
+    function resetActionsToday() internal {
+        navAct.resetActionsToday();
+    }
+
+    function resetActionsTodayByOwner() public onlyOwner {
+        navAct.resetActionsToday();
     }
 }

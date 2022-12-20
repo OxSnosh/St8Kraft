@@ -131,9 +131,9 @@ contract NavyContract is Ownable {
     address public military;
     address public nukes;
     address public wonders1;
+    address public countryMinter;
     address public navalActions;
     address public additionalNavy;
-    address public countryMinter;
     uint256 public corvetteCost = 300000;
     uint256 public landingShipCost = 300000;
     uint256 public battleshipCost = 300000;
@@ -195,6 +195,11 @@ contract NavyContract is Ownable {
         navAct = NavalActionsContract(_navalActions);
         additionalNavy = _additionalNavy;
         addNav = AdditionalNavyContract(_additionalNavy);
+    }
+
+    function settings2(address _countryMinter) public onlyOwner {
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
     }
 
     function generateNavy(uint256 id) public {
@@ -287,7 +292,7 @@ contract NavyContract is Ownable {
 
     function buyCorvette(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         uint256 availablePurchases = addNav.getAvailablePurchases(id);
         require(
             amount <= availablePurchases,
@@ -324,7 +329,7 @@ contract NavyContract is Ownable {
 
     function buyLandingShip(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         uint256 availablePurchases = addNav.getAvailablePurchases(id);
         require(
             amount <= availablePurchases,
@@ -361,7 +366,7 @@ contract NavyContract is Ownable {
 
     function buyBattleship(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         uint256 availablePurchases = addNav.getAvailablePurchases(id);
         require(
             amount <= availablePurchases,
@@ -398,7 +403,7 @@ contract NavyContract is Ownable {
 
     function buyCruiser(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         uint256 availablePurchases = addNav.getAvailablePurchases(id);
         require(
             amount <= availablePurchases,
@@ -435,7 +440,7 @@ contract NavyContract is Ownable {
 
     function buyFrigate(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         uint256 availablePurchases = addNav.getAvailablePurchases(id);
         require(
             amount <= availablePurchases,
@@ -476,7 +481,7 @@ contract NavyContract is Ownable {
 
     function buyDestroyer(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         uint256 availablePurchases = addNav.getAvailablePurchases(id);
         require(
             amount <= availablePurchases,
@@ -517,7 +522,7 @@ contract NavyContract is Ownable {
 
     function buySubmarine(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         uint256 availablePurchases = addNav.getAvailablePurchases(id);
         require(
             amount <= availablePurchases,
@@ -558,7 +563,7 @@ contract NavyContract is Ownable {
 
     function buyAircraftCarrier(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         uint256 availablePurchases = addNav.getAvailablePurchases(id);
         require(
             amount <= availablePurchases,
@@ -602,10 +607,9 @@ contract NavyContract is Ownable {
         _;
     }
 
-    function decreaseNavyFromNukeContract(uint256 defenderId)
-        public
-        onlyNukeContract
-    {
+    function decreaseNavyFromNukeContract(
+        uint256 defenderId
+    ) public onlyNukeContract {
         //corvettes, landing ships, cruisers, frigates
         uint256 corvetteCount = idToNavy[defenderId].corvetteCount;
         uint256 landingShipCount = idToNavy[defenderId].landingShipCount;
@@ -625,7 +629,6 @@ contract NavyContract is Ownable {
         idToNavy[defenderId].frigateCount -= ((frigateCount * percentage) /
             100);
     }
-
 }
 
 contract AdditionalNavyContract is Ownable {
@@ -641,7 +644,13 @@ contract AdditionalNavyContract is Ownable {
     WondersContract1 won1;
     ImprovementsContract4 imp4;
 
-    function setting (address _navy, address _navalActions, address _military, address _wonders1, address _improvements4) public onlyOwner {
+    function settings(
+        address _navy,
+        address _navalActions,
+        address _military,
+        address _wonders1,
+        address _improvements4
+    ) public onlyOwner {
         navy = _navy;
         nav = NavyContract(_navy);
         navalActions = _navalActions;
@@ -692,11 +701,9 @@ contract AdditionalNavyContract is Ownable {
         return blockadeCapableShips;
     }
 
-    function getBreakBlockadeCapableShips(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
+    function getBreakBlockadeCapableShips(
+        uint256 id
+    ) public view returns (uint256) {
         uint256 battleships = nav.getBattleshipCount(id);
         uint256 cruisers = nav.getCruiserCount(id);
         uint256 frigates = nav.getFrigateCount(id);
@@ -708,11 +715,9 @@ contract AdditionalNavyContract is Ownable {
         return breakBlockadeCapableShips;
     }
 
-    function getVesselCountForDrydock(uint256 countryId)
-        public
-        view
-        returns (uint256 count)
-    {
+    function getVesselCountForDrydock(
+        uint256 countryId
+    ) public view returns (uint256 count) {
         uint256 corvetteAmount = nav.getCorvetteCount(countryId);
         uint256 battleshipAmount = nav.getBattleshipCount(countryId);
         uint256 cruiserAmount = nav.getCruiserCount(countryId);
@@ -724,11 +729,9 @@ contract AdditionalNavyContract is Ownable {
         return shipCount;
     }
 
-    function getVesselCountForShipyard(uint256 countryId)
-        public
-        view
-        returns (uint256 count)
-    {
+    function getVesselCountForShipyard(
+        uint256 countryId
+    ) public view returns (uint256 count) {
         uint256 landingShipAmount = nav.getLandingShipCount(countryId);
         uint256 frigateAmount = nav.getFrigateCount(countryId);
         uint256 submarineAmount = nav.getSubmarineCount(countryId);

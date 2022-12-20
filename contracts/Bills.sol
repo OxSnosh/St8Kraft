@@ -309,8 +309,7 @@ contract BillsContract is Ownable {
     ) public view returns (uint256 militaryBills) {
         uint256 soldierUpkeep = getSoldierUpkeep(id);
         uint256 tankUpkeep = getTankUpkeep(id);
-        uint256 aircraftCount = fight.getAircraftCount(id);
-        uint256 aircraftUpkeep = getAircraftUpkeep(id, aircraftCount);
+        uint256 aircraftUpkeep = getAircraftUpkeep(id);
         uint256 navyUpkeep = getNavyUpkeep(id);
         uint256 nukeUpkeep = getNukeUpkeep(id);
         uint256 cruiseMissileUpkeep = getCruiseMissileUpkeep(
@@ -408,9 +407,9 @@ contract BillsContract is Ownable {
     }
 
     function getAircraftUpkeep(
-        uint256 id,
-        uint256 aircraftCount
+        uint256 id
     ) public view returns (uint256) {
+        uint256 aircraftCount = fight.getAircraftCount(id);
         uint256 aircraftUpkeep = (aircraftCount * 200);
         uint256 aircraftUpkeepModifier = 100;
         bool lead = res.viewLead(id);

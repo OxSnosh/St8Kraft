@@ -702,7 +702,8 @@ describe("Taxes Contract", async function () {
             aidcontract.address,
             warcontract.address,
             treasurycontract.address,
-            missilescontract.address
+            missilescontract.address,
+            navalactionscontract.address
         )
 
         landmarketcontract.settings(
@@ -738,6 +739,9 @@ describe("Taxes Contract", async function () {
             navalactionscontract.address,
             additionalnavycontract.address
         )
+        navycontract.settings2(
+            countryminter.address
+        )
         
         navalactionscontract.settings(
             navalblockadecontract.address,
@@ -746,6 +750,14 @@ describe("Taxes Contract", async function () {
             keepercontract.address,
             navycontract.address,
             countryminter.address
+        )
+
+        additionalnavycontract.settings(
+            navycontract.address,
+            navalactionscontract.address,
+            militarycontract.address,
+            wonderscontract1.address,
+            improvementscontract4.address
         )
 
         navalblockadecontract.settings(
@@ -1176,33 +1188,33 @@ describe("Taxes Contract", async function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 15000);
             // const happiness1 = await taxescontract.getHappiness(0)
             // console.log("happiness 1", happiness1.toNumber());
-            // const dailyIncome = await taxescontract.getDailyIncome(0);
+            const dailyIncome = await taxescontract.getDailyIncome(0);
             // console.log("income", dailyIncome.toNumber());
             //banks
             await improvementscontract1.connect(signer1).buyImprovement1(5, 0, 2);
-            // const dailyIncome2 = await taxescontract.getDailyIncome(0);
+            const dailyIncome2 = await taxescontract.getDailyIncome(0);
             // console.log("income2", dailyIncome2.toNumber());
             //ministries
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 1);
-            // const dailyIncome3 = await taxescontract.getDailyIncome(0);
+            const dailyIncome3 = await taxescontract.getDailyIncome(0);
             // console.log("income3", dailyIncome3.toNumber());
             //harbors
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4);
-            // const dailyIncome4 = await taxescontract.getDailyIncome(0);
+            const dailyIncome4 = await taxescontract.getDailyIncome(0);
             // console.log("income4", dailyIncome4.toNumber());
             //schools
             await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 8);
-            // const dailyIncome5 = await taxescontract.getDailyIncome(0);
+            const dailyIncome5 = await taxescontract.getDailyIncome(0);
             // console.log("income5", dailyIncome5.toNumber());
             //guerilla camps
             await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 3)
-            // const dailyIncome6 = await taxescontract.getDailyIncome(0);
+            const dailyIncome6 = await taxescontract.getDailyIncome(0);
             // console.log("income6", dailyIncome6.toNumber());
             //casinos
             await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 7);
             const dailyIncome7 = await taxescontract.getDailyIncome(0);
             // console.log("income7", dailyIncome7.toNumber());
-            expect(dailyIncome7.toNumber()).to.equal(107);
+            expect(dailyIncome7.toNumber()).to.equal(116);
         })
 
         it("taxes1 tests additions to income", async function () {

@@ -987,7 +987,6 @@ contract FightersMarketplace1 is Ownable {
         uint256 balance = TreasuryContract(treasury).checkBalance(id);
         require(balance >= purchasePrice);
         FightersContract(fighters).increaseP51MustangCount(id, amount);
-        FightersContract(fighters).increaseAircraftCount(amount, id);
         TreasuryContract(treasury).spendBalance(id, purchasePrice);
     }
 
@@ -1010,7 +1009,6 @@ contract FightersMarketplace1 is Ownable {
         uint256 balance = TreasuryContract(treasury).checkBalance(id);
         require(balance >= purchasePrice);
         FightersContract(fighters).increaseF86SabreCount(id, amount);
-        FightersContract(fighters).increaseAircraftCount(amount, id);
         TreasuryContract(treasury).spendBalance(id, purchasePrice);
     }
 
@@ -1033,7 +1031,6 @@ contract FightersMarketplace1 is Ownable {
         uint256 balance = TreasuryContract(treasury).checkBalance(id);
         require(balance >= purchasePrice);
         FightersContract(fighters).increaseMig15Count(id, amount);
-        FightersContract(fighters).increaseAircraftCount(amount, id);
         TreasuryContract(treasury).spendBalance(id, purchasePrice);
     }
 
@@ -1056,7 +1053,6 @@ contract FightersMarketplace1 is Ownable {
         uint256 balance = TreasuryContract(treasury).checkBalance(id);
         require(balance >= purchasePrice);
         FightersContract(fighters).increaseF100SuperSabreCount(id, amount);
-        FightersContract(fighters).increaseAircraftCount(amount, id);
         TreasuryContract(treasury).spendBalance(id, purchasePrice);
     }
 
@@ -1263,7 +1259,6 @@ contract FightersMarketplace2 is Ownable {
         uint256 balance = TreasuryContract(treasury).checkBalance(id);
         require(balance >= purchasePrice);
         FightersContract(fighters).increaseF35LightningCount(id, amount);
-        FightersContract(fighters).increaseAircraftCount(amount, id);
         TreasuryContract(treasury).spendBalance(id, purchasePrice);
     }
 
@@ -1286,7 +1281,6 @@ contract FightersMarketplace2 is Ownable {
         uint256 balance = TreasuryContract(treasury).checkBalance(id);
         require(balance >= purchasePrice);
         FightersContract(fighters).increaseF15EagleCount(id, amount);
-        FightersContract(fighters).increaseAircraftCount(amount, id);
         TreasuryContract(treasury).spendBalance(id, purchasePrice);
     }
 
@@ -1309,7 +1303,6 @@ contract FightersMarketplace2 is Ownable {
         uint256 balance = TreasuryContract(treasury).checkBalance(id);
         require(balance >= purchasePrice);
         FightersContract(fighters).increaseSu30MkiCount(id, amount);
-        FightersContract(fighters).increaseAircraftCount(amount, id);
         TreasuryContract(treasury).spendBalance(id, purchasePrice);
     }
 
@@ -1332,7 +1325,6 @@ contract FightersMarketplace2 is Ownable {
         uint256 balance = TreasuryContract(treasury).checkBalance(id);
         require(balance >= purchasePrice);
         FightersContract(fighters).increaseF22RaptorCount(id, amount);
-        FightersContract(fighters).increaseAircraftCount(amount, id);
         TreasuryContract(treasury).spendBalance(id, purchasePrice);
     }
 }
