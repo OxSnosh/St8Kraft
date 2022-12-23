@@ -93,7 +93,7 @@ contract NationStrengthContract is Ownable {
     }
 
     function getNationStrengthFromCommodities(uint256 id)
-        internal
+        public
         view
         returns (uint256)
     {
