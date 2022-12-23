@@ -1018,24 +1018,57 @@ describe("Infrastructure Contract", async function () {
         it("infrastructure tests population modifiers", async function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 980);
             var population = await infrastructurecontract.getTotalPopulationCount(0);
-            console.log(population.toNumber());
+            // console.log(population.toNumber());
+            expect(population.toNumber()).to.equal(8000);
             await resourcescontract.mockResourcesForTesting(0, 0, 1)
             var population = await infrastructurecontract.getTotalPopulationCount(0);
-            console.log(population.toNumber());
+            // console.log(population.toNumber());
+            expect(population.toNumber()).to.equal(8400);
             await resourcescontract.mockResourcesForTesting(0, 0, 3)
             var population = await infrastructurecontract.getTotalPopulationCount(0);
-            console.log(population.toNumber());
+            // console.log(population.toNumber());
+            expect(population.toNumber()).to.equal(8640);
             await resourcescontract.mockResourcesForTesting(0, 0, 12)
             var population = await infrastructurecontract.getTotalPopulationCount(0);
-            console.log(population.toNumber());
+            // console.log(population.toNumber());
+            expect(population.toNumber()).to.equal(8320);
             await resourcescontract.mockResourcesForTesting(0, 0, 16)
             var population = await infrastructurecontract.getTotalPopulationCount(0);
-            console.log(population.toNumber());
+            // console.log(population.toNumber());
+            expect(population.toNumber()).to.equal(8240);
             await resourcescontract.mockResourcesForTesting(0, 0, 19)
             var population = await infrastructurecontract.getTotalPopulationCount(0);
-            console.log(population.toNumber());
+            // console.log(population.toNumber());
+            expect(population.toNumber()).to.equal(8640);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5)
+            var population = await infrastructurecontract.getTotalPopulationCount(0);
+            // console.log(population.toNumber());
+            expect(population.toNumber()).to.equal(8480);
+            await improvementscontract1.connect(signer1).buyImprovement1(4, 0, 9)
+            var population = await infrastructurecontract.getTotalPopulationCount(0);
+            // console.log(population.toNumber());
+            expect(population.toNumber()).to.equal(9120);
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 5)
+            var population = await infrastructurecontract.getTotalPopulationCount(0);
+            // console.log(population.toNumber());
+            expect(population.toNumber()).to.equal(9600);
+            await wonderscontract1.connect(signer1).buyWonder1(0, 4)
+            var population = await infrastructurecontract.getTotalPopulationCount(0);
+            // console.log(population.toNumber());
+            expect(population.toNumber()).to.equal(9840);
+            await wonderscontract3.connect(signer1).buyWonder3(0, 4)
+            var population = await infrastructurecontract.getTotalPopulationCount(0);
+            // console.log(population.toNumber());
+            expect(population.toNumber()).to.equal(10240);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 15000);
+            await wonderscontract4.connect(signer1).buyWonder4(0, 6);
+            var population = await infrastructurecontract.getTotalPopulationCount(0);
+            // console.log(population.toNumber());
+            expect(population.toNumber()).to.equal(167680);
+            await wonderscontract3.connect(signer1).buyWonder3(0, 3);
+            var population = await infrastructurecontract.getTotalPopulationCount(0);
+            // console.log(population.toNumber());
+            expect(population.toNumber()).to.equal(174080);
         })
-
-
     })
 })
