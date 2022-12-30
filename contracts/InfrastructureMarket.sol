@@ -60,10 +60,38 @@ contract InfrastructureMarketContract is Ownable {
     function buyInfrastructure(uint256 id, uint256 buyAmount) public {
         bool owner = mint.checkOwnership(id, msg.sender);
         require(owner, "!nation owner");
+        uint256 costPerLevel = getInfrastructureCostPerLevel(id);
+        uint256 cost = buyAmount * costPerLevel;
+        inf.increaseInfrastructureFromMarket(id, buyAmount);
+        tsy.spendBalance(id, cost);
+    }
+
+    function getInfrastructureCostPerLevel(
+        uint256 id
+    ) public view returns (uint256) {
+        uint256 grossCost;
         uint256 currentInfrastructureAmount = inf.getInfrastructureCount(id);
-        uint256 grossCostPerLevel = getInfrastructureCostPerLevel(
-            currentInfrastructureAmount
-        );
+        if (currentInfrastructureAmount < 20) {
+            grossCost = 500;
+        } else if (currentInfrastructureAmount < 100) {
+            grossCost = ((currentInfrastructureAmount * 12) + 500);
+        } else if (currentInfrastructureAmount < 200) {
+            grossCost = ((currentInfrastructureAmount * 15) + 500);
+        } else if (currentInfrastructureAmount < 1000) {
+            grossCost = ((currentInfrastructureAmount * 20) + 500);
+        } else if (currentInfrastructureAmount < 3000) {
+            grossCost = ((currentInfrastructureAmount * 25) + 500);
+        } else if (currentInfrastructureAmount < 4000) {
+            grossCost = ((currentInfrastructureAmount * 30) + 500);
+        } else if (currentInfrastructureAmount < 5000) {
+            grossCost = ((currentInfrastructureAmount * 40) + 500);
+        } else if (currentInfrastructureAmount < 8000) {
+            grossCost = ((currentInfrastructureAmount * 60) + 500);
+        } else if (currentInfrastructureAmount < 15000) {
+            grossCost = ((currentInfrastructureAmount * 70) + 500);
+        } else {
+            grossCost = ((currentInfrastructureAmount * 80) + 500);
+        }
         uint256 costAdjustments1 = getInfrastructureCostMultiplier1(id);
         uint256 costAdjustments2 = getInfrastructureCostMultiplier2(id);
         uint256 costAdjustments3 = getInfrastructureCostMultiplier3(id);
@@ -71,46 +99,8 @@ contract InfrastructureMarketContract is Ownable {
             costAdjustments2 +
             costAdjustments3);
         uint256 multiplier = (100 - adjustments);
-        //check amount of zeros below
-        uint256 adjustedCostPerLevel = ((grossCostPerLevel * multiplier));
-        uint256 cost = buyAmount * adjustedCostPerLevel;
-        inf.increaseInfrastructureFromMarket(id, buyAmount);
-        tsy.spendBalance(id, cost);
-    }
-
-    function getInfrastructureCostPerLevel(
-        uint256 currentInfrastructureAmount
-    ) public pure returns (uint256) {
-        if (currentInfrastructureAmount < 20) {
-            return 500;
-        } else if (currentInfrastructureAmount < 100) {
-            uint256 grossCost = ((currentInfrastructureAmount * 12) + 500);
-            return grossCost;
-        } else if (currentInfrastructureAmount < 200) {
-            uint256 grossCost = ((currentInfrastructureAmount * 15) + 500);
-            return grossCost;
-        } else if (currentInfrastructureAmount < 1000) {
-            uint256 grossCost = ((currentInfrastructureAmount * 20) + 500);
-            return grossCost;
-        } else if (currentInfrastructureAmount < 3000) {
-            uint256 grossCost = ((currentInfrastructureAmount * 25) + 500);
-            return grossCost;
-        } else if (currentInfrastructureAmount < 4000) {
-            uint256 grossCost = ((currentInfrastructureAmount * 30) + 500);
-            return grossCost;
-        } else if (currentInfrastructureAmount < 5000) {
-            uint256 grossCost = ((currentInfrastructureAmount * 40) + 500);
-            return grossCost;
-        } else if (currentInfrastructureAmount < 8000) {
-            uint256 grossCost = ((currentInfrastructureAmount * 60) + 500);
-            return grossCost;
-        } else if (currentInfrastructureAmount < 15000) {
-            uint256 grossCost = ((currentInfrastructureAmount * 70) + 500);
-            return grossCost;
-        } else {
-            uint256 grossCost = ((currentInfrastructureAmount * 80) + 500);
-            return grossCost;
-        }
+        uint256 adjustedCostPerLevel = ((grossCost * multiplier));
+        return adjustedCostPerLevel * (10**18);
     }
 
     function getInfrastructureCostMultiplier1(

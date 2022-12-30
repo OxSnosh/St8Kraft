@@ -54,8 +54,9 @@ import {
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
+import { BigNumber } from "ethers";
 
-describe("ResourcesContract", async function () {
+describe("Infrastructure Market Contract", async function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -109,6 +110,9 @@ describe("ResourcesContract", async function () {
     let signer0: SignerWithAddress
     let signer1: SignerWithAddress
     let signer2: SignerWithAddress
+    let signer3: SignerWithAddress
+    let signer4: SignerWithAddress
+    let signer5: SignerWithAddress
     let signers: SignerWithAddress[]
     let addrs
 
@@ -120,6 +124,9 @@ describe("ResourcesContract", async function () {
         signer0 = signers[0];
         signer1 = signers[1];
         signer2 = signers[2];
+        signer3 = signers[3];
+        signer4 = signers[4];
+        signer5 = signers[5];
         
         let chainId: any
         chainId = network.config.chainId
@@ -928,108 +935,34 @@ describe("ResourcesContract", async function () {
             countryminter.address
         )
 
-        // console.log("country 1");
         await countryminter.connect(signer1).generateCountry(
             "TestRuler",
             "TestNationName",
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        const tx1 = await resourcescontract.fulfillRequest(0);
-        let txReceipt1 = await tx1.wait(1);
-        let requestId1 = txReceipt1?.events?.[1].args?.requestId;
-        // console.log("requestId", (txReceipt1.events?.[1].args?.requestId).toNumber());
-        await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, resourcescontract.address);
-        let resources1 = await resourcescontract.getPlayerResources(0);
-        // console.log("resources", resources1[0].toNumber(), resources1[1].toNumber());
-        
-        // console.log("country 2");
-        await countryminter.connect(signer2).generateCountry(
-            "TestRuler2",
-            "TestNationName2",
-            "TestCapitalCity2",
-            "TestNationSlogan2"
-        )
-        const tx2 = await resourcescontract.fulfillRequest(1);
-        let txReceipt2 = await tx2.wait(1);
-        let requestId2 = txReceipt2?.events?.[1].args?.requestId;
-        // console.log("requestId", (txReceipt2.events?.[1].args?.requestId).toNumber());
-        await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, resourcescontract.address);
-        let resources2 = await resourcescontract.getPlayerResources(1);
-        // console.log("resources", resources2[0].toNumber(), resources2[1].toNumber());
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(3000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(3000000000*(10**18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(2000000000*(10**18)), 0);
     });
 
-    describe("Resources Setup", function () {
-        it("Tests that two resources were randomly selected and set to true", async function () {
-            var wheat1 = await resourcescontract.viewWheat(0);
-            expect(wheat1).to.equal(true);
-            var oil1 = await resourcescontract.viewOil(0);
-            expect(oil1).to.equal(true);
-            var fish1 = await resourcescontract.viewFish(0);
-            expect(fish1).to.equal(false);
-
-            var gems2 = await resourcescontract.viewGems(1);
-            expect(gems2).to.equal(true);
-            var water2 = await resourcescontract.viewWater(1);
-            expect(water2).to.equal(true);
-            var coal2 = await resourcescontract.viewCoal(1);
-            expect(coal2).to.equal(false);
-        });
-    });
-
-    describe("Accept Trading Partner", function () {
-        it("Test that partners recieve each others resources", async function () {
-            await resourcescontract.connect(signer1).proposeTrade(0, 1);
-            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
-            var wheat1 = await resourcescontract.viewWheat(0);
-            expect(wheat1).to.equal(true);
-            var oil1 = await resourcescontract.viewOil(0);
-            expect(oil1).to.equal(true)
-            var gems1 = await resourcescontract.viewGems(0);
-            expect(gems1).to.equal(true);
-            var water1 = await resourcescontract.viewWater(0);
-            expect(water1).to.equal(true);
-            var wheat2 = await resourcescontract.viewWheat(1);
-            expect(wheat2).to.equal(true);
-            var oil2 = await resourcescontract.viewOil(1);
-            expect(oil2).to.equal(true)
-            var gems2 = await resourcescontract.viewGems(1);
-            expect(gems2).to.equal(true);
-            var water2 = await resourcescontract.viewWater(1);
-            expect(water2).to.equal(true);
-        })
-    })
-
-    describe("Remove Trading Partners", async function () {
-        it("Nation one in a trade can remove the trade", async function () {
-            await resourcescontract.connect(signer1).proposeTrade(0, 1);
-            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
-            var nation1TradingPartnersFirst = await resourcescontract.getTradingPartners(0);
-            expect(nation1TradingPartnersFirst.length).to.equal(1);
-            await resourcescontract.connect(signer1).removeTradingPartner(0, 1);
-            var nation1TradingPartners = await resourcescontract.getTradingPartners(0);
-            expect(nation1TradingPartners.length).to.equal(0);
+    describe("Infrastructure Market", function () {
+        it("inf market tests that buyInfrastructure() works", async function () {
+            var inf = await infrastructurecontract.getInfrastructureCount(0);
+            // console.log(inf.toNumber(), "inf amount initial");
+            expect(inf.toNumber()).to.equal(20);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 100);
+            var inf = await infrastructurecontract.getInfrastructureCount(0);
+            // console.log(inf.toNumber(), "inf amount updated");
+            expect(inf.toNumber()).to.equal(120);
         })
 
-        it("Nation two in a trade can remove the trade", async function () {
-            await resourcescontract.connect(signer1).proposeTrade(0, 1);
-            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
-            var nation1TradingPartnersFirst = await resourcescontract.getTradingPartners(1);
-            expect(nation1TradingPartnersFirst.length).to.equal(1);
-            await resourcescontract.connect(signer2).removeTradingPartner(1, 0);
-            var nation1TradingPartners = await resourcescontract.getTradingPartners(1);
-            expect(nation1TradingPartners.length).to.equal(0);
+        it("inf market tests that buyInfrastructure() rverts if too expensive", async function () {
+            var inf = await infrastructurecontract.getInfrastructureCount(0);
+            // console.log(inf.toNumber(), "inf amount initial");
+            // expect(inf.toNumber()).to.equal(20);
+            await expect(infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000000000)).to.be.reverted;
         })
-    })
-
-    describe("Set Resources", async function () {
-        it("tests that the mock set resources functionality works", async function () {
-            await resourcescontract.mockResourcesForTesting(0, 0, 1);
-            // await resourcescontract.mockResourcesForTesting(0, 1, 2);
-            var resource1 = await resourcescontract.viewAluminium(0);
-            expect(resource1).to.equal(true);
-            var resource2 = await resourcescontract.viewCattle(0);
-            expect(resource2).to.equal(true);
-        })
+    
     })
 })
