@@ -776,7 +776,7 @@ describe("Infrastructure Contract", async function () {
             navalactionscontract.address
         )
 
-        navalattackcontract.settings(
+        await navalattackcontract.settings(
             navycontract.address,
             warcontract.address,
             improvementscontract4.address,
@@ -934,7 +934,7 @@ describe("Infrastructure Contract", async function () {
             wonderscontract3.address,
             countryminter.address
         )
-        
+
         await countryminter.connect(signer1).generateCountry(
             "TestRuler",
             "TestNationName",

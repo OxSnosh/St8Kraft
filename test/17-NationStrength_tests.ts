@@ -776,7 +776,7 @@ describe("Nation Strength Contract", async function () {
             navalactionscontract.address
         )
 
-        navalattackcontract.settings(
+        await navalattackcontract.settings(
             navycontract.address,
             warcontract.address,
             improvementscontract4.address,
