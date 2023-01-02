@@ -60,10 +60,15 @@ contract InfrastructureMarketContract is Ownable {
     function buyInfrastructure(uint256 id, uint256 buyAmount) public {
         bool owner = mint.checkOwnership(id, msg.sender);
         require(owner, "!nation owner");
-        uint256 costPerLevel = getInfrastructureCostPerLevel(id);
-        uint256 cost = buyAmount * costPerLevel;
+        uint256 cost = getInfrastructureCost(id, buyAmount);
         inf.increaseInfrastructureFromMarket(id, buyAmount);
         tsy.spendBalance(id, cost);
+    }
+
+    function getInfrastructureCost(uint256 id, uint256 buyAmount) public view returns (uint256) {
+        uint256 costPerLevel = getInfrastructureCostPerLevel(id);
+        uint256 cost = buyAmount * costPerLevel;
+        return cost;
     }
 
     function getInfrastructureCostPerLevel(
@@ -99,7 +104,7 @@ contract InfrastructureMarketContract is Ownable {
             costAdjustments2 +
             costAdjustments3);
         uint256 multiplier = (100 - adjustments);
-        uint256 adjustedCostPerLevel = ((grossCost * multiplier));
+        uint256 adjustedCostPerLevel = ((grossCost * multiplier) / 100);
         return adjustedCostPerLevel * (10**18);
     }
 

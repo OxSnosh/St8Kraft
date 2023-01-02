@@ -1124,7 +1124,7 @@ describe("Senate Contract", async function () {
     
             // console.log("senators", team7Senators);
 
-            senatecontract.inaugurateTeam7Senators(team7Senators);
+            await senatecontract.inaugurateTeam7Senators(team7Senators);
             
             var isNation7ASenator = await senatecontract.isSenator(7);
             var isNation8ASenator = await senatecontract.isSenator(8);

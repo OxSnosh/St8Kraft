@@ -938,7 +938,7 @@ describe("Improvements", async function () {
         let ownerInitialWarBucksBalance : any = await warbucks.balanceOf(signer0.address);
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(ownerInitialWarBucksBalance));
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(ownerInitialWarBucksBalance));
-        await treasurycontract.connect(signer1).addFunds(50000000, 0);
+        await treasurycontract.connect(signer1).addFunds(BigInt(500000000*(10**18)), 0);
         await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500);
     });
 
@@ -965,8 +965,8 @@ describe("Improvements", async function () {
 
         it("improvement1 tests airport price can be updated", async function () {
             let prices = await improvementscontract1.getCost1();
-            var cost = prices[0];
-            expect(cost.toNumber()).to.equal(100000);
+            var cost : any = prices[0];
+            expect(BigInt(cost).toString()).to.equal("100000000000000000000000");
             await improvementscontract1.connect(signer0).updateAirportCost(100);
             let newPrices = await improvementscontract1.getCost1();
             var newCost = newPrices[0];
@@ -995,8 +995,8 @@ describe("Improvements", async function () {
 
         it("improvement1 tests bank price can be updated", async function () {
             let prices = await improvementscontract1.getCost1();
-            var cost = prices[1];
-            expect(cost.toNumber()).to.equal(100000);
+            var cost : any = prices[1];
+            expect(BigInt(cost).toString()).to.equal("100000000000000000000000");
             await improvementscontract1.connect(signer0).updateBankCost(100);
             let newPrices = await improvementscontract1.getCost1();
             var newCost = newPrices[1];
@@ -1025,8 +1025,8 @@ describe("Improvements", async function () {
 
         it("improvement1 tests barracks price can be updated", async function () {
             let prices = await improvementscontract1.getCost1();
-            var cost = prices[2];
-            expect(cost.toNumber()).to.equal(50000);
+            var cost : any = prices[2];
+            expect(BigInt(cost).toString()).to.equal("50000000000000000000000");
             await improvementscontract1.connect(signer0).updateBarracksCost(100);
             let newPrices = await improvementscontract1.getCost1();
             var newCost = newPrices[2];
@@ -1063,8 +1063,8 @@ describe("Improvements", async function () {
 
         it("improvement1 tests border fortification price can be updated", async function () {
             let prices = await improvementscontract1.getCost1();
-            var cost = prices[3];
-            expect(cost.toNumber()).to.equal(125000);
+            var cost : any = prices[3];
+            expect(BigInt(cost).toString()).to.equal("125000000000000000000000");
             await improvementscontract1.connect(signer0).updateBorderFortificationCost(100);
             let newPrices = await improvementscontract1.getCost1();
             var newCost = newPrices[3];
@@ -1099,8 +1099,8 @@ describe("Improvements", async function () {
 
         it("improvement1 tests border wall price can be updated", async function () {
             let prices = await improvementscontract1.getCost1();
-            var cost = prices[4];
-            expect(cost.toNumber()).to.equal(60000);
+            var cost :any = prices[4];
+            expect(BigInt(cost).toString()).to.equal("60000000000000000000000");
             await improvementscontract1.connect(signer0).updateBorderWallCost(100);
             let newPrices = await improvementscontract1.getCost1();
             var newCost = newPrices[4];
@@ -1138,8 +1138,8 @@ describe("Improvements", async function () {
 
         it("improvement1 tests bunker price can be updated", async function () {
             let prices = await improvementscontract1.getCost1();
-            var cost = prices[5];
-            expect(cost.toNumber()).to.equal(200000);
+            var cost : any = prices[5];
+            expect(BigInt(cost).toString()).to.equal("200000000000000000000000");
             await improvementscontract1.connect(signer0).updateBunkerCost(100);
             let newPrices = await improvementscontract1.getCost1();
             var newCost = newPrices[5];
@@ -1168,8 +1168,8 @@ describe("Improvements", async function () {
 
         it("improvement1 casino price can be updated", async function () {
             let prices = await improvementscontract1.getCost1();
-            var cost = prices[6];
-            expect(cost.toNumber()).to.equal(100000);
+            var cost : any = prices[6];
+            expect(BigInt(cost).toString()).to.equal("100000000000000000000000");
             await improvementscontract1.connect(signer0).updateCasinoCost(100);
             let newPrices = await improvementscontract1.getCost1();
             var newCost = newPrices[6];
@@ -1198,8 +1198,8 @@ describe("Improvements", async function () {
 
         it("improvement1 church price can be updated", async function () {
             let prices = await improvementscontract1.getCost1();
-            var cost = prices[7];
-            expect(cost.toNumber()).to.equal(40000);
+            var cost : any = prices[7];
+            expect(BigInt(cost).toString()).to.equal("40000000000000000000000");
             await improvementscontract1.connect(signer0).updateChurchCost(100);
             let newPrices = await improvementscontract1.getCost1();
             var newCost = newPrices[7];
@@ -1226,8 +1226,8 @@ describe("Improvements", async function () {
 
         it("improvement1 clinic price can be updated", async function () {
             let prices = await improvementscontract1.getCost1();
-            var cost = prices[8];
-            expect(cost.toNumber()).to.equal(50000);
+            var cost : any = prices[8];
+            expect(BigInt(cost).toString()).to.equal("50000000000000000000000");
             await improvementscontract1.connect(signer0).updateClinicCost(100);
             let newPrices = await improvementscontract1.getCost1();
             var newCost = newPrices[8];
@@ -1258,8 +1258,8 @@ describe("Improvements", async function () {
 
         it("improvement1 drydock price can be updated", async function () {
             let prices = await improvementscontract1.getCost1();
-            var cost = prices[9];
-            expect(cost.toNumber()).to.equal(100000);
+            var cost : any = prices[9];
+            expect(BigInt(cost).toString()).to.equal("100000000000000000000000");
             await improvementscontract1.connect(signer0).updateDrydockCost(100);
             let newPrices = await improvementscontract1.getCost1();
             var newCost = newPrices[9];
@@ -1288,8 +1288,8 @@ describe("Improvements", async function () {
 
         it("improvement1 factory price can be updated", async function () {
             let prices = await improvementscontract1.getCost1();
-            var cost = prices[10];
-            expect(cost.toNumber()).to.equal(150000);
+            var cost : any = prices[10];
+            expect(BigInt(cost).toString()).to.equal("150000000000000000000000");
             await improvementscontract1.connect(signer0).updateFactoryCost(100);
             let newPrices = await improvementscontract1.getCost1();
             var newCost = newPrices[10];
@@ -1319,8 +1319,8 @@ describe("Improvements", async function () {
 
         it("improvement2 foreign ministry price can be updated", async function () {
             let prices = await improvementscontract2.getCost2();
-            var cost = prices[0];
-            expect(cost.toNumber()).to.equal(120000);
+            var cost : any = prices[0];
+            expect(BigInt(cost).toString()).to.equal("120000000000000000000000");
             await improvementscontract2.connect(signer0).updateForeignMinistryCost(100);
             let newPrices = await improvementscontract2.getCost2();
             var newCost = newPrices[0];
@@ -1349,8 +1349,8 @@ describe("Improvements", async function () {
 
         it("improvement2 forward operating base price can be updated", async function () {
             let prices = await improvementscontract2.getCost2();
-            var cost = prices[1];
-            expect(cost.toNumber()).to.equal(125000);
+            var cost : any = prices[1];
+            expect(BigInt(cost).toString()).to.equal("125000000000000000000000");
             await improvementscontract2.connect(signer0).updateForwardOperatingBaseCost(100);
             let newPrices = await improvementscontract2.getCost2();
             var newCost = newPrices[1];
@@ -1379,8 +1379,8 @@ describe("Improvements", async function () {
 
         it("improvement2 guerilla camp price can be updated", async function () {
             let prices = await improvementscontract2.getCost2();
-            var cost = prices[2];
-            expect(cost.toNumber()).to.equal(20000);
+            var cost : any = prices[2];
+            expect(BigInt(cost).toString()).to.equal("20000000000000000000000");
             await improvementscontract2.connect(signer0).updateGuerillaCampCost(100);
             let newPrices = await improvementscontract2.getCost2();
             var newCost = newPrices[2];
@@ -1406,8 +1406,8 @@ describe("Improvements", async function () {
 
         it("improvement2 harbor price can be updated", async function () {
             let prices = await improvementscontract2.getCost2();
-            var cost = prices[3];
-            expect(cost.toNumber()).to.equal(200000);
+            var cost : any = prices[3];
+            expect(BigInt(cost).toString()).to.equal("200000000000000000000000")
             await improvementscontract2.connect(signer0).updateHarborCost(100);
             let newPrices = await improvementscontract2.getCost2();
             var newCost = newPrices[3];
@@ -1436,8 +1436,8 @@ describe("Improvements", async function () {
 
         it("improvement2 hospital price can be updated", async function () {
             let prices = await improvementscontract2.getCost2();
-            var cost = prices[4];
-            expect(cost.toNumber()).to.equal(180000);
+            var cost : any = prices[4];
+            expect(BigInt(cost).toString()).to.equal("180000000000000000000000");
             await improvementscontract2.connect(signer0).updateHospitalCost(100);
             let newPrices = await improvementscontract2.getCost2();
             var newCost = newPrices[4];
@@ -1466,8 +1466,8 @@ describe("Improvements", async function () {
 
         it("improvement2 intel agency price can be updated", async function () {
             let prices = await improvementscontract2.getCost2();
-            var cost = prices[5];
-            expect(cost.toNumber()).to.equal(38500);
+            var cost : any = prices[5];
+            expect(BigInt(cost).toString()).to.equal("38500000000000000000000")
             await improvementscontract2.connect(signer0).updateIntelligenceAgencyCost(100);
             let newPrices = await improvementscontract2.getCost2();
             var newCost = newPrices[5];
@@ -1496,8 +1496,8 @@ describe("Improvements", async function () {
 
         it("improvement2 jail price can be updated", async function () {
             let prices = await improvementscontract2.getCost2();
-            var cost = prices[6];
-            expect(cost.toNumber()).to.equal(25000);
+            var cost : any = prices[6];
+            expect(BigInt(cost).toString()).to.equal("25000000000000000000000");
             await improvementscontract2.connect(signer0).updateJailCost(100);
             let newPrices = await improvementscontract2.getCost2();
             var newCost = newPrices[6];
@@ -1526,8 +1526,8 @@ describe("Improvements", async function () {
 
         it("improvement2 labor camp price can be updated", async function () {
             let prices = await improvementscontract2.getCost2();
-            var cost = prices[7];
-            expect(cost.toNumber()).to.equal(150000);
+            var cost : any = prices[7];
+            expect(BigInt(cost).toString()).to.equal("150000000000000000000000")
             await improvementscontract2.connect(signer0).updateLaborCampCost(100);
             let newPrices = await improvementscontract2.getCost2();
             var newCost = newPrices[7];
@@ -1558,8 +1558,8 @@ describe("Improvements", async function () {
 
         it("improvement4 missile defense price can be updated", async function () {
             let prices = await improvementscontract4.getCost4();
-            var cost = prices[0];
-            expect(cost.toNumber()).to.equal(90000);
+            var cost : any = prices[0];
+            expect(BigInt(cost).toString()).to.equal("90000000000000000000000")
             await improvementscontract4.connect(signer0).updateMissileDefenseCost(100);
             let newPrices = await improvementscontract4.getCost4();
             var newCost = newPrices[0];
@@ -1592,8 +1592,8 @@ describe("Improvements", async function () {
 
         it("improvement4 munitions factory price can be updated", async function () {
             let prices = await improvementscontract4.getCost4();
-            var cost = prices[1];
-            expect(cost.toNumber()).to.equal(200000);
+            var cost : any = prices[1];
+            expect(BigInt(cost).toString()).to.equal("200000000000000000000000")
             await improvementscontract4.connect(signer0).updateMunitionsFactoryCost(100);
             let newPrices = await improvementscontract4.getCost4();
             var newCost = newPrices[1];
@@ -1625,8 +1625,8 @@ describe("Improvements", async function () {
 
         it("improvement4 naval academy price can be updated", async function () {
             let prices = await improvementscontract4.getCost4();
-            var cost = prices[2];
-            expect(cost.toNumber()).to.equal(300000);
+            var cost : any = prices[2];
+            expect(BigInt(cost).toString()).to.equal("300000000000000000000000");
             await improvementscontract4.connect(signer0).updateNavalAcademyCost(100);
             let newPrices = await improvementscontract4.getCost4();
             var newCost = newPrices[2];
@@ -1658,8 +1658,8 @@ describe("Improvements", async function () {
 
         it("improvement4 naval construction yard price can be updated", async function () {
             let prices = await improvementscontract4.getCost4();
-            var cost = prices[3];
-            expect(cost.toNumber()).to.equal(300000);
+            var cost : any = prices[3];
+            expect(BigInt(cost).toString()).to.equal("300000000000000000000000");
             await improvementscontract4.connect(signer0).updateNavalConstructionYardCost(100);
             let newPrices = await improvementscontract4.getCost4();
             var newCost = newPrices[3];
@@ -1693,8 +1693,8 @@ describe("Improvements", async function () {
 
         it("improvement3 office of propaganda price can be updated", async function () {
             let prices = await improvementscontract3.getCost3();
-            var cost = prices[0];
-            expect(cost.toNumber()).to.equal(200000);
+            var cost : any = prices[0];
+            expect(BigInt(cost).toString()).to.equal("200000000000000000000000")
             await improvementscontract3.connect(signer0).updateOfficeOfPropagandaCost(100);
             let newPrices = await improvementscontract3.getCost3();
             var newCost = newPrices[0];
@@ -1723,8 +1723,8 @@ describe("Improvements", async function () {
 
         it("improvement3 police headquarters price can be updated", async function () {
             let prices = await improvementscontract3.getCost3();
-            var cost = prices[1];
-            expect(cost.toNumber()).to.equal(75000);
+            var cost : any = prices[1];
+            expect(BigInt(cost).toString()).to.equal("75000000000000000000000");
             await improvementscontract3.connect(signer0).updatePoliceHeadquartersCost(100);
             let newPrices = await improvementscontract3.getCost3();
             var newCost = newPrices[1];
@@ -1753,8 +1753,8 @@ describe("Improvements", async function () {
 
         it("improvement3 prison price can be updated", async function () {
             let prices = await improvementscontract3.getCost3();
-            var cost = prices[2];
-            expect(cost.toNumber()).to.equal(200000);
+            var cost : any = prices[2];
+            expect(BigInt(cost).toString()).to.equal("200000000000000000000000");
             await improvementscontract3.connect(signer0).updatePrisonCost(100);
             let newPrices = await improvementscontract3.getCost3();
             var newCost = newPrices[2];
@@ -1786,8 +1786,8 @@ describe("Improvements", async function () {
 
         it("improvement3 radiation containment chamber price can be updated", async function () {
             let prices = await improvementscontract3.getCost3();
-            var cost = prices[3];
-            expect(cost.toNumber()).to.equal(200000);
+            var cost : any = prices[3];
+            expect(BigInt(cost).toString()).to.equal("200000000000000000000000");
             await improvementscontract3.connect(signer0).updateRadiationContainmentChamberCost(100);
             let newPrices = await improvementscontract3.getCost3();
             var newCost = newPrices[3];
@@ -1816,8 +1816,8 @@ describe("Improvements", async function () {
 
         it("improvement3 red light district price can be updated", async function () {
             let prices = await improvementscontract3.getCost3();
-            var cost = prices[4];
-            expect(cost.toNumber()).to.equal(50000);
+            var cost : any = prices[4];
+            expect(BigInt(cost).toString()).to.equal("50000000000000000000000");
             await improvementscontract3.connect(signer0).updateRedLightDistrictCost(100);
             let newPrices = await improvementscontract3.getCost3();
             var newCost = newPrices[4];
@@ -1846,8 +1846,8 @@ describe("Improvements", async function () {
 
         it("improvement3 rehabilitation facility price can be updated", async function () {
             let prices = await improvementscontract3.getCost3();
-            var cost = prices[5];
-            expect(cost.toNumber()).to.equal(500000);
+            var cost : any = prices[5];
+            expect(BigInt(cost).toString()).to.equal("500000000000000000000000");
             await improvementscontract3.connect(signer0).updateRehabilitationFacilityCost(100);
             let newPrices = await improvementscontract3.getCost3();
             var newCost = newPrices[5];
@@ -1876,8 +1876,8 @@ describe("Improvements", async function () {
 
         it("improvement3 satellite price can be updated", async function () {
             let prices = await improvementscontract3.getCost3();
-            var cost = prices[6];
-            expect(cost.toNumber()).to.equal(90000);
+            var cost : any = prices[6];
+            expect(BigInt(cost).toString()).to.equal("90000000000000000000000");
             await improvementscontract3.connect(signer0).updateSatelliteCost(100);
             let newPrices = await improvementscontract3.getCost3();
             var newCost = newPrices[6];
@@ -1906,8 +1906,8 @@ describe("Improvements", async function () {
 
         it("improvement3 school price can be updated", async function () {
             let prices = await improvementscontract3.getCost3();
-            var cost = prices[7];
-            expect(cost.toNumber()).to.equal(85000);
+            var cost : any = prices[7];
+            expect(BigInt(cost).toString()).to.equal("85000000000000000000000");
             await improvementscontract3.connect(signer0).updateSchoolCost(100);
             let newPrices = await improvementscontract3.getCost3();
             var newCost = newPrices[7];
@@ -1936,8 +1936,8 @@ describe("Improvements", async function () {
 
         it("improvement3 shipyard price can be updated", async function () {
             let prices = await improvementscontract3.getCost3();
-            var cost = prices[8];
-            expect(cost.toNumber()).to.equal(100000);
+            var cost : any = prices[8];
+            expect(BigInt(cost).toString()).to.equal("100000000000000000000000");
             await improvementscontract3.connect(signer0).updateShipyardCost(100);
             let newPrices = await improvementscontract3.getCost3();
             var newCost = newPrices[8];
@@ -1966,8 +1966,8 @@ describe("Improvements", async function () {
 
         it("improvement3 stadium price can be updated", async function () {
             let prices = await improvementscontract3.getCost3();
-            var cost = prices[9];
-            expect(cost.toNumber()).to.equal(110000);
+            var cost : any = prices[9];
+            expect(BigInt(cost).toString()).to.equal("110000000000000000000000");
             await improvementscontract3.connect(signer0).updateStadiumCost(100);
             let newPrices = await improvementscontract3.getCost3();
             var newCost = newPrices[9];
@@ -1998,8 +1998,8 @@ describe("Improvements", async function () {
 
         it("improvement3 university price can be updated", async function () {
             let prices = await improvementscontract3.getCost3();
-            var cost = prices[10];
-            expect(cost.toNumber()).to.equal(180000);
+            var cost : any = prices[10];
+            expect(BigInt(cost).toString()).to.equal("180000000000000000000000");
             await improvementscontract3.connect(signer0).updateUniversityCost(100);
             let newPrices = await improvementscontract3.getCost3();
             var newCost = newPrices[10];

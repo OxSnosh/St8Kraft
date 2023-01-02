@@ -1037,12 +1037,14 @@ describe("Treasury", async function () {
             let initialTaxRevenue = await treasurycontract.viewTaxRevenues();
             // console.log("Initial Balance", initialTaxRevenue.toNumber());
             expect(initialTaxRevenue.toNumber()).to.equal(0);
-            await warbucks.connect(signer0).approve(warbucks.address, BigInt(500000000*(10**18)));
-            await warbucks.connect(signer0).transfer(signer1.address, BigInt(500000000*(10**18)));
+            await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
+            await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
+            var cost : any = await infrastructuremarketplace.connect(signer1).getInfrastructureCost(0, 100);
+            // console.log(BigInt(cost), "cost");
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 100);
-            let afterTaxRevenue = await treasurycontract.viewTaxRevenues();
+            let afterTaxRevenue : any = await treasurycontract.viewTaxRevenues();
             // console.log("After Transaction Tax Balance", afterTaxRevenue.toNumber());
-            expect(afterTaxRevenue.toNumber()).to.equal(3700000);
+            expect(BigInt(afterTaxRevenue).toString()).to.equal("37000000000000000000000");
         })
 
         it("Tests that the owner can withdraw game taxes from the treasury contract", async function () {

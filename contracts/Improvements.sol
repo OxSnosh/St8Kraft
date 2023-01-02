@@ -17,17 +17,17 @@ contract ImprovementsContract1 is Ownable {
     address public navy;
     address public additionalNavy;
     address public countryMinter;
-    uint256 public airportCost = 100000;
-    uint256 public bankCost = 100000;
-    uint256 public barracksCost = 50000;
-    uint256 public borderFortificationCost = 125000;
-    uint256 public borderWallCost = 60000;
-    uint256 public bunkerCost = 200000;
-    uint256 public casinoCost = 100000;
-    uint256 public churchCost = 40000;
-    uint256 public clinicCost = 50000;
-    uint256 public drydockCost = 100000;
-    uint256 public factoryCost = 150000;
+    uint256 public airportCost = 100000 * (10**18);
+    uint256 public bankCost = 100000 * (10**18);
+    uint256 public barracksCost = 50000 * (10**18);
+    uint256 public borderFortificationCost = 125000 * (10**18);
+    uint256 public borderWallCost = 60000 * (10**18);
+    uint256 public bunkerCost = 200000 * (10**18);
+    uint256 public casinoCost = 100000 * (10**18);
+    uint256 public churchCost = 40000 * (10**18);
+    uint256 public clinicCost = 50000 * (10**18);
+    uint256 public drydockCost = 100000 * (10**18);
+    uint256 public factoryCost = 150000 * (10**18);
 
     WondersContract1 won1;
     CountryMinter mint;
@@ -585,14 +585,14 @@ contract ImprovementsContract2 is Ownable {
     address public forces;
     address public wonders1;
     address public countryMinter;
-    uint256 public foreignMinistryCost = 120000;
-    uint256 public forwardOperatingBaseCost = 125000;
-    uint256 public guerillaCampCost = 20000;
-    uint256 public harborCost = 200000;
-    uint256 public hospitalCost = 180000;
-    uint256 public intelligenceAgencyCost = 38500;
-    uint256 public jailCost = 25000;
-    uint256 public laborCampCost = 150000;
+    uint256 public foreignMinistryCost = 120000 * (10**18);
+    uint256 public forwardOperatingBaseCost = 125000 * (10**18);
+    uint256 public guerillaCampCost = 20000 * (10**18);
+    uint256 public harborCost = 200000 * (10**18);
+    uint256 public hospitalCost = 180000 * (10**18);
+    uint256 public intelligenceAgencyCost = 38500 * (10**18);
+    uint256 public jailCost = 25000 * (10**18);
+    uint256 public laborCampCost = 150000 * (10**18);
 
     WondersContract1 won1;
     CountryMinter mint;
@@ -1119,10 +1119,10 @@ contract ImprovementsContract4 is Ownable {
     address public improvements2;
     address public forces;
     address public countryMinter;
-    uint256 public missileDefenseCost = 90000;
-    uint256 public munitionsFactoryCost = 200000;
-    uint256 public navalAcademyCost = 300000;
-    uint256 public navalConstructionYardCost = 300000;
+    uint256 public missileDefenseCost = 90000 * (10**18);
+    uint256 public munitionsFactoryCost = 200000 * (10**18);
+    uint256 public navalAcademyCost = 300000 * (10**18);
+    uint256 public navalConstructionYardCost = 300000 * (10**18);
 
     WondersContract1 won1;
     ImprovementsContract2 imp2;
@@ -1437,17 +1437,17 @@ contract ImprovementsContract3 is Ownable {
     address public navy;
     address public additionalNavy;
     address public countryMinter;
-    uint256 public officeOfPropagandaCost = 200000;
-    uint256 public policeHeadquartersCost = 75000;
-    uint256 public prisonCost = 200000;
-    uint256 public radiationContainmentChamberCost = 200000;
-    uint256 public redLightDistrictCost = 50000;
-    uint256 public rehabilitationFacilityCost = 500000;
-    uint256 public satteliteCost = 90000;
-    uint256 public schoolCost = 85000;
-    uint256 public shipyardCost = 100000;
-    uint256 public stadiumCost = 110000;
-    uint256 public universityCost = 180000;
+    uint256 public officeOfPropagandaCost = 200000 * (10**18);
+    uint256 public policeHeadquartersCost = 75000 * (10**18);
+    uint256 public prisonCost = 200000 * (10**18);
+    uint256 public radiationContainmentChamberCost = 200000 * (10**18);
+    uint256 public redLightDistrictCost = 50000 * (10**18);
+    uint256 public rehabilitationFacilityCost = 500000 * (10**18);
+    uint256 public satteliteCost = 90000 * (10**18);
+    uint256 public schoolCost = 85000 * (10**18);
+    uint256 public shipyardCost = 100000 * (10**18);
+    uint256 public stadiumCost = 110000 * (10**18);
+    uint256 public universityCost = 180000 * (10**18);
 
     CountryMinter mint;
 

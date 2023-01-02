@@ -151,7 +151,7 @@ contract TreasuryContract is Ownable {
     function spendBalance(uint256 id, uint256 cost) public {
         //need a way to only allow the nation owner to do this
         uint256 balance = idToTreasury[id].balance;
-        require(balance >= cost, "insufficient funds");
+        require(balance >= cost, "insufficient balance");
         idToTreasury[id].balance -= cost;
         //TAXES here
         uint256 taxLevied = ((cost * gameTaxPercentage) / 100);

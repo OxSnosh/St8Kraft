@@ -944,6 +944,8 @@ describe("Aid Contract", async function () {
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(100000000*(10**18)));
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(100000000*(10**18)));
         await treasurycontract.connect(signer1).addFunds(BigInt(100000000*(10**18)), 0);
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(100000000*(10**18)));
+        await treasurycontract.connect(signer2).addFunds(BigInt(100000000*(10**18)), 1);
         await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
         await forcescontract.connect(signer1).buySoldiers(7000, 0);
     });
@@ -965,7 +967,7 @@ describe("Aid Contract", async function () {
             await aidcontract.connect(signer2).acceptProposal(0);
             await expect((await forcescontract.getSoldierCount(1)).toNumber()).to.equal(4020);
             await expect((await infrastructurecontract.getTechnologyCount(1)).toNumber()).to.equal(100);
-            await expect((await (await treasurycontract.checkBalance(1)))).to.equal(BigInt("7999999999999999899336704"));
+            await expect((await (await treasurycontract.checkBalance(1)))).to.equal(BigInt("108000000000000004664066048"));
         })
 
         it("aid1 tests proposeAid() function reverts correctly with slot not available", async function () {
@@ -991,7 +993,7 @@ describe("Aid Contract", async function () {
             await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4001)).to.be.revertedWith("max soldier aid is excedded");            
         })
 
-        it("aid1 tests proposeAid() function reverts when max amount exceeded (no frderal aid)", async function () {
+        it("aid1 tests proposeAid() function doesnt revert with federal aid", async function () {
             await wonderscontract1.connect(signer1).buyWonder1(0, 7);
             await wonderscontract1.connect(signer2).buyWonder1(1, 7);
             await aidcontract.connect(signer1).proposeAid(0, 1, 101, BigInt(6000001*(10**18)), 4001);

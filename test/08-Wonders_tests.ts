@@ -934,9 +934,9 @@ describe("Wonders", async function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        await warbucks.connect(signer0).approve(warbucks.address, BigInt(3000000000*(10**18)));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(3000000000*(10**18)));
-        await treasurycontract.connect(signer1).addFunds(BigInt(2000000000*(10**18)), 0);
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(25000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000*(10**18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(20000000000*(10**18)), 0);
         // await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 10000);
         // await landmarketcontract.connect(signer1).buyLand(0, 10000);
         // await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
@@ -973,8 +973,8 @@ describe("Wonders", async function () {
 
         it("wonder1 tests agriculture development program price can be updated", async function () {
             let prices = await wonderscontract1.getWonderCosts1();
-            var cost = prices[0];
-            expect(cost.toNumber()).to.equal(30000000);
+            var cost : any = prices[0];
+            expect(BigInt(cost).toString()).to.equal("30000000000000000000000000");
             await wonderscontract1.connect(signer0).updateAgricultureDevelopmentCost(100);
             let newPrices = await wonderscontract1.getWonderCosts1();
             var newCost = newPrices[0];
@@ -1004,8 +1004,8 @@ describe("Wonders", async function () {
 
         it("wonder1 tests anti air defense network price can be updated", async function () {
             let prices = await wonderscontract1.getWonderCosts1();
-            var cost = prices[1];
-            expect(cost.toNumber()).to.equal(50000000);
+            var cost : any = prices[1];
+            expect(BigInt(cost).toString()).to.equal("50000000000000000000000000");
             await wonderscontract1.connect(signer0).updateAntiAirDefenseNetworkCost(100);
             let newPrices = await wonderscontract1.getWonderCosts1();
             var newCost = newPrices[1];
@@ -1035,8 +1035,8 @@ describe("Wonders", async function () {
 
         it("wonder1 tests central intelligence agency price can be updated", async function () {
             let prices = await wonderscontract1.getWonderCosts1();
-            var cost = prices[2];
-            expect(cost.toNumber()).to.equal(40000000);
+            var cost : any = prices[2];
+            expect(BigInt(cost).toString()).to.equal("40000000000000000000000000");
             await wonderscontract1.connect(signer0).updateCentralIntelligenceAgencyCost(100);
             let newPrices = await wonderscontract1.getWonderCosts1();
             var newCost = newPrices[2];
@@ -1066,8 +1066,8 @@ describe("Wonders", async function () {
 
         it("wonder1 tests disaster relief agency price can be updated", async function () {
             let prices = await wonderscontract1.getWonderCosts1();
-            var cost = prices[3];
-            expect(cost.toNumber()).to.equal(40000000);
+            var cost : any = prices[3];
+            expect(BigInt(cost).toString()).to.equal("40000000000000000000000000");
             await wonderscontract1.connect(signer0).updateDisasterReliefAgencyCost(100);
             let newPrices = await wonderscontract1.getWonderCosts1();
             var newCost = newPrices[3];
@@ -1110,8 +1110,8 @@ describe("Wonders", async function () {
 
         it("wonder1 tests emp weaponization price can be updated", async function () {
             let prices = await wonderscontract1.getWonderCosts1();
-            var cost = prices[4];
-            expect(cost.toNumber()).to.equal(200000000);
+            var cost : any = prices[4];
+            expect(BigInt(cost).toString()).to.equal("200000000000000000000000000");
             await wonderscontract1.connect(signer0).updateEmpWeaponizationCost(100);
             let newPrices = await wonderscontract1.getWonderCosts1();
             var newCost = newPrices[4];
@@ -1147,8 +1147,8 @@ describe("Wonders", async function () {
 
         it("wonder1 tests fallout shelter system price can be updated", async function () {
             let prices = await wonderscontract1.getWonderCosts1();
-            var cost = prices[5];
-            expect(cost.toNumber()).to.equal(40000000);
+            var cost : any = prices[5];
+            expect(BigInt(cost).toString()).to.equal("40000000000000000000000000");
             await wonderscontract1.connect(signer0).updateFalloutShelterSystemCost(100);
             let newPrices = await wonderscontract1.getWonderCosts1();
             var newCost = newPrices[5];
@@ -1178,8 +1178,8 @@ describe("Wonders", async function () {
 
         it("wonder1 tests federal aid commission price can be updated", async function () {
             let prices = await wonderscontract1.getWonderCosts1();
-            var cost = prices[6];
-            expect(cost.toNumber()).to.equal(25000000);
+            var cost : any = prices[6];
+            expect(BigInt(cost).toString()).to.equal("25000000000000000000000000");
             await wonderscontract1.connect(signer0).updateFederalAidCommissionCost(100);
             let newPrices = await wonderscontract1.getWonderCosts1();
             var newCost = newPrices[6];
@@ -1212,8 +1212,8 @@ describe("Wonders", async function () {
 
         it("wonder1 tests federal reserve price can be updated", async function () {
             let prices = await wonderscontract1.getWonderCosts1();
-            var cost = prices[7];
-            expect(cost.toNumber()).to.equal(100000000);
+            var cost : any = prices[7];
+            expect(BigInt(cost).toString()).to.equal("100000000000000000000000000");
             await wonderscontract1.connect(signer0).updateFederalReserveCost(100);
             let newPrices = await wonderscontract1.getWonderCosts1();
             var newCost = newPrices[7];
@@ -1243,8 +1243,8 @@ describe("Wonders", async function () {
 
         it("wonder1 tests foreign air force base price can be updated", async function () {
             let prices = await wonderscontract1.getWonderCosts1();
-            var cost = prices[8];
-            expect(cost.toNumber()).to.equal(35000000);
+            var cost : any = prices[8];
+            expect(BigInt(cost).toString()).to.equal("35000000000000000000000000");
             await wonderscontract1.connect(signer0).updateForeignAirForceBaseCost(100);
             let newPrices = await wonderscontract1.getWonderCosts1();
             var newCost = newPrices[8];
@@ -1277,8 +1277,8 @@ describe("Wonders", async function () {
 
         it("wonder1 tests foreign army base price can be updated", async function () {
             let prices = await wonderscontract1.getWonderCosts1();
-            var cost = prices[9];
-            expect(cost.toNumber()).to.equal(200000000);
+            var cost : any = prices[9];
+            expect(BigInt(cost).toString()).to.equal("200000000000000000000000000");
             await wonderscontract1.connect(signer0).updateForeignArmyBaseCost(100);
             let newPrices = await wonderscontract1.getWonderCosts1();
             var newCost = newPrices[9];
@@ -1311,8 +1311,8 @@ describe("Wonders", async function () {
 
         it("wonder1 tests foreign navy base price can be updated", async function () {
             let prices = await wonderscontract1.getWonderCosts1();
-            var cost = prices[10];
-            expect(cost.toNumber()).to.equal(200000000);
+            var cost : any = prices[10];
+            expect(BigInt(cost).toString()).to.equal("200000000000000000000000000");
             await wonderscontract1.connect(signer0).updateForeignNavalBaseCost(100);
             let newPrices = await wonderscontract1.getWonderCosts1();
             var newCost = newPrices[10];
@@ -1344,8 +1344,8 @@ describe("Wonders", async function () {
 
         it("wonder2 tests great monument price can be updated", async function () {
             let prices = await wonderscontract2.getWonderCosts2();
-            var cost = prices[0];
-            expect(cost.toNumber()).to.equal(35000000);
+            var cost : any = prices[0];
+            expect(BigInt(cost).toString()).to.equal("35000000000000000000000000");
             await wonderscontract2.connect(signer0).updateGreatMonumentCost(100);
             let newPrices = await wonderscontract2.getWonderCosts2();
             var newCost = newPrices[0];
@@ -1375,8 +1375,8 @@ describe("Wonders", async function () {
 
         it("wonder2 tests great temple price can be updated", async function () {
             let prices = await wonderscontract2.getWonderCosts2();
-            var cost = prices[1];
-            expect(cost.toNumber()).to.equal(35000000);
+            var cost : any = prices[1];
+            expect(BigInt(cost).toString()).to.equal("35000000000000000000000000");
             await wonderscontract2.connect(signer0).updateGreatTempleCost(100);
             let newPrices = await wonderscontract2.getWonderCosts2();
             var newCost = newPrices[1];
@@ -1406,8 +1406,8 @@ describe("Wonders", async function () {
         
         it("wonder2 tests great university price can be updated", async function () {
             let prices = await wonderscontract2.getWonderCosts2();
-            var cost = prices[2];
-            expect(cost.toNumber()).to.equal(35000000);
+            var cost : any = prices[2];
+            expect(BigInt(cost).toString()).to.equal("35000000000000000000000000");
             await wonderscontract2.connect(signer0).updateGreatUniversityCost(100);
             let newPrices = await wonderscontract2.getWonderCosts2();
             var newCost = newPrices[2];
@@ -1437,8 +1437,8 @@ describe("Wonders", async function () {
         
         it("wonder2 tests hidden nuclear missile silo price can be updated", async function () {
             let prices = await wonderscontract2.getWonderCosts2();
-            var cost = prices[3];
-            expect(cost.toNumber()).to.equal(30000000);
+            var cost : any = prices[3];
+            expect(BigInt(cost).toString()).to.equal("30000000000000000000000000");
             await wonderscontract2.connect(signer0).updateHiddenNuclearMissileSiloCost(100);
             let newPrices = await wonderscontract2.getWonderCosts2();
             var newCost = newPrices[3];
@@ -1478,8 +1478,8 @@ describe("Wonders", async function () {
         
         it("wonder2 tests interceptor misile system price can be updated", async function () {
             let prices = await wonderscontract2.getWonderCosts2();
-            var cost = prices[4];
-            expect(cost.toNumber()).to.equal(50000000);
+            var cost : any = prices[4];
+            expect(BigInt(cost).toString()).to.equal("50000000000000000000000000");
             await wonderscontract2.connect(signer0).updateInterceptorMissileSystemCost(100);
             let newPrices = await wonderscontract2.getWonderCosts2();
             var newCost = newPrices[4];
@@ -1509,8 +1509,8 @@ describe("Wonders", async function () {
         
         it("wonder2 tests internet price can be updated", async function () {
             let prices = await wonderscontract2.getWonderCosts2();
-            var cost = prices[5];
-            expect(cost.toNumber()).to.equal(35000000);
+            var cost : any = prices[5];
+            expect(BigInt(cost).toString()).to.equal("35000000000000000000000000");
             await wonderscontract2.connect(signer0).updateInternetCost(100);
             let newPrices = await wonderscontract2.getWonderCosts2();
             var newCost = newPrices[5];
@@ -1540,8 +1540,8 @@ describe("Wonders", async function () {
         
         it("wonder2 tests interstate system price can be updated", async function () {
             let prices = await wonderscontract2.getWonderCosts2();
-            var cost = prices[6];
-            expect(cost.toNumber()).to.equal(45000000);
+            var cost : any = prices[6];
+            expect(BigInt(cost).toString()).to.equal("45000000000000000000000000");
             await wonderscontract2.connect(signer0).updateInterstateSystemCost(100);
             let newPrices = await wonderscontract2.getWonderCosts2();
             var newCost = newPrices[6];
@@ -1577,8 +1577,8 @@ describe("Wonders", async function () {
         
         it("wonder2 tests manhattan project price can be updated", async function () {
             let prices = await wonderscontract2.getWonderCosts2();
-            var cost = prices[7];
-            expect(cost.toNumber()).to.equal(100000000);
+            var cost : any = prices[7];
+            expect(BigInt(cost).toString()).to.equal("100000000000000000000000000");
             await wonderscontract2.connect(signer0).updateManhattanProjectCost(100);
             let newPrices = await wonderscontract2.getWonderCosts2();
             var newCost = newPrices[7];
@@ -1617,8 +1617,8 @@ describe("Wonders", async function () {
         
         it("wonder2 tests mining industry consortium price can be updated", async function () {
             let prices = await wonderscontract2.getWonderCosts2();
-            var cost = prices[8];
-            expect(cost.toNumber()).to.equal(25000000);
+            var cost : any = prices[8];
+            expect(BigInt(cost).toString()).to.equal("25000000000000000000000000");
             await wonderscontract2.connect(signer0).updateMiningIndustryConsortiumCost(100);
             let newPrices = await wonderscontract2.getWonderCosts2();
             var newCost = newPrices[8];
@@ -1650,8 +1650,8 @@ describe("Wonders", async function () {
 
         it("wonder3 tests movie industry price can be updated", async function () {
             let prices = await wonderscontract3.getWonderCosts3();
-            var cost = prices[0];
-            expect(cost.toNumber()).to.equal(26000000);
+            var cost : any = prices[0];
+            expect(BigInt(cost).toString()).to.equal("26000000000000000000000000");
             await wonderscontract3.connect(signer0).updateMovieIndustryCost(100);
             let newPrices = await wonderscontract3.getWonderCosts3();
             var newCost = newPrices[0];
@@ -1687,8 +1687,8 @@ describe("Wonders", async function () {
         
         it("wonder3 tests national cemetary price can be updated", async function () {
             let prices = await wonderscontract3.getWonderCosts3();
-            var cost = prices[1];
-            expect(cost.toNumber()).to.equal(150000000);
+            var cost : any = prices[1];
+            expect(BigInt(cost).toString()).to.equal("150000000000000000000000000");
             await wonderscontract3.connect(signer0).updateNationalCemetaryCost(100);
             let newPrices = await wonderscontract3.getWonderCosts3();
             var newCost = newPrices[1];
@@ -1721,8 +1721,8 @@ describe("Wonders", async function () {
         
         it("wonder3 tests national environmental office can be updated", async function () {
             let prices = await wonderscontract3.getWonderCosts3();
-            var cost = prices[2];
-            expect(cost.toNumber()).to.equal(100000000);
+            var cost : any = prices[2];
+            expect(BigInt(cost).toString()).to.equal("100000000000000000000000000");
             await wonderscontract3.connect(signer0).updateNationalEnvironmentOfficeCost(100);
             let newPrices = await wonderscontract3.getWonderCosts3();
             var newCost = newPrices[2];
@@ -1752,8 +1752,8 @@ describe("Wonders", async function () {
 
         it("wonder3 tests national research lab can be updated", async function () {
             let prices = await wonderscontract3.getWonderCosts3();
-            var cost = prices[3];
-            expect(cost.toNumber()).to.equal(35000000);
+            var cost : any = prices[3];
+            expect(BigInt(cost).toString()).to.equal("35000000000000000000000000");
             await wonderscontract3.connect(signer0).updateNationalResearchLabCost(100);
             let newPrices = await wonderscontract3.getWonderCosts3();
             var newCost = newPrices[3];
@@ -1786,8 +1786,8 @@ describe("Wonders", async function () {
 
         it("wonder3 tests national war memorial can be updated", async function () {
             let prices = await wonderscontract3.getWonderCosts3();
-            var cost = prices[4];
-            expect(cost.toNumber()).to.equal(27000000);
+            var cost : any = prices[4];
+            expect(BigInt(cost).toString()).to.equal("27000000000000000000000000");
             await wonderscontract3.connect(signer0).updateNationalWarMemorialCost(100);
             let newPrices = await wonderscontract3.getWonderCosts3();
             var newCost = newPrices[4];
@@ -1823,8 +1823,8 @@ describe("Wonders", async function () {
 
         it("wonder3 tests nuclear power plant can be updated", async function () {
             let prices = await wonderscontract3.getWonderCosts3();
-            var cost = prices[5];
-            expect(cost.toNumber()).to.equal(75000000);
+            var cost : any = prices[5];
+            expect(BigInt(cost).toString()).to.equal("75000000000000000000000000");
             await wonderscontract3.connect(signer0).updateNuclearPowerPlantCost(100);
             let newPrices = await wonderscontract3.getWonderCosts3();
             var newCost = newPrices[5];
@@ -1854,8 +1854,8 @@ describe("Wonders", async function () {
 
         it("wonder3 tests pentagon can be updated", async function () {
             let prices = await wonderscontract3.getWonderCosts3();
-            var cost = prices[6];
-            expect(cost.toNumber()).to.equal(30000000);
+            var cost : any = prices[6];
+            expect(BigInt(cost).toString()).to.equal("30000000000000000000000000");
             await wonderscontract3.connect(signer0).updatePentagonCost(100);
             let newPrices = await wonderscontract3.getWonderCosts3();
             var newCost = newPrices[6];
@@ -1885,8 +1885,8 @@ describe("Wonders", async function () {
 
         it("wonder3 tests political lobbyists can be updated", async function () {
             let prices = await wonderscontract3.getWonderCosts3();
-            var cost = prices[7];
-            expect(cost.toNumber()).to.equal(50000000);
+            var cost : any = prices[7];
+            expect(BigInt(cost).toString()).to.equal("50000000000000000000000000");
             await wonderscontract3.connect(signer0).updatePoliticalLobbyistsCost(100);
             let newPrices = await wonderscontract3.getWonderCosts3();
             var newCost = newPrices[7];
@@ -1928,8 +1928,8 @@ describe("Wonders", async function () {
 
         it("wonder3 tests scientific development center can be updated", async function () {
             let prices = await wonderscontract3.getWonderCosts3();
-            var cost = prices[8];
-            expect(cost.toNumber()).to.equal(150000000);
+            var cost : any = prices[8];
+            expect(BigInt(cost).toString()).to.equal("150000000000000000000000000");
             await wonderscontract3.connect(signer0).updateScientificDevelopmentCenterCost(100);
             let newPrices = await wonderscontract3.getWonderCosts3();
             var newCost = newPrices[8];
@@ -1961,8 +1961,8 @@ describe("Wonders", async function () {
 
         it("wonder4 tests social security can be updated", async function () {
             let prices = await wonderscontract4.getWonderCosts4();
-            var cost = prices[0];
-            expect(cost.toNumber()).to.equal(40000000);
+            var cost : any = prices[0];
+            expect(BigInt(cost).toString()).to.equal("40000000000000000000000000");
             await wonderscontract4.connect(signer0).updateSocialSecuritySystemCost(100);
             let newPrices = await wonderscontract4.getWonderCosts4();
             var newCost = newPrices[0];
@@ -1992,8 +1992,8 @@ describe("Wonders", async function () {
 
         it("wonder4 tests space program can be updated", async function () {
             let prices = await wonderscontract4.getWonderCosts4();
-            var cost = prices[1];
-            expect(cost.toNumber()).to.equal(30000000);
+            var cost : any = prices[1];
+            expect(BigInt(cost).toString()).to.equal("30000000000000000000000000");
             await wonderscontract4.connect(signer0).updateSpaceProgramCost(100);
             let newPrices = await wonderscontract4.getWonderCosts4();
             var newCost = newPrices[1];
@@ -2023,8 +2023,8 @@ describe("Wonders", async function () {
         
         it("wonder4 tests stock market can be updated", async function () {
             let prices = await wonderscontract4.getWonderCosts4();
-            var cost = prices[2];
-            expect(cost.toNumber()).to.equal(30000000);
+            var cost : any = prices[2];
+            expect(BigInt(cost).toString()).to.equal("30000000000000000000000000");
             await wonderscontract4.connect(signer0).updateStockMarketCost(100);
             let newPrices = await wonderscontract4.getWonderCosts4();
             var newCost = newPrices[2];
@@ -2060,8 +2060,8 @@ describe("Wonders", async function () {
 
         it("wonder4 tests strategic defense initiative can be updated", async function () {
             let prices = await wonderscontract4.getWonderCosts4();
-            var cost = prices[3];
-            expect(cost.toNumber()).to.equal(75000000);
+            var cost : any = prices[3];
+            expect(BigInt(cost).toString()).to.equal("75000000000000000000000000");
             await wonderscontract4.connect(signer0).updateStrategicDefenseInitiativeCost(100);
             let newPrices = await wonderscontract4.getWonderCosts4();
             var newCost = newPrices[3];
@@ -2094,8 +2094,8 @@ describe("Wonders", async function () {
 
         it("wonder4 tests superior logistical support can be updated", async function () {
             let prices = await wonderscontract4.getWonderCosts4();
-            var cost = prices[4];
-            expect(cost.toNumber()).to.equal(80000000);
+            var cost : any = prices[4];
+            expect(BigInt(cost).toString()).to.equal("80000000000000000000000000");
             await wonderscontract4.connect(signer0).updateSuperiorLogisticalSupportCost(100);
             let newPrices = await wonderscontract4.getWonderCosts4();
             var newCost = newPrices[4];
@@ -2136,8 +2136,8 @@ describe("Wonders", async function () {
 
         it("wonder4 tests universal healthcare can be updated", async function () {
             let prices = await wonderscontract4.getWonderCosts4();
-            var cost = prices[5];
-            expect(cost.toNumber()).to.equal(100000000);
+            var cost : any = prices[5];
+            expect(BigInt(cost).toString()).to.equal("100000000000000000000000000");
             await wonderscontract4.connect(signer0).updateUniversalHealthcareCost(100);
             let newPrices = await wonderscontract4.getWonderCosts4();
             var newCost = newPrices[5];
@@ -2179,8 +2179,8 @@ describe("Wonders", async function () {
 
         it("wonder4 tests weapons research center can be updated", async function () {
             let prices = await wonderscontract4.getWonderCosts4();
-            var cost = prices[6];
-            expect(cost.toNumber()).to.equal(150000000);
+            var cost : any = prices[6];
+            expect(BigInt(cost).toString()).to.equal("150000000000000000000000000");
             await wonderscontract4.connect(signer0).updateWeaponsResearchCenterCost(100);
             let newPrices = await wonderscontract4.getWonderCosts4();
             var newCost = newPrices[6];

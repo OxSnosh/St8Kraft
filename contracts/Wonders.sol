@@ -16,17 +16,17 @@ contract WondersContract1 is Ownable {
     address public wondersContract4Address;
     address public infrastructureAddress;
     address public countryMinter;
-    uint256 public agricultureDevelopmentCost = 30000000;
-    uint256 public antiAirDefenseNetworkCost = 50000000;
-    uint256 public centralIntelligenceAgencyCost = 40000000;
-    uint256 public disasterReliefAgencyCost = 40000000;
-    uint256 public empWeaponizationCost = 200000000;
-    uint256 public falloutShelterSystemCost = 40000000;
-    uint256 public federalAidCommissionCost = 25000000;
-    uint256 public federalReserveCost = 100000000;
-    uint256 public foreignAirForceBaseCost = 35000000;
-    uint256 public foreignArmyBaseCost = 200000000;
-    uint256 public foreignNavalBaseCost = 200000000;
+    uint256 public agricultureDevelopmentCost = 30000000 * (10**18);
+    uint256 public antiAirDefenseNetworkCost = 50000000 * (10**18);
+    uint256 public centralIntelligenceAgencyCost = 40000000 * (10**18);
+    uint256 public disasterReliefAgencyCost = 40000000 * (10**18);
+    uint256 public empWeaponizationCost = 200000000 * (10**18);
+    uint256 public falloutShelterSystemCost = 40000000 * (10**18);
+    uint256 public federalAidCommissionCost = 25000000 * (10**18);
+    uint256 public federalReserveCost = 100000000 * (10**18);
+    uint256 public foreignAirForceBaseCost = 35000000 * (10**18);
+    uint256 public foreignArmyBaseCost = 200000000 * (10**18);
+    uint256 public foreignNavalBaseCost = 200000000 * (10**18);
 
     CountryMinter mint;
 
@@ -582,15 +582,15 @@ contract WondersContract2 is Ownable {
     address public wonderContract3Address;
     address public wonderContract4Address;
     address public countryMinter;
-    uint256 public greatMonumentCost = 35000000;
-    uint256 public greatTempleCost = 35000000;
-    uint256 public greatUniversityCost = 35000000;
-    uint256 public hiddenNuclearMissileSiloCost = 30000000;
-    uint256 public interceptorMissileSystemCost = 50000000;
-    uint256 public internetCost = 35000000;
-    uint256 public interstateSystemCost = 45000000;
-    uint256 public manhattanProjectCost = 100000000;
-    uint256 public miningIndustryConsortiumCost = 25000000;
+    uint256 public greatMonumentCost = 35000000 * (10**18);
+    uint256 public greatTempleCost = 35000000 * (10**18);
+    uint256 public greatUniversityCost = 35000000 * (10**18);
+    uint256 public hiddenNuclearMissileSiloCost = 30000000 * (10**18);
+    uint256 public interceptorMissileSystemCost = 50000000 * (10**18);
+    uint256 public internetCost = 35000000 * (10**18);
+    uint256 public interstateSystemCost = 45000000 * (10**18);
+    uint256 public manhattanProjectCost = 100000000 * (10**18);
+    uint256 public miningIndustryConsortiumCost = 25000000 * (10**18);
 
     CountryMinter mint;
 
@@ -1061,15 +1061,15 @@ contract WondersContract3 is Ownable {
     address public wonderContract4Address;
     address public forces;
     address public countryMinter;
-    uint256 public movieIndustryCost = 26000000;
-    uint256 public nationalCemetaryCost = 150000000;
-    uint256 public nationalEnvironmentOfficeCost = 100000000;
-    uint256 public nationalResearchLabCost = 35000000;
-    uint256 public nationalWarMemorialCost = 27000000;
-    uint256 public nuclearPowerPlantCost = 75000000;
-    uint256 public pentagonCost = 30000000;
-    uint256 public politicalLobbyistsCost = 50000000;
-    uint256 public scientificDevelopmentCenterCost = 150000000;
+    uint256 public movieIndustryCost = 26000000 * (10**18);
+    uint256 public nationalCemetaryCost = 150000000 * (10**18);
+    uint256 public nationalEnvironmentOfficeCost = 100000000 * (10**18);
+    uint256 public nationalResearchLabCost = 35000000 * (10**18);
+    uint256 public nationalWarMemorialCost = 27000000 * (10**18);
+    uint256 public nuclearPowerPlantCost = 75000000 * (10**18);
+    uint256 public pentagonCost = 30000000 * (10**18);
+    uint256 public politicalLobbyistsCost = 50000000 * (10**18);
+    uint256 public scientificDevelopmentCenterCost = 150000000 * (10**18);
 
     ForcesContract frc;
     CountryMinter mint;
@@ -1573,13 +1573,13 @@ contract WondersContract4 is Ownable {
     address public wonderContract1Address;
     address public wonderContract3Address;
     address public countryMinter;
-    uint256 public socialSecuritySystemCost = 40000000;
-    uint256 public spaceProgramCost = 30000000;
-    uint256 public stockMarketCost = 30000000;
-    uint256 public strategicDefenseInitiativeCost = 75000000;
-    uint256 public superiorLogisticalSupportCost = 80000000;
-    uint256 public universalHealthcareCost = 100000000;
-    uint256 public weaponsResearchCenterCost = 150000000;
+    uint256 public socialSecuritySystemCost = 40000000 * (10**18);
+    uint256 public spaceProgramCost = 30000000 * (10**18);
+    uint256 public stockMarketCost = 30000000 * (10**18);
+    uint256 public strategicDefenseInitiativeCost = 75000000 * (10**18);
+    uint256 public superiorLogisticalSupportCost = 80000000 * (10**18);
+    uint256 public universalHealthcareCost = 100000000 * (10**18);
+    uint256 public weaponsResearchCenterCost = 150000000 * (10**18);
 
     CountryMinter mint;
 
