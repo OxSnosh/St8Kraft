@@ -59,79 +59,86 @@ contract TechnologyMarketContract is Ownable {
     function buyTech(uint256 id, uint256 amount) public {
         bool owner = mint.checkOwnership(id, msg.sender);
         require(owner, "!nation owner");
-        uint256 currentTechAmount = inf.getTechnologyCount(id);
-        uint256 baseCostPerTechLevel = getBaseTechCost(currentTechAmount);
-        uint256 costMultiplier = getTechCostMultiplier(id);
-        uint256 adjustedCostPerLevel = (baseCostPerTechLevel * costMultiplier);
-        uint256 cost = amount * adjustedCostPerLevel;
+        uint256 cost = getTechCost(id, amount);
         inf.increaseTechnologyFromMarket(id, amount);
         tsy.spendBalance(id, cost);
     }
 
-    function getBaseTechCost(uint256 currentTechAmount)
+    function getTechCost(uint256 id, uint256 amount) public view returns (uint256) {
+        uint256 costPerLevel = getTechCostPerLevel(id);
+        uint256 cost = (costPerLevel * amount);
+        return cost;
+    }
+
+    function getTechCostPerLevel(uint256 id)
         public
-        pure
+        view
         returns (uint256)
     {
+        uint256 currentTechAmount = inf.getTechnologyCount(id);
+        uint256 baseCostPerLevel; 
         if (currentTechAmount < 5) {
-            return 100;
+            baseCostPerLevel = 100 * (10 ** 18);
         } else if (currentTechAmount < 8) {
-            return 120;
+            baseCostPerLevel = 120 * (10 ** 18);
         } else if (currentTechAmount < 10) {
-            return 130;
+            baseCostPerLevel = 130 * (10 ** 18);
         } else if (currentTechAmount < 15) {
-            return 140;
+            baseCostPerLevel = 140 * (10 ** 18);
         } else if (currentTechAmount < 30) {
-            return 160;
+            baseCostPerLevel = 160 * (10 ** 18);
         } else if (currentTechAmount < 50) {
-            return 180;
+            baseCostPerLevel = 180 * (10 ** 18);
         } else if (currentTechAmount < 75) {
-            return 200;
+            baseCostPerLevel = 200 * (10 ** 18);
         } else if (currentTechAmount < 100) {
-            return 220;
+            baseCostPerLevel = 220 * (10 ** 18);
         } else if (currentTechAmount < 150) {
-            return 240;
+            baseCostPerLevel = 240 * (10 ** 18);
         } else if (currentTechAmount < 200) {
-            return 260;
+            baseCostPerLevel = 260 * (10 ** 18);
         } else if (currentTechAmount < 250) {
-            return 300;
+            baseCostPerLevel = 300 * (10 ** 18);
         } else if (currentTechAmount < 300) {
-            return 400;
+            baseCostPerLevel = 400 * (10 ** 18);
         } else if (currentTechAmount < 400) {
-            return 500;
+            baseCostPerLevel = 500 * (10 ** 18);
         } else if (currentTechAmount < 500) {
-            return 600;
+            baseCostPerLevel = 600 * (10 ** 18);
         } else if (currentTechAmount < 600) {
-            return 700;
+            baseCostPerLevel = 700 * (10 ** 18);
         } else if (currentTechAmount < 700) {
-            return 800;
+            baseCostPerLevel = 800 * (10 ** 18);
         } else if (currentTechAmount < 1000) {
-            return 1100;
+            baseCostPerLevel = 1100 * (10 ** 18);
         } else if (currentTechAmount < 2000) {
-            return 1600;
+            baseCostPerLevel = 1600 * (10 ** 18);
         } else if (currentTechAmount < 3000) {
-            return 2100;
+            baseCostPerLevel = 2100 * (10 ** 18);
         } else if (currentTechAmount < 4000) {
-            return 2600;
+            baseCostPerLevel = 2600 * (10 ** 18);
         } else if (currentTechAmount < 5000) {
-            return 3100;
+            baseCostPerLevel = 3100 * (10 ** 18);
         } else if (currentTechAmount < 6000) {
-            return 3600;
+            baseCostPerLevel = 3600 * (10 ** 18);
         } else if (currentTechAmount < 7000) {
-            return 4100;
+            baseCostPerLevel = 4100 * (10 ** 18);
         } else if (currentTechAmount < 8000) {
-            return 4600;
+            baseCostPerLevel = 4600 * (10 ** 18);
         } else if (currentTechAmount < 9000) {
-            return 5100;
+            baseCostPerLevel = 5100 * (10 ** 18);
         } else if (currentTechAmount < 10000) {
-            return 5600;
+            baseCostPerLevel = 5600 * (10 ** 18);
         } else if (currentTechAmount < 15000) {
-            return 6600;
+            baseCostPerLevel = 6600 * (10 ** 18);
         } else if (currentTechAmount < 20000) {
-            return 7600;
+            baseCostPerLevel = 7600 * (10 ** 18);
         } else {
-            return 8600;
+            baseCostPerLevel = 8600 * (10 ** 18);
         }
+        uint256 costMultiplier = getTechCostMultiplier(id);
+        uint256 costPerLevel = ((baseCostPerLevel * costMultiplier) / 100);
+        return costPerLevel;
     }
 
     function getTechCostMultiplier(uint256 id) public view returns (uint256) {

@@ -947,7 +947,7 @@ describe("Nation Strength Contract", async function () {
     });
 
     describe("Nation Strength", function () {
-        it("strength1 tests strength from commodities", async function () {
+        it("strength1 tests strength", async function () {
             var strength = await nationstrengthcontract.getNationStrength(0);
             // console.log(strength.toNumber(), "strength initial");
             expect(strength.toNumber()).to.equal(90);
@@ -982,9 +982,26 @@ describe("Nation Strength Contract", async function () {
             await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 10);
             await navycontract.connect(signer1).buyDestroyer(1, 0);
             var strength = await nationstrengthcontract.getNationStrength(0);
-            // console.log(strength.toNumber(), "strength after navy");
             expect(strength.toNumber()).to.equal(7250);
-
+            await technologymarketcontrat.connect(signer1).buyTech(0, 31000);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000);
+            await resourcescontract.mockResourcesForTesting(0, 17, 18);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            var strength = await nationstrengthcontract.getNationStrength(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            var strength = await nationstrengthcontract.getNationStrength(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            var strength = await nationstrengthcontract.getNationStrength(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            var strength = await nationstrengthcontract.getNationStrength(0);
+            await keepercontract.resetNukesPurchasedTodayByOwner();
+            await missilescontract.connect(signer1).buyNukes(0);
+            var strength = await nationstrengthcontract.getNationStrength(0);
+            expect(strength.toNumber()).to.equal(168500);
         })
     
     })

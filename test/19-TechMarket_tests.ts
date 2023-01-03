@@ -56,7 +56,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-wit
 import { networkConfig } from "../helper-hardhat-config"
 import { BigNumber } from "ethers";
 
-describe("Infrastructure Contract", async function () {
+describe("Technology Market Contract", async function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -941,133 +941,166 @@ describe("Infrastructure Contract", async function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        await warbucks.connect(signer0).approve(warbucks.address, BigInt(3000000000*(10**18)));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(3000000000*(10**18)));
-        await treasurycontract.connect(signer1).addFunds(BigInt(2000000000*(10**18)), 0);
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(25000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000*(10**18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(20000000000*(10**18)), 0);
     });
 
-    describe("Infrastructure", function () {
-        it("infrastructure get infrastructure function works correctly", async function () {
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200);
-            var infrastructureAmount = await infrastructurecontract.getInfrastructureCount(0);
-            expect(infrastructureAmount.toNumber()).to.equal(220);
-        })
-
-        it("infrastructure get technology function works correctly", async function () {
-            await technologymarketcontrat.connect(signer1).buyTech(0, 200);
+    describe("Technology Market", function () {
+        it("tech market tests that buyTech() works", async function () {
             var tech = await infrastructurecontract.getTechnologyCount(0);
-            expect(tech.toNumber()).to.equal(200);
+            // console.log(tech.toNumber());
+            expect(tech.toNumber()).to.equal(0);
+            await technologymarketcontrat.connect(signer1).buyTech(0, 50);
+            var tech = await infrastructurecontract.getTechnologyCount(0);
+            // console.log(tech.toNumber());
+            expect(tech.toNumber()).to.equal(50);
         })
 
-        it("infrastructure get land function works correctly", async function () {
-            await landmarketcontract.connect(signer1).buyLand(0, 200);
-            var land = await infrastructurecontract.getLandCount(0);
-            expect(land.toNumber()).to.equal(220);
+        it("tech market tests that tech cost per level works correctly", async function () {
+            var costPerLevel : any = await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("100000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 5);
+            var costPerLevel : any = await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("120000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 3);
+            var costPerLevel : any  = await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("130000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 2);
+            var costPerLevel : any = await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("140000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 5);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("160000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 15);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("180000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 20);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("200000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 25);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("220000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 25);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("240000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 50);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("260000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 50);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("300000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 50);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("400000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 50);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("500000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 100);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("600000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 100);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("700000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 100);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("800000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 100);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("1100000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 300);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("1600000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("2100000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("2600000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("3100000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("3600000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("4100000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("4600000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("5100000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("5600000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("6600000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 5000);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("7600000000000000000000")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 5000);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("8600000000000000000000")
         })
 
-        it("infrastructure tests setTaxRate() and getTaxRate() function", async function () {
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200);
-            var taxes : any = await taxescontract.getTaxesCollectible(0);
-            var taxRate = await infrastructurecontract.getTaxRate(0);
-            // console.log("taxes collectible = ", BigInt(taxes[1]/(10**18)));
-            // console.log(" at a rate of ", taxRate.toNumber(), "%");
-            await infrastructurecontract.connect(signer1).setTaxRate(0, 28);
-            var taxes : any = await taxescontract.getTaxesCollectible(0);
-            var taxRate = await infrastructurecontract.getTaxRate(0);
-            // console.log("taxes collectible = ", BigInt(taxes[1]/(10**18)));
-            // console.log(" at a rate of ", taxRate.toNumber(), "%");
-        })
-
-        it("infrastructure tests checkIfCollectionNeeded function works", async function () {
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200);
-            var collectionNeeded = await infrastructurecontract.checkIfCollectionNeededToChangeRate(0);
-            expect(collectionNeeded).to.equal(false);
-        })
-
-        it("infrastructure tests land modifiers", async function () {
-            await landmarketcontract.connect(signer1).buyLand(0, 2980);
-            var land = await infrastructurecontract.getLandCount(0);
-            var areaOfInfluence = await infrastructurecontract.getAreaOfInfluence(0);
-            // console.log("land", land.toNumber(), areaOfInfluence.toNumber(), "area");
-            expect(land.toNumber()).to.equal(3000);
-            await resourcescontract.mockResourcesForTesting(0, 2, 3);
-            var land = await infrastructurecontract.getLandCount(0);
-            var areaOfInfluence = await infrastructurecontract.getAreaOfInfluence(0);
-            // console.log("land", land.toNumber(), areaOfInfluence.toNumber(), "area");
-            expect(areaOfInfluence.toNumber()).to.equal(3450);
-            await resourcescontract.mockResourcesForTesting(0, 13, 3);
-            var land = await infrastructurecontract.getLandCount(0);
-            var areaOfInfluence = await infrastructurecontract.getAreaOfInfluence(0);
-            // console.log("land", land.toNumber(), areaOfInfluence.toNumber(), "area");
-            expect(areaOfInfluence.toNumber()).to.equal(3600);
-            await resourcescontract.mockResourcesForTesting(0, 15, 3);
-            var land = await infrastructurecontract.getLandCount(0);
-            var areaOfInfluence = await infrastructurecontract.getAreaOfInfluence(0);
-            // console.log("land", land.toNumber(), areaOfInfluence.toNumber(), "area");
-            expect(areaOfInfluence.toNumber()).to.equal(3240);
-            await resourcescontract.mockResourcesForTesting(0, 8, 3);
+        it("tech market tests that tech cost multipliers work correctly", async function () {
             await technologymarketcontrat.connect(signer1).buyTech(0, 500);
-            await wonderscontract1.connect(signer1).buyWonder1(0, 1);
-            var land = await infrastructurecontract.getLandCount(0);
-            var areaOfInfluence = await infrastructurecontract.getAreaOfInfluence(0);
-            // console.log("land", land.toNumber(), areaOfInfluence.toNumber(), "area");
-            expect(areaOfInfluence.toNumber()).to.equal(3450);
-        })
-
-        it("infrastructure tests population modifiers", async function () {
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 980);
-            var population = await infrastructurecontract.getTotalPopulationCount(0);
-            // console.log(population.toNumber());
-            expect(population.toNumber()).to.equal(8000);
-            await resourcescontract.mockResourcesForTesting(0, 0, 1)
-            var population = await infrastructurecontract.getTotalPopulationCount(0);
-            // console.log(population.toNumber());
-            expect(population.toNumber()).to.equal(8400);
-            await resourcescontract.mockResourcesForTesting(0, 0, 3)
-            var population = await infrastructurecontract.getTotalPopulationCount(0);
-            // console.log(population.toNumber());
-            expect(population.toNumber()).to.equal(8640);
-            await resourcescontract.mockResourcesForTesting(0, 0, 12)
-            var population = await infrastructurecontract.getTotalPopulationCount(0);
-            // console.log(population.toNumber());
-            expect(population.toNumber()).to.equal(8320);
-            await resourcescontract.mockResourcesForTesting(0, 0, 16)
-            var population = await infrastructurecontract.getTotalPopulationCount(0);
-            // console.log(population.toNumber());
-            expect(population.toNumber()).to.equal(8240);
-            await resourcescontract.mockResourcesForTesting(0, 0, 19)
-            var population = await infrastructurecontract.getTotalPopulationCount(0);
-            // console.log(population.toNumber());
-            expect(population.toNumber()).to.equal(8640);
-            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5)
-            var population = await infrastructurecontract.getTotalPopulationCount(0);
-            // console.log(population.toNumber());
-            expect(population.toNumber()).to.equal(8480);
-            await improvementscontract1.connect(signer1).buyImprovement1(4, 0, 9)
-            var population = await infrastructurecontract.getTotalPopulationCount(0);
-            // console.log(population.toNumber());
-            expect(population.toNumber()).to.equal(9120);
-            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 5)
-            var population = await infrastructurecontract.getTotalPopulationCount(0);
-            // console.log(population.toNumber());
-            expect(population.toNumber()).to.equal(9600);
-            await wonderscontract1.connect(signer1).buyWonder1(0, 4)
-            var population = await infrastructurecontract.getTotalPopulationCount(0);
-            // console.log(population.toNumber());
-            expect(population.toNumber()).to.equal(9840);
-            await wonderscontract3.connect(signer1).buyWonder3(0, 4)
-            var population = await infrastructurecontract.getTotalPopulationCount(0);
-            // console.log(population.toNumber());
-            expect(population.toNumber()).to.equal(10240);
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 15000);
-            await wonderscontract4.connect(signer1).buyWonder4(0, 6);
-            var population = await infrastructurecontract.getTotalPopulationCount(0);
-            // console.log(population.toNumber());
-            expect(population.toNumber()).to.equal(167680);
-            await wonderscontract3.connect(signer1).buyWonder3(0, 3);
-            var population = await infrastructurecontract.getTotalPopulationCount(0);
-            // console.log(population.toNumber());
-            expect(population.toNumber()).to.equal(174080);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("700000000000000000000")
+            await resourcescontract.mockResourcesForTesting(0, 0, 6);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("665000000000000000000")
+            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 8)
+            await improvementscontract3.connect(signer1).buyImprovement3(2, 0, 11)
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("525000000000000000000")
+            await wonderscontract2.connect(signer1).buyWonder2(0, 3);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("455000000000000000000")
+            await wonderscontract3.connect(signer1).buyWonder3(0, 4);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("434000000000000000000")
+            await wonderscontract4.connect(signer1).buyWonder4(0, 2);
+            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
+            // console.log(BigInt(costPerLevel).toString())
+            expect(BigInt(costPerLevel).toString()).to.equal("413000000000000000000")
         })
     })
 })

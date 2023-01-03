@@ -84,7 +84,7 @@ contract InfrastructureMarketContract is Ownable {
             grossCost = ((currentInfrastructureAmount * 15) + 500);
         } else if (currentInfrastructureAmount < 1000) {
             grossCost = ((currentInfrastructureAmount * 20) + 500);
-        } else if (currentInfrastructureAmount < 3000) {
+        } else if (currentInfrastructureAmount < 2000) {
             grossCost = ((currentInfrastructureAmount * 25) + 500);
         } else if (currentInfrastructureAmount < 4000) {
             grossCost = ((currentInfrastructureAmount * 30) + 500);

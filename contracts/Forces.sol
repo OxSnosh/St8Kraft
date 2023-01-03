@@ -869,7 +869,7 @@ contract MissilesContract is Ownable {
 
     function resetNukesPurchasedToday() public onlyKeeper {
         uint256 countryCount = mint.getCountryCount();
-        for(uint i = 0; i < countryCount -1; i++) {
+        for(uint i = 0; i < countryCount; i++) {
             idToMissiles[i].nukesPurchasedToday = 0;
         }
     }

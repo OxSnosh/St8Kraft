@@ -941,9 +941,9 @@ describe("Bills Contract", async function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        await warbucks.connect(signer0).approve(warbucks.address, BigInt(3000000000*(10**18)));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(3000000000*(10**18)));
-        await treasurycontract.connect(signer1).addFunds(BigInt(2000000000*(10**18)), 0);
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(25000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000*(10**18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(20000000000*(10**18)), 0);
 
         await countryminter.connect(signer2).generateCountry(
             "TestRuler2",
@@ -990,14 +990,14 @@ describe("Bills Contract", async function () {
             // expect(BigInt(billsPayable/(10**18)).toString()).to.equal("25875");
             const startingBalance : any = await treasurycontract.checkBalance(0);
             // console.log("starting balance", BigInt(startingBalance/(10**18)));
-            expect(BigInt(startingBalance/(10**18)).toString()).to.equal("2002000000");
+            expect(BigInt(startingBalance/(10**18)).toString()).to.equal("20001852000");
             const initialBillsPayable : any = await billscontract.getBillsPayable(0);
             // console.log("updated bills payable", BigInt(initialBillsPayable/(10**18)));
             expect(BigInt(initialBillsPayable/(10**18)).toString()).to.equal("7300");
             await billscontract.connect(signer1).payBills(0);
             const endingBalance : any = await treasurycontract.checkBalance(0);
             // console.log("ending balance", endingBalance/(10**18));
-            expect((endingBalance/(10**18)).toString()).to.equal("2001992700.0000002");
+            expect((endingBalance/(10**18)).toString()).to.equal("20001844700");
             const updatedBillsPayable : any = await billscontract.getBillsPayable(0);
             // console.log("updated bills payable", BigInt(updatedBillsPayable/(10**18)));
             expect(BigInt(updatedBillsPayable/(10**18)).toString()).to.equal("0");
@@ -1265,12 +1265,12 @@ describe("Bills Contract", async function () {
             expect(upkeep.toNumber()).to.equal(137250);
             await resourcescontract.mockResourcesForTesting(0, 8, 11);
             var upkeep = await billscontract.getNavyUpkeep(0);
-            console.log(upkeep.toNumber());
+            // console.log(upkeep.toNumber());
             expect(upkeep.toNumber()).to.equal(98000);
             await wonderscontract3.connect(signer1).buyWonder3(0, 7);
             await wonderscontract4.connect(signer1).buyWonder4(0, 5);
             var upkeep = await billscontract.getNavyUpkeep(0);
-            console.log(upkeep.toNumber());
+            // console.log(upkeep.toNumber());
             expect(upkeep.toNumber()).to.equal(84000);
         })
     })
@@ -1298,7 +1298,7 @@ describe("Bills Contract", async function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 12000);
             await wonderscontract3.connect(signer1).buyWonder3(0, 6);
             var upkeep : any = await billscontract.calculateDailyBillsFromImprovements(0);
-            console.log("this", BigInt(upkeep/(10**18)))
+            // console.log("this", BigInt(upkeep/(10**18)))
             expect(BigInt(upkeep/(10**18)).toString()).to.equal("16245");           
         })
         it("bills4 tests wonder increment bills correctly", async function () {

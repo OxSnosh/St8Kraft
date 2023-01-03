@@ -941,9 +941,9 @@ describe("Taxes Contract", async function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        await warbucks.connect(signer0).approve(warbucks.address, BigInt(3000000000*(10**18)));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(3000000000*(10**18)));
-        await treasurycontract.connect(signer1).addFunds(BigInt(2000000000*(10**18)), 0);
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(25000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000*(10**18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(20000000000*(10**18)), 0);
 
         await countryminter.connect(signer2).generateCountry(
             "TestRuler2",
@@ -1006,11 +1006,11 @@ describe("Taxes Contract", async function () {
             expect(BigInt(taxesCollectible[1]/(10**18)).toString()).to.equal("25875");
             const startingBalance : any = await treasurycontract.checkBalance(0);
             // console.log("starting balance", BigInt(startingBalance/(10**18)));
-            expect(BigInt(startingBalance/(10**18)).toString()).to.equal("2002000000");
+            expect(BigInt(startingBalance/(10**18)).toString()).to.equal("20001852000");
             await taxescontract.connect(signer1).collectTaxes(0);
             const endingBalance : any = await treasurycontract.checkBalance(0);
             // console.log("ending balance", BigInt(endingBalance/(10**18)));
-            expect(BigInt(endingBalance/(10**18)).toString()).to.equal("2002025875");
+            expect(BigInt(endingBalance/(10**18)).toString()).to.equal("20001877875");
             const updatedTaxesCollectible : any = await taxescontract.getTaxesCollectible(0);
             // console.log("updated taxes collectible", BigInt(updatedTaxesCollectible[1]/(10**18)));
             expect(updatedTaxesCollectible[1]).to.equal(0);
@@ -1078,7 +1078,6 @@ describe("Taxes Contract", async function () {
             // const happiness1 = await taxescontract.getHappiness(0)
             // console.log("happiness 1", happiness1.toNumber());
             await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 12000);
             await wonderscontract3.connect(signer1).buyWonder3(0, 6);
             // const nukeHappiness = await additionaltaxescontract.getNuclearAndUraniumBonus(0);
             // console.log(nukeHappiness.toNumber(), "happiness from nuke / uranium");

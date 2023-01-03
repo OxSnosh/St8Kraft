@@ -941,9 +941,9 @@ describe("Infrastructure Market Contract", async function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        await warbucks.connect(signer0).approve(warbucks.address, BigInt(3000000000*(10**18)));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(3000000000*(10**18)));
-        await treasurycontract.connect(signer1).addFunds(BigInt(2000000000*(10**18)), 0);
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(25000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000*(10**18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(20000000000*(10**18)), 0);
     });
 
     describe("Infrastructure Market", function () {
@@ -963,6 +963,93 @@ describe("Infrastructure Market Contract", async function () {
             // expect(inf.toNumber()).to.equal(20);
             await expect(infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000000000)).to.be.reverted;
         })
-    
+
+
+        it("inf market tests that infrastructure cost per level works correctly", async function () {
+            var inf = await infrastructurecontract.getInfrastructureCount(0);
+            // console.log(inf.toNumber(), "inf level");
+            var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log(BigInt(costPerLevel/(10**18)).toString(), "cost per level");
+            expect(BigInt(costPerLevel).toString()).to.equal("740000000000000000000")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 80);
+            var inf = await infrastructurecontract.getInfrastructureCount(0);
+            // console.log(inf.toNumber(), "inf level");
+            var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log(BigInt(costPerLevel/(10**18)).toString(), "cost per level");
+            expect(BigInt(costPerLevel).toString()).to.equal("2000000000000000000000")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 100);
+            var inf = await infrastructurecontract.getInfrastructureCount(0);
+            // console.log(inf.toNumber(), "inf level");
+            var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log(BigInt(costPerLevel/(10**18)).toString(), "cost per level");
+            expect(BigInt(costPerLevel).toString()).to.equal("4500000000000000000000")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 800);
+            var inf = await infrastructurecontract.getInfrastructureCount(0);
+            // console.log(inf.toNumber(), "inf level");
+            var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log(BigInt(costPerLevel/(10**18)).toString(), "cost per level");
+            expect(BigInt(costPerLevel).toString()).to.equal("25500000000000000000000")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
+            var inf = await infrastructurecontract.getInfrastructureCount(0);
+            // console.log(inf.toNumber(), "inf level");
+            var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log(BigInt(costPerLevel/(10**18)).toString(), "cost per level");
+            expect(BigInt(costPerLevel).toString()).to.equal("60500000000000000000000")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000);
+            var inf = await infrastructurecontract.getInfrastructureCount(0);
+            // console.log(inf.toNumber(), "inf level");
+            var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log(BigInt(costPerLevel/(10**18)).toString(), "cost per level");
+            expect(BigInt(costPerLevel).toString()).to.equal("160500000000000000000000")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
+            var inf = await infrastructurecontract.getInfrastructureCount(0);
+            // console.log(inf.toNumber(), "inf level");
+            var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log(BigInt(costPerLevel/(10**18)).toString(), "cost per level");
+            expect(BigInt(costPerLevel).toString()).to.equal("300500000000000000000000")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 3000);
+            var inf = await infrastructurecontract.getInfrastructureCount(0);
+            // console.log(inf.toNumber(), "inf level");
+            var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log(BigInt(costPerLevel/(10**18)).toString(), "cost per level");
+            expect(BigInt(costPerLevel).toString()).to.equal("560500000000000000000000")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 7000);
+            var inf = await infrastructurecontract.getInfrastructureCount(0);
+            // console.log(inf.toNumber(), "inf level");
+            var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log(BigInt(costPerLevel/(10**18)).toString(), "cost per level");
+            expect(BigInt(costPerLevel).toString()).to.equal("1200500000000000000000000")
+        })
+
+        it("inf market tests that infrastructure cost multipliers works correctly", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 480);
+            var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log(BigInt(costPerLevel).toString(), "cost per level");
+            expect(BigInt(costPerLevel).toString()).to.equal("10500000000000000000000")
+            await resourcescontract.mockResourcesForTesting(0, 0, 9);
+            var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log(BigInt(costPerLevel).toString(), "cost per level with lumber");
+            expect(BigInt(costPerLevel).toString()).to.equal("9135000000000000000000")
+            await resourcescontract.mockResourcesForTesting(0, 0, 7);
+            var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log(BigInt(costPerLevel).toString(), "cost per level with iron");
+            expect(BigInt(costPerLevel).toString()).to.equal("9240000000000000000000")
+            await resourcescontract.mockResourcesForTesting(0, 0, 10);
+            var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log(BigInt(costPerLevel).toString(), "cost per level with marble");
+            expect(BigInt(costPerLevel).toString()).to.equal("8715000000000000000000")
+            await resourcescontract.mockResourcesForTesting(0, 0, 13);
+            var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log(BigInt(costPerLevel).toString(), "cost per level with rubber");
+            expect(BigInt(costPerLevel).toString()).to.equal("9450000000000000000000")
+            await improvementscontract1.connect(signer1).buyImprovement1(5, 0, 11);
+            var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log(BigInt(costPerLevel).toString(), "cost per level with factories");
+            expect(BigInt(costPerLevel).toString()).to.equal("5250000000000000000000")
+            await resourcescontract.mockResourcesForTesting(0, 2, 7);
+            var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log(BigInt(costPerLevel).toString(), "cost per level with steel");
+            expect(BigInt(costPerLevel).toString()).to.equal("5145000000000000000000")
+        })
     })
 })
