@@ -10,6 +10,7 @@ import "./Forces.sol";
 import "./Wonders.sol";
 import "./CountryParameters.sol";
 import "./Crime.sol";
+import "./Forces.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract InfrastructureContract is Ownable {
@@ -48,6 +49,7 @@ contract InfrastructureContract is Ownable {
     WondersContract3 won3;
     WondersContract4 won4;
     CrimeContract crim;
+    ForcesContract forc;
 
     struct Infrastructure {
         uint256 landArea;
@@ -105,6 +107,7 @@ contract InfrastructureContract is Ownable {
         treasury = _treasury;
         parameters = _parameters;
         forces = _forces;
+        forc = ForcesContract(_forces);
         aid = _aid;
     }
 
@@ -603,7 +606,8 @@ contract InfrastructureContract is Ownable {
     function getTaxablePopulationCount(uint256 id) public view returns (uint256) {
         uint256 totalPop = getTotalPopulationCount(id);
         uint256 criminals = crim.getCriminalCount(id);
-        return (totalPop - criminals);
+        uint256 soldiers = forc.getSoldierCount(id);
+        return (totalPop - (criminals + soldiers));
     }
 
     function transferLandAndTech(

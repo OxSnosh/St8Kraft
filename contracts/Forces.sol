@@ -162,6 +162,10 @@ contract ForcesContract is Ownable {
     function buySoldiers(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
+        uint256 populationCount = inf.getTotalPopulationCount(0);
+        uint256 maxSoldierCount = ((populationCount*70)/100);
+        uint256 currentSoldierCount = idToForces[id].numberOfSoldiers;
+        require((currentSoldierCount + amount) <= maxSoldierCount, "population cannot support that many soldiers");
         uint256 soldierCost = getSoldierCost(id);
         uint256 purchasePrice = soldierCost * amount;
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
