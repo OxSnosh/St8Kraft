@@ -37,46 +37,51 @@ contract LandMarketContract is Ownable {
     function buyLand(uint256 id, uint256 amount) public {
         bool owner = mint.checkOwnership(id, msg.sender);
         require(owner, "!nation owner");
-        uint256 costPerMile = getLandCostPerMile(id);
-        uint256 purchasePriceMultiplier = getLandPriceMultiplier(id);
-        uint256 adjustedCostPerMile = ((costPerMile * purchasePriceMultiplier) /
-            100);
-        uint256 cost = (amount * adjustedCostPerMile);
+        uint256 cost = getLandCost(id, amount);
         inf.increaseLandCountFromMarket(id, amount);
         tsy.spendBalance(id, cost);
+    }
+
+    function getLandCost(uint256 id, uint256 amount) public view returns (uint256) {
+        uint256 costPerMile = getLandCostPerMile(id);
+        uint256 cost = (costPerMile * amount);
+        return cost;
     }
 
     function getLandCostPerMile(uint256 id) public view returns (uint256) {
         uint256 currentLand = inf.getLandCount(id);
         uint256 costPerLevel = 400;
-        if (currentLand > 30) {
+        if (currentLand < 30) {
             costPerLevel = (400 + (currentLand * 2));
-        } else if (currentLand > 100) {
+        } else if (currentLand < 100) {
             costPerLevel = (400 + (currentLand * 3));
-        } else if (currentLand > 200) {
+        } else if (currentLand < 200) {
             costPerLevel = (400 + (currentLand * 5));
-        } else if (currentLand > 250) {
+        } else if (currentLand < 250) {
             costPerLevel = (400 + (currentLand * 10));
-        } else if (currentLand > 300) {
+        } else if (currentLand < 300) {
             costPerLevel = (400 + (currentLand * 15));
-        } else if (currentLand > 400) {
+        } else if (currentLand < 400) {
             costPerLevel = (400 + (currentLand * 20));
-        } else if (currentLand > 500) {
+        } else if (currentLand < 500) {
             costPerLevel = (400 + (currentLand * 25));
-        } else if (currentLand > 800) {
+        } else if (currentLand < 800) {
             costPerLevel = (400 + (currentLand * 30));
-        } else if (currentLand > 1200) {
+        } else if (currentLand < 1200) {
             costPerLevel = (400 + (currentLand * 35));
-        } else if (currentLand > 2000) {
+        } else if (currentLand < 2000) {
             costPerLevel = (400 + (currentLand * 40));
-        } else if (currentLand > 3000) {
+        } else if (currentLand < 3000) {
             costPerLevel = (400 + (currentLand * 45));
-        } else if (currentLand > 4000) {
+        } else if (currentLand < 4000) {
             costPerLevel = (400 + (currentLand * 55));
         } else {
             costPerLevel = (400 + (currentLand * 75));
         }
-        return costPerLevel;
+        uint256 purchasePriceMultiplier = getLandPriceMultiplier(id);
+        uint256 adjustedCostPerMile = ((costPerLevel * purchasePriceMultiplier) /
+            100);
+        return adjustedCostPerMile * (10**18);
     }
 
     function getLandPriceMultiplier(uint256 id) public view returns (uint256) {

@@ -12,8 +12,6 @@ import "./NationStrength.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract ForcesContract is Ownable {
-    uint256 public cruiseMissileCost;
-    uint256 public nukeCost;
     uint256 public spyCost = 100000;
     address public countryMinter;
     address public treasuryAddress;
@@ -116,14 +114,6 @@ contract ForcesContract is Ownable {
     function updateImprovementsContract1(address newAddress) public onlyOwner {
         improvements1 = newAddress;
         imp1 = ImprovementsContract1(newAddress);
-    }
-
-    function updateCruiseMissileCost(uint256 newPrice) public onlyOwner {
-        cruiseMissileCost = newPrice;
-    }
-
-    function updateNukeCost(uint256 newPrice) public onlyOwner {
-        nukeCost = newPrice;
     }
 
     function updateSpyCost(uint256 newPrice) public onlyOwner {
