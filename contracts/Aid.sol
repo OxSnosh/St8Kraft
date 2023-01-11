@@ -8,6 +8,7 @@ import "./Wonders.sol";
 import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+/// @title 
 contract AidContract is Ownable {
     address public countryMinter;
     address public treasury;

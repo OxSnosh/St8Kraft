@@ -7,6 +7,7 @@ import "hardhat-contract-sizer"
 import "dotenv/config"
 import "@nomiclabs/hardhat-solhint"
 import "@typechain/hardhat"
+import "solidity-docgen"
 import { HardhatUserConfig } from "hardhat/types"
 
 /**
@@ -122,6 +123,9 @@ const config: HardhatUserConfig = {
   mocha: {
     timeout: 200000, // 200 seconds max for running tests
   },
+  docgen: {
+    
+  }
 }
 
 export default config;
