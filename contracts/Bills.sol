@@ -13,6 +13,9 @@ import "./CountryMinter.sol";
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+///@title BillsContact
+///@author OxSnosh
+///@notice this contact allows a nation owner to calculate and pay the daily bills owed for the nation upkeep
 contract BillsContract is Ownable {
     address public countryMinter;
     address public treasury;
@@ -46,6 +49,8 @@ contract BillsContract is Ownable {
 
     mapping(uint256 => address) public idToOwnerBills;
 
+    ///@dev this function is only callable from the contact owner
+    ///@dev this function will be called right after contract deployment to set contract pointers
     function settings(
         address _countryMinter,
         address _treasury,
@@ -80,6 +85,8 @@ contract BillsContract is Ownable {
         res = ResourcesContract(_resources);
     }
 
+    ///@dev this function is only callable from the contact owner
+    ///@dev this function will be called right after contract deployment to set contract pointers
     function settings2(
         address _improvements1,
         address _improvements2,
@@ -176,7 +183,10 @@ contract BillsContract is Ownable {
         _;
     }
 
-    //need to reduce by a percentage for blockades
+    ///@dev this is public function but will only work for the nation owner paying the bills
+    ///@param id is the nation ID of the nation looking to pay bills
+    ///@notice this function allows a nation owner to pay their bills
+    ///@notice this function will only work if the caller of the function is the owner of the nation ID in the id parameter
     function payBills(uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
@@ -189,6 +199,8 @@ contract BillsContract is Ownable {
         tsy.decreaseBalanceOnBillsPaid(id, billsPayable);
     }
 
+    ///@notice this is a public view function that will determine a nations bill payment
+    ///@param id is the nation ID of the nation whose bill payment is being calculate
     function getBillsPayable(uint256 id) public view returns (uint256) {
         uint256 daysSinceLastPayment = tsy.getDaysSinceLastBillsPaid(id);
         uint256 infrastructureBillsPayable = calculateDailyBillsFromInfrastructure(
@@ -207,6 +219,7 @@ contract BillsContract is Ownable {
         return billsPayable;
     }
 
+    ///@notice this function will calculate the daily bills due for a nation's infrastructure
     function calculateDailyBillsFromInfrastructure(
         uint256 id
     ) public view returns (uint256 dailyInfrastructureBills) {
@@ -215,6 +228,7 @@ contract BillsContract is Ownable {
         return (costPerLevel * infrastructureAmount);
     }
 
+    ///@notice this function calculated the bill payment per level for a nations infrastructure level
     function calculateInfrastructureCostPerLevel(
         uint256 id
     ) public view returns (uint256 infrastructureBillsPerLevel) {
@@ -266,6 +280,7 @@ contract BillsContract is Ownable {
         return adjustedInfrastructureCostPerLevel * (10 ** 18);
     }
 
+    ///@notice this function will adjust the cost per level based on resources, improvements and wonders that make infrastructure upkeep cheaper
     function calculateModifiedInfrastrucureUpkeep(
         uint256 baseDailyInfrastructureCostPerLevel,
         uint256 id
@@ -304,6 +319,8 @@ contract BillsContract is Ownable {
         return dailyInfrastructureCostPerLevel;
     }
 
+    ///@notice this function will calculate the daily bills due from military
+    ///@notice military bills will come from soldiers, tanks, aircraft, navy, nukes and cruise missiles
     function calculateDailyBillsFromMilitary(
         uint256 id
     ) public view returns (uint256 militaryBills) {
@@ -324,6 +341,7 @@ contract BillsContract is Ownable {
         return dailyMilitaryUpkeep * (10 ** 18);
     }
 
+    ///@notice this function calculates daily bills for soldiers
     function getSoldierUpkeep(
         uint256 id
     ) public view returns (uint256) {
@@ -351,6 +369,7 @@ contract BillsContract is Ownable {
         return adjustedSoldierUpkeep;
     }
 
+    ///@notice this functions calculates daily bills for tanks
     function getTankUpkeep(
         uint256 id
     ) public view returns (uint256) {
@@ -373,6 +392,7 @@ contract BillsContract is Ownable {
         return adjustedTankUpkeep;
     }
 
+    ///@notice this finction calculates daily bills for a ntaions nukes
     function getNukeUpkeep(
         uint256 id
     ) public view returns (uint256) {
@@ -391,6 +411,7 @@ contract BillsContract is Ownable {
         return adjustedNukeUpkeep;
     }
 
+    ///@notice this function claculates daily bills for a nations cruise missiles
     function getCruiseMissileUpkeep(
         uint256 id
     ) public view returns (uint256) {
@@ -406,6 +427,7 @@ contract BillsContract is Ownable {
         return adjustedMissileUpkeep;
     }
 
+    ///@notice this function calculates daily bills for a nations aircraft
     function getAircraftUpkeep(
         uint256 id
     ) public view returns (uint256) {
@@ -429,6 +451,7 @@ contract BillsContract is Ownable {
         return adjustedAircraftUpkeep;
     }
 
+    ///@notice this function calculates daily bills for a nations navy
     function getNavyUpkeep(
         uint256 id
     ) public view returns (uint256 navyUpkeep) {
@@ -471,6 +494,7 @@ contract BillsContract is Ownable {
         return additionalNavyUpkeep;
     }
 
+    ///@notice this function will adjust a nations navy bills based on resources, improvements and wonders that reduce navy upkeep
     function getAdjustedNavyUpkeep(
         uint256 id,
         uint256 baseNavyUpkeep
@@ -493,6 +517,7 @@ contract BillsContract is Ownable {
         return adjustedNavyUpkeep;
     }
 
+    ///@notice this function calculated bills from a nations improvements
     function calculateDailyBillsFromImprovements(
         uint256 id
     ) public view returns (uint256 improvementBills) {
@@ -523,6 +548,7 @@ contract BillsContract is Ownable {
         return dailyImprovementBillsDue * (10 ** 18);
     }
 
+    ///@notice this function calculated bills from a nations wonders
     function calculateWonderBillsPayable(
         uint256 id
     ) public view returns (uint256) {

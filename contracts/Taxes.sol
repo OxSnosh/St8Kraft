@@ -184,6 +184,7 @@ contract TaxesContract is Ownable {
         idToOwnerTaxes[id] = nationOwner;
     }
 
+    //need to reduce taxes collectible by a percentage for each blockade against
     function collectTaxes(uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require (isOwner, "!nation owner");

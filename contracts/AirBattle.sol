@@ -12,6 +12,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
+///@title AirBattleContract
+///@author OxSnosh
+///@dev this contract allows you to launch a bombing campaign against another nation
 contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
     uint256 airBattleId;
     address warAddress;
@@ -70,7 +73,6 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 warId;
     }
 
-    //Chainlik Variables
     uint256[] private s_randomWords;
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
     uint64 private immutable i_subscriptionId;
@@ -94,10 +96,11 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
+    ///@dev this is the constructor funtion for the contact
     constructor(
         address vrfCoordinatorV2,
         uint64 subscriptionId,
-        bytes32 gasLane, // keyHash
+        bytes32 gasLane,
         uint32 callbackGasLimit
     ) VRFConsumerBaseV2(vrfCoordinatorV2) {
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
@@ -106,6 +109,8 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         i_callbackGasLimit = callbackGasLimit;
     }
 
+    ///@dev this function is only callable by the owner
+    ///@dev this function will be called right after deployment in order to set up contract pointers
     function settings (
         address _warAddress,
         address _fighter,
@@ -127,50 +132,64 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         fighterLoss = FighterLosses(_fighterLosses);
     }
 
+    ///@dev this function is only callable by the owner of the contract
     function updateWarAddress(address newAddress) public onlyOwner {
         warAddress = newAddress;
     }
 
+    ///@dev this function is only callable by the owner of the contract
     function updateFighterAddress(address newAddress) public onlyOwner {
         fighterAddress = newAddress;
         fighter = FightersContract(newAddress);
     }
 
+    ///@dev this function is only callable by the owner of the contract
     function updateBomberAddress(address newAddress) public onlyOwner {
         bomberAddress = newAddress;
         bomber = BombersContract(newAddress);
     }
 
+    ///@dev this function is only callable by the owner of the contract
     function updateInfrastructureAddress(address newAddress) public onlyOwner {
         infrastructure = newAddress;
         inf = InfrastructureContract(newAddress);
     }
 
+    ///@dev this function is only callable by the owner of the contract
     function updateForcesAddress(address newAddress) public onlyOwner {
         forces = newAddress;
         force = ForcesContract(newAddress);
     }
 
+    ///@dev this function is only callable by the owner of the contract
     function updateFighterLossesAddress(address newAddress) public onlyOwner {
         fighterLosses = newAddress;
         fighterLoss = FighterLosses(newAddress);
     }
 
+    ///@dev this function is only callable by the owner of the contract
     function updateMissilesAddress(address newAddress) public onlyOwner {
         missiles = newAddress;
         mis = MissilesContract(newAddress);
     }
 
+    ///@dev this function is only callable by the owner of the contract
     function updateWonders1Address(address newAddress) public onlyOwner {
         wonders1 = newAddress;
         won1 = WondersContract1(newAddress);
     }
 
+    ///@dev this function is a public function 
+    ///@notice this function allows one nation to launch a bombing campaign against another nation
+    ///@notice can only be called if a war is active between the two nations
+    ///@param warId is the ID of the current war between the two nations
+    ///@param attackerId is the nation ID of the attacker nation
+    ///@param defenderId is the nation ID of the defending nation 
     function airBattle(
         uint256 warId,
         uint256 attackerId,
         uint256 defenderId
-    ) internal {
+    ) public {
         bool isOwner = mint.checkOwnership(attackerId, msg.sender);
         require (isOwner, "!nation owner");
         bool isActiveWar = war.isWarActive(warId);
@@ -194,6 +213,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         airBattleId++;
     }
 
+    ///@dev this is an internal function that will 
     function generateAttackerFighterStruct(
         uint256 warId,
         uint256 battleId,
