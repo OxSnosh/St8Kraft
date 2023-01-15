@@ -8,7 +8,8 @@ import "./Wonders.sol";
 import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-/// @title 
+/// @title AidContract this contract facilitates aid being sent between nations
+/// @author OxSnosh
 contract AidContract is Ownable {
     address public countryMinter;
     address public treasury;
@@ -19,6 +20,8 @@ contract AidContract is Ownable {
     uint256 public aidProposalId;
     uint256 proposalExpiration = 7 days;
 
+    /// @dev this function is callable by the owner only
+    /// @dev this function will be called after deployment to initiate contract pointers within this contract
     function settings (
         address _countryMinter,
         address _treasury,
@@ -56,27 +59,33 @@ contract AidContract is Ownable {
     mapping(uint256 => uint256) public idToAidSlots;
     mapping(uint256 => Proposal) public idToProposal;
 
+    /// @dev this function is only callable from the owner
     function updateCountryMinterAddress(address _newAddress) public onlyOwner {
         countryMinter = _newAddress;
         mint = CountryMinter(_newAddress);
     }
 
+    /// @dev this function is only callable from the owner
     function updateTreasuryAddress(address _newAddress) public onlyOwner {
         treasury = _newAddress;
     }
 
+    /// @dev this function is only callable from the owner
     function updateForcesAddress(address _newAddress) public onlyOwner {
         forces = _newAddress;
     }
 
+    /// @dev this function is only callable from the owner
     function updateInfrastructureAddress(address _newAddress) public onlyOwner {
         infrastructure = _newAddress;
     }
 
+    /// @dev this function is only callable from the owner
     function updateKeeperAddress(address _newAddress) public onlyOwner {
         keeper = _newAddress;
     }
 
+    /// @dev this function is only callable from the owner
     function updateWonderContract1Address(address _newAddress) public onlyOwner {
         wonder1 = _newAddress;
         won1 = WondersContract1(_newAddress);
@@ -90,6 +99,7 @@ contract AidContract is Ownable {
         _;
     }
 
+    /// @dev this function gets called by the country minter contract once the country gets minted
     function initiateAid(uint256 id, address nationOwner)
         public
         onlyCountryMinter
@@ -98,6 +108,15 @@ contract AidContract is Ownable {
     }
 
     //check for sanctions
+
+    /// @dev this is the function a nations owner will call to initiate an aid proposal
+    /// @param idSender is the country ID of the aid sender (caller of the function)
+    /// @param idRecipient is the country ID of the aid recipient
+    /// @param techAid is the amount of Technology being sent in the proposal
+    /// @param balanceAid is the amount of balance being sent in the proposal
+    /// @param soldiersAid is the amount of troops beind sent in the proposal
+    /// @notice the max aid is 100 Tech, 6,000,000 balance and 4,000 soldiers without a Federal Aid Commission
+    /// @notice the max aid is 150 Tech, 9,000,000 balance and 6,000 soldiers with a Federal Aid Commission
     function proposeAid(
         uint256 idSender,
         uint256 idRecipient,
@@ -142,6 +161,10 @@ contract AidContract is Ownable {
         aidProposalId++;
     }
 
+    ///@dev this function is public but called by the proposeAid() function to check the availabiliy of proposing aid
+    ///@notice nations can only send one aid proposal per day without a Disaster Relief Agency
+    ///@notice nations can send 2 aid porposals per day with a disaster relief agency
+    ///@param idSender id the nation ID of the nation proposing aid
     function checkAidSlots(uint256 idSender) public view returns (bool) {
         uint256 maxAidSlots = getMaxAidSlots(idSender);
         uint256 aidSlotsUsedToday = idToAidSlots[idSender];
@@ -152,6 +175,12 @@ contract AidContract is Ownable {
         }
     }
 
+    ///@dev this function is public but also callable by the proposeAid() and acceptProposal() function
+    ///@notice this function checks that the aid proposed is less than the available aid of the sender nation
+    ///@param idSender is the nation ID of the nations proposing aid
+    ///@param techAid is the amount of Tech in the aid proposal
+    ///@param balanceAid is the amount of Balance in the aid proposal
+    ///@param soldiersAid is the amount of soldiers in the aid proposal
     function checkAvailability(
         uint256 idSender,
         uint256 techAid,
@@ -177,6 +206,10 @@ contract AidContract is Ownable {
         return true;
     }
 
+    ///@dev this function is public but also callable from the proposeAid() function
+    ///@notice this function checks max aid slots per day for a nation
+    ///@notice max aid slots allow you to propose 1 aid per day (2 proposals with a didadter relief agency)
+    ///@param id id the nation ID of the nation proposing aid
     function getMaxAidSlots(uint256 id) public view returns (uint256) {
         uint256 maxAidSlotsPerDay = 1;
         bool disasterReliefAgency = won1.getDisasterReliefAgency(id);
@@ -186,6 +219,10 @@ contract AidContract is Ownable {
         return (maxAidSlotsPerDay);
     }
 
+    ///@dev this function is a public view function that is called by the proposeAid() function
+    ///@notice if both nations have a federal aid commission then max aid amounts increase 50%
+    ///@param idSender is the nation ID of the sender of the aid proposal
+    ///@param idRecipient id the nation ID of the recipient of the aid proposal
     function getFederalAidEligability(uint256 idSender, uint256 idRecipient)
         public
         view
@@ -200,14 +237,20 @@ contract AidContract is Ownable {
         }
     }
 
+    ///@dev this finction is only callable by the owner of the contract
+    ///@dev this function allows the contract owner to set how long aid proposals stay active for
     function setProposalExpiration(uint256 newExpiration) public onlyOwner {
         proposalExpiration = newExpiration;
     }
 
+    ///@dev this is a view function that allows anyone to view the duration aid proposals have untile they expire
     function getProposalExpiration() public view returns (uint256) {
         return proposalExpiration;
     }
 
+    ///@dev this function is a public view function that checks to see if an aid propoals is expired (too much time has elapsed since proposal)
+    ///@notice this function will prevent an aid proposal from being fulfilled if the proposal is passed the expiration duration
+    ///@param proposalId id the ID of the aid proposal    
     function proposalExpired(uint256 proposalId) public view returns (bool) {
         uint256 timeProposed = idToProposal[proposalId].timeProposed;
         uint256 timeElapsed = (block.timestamp - timeProposed);
@@ -219,6 +262,10 @@ contract AidContract is Ownable {
     }
 
     //check for sanctions
+
+    ///@dev this is a public function that is callable by the recipient of the aid proposal
+    ///@notice this function is called by the recipient of an aid proposal in order to accept the aid
+    ///@param proposalId this id the ID of the aid proposal
     function acceptProposal(uint256 proposalId) public {
         bool expired = proposalExpired(proposalId);
         require(expired == false, "proposal expired");
@@ -252,6 +299,9 @@ contract AidContract is Ownable {
         idToProposal[proposalId].accepted = true;
     }
 
+    ///@dev this function is a public function that allows the aid proposal to be cancelled by the sender of the proposal
+    ///@notice this function allows the aid sender to cancel an aid proposal prior to it being accepted
+    ///@param proposalId this is the id of the proposal
     function cancelAid(uint256 proposalId) public {
         uint256 idRecipient = idToProposal[proposalId].idRecipient;
         uint256 idSender = idToProposal[proposalId].idSender;
@@ -275,6 +325,8 @@ contract AidContract is Ownable {
         _;
     }
 
+    ///@dev this function is callable by the keeper contract only
+    ///@dev this finction is called daily to reset every nations aid proposals for that day to 0
     function resetAidProposals() public onlyKeeper {
         uint256 countryCount = mint.getCountryCount();
         countryCount -= 1;
@@ -283,6 +335,7 @@ contract AidContract is Ownable {
         }
     }
 
+    ///@dev this is public view function that allows a caller to return the items in a proposal struct
     function getProposal(uint256 proposalId) public view returns(
         uint256,
         uint256,
@@ -303,6 +356,7 @@ contract AidContract is Ownable {
         );
     }
 
+    ///@dev this function is a public view function that allows the caller to see if an aid proposal is cancelled or accepted already
     function checkCancelledOrAccepted(uint256 proposalId) public view returns(
         bool,
         bool

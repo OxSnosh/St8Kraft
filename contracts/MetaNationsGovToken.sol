@@ -4,7 +4,8 @@ pragma solidity 0.8.7;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-/// @title MetaNationsGovToken This is the token used to govern the game
+/// @title MetaNationsGovToken This is the token used to purchase nation NFTs
+/// @author OxSnosh
 /// @notice This token will be spent to purchase your nation NFT
 /// @notice This token is spent at the amount equivalent cost in USDC to the seed money of the nation (initiallt 2,000,000 WarBucks)
 contract MetaNationsGovToken is ERC20, Ownable {
