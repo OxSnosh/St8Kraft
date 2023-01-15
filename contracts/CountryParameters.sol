@@ -316,8 +316,9 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     }
 
     //needs to be called by a keeper
-    ///@dev
-
+    ///@dev this is an esterna function that is only callable from the keeper contract
+    ///@dev this function will increment the days since a religion and goverment change
+    ///@notice ruler must wait 3 days to change religion and government
     function incrementDaysSince() external onlyKeeperContract {
         uint256 countryCount = mint.getCountryCount();
         uint256 i;
@@ -327,6 +328,8 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         }
     }
 
+    ///@dev this is a view funtion that will return the ruler name for a country
+    ///@param countryId this is the ID for the nation being queried
     function getRulerName(
         uint256 countryId
     ) public view returns (string memory) {
@@ -334,6 +337,8 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         return ruler;
     }
 
+    ///@dev this is a view funtion that will return the nation name for a country
+    ///@param countryId this is the ID for the nation being queried
     function getNationName(
         uint256 countryId
     ) public view returns (string memory) {
@@ -341,16 +346,22 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         return nationName;
     }
 
+    ///@dev this is a view funtion that will return the capital city for a country
+    ///@param countryId this is the ID for the nation being queried
     function getCapital(uint256 countryId) public view returns (string memory) {
         string memory capital = idToCountryParameters[countryId].capitalCity;
         return capital;
     }
 
+    ///@dev this is a view funtion that will return the slogan for a country
+    ///@param countryId this is the ID for the nation being queried
     function getSlogan(uint256 countryId) public view returns (string memory) {
         string memory slogan = idToCountryParameters[countryId].nationSlogan;
         return slogan;
     }
 
+    ///@dev this is a view funtion that will return the alliance name for a country
+    ///@param countryId this is the ID for the nation being queried
     function getAlliance(
         uint256 countryId
     ) public view returns (string memory) {
@@ -358,36 +369,51 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         return alliance;
     }
 
+    ///@dev this is a view funtion that will return the team for a country
+    ///@param countryId this is the ID for the nation being queried
     function getTeam(uint256 countryId) public view returns (uint256) {
         return idToCountrySettings[countryId].nationTeam;
     }
 
+    ///@dev this is a view funtion that will return the goverment type for a country
+    ///@param countryId this is the ID for the nation being queried
     function getGovernmentType(
         uint256 countryId
     ) public view returns (uint256) {
         return idToCountrySettings[countryId].governmentType;
     }
 
+    ///@dev this is a view funtion that will return the religion type for a country
+    ///@param countryId this is the ID for the nation being queried
     function getReligionType(uint256 countryId) public view returns (uint256) {
         return idToCountrySettings[countryId].nationalReligion;
     }
 
+    ///@dev this is a view funtion that will return the time a nation was minted
+    ///@param countryId this is the ID for the nation being queried
     function getTimeCreated(uint256 countryId) public view returns (uint256) {
         return idToCountrySettings[countryId].timeCreated;
     }
 
+    ///@dev this is a view funtion that will return the government preference for a country
+    ///@param id this is the ID for the nation being queried
     function getGovernmentPreference(
         uint256 id
     ) public view returns (uint256 preference) {
         return idToGovernmentPreference[id];
     }
 
+    ///@dev this is a view funtion that will return the religion preference for a country
+    ///@param id this is the ID for the nation being queried
     function getReligionPreference(
         uint256 id
     ) public view returns (uint256 preference) {
         return idToReligionPreference[id];
     }
 
+    ///@dev this is a view funtion that will return the days since a religion and governemnt change for a nation
+    ///@param id this is the ID for the nation being queried
+    ///@return uint256 will return an array with [0] as the days since governemtn change and [1] as days since religion change
     function getDaysSince(uint256 id) public view returns (uint256, uint256) {
         uint256 daysSinceGovChange = idToCountrySettings[id]
             .daysSinceGovernmentChenge;
