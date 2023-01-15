@@ -15,7 +15,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 ///@title BillsContact
 ///@author OxSnosh
-///@notice this contact allows a nation owner to calculate and pay the daily bills owed for the nation upkeep
+///@notice this contact allows a nation owner to calculate and pay the daily upkeep bills owed for the nation
+///@notice source of bill payments come from infrastructure, improvements, wonders, military and missiles 
 contract BillsContract is Ownable {
     address public countryMinter;
     address public treasury;
@@ -183,10 +184,10 @@ contract BillsContract is Ownable {
         _;
     }
 
-    ///@dev this is public function but will only work for the nation owner paying the bills
+    ///@dev this is public function but will only work for the nation owner who owes the bill payment
     ///@param id is the nation ID of the nation looking to pay bills
-    ///@notice this function allows a nation owner to pay their bills
-    ///@notice this function will only work if the caller of the function is the owner of the nation ID in the id parameter
+    ///@notice function allows a nation owner to pay their bills
+    ///@notice function will only work if the caller of the function is the owner of the nation ID in the id parameter
     function payBills(uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
@@ -201,6 +202,7 @@ contract BillsContract is Ownable {
 
     ///@notice this is a public view function that will determine a nations bill payment
     ///@param id is the nation ID of the nation whose bill payment is being calculate
+    ///@return uint256 funtion returns the total bill payment due for nation
     function getBillsPayable(uint256 id) public view returns (uint256) {
         uint256 daysSinceLastPayment = tsy.getDaysSinceLastBillsPaid(id);
         uint256 infrastructureBillsPayable = calculateDailyBillsFromInfrastructure(
@@ -220,6 +222,7 @@ contract BillsContract is Ownable {
     }
 
     ///@notice this function will calculate the daily bills due for a nation's infrastructure
+    ///@return dailyInfrastructureBills function will return the daily bill payment for a nation
     function calculateDailyBillsFromInfrastructure(
         uint256 id
     ) public view returns (uint256 dailyInfrastructureBills) {
@@ -229,6 +232,8 @@ contract BillsContract is Ownable {
     }
 
     ///@notice this function calculated the bill payment per level for a nations infrastructure level
+    ///@param id this is the nation ID for the country to calculate infrastructure bill payment per level of infrastructure
+    ///@return infrastructureBillsPErLevel function will return the infrastructure upkeep cost per level of infrasttucture
     function calculateInfrastructureCostPerLevel(
         uint256 id
     ) public view returns (uint256 infrastructureBillsPerLevel) {
@@ -281,6 +286,9 @@ contract BillsContract is Ownable {
     }
 
     ///@notice this function will adjust the cost per level based on resources, improvements and wonders that make infrastructure upkeep cheaper
+    ///@param baseDailyInfrastructureCostPerLevel this parameter will be the daily cost of infrastructure before adjustments
+    ///@param id is the nation ID for the nation that the bills are being calculated
+    ///@return uint256 this is daily cost per level for infrastructure upkeep after adjusting for resources, improvements and wonders
     function calculateModifiedInfrastrucureUpkeep(
         uint256 baseDailyInfrastructureCostPerLevel,
         uint256 id
@@ -321,6 +329,8 @@ contract BillsContract is Ownable {
 
     ///@notice this function will calculate the daily bills due from military
     ///@notice military bills will come from soldiers, tanks, aircraft, navy, nukes and cruise missiles
+    ///@param id is the nation ID for the bills being calculated
+    ///@return militaryBills this is the daily cost for military upkeep for the nation
     function calculateDailyBillsFromMilitary(
         uint256 id
     ) public view returns (uint256 militaryBills) {
@@ -342,6 +352,8 @@ contract BillsContract is Ownable {
     }
 
     ///@notice this function calculates daily bills for soldiers
+    ///@param id this is the nation ID for the soldier upkeep calculation
+    ///@return uint256 is the daily upkeep cost of soldiers for the nation
     function getSoldierUpkeep(
         uint256 id
     ) public view returns (uint256) {
@@ -370,6 +382,8 @@ contract BillsContract is Ownable {
     }
 
     ///@notice this functions calculates daily bills for tanks
+    ///@param id is the nation ID of the daily tank upkeep calculation
+    ///@return uint256 is the daily cost of tank upkeep for the nation
     function getTankUpkeep(
         uint256 id
     ) public view returns (uint256) {
@@ -393,6 +407,7 @@ contract BillsContract is Ownable {
     }
 
     ///@notice this finction calculates daily bills for a ntaions nukes
+    ///@param id is the nation for the calculation of daily nuke upkeep costs
     function getNukeUpkeep(
         uint256 id
     ) public view returns (uint256) {
@@ -412,6 +427,8 @@ contract BillsContract is Ownable {
     }
 
     ///@notice this function claculates daily bills for a nations cruise missiles
+    ///@param id this is the nation ID of the calulation for daily cruise missile upkeep costs
+    ///@return uint256 this is the daily cruise missile upkeep cost for the nation
     function getCruiseMissileUpkeep(
         uint256 id
     ) public view returns (uint256) {
@@ -428,6 +445,8 @@ contract BillsContract is Ownable {
     }
 
     ///@notice this function calculates daily bills for a nations aircraft
+    ///@param id is the nation ID for the calculation of daily aircraft upkeep
+    ///@return uint256 this is the daily upkeep cost for a nations aircraft
     function getAircraftUpkeep(
         uint256 id
     ) public view returns (uint256) {
@@ -452,6 +471,8 @@ contract BillsContract is Ownable {
     }
 
     ///@notice this function calculates daily bills for a nations navy
+    ///@param id this is the nation ID for the calulation of navy upkeep costs
+    ///@return navyUpkeep this is the daily cost of upkeep for a nations navy
     function getNavyUpkeep(
         uint256 id
     ) public view returns (uint256 navyUpkeep) {
@@ -473,6 +494,9 @@ contract BillsContract is Ownable {
         return dailyNavyUpkeep;
     }
 
+    ///@notice this function calculates additional nacy upkeep for a nation
+    ///@param id this is the nation ID of the nation where the additional navy upkeep is being calculated
+    ///@return uint256 this is additional navy upkeep costs that will be added to the daily navy upkeep costs
     function getNavyUpkeepAppended(uint256 id) internal view returns (uint256) {
         uint256 frigateCount = nav.getFrigateCount(id);
         uint256 frigateUpkeep = (frigateCount * 15000);
@@ -495,6 +519,9 @@ contract BillsContract is Ownable {
     }
 
     ///@notice this function will adjust a nations navy bills based on resources, improvements and wonders that reduce navy upkeep
+    ///@param id this is the nation ID for the countey whose navy upkeep is being calculated
+    ///@param baseNavyUpkeep this is the base daily cost of navy bills before adjustments
+    ///@return uint256 this is a nations daily navy upkeep adjusted for resources, improvements and woneers
     function getAdjustedNavyUpkeep(
         uint256 id,
         uint256 baseNavyUpkeep
@@ -518,6 +545,8 @@ contract BillsContract is Ownable {
     }
 
     ///@notice this function calculated bills from a nations improvements
+    ///@param id this is the nation ID for the country for the daily improvement upkeep calculation
+    ///@return improvementBills is the daily cost of imprvements for the nation
     function calculateDailyBillsFromImprovements(
         uint256 id
     ) public view returns (uint256 improvementBills) {
@@ -549,6 +578,8 @@ contract BillsContract is Ownable {
     }
 
     ///@notice this function calculated bills from a nations wonders
+    ///@param id this is the nation ID for the calculaton of daily wonder bills
+    ///@return uint256 is the daily upkeep costs for wonders of the nation
     function calculateWonderBillsPayable(
         uint256 id
     ) public view returns (uint256) {

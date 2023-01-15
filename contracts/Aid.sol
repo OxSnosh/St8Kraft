@@ -165,6 +165,7 @@ contract AidContract is Ownable {
     ///@notice nations can only send one aid proposal per day without a Disaster Relief Agency
     ///@notice nations can send 2 aid porposals per day with a disaster relief agency
     ///@param idSender id the nation ID of the nation proposing aid
+    ///@return bool returns a boolean value if there is an aid slot available for the prpoposal
     function checkAidSlots(uint256 idSender) public view returns (bool) {
         uint256 maxAidSlots = getMaxAidSlots(idSender);
         uint256 aidSlotsUsedToday = idToAidSlots[idSender];
@@ -181,6 +182,7 @@ contract AidContract is Ownable {
     ///@param techAid is the amount of Tech in the aid proposal
     ///@param balanceAid is the amount of Balance in the aid proposal
     ///@param soldiersAid is the amount of soldiers in the aid proposal
+    ///@return bool true if the sender has enough of each aid parameter to send
     function checkAvailability(
         uint256 idSender,
         uint256 techAid,
@@ -210,6 +212,7 @@ contract AidContract is Ownable {
     ///@notice this function checks max aid slots per day for a nation
     ///@notice max aid slots allow you to propose 1 aid per day (2 proposals with a didadter relief agency)
     ///@param id id the nation ID of the nation proposing aid
+    ///@return uint256 defaults to 1 aid slot per day and 2 with a disaster relief agency
     function getMaxAidSlots(uint256 id) public view returns (uint256) {
         uint256 maxAidSlotsPerDay = 1;
         bool disasterReliefAgency = won1.getDisasterReliefAgency(id);
@@ -223,6 +226,7 @@ contract AidContract is Ownable {
     ///@notice if both nations have a federal aid commission then max aid amounts increase 50%
     ///@param idSender is the nation ID of the sender of the aid proposal
     ///@param idRecipient id the nation ID of the recipient of the aid proposal
+    ///@return bool true if both sender and reciever have a federal aid commission
     function getFederalAidEligability(uint256 idSender, uint256 idRecipient)
         public
         view
@@ -244,13 +248,15 @@ contract AidContract is Ownable {
     }
 
     ///@dev this is a view function that allows anyone to view the duration aid proposals have untile they expire
+    ///@return uint256 the number of days a proposal has to be exepted otherwise it expires
     function getProposalExpiration() public view returns (uint256) {
         return proposalExpiration;
     }
 
     ///@dev this function is a public view function that checks to see if an aid propoals is expired (too much time has elapsed since proposal)
     ///@notice this function will prevent an aid proposal from being fulfilled if the proposal is passed the expiration duration
-    ///@param proposalId id the ID of the aid proposal    
+    ///@param proposalId id the ID of the aid proposal
+    ///@return bool true if amount of time elapsed since proposal is greater than the proposal expiration time
     function proposalExpired(uint256 proposalId) public view returns (bool) {
         uint256 timeProposed = idToProposal[proposalId].timeProposed;
         uint256 timeElapsed = (block.timestamp - timeProposed);
@@ -300,7 +306,7 @@ contract AidContract is Ownable {
     }
 
     ///@dev this function is a public function that allows the aid proposal to be cancelled by the sender of the proposal
-    ///@notice this function allows the aid sender to cancel an aid proposal prior to it being accepted
+    ///@notice this function allows the aid sender or recipient to cancel an aid proposal prior to it being accepted
     ///@param proposalId this is the id of the proposal
     function cancelAid(uint256 proposalId) public {
         uint256 idRecipient = idToProposal[proposalId].idRecipient;
@@ -336,6 +342,7 @@ contract AidContract is Ownable {
     }
 
     ///@dev this is public view function that allows a caller to return the items in a proposal struct
+    ///@return uint256 this funtion returns the contects of a proposal struct
     function getProposal(uint256 proposalId) public view returns(
         uint256,
         uint256,
@@ -357,6 +364,7 @@ contract AidContract is Ownable {
     }
 
     ///@dev this function is a public view function that allows the caller to see if an aid proposal is cancelled or accepted already
+    ///@return bool true if the proposal has cancelled or accepted
     function checkCancelledOrAccepted(uint256 proposalId) public view returns(
         bool,
         bool

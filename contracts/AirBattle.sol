@@ -496,67 +496,67 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
     }
 
     function setAttackerFighterStrength(uint256 battleId) internal {
-        uint256 _yak9Strength = airBattleIdToAttackerFighters[battleId]
-            .yak9Count * yak9Strength;
-        uint256 _p51MustangStrength = airBattleIdToAttackerFighters[battleId]
-            .p51MustangCount * p51MustangStrength;
-        uint256 _f86SabreStrength = airBattleIdToAttackerFighters[battleId]
-            .f86SabreCount * f86SabreStrength;
-        uint256 _mig15Strength = airBattleIdToAttackerFighters[battleId]
-            .mig15Count * mig15Strength;
-        uint256 _f100SuperSabreStrength = airBattleIdToAttackerFighters[
-            battleId
-        ].f100SuperSabreCount * f100SuperSabreStrength;
-        uint256 _f35LightningStrength = airBattleIdToAttackerFighters[battleId]
-            .f35LightningCount * f35LightningStrength;
-        uint256 _f15EagleStrength = airBattleIdToAttackerFighters[battleId]
-            .f15EagleCount * f15EagleStrength;
-        uint256 _su30MkiStrength = airBattleIdToAttackerFighters[battleId]
-            .su30MkiCount * su30MkiStrength;
-        uint256 _f22RaptorStrength = airBattleIdToAttackerFighters[battleId]
-            .f22RaptorCount * f22RaptorStrength;
-        uint256 strength = (_yak9Strength +
-            _p51MustangStrength +
-            _f86SabreStrength +
-            _mig15Strength +
-            _f100SuperSabreStrength +
-            _f35LightningStrength +
-            _f15EagleStrength +
-            _su30MkiStrength +
-            _f22RaptorStrength);
-        airBattleIdToAttackerFighters[battleId].fighterStrength = strength;
+        // uint256 _yak9Strength = airBattleIdToAttackerFighters[battleId]
+        //     .yak9Count * yak9Strength;
+        // uint256 _p51MustangStrength = airBattleIdToAttackerFighters[battleId]
+        //     .p51MustangCount * p51MustangStrength;
+        // uint256 _f86SabreStrength = airBattleIdToAttackerFighters[battleId]
+        //     .f86SabreCount * f86SabreStrength;
+        // uint256 _mig15Strength = airBattleIdToAttackerFighters[battleId]
+        //     .mig15Count * mig15Strength;
+        // uint256 _f100SuperSabreStrength = airBattleIdToAttackerFighters[
+        //     battleId
+        // ].f100SuperSabreCount * f100SuperSabreStrength;
+        // uint256 _f35LightningStrength = airBattleIdToAttackerFighters[battleId]
+        //     .f35LightningCount * f35LightningStrength;
+        // uint256 _f15EagleStrength = airBattleIdToAttackerFighters[battleId]
+        //     .f15EagleCount * f15EagleStrength;
+        // uint256 _su30MkiStrength = airBattleIdToAttackerFighters[battleId]
+        //     .su30MkiCount * su30MkiStrength;
+        // uint256 _f22RaptorStrength = airBattleIdToAttackerFighters[battleId]
+        //     .f22RaptorCount * f22RaptorStrength;
+        // uint256 strength = (_yak9Strength +
+        //     _p51MustangStrength +
+        //     _f86SabreStrength +
+        //     _mig15Strength +
+        //     _f100SuperSabreStrength +
+        //     _f35LightningStrength +
+        //     _f15EagleStrength +
+        //     _su30MkiStrength +
+        //     _f22RaptorStrength);
+        // airBattleIdToAttackerFighters[battleId].fighterStrength = strength;
     }
 
     function setDefenderFighterStrength(uint256 battleId) internal {
-        uint256 _yak9Strength = airBattleIdToDefenderFighters[battleId]
-            .yak9Count * yak9Strength;
-        uint256 _p51MustangStrength = airBattleIdToDefenderFighters[battleId]
-            .p51MustangCount * p51MustangStrength;
-        uint256 _f86SabreStrength = airBattleIdToDefenderFighters[battleId]
-            .f86SabreCount * f86SabreStrength;
-        uint256 _mig15Strength = airBattleIdToDefenderFighters[battleId]
-            .mig15Count * mig15Strength;
-        uint256 _f100SuperSabreStrength = airBattleIdToDefenderFighters[
-            battleId
-        ].f100SuperSabreCount * f100SuperSabreStrength;
-        uint256 _f35LightningStrength = airBattleIdToDefenderFighters[battleId]
-            .f35LightningCount * f35LightningStrength;
-        uint256 _f15EagleStrength = airBattleIdToDefenderFighters[battleId]
-            .f15EagleCount * f15EagleStrength;
-        uint256 _su30MkiStrength = airBattleIdToDefenderFighters[battleId]
-            .su30MkiCount * su30MkiStrength;
-        uint256 _f22RaptorStrength = airBattleIdToDefenderFighters[battleId]
-            .f22RaptorCount * f22RaptorStrength;
-        uint256 strength = (_yak9Strength +
-            _p51MustangStrength +
-            _f86SabreStrength +
-            _mig15Strength +
-            _f100SuperSabreStrength +
-            _f35LightningStrength +
-            _f15EagleStrength +
-            _su30MkiStrength +
-            _f22RaptorStrength);
-        airBattleIdToDefenderFighters[battleId].fighterStrength = strength;
+        // uint256 _yak9Strength = airBattleIdToDefenderFighters[battleId]
+        //     .yak9Count * yak9Strength;
+        // uint256 _p51MustangStrength = airBattleIdToDefenderFighters[battleId]
+        //     .p51MustangCount * p51MustangStrength;
+        // uint256 _f86SabreStrength = airBattleIdToDefenderFighters[battleId]
+        //     .f86SabreCount * f86SabreStrength;
+        // uint256 _mig15Strength = airBattleIdToDefenderFighters[battleId]
+        //     .mig15Count * mig15Strength;
+        // uint256 _f100SuperSabreStrength = airBattleIdToDefenderFighters[
+        //     battleId
+        // ].f100SuperSabreCount * f100SuperSabreStrength;
+        // uint256 _f35LightningStrength = airBattleIdToDefenderFighters[battleId]
+        //     .f35LightningCount * f35LightningStrength;
+        // uint256 _f15EagleStrength = airBattleIdToDefenderFighters[battleId]
+        //     .f15EagleCount * f15EagleStrength;
+        // uint256 _su30MkiStrength = airBattleIdToDefenderFighters[battleId]
+        //     .su30MkiCount * su30MkiStrength;
+        // uint256 _f22RaptorStrength = airBattleIdToDefenderFighters[battleId]
+        //     .f22RaptorCount * f22RaptorStrength;
+        // uint256 strength = (_yak9Strength +
+        //     _p51MustangStrength +
+        //     _f86SabreStrength +
+        //     _mig15Strength +
+        //     _f100SuperSabreStrength +
+        //     _f35LightningStrength +
+        //     _f15EagleStrength +
+        //     _su30MkiStrength +
+        //     _f22RaptorStrength);
+        // airBattleIdToDefenderFighters[battleId].fighterStrength = strength;
     }
 
     function fulfillRequest(uint256 battleId) public {
