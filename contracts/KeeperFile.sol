@@ -7,6 +7,7 @@ import "./War.sol";
 import "./Treasury.sol";
 import "./Forces.sol";
 import "./Navy.sol";
+import "./CountryParameters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract KeeperContract is Ownable {
@@ -16,6 +17,7 @@ contract KeeperContract is Ownable {
     address treasury;
     address missiles;
     address navalActions;
+    address parameters;
 
     NukeContract nuke;
     AidContract aid;
@@ -23,6 +25,7 @@ contract KeeperContract is Ownable {
     TreasuryContract tres;
     MissilesContract miss;
     NavalActionsContract navAct;
+    CountryParametersContract params;
 
     function settings (
         address _nukes,
@@ -30,7 +33,8 @@ contract KeeperContract is Ownable {
         address _war,
         address _treasury,
         address _missiles,
-        address _navalActions
+        address _navalActions,
+        address _parameters
     ) public onlyOwner {
         nukes = _nukes;
         nuke = NukeContract(_nukes);
@@ -44,6 +48,8 @@ contract KeeperContract is Ownable {
         miss = MissilesContract(_missiles);
         navalActions = _navalActions;
         navAct = NavalActionsContract(_navalActions);
+        parameters = _parameters;
+        params = CountryParametersContract(_parameters);
     }
 
     function keeperFunctionToCall() public {
@@ -54,6 +60,7 @@ contract KeeperContract is Ownable {
         incrementDaysSince();
         resetNukesPurchasedToday();
         resetActionsToday();
+        incrementDaysSinceForParameters();
     }
 
     function keeperFunctionToCallManually() public onlyOwner {
@@ -64,6 +71,7 @@ contract KeeperContract is Ownable {
         incrementDaysSince();
         resetNukesPurchasedToday();
         resetActionsToday();
+        incrementDaysSinceForParameters();
     }
 
     function shiftNukeDays() internal {
@@ -104,5 +112,13 @@ contract KeeperContract is Ownable {
 
     function resetActionsTodayByOwner() public onlyOwner {
         navAct.resetActionsToday();
+    }
+
+    function incrementDaysSinceForParameters() internal {
+        params.incrementDaysSince();
+    }
+
+    function incrementDaysSinceForParametersByOwner() public onlyOwner {
+        params.incrementDaysSince();
     }
 }

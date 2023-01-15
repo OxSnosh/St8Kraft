@@ -497,7 +497,8 @@ describe("CountryMinter", function () {
         await countryparameterscontract.settings(
             spyoperationscontract.address,
             countryminter.address,
-            senatecontract.address
+            senatecontract.address,
+            keepercontract.address
         )
 
         await crimecontract.settings(
@@ -700,7 +701,8 @@ describe("CountryMinter", function () {
             warcontract.address,
             treasurycontract.address,
             missilescontract.address,
-            navalactionscontract.address
+            navalactionscontract.address,
+            countryparameterscontract.address
         )
 
         await landmarketcontract.settings(

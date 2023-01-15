@@ -18,6 +18,9 @@ import "./Bombers.sol";
 import "./Aid.sol";
 import "./Senate.sol";
 
+///@title CountryMinter
+///@author OxSnosh
+///@notice this is the contract that will allow the user to mint a nation!
 contract CountryMinter is ERC721, Ownable {
     uint256 public countryId = 0;
     address public countryParameters;
@@ -60,6 +63,8 @@ contract CountryMinter is ERC721, Ownable {
     ) ERC721("MetaNations", "MNS") {
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings (
         address _countryParameters,
         address _treasury,
@@ -78,6 +83,8 @@ contract CountryMinter is ERC721, Ownable {
         senate = _senate;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings2 (
         address _improvements1,
         address _improvements2,
@@ -98,6 +105,8 @@ contract CountryMinter is ERC721, Ownable {
         wonders4 = _wonders4;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings3 (
         address _military,
         address _forces,
@@ -122,6 +131,13 @@ contract CountryMinter is ERC721, Ownable {
         bombersMarket2 = _bombersMarket2;
     }
 
+    ///@dev this is a public function that allows the caller to mint a nation
+    ///@notice this function allows the caller to mint a nation
+    ///@notice each wallet address can only contain one country
+    ///@param ruler this is a string that is the nation ruler name
+    ///@param nationName this is a string that is the name of the nation
+    ///@param capitalCity this is a string that is the name of the capital city of the nation
+    ///@param nationSlogan this is a string that represents that slogan of the nation
     function generateCountry(
         string memory ruler,
         string memory nationName,
@@ -166,6 +182,11 @@ contract CountryMinter is ERC721, Ownable {
         emit nationCreated(msg.sender, nationName, ruler);
     }
 
+    ///@dev this is public view function that will check if the caller of the function is the nation owner
+    ///@dev this function is used throught the contracts for the game
+    ///@param id is the nation id
+    ///@param caller is the caller of the function that gets passed into this function from another contract throught the game
+    ///@return bool will be true if the caller address passed into the caller parameter is the owner of the nation of parameter id
     function checkOwnership(uint256 id, address caller) public view returns (bool) {
         if(idToOwner[id] == caller) {
             return true;
@@ -173,6 +194,8 @@ contract CountryMinter is ERC721, Ownable {
         return false;
     }
 
+    ///@dev this function will return the current country Id that gets incremented every time a county is minted
+    ///@return uint256 will be number of countries minted
     function getCountryCount() public view returns (uint256) {
         uint256 countryCount = countryId;
         return countryCount;

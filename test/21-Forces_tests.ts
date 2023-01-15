@@ -499,7 +499,8 @@ describe("Forces Contract", async function () {
         await countryparameterscontract.settings(
             spyoperationscontract.address,
             countryminter.address,
-            senatecontract.address
+            senatecontract.address,
+            keepercontract.address
         )
 
         await crimecontract.settings(
@@ -702,7 +703,8 @@ describe("Forces Contract", async function () {
             warcontract.address,
             treasurycontract.address,
             missilescontract.address,
-            navalactionscontract.address
+            navalactionscontract.address,
+            countryparameterscontract.address
         )
 
         await landmarketcontract.settings(
@@ -959,6 +961,6 @@ describe("Forces Contract", async function () {
             await expect(forcescontract.connect(signer1).buySoldiers(500, 0)).to.be.revertedWith("population cannot support that many soldiers");
         })
 
-        
+
     })
 })
