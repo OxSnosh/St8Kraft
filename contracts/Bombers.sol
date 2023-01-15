@@ -867,6 +867,9 @@ contract BombersContract is Ownable {
     }
 }
 
+///@title BombersMarketplace1
+///@author OxSnosh
+///@notice this is the contract that will allow nation owners to purchase AH! Cobras, AH64 Apaches, Bristol Blenheims, B52 Mitchells and B17 Flying Fortresses
 contract BombersMarketplace1 is Ownable {
     address public countryMinter;
     address public bombers1;
@@ -897,6 +900,8 @@ contract BombersMarketplace1 is Ownable {
     TreasuryContract tsy;
     BombersContract bomb1;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings (
         address _countryMinter,
         address _bombers1,
@@ -924,31 +929,38 @@ contract BombersMarketplace1 is Ownable {
         _;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateCountryMinterAddress(address newAddress) public onlyOwner {
         countryMinter = newAddress;
         mint = CountryMinter(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateBombers1Address(address newAddress) public onlyOwner {
         bombers1 = newAddress;
         bomb1 = BombersContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateFightersAddress(address newAddress) public onlyOwner {
         fighters = newAddress;
         fight = FightersContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateInfrastructureAddress(address newAddress) public onlyOwner {
         infrastructure = newAddress;
         inf = InfrastructureContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateTreasuryAddress(address newAddress) public onlyOwner {
         treasury = newAddress;
         tsy = TreasuryContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be used to update the price, infrastructure requirement and tech requirement in order to purchase a AH1 Cobra
     function updateAh1CobraSpecs(
         uint256 newPrice,
         uint256 newInfra,
@@ -959,6 +971,8 @@ contract BombersMarketplace1 is Ownable {
         ah1CobraRequiredTech = newTech;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be used to update the price, infrastructure requirement and tech requirement in order to purchase a A64 Apache
     function updateAh64ApacheSpecs(
         uint256 newPrice,
         uint256 newInfra,
@@ -969,6 +983,8 @@ contract BombersMarketplace1 is Ownable {
         ah64ApacheRequiredTech = newTech;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be used to update the price, infrastructure requirement and tech requirement in order to purchase a Bristol Blenheim
     function updateBristolBlenheimSpecs(
         uint256 newPrice,
         uint256 newInfra,
@@ -979,6 +995,8 @@ contract BombersMarketplace1 is Ownable {
         bristolBlenheimRequiredTech = newTech;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be used to update the price, infrastructure requirement and tech requirement in order to purchase a B52 Mitchell
     function updateB52MitchellSpecs(
         uint256 newPrice,
         uint256 newInfra,
@@ -989,6 +1007,8 @@ contract BombersMarketplace1 is Ownable {
         b52MitchellRequiredTech = newTech;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be used to update the price, infrastructure requirement and tech requirement in order to purchase a B17 Flying Fortress
     function updateB17gFlyingFortressSpecs(
         uint256 newPrice,
         uint256 newInfra,
@@ -999,6 +1019,10 @@ contract BombersMarketplace1 is Ownable {
         b17gFlyingFortressRequiredTech = newTech;
     }
 
+    ///@dev this is a public view function that will allow the caller to purchase an AH1 Cobra for their nation
+    ///@notice this function allowes the caller to purchase an AH1 Cobra for their nation
+    ///@param amount specifies the number of aircraft being purchased
+    ///@param id is the nation ID
     function buyAh1Cobra(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
@@ -1020,6 +1044,10 @@ contract BombersMarketplace1 is Ownable {
         tsy.spendBalance(id, purchasePrice);
     }
 
+    ///@dev this is a public view function that will allow the caller to purchase an A64 Apache for their nation
+    ///@notice this function allowes the caller to purchase an A64 Apache for their nation
+    ///@param amount specifies the number of aircraft being purchased
+    ///@param id is the nation ID
     function buyAh64Apache(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
@@ -1041,6 +1069,10 @@ contract BombersMarketplace1 is Ownable {
         tsy.spendBalance(id, purchasePrice);
     }
 
+    ///@dev this is a public view function that will allow the caller to purchase a Bristol Blenheim for their nation
+    ///@notice this function allowes the caller to purchase a Bristol Blenheim for their nation
+    ///@param amount specifies the number of aircraft being purchased
+    ///@param id is the nation ID
     function buyBristolBlenheim(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
@@ -1062,6 +1094,10 @@ contract BombersMarketplace1 is Ownable {
         tsy.spendBalance(id, purchasePrice);
     }
 
+    ///@dev this is a public view function that will allow the caller to purchase a B52 Mitchell for their nation
+    ///@notice this function allowes the caller to purchase a B52 Mitchell for their nation
+    ///@param amount specifies the number of aircraft being purchased
+    ///@param id is the nation ID
     function buyB52Mitchell(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
@@ -1083,6 +1119,10 @@ contract BombersMarketplace1 is Ownable {
         tsy.spendBalance(id, purchasePrice);
     }
 
+    ///@dev this is a public view function that will allow the caller to purchase a B17 Flying Fortress for their nation
+    ///@notice this function allowes the caller to purchase a B17 Flying Fortress for their nation
+    ///@param amount specifies the number of aircraft being purchased
+    ///@param id is the nation ID
     function buyB17gFlyingFortress(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
@@ -1105,6 +1145,9 @@ contract BombersMarketplace1 is Ownable {
     }
 }
 
+///@title BombersMarketplace2
+///@author OxSnosh
+///@notice this contract allows nation owners to purchase B52 Stratofortresses, B2 Spirits, B1B Lancers and Tupolev TO160s
 contract BombersMarketplace2 is Ownable {
     address public countryMinter;
     address public bombers1;
@@ -1132,6 +1175,8 @@ contract BombersMarketplace2 is Ownable {
     TreasuryContract tsy;
     BombersContract bomb1;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings (
         address _countryMinter,
         address _bombers1,
@@ -1159,31 +1204,38 @@ contract BombersMarketplace2 is Ownable {
         _;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateCountryMinterAddress(address newAddress) public onlyOwner {
         countryMinter = newAddress;
         mint = CountryMinter(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateBombers1Address(address newAddress) public onlyOwner {
         bombers1 = newAddress;
         bomb1 = BombersContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateFightersAddress(address newAddress) public onlyOwner {
         fighters = newAddress;
         fight = FightersContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateInfrastructureAddress(address newAddress) public onlyOwner {
         infrastructure = newAddress;
         inf = InfrastructureContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateTreasuryAddress(address newAddress) public onlyOwner {
         treasury = newAddress;
         tsy = TreasuryContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be used to update the price, infrastructure requirement and tech requirement in order to purchase a B52 Stratofortress
     function updateB52StratofortressSpecs(
         uint256 newPrice,
         uint256 newInfra,
@@ -1194,6 +1246,8 @@ contract BombersMarketplace2 is Ownable {
         b52StratofortressRequiredTech = newTech;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be used to update the price, infrastructure requirement and tech requirement in order to purchase a B2 Spirit
     function updateb2SpiritSpecs(
         uint256 newPrice,
         uint256 newInfra,
@@ -1204,6 +1258,8 @@ contract BombersMarketplace2 is Ownable {
         b2SpiritRequiredTech = newTech;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be used to update the price, infrastructure requirement and tech requirement in order to purchase a B1B Lancer
     function updateB1bLancerSpecs(
         uint256 newPrice,
         uint256 newInfra,
@@ -1214,6 +1270,8 @@ contract BombersMarketplace2 is Ownable {
         b1bLancerRequiredTech = newTech;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be used to update the price, infrastructure requirement and tech requirement in order to purchase a Tupolev TU160
     function updateTupolevTu160Specs(
         uint256 newPrice,
         uint256 newInfra,
@@ -1224,6 +1282,10 @@ contract BombersMarketplace2 is Ownable {
         tupolevTu160RequiredTech = newTech;
     }
 
+    ///@dev this is a public view function that will allow the caller to purchase a B52 Stratofortress for their nation
+    ///@notice this function allowes the caller to purchase a B52 Stratofortress for their nation
+    ///@param amount specifies the number of aircraft being purchased
+    ///@param id is the nation ID
     function buyB52Stratofortress(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
@@ -1245,6 +1307,10 @@ contract BombersMarketplace2 is Ownable {
         tsy.spendBalance(id, purchasePrice);
     }
 
+    ///@dev this is a public view function that will allow the caller to purchase a B2 Spirit for their nation
+    ///@notice this function allowes the caller to purchase a B2 Spirit for their nation
+    ///@param amount specifies the number of aircraft being purchased
+    ///@param id is the nation ID
     function buyB2Spirit(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
@@ -1266,6 +1332,10 @@ contract BombersMarketplace2 is Ownable {
         tsy.spendBalance(id, purchasePrice);
     }
 
+    ///@dev this is a public view function that will allow the caller to purchase a B1B Lancer for their nation
+    ///@notice this function allowes the caller to purchase a B1B Lancer for their nation
+    ///@param amount specifies the number of aircraft being purchased
+    ///@param id is the nation ID
     function buyB1bLancer(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
@@ -1287,6 +1357,10 @@ contract BombersMarketplace2 is Ownable {
         tsy.spendBalance(id, purchasePrice);
     }
 
+    ///@dev this is a public view function that will allow the caller to purchase a Tupolev TU160 for their nation
+    ///@notice this function allowes the caller to purchase a Tupolev TU160 for their nation
+    ///@param amount specifies the number of aircraft being purchased
+    ///@param id is the nation ID
     function buyTupolevTu160(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
