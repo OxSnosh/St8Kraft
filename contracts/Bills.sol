@@ -233,7 +233,7 @@ contract BillsContract is Ownable {
 
     ///@notice this function calculated the bill payment per level for a nations infrastructure level
     ///@param id this is the nation ID for the country to calculate infrastructure bill payment per level of infrastructure
-    ///@return infrastructureBillsPErLevel function will return the infrastructure upkeep cost per level of infrasttucture
+    ///@return infrastructureBillsPerLevel function will return the infrastructure upkeep cost per level of infrasttucture
     function calculateInfrastructureCostPerLevel(
         uint256 id
     ) public view returns (uint256 infrastructureBillsPerLevel) {
