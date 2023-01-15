@@ -101,7 +101,7 @@ contract AidContract is Ownable {
 
     /// @dev this function gets called by the country minter contract once the country gets minted
     function initiateAid(uint256 id, address nationOwner)
-        public
+        external
         onlyCountryMinter
     {
         idToOwnerAid[id] = nationOwner;

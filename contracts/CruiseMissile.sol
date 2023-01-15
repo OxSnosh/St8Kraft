@@ -10,6 +10,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
+///@title CruiseMissileContract
+///@author OxSnosh
+///@notice this contract will allow a nation owner to launch a cruise missile attack against another nation
+///@dev this contract inherits from OpenZeppelin ownable and Chainlink VRF
 contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
     uint256 public cruiseMissileAttackId;
     address public forces;
@@ -54,6 +58,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
+    ///@dev this is the constructor that inherits chainlink variables to use chainlink VRF
     constructor(
         address vrfCoordinatorV2,
         uint64 subscriptionId,
@@ -66,6 +71,8 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         i_callbackGasLimit = callbackGasLimit;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings (
         address _forces,
         address _countryMinter,
@@ -85,6 +92,8 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         mis = MissilesContract(_missiles);
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings2 (
         address _improvements1,
         address _improvements3,
@@ -101,51 +110,66 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         won2 = WondersContract2(_wonders2);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateForcesContract(address newAddress) public onlyOwner {
         forces = newAddress;
         force = ForcesContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateCountryMinter(address newAddress) public onlyOwner {
         countryMinter = newAddress;
         mint = CountryMinter(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWarContract(address newAddress) public onlyOwner {
         warAddress = newAddress;
         war = WarContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateInfrastructureContract(address newAddress) public onlyOwner {
         warAddress = newAddress;
         war = WarContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateMissilesContract(address newAddress) public onlyOwner {
         missiles = newAddress;
         mis = MissilesContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateImprovementsContract1(address newAddress) public onlyOwner {
         improvements1 = newAddress;
         imp1 = ImprovementsContract1(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateImprovementsContract3(address newAddress) public onlyOwner {
         improvements3 = newAddress;
         imp3 = ImprovementsContract3(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateImprovementsContract4(address newAddress) public onlyOwner {
         improvements4 = newAddress;
         imp4 = ImprovementsContract4(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWondersContract2(address newAddress) public onlyOwner {
         wonders2 = newAddress;
         won2 = WondersContract2(newAddress);
     }
 
+    ///@dev this is a public function that will allow a nation to launch a cruise missile attack against another nation
+    ///@notice this function allows a nation owner to launch a cruise missile attack
+    ///@notice can only attack another nation where war is currently declared
+    ///@param attackerId is the ID of the attacking nation
+    ///@param defenderId is the ID of the defendin nation
+    ///@param warId is the ID for the war between the two nations 
     function launchCruiseMissileAttack(
         uint256 attackerId,
         uint256 defenderId,
@@ -171,6 +195,8 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         cruiseMissileAttackId++;
     }
 
+    ///@dev this is an internal function that will call the VRFCoordinator from randomness from chainlink
+    ///@param id this is the ID of the cruise missile attack
     function fulfillRequest(uint256 id) internal {
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
@@ -182,6 +208,14 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         s_requestIdToRequestIndex[requestId] = id;
     }
 
+    ///@dev this is the fnction that the ChainlinkVRF contract will call when it responds
+    ///@dev this function randomly determine the outcome of the cruise missile attack
+    ///@notice this function will randomly determine is the cruise missile attacke was successful
+    ///@notice attacker satellites increase the odds of a successful attack
+    ///@notice defender satellites and intercepor middile system will increase the odds of a missile attack being thwarted
+    ///@notice a successful cruise missile attacke will reduce defender tanks, tech or infrastructure (type selected randomly) 
+    ///@param requestId id the ID number for the request made to the VRF contract
+    ///@param randomWords is the random numbers that the ChainlinkVRF contract responds with
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords)
         internal
         override
@@ -224,6 +258,11 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         }
     }
 
+    ///@dev this is the internal function that will determine the number of tanks destroyed in a cruise missile attack
+    ///@notice this function will decrease the number of tanks of the defender in a successful cruise missile attack
+    ///@notice attacker munitions factories will increase the damage inflicted by a cruise missile attack on tanks
+    ///@notice defender bunkers will decrease the damage infilcted by a cruise missile attack on tanks 
+    ///@param attackId is the ID of the cruise missile attack
     function destroyTanks(uint256 attackId) internal {
         uint256 defenderId = attackIdToCruiseMissile[attackId].defenderId;
         uint256 attackerId = attackIdToCruiseMissile[attackId].attackerId;
@@ -250,6 +289,11 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         }
     }
 
+    ///@dev this is an internal function that will decrease defender Tech in the event of a successful cruise missile launch
+    ///@notice this function will decrease the tech of a defending nation in the event of a successful cruise missile attack
+    ///@notice attacker munitions factories will increase the damage inflicted by a cruise missile attack on tech
+    ///@notice defender bunkers will decrease the damage infilcted by a cruise missile attack on tech 
+    ///@param attackId is the ID of the cruise missile attack
     function destroyTech(uint256 attackId) internal {
         uint256 defenderId = attackIdToCruiseMissile[attackId].defenderId;
         uint256 attackerId = attackIdToCruiseMissile[attackId].attackerId;
@@ -270,6 +314,11 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         }
     }
 
+    ///@dev this is an internal function that will decrease defender Infrastructure in the event of a successful cruise missile attack
+    ///@notice this function will decrease the infrastructure of a defending nation in the event of a successful cruise missile attack
+    ///@notice attacker munitions factories will increase the damage inflicted by a cruise missile attack on infrastructure
+    ///@notice defender bunkers will decrease the damage infilcted by a cruise missile attack on infrastructure 
+    ///@param attackId is the ID of the cruise missile attack
     function destroyInfrastructure(uint256 attackId) internal {
         uint256 defenderId = attackIdToCruiseMissile[attackId].defenderId;
         uint256 attackerId = attackIdToCruiseMissile[attackId].attackerId;
