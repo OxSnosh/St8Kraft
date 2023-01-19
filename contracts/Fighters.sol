@@ -938,7 +938,7 @@ contract FighterLosses is Ownable {
     ///@notice this function will decrease the amount of fighers lost in battle from the FighersContract
     ///@param defenderLosses is an array of uints that represent the fighters that the defender lost in battle
     ///@param defenderId is the nation ID of the defender
-    ///@param attackerLossrs is an array of uints that represent the fighters that the attacker lost in battle
+    ///@param attackerLosses is an array of uints that represent the fighters that the attacker lost in battle
     ///@param attackerId is the nation ID of the attacker
     function decrementLosses(
         uint256[] memory defenderLosses,
