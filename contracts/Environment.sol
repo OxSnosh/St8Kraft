@@ -12,6 +12,10 @@ import "./Nuke.sol";
 import "./CountryParameters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+///@title EnvironmentContract
+///@author OxSnosh
+///@notice this contract will calculate the environment score for a nation
+///@dev this contact inherits from OpenZeppelin ownable 
 contract EnvironmentContract is Ownable {
     address public countryMinter;
     address public resources;
@@ -41,6 +45,8 @@ contract EnvironmentContract is Ownable {
     MissilesContract mis;
     NukeContract nuke;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers 
     function settings (
         address _countryMinter,
         address _resources,
@@ -75,6 +81,8 @@ contract EnvironmentContract is Ownable {
         nuke = NukeContract(_nukes);
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings2 (
         address _improvements1,
         address _improvements3,
@@ -88,71 +96,88 @@ contract EnvironmentContract is Ownable {
         imp4 = ImprovementsContract4(_improvements4);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateCountryMinter(address newAddress) public onlyOwner {
         countryMinter = newAddress;
         mint = CountryMinter(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateResourcesContract(address newAddress) public onlyOwner {
         resources = newAddress;
         res = ResourcesContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateInfrastructureContract(address newAddress) public onlyOwner {
         infrastructure = newAddress;
         inf = InfrastructureContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWondersContract3(address newAddress) public onlyOwner {
         wonders3 = newAddress;
         won3 = WondersContract3(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWondersContract4(address newAddress) public onlyOwner {
         wonders4 = newAddress;
         won4 = WondersContract4(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateForcesContract(address newAddress) public onlyOwner {
         forces = newAddress;
         force = ForcesContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateParametersContract(address newAddress) public onlyOwner {
         parameters = newAddress;
         param = CountryParametersContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateTaxesContract(address newAddress) public onlyOwner {
         taxes = newAddress;
         tax = TaxesContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateMissilesContract(address newAddress) public onlyOwner {
         missiles = newAddress;
         mis = MissilesContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateNukeContract(address newAddress) public onlyOwner {
         nukes = newAddress;
         nuke = NukeContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateImprovementsContract1(address newAddress) public onlyOwner {
         improvements1 = newAddress;
         imp1 = ImprovementsContract1(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateImprovementsContract3(address newAddress) public onlyOwner {
         improvements3 = newAddress;
         imp3 = ImprovementsContract3(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateImprovementsContract4(address newAddress) public onlyOwner {
         improvements4 = newAddress;
         imp4 = ImprovementsContract4(newAddress);
     }
 
+    ///@dev this is a public view function that will return the environment score for a nation
+    ///@notice a higher environment score will decrease a nations happiness and population
+    ///@param id is the nation ID of the nation being queried
+    ///@return uint256 is the environement score for the nation (environment scores are 0 - 10)
     function getEnvironmentScore(uint256 id) public view returns (uint256) {
         uint256 environmentScore;
         int256 grossScore = getGrossEnvironmentScore(id);
@@ -199,6 +224,11 @@ contract EnvironmentContract is Ownable {
         return environmentScore;
     }
 
+    ///@dev this is a public view function that will generate the gross environment score
+    ///@notice the gross environment score generated here will be converted into the environment score
+    ///@notice every 10 points of gross score is equal to one point of environement
+    ///@param id this is the nation ID being queried
+    ///@return int256 this is the gross environment score
     function getGrossEnvironmentScore(uint256 id) public view returns (int256) {
         int256 scoreFromResources = getEnvironmentScoreFromResources(id);
         int256 scoreFromImprovementsAndWonders = getEnvironmentScoreFromImprovementsAndWonders(
@@ -223,6 +253,10 @@ contract EnvironmentContract is Ownable {
         return grossEnvironmentScore;
     }
 
+    ///@dev this is a public view function that will generate environment points from resources
+    ///@notice coal, oil, iron, uranium, water and radiation cleanup resources will all affect environemnt
+    ///@param id is the nation ID of the nation being queried
+    ///@return int256 is gross environment points from resources
     function getEnvironmentScoreFromResources(uint256 id)
         public
         view
@@ -253,6 +287,11 @@ contract EnvironmentContract is Ownable {
         return pointsFromResources;
     }
 
+    ///@dev this is a public view function that will generate gross environment score from improvements and wonders
+    ///@notice this function will return gross environment points from improvements and wonders
+    ///@notice border walls, munitions factories and red light districts affect a nations environment score
+    ///@param id this is the nation ID of the nation being queried
+    ///@return int256 is the gross environment points from improvements and wonders
     function getEnvironmentScoreFromImprovementsAndWonders(uint256 id)
         public
         view
@@ -308,6 +347,11 @@ contract EnvironmentContract is Ownable {
         return pointsFromWondersAndImprovements;
     }
 
+    ///@dev this is a public view function that will generate gross environment score from a nations technology level
+    ///@notice this function will return gross environment points from a nations technology level
+    ///@notice a nations environment score will be penalized if the tech level is less than 6
+    ///@param id this is the nation ID of the nation being queried
+    ///@return int256 is the gross environment points from a nations technology level
     function getEnvironmentScoreFromTech(uint256 id)
         public
         view
@@ -321,6 +365,11 @@ contract EnvironmentContract is Ownable {
         return pointsFromTech;
     }
 
+    ///@dev this is a public view function that will generate gross environment score from a nations soldier to population ratio
+    ///@notice this function will return gross environment points from a nations soldier to population ratio
+    ///@notice a soldier to population ratio greater than 60% will result in an environmental penalty
+    ///@param id this is the nation ID of the nation being queried
+    ///@return int256 is the gross environment points from a nations soldier to population ratio   
     function getEnvironmentScoreFromMilitaryDensity(uint256 id)
         public
         view
@@ -334,6 +383,11 @@ contract EnvironmentContract is Ownable {
         return pointsFromMilitaryRatiio;
     }
 
+    ///@dev this is a public view function that will generate gross environment score from a nations infrastructure to land ratio
+    ///@notice this function will return gross environment points from a nations infrastructure to land ratio
+    ///@notice a infrastructure to land ratio greater than 2:1 will result in an environmental penalty
+    ///@param id this is the nation ID of the nation being queried
+    ///@return int256 is the gross environment points from a nations infrastructure to land ratio  
     function getEnvironmentScoreFromInfrastructure(uint256 id)
         public
         view
@@ -348,6 +402,11 @@ contract EnvironmentContract is Ownable {
         return pointsFromInfrastructure;
     }
 
+    ///@dev this is a public view function that will generate gross environment score from a nations nuke count
+    ///@notice this function will return gross environment points from a nations nuke count
+    ///@notice a nations environment score will go up 1 point every ten nukes owned
+    ///@param id this is the nation ID of the nation being queried
+    ///@return int256 is the gross environment points from a nations nuke count
     function getScoreFromNukes(uint256 id) public view returns (int256) {
         int256 pointsFromNukes;
         uint256 nukeCount = mis.getNukeCount(id);
@@ -361,6 +420,12 @@ contract EnvironmentContract is Ownable {
         return pointsFromNukes;
     }
 
+    ///@dev this is a public view function that will generate gross environment score from a nations government type
+    ///@notice this function will return gross environment points from a nations government type
+    ///@notice a nations environment score will go up 10 points for anarchy, communist, dictatorship, and transitional gov types
+    ///@notice a nations environment score will go down 10 points for capitalist, democracy, and republic gov types
+    ///@param id this is the nation ID of the nation being queried
+    ///@return int256 is the gross environment points from a nations government
     function getScoreFromGovernment(uint256 id) public view returns (int256) {
         int256 pointsFromGovernmentType = 0;
         uint256 governmentType = param.getGovernmentType(id);
@@ -387,14 +452,4 @@ contract EnvironmentContract is Ownable {
         }
         return pointsFromGovernmentType;
     }
-    //lead (nuke penatly)
-    //wonders (national env office +1)
-    //wonders (weapons research complex -1)
-    //border walls +1
-    //tech (> 6)
-    //military (soldiers <60% of populaiton) (-1)
-    //land (>50% infrastructure) -1 (or +1 over)
-    //government type (communist, dictatorship, transitional or anarchy)  -1
-    //nukes -0.10 env per nuke
-    //government positions
 }
