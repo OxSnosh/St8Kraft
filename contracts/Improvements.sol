@@ -2451,11 +2451,11 @@ contract ImprovementsContract3 is Ownable {
     ///@dev this is a public view function that will return the number of radiation containment chambers for a given nation 
     ///@notice this function will return the number of radiation containment chambers a nation owns
     ///@param countryId is the nation ID of the nation being queried
-    ///@return count is the number of radiation containment chambers a given nation owns
+    ///@return uint256 is the number of radiation containment chambers a given nation owns
     function getRadiationContainmentChamberCount(uint256 countryId)
         public
         view
-        returns (uint256 count)
+        returns (uint256)
     {
         uint256 count = idToImprovements3[countryId]
             .radiationContainmentChamberCount;
@@ -2465,11 +2465,11 @@ contract ImprovementsContract3 is Ownable {
     ///@dev this is a public view function that will return the number of red light districts for a given nation 
     ///@notice this function will return the number of red light districts a nation owns
     ///@param countryId is the nation ID of the nation being queried
-    ///@return count is the number of red light districts a given nation owns
+    ///@return uint256 is the number of red light districts a given nation owns
     function getRedLightDistrictCount(uint256 countryId)
         public
         view
-        returns (uint256 count)
+        returns (uint256)
     {
         uint256 count = idToImprovements3[countryId].redLightDistrictCount;
         return count;
@@ -2478,11 +2478,11 @@ contract ImprovementsContract3 is Ownable {
     ///@dev this is a public view function that will return the number of rehab facilities for a given nation 
     ///@notice this function will return the number of rehab facilities a nation owns
     ///@param countryId is the nation ID of the nation being queried
-    ///@return count is the number of rehab facilities a given nation owns
+    ///@return uint256 is the number of rehab facilities a given nation owns
     function getRehabilitationFacilityCount(uint256 countryId)
         public
         view
-        returns (uint256 count)
+        returns (uint256)
     {
         uint256 count = idToImprovements3[countryId].rehabilitationFacilityCount;
         return count;
@@ -2504,8 +2504,8 @@ contract ImprovementsContract3 is Ownable {
     ///@dev this is a public view function that will return the number of schools for a given nation 
     ///@notice this function will return the number of schools a nation owns
     ///@param countryId is the nation ID of the nation being queried
-    ///@return count is the number of schools a given nation owns
-    function getSchoolCount(uint256 countryId) public view returns (uint256 count) {
+    ///@return uint256 is the number of schools a given nation owns
+    function getSchoolCount(uint256 countryId) public view returns (uint256) {
         uint256 count = idToImprovements3[countryId].schoolCount;
         return count;
     }
