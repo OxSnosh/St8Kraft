@@ -249,6 +249,11 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[id].infrastructureCount += amount;
     }
 
+    ///@dev this is a public function only callable from the infrastructure market contract
+    ///@dev this function will allow a nation owner to sell infrastructure
+    ///@notice this function will allow a nation owner to sell infrastructure
+    ///@param id this is the nation id of the nation selling infrastructure
+    ///@param amount this is the amount of infrastructure being sold
     function decreaseInfrastructureFromMarket(uint256 id, uint256 amount)
         public
         onlyInfrastructureMarket
@@ -256,6 +261,11 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[id].infrastructureCount -= amount;
     }
 
+    ///@dev this is a public function only callable from the technology market contract
+    ///@dev this function will increase the technology count when technology is purchased
+    ///@notice this function will increase technology when technology is purchased
+    ///@param id this is the nation id of the nation purchasing technology
+    ///@param amount this is the amount of technology being purchased
     function increaseTechnologyFromMarket(uint256 id, uint256 amount)
         public
         onlyTechMarket
@@ -263,6 +273,11 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[id].technologyCount += amount;
     }
 
+    ///@dev this is a public function only callable from the technology market contract
+    ///@dev this function will allow a nation owner to sell technology
+    ///@notice this function will allow a nation owner to sell technology
+    ///@param id this is the nation id of the nation selling technology
+    ///@param amount this is the amount of technology being sold
     function decreaseTechnologyFromMarket(uint256 id, uint256 amount)
         public
         onlyTechMarket
@@ -270,6 +285,11 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[id].technologyCount -= amount;
     }
 
+    ///@dev this is a public function only callable from the land market contract
+    ///@dev this function will increase the land area count when land is purchased
+    ///@notice this function will increase land area when land is purchased
+    ///@param id this is the nation id of the nation purchasing land
+    ///@param amount this is the amount of land being purchased
     function increaseLandCountFromMarket(uint256 id, uint256 amount)
         public
         onlyLandMarket
@@ -277,6 +297,11 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[id].landArea += amount;
     }
 
+    ///@dev this is a public function only callable from the land market contract
+    ///@dev this function will allow a nation owner to sell land
+    ///@notice this function will allow a nation owner to sell land
+    ///@param id this is the nation id of the nation selling land
+    ///@param amount this is the amount of land being sold
     function decreaseLandCountFromMarket(uint256 id, uint256 amount)
         public
         onlyLandMarket
@@ -284,6 +309,14 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[id].landArea -= amount;
     }
 
+    ///@dev this is a public view function that will return a nations area of influence from a given land area
+    ///@notice this function will return a given nations area of influence as a multiple of their land area
+    ///@notice coal will increase area of influence 15%
+    ///@notice rubber will increase area of influence 20%
+    ///@notice spices will increase area of influence 8%
+    ///@notice an agriculture development program will increase area of influence 15%
+    ///@param id is the nation id of the nation being queried
+    ///@return uint256 is the given nations area of influence
     function getAreaOfInfluence(uint256 id) public view returns (uint256) {
         uint256 currentLand = idToInfrastructure[id].landArea;
         uint256 landModifier = 100;
@@ -308,6 +341,12 @@ contract InfrastructureContract is Ownable {
         return areaOfInfluence;
     }
 
+    ///@dev this is a public function only callable from a nation owner
+    ///@dev this function will allow a nation owner to sell land
+    ///@notice this function will allow a nation owner to sell land
+    ///@notice land can be sold for 100/mile (300 with rubber)
+    ///@param id is the nation id of the nation selling land
+    ///@param amount is the amount of land being sold
     function sellLand(uint256 id, uint256 amount) public {
         bool owner = mint.checkOwnership(id, msg.sender);
         require(owner, "!nation owner");
@@ -328,6 +367,12 @@ contract InfrastructureContract is Ownable {
         _;
     }
 
+    ///@dev this is a public function only callable from the aid contract
+    ///@dev this function will send the technology when an aid proposal is accepted
+    ///@notice this function will send the technology when an aid proposal is accepted
+    ///@param idSender is the nation id of the sender of the technology aid
+    ///@param idReciever is the nation id of the recipient of technology aid
+    ///@param amount is the amount of technology being sent
     function sendTech(
         uint256 idSender,
         uint256 idReciever,
@@ -339,6 +384,10 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[idReciever].technologyCount += amount;
     }
 
+    ///@dev this is a public view function that will return the amount of land a nation has
+    ///@notice this function will return the amount of land a nation has
+    ///@param countryId this is the nation ID of the country being queried
+    ///@return count is the amount of land area for a given country
     function getLandCount(uint256 countryId)
         public
         view
@@ -347,6 +396,11 @@ contract InfrastructureContract is Ownable {
         return idToInfrastructure[countryId].landArea;
     }
 
+    ///@dev this is a public function that is only callable from the spy contract
+    ///@dev this function will decrease land area after a successful spy attack
+    ///@notice this function will deacrease land area after a succesfuls spy attack
+    ///@param countryId is the country if of the nation losing land in the attack
+    ///@param amount is the amount of land being lost in the attack
     function decreaseLandCount(uint256 countryId, uint256 amount)
         public
         onlySpyContract
@@ -354,6 +408,12 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[countryId].landArea -= amount;
     }
 
+    ///@dev this is a public function that will decrease a nations land when attacked by a nuke
+    ///@dev this function is only callable by the nuke contract
+    ///@notice this function will decrease the amount of a nations land when attacked by a nuke
+    ///@notice the maximum amount of land that can be lost is 150 miles
+    ///@param countryId this is the nation ID of the nation being attacked
+    ///@param percentage this is the percentage of a nations land being lost
     function decreaseLandCountFromNukeContract(uint256 countryId, uint256 percentage)
         public
         onlyNukeContract
@@ -367,6 +427,11 @@ contract InfrastructureContract is Ownable {
         }
     }
 
+    ///@dev this is a public function only callable from the spy contract
+    ///@dev this function will increase a attacking nations land after a successful spy attack
+    ///@notice this function will increase an attacking nations land after a successful spy attack
+    ///@param countryId is the nation ID of the nation gaining technology
+    ///@param amount is the amount of land area being gained
     function increaseLandCountFromSpyContract(uint256 countryId, uint256 amount)
         public
         onlySpyContract
@@ -374,6 +439,10 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[countryId].landArea += amount;
     }
 
+    ///@dev this is a public view function that will retrun the amount of technology a nation has
+    ///@notice this function will return the amount of technology a nation has
+    ///@param countryId this is the nation ID of the nation being queried
+    ///@return count is the tech amount for a given nation
     function getTechnologyCount(uint256 countryId)
         public
         view
@@ -384,6 +453,11 @@ contract InfrastructureContract is Ownable {
         return technologyAmount;
     }
 
+    ///@dev this is a public function only callable from the spy contract
+    ///@dev this function will decrease the amount of tech for a nation after a succesful spy attack
+    ///@notice this function will decrease a nations tech after a succesful spy attack
+    ///@param countryId this is the nation ID of the nation being attacked
+    ///@param amount is the amount of technology a nation is losing in the attack
     function decreaseTechCountFromSpyContract(uint256 countryId, uint256 amount)
         public
         onlySpyContract
@@ -391,6 +465,11 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[countryId].technologyCount -= amount;
     }
 
+    ///@dev this is a public function only callable from the cruise missile contract
+    ///@dev this function will decrease the amount of tech for a nation after a succesful cruise missile attack
+    ///@notice this function will decrease a nations tech after a succesful cruise missile attack
+    ///@param countryId this is the nation ID of the nation being attacked
+    ///@param amount is the amount of technology a nation is losing in the attack
     function decreaseTechCountFromCruiseMissileContract(
         uint256 countryId,
         uint256 amount
@@ -398,6 +477,12 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[countryId].technologyCount -= amount;
     }
 
+    ///@dev this is a public function only callable from the nuke contract
+    ///@dev this function will decrease the amount of tech for a nation after a succesful nuke attack
+    ///@notice this function will decrease a nations tech after a succesful nuke attack
+    ///@notice the maximum amount of tech a nation can lose in an attack is 50
+    ///@param countryId this is the nation ID of the nation being attacked
+    ///@param percentage is the percentage of a nations technology a nation is losing in the attack
     function decreaseTechCountFromNukeContract(uint256 countryId, uint256 percentage)
         public
         onlyNukeContract
@@ -412,6 +497,11 @@ contract InfrastructureContract is Ownable {
         }
     }
 
+    ///@dev this is a public function that is only callable from the spy contract
+    ///@dev this function will increase an attacking nations tech after a succesful spy attack
+    ///@notice this function will increase a nations technology from a succesful spy attack
+    ///@param countryId is the nation ID of the attacking nation gaining tech from the attack
+    ///@param amount is the amount of tech being gained
     function increaseTechCountFromSpyContract(uint256 countryId, uint256 amount)
         public
         onlySpyContract
@@ -419,6 +509,10 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[countryId].technologyCount += amount;
     }
 
+    ///@dev this is a public view function that will return the amount of infrastructure for a nation
+    ///@notice this function will return a nations infrastructure count
+    ///@param countryId is the nation ID of the country being queried
+    ///@return count is the amount of technology for a given nation
     function getInfrastructureCount(uint256 countryId)
         public
         view
@@ -429,6 +523,11 @@ contract InfrastructureContract is Ownable {
         return infrastructureAmount;
     }
 
+    ///@dev this is a public function only callable from the spy contract
+    ///@dev this function will decrease a nations infrastructure amount after a succesful spy attack
+    ///@notice this function will decrease a nations infrastrucure after a succesful spy attack
+    ///@param countryId this is the nationId of the nation losing infrastructure
+    ///@param amount this is the amount of infrastructure being lost
     function decreaseInfrastructureCountFromSpyContract(
         uint256 countryId,
         uint256 amount
@@ -436,6 +535,11 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[countryId].infrastructureCount -= amount;
     }
 
+    ///@dev this is a public view function that is only callable from the cruise missile contract
+    ///@dev this function will decrease the amount of technology lost in a cruise missile attack
+    ///@notice this function will decrease the amount of technology lost in a cruise missile attack
+    ///@param countryId this is the nation id of the country being queried
+    ///@param amountToDecrease this is the amount of infrastructure being decreased
     function decreaseInfrastructureCountFromCruiseMissileContract(
         uint256 countryId,
         uint256 amountToDecrease
@@ -450,6 +554,15 @@ contract InfrastructureContract is Ownable {
         }
     }
 
+    ///@dev this is a public function only callable from the nuke contract
+    ///@dev this function will decrease the amount of a nations infrastructure after a nuke attack
+    ///@notice this function will decrease the amount of a nations infrastructure after a nuke attack
+    ///@notice the maximum amount of infrastructure a nation can lose in a nuke strike is 150
+    ///@notice defender bunkers will decrease the amount of damage in a succesful nuke attack
+    ///@notice attacker munitions factories will increase the amount of damage of a succesful nuke attack
+    ///@param defenderId is the defending nation in a nuke strike
+    ///@param attackerId is an attacking nation in a nuke strike 
+    ///@param percentage is the percentage of infrastructure being lost before modifiers (defender bunkers and attacker munitions factories)
     function decreaseInfrastructureCountFromNukeContract(
         uint256 defenderId,
         uint256 attackerId,
@@ -478,6 +591,11 @@ contract InfrastructureContract is Ownable {
         }
     }
 
+    ///@dev this is a public function only callable from the air battle contract 
+    ///@dev this function will decrease a nations infrastructure lost in a bombing attack
+    ///@notice this function will decrease a nations infrastructure lost in a bombing attack
+    ///@param countryId is the nation id of the country losing infrastructure
+    ///@param amountToDecrease is the amount of infrastructure being lost 
     function decreaseInfrastructureCountFromAirBattleContract(
         uint256 countryId,
         uint256 amountToDecrease
@@ -498,6 +616,11 @@ contract InfrastructureContract is Ownable {
         }
     }
 
+    ///@dev this is a public function only callable from the spy contract
+    ///@dev this function will decrease increase the amount of infrastructure for an attacker in a succesful spy attack
+    ///@notice this function will decrease increase the amount of infrastructure for an attacker in a succesful spy attack
+    ///@param countryId is the nation ID for the nation gaining infrastructure in the attack
+    ///@param amount is the amount of infrastructre being gained
     function increaseInfrastructureCountFromSpyContract(
         uint256 countryId,
         uint256 amount
@@ -505,6 +628,10 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[countryId].infrastructureCount += amount;
     }
 
+    ///@dev this is a public view function that will return a nations tax rate at which they tax their citizens
+    ///@notice this function will return the tax rate which a nation taxes their citizens at
+    ///@param id is the nation ID of the nation being queried
+    ///@param taxPercentage is the tax rate for a given nation
     function getTaxRate(uint256 id)
         public
         view
@@ -514,7 +641,16 @@ contract InfrastructureContract is Ownable {
         return taxRate;
     }
 
+    ///@dev this is a public function only vallable by a nation owner
+    ///@dev this function will allow a nation owner to set their nations tax rate
+    ///@notice this function will allow a nation owner to set their nations tax rate
+    ///@notice a tax rate can be between 15% and 28%
+    ///@notice a tax rate can be 30% with a social security wonder
+    ///@param id is the nation id of the nation changing its tax rate
+    ///@param newTaxRate is the new tax rate for a nation
     function setTaxRate(uint256 id, uint256 newTaxRate) public {
+        bool owner = mint.checkOwnership(id, msg.sender);
+        require(owner, "!nation owner");
         require(
             idToInfrastructure[id].collectionNeededToChangeRate == false,
             "need to collect taxes before changing tax rate"
@@ -529,6 +665,11 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[id].taxRate = newTaxRate;
     }
 
+    ///@dev this is a public function only callable from the spy contract
+    ///@dev this function will reset a nations tax rate after a succesful spy attack
+    ///@notice this function will reset a nations tax rate after a succesful spy attack
+    ///@param id this is the nation ID for the nation being attacked and getting its tax rate changed
+    ///@param newTaxRate is the new tax rate for the nation
     function setTaxRateFromSpyContract(uint256 id, uint256 newTaxRate)
         public
         onlySpyContract
@@ -539,6 +680,11 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[id].collectionNeededToChangeRate = true;
     }
 
+    ///@dev this is a public function only callable from the taxes contract
+    ///@dev this function will toggle the collection needed to change tax rate to true
+    ///@notice this function will toggle the collection needed to change tax rate to true
+    ///@notice when a nation is blockaded it will need to either break the blockade or collect taxes at a reduced rate to be able to change tax rate
+    ///@param id is the nation ID of the nation toggleing the collection needed parameter
     function toggleCollectionNeededToChangeRate(uint256 id)
         public
         onlyTaxesContract
@@ -546,6 +692,10 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[id].collectionNeededToChangeRate = false;
     }
 
+    ///@dev this is a public view function that will return true if a nation needs to collect taxes in order to change its tax rate
+    ///@notice this function will retrun true if a nation needs to collect taxes in order to change its tax rate
+    ///@param id is the nation ID of the nation being queried
+    ///@return bool is the boolean value whether a nation needs to collect taxes in order to change its tax rate
     function checkIfCollectionNeededToChangeRate(uint256 id)
         public
         view
@@ -556,6 +706,11 @@ contract InfrastructureContract is Ownable {
         return collectionNeeded;
     }
 
+    ///@dev this is public view function that will return a nations total population count
+    ///@notice this function will return a nation population count
+    ///@notice a nations base populaton is a nation infrastructure count * 8
+    ///@notice a nations population is increased by cattle, fish, pigs, sugar, wheat, affluent population and decreased by border walls
+    ///@return uint256 is a nations total population
     function getTotalPopulationCount(uint256 id) public view returns (uint256) {
         uint256 infra = getInfrastructureCount(id);
         uint256 populationBaseCount = (infra * 8);
@@ -596,6 +751,11 @@ contract InfrastructureContract is Ownable {
         return population;
     }
 
+    ///@dev this is an internal view function that will be called by the above function
+    ///@dev this function will return additonal population percentage modifiers for the above function
+    ///@notice this function will return additonal population percentage modifiers for the above function
+    ///@notice a nations population is increased by clinics, hospitals, disaster relief agencies, national environmental office, national research lab and universal healthcare
+    ///@return uint256 is the additional percentage modifiers for the above function
     function getAdditionalPopulationModifierPoints(uint256 id)
         internal
         view
@@ -629,6 +789,12 @@ contract InfrastructureContract is Ownable {
         return additionalPoints;
     }
 
+    ///@dev this is public view function that will return a nations taxable population
+    ///@notice this function will return a nations taxable population
+    ///@notice a nations total population consists of citizens, soldiers and criminals
+    ///@notice only citizens pay taxes
+    ///@param id is the nation id of the nation being queried
+    ///@return uint256 this is the given nations total taxable population
     function getTaxablePopulationCount(uint256 id) public view returns (uint256) {
         uint256 totalPop = getTotalPopulationCount(id);
         uint256 criminals = crim.getCriminalCount(id);
@@ -636,6 +802,12 @@ contract InfrastructureContract is Ownable {
         return (totalPop - (criminals + soldiers));
     }
 
+    ///@dev this is a public function only callable from the ground battle contract
+    ///@notice this function will transfer land and technology lost during a ground battle
+    ///@param landMiles is the amount of land being transferred
+    ///@param techLevels is the amount of technology being transferred
+    ///@param attackerId is the ID of the attack nation
+    ///@param defenderId is the ID of the defending nation
     function transferLandAndTech(
         uint256 landMiles,
         uint256 techLevels,
