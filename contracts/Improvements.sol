@@ -859,8 +859,8 @@ contract ImprovementsContract2 is Ownable {
     }
 
     ///@dev this function will allow the caller to return the cost of an improvement
-    ///@return airportCost this will be the cost of an airport
-    ///@return bankCost this will be the cost of a bank...
+    ///@return foreignMinistryCost this will be the cost of a foreign ministry
+    ///@return forwardOperatingBaseCost this will be the cost of a forward operating base...
     function getCost2() public view returns (
         uint256,
         uint256,
@@ -1350,6 +1350,9 @@ contract ImprovementsContract2 is Ownable {
     }
 }
 
+///@title ImprovementsContract4
+///@author OxSnosh
+///@notice this contract will allow a nation owner to buy certain improvements
 contract ImprovementsContract4 is Ownable {
     address public treasury;
     address public improvements1;
@@ -1398,6 +1401,8 @@ contract ImprovementsContract4 is Ownable {
 
     mapping(uint256 => Improvements4) public idToImprovements4;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
         address _treasury,
         address _forces,
@@ -1414,6 +1419,14 @@ contract ImprovementsContract4 is Ownable {
         mint = CountryMinter(_countryMinter);
     }
 
+    modifier onlyCountryMinter() {
+        require(
+            msg.sender == countryMinter, "function only callable by countryMinter contract"
+        );
+        _;
+    }    
+
+    ///@dev this function is only callable by the contract owner
     function updateTreasuryAddress(address _newTreasuryAddress)
         public
         onlyOwner
@@ -1421,6 +1434,7 @@ contract ImprovementsContract4 is Ownable {
         treasury = _newTreasuryAddress;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateImprovementContract1Address(address _improvements1)
         public
         onlyOwner
@@ -1428,6 +1442,7 @@ contract ImprovementsContract4 is Ownable {
         improvements1 = _improvements1;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateImprovementContract2Address(address _improvements2)
         public
         onlyOwner
@@ -1436,15 +1451,23 @@ contract ImprovementsContract4 is Ownable {
         imp2 = ImprovementsContract2(_improvements2);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateForcesAddress(address _forces) public onlyOwner {
         forces = _forces;
     }
 
-    function generateImprovements(uint256 id) public {
+    ///@dev this function is only callable by the countryMinter contract
+    ///@dev this function will initialize the struct to store the info about the minted nations improvements
+    ///@notice this function will allow each minted nation to buy imoprovements
+    ///@param id this is the nation ID for the nation being minted
+    function generateImprovements(uint256 id) public onlyCountryMinter {
         Improvements4 memory newImprovements4 = Improvements4(0, 0, 0, 0);
         idToImprovements4[id] = newImprovements4;
     }
 
+    ///@dev this function will allow the caller to return the cost of an improvement
+    ///@return missileDefenseCost this will be the cost of a foreign ministry
+    ///@return munitionsFactoryCost this will be the cost of a forward operating base...
     function getCost4() public view returns (
         uint256,
         uint256,
@@ -1459,18 +1482,26 @@ contract ImprovementsContract4 is Ownable {
         );
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a missile defense
     function updateMissileDefenseCost(uint256 newPrice) public onlyOwner {
         missileDefenseCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a munitions factory
     function updateMunitionsFactoryCost(uint256 newPrice) public onlyOwner {
         munitionsFactoryCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of naval academy
     function updateNavalAcademyCost(uint256 newPrice) public onlyOwner {
         navalAcademyCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of naval construction yard
     function updateNavalConstructionYardCost(uint256 newPrice)
         public
         onlyOwner
@@ -1478,6 +1509,18 @@ contract ImprovementsContract4 is Ownable {
         navalConstructionYardCost = newPrice;
     }
 
+    ///@dev this is a public function that allows a nation owner to purchase improvements
+    ///@dev this function is only callable by the nation owner
+    ///@notice this function will allow a nation owner to purchase certain improvements
+    ///@param amount is the number of improvements being purchased
+    ///@param countryId is the nation purchasing improvements
+    /**
+     * @param improvementId this will determine which improvement is being purchased
+     * 1 = missile defense
+     * 2 = munitions factory 
+     * 3 = naval academy
+     * 4 = naval construction yard
+     */
     function buyImprovement4(
         uint256 amount,
         uint256 countryId,
@@ -1562,6 +1605,18 @@ contract ImprovementsContract4 is Ownable {
         }
     }
 
+    ///@dev this is a public function that allows a nation owner to delete improvements
+    ///@dev this function is only callable by the nation owner
+    ///@notice this function will allow a nation owner to delete certain improvements
+    ///@param amount is the number of improvements being delete
+    ///@param countryId is the nation deleting improvements
+    /**
+     * @param improvementId this will determine which improvement is being deleted
+     * 1 = missile defense
+     * 2 = munitions factory 
+     * 3 = naval academy
+     * 4 = naval construction yard
+     */
     function deleteImprovement4(
         uint256 amount,
         uint256 countryId,
@@ -1626,6 +1681,10 @@ contract ImprovementsContract4 is Ownable {
         }
     }
 
+    ///@dev this is a public view function that will return the number of missile defenses for a given nation 
+    ///@notice this function will return the number of missile defenses a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of missile defenses a given nation owns
     function getMissileDefenseCount(uint256 countryId)
         public
         view
@@ -1636,6 +1695,10 @@ contract ImprovementsContract4 is Ownable {
         return missileDefenseAmount;
     }
 
+    ///@dev this is a public view function that will return the number of munitions factories for a given nation 
+    ///@notice this function will return the number of munitions factories a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of munitions factories a given nation owns
     function getMunitionsFactoryCount(uint256 countryId)
         public
         view
@@ -1646,6 +1709,10 @@ contract ImprovementsContract4 is Ownable {
         return munitionsFactoryAmount;
     }
 
+    ///@dev this is a public view function that will return the number of naval academies for a given nation 
+    ///@notice this function will return the number of naval academies a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of naval academies a given nation owns
     function getNavalAcademyCount(uint256 countryId)
         public
         view
@@ -1656,6 +1723,10 @@ contract ImprovementsContract4 is Ownable {
         return navalAcademyAmount;
     }
 
+    ///@dev this is a public view function that will return the number of naval construction yards for a given nation 
+    ///@notice this function will return the number of naval construction yards a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of naval construction yards a given nation owns
     function getNavalConstructionYardCount(uint256 countryId)
         public
         view
@@ -1667,6 +1738,9 @@ contract ImprovementsContract4 is Ownable {
     }
 }
 
+///@title ImprovementsContract3
+///@author OxSnosh
+///@notice this contract will allow a nation owner to buy certain improvements
 contract ImprovementsContract3 is Ownable {
     address public treasury;
     address public improvements1;
@@ -1775,10 +1849,19 @@ contract ImprovementsContract3 is Ownable {
         mint = CountryMinter(_countryMinter);
     }
 
+    modifier onlyCountryMinter() {
+        require(
+            msg.sender == countryMinter, "function only callable by countryMinter contract"
+        );
+        _;
+    } 
+
+    ///@dev this function is only callable by the contract owner
     function updateTreasuryAddress(address _treasury) public onlyOwner {
         treasury = _treasury;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateImprovementContract1Address(address _improvements1)
         public
         onlyOwner
@@ -1786,6 +1869,7 @@ contract ImprovementsContract3 is Ownable {
         improvements1 = _improvements1;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateImprovementContract2Address(address _improvements2)
         public
         onlyOwner
@@ -1793,11 +1877,16 @@ contract ImprovementsContract3 is Ownable {
         improvements2 = _improvements2;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateNavyContractAddress(address _navy) public onlyOwner {
         navy = _navy;
     }
 
-    function generateImprovements(uint256 id) public {
+    ///@dev this function is only callable by the countryMinter contract
+    ///@dev this function will initialize the struct to store the info about the minted nations improvements
+    ///@notice this function will allow each minted nation to buy imoprovements
+    ///@param id this is the nation ID for the nation being minted
+    function generateImprovements(uint256 id) public onlyCountryMinter {
         Improvements3 memory newImprovements3 = Improvements3(
             0,
             0,
@@ -1814,6 +1903,9 @@ contract ImprovementsContract3 is Ownable {
         idToImprovements3[id] = newImprovements3;
     }
 
+    ///@dev this function will allow the caller to return the cost of an improvement
+    ///@return officeOfPropagandaCost this will be the cost of an office of propaganda
+    ///@return policeHeadquartersCost this will be the cost of a police headquarters...
     function getCost3() public view returns (
         uint256,
         uint256,
@@ -1842,18 +1934,26 @@ contract ImprovementsContract3 is Ownable {
         );
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of an office of propaganda
     function updateOfficeOfPropagandaCost(uint256 newPrice) public onlyOwner {
         officeOfPropagandaCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a police headquarters
     function updatePoliceHeadquartersCost(uint256 newPrice) public onlyOwner {
         policeHeadquartersCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a prison
     function updatePrisonCost(uint256 newPrice) public onlyOwner {
         prisonCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a radiatiion containment chamber
     function updateRadiationContainmentChamberCost(uint256 newPrice)
         public
         onlyOwner
@@ -1861,10 +1961,14 @@ contract ImprovementsContract3 is Ownable {
         radiationContainmentChamberCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a red light district
     function updateRedLightDistrictCost(uint256 newPrice) public onlyOwner {
         redLightDistrictCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a rehab facility
     function updateRehabilitationFacilityCost(uint256 newPrice)
         public
         onlyOwner
@@ -1872,26 +1976,55 @@ contract ImprovementsContract3 is Ownable {
         rehabilitationFacilityCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a satellite
     function updateSatelliteCost(uint256 newPrice) public onlyOwner {
         satteliteCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a school
     function updateSchoolCost(uint256 newPrice) public onlyOwner {
         schoolCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a shipyard
     function updateShipyardCost(uint256 newPrice) public onlyOwner {
         shipyardCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a stadium
     function updateStadiumCost(uint256 newPrice) public onlyOwner {
         stadiumCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a university
     function updateUniversityCost(uint256 newPrice) public onlyOwner {
         universityCost = newPrice;
     }
 
+    ///@dev this is a public function that allows a nation owner to purchase improvements
+    ///@dev this function is only callable by the nation owner
+    ///@notice this function will allow a nation owner to purchase certain improvements
+    ///@param amount is the number of improvements being purchased
+    ///@param countryId is the nation purchasing improvements
+    /**
+     * @param improvementId this will determine which improvement is being purchased
+     * 1 = office of propaganda
+     * 2 = police headquarters
+     * 3 = prison
+     * 4 = radiaton containment chambers
+     * 5 = red light district
+     * 6 = rehab facilities
+     * 7 = satellite
+     * 8 = school
+     * 9 = shipyard
+     * 10 = stadium
+     * 11 = university
+     */
     function buyImprovement3(
         uint256 amount,
         uint256 countryId,
@@ -2095,6 +2228,25 @@ contract ImprovementsContract3 is Ownable {
         }
     }
 
+    ///@dev this is a public function that allows a nation owner to delete improvements
+    ///@dev this function is only callable by the nation owner
+    ///@notice this function will allow a nation owner to delete certain improvements
+    ///@param amount is the number of improvements being delete
+    ///@param countryId is the nation deleting improvements
+    /**
+     * @param improvementId this will determine which improvement is being deleted
+     * 1 = office of propaganda
+     * 2 = police headquarters
+     * 3 = prison
+     * 4 = radiaton containment chambers
+     * 5 = red light district
+     * 6 = rehab facilities
+     * 7 = satellite
+     * 8 = school
+     * 9 = shipyard
+     * 10 = stadium
+     * 11 = university
+     */
     function deleteImprovement3(
         uint256 amount,
         uint256 countryId,
@@ -2259,6 +2411,10 @@ contract ImprovementsContract3 is Ownable {
         }
     }
 
+    ///@dev this is a public view function that will return the number of offices of propaganda for a given nation 
+    ///@notice this function will return the number of roffices of propaganda a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of offices of propaganda a given nation owns
     function getOfficeOfPropagandaCount(uint256 countryId)
         public
         view
@@ -2268,6 +2424,10 @@ contract ImprovementsContract3 is Ownable {
         return count;
     }
 
+    ///@dev this is a public view function that will return the number of police headquarters for a given nation 
+    ///@notice this function will return the number of police headquuarters a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of police headquarters a given nation owns
     function getPoliceHeadquartersCount(uint256 countryId)
         public
         view
@@ -2277,39 +2437,59 @@ contract ImprovementsContract3 is Ownable {
         return count;
     }
 
+    ///@dev this is a public view function that will return the number of prisons for a given nation 
+    ///@notice this function will return the number of prisons a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of prisons a given nation owns
     function getPrisonCount(uint256 countryId) public view returns (uint256) {
         uint256 count = idToImprovements3[countryId].prisonCount;
         return count;
     }
 
+    ///@dev this is a public view function that will return the number of radiation containment chambers for a given nation 
+    ///@notice this function will return the number of radiation containment chambers a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of radiation containment chambers a given nation owns
     function getRadiationContainmentChamberCount(uint256 countryId)
         public
         view
-        returns (uint256)
+        returns (uint256 count)
     {
         uint256 count = idToImprovements3[countryId]
             .radiationContainmentChamberCount;
         return count;
     }
 
+    ///@dev this is a public view function that will return the number of red light districts for a given nation 
+    ///@notice this function will return the number of red light districts a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of red light districts a given nation owns
     function getRedLightDistrictCount(uint256 countryId)
         public
         view
-        returns (uint256)
+        returns (uint256 count)
     {
         uint256 count = idToImprovements3[countryId].redLightDistrictCount;
         return count;
     }
 
+    ///@dev this is a public view function that will return the number of rehab facilities for a given nation 
+    ///@notice this function will return the number of rehab facilities a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of rehab facilities a given nation owns
     function getRehabilitationFacilityCount(uint256 countryId)
         public
         view
-        returns (uint256)
+        returns (uint256 count)
     {
         uint256 count = idToImprovements3[countryId].rehabilitationFacilityCount;
         return count;
     }
 
+    ///@dev this is a public view function that will return the number of satellites for a given nation 
+    ///@notice this function will return the number of satellites a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of satellites a given nation owns
     function getSatelliteCount(uint256 countryId)
         public
         view
@@ -2319,11 +2499,19 @@ contract ImprovementsContract3 is Ownable {
         return satelliteAmount;
     }
 
-    function getSchoolCount(uint256 countryId) public view returns (uint256) {
+    ///@dev this is a public view function that will return the number of schools for a given nation 
+    ///@notice this function will return the number of schools a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of schools a given nation owns
+    function getSchoolCount(uint256 countryId) public view returns (uint256 count) {
         uint256 count = idToImprovements3[countryId].schoolCount;
         return count;
     }
 
+    ///@dev this is a public view function that will return the number of shipyards for a given nation 
+    ///@notice this function will return the number of shipyards a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of shipyards a given nation owns
     function getShipyardCount(uint256 countryId)
         public
         view
@@ -2333,6 +2521,10 @@ contract ImprovementsContract3 is Ownable {
         return shipyardAmount;
     }
 
+    ///@dev this is a public view function that will return the number of stadiums for a given nation 
+    ///@notice this function will return the number of stadiums a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of stadiums a given nation owns
     function getStadiumCount(uint256 countryId)
         public
         view
@@ -2342,6 +2534,10 @@ contract ImprovementsContract3 is Ownable {
         return stadiumAmount;
     }
 
+    ///@dev this is a public view function that will return the number of universities for a given nation 
+    ///@notice this function will return the number of universities a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of universities a given nation owns
     function getUniversityCount(uint256 countryId)
         public
         view
