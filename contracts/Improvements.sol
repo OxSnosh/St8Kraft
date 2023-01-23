@@ -8,6 +8,9 @@ import "./Wonders.sol";
 import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+///@title ImprovementsContract1
+///@author OxSnosh
+///@notice this contract will allow a nation owner to buy certain improvements
 contract ImprovementsContract1 is Ownable {
     address public treasury;
     address public improvements2;
@@ -108,6 +111,8 @@ contract ImprovementsContract1 is Ownable {
 
     mapping(uint256 => Improvements1) public idToImprovements1;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
         address _treasury,
         address _improvements2,
@@ -140,10 +145,19 @@ contract ImprovementsContract1 is Ownable {
         _;
     }
 
+    modifier onlyCountryMinter() {
+        require(
+            msg.sender == countryMinter, "function only callable by countryMinter contract"
+        );
+        _;
+    }
+
+    ///@dev this function is only callable by the contract owner
     function updateTreasuryAddress(address _newAddress) public onlyOwner {
         treasury = _newAddress;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateImprovementContractAddresses(
         address _improvements2,
         address _improvements3,
@@ -154,11 +168,16 @@ contract ImprovementsContract1 is Ownable {
         improvements4 = _improvements4;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateNavyContractAddress(address _navy) public onlyOwner {
         navy = _navy;
     }
 
-    function generateImprovements(uint256 id) public {
+    ///@dev this function is only callable by the countryMinter contract
+    ///@dev this function will initialize the struct to store the info about the minted nations improvements
+    ///@notice this function will allow each minted nation to buy imoprovements
+    ///@param id this is the nation ID for the nation being minted
+    function generateImprovements(uint256 id) public onlyCountryMinter {
         Improvements1 memory newImprovements1 = Improvements1(
             0,
             0,
@@ -176,50 +195,75 @@ contract ImprovementsContract1 is Ownable {
         idToImprovements1[id] = newImprovements1;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of an airport
     function updateAirportCost(uint256 newPrice) public onlyOwner {
         airportCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a bank
     function updateBankCost(uint256 newPrice) public onlyOwner {
         bankCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a barracks
     function updateBarracksCost(uint256 newPrice) public onlyOwner {
         barracksCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a border fortification
     function updateBorderFortificationCost(uint256 newPrice) public onlyOwner {
         borderFortificationCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a border wall
     function updateBorderWallCost(uint256 newPrice) public onlyOwner {
         borderWallCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a bunker
     function updateBunkerCost(uint256 newPrice) public onlyOwner {
         bunkerCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a casino
     function updateCasinoCost(uint256 newPrice) public onlyOwner {
         casinoCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a church
     function updateChurchCost(uint256 newPrice) public onlyOwner {
         churchCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a clinic
     function updateClinicCost(uint256 newPrice) public onlyOwner {
         clinicCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a drydock
     function updateDrydockCost(uint256 newPrice) public onlyOwner {
         drydockCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a factory
     function updateFactoryCost(uint256 newPrice) public onlyOwner {
         factoryCost = newPrice;
     }
 
+    ///@dev this function will allow the caller to return the cost of an improvement
+    ///@return airportCost this will be the cost of an airport
+    ///@return bankCost this will be the cost of a bank...
     function getCost1() public view returns (
         uint256,
         uint256,
@@ -248,6 +292,10 @@ contract ImprovementsContract1 is Ownable {
         );
     }
 
+    ///@dev this is a public view function that will return the number of improvements a nation owns
+    ///@notice this function will return the number of improvements a nation owns
+    ///@param id this is the nation ID of the nation being queried
+    ///@return count this is the number of improvements for a given nation
     function getImprovementCount(uint256 id)
         public
         view
@@ -257,6 +305,10 @@ contract ImprovementsContract1 is Ownable {
         return count;
     }
 
+    ///@dev this is a publiv function that is only callable from the other improvement contracts
+    ///@notice this function will incrase the number of improvements for a nation when improvements are purchased
+    ///@param id this is the ID for the nation purchasing improvements
+    ///@param newCount is the updated total of improvements for a given nation
     function updateImprovementCount(uint256 id, uint256 newCount)
         public
         approvedAddress
@@ -264,6 +316,25 @@ contract ImprovementsContract1 is Ownable {
         idToImprovements1[id].improvementCount = newCount;
     }
 
+    ///@dev this is a public function that allows a nation owner to purchase improvements
+    ///@dev this function is only callable by the nation owner
+    ///@notice this function will allow a nation owner to purchase certain improvements
+    ///@param amount is the number of improvements being purchased
+    ///@param countryId is the nation purchasing improvements
+    /**
+     * @param improvementId this will determine which improvement is being purchased
+     * 1 = airport
+     * 2 = bank
+     * 3 = barracks
+     * 4 = border fortification
+     * 5 = border wall
+     * 6 = bunker
+     * 7 = casino
+     * 8 = church
+     * 9 = clinic
+     * 10 = drydock
+     * 11 = factory
+     */
     function buyImprovement1(
         uint256 amount,
         uint256 countryId,
@@ -410,6 +481,25 @@ contract ImprovementsContract1 is Ownable {
         }
     }
 
+    ///@dev this is a public function that allows a nation owner to delete improvements
+    ///@dev this function is only callable by the nation owner
+    ///@notice this function will allow a nation owner to delete certain improvements
+    ///@param amount is the number of improvements being deleted
+    ///@param countryId is the nation deleting improvements
+    /**
+     * @param improvementId this will determine which improvement is being deleted
+     * 1 = airport
+     * 2 = bank
+     * 3 = barracks
+     * 4 = border fortification
+     * 5 = border wall
+     * 6 = bunker
+     * 7 = casino
+     * 8 = church
+     * 9 = clinic
+     * 10 = drydock
+     * 11 = factory
+     */
     function deleteImprovement1(
         uint256 amount,
         uint256 countryId,
@@ -490,6 +580,10 @@ contract ImprovementsContract1 is Ownable {
         }
     }
 
+    ///@dev this is a public view function that will return the number of airports for a given nation 
+    ///@notice this function will return the number of airports a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of airports a given nation owns
     function getAirportCount(uint256 countryId)
         public
         view
@@ -499,6 +593,10 @@ contract ImprovementsContract1 is Ownable {
         return airportAmount;
     }
 
+    ///@dev this is a public view function that will return the number of barracks for a given nation 
+    ///@notice this function will return the number of barracks a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of barracks a given nation owns
     function getBarracksCount(uint256 countryId)
         public
         view
@@ -508,6 +606,10 @@ contract ImprovementsContract1 is Ownable {
         return barracksAmount;
     }
 
+    ///@dev this is a public view function that will return the number of border fortifications for a given nation 
+    ///@notice this function will return the number of border fortifications a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of border fortifications a given nation owns
     function getBorderFortificationCount(uint256 countryId)
         public
         view
@@ -518,6 +620,10 @@ contract ImprovementsContract1 is Ownable {
         return borderFortificationAmount;
     }
 
+    ///@dev this is a public view function that will return the number of border walls for a given nation 
+    ///@notice this function will return the number of border walls a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of border walls a given nation owns
     function getBorderWallCount(uint256 countryId)
         public
         view
@@ -527,11 +633,19 @@ contract ImprovementsContract1 is Ownable {
         return borderWallAmount;
     }
 
+    ///@dev this is a public view function that will return the number of banks for a given nation 
+    ///@notice this function will return the number of banks a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of banks a given nation owns
     function getBankCount(uint256 countryId) public view returns (uint256) {
         uint256 count = idToImprovements1[countryId].bankCount;
         return count;
     }
 
+    ///@dev this is a public view function that will return the number of bunkers for a given nation 
+    ///@notice this function will return the number of bunkers a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of bunkers a given nation owns
     function getBunkerCount(uint256 countryId)
         public
         view
@@ -541,16 +655,28 @@ contract ImprovementsContract1 is Ownable {
         return bunkerAmount;
     }
 
+    ///@dev this is a public view function that will return the number of casinos for a given nation 
+    ///@notice this function will return the number of casinos a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of casinos a given nation owns
     function getCasinoCount(uint256 countryId) public view returns (uint256) {
         uint256 count = idToImprovements1[countryId].casinoCount;
         return count;
     }
 
+    ///@dev this is a public view function that will return the number of churches for a given nation 
+    ///@notice this function will return the number of churches a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of churches a given nation owns
     function getChurchCount(uint256 countryId) public view returns (uint256) {
         uint256 count = idToImprovements1[countryId].churchCount;
         return count;
     }
 
+    ///@dev this is a public view function that will return the number of drydocks for a given nation 
+    ///@notice this function will return the number of drydocks a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of drydocks a given nation owns
     function getDrydockCount(uint256 countryId)
         public
         view
@@ -560,6 +686,10 @@ contract ImprovementsContract1 is Ownable {
         return drydockAmount;
     }
 
+    ///@dev this is a public view function that will return the number of clinics for a given nation 
+    ///@notice this function will return the number of clinics a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of clinics a given nation owns
     function getClinicCount(uint256 countryId)
         public
         view
@@ -569,6 +699,10 @@ contract ImprovementsContract1 is Ownable {
         return clinicAmount;
     }
 
+    ///@dev this is a public view function that will return the number of factories for a given nation 
+    ///@notice this function will return the number of factories a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of factories a given nation owns
     function getFactoryCount(uint256 countryId)
         public
         view
@@ -579,6 +713,9 @@ contract ImprovementsContract1 is Ownable {
     }
 }
 
+///@title ImprovementsContract2
+///@author OxSnosh
+///@notice this contract will allow a nation owner to buy certain improvements
 contract ImprovementsContract2 is Ownable {
     address public treasury;
     address public improvements1;
@@ -655,6 +792,8 @@ contract ImprovementsContract2 is Ownable {
 
     mapping(uint256 => Improvements2) public idToImprovements2;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
         address _treasury,
         address _forces,
@@ -671,10 +810,19 @@ contract ImprovementsContract2 is Ownable {
         improvements1 = _improvements1;
     }
 
+    modifier onlyCountryMinter() {
+        require(
+            msg.sender == countryMinter, "function only callable by countryMinter contract"
+        );
+        _;
+    }
+
+    ///@dev this function is only callable by the contract owner
     function updateTreasuryAddress(address _treasury) public onlyOwner {
         treasury = _treasury;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateImprovementContract1Address(address _improvements1)
         public
         onlyOwner
@@ -682,15 +830,21 @@ contract ImprovementsContract2 is Ownable {
         improvements1 = _improvements1;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWondersContract1Address(address _wonders1) public onlyOwner {
         wonders1 = _wonders1;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateForcesAddress(address _forces) public onlyOwner {
         forces = _forces;
     }
 
-    function generateImprovements(uint256 id) public {
+    ///@dev this function is only callable by the countryMinter contract
+    ///@dev this function will initialize the struct to store the info about the minted nations improvements
+    ///@notice this function will allow each minted nation to buy imoprovements
+    ///@param id this is the nation ID for the nation being minted
+    function generateImprovements(uint256 id) public onlyCountryMinter {
         Improvements2 memory newImprovements2 = Improvements2(
             0,
             0,
@@ -704,6 +858,9 @@ contract ImprovementsContract2 is Ownable {
         idToImprovements2[id] = newImprovements2;
     }
 
+    ///@dev this function will allow the caller to return the cost of an improvement
+    ///@return airportCost this will be the cost of an airport
+    ///@return bankCost this will be the cost of a bank...
     function getCost2() public view returns (
         uint256,
         uint256,
@@ -726,38 +883,70 @@ contract ImprovementsContract2 is Ownable {
         );
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a foreign ministry
     function updateForeignMinistryCost(uint256 newPrice) public onlyOwner {
         foreignMinistryCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a forward operating base
     function updateForwardOperatingBaseCost(uint256 newPrice) public onlyOwner {
         forwardOperatingBaseCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a guerilla camp
     function updateGuerillaCampCost(uint256 newPrice) public onlyOwner {
         guerillaCampCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a harbor
     function updateHarborCost(uint256 newPrice) public onlyOwner {
         harborCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a hospital
     function updateHospitalCost(uint256 newPrice) public onlyOwner {
         hospitalCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of an intel agency
     function updateIntelligenceAgencyCost(uint256 newPrice) public onlyOwner {
         intelligenceAgencyCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a jail
     function updateJailCost(uint256 newPrice) public onlyOwner {
         jailCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will allow the owner of the contract to update the cost of a labor camp
     function updateLaborCampCost(uint256 newPrice) public onlyOwner {
         laborCampCost = newPrice;
     }
 
+    ///@dev this is a public function that allows a nation owner to purchase improvements
+    ///@dev this function is only callable by the nation owner
+    ///@notice this function will allow a nation owner to purchase certain improvements
+    ///@param amount is the number of improvements being purchased
+    ///@param countryId is the nation purchasing improvements
+    /**
+     * @param improvementId this will determine which improvement is being purchased
+     * 1 = foreign ministry
+     * 2 = forward operating base 
+     * 3 = guerilla camp
+     * 4 = harbor
+     * 5 = hospital
+     * 6 = intel agency
+     * 7 = jail
+     * 8 = labor camp
+     */
     function buyImprovement2(
         uint256 amount,
         uint256 countryId,
@@ -907,6 +1096,22 @@ contract ImprovementsContract2 is Ownable {
         }
     }
 
+    ///@dev this is a public function that allows a nation owner to delete improvements
+    ///@dev this function is only callable by the nation owner
+    ///@notice this function will allow a nation owner to delete certain improvements
+    ///@param amount is the number of improvements being deleted
+    ///@param countryId is the nation deleting improvements
+    /**
+     * @param improvementId this will determine which improvement is being deleted
+     * 1 = foreign ministry
+     * 2 = forward operating base 
+     * 3 = guerilla camp
+     * 4 = harbor
+     * 5 = hospital
+     * 6 = intel agency
+     * 7 = jail
+     * 8 = labor camp
+     */
     function deleteImprovement2(
         uint256 amount,
         uint256 countryId,
@@ -1038,6 +1243,10 @@ contract ImprovementsContract2 is Ownable {
         }
     }
 
+    ///@dev this is a public view function that will return the number of foreign ministries for a given nation 
+    ///@notice this function will return the number of foreign ministries a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of foreign ministries a given nation owns
     function getForeignMinistryCount(uint256 countryId)
         public
         view
@@ -1047,6 +1256,10 @@ contract ImprovementsContract2 is Ownable {
         return count;
     }
 
+    ///@dev this is a public view function that will return the number of forward operating bases for a given nation 
+    ///@notice this function will return the number of forward operating bases a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of forward operating bases a given nation owns
     function getForwardOperatingBaseCount(uint256 countryId)
         public
         view
@@ -1057,6 +1270,10 @@ contract ImprovementsContract2 is Ownable {
         return fobCount;
     }
 
+    ///@dev this is a public view function that will return the number of guerilla camps for a given nation 
+    ///@notice this function will return the number of guerialls camps a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of guerilla camps a given nation owns
     function getGuerillaCampCount(uint256 countryId)
         public
         view
@@ -1065,7 +1282,11 @@ contract ImprovementsContract2 is Ownable {
         uint256 count = idToImprovements2[countryId].guerillaCampCount;
         return count;
     }
-
+    
+    ///@dev this is a public view function that will return the number of harbors for a given nation 
+    ///@notice this function will return the number of harbors a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of harbors a given nation owns
     function getHarborCount(uint256 countryId)
         public
         view
@@ -1075,6 +1296,10 @@ contract ImprovementsContract2 is Ownable {
         return harborAmount;
     }
 
+    ///@dev this is a public view function that will return the number of hospitals for a given nation 
+    ///@notice this function will return the number of hospitals a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of hospitals a given nation owns
     function getHospitalCount(uint256 countryId)
         public
         view
@@ -1084,6 +1309,10 @@ contract ImprovementsContract2 is Ownable {
         return hospitalAmount;
     }
 
+    ///@dev this is a public view function that will return the number of intel agencies for a given nation 
+    ///@notice this function will return the number of intel agencies a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of intel agencies a given nation owns
     function getIntelAgencyCount(uint256 countryId)
         public
         view
@@ -1094,6 +1323,10 @@ contract ImprovementsContract2 is Ownable {
         return intelAgencyAmount;
     }
 
+    ///@dev this is a public view function that will return the number of jails for a given nation 
+    ///@notice this function will return the number of jails a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of jails a given nation owns
     function getJailCount(uint256 countryId)
         public
         view
@@ -1103,6 +1336,10 @@ contract ImprovementsContract2 is Ownable {
         return jailAmount;
     }
 
+    ///@dev this is a public view function that will return the number of labor camps for a given nation 
+    ///@notice this function will return the number of labor camps a nation owns
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the number of labor camps a given nation owns
     function getLaborCampCount(uint256 countryId)
         public
         view
