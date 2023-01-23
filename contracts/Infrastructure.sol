@@ -13,6 +13,9 @@ import "./Crime.sol";
 import "./Forces.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+///@title InfrastructureContract
+///@author OxSnosh
+///@notice this contract will store a nations land, technology, infrastructure and tax rate
 contract InfrastructureContract is Ownable {
     address public countryMinter;
     address public resources;
@@ -62,6 +65,8 @@ contract InfrastructureContract is Ownable {
     mapping(uint256 => Infrastructure) public idToInfrastructure;
     mapping(uint256 => address) public idToOwnerInfrastructure;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings1 (
         address _resources,
         address _improvements1,
@@ -87,6 +92,8 @@ contract InfrastructureContract is Ownable {
         landMarket = _landMarket;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings2 (
         address _wonders1,
         address _wonders2,
@@ -111,6 +118,8 @@ contract InfrastructureContract is Ownable {
         aid = _aid;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings3 (
         address _spyAddress,
         address _tax,
@@ -205,7 +214,19 @@ contract InfrastructureContract is Ownable {
         _;
     }
 
-    function generateInfrastructure(uint256 id) public {
+    modifier onlyCountryMinter() {
+        require(
+            msg.sender == countryMinter,
+            "function only callable from countryMinter contract"
+        );
+        _;
+    }
+
+    ///@dev this function is only callable by the countryMinter contract
+    ///@dev this function will initialize the struct to store the info about the minted nations infrastructure
+    ///@notice this function allows this contract to store info about a nations infrastructure
+    ///@param id this is the nation ID for the nation being minted
+    function generateInfrastructure(uint256 id) public onlyCountryMinter {
         Infrastructure memory newInfrastrusture = Infrastructure(
             20,
             0,
@@ -216,6 +237,11 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[id] = newInfrastrusture;
     }
 
+    ///@dev this function is only callable from the infrastructure market contract
+    ///@dev this function will increase a nations infrastructure when purchased in the market contract
+    ///@notice this function will increase a nations infrastructure when purchased in the market contract
+    ///@param id is the nation purchasing infrastructure
+    ///@param amount is the amount of infrastructure being purchased
     function increaseInfrastructureFromMarket(uint256 id, uint256 amount)
         public
         onlyInfrastructureMarket

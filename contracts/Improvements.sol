@@ -1834,6 +1834,8 @@ contract ImprovementsContract3 is Ownable {
 
     mapping(uint256 => Improvements3) public idToImprovements3;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
         address _treasury,
         address _additionalNavy, 
