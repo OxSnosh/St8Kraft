@@ -737,6 +737,10 @@ contract ForcesContract is Ownable {
     }
 }
 
+///@title MissilesContract
+///@author OxSnosh
+///@dev this contract will allow a nation to purchase cruise missiles and nukes
+///@dev this contract inherits from the openzeppelin ownable contract
 contract MissilesContract is Ownable {
     uint256 public cruiseMissileCost = 20000;
     uint256 public nukeCost;
@@ -773,6 +777,8 @@ contract MissilesContract is Ownable {
         uint256 nukesPurchasedToday;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings (
         address _treasury,
         address _spyAddress,
@@ -795,6 +801,8 @@ contract MissilesContract is Ownable {
         inf = InfrastructureContract(_infrastructure);
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings2 (
         address _resources,
         address _improvements1,
@@ -818,68 +826,75 @@ contract MissilesContract is Ownable {
 
     mapping(uint256 => Missiles) public idToMissiles;
 
-    modifier onlyKeeper() {
-        require(msg.sender == keeper, "function only callable from keeper contract");
-        _;
-    }
-
     function generateMissiles(uint256 id) public {
         Missiles memory newMissiles = Missiles(0, 0, 0);
         idToMissiles[id] = newMissiles;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateTreasuryContract(address newAddress) public onlyOwner {
         treasury = newAddress;
         tsy = TreasuryContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateSpyContract(address newAddress) public onlyOwner {
         spyAddress = newAddress;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateNukeContract(address newAddress) public onlyOwner {
         nukeAddress = newAddress;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateAirBattleContract(address newAddress) public onlyOwner {
         airBattle = newAddress;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateNationStrengthContract(address newAddress) public onlyOwner {
         strength = newAddress;
         stren = NationStrengthContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateResourcesContract(address newAddress) public onlyOwner {
         resources = newAddress;
         res = ResourcesContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateImprovementsContract1(address newAddress) public onlyOwner {
         improvements1 = newAddress;
         imp1 = ImprovementsContract1(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWondersContract1(address newAddress) public onlyOwner {
         wonders1 = newAddress;
         won1 = WondersContract1(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWondersContract2(address newAddress) public onlyOwner {
         wonders2 = newAddress;
         won2 = WondersContract2(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWondersContract4(address newAddress) public onlyOwner {
         wonders4 = newAddress;
         won4 = WondersContract4(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateCountryMinter(address newAddress) public onlyOwner {
         countryMinter = newAddress;
         mint = CountryMinter(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateCruiseMissileCost(uint256 newPrice) public onlyOwner {
         cruiseMissileCost = newPrice;
     }
@@ -902,18 +917,29 @@ contract MissilesContract is Ownable {
         _;
     }
 
+    modifier onlyKeeper() {
+        require(msg.sender == keeper, "function only callable from keeper contract");
+        _;
+    }
+
     function buyCruiseMissiles(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
-        uint256 purchasePrice = cruiseMissileCost;
+        uint256 costPerMissile = getCruiseMissileCost(id);
+        uint256 cost = (costPerMissile * amount);
+        idToMissiles[id].cruiseMissiles += amount;
+        tsy.spendBalance(id, cost);
+    }
+
+    function getCruiseMissileCost(uint256 id) public view returns (uint256 cost) {
+        uint256 basePurchasePrice = cruiseMissileCost;
         uint256 factoryCount = imp1.getFactoryCount(id);
         uint256 costModifier = 100;
         if (factoryCount > 0) {
             costModifier -= (factoryCount * 5);
         }
-        uint256 cost = (amount * ((purchasePrice * costModifier) / 100));
-        idToMissiles[id].cruiseMissiles += amount;
-        tsy.spendBalance(id, cost);
+        uint256 costPerMissile = ((basePurchasePrice * costModifier) / 100);
+        return costPerMissile;
     }
 
     function getCruiseMissileCount(uint256 id) public view returns (uint256) {
