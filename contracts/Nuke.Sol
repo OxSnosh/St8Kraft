@@ -166,6 +166,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
             attackType
         );
         nukeAttackIdToNukeAttack[nukeAttackId] = newAttack;
+        mis.
         fulfillRequest(nukeAttackId);
         nukeAttackId++;
     }
@@ -211,6 +212,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
             mis.decreaseNukeCountFromNukeContract(attackerId);
         } else {
             //thwart event
+            mis.decreaseNukeCountFromNukeContract(attackerId);
         }
     }
 

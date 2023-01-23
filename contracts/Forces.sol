@@ -922,6 +922,10 @@ contract MissilesContract is Ownable {
         _;
     }
 
+    ///@dev this function is a public function that will allow a nation owner to purchase cruise missiles
+    ///@notice this function allows a nation owner to purchase cruise missiles
+    ///@param amount is the amount of cruise missiles being purchased
+    ///@param id is the nation id of the nation buying cruise missiles
     function buyCruiseMissiles(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
@@ -931,6 +935,10 @@ contract MissilesContract is Ownable {
         tsy.spendBalance(id, cost);
     }
 
+    ///@dev this is a public view function that will return the cost per missiile of cruise missiles for a nation
+    ///@notice this function will return the cost per cruise missile for a given nation
+    ///@param id is the nation id of the nation purchasing missiles
+    ///@return cost is the cost per missile of cruise missiles for that nation
     function getCruiseMissileCost(uint256 id) public view returns (uint256 cost) {
         uint256 basePurchasePrice = cruiseMissileCost;
         uint256 factoryCount = imp1.getFactoryCount(id);
@@ -942,11 +950,19 @@ contract MissilesContract is Ownable {
         return costPerMissile;
     }
 
+    ///@dev this is a public view function that will return the number of cruise missile a nation owns
+    ///@notice this function will return the number of cruise missiles a given nation owns
+    ///@param id is the nation ID of the nation being queried
+    ///@return uint256 is the number of cruise missiles a given nation owns
     function getCruiseMissileCount(uint256 id) public view returns (uint256) {
         uint256 count = idToMissiles[id].cruiseMissiles;
         return count;
     }
 
+    ///@dev this is a public function that will decrease the number of cruise missiles only callable from the spy contract
+    ///@notice this function will decrease the number of cruise missiles lost during a spy attack
+    ///@param amount this is the number of missiles being destroyed 
+    ///@param id this is the nation id of the nation being attacked
     function decreaseCruiseMissileCount(uint256 amount, uint256 id)
         public
         onlySpyContract
@@ -954,6 +970,11 @@ contract MissilesContract is Ownable {
         idToMissiles[id].cruiseMissiles -= amount;
     }
 
+    ///@dev this is a public function that will decrease the number of cruise missiles only callable from the nuke contract
+    ///@notice this function will decrease the number of cruise missiles lost during a nuke attack
+    ///@notice a succesful nuke attack will destroy 35% of your nations cruise missiles 
+    ///@notice a fallout shelter system will reduce the number of missiles lost during a nuke attack to 25%
+    ///@param id this is the nation id of the nation being attacked
     function decreaseCruiseMissileCountFromNukeContract(uint256 id)
         public
         onlyNukeContract
@@ -964,10 +985,14 @@ contract MissilesContract is Ownable {
         if (falloutShelter) {
             percentage = 25;
         }
-        uint256 cruiseMissilesToDecrease = ((cruiseMissiles * 35) / 100);
+        uint256 cruiseMissilesToDecrease = ((cruiseMissiles * percentage) / 100);
         idToMissiles[id].cruiseMissiles -= cruiseMissilesToDecrease;
     }
 
+    ///@dev this is a public function only callable from the air battle contact
+    ///@notice this function will decrease the number of cruise missiles lost during a bombing mission
+    ///@param id this is the nation id of the nation losing missiles from being attacked by bombers
+    ///@param amountToDecrease this is the number of cruise missiles beind destroyed by the bombing mission
     function decreaseCruiseMissileCountFromAirBattleContract(
         uint256 id,
         uint256 amountToDecrease
@@ -980,6 +1005,12 @@ contract MissilesContract is Ownable {
         }
     }
 
+    ///@dev this is a public function that will allow a nation owner to purchase nukes
+    ///@notice this function allows a nation owner to purchase nukes
+    ///@notice requirements to purchase nukes are 75 technology, 1000 infrastructure and access to uranium
+    ///@notice a nation must also have a nation strength of 150,000 or a manhattan project to purchase nukes
+    ///@notice a nation owner can only purchase one nuke per day (2 with a weapons research center)
+    ///@param id is the nation id of the nation purchasing nukes
     function buyNukes(uint256 id) public {
         //tech 75 infra 1000 access to uranium
         bool isOwner = mint.checkOwnership(id, msg.sender);
@@ -1000,28 +1031,47 @@ contract MissilesContract is Ownable {
             maxNukesPerDay = 2;
         }
         require(nukesPurchasedToday < maxNukesPerDay, "already purchased nuke today");
+        uint256 cost = getNukeCost(id);
         idToMissiles[id].nukesPurchasedToday += 1;
-        uint256 nukeCount = idToMissiles[id].nuclearWeapons;
-        uint256 cost = (500000 + (nukeCount * 50000));
         idToMissiles[id].nuclearWeapons += 1;
         tsy.spendBalance(id, cost);
     }
 
+    ///@dev this is a public function that will return the cost per nuke for a nation
+    ///@notice this function will return the cost per nuke for a nation
+    ///@notice nukes cost 500,000 + (50,000 * current nuke count)
+    ///@param id is the nation ID of the nation being queried
+    ///@return uint256 is the cost per nuke for a given nation
+    function getNukeCost(uint256 id) public view returns (uint256) {
+        uint256 nukeCount = idToMissiles[id].nuclearWeapons;
+        uint256 cost = (500000 + (nukeCount * 50000));
+        return cost;
+    }
+
+    ///@dev this is a public view function that will retrun a nations current nuke count
+    ///@notice this function retrurns a nations current nuke count
+    ///@param id this is the nation ID for the nation being queried
+    ///@return uint256 this is the current nuke count for a given nation
     function getNukeCount(uint256 id) public view returns (uint256) {
         uint256 count = idToMissiles[id].nuclearWeapons;
         return count;
     }
 
-    //need to decrease nuke count when launched
-
+    ///@dev this is a public function that will decrease the nuke count for a nation by 1 when a nuke is launched from the nuke contract
+    ///@dev this function is only callable from the nuke contract
+    ///@notice this function will decrease a nations nuke count by 1 when a nuke is launched
+    ///@param id is the nation id of the nation launching the nuke that will have its nuke count decreased by 1
     function decreaseNukeCountFromNukeContract(uint256 id)
         public
         onlyNukeContract
     {
-
         idToMissiles[id].nuclearWeapons -= 1;
     }
 
+    ///@dev this is a public function that will decrease the nuke count for a nation when a successful spy attack is executed
+    ///@dev this function is only callable from the spy contract
+    ///@notice this function will decrease a nations nuke count if they are successfully attacked by a spy
+    ///@param id is the nation id of the nation that was attacked and is losing a nuke
     function decreaseNukeCountFromSpyContract(uint256 id)
         public
         onlySpyContract
@@ -1036,6 +1086,9 @@ contract MissilesContract is Ownable {
         idToMissiles[id].nuclearWeapons -= 1;
     }
 
+    ///@dev this is a function that is only callable from the keeper contract
+    ///@dev this function will reset the number of nukes purchased by each nation for that day back to 0
+    ///@dev this function will be called daily
     function resetNukesPurchasedToday() public onlyKeeper {
         uint256 countryCount = mint.getCountryCount();
         for(uint i = 0; i < countryCount; i++) {
