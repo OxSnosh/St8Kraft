@@ -520,6 +520,10 @@ contract ForcesContract is Ownable {
         idToForces[id].deployedTanks -= amountToWithdraw;
     }
 
+    ///@dev this is a public view function that can only be called by the Spy Contract
+    ///@notice this funtion will allow the spy contract to decrease the number of defending tanks in a spy attack
+    ///@param amount is the amount of tanks being decreased
+    ///@param id is the nation id of the nation being attacked
     function decreaseDefendingTankCount(uint256 amount, uint256 id)
         public
         onlySpyContract
@@ -528,6 +532,10 @@ contract ForcesContract is Ownable {
         idToForces[id].numberOfTanks -= amount;
     }
 
+    ///@dev this is a public function that can only be called from the cruise missile contract
+    ///@notice this funtion will allow the cruise missile contact to decrease the number of tanks in a cruise missile attack
+    ///@param amount is the number of tanks being decreased
+    ///@param id is the nation id of the nation being attacked
     function decreaseDefendingTankCountFromCruiseMissileContract(
         uint256 amount,
         uint256 id
@@ -536,6 +544,9 @@ contract ForcesContract is Ownable {
         idToForces[id].numberOfTanks -= amount;
     }
 
+    ///@dev this is a public function that can only be called from the nuke contract
+    ///@notice this funtion will allow the cruise missile contact to decrease the number of tanks in a nuke attack
+    ///@param id is the nation id of the nation being attacked
     function decreaseDefendingTankCountFromNukeContract(uint256 id)
         public
         onlyNukeContract
@@ -551,6 +562,10 @@ contract ForcesContract is Ownable {
         idToForces[id].defendingTanks -= defendingTanksToDecrease;
     }
 
+    ///@dev this is a public function that can only be called from the air battle contract
+    ///@notice this funtion will allow the cruise missile contact to decrease the number of tanks in a bombing attack
+    ///@param amountToDecrease is the number of tanks being decreased
+    ///@param id is the nation id of the nation being attacked
     function decreaseDefendingTankCountFromAirBattleContract(
         uint256 id,
         uint256 amountToDecrease
@@ -565,11 +580,19 @@ contract ForcesContract is Ownable {
         }
     }
 
+    ///@dev this is a public view function that will return the number of tanks a nation has
+    ///@notice this function will return the number of tanks for a nation
+    ///@param id is the nation id for the nation being queried
+    ///@return tanks is the number of tanks for the nation being queried
     function getTankCount(uint256 id) public view returns (uint256 tanks) {
         uint256 tankAmount = idToForces[id].numberOfTanks;
         return tankAmount;
     }
 
+    ///@dev this is a public view function that will return the number of deployed tanks a nation has
+    ///@notice this function will return the number of deployed tanks for a nation
+    ///@param id is the nation id for the nation being queried
+    ///@return tanks is the number of deployed tanks for the nation being queried
     function getDeployedTankCount(uint256 id)
         public
         view
@@ -579,6 +602,10 @@ contract ForcesContract is Ownable {
         return tankAmount;
     }
 
+    ///@dev this is a public view function that will return the number of defending tanks a nation has
+    ///@notice this function will return the number of defending tanks for a nation
+    ///@param id is the nation id for the nation being queried
+    ///@return tanks is the number of defending tanks for the nation being queried
     function getDefendingTankCount(uint256 id)
         public
         view
@@ -588,6 +615,11 @@ contract ForcesContract is Ownable {
         return tankAmount;
     }
 
+    ///@dev this is a public function only callable by the nation owner that will purchase spies
+    ///@notice this function will allow a natio nowner to purchase spies
+    ///@notice you cannot buy more spies than the maximum amount for your nation
+    ///@param amount is the amount of spies being purchased
+    ///@param id is the nation id of the nation buying spies
     function buySpies(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
@@ -604,6 +636,13 @@ contract ForcesContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
+    ///@dev this is a public view function that will return the maximum amount of spies a given country can own
+    ///@notice this function will return the maximum amount of spies a nation can own
+    ///@notice the base max spy count for a nation is 50
+    ///@notice intel agencies will increase the max number of spies by 100
+    ///@notice a central intelligence agency wonder will increase the max number of spies by 250
+    ///@param id is the nation id for the nation being queried
+    ///@return uint256 is the maximum number of spies for a given nation
     function getMaxSpyCount(uint256 id) public view returns (uint256) {
         uint256 maxSpyCount = 50;
         uint256 intelAgencies = imp2.getIntelAgencyCount(id);
@@ -617,10 +656,17 @@ contract ForcesContract is Ownable {
         return maxSpyCount;
     }
 
+    ///@dev this is a public function only callable from the Spy Contract
+    ///@notice this function will allow the spy contract to decrease the number of spies of an nation that is lost by the attacker during a spy attack
+    ///@param id is the nation id of the nation losing their spy when the attack fails
     function decreaseAttackerSpyCount(uint256 id) public onlySpyContract {
         idToForces[id].numberOfSpies -= 1;
     }
 
+    ///@dev this is a public view function that allows the spy contract to decrease the number of spies of a nation in a spy attack
+    ///@notice this function will allow the spy contract to decrease the number of spies lost during a spy attack
+    ///@param amount is the number of spies lost during the attack
+    ///@param id is the nation suffering losses during the spy attack
     function decreaseDefenderSpyCount(uint256 amount, uint256 id)
         public
         onlySpyContract
@@ -628,6 +674,10 @@ contract ForcesContract is Ownable {
         idToForces[id].numberOfSpies -= amount;
     }
 
+    ///@dev this is a public view function that will return the current spy count for a nation
+    ///@notice this function will return a nations current spy count
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the spy count for a given nation
     function getSpyCount(uint256 countryId)
         public
         view
@@ -637,6 +687,12 @@ contract ForcesContract is Ownable {
         return spyAmount;
     }
 
+    ///@dev this is a public function only callable from the ground battle contract
+    ///@dev this function will decrease the losses of an attacker during a ground battle
+    ///@notice this function will decrease the number of losses of an attacker during a ground battle
+    ///@param attackerSoldierLosses is the soldier losses for an attacker from a battle
+    ///@param attackerTankLosses is the tank losses for an attacker from a battle
+    ///@param attackerId is the nation ID of the nation suffering losses
     function decreaseDeployedUnits(
         uint256 attackerSoldierLosses,
         uint256 attackerTankLosses,
@@ -649,6 +705,12 @@ contract ForcesContract is Ownable {
         idToForces[attackerId].deployedTanks -= attackerTankLosses;
     }
 
+    ///@dev this is a public function only callable from the ground battle contract
+    ///@dev this function will decrease the losses of an defender during a ground battle
+    ///@notice this function will decrease the number of losses of an defender during a ground battle
+    ///@param defenderSoldierLosses is the soldier losses for an defender from a battle
+    ///@param defenderTankLosses is the tank losses for an defender from a battle
+    ///@param defenderId is the nation ID of the nation suffering losses
     function decreaseDefendingUnits(
         uint256 defenderSoldierLosses,
         uint256 defenderTankLosses,
@@ -661,10 +723,15 @@ contract ForcesContract is Ownable {
         idToForces[defenderId].defendingTanks -= defenderTankLosses;
     }
 
+    ///@dev this is a function for the development environment that will assist in testing wonders and improvements that are available after a certain number of casualties
     function increaseSoldierCasualties(uint256 id, uint256 amount) public onlyOwner {
         idToForces[id].soldierCasualties += amount;
     }
 
+    ///@dev this is a public view function that will return a nations casualty count
+    ///@notice this function will return a nations casualty count
+    ///@param id is a nation id for the nation being queried
+    ///@return uint256 is the casualty count for a given nation
     function getCasualties(uint256 id) public view returns (uint256) {
         return idToForces[id].soldierCasualties;
     }
