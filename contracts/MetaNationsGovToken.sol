@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 /// @title MetaNationsGovToken This is the token used to purchase nation NFTs
 /// @author OxSnosh
 /// @notice This token will be spent to purchase your nation NFT
-/// @notice This token is spent at the amount equivalent cost in USDC to the seed money of the nation (initiallt 2,000,000 WarBucks)
+/// @notice This token is spent at the amount equivalent cost in USDC to the seed money of the nation
 contract MetaNationsGovToken is ERC20, Ownable {
 
     /// @param initialSupply is the initial supply minted of MetaNationsGovToekn

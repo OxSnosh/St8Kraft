@@ -5,6 +5,10 @@ import "./SpyOperations.sol";
 import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+///@title MilitaryContract
+///@author OxSnosh
+///@dev this contract inherits from openzeppelin's ownable contract
+///@notice this contract will allow a nation owner to control their defcon level, threat level and war/peace preference
 contract MilitaryContract is Ownable {
     address public spyAddress;
     address public countryMinter;
@@ -25,6 +29,13 @@ contract MilitaryContract is Ownable {
         _;
     }
 
+    modifier onlyCountryMinter() {
+        require(msg.sender == countryMinter, "only callable from country minter contract");
+        _;
+    }
+
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings (address _spyAddress, address _countryMinter) public onlyOwner {
         spyAddress = _spyAddress;
         spy = SpyOperationsContract(_spyAddress);
@@ -32,11 +43,18 @@ contract MilitaryContract is Ownable {
         mint = CountryMinter(_countryMinter);
     }
 
-    function generateMilitary(uint256 id) public {
+    ///@dev this function is a public function only callable from the country minter contract
+    ///@notice this function will allow allow a nation owner to reset their defcon and threat level and toggle their war peace preference
+    function generateMilitary(uint256 id) public onlyCountryMinter {
         Military memory newMilitary = Military(5, 1, false);
         idToMilitary[id] = newMilitary;
     }
 
+    ///@dev this is a public function only callable by the nation owner
+    ///@dev this function will allow a nation owner to update their defcon level
+    ///@notice this function will allow a nation owner to update their defcon level
+    ///@param newDefcon is the new defcon which must be an integer between 1 and 5
+    ///@param id is the nation id of the nation updating their defcon
     function updateDefconLevel(uint256 newDefcon, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require (isOwner, "!nation owner");
@@ -51,10 +69,20 @@ contract MilitaryContract is Ownable {
         idToMilitary[id].defconLevel = newDefcon;
     }
 
+    ///@dev this function will only be callable from the Spy contract
+    ///@dev this function will allow a successful spy operation to update the defcon level
+    ///@notice this function will allow a succesful spy attack to update the defcon level
+    ///@param id is the nation id that was attacked and getting their defcon reset
+    ///@param newLevel is the new defcon level being set during the attack
     function setDefconLevelFromSpyContract(uint256 id, uint256 newLevel) public onlySpyContract {
         idToMilitary[id].defconLevel = newLevel;
     }
 
+    ///@dev this is a public function only callable by the nation owner
+    ///@dev this function allows a nation owner to update the threat level of a nation
+    ///@notice this function allows a nation owner to update the threat level of a nation
+    ///@param newThreatLevel is the new threat level being updated
+    ///@param id is the nation id of the nation updating the threat level
     function updateThreatLevel(uint256 newThreatLevel, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require (isOwner, "!nation owner");
@@ -69,6 +97,11 @@ contract MilitaryContract is Ownable {
         idToMilitary[id].threatLevel = newThreatLevel;
     }
 
+    ///@dev this function will only be callable from the Spy contract
+    ///@dev this function will allow a successful spy operation to update the threat level
+    ///@notice this function will allow a succesful spy attack to update the threat level
+    ///@param id is the nation id that was attacked and getting their threat level reset
+    ///@param newLevel is the new threat level being set during the attack
     function setThreatLevelFromSpyContract(uint256 id, uint256 newLevel)
         public
         onlySpyContract
@@ -76,6 +109,10 @@ contract MilitaryContract is Ownable {
         idToMilitary[id].threatLevel = newLevel;
     }
 
+    ///@dev this function is a public function only callable from the nation owner
+    ///@dev this function will allow a nation to toggle their prefernece for peace or war
+    ///@notice this function will allow a nation to toggle their prefernece for peace or war
+    ///@param id is the nation id of the nation toggling their preference
     function toggleWarPeacePreference(uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require (isOwner, "!nation owner");
@@ -86,16 +123,25 @@ contract MilitaryContract is Ownable {
         }
     }
 
+    ///@dev this is a public view function that will return a nations defcon level
+    ///@param id is the nation id of the nation being queried
+    ///@return uint256 is the defcon level for a given nation
     function getDefconLevel(uint256 id) public view returns (uint256) {
         uint256 defcon = idToMilitary[id].defconLevel;
         return defcon;
     }
 
+    ///@dev this is a public view function that will return a nations threat level
+    ///@param id is the nation id of the nation being queried
+    ///@return uint256 is the threat level for a given nation
     function getThreatLevel(uint256 id) public view returns (uint256) {
         uint256 threatLevel = idToMilitary[id].threatLevel;
         return threatLevel;
     }
 
+    ///@dev this is a public view function that will return a nations preference for war
+    ///@param id is the nation id of the nation being queried
+    ///@return bool is true if war is possible
     function getWarPeacePreference(uint256 id) public view returns (bool) {
         bool war = idToMilitary[id].warPeacePreference;
         return war;

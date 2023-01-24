@@ -10,6 +10,9 @@ import "./Treasury.sol";
 import "./CountryParameters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+///@title InfrastructureMarketContract
+///@author OxSnosh
+///@notice this contract will allow a nation owner to buy Infrastructure
 contract InfrastructureMarketContract is Ownable {
     address public countryMinter;
     address public resources;
@@ -29,6 +32,8 @@ contract InfrastructureMarketContract is Ownable {
     InfrastructureContract inf;
     TreasuryContract tsy;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
         address _resources,
         address _parameters,
@@ -57,6 +62,11 @@ contract InfrastructureMarketContract is Ownable {
         inf = InfrastructureContract(_infrastructure);
     }
 
+    ///@dev this is a public view function that will allow a nation owner to buy infrastructure
+    ///@dev this function is only callable by the nation owner
+    ///@notice this function will allow a nation owner to purchase infrastructure
+    ///@param id is the nation id of the nation purchasing infrastructure
+    ///@param buyAmount is the amount of infrastructure being purchased
     function buyInfrastructure(uint256 id, uint256 buyAmount) public {
         bool owner = mint.checkOwnership(id, msg.sender);
         require(owner, "!nation owner");
@@ -65,12 +75,23 @@ contract InfrastructureMarketContract is Ownable {
         tsy.spendBalance(id, cost);
     }
 
+    ///@dev this is a public view function that will return the cost of an infrastructure purchase
+    ///@dev this function multiplies the cost per level by the purchases amount
+    ///@notice this function will return the cost of an infrastructure purchase
+    ///@param id is the nation id of the nation buying infrastructure
+    ///@param buyAmount this is the amount of infrastructure being purchased
+    ///@return uint256 this is the cost of the purchase
     function getInfrastructureCost(uint256 id, uint256 buyAmount) public view returns (uint256) {
         uint256 costPerLevel = getInfrastructureCostPerLevel(id);
         uint256 cost = buyAmount * costPerLevel;
         return cost;
     }
 
+    ///@dev this is a public view functon that will return the infrastructure cost per level
+    ///@notice this function will return the cost of an infrastructure purchase per level
+    ///@notice cartain modifiers in the following functions will reduce the cost of infrastructure
+    ///@param id this is the nation id making the purchase
+    ///@return uint256 this is the cost per level of an infrastructure purchase
     function getInfrastructureCostPerLevel(
         uint256 id
     ) public view returns (uint256) {
@@ -108,6 +129,13 @@ contract InfrastructureMarketContract is Ownable {
         return adjustedCostPerLevel * (10**18);
     }
 
+    ///@dev this function is one of three functions that will adjust the cost of infrastructure lower
+    ///@dev this function is a public view function that will get called when infrasturcture is quoted or purchased
+    ///@notice this function is one of three functions that will adjust the cost of infrastructure lower based on a nations resources, improvements and wonders
+    ///@notice lumber will reduce the cost of infrastructure by 6%
+    ///@notice iron will reduce the cost of infrastructure by 5%
+    ///@notice marble will reduce the cost of infrastructure by 10%
+    ///@return uint256 this will be the multiplier reductions from this formula
     function getInfrastructureCostMultiplier1(
         uint256 id
     ) public view returns (uint256) {
@@ -132,6 +160,15 @@ contract InfrastructureMarketContract is Ownable {
         return sumOfAdjustments;
     }
 
+    ///@dev this function is the second of three functions that will adjust the cost of infrastructure lower
+    ///@dev this function is a public view function that will get called when infrasturcture is quoted or purchased
+    ///@notice this function is the second of three functions that will adjust the cost of infrastructure lower based on a nations resources, improvements and wonders
+    ///@notice rubber will reduce the cost of infrastructure by 3%
+    ///@notice construction will reduce the cost of infrastructure by 5%
+    ///@notice an interstate system will reduce the cost of infrastructure by 8%
+    ///@notice certain accomodative governements will reduce the cost of infrastructure by 5%
+    ///@notice factories without a scientific development center will reduce the cost of infrastructure by 8% and 10% with a scientific development center
+    ///@return uint256 this will be the multiplier reductions from this formula
     function getInfrastructureCostMultiplier2(
         uint256 id
     ) public view returns (uint256) {
@@ -175,6 +212,14 @@ contract InfrastructureMarketContract is Ownable {
         return sumOfAdjustments;
     }
 
+    ///@dev this function is the third of three functions that will adjust the cost of infrastructure lower
+    ///@dev this function is a public view function that will get called when infrasturcture is quoted or purchased
+    ///@notice this function is the third of three functions that will adjust the cost of infrastructure lower based on a nations resources, improvements and wonders
+    ///@notice aluminium will reduce the cost of infrastructure by 7%
+    ///@notice coal will reduce the cost of infrastructure by 4%
+    ///@notice steel will reduce the cost of infrastructure by 2%
+    ///@notice asphalt will reduce the cost of infrastructure by 5%
+    ///@return uint256 this will be the multiplier reductions from this formula
     function getInfrastructureCostMultiplier3(
         uint256 id
     ) public view returns (uint256) {
@@ -205,6 +250,10 @@ contract InfrastructureMarketContract is Ownable {
         return sumOfAdjustments;
     }
 
+    ///@dev this is a public view function that will return a boolean value if a nations government type accomodates a reduced infrastructure cost
+    ///@notice this function will check if the given nation has a governemnt type that accomodate a lower cost of infrastructure
+    ///@param countryId is the nation ID of the country being queried
+    ///@return bool will be true if the nation's government type accomodates a lower infrastructure cost
     function checkAccomodativeGovernment(
         uint256 countryId
     ) public view returns (bool) {
@@ -222,6 +271,11 @@ contract InfrastructureMarketContract is Ownable {
         return false;
     }
 
+    ///@dev this is a public function callable by the nation owner 
+    ///@dev this function will allow a nation owner to destroy infrastructure
+    ///@notice this function will allow a nation owner to destroy infrastructure
+    ///@param id this is the nation id of the nation destroying infrastructure
+    ///@param amount this is the amount of infrastructure being destroyed
     function destroyInfrastructure(uint256 id, uint256 amount) public {
         bool owner = mint.checkOwnership(id, msg.sender);
         require(owner, "!nation owner");

@@ -10,6 +10,9 @@ import "./Navy.sol";
 import "./CountryParameters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+///@title KeeperContract
+///@author OxSnosh
+///@dev this contract will allow the chainlink keeper to maintain the game clock that resets everal parameters daily
 contract KeeperContract is Ownable {
     address nukes;
     address aidContract;
@@ -27,6 +30,8 @@ contract KeeperContract is Ownable {
     NavalActionsContract navAct;
     CountryParametersContract params;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings (
         address _nukes,
         address _aid,
@@ -52,6 +57,7 @@ contract KeeperContract is Ownable {
         params = CountryParametersContract(_parameters);
     }
 
+    ///@dev this functon will be called by the chainlink keeper
     function keeperFunctionToCall() public {
         shiftNukeDays();
         resetAidProposals();
@@ -63,6 +69,7 @@ contract KeeperContract is Ownable {
         incrementDaysSinceForParameters();
     }
 
+    ///@dev this function can be called by the contract owner in the event the keeper fails
     function keeperFunctionToCallManually() public onlyOwner {
         shiftNukeDays();
         resetAidProposals();

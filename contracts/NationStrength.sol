@@ -8,6 +8,10 @@ import "./Bombers.sol";
 import "./Navy.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+///@title NationStrengthContract
+///@author OxSnosh
+///@dev this contract inherits from openzeppelin's ownable contract
+///@notice this contract will calculate a given nation's strength
 contract NationStrengthContract is Ownable {
     address public infrastructure;
     address public forces;
@@ -23,6 +27,8 @@ contract NationStrengthContract is Ownable {
     NavyContract nav;
     MissilesContract mis;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings (
         address _infrastructure,
         address _forces,
@@ -45,43 +51,54 @@ contract NationStrengthContract is Ownable {
         mis = MissilesContract(_missiles);
     }
 
+    
+    ///@dev this function is only callable by the contract owner
     function updateInfrastructureContract(address newAddress) public onlyOwner {
         infrastructure = newAddress;
         inf = InfrastructureContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateForcesContract(address newAddress) public onlyOwner {
         forces = newAddress;
         frc = ForcesContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateFightersContract(address newAddress) public onlyOwner {
         fighters = newAddress;
         fight = FightersContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateBombersContract(address newAddress) public onlyOwner {
         bombers = newAddress;
         bomb = BombersContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateNavyContract(address newAddress) public onlyOwner {
         navy = newAddress;
         nav = NavyContract(newAddress);
     }
 
-    //NATION STRENGTH
-    //land purchased * 1.5 +
-    //tanks deployed * .15 +
-    //tanks defending * .20 +
-    //cruise missiles * 10 +
-    //nukes ** 2 * 10 +
-    //tech * 5 +
-    //infra * 3 +
-    //soldiers * .02 +
-    //aircraft rankings * 5 +
-    //navy rankings * 10
-
+    ///@dev this is a public view function that will return a nation's strength
+    ///@notice this function will return a given nations strength
+    ///@notice strength is calculated in the following way
+    /**
+     * land purchased * 1.5 +
+     * infra * 3 +
+     * tech * 5 +
+     * soldiers * .02 +
+     * tanks deployed * .15 +
+     * tanks defending * .20 +
+     * aircraft rankings * 5 +
+     * navy rankings * 10
+     * cruise missiles * 10 +
+     * nukes ** 2 * 10 +
+    */
+    ///@param id is the nation id of the nation being queried
+    ///@return uint256 is the nations strength
     function getNationStrength(uint256 id) public view returns (uint256) {
         uint256 nationStrengthFromCommodities = getNationStrengthFromCommodities(
                 id

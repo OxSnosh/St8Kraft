@@ -60,7 +60,7 @@ contract CountryMinter is ERC721, Ownable {
     );
 
     constructor (
-    ) ERC721("MetaNations", "MNS") {
+    ) ERC721("MetaNations", "MNFT") {
     }
 
     ///@dev this function is only callable by the contract owner
