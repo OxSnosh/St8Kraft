@@ -57,7 +57,7 @@ contract LandMarketContract is Ownable {
     ///@dev this function multiplies the cost per level by the purchases amount
     ///@notice this function will return the cost of a land purchase
     ///@param id is the nation id of the nation buying land
-    ///@param buyAmount this is the amount of land being purchased
+    ///@param amount this is the amount of land being purchased
     ///@return uint256 this is the cost of the purchase
     function getLandCost(uint256 id, uint256 amount) public view returns (uint256) {
         uint256 costPerMile = getLandCostPerMile(id);

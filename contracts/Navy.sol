@@ -11,6 +11,10 @@ import "./Wonders.sol";
 import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+///@title NavalActionsContract
+///@author OxSnosh
+///@dev this contract inherits from openzeppelin's ownable contract
+///@notice this contract will keep track of naval actions (daily blockades, purchases and action slots)
 contract NavalActionsContract is Ownable {
     address public keeper;
     address public navy;
@@ -29,6 +33,8 @@ contract NavalActionsContract is Ownable {
 
     mapping(uint256 => NavalActions) idToNavalActions;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
         address _navalBlockade,
         address _breakBlockade,
@@ -64,11 +70,20 @@ contract NavalActionsContract is Ownable {
         _;
     }
 
+    ///@dev this is a public function that is only callable from the country minter contract
+    ///@dev this function is called when a nation is minted
+    ///@dev this function will initialize the struct that will keep track of action slots, daily blockades and purchases
+    ///@notice this function will allow the contract to keep track of each nations action slots, blockades and purchases
+    ///@param id is the nation ID of the country being minted
     function generateNavalActions(uint256 id) public onlyCountryMinter {
         NavalActions memory newNavalActions = NavalActions(false, 0, 0);
         idToNavalActions[id] = newNavalActions;
     }
 
+    ///@dev this is a public view function that is only callable from the navy battle contracts
+    ///@dev a nation is only allows to make 3 naval actions per day
+    ///@notice a nation is only allowed to make 3 naval actions per day
+    ///@notice this function will increase naval actions when they occur
     function increaseAction(uint256 id) public onlyNavalAction {
         idToNavalActions[id].actionSlotsUsedToday += 1;
     }
@@ -78,6 +93,12 @@ contract NavalActionsContract is Ownable {
         _;
     }
 
+    ///@dev this is a public function that is only callable from the navy contract where purchases occur
+    ///@dev this function will increment a nations daily purchases as purchases occur
+    ///@notice a nation at war can purchase 5 naval ships per day (7 with a foreign naval base)
+    ///@notice during peacetime a nation can purchase 2 naval ships per day (4 with a foreign navla base)
+    ///@param id is the nation id of the nation purchasin vessels
+    ///@param amount is the amount of navy vessels being purchased
     function increasePurchases(uint256 id, uint256 amount) public onlyNavy {
         idToNavalActions[id].purchasesToday += amount;
     }
@@ -87,7 +108,12 @@ contract NavalActionsContract is Ownable {
         _;
     }
 
-    function toggleBlockaded(uint256 id) public onlyNavy {
+    ///@dev this function is a public function that can only be called by the naval battle contracts
+    ///@dev a nation can only be blockaded once per day
+    ///@notice a nation can only be blockaded once per day
+    ///@notice this function will be called when a nation is blockaded and set the blockadedToday to true
+    ///@param id is the nation id of the nation being blockaded
+    function toggleBlockaded(uint256 id) public onlyNavalAction {
         idToNavalActions[id].blockadedToday = true;
     }
 
@@ -96,6 +122,9 @@ contract NavalActionsContract is Ownable {
         _;
     }
 
+    ///@dev this is a public function only callable from the keeper contract
+    ///@dev this function will reset the naval actions dailw when the chainlink keeper calls the function
+    ///@notice this function will reset the naval actions daily when called by a chainlink keeper
     function resetActionsToday() public onlyKeeper {
         uint256 countryCount = mint.getCountryCount();
         for (uint256 i = 0; i <= countryCount; i++) {
@@ -105,16 +134,28 @@ contract NavalActionsContract is Ownable {
         }
     }
 
+    ///@dev this is a public view function that will return a nations daily purchases
+    ///@notice this function will return the amount of vessels a nation purchases today
+    ///@param id is the nation id of the nation being queried
+    ///@return uint256 is the number of ships purchased today
     function getPurchasesToday(uint256 id) public view returns (uint256) {
         uint256 purchasesToday = idToNavalActions[id].purchasesToday;
         return purchasesToday;
     }
 
+    ///@dev this is a public view function that will return a nations daily action slots used
+    ///@notice this function will return the number of action slots a naton has used today
+    ///@param id is the nation id of the nation being queried
+    ///@return uint256 is the number of action slots used today
     function getActionSlotsUsed(uint256 id) public view returns (uint256) {
         uint256 actionSlotsUsed = idToNavalActions[id].actionSlotsUsedToday;
         return actionSlotsUsed;
     }
 
+    ///@dev this is a public view function that will return a boolean whether a nation has been blockaded today
+    ///@notice this function will return true if a nation has been blockaded today
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if a nation has been blockaded today
     function getBlockadedToday(uint256 id) public view returns (bool) {
         bool blockadedToday = idToNavalActions[id].blockadedToday;
         return blockadedToday;
