@@ -162,6 +162,10 @@ contract NavalActionsContract is Ownable {
     }
 }
 
+///@title NavyContract
+///@author OxSnosh
+///@dev this contract inherits from openzeppelin's ownable contract
+///@notice this contract will allow a user to purchase navy vessels
 contract NavyContract is Ownable {
     address public treasuryAddress;
     address public improvementsContract1Address;
@@ -207,6 +211,16 @@ contract NavyContract is Ownable {
     CountryMinter mint;
     AdditionalNavyContract addNav;
 
+    modifier onlyCountryMinter() {
+        require(
+            msg.sender == countryMinter,
+            "function only callable from countryMinter"
+        );
+        _;
+    }
+
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
         address _treasuryAddress,
         address _improvementsContract1Address,
@@ -238,12 +252,18 @@ contract NavyContract is Ownable {
         addNav = AdditionalNavyContract(_additionalNavy);
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings2(address _countryMinter) public onlyOwner {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
     }
 
-    function generateNavy(uint256 id) public {
+    ///@dev this is a public function only callable from the countryMinter contract
+    ///@dev this function will allow a nation owner to buy navy vessels
+    ///@notice this function will allow a nation owner to buy navy vessels
+    ///@param id this is the nation id of the nation being minted
+    function generateNavy(uint256 id) public onlyCountryMinter {
         Navy memory newNavy = Navy(0, 0, 0, 0, 0, 0, 0, 0, 0);
         idToNavy[id] = newNavy;
     }
@@ -648,6 +668,12 @@ contract NavyContract is Ownable {
         _;
     }
 
+    ///@dev this is a public function only callable from the nuke contract
+    ///@dev this function will decrease the amount of ships that are vulnerable to nuclear attacks when a nation is attacked by a nuke strike
+    ///@notice this function will decrease the amount of ships that are vulnerable to nuclear attacks when a nation is attacked by a nuke strike
+    ///@notice vessels available to nuke strikes are corvettes, landing ships, cruisers and frigates
+    ///@notice a nuke strike will reduce the number of these ships by 25% (12% with a fallout shelter system)
+    ///@param defenderId this is the nation id of the nation being attacked
     function decreaseNavyFromNukeContract(
         uint256 defenderId
     ) public onlyNukeContract {
@@ -672,6 +698,10 @@ contract NavyContract is Ownable {
     }
 }
 
+///@title AdditionalNavyContract
+///@author OxSnosh
+///@dev this contract inherits from the openzeppelin ownabl contract
+///@notice this contract will keep track of additional information about a nations navy
 contract AdditionalNavyContract is Ownable {
     address public navy;
     address public navalActions;
@@ -685,6 +715,8 @@ contract AdditionalNavyContract is Ownable {
     WondersContract1 won1;
     ImprovementsContract4 imp4;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
         address _navy,
         address _navalActions,
@@ -704,6 +736,11 @@ contract AdditionalNavyContract is Ownable {
         imp4 = ImprovementsContract4(_improvements4);
     }
 
+    ///@dev this is a public view function
+    ///@dev this function will return a nations available daily navy vessel purchases
+    ///@notice this function will return a nations available daily navy vessel purchases
+    ///@param id this is the nation id of the nation being queried
+    ///@return uint256 is the number of available navy vessel purchases for the day for that nation
     function getAvailablePurchases(uint256 id) public view returns (uint256) {
         uint256 purchasesToday = navAct.getPurchasesToday(id);
         uint256 maxDailyPurchases;
@@ -730,6 +767,11 @@ contract AdditionalNavyContract is Ownable {
         return availablePurchases;
     }
 
+    ///@dev this is a public view function that will return the number of blockade capable ships a nation has
+    ///@notice this function will return the number of blockade capable ships a nation has
+    ///@notice blockade capable ships include battleships, cruisers, frigates and submarines
+    ///@param id this is the nation id of the nation being queried
+    ///@return uint256 this is the number of blockade capable ships for a given nation
     function getBlockadeCapableShips(uint256 id) public view returns (uint256) {
         uint256 battleships = nav.getBattleshipCount(id);
         uint256 cruisers = nav.getCruiserCount(id);
@@ -742,6 +784,11 @@ contract AdditionalNavyContract is Ownable {
         return blockadeCapableShips;
     }
 
+    ///@dev this is a public view function that will return the number of ships a nation has that can break a blockade
+    ///@notice this function will return the number of ships a nation has that can break a blockade
+    ///@notice blockade capable ships include battleships, cruisers, frigates and destroyers
+    ///@param id this is the nation id of the nation being queried
+    ///@return uint256 this is the number of ships that can break a blockade for a given nation
     function getBreakBlockadeCapableShips(
         uint256 id
     ) public view returns (uint256) {
@@ -756,6 +803,12 @@ contract AdditionalNavyContract is Ownable {
         return breakBlockadeCapableShips;
     }
 
+    ///@dev this is a public view function that returns the number of navy vessels that a nations drydocks support 
+    ///@notice this function will return the number of ships that a nations drydocks support
+    ///@notice a nation cannot delete a drydock if it supports a vessel
+    ///@notice drydocks support corvettes, battleships, cruisers and destroyers
+    ///@param countryId is the nation id of the nation being queried
+    ///@return count is the number of vessel supported by the drydocks
     function getVesselCountForDrydock(
         uint256 countryId
     ) public view returns (uint256 count) {
@@ -770,6 +823,12 @@ contract AdditionalNavyContract is Ownable {
         return shipCount;
     }
 
+    ///@dev this is a public view function that returns the number of navy vessels that a nations shipyards support 
+    ///@notice this function will return the number of ships that a nations shipyards support
+    ///@notice a nation cannot delete a shipyard if it supports a vessel
+    ///@notice shipyards support landing ships, frigates, submarines and aircraft carriers
+    ///@param countryId is the nation id of the nation being queried
+    ///@return count is the number of vessel supported by the shipyards
     function getVesselCountForShipyard(
         uint256 countryId
     ) public view returns (uint256 count) {
