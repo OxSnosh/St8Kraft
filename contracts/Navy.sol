@@ -268,43 +268,58 @@ contract NavyContract is Ownable {
         idToNavy[id] = newNavy;
     }
 
-    // function updateCorvetteCost(uint256 newPrice) public onlyOwner {
-    //     corvetteCost = newPrice;
-    // }
+    ///@dev this function is only callable by the contract owner
+    function updateCorvetteCost(uint256 newPrice) public onlyOwner {
+        corvetteCost = newPrice;
+    }
 
-    // function updateLandingShipCost(uint256 newPrice) public onlyOwner {
-    //     landingShipCost = newPrice;
-    // }
+    ///@dev this function is only callable by the contract owner
+    function updateLandingShipCost(uint256 newPrice) public onlyOwner {
+        landingShipCost = newPrice;
+    }
 
-    // function updateBattleshipCost(uint256 newPrice) public onlyOwner {
-    //     battleshipCost = newPrice;
-    // }
+    ///@dev this function is only callable by the contract owner
+    function updateBattleshipCost(uint256 newPrice) public onlyOwner {
+        battleshipCost = newPrice;
+    }
 
-    // function updateCruiserCost(uint256 newPrice) public onlyOwner {
-    //     cruiserCost = newPrice;
-    // }
+    ///@dev this function is only callable by the contract owner
+    function updateCruiserCost(uint256 newPrice) public onlyOwner {
+        cruiserCost = newPrice;
+    }
 
-    // function updateFrigateCost(uint256 newPrice) public onlyOwner {
-    //     frigateCost = newPrice;
-    // }
+    ///@dev this function is only callable by the contract owner
+    function updateFrigateCost(uint256 newPrice) public onlyOwner {
+        frigateCost = newPrice;
+    }
 
-    // function updateDestroyerCost(uint256 newPrice) public onlyOwner {
-    //     destroyerCost = newPrice;
-    // }
+    ///@dev this function is only callable by the contract owner
+    function updateDestroyerCost(uint256 newPrice) public onlyOwner {
+        destroyerCost = newPrice;
+    }
 
-    // function updateSubmarineCost(uint256 newPrice) public onlyOwner {
-    //     submarineCost = newPrice;
-    // }
+    ///@dev this function is only callable by the contract owner
+    function updateSubmarineCost(uint256 newPrice) public onlyOwner {
+        submarineCost = newPrice;
+    }
 
-    // function updateAircraftCarrierCost(uint256 newPrice) public onlyOwner {
-    //     aircraftCarrierCost = newPrice;
-    // }
+    ///@dev this function is only callable by the contract owner
+    function updateAircraftCarrierCost(uint256 newPrice) public onlyOwner {
+        aircraftCarrierCost = newPrice;
+    }
 
     modifier onlyBattle() {
         require(msg.sender == navyBattleAddress, "only callable from battle");
         _;
     }
 
+    ///@dev this is a public function that is only callable from the Navt Battle contract
+    ///@dev this funtion will take the results of a battle and decrease the number of vessels
+    ///@notice this function will take the results of a battle and decrease number of vessels
+    ///@param defenderLosses is an array containing the defenders losses from the battle, each member of the array represents a different vessel
+    ///@param defenderId this is the nation id of the defending nation in the battle
+    ///@param attackerLosses is an array containing the attacker losses from the battle, each memeber of the array represents a different vessel
+    ///@param attackerId this is the nation id of the attacking nation in the battle
     function decrementLosses(
         uint256[] memory defenderLosses,
         uint256 defenderId,
@@ -351,6 +366,11 @@ contract NavyContract is Ownable {
         }
     }
 
+    ///@dev this is a public function callable only by the nation owner
+    ///@dev this function will allow a nation owner to purchase a corvette vessel
+    ///@notice this function will allow a nation owner to purchase a corvette vessel
+    ///@param amount this is the number of corvettes being purchased
+    ///@param id this is the naton id of the nation purchasing vessels
     function buyCorvette(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
@@ -376,18 +396,21 @@ contract NavyContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
+    ///@dev this is a public view function that will return the number of corvettes a nation owns
+    ///@dev this function wll return the number of corvettes a nation owns
+    ///@notice this functon will return the number of corvettes a nation owns
+    ///@param id this is the nation id of the nation being queried
+    ///@return uint256 this is the number of corvettes for a given nation
     function getCorvetteCount(uint256 id) public view returns (uint256) {
         uint256 corvetteAmount = idToNavy[id].corvetteCount;
         return corvetteAmount;
     }
 
-    //callable from fighting contract
-    //needs modifier
-    function decreaseCorvetteCount(uint256 amount, uint256 id) public {
-        idToNavy[id].corvetteCount -= amount;
-        idToNavy[id].navyVessels -= amount;
-    }
-
+    ///@dev this is a public function callable only by the nation owner
+    ///@dev this function will allow a nation owner to purchase a landing ships vessel
+    ///@notice this function will allow a nation owner to purchase a landing ships vessel
+    ///@param amount this is the number of landing ships being purchased
+    ///@param id this is the naton id of the nation purchasing vessels
     function buyLandingShip(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
@@ -413,18 +436,21 @@ contract NavyContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
+    ///@dev this is a public view function that will return the number of landing ships a nation owns
+    ///@dev this function wll return the number of landing ships a nation owns
+    ///@notice this functon will return the number of landing ships a nation owns
+    ///@param id this is the nation id of the nation being queried
+    ///@return uint256 this is the number of landing ships for a given nation
     function getLandingShipCount(uint256 id) public view returns (uint256) {
         uint256 landingShipAmount = idToNavy[id].landingShipCount;
         return landingShipAmount;
     }
 
-    //callable from fighting contract
-    //needs modifier
-    function decreaseLandingShipCount(uint256 amount, uint256 id) public {
-        idToNavy[id].landingShipCount -= amount;
-        idToNavy[id].navyVessels -= amount;
-    }
-
+    ///@dev this is a public function callable only by the nation owner
+    ///@dev this function will allow a nation owner to purchase a battleship vessel
+    ///@notice this function will allow a nation owner to purchase a battleship vessel
+    ///@param amount this is the number of battleship being purchased
+    ///@param id this is the naton id of the nation purchasing vessels
     function buyBattleship(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
@@ -450,18 +476,21 @@ contract NavyContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
+    ///@dev this is a public view function that will return the number of battleships a nation owns
+    ///@dev this function wll return the number of battleships a nation owns
+    ///@notice this functon will return the number of battleships a nation owns
+    ///@param id this is the nation id of the nation being queried
+    ///@return uint256 this is the number of battleships for a given nation
     function getBattleshipCount(uint256 id) public view returns (uint256) {
         uint256 battleshipAmount = idToNavy[id].battleshipCount;
         return battleshipAmount;
     }
 
-    //callable from fighting contract
-    //needs modifier
-    function decreaseBatteshipCount(uint256 amount, uint256 id) public {
-        idToNavy[id].battleshipCount -= amount;
-        idToNavy[id].navyVessels -= amount;
-    }
-
+    ///@dev this is a public function callable only by the nation owner
+    ///@dev this function will allow a nation owner to purchase a cruiser vessel
+    ///@notice this function will allow a nation owner to purchase a cruiser vessel
+    ///@param amount this is the number of cruisers being purchased
+    ///@param id this is the naton id of the nation purchasing vessels
     function buyCruiser(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
@@ -487,18 +516,21 @@ contract NavyContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
+    ///@dev this is a public view function that will return the number of cruisers a nation owns
+    ///@dev this function wll return the number of cruisers a nation owns
+    ///@notice this functon will return the number of cruisers a nation owns
+    ///@param id this is the nation id of the nation being queried
+    ///@return uint256 this is the number of cruisers for a given nation
     function getCruiserCount(uint256 id) public view returns (uint256) {
         uint256 cruiserAmount = idToNavy[id].cruiserCount;
         return cruiserAmount;
     }
 
-    //callable from fighting contract
-    //needs modifier
-    function decreaseCruiserCount(uint256 amount, uint256 id) public {
-        idToNavy[id].cruiserCount -= amount;
-        idToNavy[id].navyVessels -= amount;
-    }
-
+    ///@dev this is a public function callable only by the nation owner
+    ///@dev this function will allow a nation owner to purchase a frigates vessel
+    ///@notice this function will allow a nation owner to purchase a frigates vessel
+    ///@param amount this is the number of frigates being purchased
+    ///@param id this is the naton id of the nation purchasing vessels
     function buyFrigate(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
@@ -528,18 +560,21 @@ contract NavyContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
+    ///@dev this is a public view function that will return the number of frigates a nation owns
+    ///@dev this function wll return the number of frigates a nation owns
+    ///@notice this functon will return the number of frigates a nation owns
+    ///@param id this is the nation id of the nation being queried
+    ///@return uint256 this is the number of frigates for a given nation
     function getFrigateCount(uint256 id) public view returns (uint256) {
         uint256 frigateAmount = idToNavy[id].frigateCount;
         return frigateAmount;
     }
 
-    //callable from fighting contract
-    //needs modifier
-    function decreaseFrigateCount(uint256 amount, uint256 id) public {
-        idToNavy[id].frigateCount -= amount;
-        idToNavy[id].navyVessels -= amount;
-    }
-
+    ///@dev this is a public function callable only by the nation owner
+    ///@dev this function will allow a nation owner to purchase a destroyer vessel
+    ///@notice this function will allow a nation owner to purchase a destroyer vessel
+    ///@param amount this is the number of destroyers being purchased
+    ///@param id this is the naton id of the nation purchasing vessels
     function buyDestroyer(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
@@ -569,18 +604,21 @@ contract NavyContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
+    ///@dev this is a public view function that will return the number of destroyers a nation owns
+    ///@dev this function wll return the number of destroyers a nation owns
+    ///@notice this functon will return the number of destroyers a nation owns
+    ///@param id this is the nation id of the nation being queried
+    ///@return uint256 this is the number of destroyers for a given nation
     function getDestroyerCount(uint256 id) public view returns (uint256) {
         uint256 destroyerAmount = idToNavy[id].destroyerCount;
         return destroyerAmount;
     }
 
-    //callable from fighting contract
-    //needs modifier
-    function decreaseDestroyerCount(uint256 amount, uint256 id) public {
-        idToNavy[id].destroyerCount -= amount;
-        idToNavy[id].navyVessels -= amount;
-    }
-
+    ///@dev this is a public function callable only by the nation owner
+    ///@dev this function will allow a nation owner to purchase a submarine vessel
+    ///@notice this function will allow a nation owner to purchase a submarine vessel
+    ///@param amount this is the number of submarines being purchased
+    ///@param id this is the naton id of the nation purchasing vessels
     function buySubmarine(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
@@ -610,18 +648,22 @@ contract NavyContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
+    
+    ///@dev this is a public view function that will return the number of submarines a nation owns
+    ///@dev this function wll return the number of submarines ttes a nation owns
+    ///@notice this functon will return the number of submarines a nation owns
+    ///@param id this is the nation id of the nation being queried
+    ///@return uint256 this is the number of submarines for a given nation
     function getSubmarineCount(uint256 id) public view returns (uint256) {
         uint256 submarineAmount = idToNavy[id].submarineCount;
         return submarineAmount;
     }
 
-    //callable from fighting contract
-    //needs modifier
-    function decreaseSubmarineCount(uint256 amount, uint256 id) public {
-        idToNavy[id].submarineCount -= amount;
-        idToNavy[id].navyVessels -= amount;
-    }
-
+    ///@dev this is a public function callable only by the nation owner
+    ///@dev this function will allow a nation owner to purchase a aircraft carrier vessel
+    ///@notice this function will allow a nation owner to purchase a aircraft carrier vessel
+    ///@param amount this is the number of aircraft carriers being purchased
+    ///@param id this is the naton id of the nation purchasing vessels
     function buyAircraftCarrier(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
@@ -651,16 +693,14 @@ contract NavyContract is Ownable {
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
+    ///@dev this is a public view function that will return the number of aircraft carriers a nation owns
+    ///@dev this function wll return the number of aircraft carriers a nation owns
+    ///@notice this functon will return the number of aircraft carriers a nation owns
+    ///@param id this is the nation id of the nation being queried
+    ///@return uint256 this is the number of aircraft carriers for a given nation
     function getAircraftCarrierCount(uint256 id) public view returns (uint256) {
         uint256 aircraftCarrierAmount = idToNavy[id].aircraftCarrierCount;
         return aircraftCarrierAmount;
-    }
-
-    //callable from fighting contract
-    //needs modifier
-    function decreaseAircraftCarrierCount(uint256 amount, uint256 id) public {
-        idToNavy[id].aircraftCarrierCount -= amount;
-        idToNavy[id].navyVessels -= amount;
     }
 
     modifier onlyNukeContract() {
