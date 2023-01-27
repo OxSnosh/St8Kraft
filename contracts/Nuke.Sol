@@ -12,6 +12,11 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
+///@title NukeContract
+///@author OxSnosh
+///@dev this contract inherits from chainlink VRF
+///@dev this contract inherits from openzeppelin ownable
+///@notice this contract will allow a nation to launch a nuclear missile at anoter nation
 contract NukeContract is Ownable, VRFConsumerBaseV2 {
     uint256 nukeAttackId;
     uint256 nukesDroppedToday;
@@ -32,6 +37,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     address navy;
     address missiles;
     address keeper;
+    uint256 mod = 300;
 
     //Chainlik Variables
     uint256[] private s_randomWords;
@@ -64,6 +70,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
+    ///@dev this function contains the variable necessary for chainlink randomness
     constructor(
         address vrfCoordinatorV2,
         uint64 subscriptionId,
@@ -76,6 +83,8 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         i_callbackGasLimit = callbackGasLimit;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings (
         address _countryMinter,
         address _warAddress,
@@ -112,21 +121,34 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         keeper = _keeper;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateCountryMinterContract(address newAddress) public onlyOwner {
         countryMinter = newAddress;
         mint = CountryMinter(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWarContract(address newAddress) public onlyOwner {
         warAddress = newAddress;
         war = WarContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWonders1Contract(address newAddress) public onlyOwner {
         wonders1 = newAddress;
         won1 = WondersContract1(newAddress);
     }
 
+    ///@dev this is a public function callable only by the attacking nation owner
+    ///@dev this function will launch a nuke strike against another nation, nations are required to be at war
+    ///@notice this function will launch a nuke strike against another nation, nations are required to be at war
+    ///@notice a nuke cannot be launched until a war is one day old
+    ///@param attackType determines if the attack is a standard attack or an attack targeting infrastructure, land or technology
+    ///@notice attack type will be 1 for a standard attack, 2 for an infrastructre attack, 3 for a land attack and 4 for a technology attack
+    ///@notice if an attacking nation does not have a emp wonder, than the attack type will need to be a standard attack
+    ///@param warId will be the war id of the active war between the 2 nations
+    ///@param attackerId will be the id of the attacking nation (launching the nuke)
+    ///@param defenderId will be the id of the defending nation
     function launchNuke(
         uint256 warId,
         uint256 attackerId,
@@ -170,7 +192,9 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         nukeAttackId++;
     }
 
-    function fulfillRequest(uint256 id) public {
+    ///@dev this function will be called by the launchNuke() function
+    ///@dev this function will send a randomness request to the chainlink VRF contract
+    function fulfillRequest(uint256 id) internal {
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
@@ -181,6 +205,14 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         s_requestIdToRequestIndex[requestId] = id;
     }
 
+    ///@dev this function will be called by the chainlink VRF contract in response to a randomness request
+    ///@dev the random numbers will be used to determine if the nuke strike was a success or not
+    ///@notice a nations default odds of a successful nuke strike are 50%
+    ///@notice if a defender has a strategic defense initiative the odds of a successful strike go down 20%
+    ///@notice if the attacker has sattelites, the odds of a succesful strike go up 5% per sattelite
+    ///@notice if a defender has a missile defense, the odds of a sucessful strike go down 5% per missile defense
+    ///@param requestId will be the request id passed in from the fulfillRequest() function
+    ///@param randomWords is the randomly generate number for the calculation of a successful nuke strike
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords)
         internal
         override
@@ -209,12 +241,16 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         if (randomNukeSuccessNumber > thwartOdds) {
             inflictNukeDamage(requestNumber);
             mis.decreaseNukeCountFromNukeContract(attackerId);
+            nukesDroppedToday++;
         } else {
             //thwart event
             mis.decreaseNukeCountFromNukeContract(attackerId);
         }
     }
 
+    ///@dev this is an internal function that will be called in the event of a succesful nuke strike
+    ///@notice this function will take the attack tyoe and direct the type of damage to inflict
+    ///@param attackId this is the type of attack that was launched that will determine if the attack was a standard attack or an infrastructure, land or tech attack
     function inflictNukeDamage(uint256 attackId) internal {
         uint256 attackType = nukeAttackIdToNukeAttack[attackId].attackType;
         if (attackType == 1) {
@@ -228,6 +264,8 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         }
     }
 
+    ///@dev this is the function that will be called in the event of a standard attack
+    ///@notice a standard nuke attack will decrease land, infrastructure and tech by 35%
     function standardAttack(uint256 attackId) internal {
         uint256 defenderId = nukeAttackIdToNukeAttack[attackId].defenderId;
         uint256 attackerId = nukeAttackIdToNukeAttack[attackId].attackerId;
@@ -239,6 +277,8 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         inf.decreaseTechCountFromNukeContract(defenderId, 35);
     }
 
+    ///@dev this is the function that will be called in the event of a infrastructure attack
+    ///@notice an infrastructure nuke attack will decrease infrastructure by 45% and land and tech by 25%
     function infrastructureAttack(uint256 attackId) internal {
         uint256 defenderId = nukeAttackIdToNukeAttack[attackId].defenderId;
         uint256 attackerId = nukeAttackIdToNukeAttack[attackId].attackerId;
@@ -250,6 +290,8 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         inf.decreaseTechCountFromNukeContract(defenderId, 25);
     }
 
+    ///@dev this is the function that will be called in the event of a land attack
+    ///@notice a land nuke attack will decrease land by 45% and infrastructe and tech by 25%
     function landAttack(uint256 attackId) internal {
         uint256 defenderId = nukeAttackIdToNukeAttack[attackId].defenderId;
         uint256 attackerId = nukeAttackIdToNukeAttack[attackId].attackerId;
@@ -261,6 +303,8 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         inf.decreaseTechCountFromNukeContract(defenderId, 25);
     }
 
+    ///@dev this is the function that will be called in the event of a tech attack
+    ///@notice a tech nuke attack will decrease tech by 45% and infrastructe and land by 25%
     function technologyAttack(uint256 attackId) internal {
         uint256 defenderId = nukeAttackIdToNukeAttack[attackId].defenderId;
         uint256 attackerId = nukeAttackIdToNukeAttack[attackId].attackerId;
@@ -272,6 +316,8 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         inf.decreaseTechCountFromNukeContract(defenderId, 45);
     }
 
+    ///@dev this function is a public view function that will return the number of nukes launched in the game in the last 7 days
+    ///@dev this function will be used to calculate global radiation levels (next function)
     function calculateNukesLandedLastSevenDays() public view returns (uint256) {
         uint256 sum = (nukesDroppedToday +
             nukesDropped1DayAgo +
@@ -283,12 +329,22 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         return sum;
     }
 
+    ///@dev this is a public view function that will return the global radiation levels that will be used in a nations environment calculation
+    ///@notice this function will return the global radiation levels for the game
+    ///@notice global radiation is calulates by miltiplying nukes landed in the last 7 days by a modifier (default 300) and dividing by the number of countries
+    ///@return uint256 is the global radiation level
     function getGlobalRadiation() public view returns (uint256) {
         uint256 countries = mint.getCountryCount();
         uint256 nukesLanded = calculateNukesLandedLastSevenDays();
-        uint256 mod = 300;
         uint256 globalRadiation = ((nukesLanded * mod) / countries);
         return globalRadiation;
+    }
+
+    ///@dev this is a function callable by the owner of the contract that will allow the caller to update the modifier for the global radiation level
+    ///@notice this function will allow the owner of the contract to adjust the modifier for the global radiation level
+    ///@param newModifier is the new modifier for the global radiation level
+    function updateGlobalRadiationModifier(uint256 newModifier) public onlyOwner {
+        mod = newModifier;
     }
 
     modifier onlyKeeper() {
@@ -296,13 +352,15 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         _;
     }
 
-    //called by keeper
+    ///@dev this is a function only callable from the chainlink keeper contract
+    ///@dev this function will shift the nukes landed daily for the last 6 days (i.e. 2 dayss ago goes to 3 days ago)
     function shiftNukesDroppedDays() public onlyKeeper {
         nukesDropped6DaysAgo = nukesDropped5DaysAgo;
         nukesDropped5DaysAgo = nukesDropped4DaysAgo;
         nukesDropped4DaysAgo = nukesDropped3DaysAgo;
         nukesDropped3DaysAgo = nukesDropped2DaysAgo;
         nukesDropped2DaysAgo = nukesDropped1DayAgo;
+        nukesDropped1DayAgo = nukesDroppedToday;
         nukesDroppedToday = 0;
     }
 }
