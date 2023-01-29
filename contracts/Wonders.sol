@@ -1164,7 +1164,7 @@ contract WondersContract2 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the great university wonder
     ///@dev this function will return true if a nation has the great university wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getGreatUniversity(uint256 countryId) public view returns (bool) {
         return idToWonders2[countryId].greatUniversity;
@@ -1172,7 +1172,7 @@ contract WondersContract2 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the hidden nuclear missile silo wonder
     ///@dev this function will return true if a nation has the hidden nuclear missile silo wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getHiddenNuclearMissileSilo(
         uint256 countryId
@@ -1182,7 +1182,7 @@ contract WondersContract2 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the intereptor missile system wonder
     ///@dev this function will return true if a nation has the intereptor missile system wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getInterceptorMissileSystem(
         uint256 countryId
@@ -1192,7 +1192,7 @@ contract WondersContract2 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the internet wonder
     ///@dev this function will return true if a nation has the internet wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getInternet(uint256 countryId) public view returns (bool) {
         return idToWonders2[countryId].internet;
@@ -1200,7 +1200,7 @@ contract WondersContract2 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the interstate system wonder
     ///@dev this function will return true if a nation has the interstate system wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getInterstateSystem(uint256 countryId) public view returns (bool) {
         return idToWonders2[countryId].interstateSystem;
@@ -1208,7 +1208,7 @@ contract WondersContract2 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the manhattan project wonder
     ///@dev this function will return true if a nation has the manhattan project wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getManhattanProject(uint256 countryId) public view returns (bool) {
         return idToWonders2[countryId].manhattanProject;
@@ -1216,7 +1216,7 @@ contract WondersContract2 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the mining industry consortium wonder
     ///@dev this function will return true if a nation has the mining industry consortium wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getMiningIndustryConsortium(
         uint256 countryId
@@ -1741,7 +1741,7 @@ contract WondersContract3 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the movie industry wonder
     ///@dev this function will return true if a nation has the movie industry wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getMovieIndustry(uint256 countryId) public view returns (bool) {
         return idToWonders3[countryId].movieIndustry;
@@ -1749,7 +1749,7 @@ contract WondersContract3 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the national cemetary wonder
     ///@dev this function will return true if a nation has the national cemetary wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getNationalCemetary(uint256 countryId) public view returns (bool) {
         return idToWonders3[countryId].nationalCemetary;
@@ -1757,7 +1757,7 @@ contract WondersContract3 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the national environmental office wonder
     ///@dev this function will return true if a nation has the national environmental office wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getNationalEnvironmentOffice(
         uint256 countryId
@@ -1767,7 +1767,7 @@ contract WondersContract3 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the national research lab wonder
     ///@dev this function will return true if a nation has the national research lab wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getNationalResearchLab(
         uint256 countryId
@@ -1777,7 +1777,7 @@ contract WondersContract3 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the national war memorial wonder
     ///@dev this function will return true if a nation has the national war memorial wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getNationalWarMemorial(
         uint256 countryId
@@ -1787,7 +1787,7 @@ contract WondersContract3 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the nuclear power plant wonder
     ///@dev this function will return true if a nation has the nuclear power plant wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getNuclearPowerPlant(
         uint256 countryId
@@ -1797,7 +1797,7 @@ contract WondersContract3 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the pentagon wonder
     ///@dev this function will return true if a nation has the pentagon wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getPentagon(uint256 countryId) public view returns (bool) {
         return idToWonders3[countryId].pentagon;
@@ -1805,7 +1805,7 @@ contract WondersContract3 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the political lobbyists wonder
     ///@dev this function will return true if a nation has the political lobbyists wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getPoliticalLobbyists(
         uint256 countryId
@@ -1815,7 +1815,7 @@ contract WondersContract3 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the scientific development center wonder
     ///@dev this function will return true if a nation has the scientific development center wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getScientificDevelopmentCenter(
         uint256 countryId
@@ -2276,7 +2276,7 @@ contract WondersContract4 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the social security system wonder
     ///@dev this function will return true if a nation has the social security system wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getSocialSecuritySystem(
         uint256 countryId
@@ -2286,7 +2286,7 @@ contract WondersContract4 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the space program wonder
     ///@dev this function will return true if a nation has the space program wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getSpaceProgram(uint256 countryId) public view returns (bool) {
         return idToWonders4[countryId].spaceProgram;
@@ -2294,7 +2294,7 @@ contract WondersContract4 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the stock market wonder
     ///@dev this function will return true if a nation has the stock market wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getStockMarket(uint256 countryId) public view returns (bool) {
         return idToWonders4[countryId].stockMarket;
@@ -2302,7 +2302,7 @@ contract WondersContract4 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the strategic defense initiative wonder
     ///@dev this function will return true if a nation has the strategic defense initiative wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getStrategicDefenseInitiative(
         uint256 countryId
@@ -2312,7 +2312,7 @@ contract WondersContract4 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the superior logistical support wonder
     ///@dev this function will return true if a nation has the superior logistical support wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getSuperiorLogisticalSupport(
         uint256 countryId
@@ -2322,7 +2322,7 @@ contract WondersContract4 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the universal healthcare wonder
     ///@dev this function will return true if a nation has the universal healthcare wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getUniversalHealthcare(
         uint256 countryId
@@ -2332,7 +2332,7 @@ contract WondersContract4 is Ownable {
 
     ///@dev this is a public view function that will return true if a nation has the weapons research center wonder
     ///@dev this function will return true if a nation has the weapons research center wonder
-    ///@param id is the nation id of the nation being queried
+    ///@param countryId is the nation id of the nation being queried
     ///@return bool will be true if the nation has the wonder
     function getWeaponsResearchCenter(
         uint256 countryId

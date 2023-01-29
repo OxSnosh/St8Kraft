@@ -346,7 +346,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     ///@notice this function allows a nation to break a blockade another nation imposed on them
     ///@param warId is the war id of the active war between the 2 nations
     ///@param attackerId is the id of the attacking nation
-    ///@param defenderId is the nation id of the defending nation
+    ///@param blockaderId is the nation id of the defending nation
     function breakBlockade(
         uint256 warId,
         uint256 attackerId,

@@ -162,7 +162,7 @@ modifier onlyCountryMinter()
 ### initiateAid
 
 ```solidity
-function initiateAid(uint256 id, address nationOwner) public
+function initiateAid(uint256 id, address nationOwner) external
 ```
 
 _this function gets called by the country minter contract once the country gets minted_
@@ -833,8 +833,6 @@ _this function is a public function_
 function generateAttackerFighterStruct(uint256 warId, uint256 battleId, uint256 attackerId) internal
 ```
 
-_this is an internal function that will_
-
 ### generateDefenderFighterStruct
 
 ```solidity
@@ -1061,6 +1059,12 @@ address resources
 address missiles
 ```
 
+### bonusResources
+
+```solidity
+address bonusResources
+```
+
 ### tsy
 
 ```solidity
@@ -1145,6 +1149,12 @@ contract MissilesContract mis
 contract CountryMinter mint
 ```
 
+### bonus
+
+```solidity
+contract BonusResourcesContract bonus
+```
+
 ### idToOwnerBills
 
 ```solidity
@@ -1163,7 +1173,7 @@ this function will be called right after contract deployment to set contract poi
 ### settings2
 
 ```solidity
-function settings2(address _improvements1, address _improvements2, address _missiles, address _wonders4, address _infrastructure) public
+function settings2(address _improvements1, address _improvements2, address _missiles, address _wonders4, address _infrastructure, address _bonusResources) public
 ```
 
 _this function is only callable from the contact owner
@@ -4833,28 +4843,34 @@ _this is a public function that will allow a nation to launch a cruise missile a
 function fulfillRequest(uint256 id) internal
 ```
 
+_this is an internal function that will call the VRFCoordinator from randomness from chainlink_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the ID of the cruise missile attack |
+
 ### fulfillRandomWords
 
 ```solidity
 function fulfillRandomWords(uint256 requestId, uint256[] randomWords) internal
 ```
 
-fulfillRandomness handles the VRF response. Your contract must
-implement it. See "SECURITY CONSIDERATIONS" above for important
-principles to keep in mind when implementing your fulfillRandomness
-method.
+this function will randomly determine is the cruise missile attacke was successful
+attacker satellites increase the odds of a successful attack
+defender satellites and intercepor middile system will increase the odds of a missile attack being thwarted
+a successful cruise missile attacke will reduce defender tanks, tech or infrastructure (type selected randomly)
 
-_VRFConsumerBaseV2 expects its subcontracts to have a method with this
-signature, and will call it once it has verified the proof
-associated with the randomness. (It is triggered via a call to
-rawFulfillRandomness, below.)_
+_this is the fnction that the ChainlinkVRF contract will call when it responds
+this function randomly determine the outcome of the cruise missile attack_
 
 #### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| requestId | uint256 | The Id initially returned by requestRandomness |
-| randomWords | uint256[] | the VRF output expanded to the requested number of words |
+| requestId | uint256 | id the ID number for the request made to the VRF contract |
+| randomWords | uint256[] | is the random numbers that the ChainlinkVRF contract responds with |
 
 ### destroyTanks
 
@@ -4862,11 +4878,35 @@ rawFulfillRandomness, below.)_
 function destroyTanks(uint256 attackId) internal
 ```
 
+this function will decrease the number of tanks of the defender in a successful cruise missile attack
+attacker munitions factories will increase the damage inflicted by a cruise missile attack on tanks
+defender bunkers will decrease the damage infilcted by a cruise missile attack on tanks
+
+_this is the internal function that will determine the number of tanks destroyed in a cruise missile attack_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| attackId | uint256 | is the ID of the cruise missile attack |
+
 ### destroyTech
 
 ```solidity
 function destroyTech(uint256 attackId) internal
 ```
+
+this function will decrease the tech of a defending nation in the event of a successful cruise missile attack
+attacker munitions factories will increase the damage inflicted by a cruise missile attack on tech
+defender bunkers will decrease the damage infilcted by a cruise missile attack on tech
+
+_this is an internal function that will decrease defender Tech in the event of a successful cruise missile launch_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| attackId | uint256 | is the ID of the cruise missile attack |
 
 ### destroyInfrastructure
 
@@ -4874,7 +4914,23 @@ function destroyTech(uint256 attackId) internal
 function destroyInfrastructure(uint256 attackId) internal
 ```
 
+this function will decrease the infrastructure of a defending nation in the event of a successful cruise missile attack
+attacker munitions factories will increase the damage inflicted by a cruise missile attack on infrastructure
+defender bunkers will decrease the damage infilcted by a cruise missile attack on infrastructure
+
+_this is an internal function that will decrease defender Infrastructure in the event of a successful cruise missile attack_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| attackId | uint256 | is the ID of the cruise missile attack |
+
 ## EnvironmentContract
+
+this contract will calculate the environment score for a nation
+
+_this contact inherits from OpenZeppelin ownable_
 
 ### countryMinter
 
@@ -4952,6 +5008,12 @@ address missiles
 
 ```solidity
 address nukes
+```
+
+### bonusResources
+
+```solidity
+address bonusResources
 ```
 
 ### mint
@@ -5032,17 +5094,29 @@ contract MissilesContract mis
 contract NukeContract nuke
 ```
 
+### bonus
+
+```solidity
+contract BonusResourcesContract bonus
+```
+
 ### settings
 
 ```solidity
 function settings(address _countryMinter, address _resources, address _infrastructure, address _wonders3, address _wonders4, address _forces, address _parameters, address _taxes, address _missiles, address _nukes) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### settings2
 
 ```solidity
-function settings2(address _improvements1, address _improvements3, address _improvements4) public
+function settings2(address _improvements1, address _improvements3, address _improvements4, address _bonusResources) public
 ```
+
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
 
 ### updateCountryMinter
 
@@ -5050,11 +5124,15 @@ function settings2(address _improvements1, address _improvements3, address _impr
 function updateCountryMinter(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateResourcesContract
 
 ```solidity
 function updateResourcesContract(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateInfrastructureContract
 
@@ -5062,11 +5140,15 @@ function updateResourcesContract(address newAddress) public
 function updateInfrastructureContract(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateWondersContract3
 
 ```solidity
 function updateWondersContract3(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateWondersContract4
 
@@ -5074,11 +5156,15 @@ function updateWondersContract3(address newAddress) public
 function updateWondersContract4(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateForcesContract
 
 ```solidity
 function updateForcesContract(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateParametersContract
 
@@ -5086,11 +5172,15 @@ function updateForcesContract(address newAddress) public
 function updateParametersContract(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateTaxesContract
 
 ```solidity
 function updateTaxesContract(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateMissilesContract
 
@@ -5098,11 +5188,15 @@ function updateTaxesContract(address newAddress) public
 function updateMissilesContract(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateNukeContract
 
 ```solidity
 function updateNukeContract(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateImprovementsContract1
 
@@ -5110,11 +5204,15 @@ function updateNukeContract(address newAddress) public
 function updateImprovementsContract1(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateImprovementsContract3
 
 ```solidity
 function updateImprovementsContract3(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateImprovementsContract4
 
@@ -5122,11 +5220,29 @@ function updateImprovementsContract3(address newAddress) public
 function updateImprovementsContract4(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### getEnvironmentScore
 
 ```solidity
 function getEnvironmentScore(uint256 id) public view returns (uint256)
 ```
+
+a higher environment score will decrease a nations happiness and population
+
+_this is a public view function that will return the environment score for a nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the environement score for the nation (environment scores are 0 - 10) |
 
 ### getGrossEnvironmentScore
 
@@ -5134,11 +5250,44 @@ function getEnvironmentScore(uint256 id) public view returns (uint256)
 function getGrossEnvironmentScore(uint256 id) public view returns (int256)
 ```
 
+the gross environment score generated here will be converted into the environment score
+every 10 points of gross score is equal to one point of environement
+
+_this is a public view function that will generate the gross environment score_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | int256 | int256 this is the gross environment score |
+
 ### getEnvironmentScoreFromResources
 
 ```solidity
 function getEnvironmentScoreFromResources(uint256 id) public view returns (int256)
 ```
+
+coal, oil, iron, uranium, water and radiation cleanup resources will all affect environemnt
+
+_this is a public view function that will generate environment points from resources_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | int256 | int256 is gross environment points from resources |
 
 ### getEnvironmentScoreFromImprovementsAndWonders
 
@@ -5146,11 +5295,45 @@ function getEnvironmentScoreFromResources(uint256 id) public view returns (int25
 function getEnvironmentScoreFromImprovementsAndWonders(uint256 id) public view returns (int256)
 ```
 
+this function will return gross environment points from improvements and wonders
+border walls, munitions factories and red light districts affect a nations environment score
+
+_this is a public view function that will generate gross environment score from improvements and wonders_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | int256 | int256 is the gross environment points from improvements and wonders |
+
 ### getEnvironmentScoreFromTech
 
 ```solidity
 function getEnvironmentScoreFromTech(uint256 id) public view returns (int256)
 ```
+
+this function will return gross environment points from a nations technology level
+a nations environment score will be penalized if the tech level is less than 6
+
+_this is a public view function that will generate gross environment score from a nations technology level_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | int256 | int256 is the gross environment points from a nations technology level |
 
 ### getEnvironmentScoreFromMilitaryDensity
 
@@ -5158,11 +5341,45 @@ function getEnvironmentScoreFromTech(uint256 id) public view returns (int256)
 function getEnvironmentScoreFromMilitaryDensity(uint256 id) public view returns (int256)
 ```
 
+this function will return gross environment points from a nations soldier to population ratio
+a soldier to population ratio greater than 60% will result in an environmental penalty
+
+_this is a public view function that will generate gross environment score from a nations soldier to population ratio_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | int256 | int256 is the gross environment points from a nations soldier to population ratio |
+
 ### getEnvironmentScoreFromInfrastructure
 
 ```solidity
 function getEnvironmentScoreFromInfrastructure(uint256 id) public view returns (int256)
 ```
+
+this function will return gross environment points from a nations infrastructure to land ratio
+a infrastructure to land ratio greater than 2:1 will result in an environmental penalty
+
+_this is a public view function that will generate gross environment score from a nations infrastructure to land ratio_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | int256 | int256 is the gross environment points from a nations infrastructure to land ratio |
 
 ### getScoreFromNukes
 
@@ -5170,13 +5387,50 @@ function getEnvironmentScoreFromInfrastructure(uint256 id) public view returns (
 function getScoreFromNukes(uint256 id) public view returns (int256)
 ```
 
+this function will return gross environment points from a nations nuke count
+a nations environment score will go up 1 point every ten nukes owned
+
+_this is a public view function that will generate gross environment score from a nations nuke count_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | int256 | int256 is the gross environment points from a nations nuke count |
+
 ### getScoreFromGovernment
 
 ```solidity
 function getScoreFromGovernment(uint256 id) public view returns (int256)
 ```
 
+this function will return gross environment points from a nations government type
+a nations environment score will go up 10 points for anarchy, communist, dictatorship, and transitional gov types
+a nations environment score will go down 10 points for capitalist, democracy, and republic gov types
+
+_this is a public view function that will generate gross environment score from a nations government type_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | int256 | int256 is the gross environment points from a nations government |
+
 ## FightersContract
+
+this contract will store data for the figher aircraft owned by a nation
 
 ### countryMinter
 
@@ -5344,11 +5598,17 @@ mapping(uint256 => struct FightersContract.DeployedFighters) idToDeployedFighter
 function settings(address _countryMinter, address _fightersMarket1, address _fightersMarket2, address _treasuryAddress, address _war, address _infrastructure, address _resources, address _improvements1, address _airBattle, address _wonders1, address _losses) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### settings2
 
 ```solidity
 function settings2(address _navy, address _bombers) public
 ```
+
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
 
 ### onlyCountryMinter
 
@@ -5380,11 +5640,37 @@ modifier onlyLossesContract()
 function generateFighters(uint256 id) public
 ```
 
+this function allows a nation to purchase fighter aircraft once a country is minted
+
+_this function is a public function but only callable from the country minter contact when a country is minted_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID of the nation being minted |
+
 ### getAircraftCount
 
 ```solidity
 function getAircraftCount(uint256 id) public view returns (uint256)
 ```
+
+this function will return the total number of a nations aircraft (fighters and bombers)
+
+_this is a public view function that will return the total (fighters + bombers) number of a nations aircraft_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the total aircraft count of a nation (fighters and bombers) |
 
 ### getDefendingCount
 
@@ -5392,11 +5678,39 @@ function getAircraftCount(uint256 id) public view returns (uint256)
 function getDefendingCount(uint256 id) public view returns (uint256)
 ```
 
+this function will return the total number of a nations defending aircraft
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the total number of the nations defending aircraft (fighters and bombers) |
+
 ### getDeployedCount
 
 ```solidity
 function getDeployedCount(uint256 id) public view returns (uint256)
 ```
+
+this function will return the total number of a nations deployed aircraft
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the total number of the nations deployed aircraft (fighters and bombers) |
 
 ### onlyBomberContract
 
@@ -5410,17 +5724,33 @@ modifier onlyBomberContract()
 function increaseAircraftCount(uint256 amount, uint256 id) public
 ```
 
+this function will increase the total aricraft count when a bomber is purchased
+
+_this function is only callable from the bomber marketplace contracts_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the number of bomber aircraft being purchased |
+| id | uint256 | this is the nation ID of the nation being queried |
+
 ### decreaseDefendingAircraftCount
 
 ```solidity
 function decreaseDefendingAircraftCount(uint256 amount, uint256 id) public
 ```
 
-### decreaseDeployedAircraftCount
+this function will decrease the total aricraft count when a bomber is decommissioned
 
-```solidity
-function decreaseDeployedAircraftCount(uint256 amount, uint256 id) public
-```
+_this function is only callable from the bomber marketplace contracts_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the number of bomber aircraft being decomissioned |
+| id | uint256 | this is the nation ID of the nation being queried |
 
 ### decreaseDefendingAircraftCountFromLosses
 
@@ -5428,23 +5758,33 @@ function decreaseDeployedAircraftCount(uint256 amount, uint256 id) public
 function decreaseDefendingAircraftCountFromLosses(uint256 amount, uint256 id) public
 ```
 
+this function will decrease the number of defending fighters lost in battle
+
+_this function is only callable from the fighter losses contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | this is the amount of figher aircraft lost |
+| id | uint256 | this is the nation ID of the nation being queried |
+
 ### decreaseDeployedAircraftCountFromLosses
 
 ```solidity
 function decreaseDeployedAircraftCountFromLosses(uint256 amount, uint256 id) public
 ```
 
-### destroyDefendingAircraft
+this function will decrease the number of deployed fighters lost in battle
 
-```solidity
-function destroyDefendingAircraft(uint256 amount, uint256 id) internal
-```
+_this function is only callable from the fighter losses contract_
 
-### destroyDeployedAircraft
+#### Parameters
 
-```solidity
-function destroyDeployedAircraft(uint256 amount, uint256 id) internal
-```
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | this is the amount of figher aircraft lost |
+| id | uint256 | this is the nation ID of the nation being queried |
 
 ### getDefendingYak9Count
 
@@ -5452,11 +5792,39 @@ function destroyDeployedAircraft(uint256 amount, uint256 id) internal
 function getDefendingYak9Count(uint256 id) public view returns (uint256)
 ```
 
+this function will return the amount of defending Yak9's of a nation
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of defending Yak9 aircraft for the nation |
+
 ### getDeployedYak9Count
 
 ```solidity
 function getDeployedYak9Count(uint256 id) public view returns (uint256)
 ```
+
+this function will return the amount of deployed Yak9's a nation owns
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of deployed Yak9's a nation owns |
 
 ### increaseYak9Count
 
@@ -5464,11 +5832,33 @@ function getDeployedYak9Count(uint256 id) public view returns (uint256)
 function increaseYak9Count(uint256 id, uint256 amount) public
 ```
 
+this function will increase the number of aircraft when they are purchased in the marketplace
+
+_this function is only callabel from the Fighter Market contracts_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+| amount | uint256 | is the amount of aircraft being purchased |
+
 ### decreaseDefendingYak9Count
 
 ```solidity
 function decreaseDefendingYak9Count(uint256 amount, uint256 id) public
 ```
+
+this function will decrease the amount of defending aircraft lost in a battle
+
+_this function is only callable from the losses contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
 
 ### decreaseDeployedYak9Count
 
@@ -5476,11 +5866,31 @@ function decreaseDefendingYak9Count(uint256 amount, uint256 id) public
 function decreaseDeployedYak9Count(uint256 amount, uint256 id) public
 ```
 
+this function will decrease the amount of deployed aircraft lost in a battle
+
+_this function is only callable from the losses contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
+
 ### scrapYak9
 
 ```solidity
 function scrapYak9(uint256 amount, uint256 id) public
 ```
+
+this function will allow a nation owner to decommission Yak9's
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
 
 ### getDefendingP51MustangCount
 
@@ -5488,11 +5898,39 @@ function scrapYak9(uint256 amount, uint256 id) public
 function getDefendingP51MustangCount(uint256 id) public view returns (uint256)
 ```
 
+this function will return the amount of defending P51 Mustangs's of a nation
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of defending P51 Mustang aircraft for the nation |
+
 ### getDeployedP51MustangCount
 
 ```solidity
 function getDeployedP51MustangCount(uint256 id) public view returns (uint256)
 ```
+
+this function will return the amount of deployed P51 Mustangs's of a nation
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of deployed P51 Mustang aircraft for the nation |
 
 ### increaseP51MustangCount
 
@@ -5500,11 +5938,33 @@ function getDeployedP51MustangCount(uint256 id) public view returns (uint256)
 function increaseP51MustangCount(uint256 id, uint256 amount) public
 ```
 
+this function will increase the number of aircraft when they are purchased in the marketplace
+
+_this function is only callabel from the Fighter Market contracts_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+| amount | uint256 | is the amount of aircraft being purchased |
+
 ### decreaseDefendingP51MustangCount
 
 ```solidity
 function decreaseDefendingP51MustangCount(uint256 amount, uint256 id) public
 ```
+
+this function will decrease the amount of defending aircraft lost in a battle
+
+_this function is only callable from the losses contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
 
 ### decreaseDeployedP51MustangCount
 
@@ -5512,11 +5972,31 @@ function decreaseDefendingP51MustangCount(uint256 amount, uint256 id) public
 function decreaseDeployedP51MustangCount(uint256 amount, uint256 id) public
 ```
 
+this function will decrease the amount of deployed aircraft lost in a battle
+
+_this function is only callable from the losses contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
+
 ### scrapP51Mustang
 
 ```solidity
 function scrapP51Mustang(uint256 amount, uint256 id) public
 ```
+
+this function will allow a nation owner to decommission P51 Mustangs's
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
 
 ### getDefendingF86SabreCount
 
@@ -5524,11 +6004,39 @@ function scrapP51Mustang(uint256 amount, uint256 id) public
 function getDefendingF86SabreCount(uint256 id) public view returns (uint256)
 ```
 
+this function will return the amount of defending F86 Sabre's of a nation
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of defending F86 Sabre aircraft for the nation |
+
 ### getDeployedF86SabreCount
 
 ```solidity
 function getDeployedF86SabreCount(uint256 id) public view returns (uint256)
 ```
+
+this function will return the amount of deployed F86 Sabre's of a nation
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of deployed F86 Sabre aircraft for the nation |
 
 ### increaseF86SabreCount
 
@@ -5536,11 +6044,33 @@ function getDeployedF86SabreCount(uint256 id) public view returns (uint256)
 function increaseF86SabreCount(uint256 id, uint256 amount) public
 ```
 
+this function will increase the number of aircraft when they are purchased in the marketplace
+
+_this function is only callabel from the Fighter Market contracts_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+| amount | uint256 | is the amount of aircraft being purchased |
+
 ### decreaseDefendingF86SabreCount
 
 ```solidity
 function decreaseDefendingF86SabreCount(uint256 amount, uint256 id) public
 ```
+
+this function will decrease the amount of defending aircraft lost in a battle
+
+_this function is only callable from the losses contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
 
 ### decreaseDeployedF86SabreCount
 
@@ -5548,11 +6078,31 @@ function decreaseDefendingF86SabreCount(uint256 amount, uint256 id) public
 function decreaseDeployedF86SabreCount(uint256 amount, uint256 id) public
 ```
 
+this function will decrease the amount of deployed aircraft lost in a battle
+
+_this function is only callable from the losses contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
+
 ### scrapF86Sabre
 
 ```solidity
 function scrapF86Sabre(uint256 amount, uint256 id) public
 ```
+
+this function will allow a nation owner to decommission F86 Sabre's
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
 
 ### getDefendingMig15Count
 
@@ -5560,11 +6110,39 @@ function scrapF86Sabre(uint256 amount, uint256 id) public
 function getDefendingMig15Count(uint256 id) public view returns (uint256)
 ```
 
+this function will return the amount of defending Mig15's of a nation
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of defending Mig15's aircraft for the nation |
+
 ### getDeployedMig15Count
 
 ```solidity
 function getDeployedMig15Count(uint256 id) public view returns (uint256)
 ```
+
+this function will return the amount of deployed Mig15's of a nation
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of deployed Mig15's aircraft for the nation |
 
 ### increaseMig15Count
 
@@ -5572,11 +6150,33 @@ function getDeployedMig15Count(uint256 id) public view returns (uint256)
 function increaseMig15Count(uint256 id, uint256 amount) public
 ```
 
+this function will increase the number of aircraft when they are purchased in the marketplace
+
+_this function is only callabel from the Fighter Market contracts_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+| amount | uint256 | is the amount of aircraft being purchased |
+
 ### decreaseDefendingMig15Count
 
 ```solidity
 function decreaseDefendingMig15Count(uint256 amount, uint256 id) public
 ```
+
+this function will decrease the amount of defending aircraft lost in a battle
+
+_this function is only callable from the losses contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
 
 ### decreaseDeployedMig15Count
 
@@ -5584,11 +6184,31 @@ function decreaseDefendingMig15Count(uint256 amount, uint256 id) public
 function decreaseDeployedMig15Count(uint256 amount, uint256 id) public
 ```
 
+this function will decrease the amount of deployed aircraft lost in a battle
+
+_this function is only callable from the losses contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
+
 ### scrapMig15
 
 ```solidity
 function scrapMig15(uint256 amount, uint256 id) public
 ```
+
+this function will allow a nation owner to decommission Mig15's
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
 
 ### getDefendingF100SuperSabreCount
 
@@ -5596,11 +6216,39 @@ function scrapMig15(uint256 amount, uint256 id) public
 function getDefendingF100SuperSabreCount(uint256 id) public view returns (uint256)
 ```
 
+this function will return the amount of defending F100 Super Sabre's of a nation
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of defending F100 Super Sabre aircraft for the nation |
+
 ### getDeployedF100SuperSabreCount
 
 ```solidity
 function getDeployedF100SuperSabreCount(uint256 id) public view returns (uint256)
 ```
+
+this function will return the amount of deployed F100 Super Sabre's of a nation
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of dployed F100 Super Sabre aircraft for the nation |
 
 ### increaseF100SuperSabreCount
 
@@ -5608,11 +6256,33 @@ function getDeployedF100SuperSabreCount(uint256 id) public view returns (uint256
 function increaseF100SuperSabreCount(uint256 id, uint256 amount) public
 ```
 
+this function will increase the number of aircraft when they are purchased in the marketplace
+
+_this function is only callabel from the Fighter Market contracts_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+| amount | uint256 | is the amount of aircraft being purchased |
+
 ### decreaseDefendingF100SuperSabreCount
 
 ```solidity
 function decreaseDefendingF100SuperSabreCount(uint256 amount, uint256 id) public
 ```
+
+this function will decrease the amount of defending aircraft lost in a battle
+
+_this function is only callable from the losses contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
 
 ### decreaseDeployedF100SuperSabreCount
 
@@ -5620,11 +6290,31 @@ function decreaseDefendingF100SuperSabreCount(uint256 amount, uint256 id) public
 function decreaseDeployedF100SuperSabreCount(uint256 amount, uint256 id) public
 ```
 
+this function will decrease the amount of deployed aircraft lost in a battle
+
+_this function is only callable from the losses contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
+
 ### scrapF100SuperSabre
 
 ```solidity
 function scrapF100SuperSabre(uint256 amount, uint256 id) public
 ```
+
+this function will allow a nation owner to decommission F100 Super Sabre's
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
 
 ### getDefendingF35LightningCount
 
@@ -5632,11 +6322,39 @@ function scrapF100SuperSabre(uint256 amount, uint256 id) public
 function getDefendingF35LightningCount(uint256 id) public view returns (uint256)
 ```
 
+this function will return the amount of defending F35 Lightning's of a nation
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of defending F35 Lightning aircraft for the nation |
+
 ### getDeployedF35LightningCount
 
 ```solidity
 function getDeployedF35LightningCount(uint256 id) public view returns (uint256)
 ```
+
+this function will return the amount of deployed F35 Lightning's of a nation
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of deployed F35 Lightning aircraft for the nation |
 
 ### increaseF35LightningCount
 
@@ -5644,11 +6362,33 @@ function getDeployedF35LightningCount(uint256 id) public view returns (uint256)
 function increaseF35LightningCount(uint256 id, uint256 amount) public
 ```
 
+this function will increase the number of aircraft when they are purchased in the marketplace
+
+_this function is only callabel from the Fighter Market contracts_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+| amount | uint256 | is the amount of aircraft being purchased |
+
 ### decreaseDefendingF35LightningCount
 
 ```solidity
 function decreaseDefendingF35LightningCount(uint256 amount, uint256 id) public
 ```
+
+this function will decrease the amount of defending aircraft lost in a battle
+
+_this function is only callable from the losses contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
 
 ### decreaseDeployedF35LightningCount
 
@@ -5656,11 +6396,31 @@ function decreaseDefendingF35LightningCount(uint256 amount, uint256 id) public
 function decreaseDeployedF35LightningCount(uint256 amount, uint256 id) public
 ```
 
+this function will decrease the amount of deployed aircraft lost in a battle
+
+_this function is only callable from the losses contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
+
 ### scrapF35Lightning
 
 ```solidity
 function scrapF35Lightning(uint256 amount, uint256 id) public
 ```
+
+this function will allow a nation owner to decommission F35's
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
 
 ### getDefendingF15EagleCount
 
@@ -5668,11 +6428,39 @@ function scrapF35Lightning(uint256 amount, uint256 id) public
 function getDefendingF15EagleCount(uint256 id) public view returns (uint256)
 ```
 
+this function will return the amount of defending F15 Eagle's of a nation
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of defending F15 Eagle aircraft for the nation |
+
 ### getDeployedF15EagleCount
 
 ```solidity
 function getDeployedF15EagleCount(uint256 id) public view returns (uint256)
 ```
+
+this function will return the amount of deployed F15 Eagle's of a nation
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of deployed F15 Eagle aircraft for the nation |
 
 ### increaseF15EagleCount
 
@@ -5680,11 +6468,33 @@ function getDeployedF15EagleCount(uint256 id) public view returns (uint256)
 function increaseF15EagleCount(uint256 id, uint256 amount) public
 ```
 
+this function will increase the number of aircraft when they are purchased in the marketplace
+
+_this function is only callabel from the Fighter Market contracts_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+| amount | uint256 | is the amount of aircraft being purchased |
+
 ### decreaseDefendingF15EagleCount
 
 ```solidity
 function decreaseDefendingF15EagleCount(uint256 amount, uint256 id) public
 ```
+
+this function will decrease the amount of defending aircraft lost in a battle
+
+_this function is only callable from the losses contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
 
 ### decreaseDeployedF15EagleCount
 
@@ -5692,11 +6502,31 @@ function decreaseDefendingF15EagleCount(uint256 amount, uint256 id) public
 function decreaseDeployedF15EagleCount(uint256 amount, uint256 id) public
 ```
 
+this function will decrease the amount of deployed aircraft lost in a battle
+
+_this function is only callable from the losses contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
+
 ### scrapF15Eagle
 
 ```solidity
 function scrapF15Eagle(uint256 amount, uint256 id) public
 ```
+
+this function will allow a nation owner to decommission F15's
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
 
 ### getDefendingSu30MkiCount
 
@@ -5704,11 +6534,39 @@ function scrapF15Eagle(uint256 amount, uint256 id) public
 function getDefendingSu30MkiCount(uint256 id) public view returns (uint256)
 ```
 
+this function will return the amount of defending Su30 Mki's of a nation
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of defending Su30 Mki aircraft for the nation |
+
 ### getDeployedSu30MkiCount
 
 ```solidity
 function getDeployedSu30MkiCount(uint256 id) public view returns (uint256)
 ```
+
+this function will return the amount of deployed Su30 Mki's of a nation
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of deployed Su30 Mki aircraft for the nation |
 
 ### increaseSu30MkiCount
 
@@ -5716,11 +6574,33 @@ function getDeployedSu30MkiCount(uint256 id) public view returns (uint256)
 function increaseSu30MkiCount(uint256 id, uint256 amount) public
 ```
 
+this function will increase the number of aircraft when they are purchased in the marketplace
+
+_this function is only callabel from the Fighter Market contracts_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+| amount | uint256 | is the amount of aircraft being purchased |
+
 ### decreaseDefendingSu30MkiCount
 
 ```solidity
 function decreaseDefendingSu30MkiCount(uint256 amount, uint256 id) public
 ```
+
+this function will decrease the amount of defending aircraft lost in a battle
+
+_this function is only callable from the losses contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
 
 ### decreaseDeployedSu30MkiCount
 
@@ -5728,11 +6608,31 @@ function decreaseDefendingSu30MkiCount(uint256 amount, uint256 id) public
 function decreaseDeployedSu30MkiCount(uint256 amount, uint256 id) public
 ```
 
+this function will decrease the amount of deployed aircraft lost in a battle
+
+_this function is only callable from the losses contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
+
 ### scrapSu30Mki
 
 ```solidity
 function scrapSu30Mki(uint256 amount, uint256 id) public
 ```
+
+this function will allow a nation owner to decommission Su30's
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
 
 ### getDefendingF22RaptorCount
 
@@ -5740,11 +6640,39 @@ function scrapSu30Mki(uint256 amount, uint256 id) public
 function getDefendingF22RaptorCount(uint256 id) public view returns (uint256)
 ```
 
+this function will return the amount of defending F22 Raptor's of a nation
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of defending F22 Raptor aircraft for the nation |
+
 ### getDeployedF22RaptorCount
 
 ```solidity
 function getDeployedF22RaptorCount(uint256 id) public view returns (uint256)
 ```
+
+this function will return the amount of deployed F22 Raptor's of a nation
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of deployed F22 Raptor aircraft for the nation |
 
 ### increaseF22RaptorCount
 
@@ -5752,11 +6680,33 @@ function getDeployedF22RaptorCount(uint256 id) public view returns (uint256)
 function increaseF22RaptorCount(uint256 id, uint256 amount) public
 ```
 
+this function will increase the number of aircraft when they are purchased in the marketplace
+
+_this function is only callabel from the Fighter Market contracts_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation |
+| amount | uint256 | is the amount of aircraft being purchased |
+
 ### decreaseDefendingF22RaptorCount
 
 ```solidity
 function decreaseDefendingF22RaptorCount(uint256 amount, uint256 id) public
 ```
+
+this function will decrease the amount of defending aircraft lost in a battle
+
+_this function is only callable from the losses contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
 
 ### decreaseDeployedF22RaptorCount
 
@@ -5764,13 +6714,35 @@ function decreaseDefendingF22RaptorCount(uint256 amount, uint256 id) public
 function decreaseDeployedF22RaptorCount(uint256 amount, uint256 id) public
 ```
 
+this function will decrease the amount of deployed aircraft lost in a battle
+
+_this function is only callable from the losses contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
+
 ### scrapF22Raptor
 
 ```solidity
 function scrapF22Raptor(uint256 amount, uint256 id) public
 ```
 
+this function will allow a nation owner to decommission F22's
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of aircraft being destroyed |
+| id | uint256 | is the nation ID of the nation |
+
 ## FighterLosses
+
+this contract will decrease the amount of fighters lost in battle
 
 ### fighters
 
@@ -5796,6 +6768,9 @@ contract FightersContract fight
 function settings(address _fighters, address _airBattle) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### onlyAirBattle
 
 ```solidity
@@ -5820,7 +6795,24 @@ function updateAirBattleAddress(address _newAddress) public
 function decrementLosses(uint256[] defenderLosses, uint256 defenderId, uint256[] attackerLosses, uint256 attackerId) public
 ```
 
+this function will decrease the amount of fighers lost in battle from the FighersContract
+
+_this is a public function that is only callable from the Air Battle contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| defenderLosses | uint256[] | is an array of uints that represent the fighters that the defender lost in battle |
+| defenderId | uint256 | is the nation ID of the defender |
+| attackerLosses | uint256[] | is an array of uints that represent the fighters that the attacker lost in battle |
+| attackerId | uint256 | is the nation ID of the attacker |
+
 ## FightersMarketplace1
+
+this contract will allow the nation owner to buy Yak9s, P51 Mustangs, F86 Sabres, Mig15s, and F100's
+
+_this contact inherits from openzeppelin's ownable contract_
 
 ### countryMinter
 
@@ -5880,6 +6872,12 @@ address wonders4
 
 ```solidity
 address navy
+```
+
+### bonusResources
+
+```solidity
+address bonusResources
 ```
 
 ### yak9Cost
@@ -6020,10 +7018,25 @@ contract FightersContract fight
 contract NavyContract nav
 ```
 
+### bonus
+
+```solidity
+contract BonusResourcesContract bonus
+```
+
 ### settings
 
 ```solidity
 function settings(address _countryMinter, address _bombers, address _fighters, address _treasury, address _infrastructure, address _resources, address _improvements1, address _wonders1, address _wonders4, address _navy) public
+```
+
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
+### settings2
+
+```solidity
+function settings2(address _bonusResources) public
 ```
 
 ### idToOwnerFightersMarket
@@ -6044,11 +7057,15 @@ modifier onlyCountryMinter()
 function updateCountryMinterAddress(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateBombersAddress
 
 ```solidity
 function updateBombersAddress(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateFightersAddress
 
@@ -6056,11 +7073,15 @@ function updateBombersAddress(address newAddress) public
 function updateFightersAddress(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateTreasuryAddress
 
 ```solidity
 function updateTreasuryAddress(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateInfrastructureAddress
 
@@ -6068,11 +7089,15 @@ function updateTreasuryAddress(address newAddress) public
 function updateInfrastructureAddress(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateResourcesAddress
 
 ```solidity
 function updateResourcesAddress(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateImprovements1Address
 
@@ -6080,11 +7105,15 @@ function updateResourcesAddress(address newAddress) public
 function updateImprovements1Address(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateWonders4Address
 
 ```solidity
 function updateWonders4Address(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateYak9Specs
 
@@ -6092,11 +7121,17 @@ function updateWonders4Address(address newAddress) public
 function updateYak9Specs(uint256 newPrice, uint256 newInfra, uint256 newTech) public
 ```
 
+_this function is only callable by the contract owner
+this function will be user to update the price, infrastructure requirement and tech requirement in order to purchase a Yak9_
+
 ### updateP51MustangSpecs
 
 ```solidity
 function updateP51MustangSpecs(uint256 newPrice, uint256 newInfra, uint256 newTech) public
 ```
+
+_this function is only callable by the contract owner
+this function will be user to update the price, infrastructure requirement and tech requirement in order to purchase a P51 Mustang_
 
 ### updateF86SabreSpecs
 
@@ -6104,11 +7139,17 @@ function updateP51MustangSpecs(uint256 newPrice, uint256 newInfra, uint256 newTe
 function updateF86SabreSpecs(uint256 newPrice, uint256 newInfra, uint256 newTech) public
 ```
 
+_this function is only callable by the contract owner
+this function will be user to update the price, infrastructure requirement and tech requirement in order to purchase a F86 Sabre_
+
 ### updateMig15Specs
 
 ```solidity
 function updateMig15Specs(uint256 newPrice, uint256 newInfra, uint256 newTech) public
 ```
+
+_this function is only callable by the contract owner
+this function will be user to update the price, infrastructure requirement and tech requirement in order to purchase a Mig15_
 
 ### updateF100SuperSabreSpecs
 
@@ -6116,11 +7157,25 @@ function updateMig15Specs(uint256 newPrice, uint256 newInfra, uint256 newTech) p
 function updateF100SuperSabreSpecs(uint256 newPrice, uint256 newInfra, uint256 newTech) public
 ```
 
+_this function is only callable by the contract owner
+this function will be user to update the price, infrastructure requirement and tech requirement in order to purchase a F100 Super Sabre_
+
 ### buyYak9
 
 ```solidity
 function buyYak9(uint256 amount, uint256 id) public
 ```
+
+this function allowes the caller to purchase a Yak9 for their nation
+
+_this is a public view function that will allow the caller to purchase a Yak9 for their nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | specifies the number of aircraft being purchased |
+| id | uint256 | is the nation ID |
 
 ### buyP51Mustang
 
@@ -6128,11 +7183,33 @@ function buyYak9(uint256 amount, uint256 id) public
 function buyP51Mustang(uint256 amount, uint256 id) public
 ```
 
+this function allowes the caller to purchase a P51 for their nation
+
+_this is a public view function that will allow the caller to purchase a P51 for their nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | specifies the number of aircraft being purchased |
+| id | uint256 | is the nation ID |
+
 ### buyF86Sabre
 
 ```solidity
 function buyF86Sabre(uint256 amount, uint256 id) public
 ```
+
+this function allowes the caller to purchase a F86 for their nation
+
+_this is a public view function that will allow the caller to purchase a F86 for their nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | specifies the number of aircraft being purchased |
+| id | uint256 | is the nation ID |
 
 ### buyMig15
 
@@ -6140,11 +7217,33 @@ function buyF86Sabre(uint256 amount, uint256 id) public
 function buyMig15(uint256 amount, uint256 id) public
 ```
 
+this function allowes the caller to purchase a Mig15 for their nation
+
+_this is a public view function that will allow the caller to purchase a Mig15 for their nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | specifies the number of aircraft being purchased |
+| id | uint256 | is the nation ID |
+
 ### buyF100SuperSabre
 
 ```solidity
 function buyF100SuperSabre(uint256 amount, uint256 id) public
 ```
+
+this function allowes the caller to purchase a F100 Super Sabre for their nation
+
+_this is a public view function that will allow the caller to purchase a F100 Super Sabre for their nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | specifies the number of aircraft being purchased |
+| id | uint256 | is the nation ID |
 
 ### getAircraftPurchaseCostModifier
 
@@ -6152,13 +7251,54 @@ function buyF100SuperSabre(uint256 amount, uint256 id) public
 function getAircraftPurchaseCostModifier(uint256 id) public view returns (uint256)
 ```
 
+this function will adjust the cost of aircraft based on resources, improvements and wonders
+aluminium, oil, rubber, airports and space programs decrease the cost of aircraft
+
+_this is public view function that will adjust the cost of the aircraft being purchased based on resources, improvements and wonders of that nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the percentage modifier used to adjust the aircraft purchase price |
+
 ### getMaxAircraftCount
 
 ```solidity
 function getMaxAircraftCount(uint256 id) public view returns (uint256)
 ```
 
+this is a function that will return the maximum amount of aircraft a nation can own
+the base amount of aircraft a nation can own is 50
+access to the construction resource will increase the amount of aircraft a nation can own by 10
+a foreign air force base will increase the maximum amount of aircraft for a nation by 20
+the maxmimum aircraft a nation can own will increase by 5 for each aircraft carrier owned
+
+_this a public view function that will return the maximum amonut of aircraft a nation can own_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the maximum amount of aircraft a nation can own |
+
 ## FightersMarketplace2
+
+this contract allows a nation owner to purchase F35's, F15's, SU30's and F22's
+
+_this contact inherits from owpenzeppelin's ownable contact_
 
 ### countryMinter
 
@@ -6322,6 +7462,9 @@ contract FightersMarketplace1 fightMarket1
 function settings(address _countryMinter, address _bombers, address _fighters, address _fightersMarket1, address _treasury, address _infrastructure, address _resources, address _improvements1) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### idToOwnerFightersMarket
 
 ```solidity
@@ -6340,11 +7483,15 @@ modifier onlyCountryMinter()
 function updateCountryMinterAddress(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateBombersAddress
 
 ```solidity
 function updateBombersAddress(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateFightersAddress
 
@@ -6352,11 +7499,15 @@ function updateBombersAddress(address newAddress) public
 function updateFightersAddress(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateTreasuryAddress
 
 ```solidity
 function updateTreasuryAddress(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateInfrastructureAddress
 
@@ -6364,11 +7515,15 @@ function updateTreasuryAddress(address newAddress) public
 function updateInfrastructureAddress(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateResourcesAddress
 
 ```solidity
 function updateResourcesAddress(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateImprovements1Address
 
@@ -6376,11 +7531,16 @@ function updateResourcesAddress(address newAddress) public
 function updateImprovements1Address(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateF35LightningSpecs
 
 ```solidity
 function updateF35LightningSpecs(uint256 newPrice, uint256 newInfra, uint256 newTech) public
 ```
+
+_this function is only callable by the contract owner
+this function will be user to update the price, infrastructure requirement and tech requirement in order to purchase a F35 Lightning_
 
 ### updateF15EagleSpecs
 
@@ -6388,11 +7548,17 @@ function updateF35LightningSpecs(uint256 newPrice, uint256 newInfra, uint256 new
 function updateF15EagleSpecs(uint256 newPrice, uint256 newInfra, uint256 newTech) public
 ```
 
+_this function is only callable by the contract owner
+this function will be user to update the price, infrastructure requirement and tech requirement in order to purchase a F15 Eagle_
+
 ### updateSU30MkiSpecs
 
 ```solidity
 function updateSU30MkiSpecs(uint256 newPrice, uint256 newInfra, uint256 newTech) public
 ```
+
+_this function is only callable by the contract owner
+this function will be user to update the price, infrastructure requirement and tech requirement in order to purchase a SU30 Mki_
 
 ### updateF22RaptorSpecs
 
@@ -6400,11 +7566,25 @@ function updateSU30MkiSpecs(uint256 newPrice, uint256 newInfra, uint256 newTech)
 function updateF22RaptorSpecs(uint256 newPrice, uint256 newInfra, uint256 newTech) public
 ```
 
+_this function is only callable by the contract owner
+this function will be user to update the price, infrastructure requirement and tech requirement in order to purchase a F22_
+
 ### buyF35Lightning
 
 ```solidity
 function buyF35Lightning(uint256 amount, uint256 id) public
 ```
+
+this function allowes the caller to purchase a F35 Lightning for their nation
+
+_this is a public view function that will allow the caller to purchase a F35 Lightning for their nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | specifies the number of aircraft being purchased |
+| id | uint256 | is the nation ID |
 
 ### buyF15Eagle
 
@@ -6412,11 +7592,33 @@ function buyF35Lightning(uint256 amount, uint256 id) public
 function buyF15Eagle(uint256 amount, uint256 id) public
 ```
 
+this function allowes the caller to purchase a F15 Eagle for their nation
+
+_this is a public view function that will allow the caller to purchase a F15 Eagle for their nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | specifies the number of aircraft being purchased |
+| id | uint256 | is the nation ID |
+
 ### buySu30Mki
 
 ```solidity
 function buySu30Mki(uint256 amount, uint256 id) public
 ```
+
+this function allowes the caller to purchase a Su30 Mki for their nation
+
+_this is a public view function that will allow the caller to purchase a Su30 Mki for their nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | specifies the number of aircraft being purchased |
+| id | uint256 | is the nation ID |
 
 ### buyF22Raptor
 
@@ -6424,7 +7626,22 @@ function buySu30Mki(uint256 amount, uint256 id) public
 function buyF22Raptor(uint256 amount, uint256 id) public
 ```
 
+this function allowes the caller to purchase a F22 Raptor for their nation
+
+_this is a public view function that will allow the caller to purchase a F22 Raptor for their nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | specifies the number of aircraft being purchased |
+| id | uint256 | is the nation ID |
+
 ## ForcesContract
+
+this contract allows a nation owner to purchase soldiers, tanks and spies
+
+_this contract inherits from the openzeppelin Ownable contract_
 
 ### spyCost
 
@@ -6583,11 +7800,17 @@ struct Forces {
 function settings(address _treasuryAddress, address _aid, address _spyAddress, address _cruiseMissile, address _nukeAddress, address _airBattle, address _groundBattle, address _warAddress) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### settings2
 
 ```solidity
 function settings2(address _infrastructure, address _resources, address _improvements1, address _improvements2, address _wonders1, address _countryMinter) public
 ```
+
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
 
 ### idToForces
 
@@ -6601,11 +7824,23 @@ mapping(uint256 => struct ForcesContract.Forces) idToForces
 function generateForces(uint256 id) public
 ```
 
+this function allows a nation to purchase forces once a country is minted
+
+_this function is a public function but only callable from the country minter contact when a country is minted_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID of the nation being minted |
+
 ### updateInfrastructureContract
 
 ```solidity
 function updateInfrastructureContract(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateResourcesContract
 
@@ -6613,11 +7848,15 @@ function updateInfrastructureContract(address newAddress) public
 function updateResourcesContract(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateImprovementsContract1
 
 ```solidity
 function updateImprovementsContract1(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateSpyCost
 
@@ -6667,11 +7906,39 @@ modifier onlyGroundBattle()
 function buySoldiers(uint256 amount, uint256 id) public
 ```
 
+this function will allow a nation owner to purchase soldiers
+
+_this is a public function that allows a nation owner to purchase soldiers_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of soldiers being purchased |
+| id | uint256 | is the nation id of the nation being queried |
+
 ### getSoldierCost
 
 ```solidity
 function getSoldierCost(uint256 id) public view returns (uint256)
 ```
+
+this will return the cost of a soldier for a nation
+access to iron and oil resources decrease the cost of soldiers
+
+_this is a public view function that will retrun the cost of soldiers for a nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the soldier cost for that nation |
 
 ### sendSoldiers
 
@@ -6679,11 +7946,39 @@ function getSoldierCost(uint256 id) public view returns (uint256)
 function sendSoldiers(uint256 idSender, uint256 idReciever, uint256 amount) public
 ```
 
+this function will allow the aid contact to send soldiers in an aid package
+
+_this function is only callable from the aid contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| idSender | uint256 | is the nation id of the aid sender |
+| idReciever | uint256 | is the nation id of the aid reciever |
+| amount | uint256 | is the amount of soldiers being sent |
+
 ### getDefendingSoldierCount
 
 ```solidity
 function getDefendingSoldierCount(uint256 id) public view returns (uint256)
 ```
+
+this function will return the number of defending soldiers for a nation
+
+_this is a public view function that will return the amount of defending soldiers of a nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of defending soldiers for the queried nation |
 
 ### deploySoldiers
 
@@ -6691,11 +7986,39 @@ function getDefendingSoldierCount(uint256 id) public view returns (uint256)
 function deploySoldiers(uint256 amountToDeploy, uint256 id, uint256 warId) public
 ```
 
+this function allows a nation owner to deploy soldiers to an active war
+
+_this is a public function that will allow a nation woner to deploy soldiers to a war_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amountToDeploy | uint256 | is the number of soldiers being deployed |
+| id | uint256 | is the nation id of the nation deploying soldiers |
+| warId | uint256 | is the id of the active war |
+
 ### getMaxDeployablePercentage
 
 ```solidity
 function getMaxDeployablePercentage(uint256 id) public view returns (uint256)
 ```
+
+this function returns the maximum percentage of a population that is deployable to war
+
+_this is a public view function that will return the maximum percentage of a population that is deployable_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation deploying soldiers |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the maximum percentage of a nations population that is deployable |
 
 ### withdrawSoldiers
 
@@ -6703,11 +8026,34 @@ function getMaxDeployablePercentage(uint256 id) public view returns (uint256)
 function withdrawSoldiers(uint256 amountToWithdraw, uint256 id) public
 ```
 
+this function lets a nation owner deploy troops from war
+
+_this is a public function that allows a nation owner to withdraw deployed troops_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amountToWithdraw | uint256 | is the amount of soldiers the nation owner is looking to withdraw |
+| id | uint256 | is the nation id of the nation withdrawing soldeirs |
+
 ### decreaseDefendingSoldierCountFromNukeAttack
 
 ```solidity
 function decreaseDefendingSoldierCountFromNukeAttack(uint256 id) public
 ```
+
+this function is only callable from the nuke contract
+this function will decrease the amount of soldiers from a nuke strike
+a fallout shelter system will decrease the number of soldiers lost by 50%
+
+_this is a public function only callable from the Nuke Contract that will decrease the number of soldiers during a nuke attack_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation being attacked |
 
 ### getSoldierCount
 
@@ -6715,11 +8061,43 @@ function decreaseDefendingSoldierCountFromNukeAttack(uint256 id) public
 function getSoldierCount(uint256 id) public view returns (uint256 soldiers)
 ```
 
+this function will return the number of soldiers a nation has
+
+_this is a public view function that will return the number of soldiers for a nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| soldiers | uint256 | is the nations soldier count |
+
 ### getDeployedSoldierCount
 
 ```solidity
 function getDeployedSoldierCount(uint256 id) public view returns (uint256 soldiers)
 ```
+
+this function returns the amount of deployed solders a nation has
+
+_this is a public view function that will return a nations deployed soldier count_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID for the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| soldiers | uint256 | is the number of deployed soldiers for that nation |
 
 ### getDeployedSoldierEfficiencyModifier
 
@@ -6727,11 +8105,45 @@ function getDeployedSoldierCount(uint256 id) public view returns (uint256 soldie
 function getDeployedSoldierEfficiencyModifier(uint256 id) public view returns (uint256)
 ```
 
+this function will adjust the efficiency of a nations deployed soldiers
+aluminium, coal, oil, pigs, barracks, guerilla camps all increase the efficiency od deployed soldiers
+
+_this is a public view function that will adjust the efficiency of a nations deployed soldiers_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID for the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the percentage modifier for a nations deployed forces |
+
 ### getDefendingSoldierEfficiencyModifier
 
 ```solidity
 function getDefendingSoldierEfficiencyModifier(uint256 id) public view returns (uint256)
 ```
+
+this function will adjust the efficiency of a nations defending soldiers
+aluminium, coal, oil, pigs, barracks, border fortifications and forward operating bases all increase the efficiency od defending soldiers
+
+_this is a public view function that will adjust the efficiency of a nations defending soldiers_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID for the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the percentage modifier for a nations defending forces |
 
 ### decomissionSoldiers
 
@@ -6739,17 +8151,58 @@ function getDefendingSoldierEfficiencyModifier(uint256 id) public view returns (
 function decomissionSoldiers(uint256 amount, uint256 id) public
 ```
 
+this function allows a nation owner to decomission soldiers
+
+_this is a public function that allows a nation owner to decommission soldiers_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of soldiers being decomissioned |
+| id | uint256 | is the nation ID of the nation |
+
 ### buyTanks
 
 ```solidity
 function buyTanks(uint256 amount, uint256 id) public
 ```
 
+this function allows a nation owner to buy tanks
+tanks cost 40X what soldeirs cost a nation
+factories reduce the cost of tanks 5% per factory
+
+_this is a public function that allows a nation owner to buy tanks_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the number of tanks being purchased |
+| id | uint256 | is the nation ID of the nation purchasing tanks |
+
 ### getMaxTankCount
 
 ```solidity
 function getMaxTankCount(uint256 id) public view returns (uint256)
 ```
+
+this function returns the maximum amount of tanks a nation can own
+a nation's max tanks is the lesser of 10% of soldier efficiency or 8% of citizens
+
+_this is a public view function that will return the maximum amount of tanks a nation can own_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the maximum amount of tanks that nation can own |
 
 ### deployTanks
 
@@ -6769,11 +8222,33 @@ function withdrawTanks(uint256 amountToWithdraw, uint256 id) public
 function decreaseDefendingTankCount(uint256 amount, uint256 id) public
 ```
 
+this funtion will allow the spy contract to decrease the number of defending tanks in a spy attack
+
+_this is a public view function that can only be called by the Spy Contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of tanks being decreased |
+| id | uint256 | is the nation id of the nation being attacked |
+
 ### decreaseDefendingTankCountFromCruiseMissileContract
 
 ```solidity
 function decreaseDefendingTankCountFromCruiseMissileContract(uint256 amount, uint256 id) public
 ```
+
+this funtion will allow the cruise missile contact to decrease the number of tanks in a cruise missile attack
+
+_this is a public function that can only be called from the cruise missile contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the number of tanks being decreased |
+| id | uint256 | is the nation id of the nation being attacked |
 
 ### decreaseDefendingTankCountFromNukeContract
 
@@ -6781,11 +8256,32 @@ function decreaseDefendingTankCountFromCruiseMissileContract(uint256 amount, uin
 function decreaseDefendingTankCountFromNukeContract(uint256 id) public
 ```
 
+this funtion will allow the cruise missile contact to decrease the number of tanks in a nuke attack
+
+_this is a public function that can only be called from the nuke contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being attacked |
+
 ### decreaseDefendingTankCountFromAirBattleContract
 
 ```solidity
 function decreaseDefendingTankCountFromAirBattleContract(uint256 id, uint256 amountToDecrease) public
 ```
+
+this funtion will allow the cruise missile contact to decrease the number of tanks in a bombing attack
+
+_this is a public function that can only be called from the air battle contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being attacked |
+| amountToDecrease | uint256 | is the number of tanks being decreased |
 
 ### getTankCount
 
@@ -6793,11 +8289,43 @@ function decreaseDefendingTankCountFromAirBattleContract(uint256 id, uint256 amo
 function getTankCount(uint256 id) public view returns (uint256 tanks)
 ```
 
+this function will return the number of tanks for a nation
+
+_this is a public view function that will return the number of tanks a nation has_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id for the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tanks | uint256 | is the number of tanks for the nation being queried |
+
 ### getDeployedTankCount
 
 ```solidity
 function getDeployedTankCount(uint256 id) public view returns (uint256 tanks)
 ```
+
+this function will return the number of deployed tanks for a nation
+
+_this is a public view function that will return the number of deployed tanks a nation has_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id for the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tanks | uint256 | is the number of deployed tanks for the nation being queried |
 
 ### getDefendingTankCount
 
@@ -6805,11 +8333,39 @@ function getDeployedTankCount(uint256 id) public view returns (uint256 tanks)
 function getDefendingTankCount(uint256 id) public view returns (uint256 tanks)
 ```
 
+this function will return the number of defending tanks for a nation
+
+_this is a public view function that will return the number of defending tanks a nation has_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id for the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tanks | uint256 | is the number of defending tanks for the nation being queried |
+
 ### buySpies
 
 ```solidity
 function buySpies(uint256 amount, uint256 id) public
 ```
+
+this function will allow a natio nowner to purchase spies
+you cannot buy more spies than the maximum amount for your nation
+
+_this is a public function only callable by the nation owner that will purchase spies_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of spies being purchased |
+| id | uint256 | is the nation id of the nation buying spies |
 
 ### getMaxSpyCount
 
@@ -6817,11 +8373,40 @@ function buySpies(uint256 amount, uint256 id) public
 function getMaxSpyCount(uint256 id) public view returns (uint256)
 ```
 
+this function will return the maximum amount of spies a nation can own
+the base max spy count for a nation is 50
+intel agencies will increase the max number of spies by 100
+a central intelligence agency wonder will increase the max number of spies by 250
+
+_this is a public view function that will return the maximum amount of spies a given country can own_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id for the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the maximum number of spies for a given nation |
+
 ### decreaseAttackerSpyCount
 
 ```solidity
 function decreaseAttackerSpyCount(uint256 id) public
 ```
+
+this function will allow the spy contract to decrease the number of spies of an nation that is lost by the attacker during a spy attack
+
+_this is a public function only callable from the Spy Contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation losing their spy when the attack fails |
 
 ### decreaseDefenderSpyCount
 
@@ -6829,11 +8414,38 @@ function decreaseAttackerSpyCount(uint256 id) public
 function decreaseDefenderSpyCount(uint256 amount, uint256 id) public
 ```
 
+this function will allow the spy contract to decrease the number of spies lost during a spy attack
+
+_this is a public view function that allows the spy contract to decrease the number of spies of a nation in a spy attack_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the number of spies lost during the attack |
+| id | uint256 | is the nation suffering losses during the spy attack |
+
 ### getSpyCount
 
 ```solidity
 function getSpyCount(uint256 countryId) public view returns (uint256 count)
 ```
+
+this function will return a nations current spy count
+
+_this is a public view function that will return the current spy count for a nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the spy count for a given nation |
 
 ### decreaseDeployedUnits
 
@@ -6841,11 +8453,37 @@ function getSpyCount(uint256 countryId) public view returns (uint256 count)
 function decreaseDeployedUnits(uint256 attackerSoldierLosses, uint256 attackerTankLosses, uint256 attackerId) public
 ```
 
+this function will decrease the number of losses of an attacker during a ground battle
+
+_this is a public function only callable from the ground battle contract
+this function will decrease the losses of an attacker during a ground battle_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| attackerSoldierLosses | uint256 | is the soldier losses for an attacker from a battle |
+| attackerTankLosses | uint256 | is the tank losses for an attacker from a battle |
+| attackerId | uint256 | is the nation ID of the nation suffering losses |
+
 ### decreaseDefendingUnits
 
 ```solidity
 function decreaseDefendingUnits(uint256 defenderSoldierLosses, uint256 defenderTankLosses, uint256 defenderId) public
 ```
+
+this function will decrease the number of losses of an defender during a ground battle
+
+_this is a public function only callable from the ground battle contract
+this function will decrease the losses of an defender during a ground battle_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| defenderSoldierLosses | uint256 | is the soldier losses for an defender from a battle |
+| defenderTankLosses | uint256 | is the tank losses for an defender from a battle |
+| defenderId | uint256 | is the nation ID of the nation suffering losses |
 
 ### increaseSoldierCasualties
 
@@ -6853,13 +8491,34 @@ function decreaseDefendingUnits(uint256 defenderSoldierLosses, uint256 defenderT
 function increaseSoldierCasualties(uint256 id, uint256 amount) public
 ```
 
+_this is a function for the development environment that will assist in testing wonders and improvements that are available after a certain number of casualties_
+
 ### getCasualties
 
 ```solidity
 function getCasualties(uint256 id) public view returns (uint256)
 ```
 
+this function will return a nations casualty count
+
+_this is a public view function that will return a nations casualty count_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is a nation id for the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the casualty count for a given nation |
+
 ## MissilesContract
+
+_this contract will allow a nation to purchase cruise missiles and nukes
+this contract inherits from the openzeppelin ownable contract_
 
 ### cruiseMissileCost
 
@@ -7039,22 +8698,22 @@ struct Missiles {
 function settings(address _treasury, address _spyAddress, address _nukeAddress, address _airBattle, address _wonders2, address _strength, address _infrastructure) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### settings2
 
 ```solidity
 function settings2(address _resources, address _improvements1, address _wonders1, address _wonders4, address _countryMinter, address _keeper) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### idToMissiles
 
 ```solidity
 mapping(uint256 => struct MissilesContract.Missiles) idToMissiles
-```
-
-### onlyKeeper
-
-```solidity
-modifier onlyKeeper()
 ```
 
 ### generateMissiles
@@ -7069,11 +8728,15 @@ function generateMissiles(uint256 id) public
 function updateTreasuryContract(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateSpyContract
 
 ```solidity
 function updateSpyContract(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateNukeContract
 
@@ -7081,11 +8744,15 @@ function updateSpyContract(address newAddress) public
 function updateNukeContract(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateAirBattleContract
 
 ```solidity
 function updateAirBattleContract(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateNationStrengthContract
 
@@ -7093,11 +8760,15 @@ function updateAirBattleContract(address newAddress) public
 function updateNationStrengthContract(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateResourcesContract
 
 ```solidity
 function updateResourcesContract(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateImprovementsContract1
 
@@ -7105,11 +8776,15 @@ function updateResourcesContract(address newAddress) public
 function updateImprovementsContract1(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateWondersContract1
 
 ```solidity
 function updateWondersContract1(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateWondersContract2
 
@@ -7117,11 +8792,15 @@ function updateWondersContract1(address newAddress) public
 function updateWondersContract2(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateWondersContract4
 
 ```solidity
 function updateWondersContract4(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateCountryMinter
 
@@ -7129,11 +8808,15 @@ function updateWondersContract4(address newAddress) public
 function updateCountryMinter(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateCruiseMissileCost
 
 ```solidity
 function updateCruiseMissileCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### onlySpyContract
 
@@ -7153,11 +8836,50 @@ modifier onlyNukeContract()
 modifier onlyAirBattle()
 ```
 
+### onlyKeeper
+
+```solidity
+modifier onlyKeeper()
+```
+
 ### buyCruiseMissiles
 
 ```solidity
 function buyCruiseMissiles(uint256 amount, uint256 id) public
 ```
+
+this function allows a nation owner to purchase cruise missiles
+
+_this function is a public function that will allow a nation owner to purchase cruise missiles_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of cruise missiles being purchased |
+| id | uint256 | is the nation id of the nation buying cruise missiles |
+
+### getCruiseMissileCost
+
+```solidity
+function getCruiseMissileCost(uint256 id) public view returns (uint256 cost)
+```
+
+this function will return the cost per cruise missile for a given nation
+
+_this is a public view function that will return the cost per missiile of cruise missiles for a nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation purchasing missiles |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| cost | uint256 | is the cost per missile of cruise missiles for that nation |
 
 ### getCruiseMissileCount
 
@@ -7165,11 +8887,38 @@ function buyCruiseMissiles(uint256 amount, uint256 id) public
 function getCruiseMissileCount(uint256 id) public view returns (uint256)
 ```
 
+this function will return the number of cruise missiles a given nation owns
+
+_this is a public view function that will return the number of cruise missile a nation owns_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of cruise missiles a given nation owns |
+
 ### decreaseCruiseMissileCount
 
 ```solidity
 function decreaseCruiseMissileCount(uint256 amount, uint256 id) public
 ```
+
+this function will decrease the number of cruise missiles lost during a spy attack
+
+_this is a public function that will decrease the number of cruise missiles only callable from the spy contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | this is the number of missiles being destroyed |
+| id | uint256 | this is the nation id of the nation being attacked |
 
 ### decreaseCruiseMissileCountFromNukeContract
 
@@ -7177,11 +8926,34 @@ function decreaseCruiseMissileCount(uint256 amount, uint256 id) public
 function decreaseCruiseMissileCountFromNukeContract(uint256 id) public
 ```
 
+this function will decrease the number of cruise missiles lost during a nuke attack
+a succesful nuke attack will destroy 35% of your nations cruise missiles 
+a fallout shelter system will reduce the number of missiles lost during a nuke attack to 25%
+
+_this is a public function that will decrease the number of cruise missiles only callable from the nuke contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation being attacked |
+
 ### decreaseCruiseMissileCountFromAirBattleContract
 
 ```solidity
 function decreaseCruiseMissileCountFromAirBattleContract(uint256 id, uint256 amountToDecrease) public
 ```
+
+this function will decrease the number of cruise missiles lost during a bombing mission
+
+_this is a public function only callable from the air battle contact_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation losing missiles from being attacked by bombers |
+| amountToDecrease | uint256 | this is the number of cruise missiles beind destroyed by the bombing mission |
 
 ### buyNukes
 
@@ -7189,11 +8961,63 @@ function decreaseCruiseMissileCountFromAirBattleContract(uint256 id, uint256 amo
 function buyNukes(uint256 id) public
 ```
 
+this function allows a nation owner to purchase nukes
+requirements to purchase nukes are 75 technology, 1000 infrastructure and access to uranium
+a nation must also have a nation strength of 150,000 or a manhattan project to purchase nukes
+a nation owner can only purchase one nuke per day (2 with a weapons research center)
+
+_this is a public function that will allow a nation owner to purchase nukes_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation purchasing nukes |
+
+### getNukeCost
+
+```solidity
+function getNukeCost(uint256 id) public view returns (uint256)
+```
+
+this function will return the cost per nuke for a nation
+nukes cost 500,000 + (50,000 * current nuke count)
+
+_this is a public function that will return the cost per nuke for a nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the cost per nuke for a given nation |
+
 ### getNukeCount
 
 ```solidity
 function getNukeCount(uint256 id) public view returns (uint256)
 ```
+
+this function retrurns a nations current nuke count
+
+_this is a public view function that will retrun a nations current nuke count_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID for the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the current nuke count for a given nation |
 
 ### decreaseNukeCountFromNukeContract
 
@@ -7201,11 +9025,33 @@ function getNukeCount(uint256 id) public view returns (uint256)
 function decreaseNukeCountFromNukeContract(uint256 id) public
 ```
 
+this function will decrease a nations nuke count by 1 when a nuke is launched
+
+_this is a public function that will decrease the nuke count for a nation by 1 when a nuke is launched from the nuke contract
+this function is only callable from the nuke contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation launching the nuke that will have its nuke count decreased by 1 |
+
 ### decreaseNukeCountFromSpyContract
 
 ```solidity
 function decreaseNukeCountFromSpyContract(uint256 id) public
 ```
+
+this function will decrease a nations nuke count if they are successfully attacked by a spy
+
+_this is a public function that will decrease the nuke count for a nation when a successful spy attack is executed
+this function is only callable from the spy contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation that was attacked and is losing a nuke |
 
 ### resetNukesPurchasedToday
 
@@ -7213,7 +9059,14 @@ function decreaseNukeCountFromSpyContract(uint256 id) public
 function resetNukesPurchasedToday() public
 ```
 
+_this is a function that is only callable from the keeper contract
+this function will reset the number of nukes purchased by each nation for that day back to 0
+this function will be called daily_
+
 ## GroundBattleContract
+
+_this contract inherits from the openzeppelin ownable contract
+this contract inherits from the chainlink vrf contract_
 
 ### groundBattleId
 
@@ -7435,8 +9288,22 @@ function updateWondersContract4(address newAddress) public
 ### groundAttack
 
 ```solidity
-function groundAttack(uint256 warId, uint256 attackerId, uint256 defenderId, uint256 attackType) internal
+function groundAttack(uint256 warId, uint256 attackerId, uint256 defenderId, uint256 attackType) public
 ```
+
+this contract allows nations at war to launch a ground attack against each other
+
+_this is a public function callable only from a nation owner
+this contract allows nations at war to launch a ground attack against each other_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| warId | uint256 | is the war id of the war between the 2 nations in the battle |
+| attackerId | uint256 | is the nation id of the attacking nation |
+| defenderId | uint256 | is the nation id of the defending nation |
+| attackType | uint256 | 1. planned 2. standard 3. aggressive 4. bezerk |
 
 ### generateAttackerForcesStruct
 
@@ -7536,6 +9403,8 @@ function burnFromTreasury(address account, uint256 amount) external
 ```
 
 ## ImprovementsContract1
+
+this contract will allow a nation owner to buy certain improvements
 
 ### treasury
 
@@ -7694,10 +9563,19 @@ mapping(uint256 => struct ImprovementsContract1.Improvements1) idToImprovements1
 function settings(address _treasury, address _improvements2, address _improvements3, address _improvements4, address _navy, address _additionalNavy, address _countryMinter, address _wonders1) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### approvedAddress
 
 ```solidity
 modifier approvedAddress()
+```
+
+### onlyCountryMinter
+
+```solidity
+modifier onlyCountryMinter()
 ```
 
 ### updateTreasuryAddress
@@ -7706,11 +9584,15 @@ modifier approvedAddress()
 function updateTreasuryAddress(address _newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateImprovementContractAddresses
 
 ```solidity
 function updateImprovementContractAddresses(address _improvements2, address _improvements3, address _improvements4) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateNavyContractAddress
 
@@ -7718,11 +9600,24 @@ function updateImprovementContractAddresses(address _improvements2, address _imp
 function updateNavyContractAddress(address _navy) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### generateImprovements
 
 ```solidity
 function generateImprovements(uint256 id) public
 ```
+
+this function will allow each minted nation to buy imoprovements
+
+_this function is only callable by the countryMinter contract
+this function will initialize the struct to store the info about the minted nations improvements_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID for the nation being minted |
 
 ### updateAirportCost
 
@@ -7730,11 +9625,17 @@ function generateImprovements(uint256 id) public
 function updateAirportCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of an airport_
+
 ### updateBankCost
 
 ```solidity
 function updateBankCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a bank_
 
 ### updateBarracksCost
 
@@ -7742,11 +9643,17 @@ function updateBankCost(uint256 newPrice) public
 function updateBarracksCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a barracks_
+
 ### updateBorderFortificationCost
 
 ```solidity
 function updateBorderFortificationCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a border fortification_
 
 ### updateBorderWallCost
 
@@ -7754,11 +9661,17 @@ function updateBorderFortificationCost(uint256 newPrice) public
 function updateBorderWallCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a border wall_
+
 ### updateBunkerCost
 
 ```solidity
 function updateBunkerCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a bunker_
 
 ### updateCasinoCost
 
@@ -7766,11 +9679,17 @@ function updateBunkerCost(uint256 newPrice) public
 function updateCasinoCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a casino_
+
 ### updateChurchCost
 
 ```solidity
 function updateChurchCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a church_
 
 ### updateClinicCost
 
@@ -7778,11 +9697,17 @@ function updateChurchCost(uint256 newPrice) public
 function updateClinicCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a clinic_
+
 ### updateDrydockCost
 
 ```solidity
 function updateDrydockCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a drydock_
 
 ### updateFactoryCost
 
@@ -7790,11 +9715,32 @@ function updateDrydockCost(uint256 newPrice) public
 function updateFactoryCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a factory_
+
 ### getCost1
 
 ```solidity
 function getCost1() public view returns (uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256)
 ```
+
+_this function will allow the caller to return the cost of an improvement_
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | airportCost this will be the cost of an airport |
+| [1] | uint256 | bankCost this will be the cost of a bank... |
+| [2] | uint256 |  |
+| [3] | uint256 |  |
+| [4] | uint256 |  |
+| [5] | uint256 |  |
+| [6] | uint256 |  |
+| [7] | uint256 |  |
+| [8] | uint256 |  |
+| [9] | uint256 |  |
+| [10] | uint256 |  |
 
 ### getImprovementCount
 
@@ -7802,11 +9748,38 @@ function getCost1() public view returns (uint256, uint256, uint256, uint256, uin
 function getImprovementCount(uint256 id) public view returns (uint256 count)
 ```
 
+this function will return the number of improvements a nation owns
+
+_this is a public view function that will return the number of improvements a nation owns_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | this is the number of improvements for a given nation |
+
 ### updateImprovementCount
 
 ```solidity
 function updateImprovementCount(uint256 id, uint256 newCount) public
 ```
+
+this function will incrase the number of improvements for a nation when improvements are purchased
+
+_this is a publiv function that is only callable from the other improvement contracts_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the ID for the nation purchasing improvements |
+| newCount | uint256 | is the updated total of improvements for a given nation |
 
 ### buyImprovement1
 
@@ -7814,11 +9787,27 @@ function updateImprovementCount(uint256 id, uint256 newCount) public
 function buyImprovement1(uint256 amount, uint256 countryId, uint256 improvementId) public
 ```
 
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 |  |
+| countryId | uint256 |  |
+| improvementId | uint256 | this will determine which improvement is being purchased 1 = airport 2 = bank 3 = barracks 4 = border fortification 5 = border wall 6 = bunker 7 = casino 8 = church 9 = clinic 10 = drydock 11 = factory |
+
 ### deleteImprovement1
 
 ```solidity
 function deleteImprovement1(uint256 amount, uint256 countryId, uint256 improvementId) public
 ```
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 |  |
+| countryId | uint256 |  |
+| improvementId | uint256 | this will determine which improvement is being deleted 1 = airport 2 = bank 3 = barracks 4 = border fortification 5 = border wall 6 = bunker 7 = casino 8 = church 9 = clinic 10 = drydock 11 = factory |
 
 ### getAirportCount
 
@@ -7826,11 +9815,43 @@ function deleteImprovement1(uint256 amount, uint256 countryId, uint256 improveme
 function getAirportCount(uint256 countryId) public view returns (uint256 count)
 ```
 
+this function will return the number of airports a nation owns
+
+_this is a public view function that will return the number of airports for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of airports a given nation owns |
+
 ### getBarracksCount
 
 ```solidity
 function getBarracksCount(uint256 countryId) public view returns (uint256 count)
 ```
+
+this function will return the number of barracks a nation owns
+
+_this is a public view function that will return the number of barracks for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of barracks a given nation owns |
 
 ### getBorderFortificationCount
 
@@ -7838,11 +9859,43 @@ function getBarracksCount(uint256 countryId) public view returns (uint256 count)
 function getBorderFortificationCount(uint256 countryId) public view returns (uint256 count)
 ```
 
+this function will return the number of border fortifications a nation owns
+
+_this is a public view function that will return the number of border fortifications for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of border fortifications a given nation owns |
+
 ### getBorderWallCount
 
 ```solidity
 function getBorderWallCount(uint256 countryId) public view returns (uint256 count)
 ```
+
+this function will return the number of border walls a nation owns
+
+_this is a public view function that will return the number of border walls for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of border walls a given nation owns |
 
 ### getBankCount
 
@@ -7850,11 +9903,43 @@ function getBorderWallCount(uint256 countryId) public view returns (uint256 coun
 function getBankCount(uint256 countryId) public view returns (uint256)
 ```
 
+this function will return the number of banks a nation owns
+
+_this is a public view function that will return the number of banks for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | count is the number of banks a given nation owns |
+
 ### getBunkerCount
 
 ```solidity
 function getBunkerCount(uint256 countryId) public view returns (uint256 count)
 ```
+
+this function will return the number of bunkers a nation owns
+
+_this is a public view function that will return the number of bunkers for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of bunkers a given nation owns |
 
 ### getCasinoCount
 
@@ -7862,11 +9947,43 @@ function getBunkerCount(uint256 countryId) public view returns (uint256 count)
 function getCasinoCount(uint256 countryId) public view returns (uint256)
 ```
 
+this function will return the number of casinos a nation owns
+
+_this is a public view function that will return the number of casinos for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | count is the number of casinos a given nation owns |
+
 ### getChurchCount
 
 ```solidity
 function getChurchCount(uint256 countryId) public view returns (uint256)
 ```
+
+this function will return the number of churches a nation owns
+
+_this is a public view function that will return the number of churches for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | count is the number of churches a given nation owns |
 
 ### getDrydockCount
 
@@ -7874,11 +9991,43 @@ function getChurchCount(uint256 countryId) public view returns (uint256)
 function getDrydockCount(uint256 countryId) public view returns (uint256 count)
 ```
 
+this function will return the number of drydocks a nation owns
+
+_this is a public view function that will return the number of drydocks for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of drydocks a given nation owns |
+
 ### getClinicCount
 
 ```solidity
 function getClinicCount(uint256 countryId) public view returns (uint256 count)
 ```
+
+this function will return the number of clinics a nation owns
+
+_this is a public view function that will return the number of clinics for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of clinics a given nation owns |
 
 ### getFactoryCount
 
@@ -7886,7 +10035,25 @@ function getClinicCount(uint256 countryId) public view returns (uint256 count)
 function getFactoryCount(uint256 countryId) public view returns (uint256 count)
 ```
 
+this function will return the number of factories a nation owns
+
+_this is a public view function that will return the number of factories for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of factories a given nation owns |
+
 ## ImprovementsContract2
+
+this contract will allow a nation owner to buy certain improvements
 
 ### treasury
 
@@ -8005,11 +10172,22 @@ mapping(uint256 => struct ImprovementsContract2.Improvements2) idToImprovements2
 function settings(address _treasury, address _forces, address _wonders1, address _countryMinter, address _improvements1) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
+### onlyCountryMinter
+
+```solidity
+modifier onlyCountryMinter()
+```
+
 ### updateTreasuryAddress
 
 ```solidity
 function updateTreasuryAddress(address _treasury) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateImprovementContract1Address
 
@@ -8017,11 +10195,15 @@ function updateTreasuryAddress(address _treasury) public
 function updateImprovementContract1Address(address _improvements1) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateWondersContract1Address
 
 ```solidity
 function updateWondersContract1Address(address _wonders1) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateForcesAddress
 
@@ -8029,11 +10211,24 @@ function updateWondersContract1Address(address _wonders1) public
 function updateForcesAddress(address _forces) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### generateImprovements
 
 ```solidity
 function generateImprovements(uint256 id) public
 ```
+
+this function will allow each minted nation to buy imoprovements
+
+_this function is only callable by the countryMinter contract
+this function will initialize the struct to store the info about the minted nations improvements_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID for the nation being minted |
 
 ### getCost2
 
@@ -8041,11 +10236,29 @@ function generateImprovements(uint256 id) public
 function getCost2() public view returns (uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256)
 ```
 
+_this function will allow the caller to return the cost of an improvement_
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | foreignMinistryCost this will be the cost of a foreign ministry |
+| [1] | uint256 | forwardOperatingBaseCost this will be the cost of a forward operating base... |
+| [2] | uint256 |  |
+| [3] | uint256 |  |
+| [4] | uint256 |  |
+| [5] | uint256 |  |
+| [6] | uint256 |  |
+| [7] | uint256 |  |
+
 ### updateForeignMinistryCost
 
 ```solidity
 function updateForeignMinistryCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a foreign ministry_
 
 ### updateForwardOperatingBaseCost
 
@@ -8053,11 +10266,17 @@ function updateForeignMinistryCost(uint256 newPrice) public
 function updateForwardOperatingBaseCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a forward operating base_
+
 ### updateGuerillaCampCost
 
 ```solidity
 function updateGuerillaCampCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a guerilla camp_
 
 ### updateHarborCost
 
@@ -8065,11 +10284,17 @@ function updateGuerillaCampCost(uint256 newPrice) public
 function updateHarborCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a harbor_
+
 ### updateHospitalCost
 
 ```solidity
 function updateHospitalCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a hospital_
 
 ### updateIntelligenceAgencyCost
 
@@ -8077,11 +10302,17 @@ function updateHospitalCost(uint256 newPrice) public
 function updateIntelligenceAgencyCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of an intel agency_
+
 ### updateJailCost
 
 ```solidity
 function updateJailCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a jail_
 
 ### updateLaborCampCost
 
@@ -8089,11 +10320,22 @@ function updateJailCost(uint256 newPrice) public
 function updateLaborCampCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a labor camp_
+
 ### buyImprovement2
 
 ```solidity
 function buyImprovement2(uint256 amount, uint256 countryId, uint256 improvementId) public
 ```
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 |  |
+| countryId | uint256 |  |
+| improvementId | uint256 | this will determine which improvement is being purchased 1 = foreign ministry 2 = forward operating base  3 = guerilla camp 4 = harbor 5 = hospital 6 = intel agency 7 = jail 8 = labor camp |
 
 ### deleteImprovement2
 
@@ -8101,11 +10343,35 @@ function buyImprovement2(uint256 amount, uint256 countryId, uint256 improvementI
 function deleteImprovement2(uint256 amount, uint256 countryId, uint256 improvementId) public
 ```
 
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 |  |
+| countryId | uint256 |  |
+| improvementId | uint256 | this will determine which improvement is being deleted 1 = foreign ministry 2 = forward operating base  3 = guerilla camp 4 = harbor 5 = hospital 6 = intel agency 7 = jail 8 = labor camp |
+
 ### getForeignMinistryCount
 
 ```solidity
 function getForeignMinistryCount(uint256 countryId) public view returns (uint256)
 ```
+
+this function will return the number of foreign ministries a nation owns
+
+_this is a public view function that will return the number of foreign ministries for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | count is the number of foreign ministries a given nation owns |
 
 ### getForwardOperatingBaseCount
 
@@ -8113,11 +10379,43 @@ function getForeignMinistryCount(uint256 countryId) public view returns (uint256
 function getForwardOperatingBaseCount(uint256 countryId) public view returns (uint256 count)
 ```
 
+this function will return the number of forward operating bases a nation owns
+
+_this is a public view function that will return the number of forward operating bases for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of forward operating bases a given nation owns |
+
 ### getGuerillaCampCount
 
 ```solidity
 function getGuerillaCampCount(uint256 countryId) public view returns (uint256)
 ```
+
+this function will return the number of guerialls camps a nation owns
+
+_this is a public view function that will return the number of guerilla camps for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | count is the number of guerilla camps a given nation owns |
 
 ### getHarborCount
 
@@ -8125,11 +10423,43 @@ function getGuerillaCampCount(uint256 countryId) public view returns (uint256)
 function getHarborCount(uint256 countryId) public view returns (uint256 count)
 ```
 
+this function will return the number of harbors a nation owns
+
+_this is a public view function that will return the number of harbors for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of harbors a given nation owns |
+
 ### getHospitalCount
 
 ```solidity
 function getHospitalCount(uint256 countryId) public view returns (uint256 count)
 ```
+
+this function will return the number of hospitals a nation owns
+
+_this is a public view function that will return the number of hospitals for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of hospitals a given nation owns |
 
 ### getIntelAgencyCount
 
@@ -8137,11 +10467,43 @@ function getHospitalCount(uint256 countryId) public view returns (uint256 count)
 function getIntelAgencyCount(uint256 countryId) public view returns (uint256 count)
 ```
 
+this function will return the number of intel agencies a nation owns
+
+_this is a public view function that will return the number of intel agencies for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of intel agencies a given nation owns |
+
 ### getJailCount
 
 ```solidity
 function getJailCount(uint256 countryId) public view returns (uint256 count)
 ```
+
+this function will return the number of jails a nation owns
+
+_this is a public view function that will return the number of jails for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of jails a given nation owns |
 
 ### getLaborCampCount
 
@@ -8149,7 +10511,25 @@ function getJailCount(uint256 countryId) public view returns (uint256 count)
 function getLaborCampCount(uint256 countryId) public view returns (uint256 count)
 ```
 
+this function will return the number of labor camps a nation owns
+
+_this is a public view function that will return the number of labor camps for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of labor camps a given nation owns |
+
 ## ImprovementsContract4
+
+this contract will allow a nation owner to buy certain improvements
 
 ### treasury
 
@@ -8246,11 +10626,22 @@ mapping(uint256 => struct ImprovementsContract4.Improvements4) idToImprovements4
 function settings(address _treasury, address _forces, address _improvements1, address _improvements2, address _countryMinter) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
+### onlyCountryMinter
+
+```solidity
+modifier onlyCountryMinter()
+```
+
 ### updateTreasuryAddress
 
 ```solidity
 function updateTreasuryAddress(address _newTreasuryAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateImprovementContract1Address
 
@@ -8258,11 +10649,15 @@ function updateTreasuryAddress(address _newTreasuryAddress) public
 function updateImprovementContract1Address(address _improvements1) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateImprovementContract2Address
 
 ```solidity
 function updateImprovementContract2Address(address _improvements2) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateForcesAddress
 
@@ -8270,11 +10665,24 @@ function updateImprovementContract2Address(address _improvements2) public
 function updateForcesAddress(address _forces) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### generateImprovements
 
 ```solidity
 function generateImprovements(uint256 id) public
 ```
+
+this function will allow each minted nation to buy imoprovements
+
+_this function is only callable by the countryMinter contract
+this function will initialize the struct to store the info about the minted nations improvements_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID for the nation being minted |
 
 ### getCost4
 
@@ -8282,11 +10690,25 @@ function generateImprovements(uint256 id) public
 function getCost4() public view returns (uint256, uint256, uint256, uint256)
 ```
 
+_this function will allow the caller to return the cost of an improvement_
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | missileDefenseCost this will be the cost of a foreign ministry |
+| [1] | uint256 | munitionsFactoryCost this will be the cost of a forward operating base... |
+| [2] | uint256 |  |
+| [3] | uint256 |  |
+
 ### updateMissileDefenseCost
 
 ```solidity
 function updateMissileDefenseCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a missile defense_
 
 ### updateMunitionsFactoryCost
 
@@ -8294,11 +10716,17 @@ function updateMissileDefenseCost(uint256 newPrice) public
 function updateMunitionsFactoryCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a munitions factory_
+
 ### updateNavalAcademyCost
 
 ```solidity
 function updateNavalAcademyCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of naval academy_
 
 ### updateNavalConstructionYardCost
 
@@ -8306,11 +10734,22 @@ function updateNavalAcademyCost(uint256 newPrice) public
 function updateNavalConstructionYardCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of naval construction yard_
+
 ### buyImprovement4
 
 ```solidity
 function buyImprovement4(uint256 amount, uint256 countryId, uint256 improvementId) public
 ```
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 |  |
+| countryId | uint256 |  |
+| improvementId | uint256 | this will determine which improvement is being purchased 1 = missile defense 2 = munitions factory  3 = naval academy 4 = naval construction yard |
 
 ### deleteImprovement4
 
@@ -8318,11 +10757,35 @@ function buyImprovement4(uint256 amount, uint256 countryId, uint256 improvementI
 function deleteImprovement4(uint256 amount, uint256 countryId, uint256 improvementId) public
 ```
 
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 |  |
+| countryId | uint256 |  |
+| improvementId | uint256 | this will determine which improvement is being deleted 1 = missile defense 2 = munitions factory  3 = naval academy 4 = naval construction yard |
+
 ### getMissileDefenseCount
 
 ```solidity
 function getMissileDefenseCount(uint256 countryId) public view returns (uint256 count)
 ```
+
+this function will return the number of missile defenses a nation owns
+
+_this is a public view function that will return the number of missile defenses for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of missile defenses a given nation owns |
 
 ### getMunitionsFactoryCount
 
@@ -8330,11 +10793,43 @@ function getMissileDefenseCount(uint256 countryId) public view returns (uint256 
 function getMunitionsFactoryCount(uint256 countryId) public view returns (uint256 count)
 ```
 
+this function will return the number of munitions factories a nation owns
+
+_this is a public view function that will return the number of munitions factories for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of munitions factories a given nation owns |
+
 ### getNavalAcademyCount
 
 ```solidity
 function getNavalAcademyCount(uint256 countryId) public view returns (uint256 count)
 ```
+
+this function will return the number of naval academies a nation owns
+
+_this is a public view function that will return the number of naval academies for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of naval academies a given nation owns |
 
 ### getNavalConstructionYardCount
 
@@ -8342,7 +10837,25 @@ function getNavalAcademyCount(uint256 countryId) public view returns (uint256 co
 function getNavalConstructionYardCount(uint256 countryId) public view returns (uint256 count)
 ```
 
+this function will return the number of naval construction yards a nation owns
+
+_this is a public view function that will return the number of naval construction yards for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of naval construction yards a given nation owns |
+
 ## ImprovementsContract3
+
+this contract will allow a nation owner to buy certain improvements
 
 ### treasury
 
@@ -8482,11 +10995,22 @@ mapping(uint256 => struct ImprovementsContract3.Improvements3) idToImprovements3
 function settings(address _treasury, address _additionalNavy, address _improvements1, address _improvements2, address _countryMinter) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
+### onlyCountryMinter
+
+```solidity
+modifier onlyCountryMinter()
+```
+
 ### updateTreasuryAddress
 
 ```solidity
 function updateTreasuryAddress(address _treasury) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateImprovementContract1Address
 
@@ -8494,11 +11018,15 @@ function updateTreasuryAddress(address _treasury) public
 function updateImprovementContract1Address(address _improvements1) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateImprovementContract2Address
 
 ```solidity
 function updateImprovementContract2Address(address _improvements2) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateNavyContractAddress
 
@@ -8506,11 +11034,24 @@ function updateImprovementContract2Address(address _improvements2) public
 function updateNavyContractAddress(address _navy) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### generateImprovements
 
 ```solidity
 function generateImprovements(uint256 id) public
 ```
+
+this function will allow each minted nation to buy imoprovements
+
+_this function is only callable by the countryMinter contract
+this function will initialize the struct to store the info about the minted nations improvements_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID for the nation being minted |
 
 ### getCost3
 
@@ -8518,11 +11059,32 @@ function generateImprovements(uint256 id) public
 function getCost3() public view returns (uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256)
 ```
 
+_this function will allow the caller to return the cost of an improvement_
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | officeOfPropagandaCost this will be the cost of an office of propaganda |
+| [1] | uint256 | policeHeadquartersCost this will be the cost of a police headquarters... |
+| [2] | uint256 |  |
+| [3] | uint256 |  |
+| [4] | uint256 |  |
+| [5] | uint256 |  |
+| [6] | uint256 |  |
+| [7] | uint256 |  |
+| [8] | uint256 |  |
+| [9] | uint256 |  |
+| [10] | uint256 |  |
+
 ### updateOfficeOfPropagandaCost
 
 ```solidity
 function updateOfficeOfPropagandaCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of an office of propaganda_
 
 ### updatePoliceHeadquartersCost
 
@@ -8530,11 +11092,17 @@ function updateOfficeOfPropagandaCost(uint256 newPrice) public
 function updatePoliceHeadquartersCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a police headquarters_
+
 ### updatePrisonCost
 
 ```solidity
 function updatePrisonCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a prison_
 
 ### updateRadiationContainmentChamberCost
 
@@ -8542,11 +11110,17 @@ function updatePrisonCost(uint256 newPrice) public
 function updateRadiationContainmentChamberCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a radiatiion containment chamber_
+
 ### updateRedLightDistrictCost
 
 ```solidity
 function updateRedLightDistrictCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a red light district_
 
 ### updateRehabilitationFacilityCost
 
@@ -8554,11 +11128,17 @@ function updateRedLightDistrictCost(uint256 newPrice) public
 function updateRehabilitationFacilityCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a rehab facility_
+
 ### updateSatelliteCost
 
 ```solidity
 function updateSatelliteCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a satellite_
 
 ### updateSchoolCost
 
@@ -8566,11 +11146,17 @@ function updateSatelliteCost(uint256 newPrice) public
 function updateSchoolCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a school_
+
 ### updateShipyardCost
 
 ```solidity
 function updateShipyardCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a shipyard_
 
 ### updateStadiumCost
 
@@ -8578,11 +11164,17 @@ function updateShipyardCost(uint256 newPrice) public
 function updateStadiumCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a stadium_
+
 ### updateUniversityCost
 
 ```solidity
 function updateUniversityCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner
+this function will allow the owner of the contract to update the cost of a university_
 
 ### buyImprovement3
 
@@ -8590,11 +11182,27 @@ function updateUniversityCost(uint256 newPrice) public
 function buyImprovement3(uint256 amount, uint256 countryId, uint256 improvementId) public
 ```
 
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 |  |
+| countryId | uint256 |  |
+| improvementId | uint256 | this will determine which improvement is being purchased 1 = office of propaganda 2 = police headquarters 3 = prison 4 = radiaton containment chambers 5 = red light district 6 = rehab facilities 7 = satellite 8 = school 9 = shipyard 10 = stadium 11 = university |
+
 ### deleteImprovement3
 
 ```solidity
 function deleteImprovement3(uint256 amount, uint256 countryId, uint256 improvementId) public
 ```
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 |  |
+| countryId | uint256 |  |
+| improvementId | uint256 | this will determine which improvement is being deleted 1 = office of propaganda 2 = police headquarters 3 = prison 4 = radiaton containment chambers 5 = red light district 6 = rehab facilities 7 = satellite 8 = school 9 = shipyard 10 = stadium 11 = university |
 
 ### getOfficeOfPropagandaCount
 
@@ -8602,11 +11210,43 @@ function deleteImprovement3(uint256 amount, uint256 countryId, uint256 improveme
 function getOfficeOfPropagandaCount(uint256 countryId) public view returns (uint256)
 ```
 
+this function will return the number of roffices of propaganda a nation owns
+
+_this is a public view function that will return the number of offices of propaganda for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | count is the number of offices of propaganda a given nation owns |
+
 ### getPoliceHeadquartersCount
 
 ```solidity
 function getPoliceHeadquartersCount(uint256 countryId) public view returns (uint256)
 ```
+
+this function will return the number of police headquuarters a nation owns
+
+_this is a public view function that will return the number of police headquarters for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | count is the number of police headquarters a given nation owns |
 
 ### getPrisonCount
 
@@ -8614,11 +11254,43 @@ function getPoliceHeadquartersCount(uint256 countryId) public view returns (uint
 function getPrisonCount(uint256 countryId) public view returns (uint256)
 ```
 
+this function will return the number of prisons a nation owns
+
+_this is a public view function that will return the number of prisons for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | count is the number of prisons a given nation owns |
+
 ### getRadiationContainmentChamberCount
 
 ```solidity
 function getRadiationContainmentChamberCount(uint256 countryId) public view returns (uint256)
 ```
+
+this function will return the number of radiation containment chambers a nation owns
+
+_this is a public view function that will return the number of radiation containment chambers for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of radiation containment chambers a given nation owns |
 
 ### getRedLightDistrictCount
 
@@ -8626,11 +11298,43 @@ function getRadiationContainmentChamberCount(uint256 countryId) public view retu
 function getRedLightDistrictCount(uint256 countryId) public view returns (uint256)
 ```
 
+this function will return the number of red light districts a nation owns
+
+_this is a public view function that will return the number of red light districts for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of red light districts a given nation owns |
+
 ### getRehabilitationFacilityCount
 
 ```solidity
 function getRehabilitationFacilityCount(uint256 countryId) public view returns (uint256)
 ```
+
+this function will return the number of rehab facilities a nation owns
+
+_this is a public view function that will return the number of rehab facilities for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of rehab facilities a given nation owns |
 
 ### getSatelliteCount
 
@@ -8638,11 +11342,43 @@ function getRehabilitationFacilityCount(uint256 countryId) public view returns (
 function getSatelliteCount(uint256 countryId) public view returns (uint256 count)
 ```
 
+this function will return the number of satellites a nation owns
+
+_this is a public view function that will return the number of satellites for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of satellites a given nation owns |
+
 ### getSchoolCount
 
 ```solidity
 function getSchoolCount(uint256 countryId) public view returns (uint256)
 ```
+
+this function will return the number of schools a nation owns
+
+_this is a public view function that will return the number of schools for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of schools a given nation owns |
 
 ### getShipyardCount
 
@@ -8650,11 +11386,43 @@ function getSchoolCount(uint256 countryId) public view returns (uint256)
 function getShipyardCount(uint256 countryId) public view returns (uint256 count)
 ```
 
+this function will return the number of shipyards a nation owns
+
+_this is a public view function that will return the number of shipyards for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of shipyards a given nation owns |
+
 ### getStadiumCount
 
 ```solidity
 function getStadiumCount(uint256 countryId) public view returns (uint256 count)
 ```
+
+this function will return the number of stadiums a nation owns
+
+_this is a public view function that will return the number of stadiums for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of stadiums a given nation owns |
 
 ### getUniversityCount
 
@@ -8662,7 +11430,25 @@ function getStadiumCount(uint256 countryId) public view returns (uint256 count)
 function getUniversityCount(uint256 countryId) public view returns (uint256 count)
 ```
 
+this function will return the number of universities a nation owns
+
+_this is a public view function that will return the number of universities for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of universities a given nation owns |
+
 ## InfrastructureContract
+
+this contract will store a nations land, technology, infrastructure and tax rate
 
 ### countryMinter
 
@@ -8808,6 +11594,12 @@ address groundBattle
 address crime
 ```
 
+### bonusResources
+
+```solidity
+address bonusResources
+```
+
 ### mint
 
 ```solidity
@@ -8874,6 +11666,12 @@ contract CrimeContract crim
 contract ForcesContract forc
 ```
 
+### bonus
+
+```solidity
+contract BonusResourcesContract bonus
+```
+
 ### Infrastructure
 
 ```solidity
@@ -8901,8 +11699,11 @@ mapping(uint256 => address) idToOwnerInfrastructure
 ### settings1
 
 ```solidity
-function settings1(address _resources, address _improvements1, address _improvements2, address _improvements3, address _improvements4, address _infrastructureMarket, address _techMarket, address _landMarket) public
+function settings1(address _resources, address _improvements1, address _improvements2, address _improvements3, address _improvements4, address _infrastructureMarket, address _techMarket, address _landMarket, address _bonusResources) public
 ```
+
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
 
 ### settings2
 
@@ -8910,11 +11711,17 @@ function settings1(address _resources, address _improvements1, address _improvem
 function settings2(address _wonders1, address _wonders2, address _wonders3, address _wonders4, address _treasury, address _parameters, address _forces, address _aid) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### settings3
 
 ```solidity
 function settings3(address _spyAddress, address _tax, address _cruiseMissile, address _nukeAddress, address _airBattle, address _groundBattle, address _countryMinter, address _crime) public
 ```
+
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
 
 ### onlySpyContract
 
@@ -8970,11 +11777,28 @@ modifier onlyTechMarket()
 modifier onlyLandMarket()
 ```
 
+### onlyCountryMinter
+
+```solidity
+modifier onlyCountryMinter()
+```
+
 ### generateInfrastructure
 
 ```solidity
 function generateInfrastructure(uint256 id) public
 ```
+
+this function allows this contract to store info about a nations infrastructure
+
+_this function is only callable by the countryMinter contract
+this function will initialize the struct to store the info about the minted nations infrastructure_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID for the nation being minted |
 
 ### increaseInfrastructureFromMarket
 
@@ -8982,11 +11806,35 @@ function generateInfrastructure(uint256 id) public
 function increaseInfrastructureFromMarket(uint256 id, uint256 amount) public
 ```
 
+this function will increase a nations infrastructure when purchased in the market contract
+
+_this function is only callable from the infrastructure market contract
+this function will increase a nations infrastructure when purchased in the market contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation purchasing infrastructure |
+| amount | uint256 | is the amount of infrastructure being purchased |
+
 ### decreaseInfrastructureFromMarket
 
 ```solidity
 function decreaseInfrastructureFromMarket(uint256 id, uint256 amount) public
 ```
+
+this function will allow a nation owner to sell infrastructure
+
+_this is a public function only callable from the infrastructure market contract
+this function will allow a nation owner to sell infrastructure_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation selling infrastructure |
+| amount | uint256 | this is the amount of infrastructure being sold |
 
 ### increaseTechnologyFromMarket
 
@@ -8994,11 +11842,35 @@ function decreaseInfrastructureFromMarket(uint256 id, uint256 amount) public
 function increaseTechnologyFromMarket(uint256 id, uint256 amount) public
 ```
 
+this function will increase technology when technology is purchased
+
+_this is a public function only callable from the technology market contract
+this function will increase the technology count when technology is purchased_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation purchasing technology |
+| amount | uint256 | this is the amount of technology being purchased |
+
 ### decreaseTechnologyFromMarket
 
 ```solidity
 function decreaseTechnologyFromMarket(uint256 id, uint256 amount) public
 ```
+
+this function will allow a nation owner to sell technology
+
+_this is a public function only callable from the technology market contract
+this function will allow a nation owner to sell technology_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation selling technology |
+| amount | uint256 | this is the amount of technology being sold |
 
 ### increaseLandCountFromMarket
 
@@ -9006,11 +11878,35 @@ function decreaseTechnologyFromMarket(uint256 id, uint256 amount) public
 function increaseLandCountFromMarket(uint256 id, uint256 amount) public
 ```
 
+this function will increase land area when land is purchased
+
+_this is a public function only callable from the land market contract
+this function will increase the land area count when land is purchased_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation purchasing land |
+| amount | uint256 | this is the amount of land being purchased |
+
 ### decreaseLandCountFromMarket
 
 ```solidity
 function decreaseLandCountFromMarket(uint256 id, uint256 amount) public
 ```
+
+this function will allow a nation owner to sell land
+
+_this is a public function only callable from the land market contract
+this function will allow a nation owner to sell land_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation selling land |
+| amount | uint256 | this is the amount of land being sold |
 
 ### getAreaOfInfluence
 
@@ -9018,11 +11914,44 @@ function decreaseLandCountFromMarket(uint256 id, uint256 amount) public
 function getAreaOfInfluence(uint256 id) public view returns (uint256)
 ```
 
+this function will return a given nations area of influence as a multiple of their land area
+coal will increase area of influence 15%
+rubber will increase area of influence 20%
+spices will increase area of influence 8%
+an agriculture development program will increase area of influence 15%
+
+_this is a public view function that will return a nations area of influence from a given land area_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the given nations area of influence |
+
 ### sellLand
 
 ```solidity
 function sellLand(uint256 id, uint256 amount) public
 ```
+
+this function will allow a nation owner to sell land
+land can be sold for 100/mile (300 with rubber)
+
+_this is a public function only callable from a nation owner
+this function will allow a nation owner to sell land_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation selling land |
+| amount | uint256 | is the amount of land being sold |
 
 ### onlyAidContract
 
@@ -9036,11 +11965,40 @@ modifier onlyAidContract()
 function sendTech(uint256 idSender, uint256 idReciever, uint256 amount) public
 ```
 
+this function will send the technology when an aid proposal is accepted
+
+_this is a public function only callable from the aid contract
+this function will send the technology when an aid proposal is accepted_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| idSender | uint256 | is the nation id of the sender of the technology aid |
+| idReciever | uint256 | is the nation id of the recipient of technology aid |
+| amount | uint256 | is the amount of technology being sent |
+
 ### getLandCount
 
 ```solidity
 function getLandCount(uint256 countryId) public view returns (uint256 count)
 ```
+
+this function will return the amount of land a nation has
+
+_this is a public view function that will return the amount of land a nation has_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | this is the nation ID of the country being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the amount of land area for a given country |
 
 ### decreaseLandCount
 
@@ -9048,11 +12006,36 @@ function getLandCount(uint256 countryId) public view returns (uint256 count)
 function decreaseLandCount(uint256 countryId, uint256 amount) public
 ```
 
+this function will deacrease land area after a succesfuls spy attack
+
+_this is a public function that is only callable from the spy contract
+this function will decrease land area after a successful spy attack_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the country if of the nation losing land in the attack |
+| amount | uint256 | is the amount of land being lost in the attack |
+
 ### decreaseLandCountFromNukeContract
 
 ```solidity
 function decreaseLandCountFromNukeContract(uint256 countryId, uint256 percentage) public
 ```
+
+this function will decrease the amount of a nations land when attacked by a nuke
+the maximum amount of land that can be lost is 150 miles
+
+_this is a public function that will decrease a nations land when attacked by a nuke
+this function is only callable by the nuke contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | this is the nation ID of the nation being attacked |
+| percentage | uint256 | this is the percentage of a nations land being lost |
 
 ### increaseLandCountFromSpyContract
 
@@ -9060,11 +12043,39 @@ function decreaseLandCountFromNukeContract(uint256 countryId, uint256 percentage
 function increaseLandCountFromSpyContract(uint256 countryId, uint256 amount) public
 ```
 
+this function will increase an attacking nations land after a successful spy attack
+
+_this is a public function only callable from the spy contract
+this function will increase a attacking nations land after a successful spy attack_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the nation gaining technology |
+| amount | uint256 | is the amount of land area being gained |
+
 ### getTechnologyCount
 
 ```solidity
 function getTechnologyCount(uint256 countryId) public view returns (uint256 count)
 ```
+
+this function will return the amount of technology a nation has
+
+_this is a public view function that will retrun the amount of technology a nation has_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | this is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the tech amount for a given nation |
 
 ### decreaseTechCountFromSpyContract
 
@@ -9072,11 +12083,35 @@ function getTechnologyCount(uint256 countryId) public view returns (uint256 coun
 function decreaseTechCountFromSpyContract(uint256 countryId, uint256 amount) public
 ```
 
+this function will decrease a nations tech after a succesful spy attack
+
+_this is a public function only callable from the spy contract
+this function will decrease the amount of tech for a nation after a succesful spy attack_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | this is the nation ID of the nation being attacked |
+| amount | uint256 | is the amount of technology a nation is losing in the attack |
+
 ### decreaseTechCountFromCruiseMissileContract
 
 ```solidity
 function decreaseTechCountFromCruiseMissileContract(uint256 countryId, uint256 amount) public
 ```
+
+this function will decrease a nations tech after a succesful cruise missile attack
+
+_this is a public function only callable from the cruise missile contract
+this function will decrease the amount of tech for a nation after a succesful cruise missile attack_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | this is the nation ID of the nation being attacked |
+| amount | uint256 | is the amount of technology a nation is losing in the attack |
 
 ### decreaseTechCountFromNukeContract
 
@@ -9084,11 +12119,36 @@ function decreaseTechCountFromCruiseMissileContract(uint256 countryId, uint256 a
 function decreaseTechCountFromNukeContract(uint256 countryId, uint256 percentage) public
 ```
 
+this function will decrease a nations tech after a succesful nuke attack
+the maximum amount of tech a nation can lose in an attack is 50
+
+_this is a public function only callable from the nuke contract
+this function will decrease the amount of tech for a nation after a succesful nuke attack_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | this is the nation ID of the nation being attacked |
+| percentage | uint256 | is the percentage of a nations technology a nation is losing in the attack |
+
 ### increaseTechCountFromSpyContract
 
 ```solidity
 function increaseTechCountFromSpyContract(uint256 countryId, uint256 amount) public
 ```
+
+this function will increase a nations technology from a succesful spy attack
+
+_this is a public function that is only callable from the spy contract
+this function will increase an attacking nations tech after a succesful spy attack_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the attacking nation gaining tech from the attack |
+| amount | uint256 | is the amount of tech being gained |
 
 ### getInfrastructureCount
 
@@ -9096,11 +12156,39 @@ function increaseTechCountFromSpyContract(uint256 countryId, uint256 amount) pub
 function getInfrastructureCount(uint256 countryId) public view returns (uint256 count)
 ```
 
+this function will return a nations infrastructure count
+
+_this is a public view function that will return the amount of infrastructure for a nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the country being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the amount of technology for a given nation |
+
 ### decreaseInfrastructureCountFromSpyContract
 
 ```solidity
 function decreaseInfrastructureCountFromSpyContract(uint256 countryId, uint256 amount) public
 ```
+
+this function will decrease a nations infrastrucure after a succesful spy attack
+
+_this is a public function only callable from the spy contract
+this function will decrease a nations infrastructure amount after a succesful spy attack_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | this is the nationId of the nation losing infrastructure |
+| amount | uint256 | this is the amount of infrastructure being lost |
 
 ### decreaseInfrastructureCountFromCruiseMissileContract
 
@@ -9108,11 +12196,39 @@ function decreaseInfrastructureCountFromSpyContract(uint256 countryId, uint256 a
 function decreaseInfrastructureCountFromCruiseMissileContract(uint256 countryId, uint256 amountToDecrease) public
 ```
 
+this function will decrease the amount of technology lost in a cruise missile attack
+
+_this is a public view function that is only callable from the cruise missile contract
+this function will decrease the amount of technology lost in a cruise missile attack_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | this is the nation id of the country being queried |
+| amountToDecrease | uint256 | this is the amount of infrastructure being decreased |
+
 ### decreaseInfrastructureCountFromNukeContract
 
 ```solidity
 function decreaseInfrastructureCountFromNukeContract(uint256 defenderId, uint256 attackerId, uint256 percentage) public
 ```
+
+this function will decrease the amount of a nations infrastructure after a nuke attack
+the maximum amount of infrastructure a nation can lose in a nuke strike is 150
+defender bunkers will decrease the amount of damage in a succesful nuke attack
+attacker munitions factories will increase the amount of damage of a succesful nuke attack
+
+_this is a public function only callable from the nuke contract
+this function will decrease the amount of a nations infrastructure after a nuke attack_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| defenderId | uint256 | is the defending nation in a nuke strike |
+| attackerId | uint256 | is an attacking nation in a nuke strike |
+| percentage | uint256 | is the percentage of infrastructure being lost before modifiers (defender bunkers and attacker munitions factories) |
 
 ### decreaseInfrastructureCountFromAirBattleContract
 
@@ -9120,11 +12236,35 @@ function decreaseInfrastructureCountFromNukeContract(uint256 defenderId, uint256
 function decreaseInfrastructureCountFromAirBattleContract(uint256 countryId, uint256 amountToDecrease) public
 ```
 
+this function will decrease a nations infrastructure lost in a bombing attack
+
+_this is a public function only callable from the air battle contract 
+this function will decrease a nations infrastructure lost in a bombing attack_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the country losing infrastructure |
+| amountToDecrease | uint256 | is the amount of infrastructure being lost |
+
 ### increaseInfrastructureCountFromSpyContract
 
 ```solidity
 function increaseInfrastructureCountFromSpyContract(uint256 countryId, uint256 amount) public
 ```
+
+this function will decrease increase the amount of infrastructure for an attacker in a succesful spy attack
+
+_this is a public function only callable from the spy contract
+this function will decrease increase the amount of infrastructure for an attacker in a succesful spy attack_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID for the nation gaining infrastructure in the attack |
+| amount | uint256 | is the amount of infrastructre being gained |
 
 ### getTaxRate
 
@@ -9132,11 +12272,35 @@ function increaseInfrastructureCountFromSpyContract(uint256 countryId, uint256 a
 function getTaxRate(uint256 id) public view returns (uint256 taxPercentage)
 ```
 
+this function will return the tax rate which a nation taxes their citizens at
+
+_this is a public view function that will return a nations tax rate at which they tax their citizens_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation being queried |
+
 ### setTaxRate
 
 ```solidity
 function setTaxRate(uint256 id, uint256 newTaxRate) public
 ```
+
+this function will allow a nation owner to set their nations tax rate
+a tax rate can be between 15% and 28%
+a tax rate can be 30% with a social security wonder
+
+_this is a public function only vallable by a nation owner
+this function will allow a nation owner to set their nations tax rate_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation changing its tax rate |
+| newTaxRate | uint256 | is the new tax rate for a nation |
 
 ### setTaxRateFromSpyContract
 
@@ -9144,11 +12308,35 @@ function setTaxRate(uint256 id, uint256 newTaxRate) public
 function setTaxRateFromSpyContract(uint256 id, uint256 newTaxRate) public
 ```
 
+this function will reset a nations tax rate after a succesful spy attack
+
+_this is a public function only callable from the spy contract
+this function will reset a nations tax rate after a succesful spy attack_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation ID for the nation being attacked and getting its tax rate changed |
+| newTaxRate | uint256 | is the new tax rate for the nation |
+
 ### toggleCollectionNeededToChangeRate
 
 ```solidity
 function toggleCollectionNeededToChangeRate(uint256 id) public
 ```
+
+this function will toggle the collection needed to change tax rate to true
+when a nation is blockaded it will need to either break the blockade or collect taxes at a reduced rate to be able to change tax rate
+
+_this is a public function only callable from the taxes contract
+this function will toggle the collection needed to change tax rate to true_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation toggleing the collection needed parameter |
 
 ### checkIfCollectionNeededToChangeRate
 
@@ -9156,11 +12344,39 @@ function toggleCollectionNeededToChangeRate(uint256 id) public
 function checkIfCollectionNeededToChangeRate(uint256 id) public view returns (bool)
 ```
 
+this function will retrun true if a nation needs to collect taxes in order to change its tax rate
+
+_this is a public view function that will return true if a nation needs to collect taxes in order to change its tax rate_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool is the boolean value whether a nation needs to collect taxes in order to change its tax rate |
+
 ### getTotalPopulationCount
 
 ```solidity
 function getTotalPopulationCount(uint256 id) public view returns (uint256)
 ```
+
+this function will return a nation population count
+a nations base populaton is a nation infrastructure count * 8
+a nations population is increased by cattle, fish, pigs, sugar, wheat, affluent population and decreased by border walls
+
+_this is public view function that will return a nations total population count_
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is a nations total population |
 
 ### getAdditionalPopulationModifierPoints
 
@@ -9168,11 +12384,41 @@ function getTotalPopulationCount(uint256 id) public view returns (uint256)
 function getAdditionalPopulationModifierPoints(uint256 id) internal view returns (uint256)
 ```
 
+this function will return additonal population percentage modifiers for the above function
+a nations population is increased by clinics, hospitals, disaster relief agencies, national environmental office, national research lab and universal healthcare
+
+_this is an internal view function that will be called by the above function
+this function will return additonal population percentage modifiers for the above function_
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the additional percentage modifiers for the above function |
+
 ### getTaxablePopulationCount
 
 ```solidity
 function getTaxablePopulationCount(uint256 id) public view returns (uint256)
 ```
+
+this function will return a nations taxable population
+a nations total population consists of citizens, soldiers and criminals
+only citizens pay taxes
+
+_this is public view function that will return a nations taxable population_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the given nations total taxable population |
 
 ### transferLandAndTech
 
@@ -9180,7 +12426,22 @@ function getTaxablePopulationCount(uint256 id) public view returns (uint256)
 function transferLandAndTech(uint256 landMiles, uint256 techLevels, uint256 attackerId, uint256 defenderId) public
 ```
 
+this function will transfer land and technology lost during a ground battle
+
+_this is a public function only callable from the ground battle contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| landMiles | uint256 | is the amount of land being transferred |
+| techLevels | uint256 | is the amount of technology being transferred |
+| attackerId | uint256 | is the ID of the attack nation |
+| defenderId | uint256 | is the ID of the defending nation |
+
 ## InfrastructureMarketContract
+
+this contract will allow a nation owner to buy Infrastructure
 
 ### countryMinter
 
@@ -9228,6 +12489,12 @@ address treasury
 
 ```solidity
 address parameters
+```
+
+### bonusResources
+
+```solidity
+address bonusResources
 ```
 
 ### mint
@@ -9278,11 +12545,20 @@ contract InfrastructureContract inf
 contract TreasuryContract tsy
 ```
 
+### bonus
+
+```solidity
+contract BonusResourcesContract bonus
+```
+
 ### settings
 
 ```solidity
-function settings(address _resources, address _parameters, address _improvements1, address _countryMinter, address _wonders2, address _wonders3, address _treasury, address _infrastructure) public
+function settings(address _resources, address _parameters, address _improvements1, address _countryMinter, address _wonders2, address _wonders3, address _treasury, address _infrastructure, address _bonusResources) public
 ```
+
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
 
 ### buyInfrastructure
 
@@ -9290,11 +12566,41 @@ function settings(address _resources, address _parameters, address _improvements
 function buyInfrastructure(uint256 id, uint256 buyAmount) public
 ```
 
+this function will allow a nation owner to purchase infrastructure
+
+_this is a public view function that will allow a nation owner to buy infrastructure
+this function is only callable by the nation owner_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation purchasing infrastructure |
+| buyAmount | uint256 | is the amount of infrastructure being purchased |
+
 ### getInfrastructureCost
 
 ```solidity
 function getInfrastructureCost(uint256 id, uint256 buyAmount) public view returns (uint256)
 ```
+
+this function will return the cost of an infrastructure purchase
+
+_this is a public view function that will return the cost of an infrastructure purchase
+this function multiplies the cost per level by the purchases amount_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation buying infrastructure |
+| buyAmount | uint256 | this is the amount of infrastructure being purchased |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the cost of the purchase |
 
 ### getInfrastructureCostPerLevel
 
@@ -9302,11 +12608,42 @@ function getInfrastructureCost(uint256 id, uint256 buyAmount) public view return
 function getInfrastructureCostPerLevel(uint256 id) public view returns (uint256)
 ```
 
+this function will return the cost of an infrastructure purchase per level
+cartain modifiers in the following functions will reduce the cost of infrastructure
+
+_this is a public view functon that will return the infrastructure cost per level_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id making the purchase |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the cost per level of an infrastructure purchase |
+
 ### getInfrastructureCostMultiplier1
 
 ```solidity
 function getInfrastructureCostMultiplier1(uint256 id) public view returns (uint256)
 ```
+
+this function is one of three functions that will adjust the cost of infrastructure lower based on a nations resources, improvements and wonders
+lumber will reduce the cost of infrastructure by 6%
+iron will reduce the cost of infrastructure by 5%
+marble will reduce the cost of infrastructure by 10%
+
+_this function is one of three functions that will adjust the cost of infrastructure lower
+this function is a public view function that will get called when infrasturcture is quoted or purchased_
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this will be the multiplier reductions from this formula |
 
 ### getInfrastructureCostMultiplier2
 
@@ -9314,11 +12651,42 @@ function getInfrastructureCostMultiplier1(uint256 id) public view returns (uint2
 function getInfrastructureCostMultiplier2(uint256 id) public view returns (uint256)
 ```
 
+this function is the second of three functions that will adjust the cost of infrastructure lower based on a nations resources, improvements and wonders
+rubber will reduce the cost of infrastructure by 3%
+construction will reduce the cost of infrastructure by 5%
+an interstate system will reduce the cost of infrastructure by 8%
+certain accomodative governements will reduce the cost of infrastructure by 5%
+factories without a scientific development center will reduce the cost of infrastructure by 8% and 10% with a scientific development center
+
+_this function is the second of three functions that will adjust the cost of infrastructure lower
+this function is a public view function that will get called when infrasturcture is quoted or purchased_
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this will be the multiplier reductions from this formula |
+
 ### getInfrastructureCostMultiplier3
 
 ```solidity
 function getInfrastructureCostMultiplier3(uint256 id) public view returns (uint256)
 ```
+
+this function is the third of three functions that will adjust the cost of infrastructure lower based on a nations resources, improvements and wonders
+aluminium will reduce the cost of infrastructure by 7%
+coal will reduce the cost of infrastructure by 4%
+steel will reduce the cost of infrastructure by 2%
+asphalt will reduce the cost of infrastructure by 5%
+
+_this function is the third of three functions that will adjust the cost of infrastructure lower
+this function is a public view function that will get called when infrasturcture is quoted or purchased_
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this will be the multiplier reductions from this formula |
 
 ### checkAccomodativeGovernment
 
@@ -9326,13 +12694,43 @@ function getInfrastructureCostMultiplier3(uint256 id) public view returns (uint2
 function checkAccomodativeGovernment(uint256 countryId) public view returns (bool)
 ```
 
+this function will check if the given nation has a governemnt type that accomodate a lower cost of infrastructure
+
+_this is a public view function that will return a boolean value if a nations government type accomodates a reduced infrastructure cost_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation ID of the country being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation's government type accomodates a lower infrastructure cost |
+
 ### destroyInfrastructure
 
 ```solidity
 function destroyInfrastructure(uint256 id, uint256 amount) public
 ```
 
+this function will allow a nation owner to destroy infrastructure
+
+_this is a public function callable by the nation owner 
+this function will allow a nation owner to destroy infrastructure_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation destroying infrastructure |
+| amount | uint256 | this is the amount of infrastructure being destroyed |
+
 ## KeeperContract
+
+_this contract will allow the chainlink keeper to maintain the game clock that resets everal parameters daily_
 
 ### nukes
 
@@ -9424,17 +12822,24 @@ contract CountryParametersContract params
 function settings(address _nukes, address _aid, address _war, address _treasury, address _missiles, address _navalActions, address _parameters) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### keeperFunctionToCall
 
 ```solidity
 function keeperFunctionToCall() public
 ```
 
+_this functon will be called by the chainlink keeper_
+
 ### keeperFunctionToCallManually
 
 ```solidity
 function keeperFunctionToCallManually() public
 ```
+
+_this function can be called by the contract owner in the event the keeper fails_
 
 ### shiftNukeDays
 
@@ -9510,6 +12915,10 @@ function incrementDaysSinceForParametersByOwner() public
 
 ## LandMarketContract
 
+this contract will allow a nation owner to purchase land
+
+_this contract inherits from openzeppelin's ownable contract_
+
 ### countryMinter
 
 ```solidity
@@ -9564,11 +12973,26 @@ contract TreasuryContract tsy
 function settings(address _resources, address _countryMinter, address _infrastructure, address _treasury) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### buyLand
 
 ```solidity
 function buyLand(uint256 id, uint256 amount) public
 ```
+
+this function will allow a nation owner to purchase land
+
+_this is a public view function that will allow a nation owner to buy land
+this function is only callable by the nation owner_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation purchasing land |
+| amount | uint256 | is the amount of land being purchased |
 
 ### getLandCost
 
@@ -9576,11 +13000,46 @@ function buyLand(uint256 id, uint256 amount) public
 function getLandCost(uint256 id, uint256 amount) public view returns (uint256)
 ```
 
+this function will return the cost of a land purchase
+
+_this is a public view function that will return the cost of a land purchase
+this function multiplies the cost per level by the purchases amount_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation buying land |
+| amount | uint256 | this is the amount of land being purchased |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the cost of the purchase |
+
 ### getLandCostPerMile
 
 ```solidity
 function getLandCostPerMile(uint256 id) public view returns (uint256)
 ```
+
+this function will return the cost of land per mile for a nation
+cartain modifiers in the following functions will reduce the cost of land
+
+_this is a public view functon that will return the land cost per mile_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id making the purchase |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the cost per level of a land purchase |
 
 ### getLandPriceMultiplier
 
@@ -9588,13 +13047,43 @@ function getLandCostPerMile(uint256 id) public view returns (uint256)
 function getLandPriceMultiplier(uint256 id) public view returns (uint256)
 ```
 
+this function will adjust the cost of land lower based on a nations resources, improvements and wonders
+cattle will reduce the cost of land by 10%
+fish will reduce the cost of land by 5%
+rubber will reduce the cost of land by 10%
+
+_this function  will adjust the cost of land lower
+this function is a public view function that will get called when land is quoted or purchased_
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this will be the multiplier reductions from this formula |
+
 ### destroyLand
 
 ```solidity
 function destroyLand(uint256 id, uint256 amount) public
 ```
 
+this function will allow a nation owner to destroy land
+
+_this is a public function callable by the nation owner 
+this function will allow a nation owner to destroy land_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation destroying land |
+| amount | uint256 | this is the amount of land being destroyed |
+
 ## MilitaryContract
+
+this contract will allow a nation owner to control their defcon level, threat level and war/peace preference
+
+_this contract inherits from openzeppelin's ownable contract_
 
 ### spyAddress
 
@@ -9642,11 +13131,20 @@ mapping(uint256 => struct MilitaryContract.Military) idToMilitary
 modifier onlySpyContract()
 ```
 
+### onlyCountryMinter
+
+```solidity
+modifier onlyCountryMinter()
+```
+
 ### settings
 
 ```solidity
 function settings(address _spyAddress, address _countryMinter) public
 ```
+
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
 
 ### generateMilitary
 
@@ -9654,11 +13152,27 @@ function settings(address _spyAddress, address _countryMinter) public
 function generateMilitary(uint256 id) public
 ```
 
+this function will allow allow a nation owner to reset their defcon and threat level and toggle their war peace preference
+
+_this function is a public function only callable from the country minter contract_
+
 ### updateDefconLevel
 
 ```solidity
 function updateDefconLevel(uint256 newDefcon, uint256 id) public
 ```
+
+this function will allow a nation owner to update their defcon level
+
+_this is a public function only callable by the nation owner
+this function will allow a nation owner to update their defcon level_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| newDefcon | uint256 | is the new defcon which must be an integer between 1 and 5 |
+| id | uint256 | is the nation id of the nation updating their defcon |
 
 ### setDefconLevelFromSpyContract
 
@@ -9666,11 +13180,35 @@ function updateDefconLevel(uint256 newDefcon, uint256 id) public
 function setDefconLevelFromSpyContract(uint256 id, uint256 newLevel) public
 ```
 
+this function will allow a succesful spy attack to update the defcon level
+
+_this function will only be callable from the Spy contract
+this function will allow a successful spy operation to update the defcon level_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id that was attacked and getting their defcon reset |
+| newLevel | uint256 | is the new defcon level being set during the attack |
+
 ### updateThreatLevel
 
 ```solidity
 function updateThreatLevel(uint256 newThreatLevel, uint256 id) public
 ```
+
+this function allows a nation owner to update the threat level of a nation
+
+_this is a public function only callable by the nation owner
+this function allows a nation owner to update the threat level of a nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| newThreatLevel | uint256 | is the new threat level being updated |
+| id | uint256 | is the nation id of the nation updating the threat level |
 
 ### setThreatLevelFromSpyContract
 
@@ -9678,11 +13216,34 @@ function updateThreatLevel(uint256 newThreatLevel, uint256 id) public
 function setThreatLevelFromSpyContract(uint256 id, uint256 newLevel) public
 ```
 
+this function will allow a succesful spy attack to update the threat level
+
+_this function will only be callable from the Spy contract
+this function will allow a successful spy operation to update the threat level_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id that was attacked and getting their threat level reset |
+| newLevel | uint256 | is the new threat level being set during the attack |
+
 ### toggleWarPeacePreference
 
 ```solidity
 function toggleWarPeacePreference(uint256 id) public
 ```
+
+this function will allow a nation to toggle their prefernece for peace or war
+
+_this function is a public function only callable from the nation owner
+this function will allow a nation to toggle their prefernece for peace or war_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation toggling their preference |
 
 ### getDefconLevel
 
@@ -9690,11 +13251,39 @@ function toggleWarPeacePreference(uint256 id) public
 function getDefconLevel(uint256 id) public view returns (uint256)
 ```
 
+_this is a public view function that will return a nations defcon level_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the defcon level for a given nation |
+
 ### getThreatLevel
 
 ```solidity
 function getThreatLevel(uint256 id) public view returns (uint256)
 ```
+
+_this is a public view function that will return a nations threat level_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the threat level for a given nation |
 
 ### getWarPeacePreference
 
@@ -9702,7 +13291,25 @@ function getThreatLevel(uint256 id) public view returns (uint256)
 function getWarPeacePreference(uint256 id) public view returns (bool)
 ```
 
+_this is a public view function that will return a nations preference for war_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool is true if war is possible |
+
 ## NationStrengthContract
+
+this contract will calculate a given nation's strength
+
+_this contract inherits from openzeppelin's ownable contract_
 
 ### infrastructure
 
@@ -9782,11 +13389,16 @@ contract MissilesContract mis
 function settings(address _infrastructure, address _forces, address _fighters, address _bombers, address _navy, address _missiles) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### updateInfrastructureContract
 
 ```solidity
 function updateInfrastructureContract(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateForcesContract
 
@@ -9794,11 +13406,15 @@ function updateInfrastructureContract(address newAddress) public
 function updateForcesContract(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateFightersContract
 
 ```solidity
 function updateFightersContract(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateBombersContract
 
@@ -9806,17 +13422,33 @@ function updateFightersContract(address newAddress) public
 function updateBombersContract(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateNavyContract
 
 ```solidity
 function updateNavyContract(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### getNationStrength
 
 ```solidity
 function getNationStrength(uint256 id) public view returns (uint256)
 ```
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the nations strength |
 
 ### getNationStrengthFromCommodities
 
@@ -9898,6 +13530,10 @@ function getAdditionalNavyStrength(uint256 id) internal view returns (uint256)
 
 ## NavalActionsContract
 
+this contract will keep track of naval actions (daily blockades, purchases and action slots)
+
+_this contract inherits from openzeppelin's ownable contract_
+
 ### keeper
 
 ```solidity
@@ -9962,6 +13598,9 @@ mapping(uint256 => struct NavalActionsContract.NavalActions) idToNavalActions
 function settings(address _navalBlockade, address _breakBlockade, address _navalAttack, address _keeper, address _navy, address _countryMinter) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### onlyCountryMinter
 
 ```solidity
@@ -9980,11 +13619,29 @@ modifier onlyNavalAction()
 function generateNavalActions(uint256 id) public
 ```
 
+this function will allow the contract to keep track of each nations action slots, blockades and purchases
+
+_this is a public function that is only callable from the country minter contract
+this function is called when a nation is minted
+this function will initialize the struct that will keep track of action slots, daily blockades and purchases_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation ID of the country being minted |
+
 ### increaseAction
 
 ```solidity
 function increaseAction(uint256 id) public
 ```
+
+a nation is only allowed to make 3 naval actions per day
+this function will increase naval actions when they occur
+
+_this is a public view function that is only callable from the navy battle contracts
+a nation is only allows to make 3 naval actions per day_
 
 ### onlyNavy
 
@@ -9998,6 +13655,19 @@ modifier onlyNavy()
 function increasePurchases(uint256 id, uint256 amount) public
 ```
 
+a nation at war can purchase 5 naval ships per day (7 with a foreign naval base)
+during peacetime a nation can purchase 2 naval ships per day (4 with a foreign navla base)
+
+_this is a public function that is only callable from the navy contract where purchases occur
+this function will increment a nations daily purchases as purchases occur_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation purchasin vessels |
+| amount | uint256 | is the amount of navy vessels being purchased |
+
 ### onlyBlockade
 
 ```solidity
@@ -10009,6 +13679,18 @@ modifier onlyBlockade()
 ```solidity
 function toggleBlockaded(uint256 id) public
 ```
+
+a nation can only be blockaded once per day
+this function will be called when a nation is blockaded and set the blockadedToday to true
+
+_this function is a public function that can only be called by the naval battle contracts
+a nation can only be blockaded once per day_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being blockaded |
 
 ### onlyKeeper
 
@@ -10022,11 +13704,32 @@ modifier onlyKeeper()
 function resetActionsToday() public
 ```
 
+this function will reset the naval actions daily when called by a chainlink keeper
+
+_this is a public function only callable from the keeper contract
+this function will reset the naval actions dailw when the chainlink keeper calls the function_
+
 ### getPurchasesToday
 
 ```solidity
 function getPurchasesToday(uint256 id) public view returns (uint256)
 ```
+
+this function will return the amount of vessels a nation purchases today
+
+_this is a public view function that will return a nations daily purchases_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of ships purchased today |
 
 ### getActionSlotsUsed
 
@@ -10034,13 +13737,49 @@ function getPurchasesToday(uint256 id) public view returns (uint256)
 function getActionSlotsUsed(uint256 id) public view returns (uint256)
 ```
 
+this function will return the number of action slots a naton has used today
+
+_this is a public view function that will return a nations daily action slots used_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of action slots used today |
+
 ### getBlockadedToday
 
 ```solidity
 function getBlockadedToday(uint256 id) public view returns (bool)
 ```
 
+this function will return true if a nation has been blockaded today
+
+_this is a public view function that will return a boolean whether a nation has been blockaded today_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if a nation has been blockaded today |
+
 ## NavyContract
+
+this contract will allow a user to purchase navy vessels
+
+_this contract inherits from openzeppelin's ownable contract_
 
 ### treasuryAddress
 
@@ -10112,6 +13851,12 @@ address navalActions
 
 ```solidity
 address additionalNavy
+```
+
+### bonusResources
+
+```solidity
+address bonusResources
 ```
 
 ### corvetteCost
@@ -10232,23 +13977,116 @@ contract CountryMinter mint
 contract AdditionalNavyContract addNav
 ```
 
+### bonus
+
+```solidity
+contract BonusResourcesContract bonus
+```
+
+### onlyCountryMinter
+
+```solidity
+modifier onlyCountryMinter()
+```
+
 ### settings
 
 ```solidity
 function settings(address _treasuryAddress, address _improvementsContract1Address, address _improvementsContract3Address, address _improvements4, address _resources, address _military, address _nukes, address _wonders1, address _navalActions, address _additionalNavy) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### settings2
 
 ```solidity
-function settings2(address _countryMinter) public
+function settings2(address _countryMinter, address _bonusResources) public
 ```
+
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
 
 ### generateNavy
 
 ```solidity
 function generateNavy(uint256 id) public
 ```
+
+this function will allow a nation owner to buy navy vessels
+
+_this is a public function only callable from the countryMinter contract
+this function will allow a nation owner to buy navy vessels_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation being minted |
+
+### updateCorvetteCost
+
+```solidity
+function updateCorvetteCost(uint256 newPrice) public
+```
+
+_this function is only callable by the contract owner_
+
+### updateLandingShipCost
+
+```solidity
+function updateLandingShipCost(uint256 newPrice) public
+```
+
+_this function is only callable by the contract owner_
+
+### updateBattleshipCost
+
+```solidity
+function updateBattleshipCost(uint256 newPrice) public
+```
+
+_this function is only callable by the contract owner_
+
+### updateCruiserCost
+
+```solidity
+function updateCruiserCost(uint256 newPrice) public
+```
+
+_this function is only callable by the contract owner_
+
+### updateFrigateCost
+
+```solidity
+function updateFrigateCost(uint256 newPrice) public
+```
+
+_this function is only callable by the contract owner_
+
+### updateDestroyerCost
+
+```solidity
+function updateDestroyerCost(uint256 newPrice) public
+```
+
+_this function is only callable by the contract owner_
+
+### updateSubmarineCost
+
+```solidity
+function updateSubmarineCost(uint256 newPrice) public
+```
+
+_this function is only callable by the contract owner_
+
+### updateAircraftCarrierCost
+
+```solidity
+function updateAircraftCarrierCost(uint256 newPrice) public
+```
+
+_this function is only callable by the contract owner_
 
 ### onlyBattle
 
@@ -10262,11 +14100,37 @@ modifier onlyBattle()
 function decrementLosses(uint256[] defenderLosses, uint256 defenderId, uint256[] attackerLosses, uint256 attackerId) public
 ```
 
+this function will take the results of a battle and decrease number of vessels
+
+_this is a public function that is only callable from the Navt Battle contract
+this funtion will take the results of a battle and decrease the number of vessels_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| defenderLosses | uint256[] | is an array containing the defenders losses from the battle, each member of the array represents a different vessel |
+| defenderId | uint256 | this is the nation id of the defending nation in the battle |
+| attackerLosses | uint256[] | is an array containing the attacker losses from the battle, each memeber of the array represents a different vessel |
+| attackerId | uint256 | this is the nation id of the attacking nation in the battle |
+
 ### buyCorvette
 
 ```solidity
 function buyCorvette(uint256 amount, uint256 id) public
 ```
+
+this function will allow a nation owner to purchase a corvette vessel
+
+_this is a public function callable only by the nation owner
+this function will allow a nation owner to purchase a corvette vessel_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | this is the number of corvettes being purchased |
+| id | uint256 | this is the naton id of the nation purchasing vessels |
 
 ### getCorvetteCount
 
@@ -10274,11 +14138,22 @@ function buyCorvette(uint256 amount, uint256 id) public
 function getCorvetteCount(uint256 id) public view returns (uint256)
 ```
 
-### decreaseCorvetteCount
+this functon will return the number of corvettes a nation owns
 
-```solidity
-function decreaseCorvetteCount(uint256 amount, uint256 id) public
-```
+_this is a public view function that will return the number of corvettes a nation owns
+this function wll return the number of corvettes a nation owns_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the number of corvettes for a given nation |
 
 ### buyLandingShip
 
@@ -10286,17 +14161,40 @@ function decreaseCorvetteCount(uint256 amount, uint256 id) public
 function buyLandingShip(uint256 amount, uint256 id) public
 ```
 
+this function will allow a nation owner to purchase a landing ships vessel
+
+_this is a public function callable only by the nation owner
+this function will allow a nation owner to purchase a landing ships vessel_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | this is the number of landing ships being purchased |
+| id | uint256 | this is the naton id of the nation purchasing vessels |
+
 ### getLandingShipCount
 
 ```solidity
 function getLandingShipCount(uint256 id) public view returns (uint256)
 ```
 
-### decreaseLandingShipCount
+this functon will return the number of landing ships a nation owns
 
-```solidity
-function decreaseLandingShipCount(uint256 amount, uint256 id) public
-```
+_this is a public view function that will return the number of landing ships a nation owns
+this function wll return the number of landing ships a nation owns_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the number of landing ships for a given nation |
 
 ### buyBattleship
 
@@ -10304,17 +14202,40 @@ function decreaseLandingShipCount(uint256 amount, uint256 id) public
 function buyBattleship(uint256 amount, uint256 id) public
 ```
 
+this function will allow a nation owner to purchase a battleship vessel
+
+_this is a public function callable only by the nation owner
+this function will allow a nation owner to purchase a battleship vessel_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | this is the number of battleship being purchased |
+| id | uint256 | this is the naton id of the nation purchasing vessels |
+
 ### getBattleshipCount
 
 ```solidity
 function getBattleshipCount(uint256 id) public view returns (uint256)
 ```
 
-### decreaseBatteshipCount
+this functon will return the number of battleships a nation owns
 
-```solidity
-function decreaseBatteshipCount(uint256 amount, uint256 id) public
-```
+_this is a public view function that will return the number of battleships a nation owns
+this function wll return the number of battleships a nation owns_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the number of battleships for a given nation |
 
 ### buyCruiser
 
@@ -10322,17 +14243,40 @@ function decreaseBatteshipCount(uint256 amount, uint256 id) public
 function buyCruiser(uint256 amount, uint256 id) public
 ```
 
+this function will allow a nation owner to purchase a cruiser vessel
+
+_this is a public function callable only by the nation owner
+this function will allow a nation owner to purchase a cruiser vessel_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | this is the number of cruisers being purchased |
+| id | uint256 | this is the naton id of the nation purchasing vessels |
+
 ### getCruiserCount
 
 ```solidity
 function getCruiserCount(uint256 id) public view returns (uint256)
 ```
 
-### decreaseCruiserCount
+this functon will return the number of cruisers a nation owns
 
-```solidity
-function decreaseCruiserCount(uint256 amount, uint256 id) public
-```
+_this is a public view function that will return the number of cruisers a nation owns
+this function wll return the number of cruisers a nation owns_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the number of cruisers for a given nation |
 
 ### buyFrigate
 
@@ -10340,17 +14284,40 @@ function decreaseCruiserCount(uint256 amount, uint256 id) public
 function buyFrigate(uint256 amount, uint256 id) public
 ```
 
+this function will allow a nation owner to purchase a frigates vessel
+
+_this is a public function callable only by the nation owner
+this function will allow a nation owner to purchase a frigates vessel_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | this is the number of frigates being purchased |
+| id | uint256 | this is the naton id of the nation purchasing vessels |
+
 ### getFrigateCount
 
 ```solidity
 function getFrigateCount(uint256 id) public view returns (uint256)
 ```
 
-### decreaseFrigateCount
+this functon will return the number of frigates a nation owns
 
-```solidity
-function decreaseFrigateCount(uint256 amount, uint256 id) public
-```
+_this is a public view function that will return the number of frigates a nation owns
+this function wll return the number of frigates a nation owns_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the number of frigates for a given nation |
 
 ### buyDestroyer
 
@@ -10358,17 +14325,40 @@ function decreaseFrigateCount(uint256 amount, uint256 id) public
 function buyDestroyer(uint256 amount, uint256 id) public
 ```
 
+this function will allow a nation owner to purchase a destroyer vessel
+
+_this is a public function callable only by the nation owner
+this function will allow a nation owner to purchase a destroyer vessel_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | this is the number of destroyers being purchased |
+| id | uint256 | this is the naton id of the nation purchasing vessels |
+
 ### getDestroyerCount
 
 ```solidity
 function getDestroyerCount(uint256 id) public view returns (uint256)
 ```
 
-### decreaseDestroyerCount
+this functon will return the number of destroyers a nation owns
 
-```solidity
-function decreaseDestroyerCount(uint256 amount, uint256 id) public
-```
+_this is a public view function that will return the number of destroyers a nation owns
+this function wll return the number of destroyers a nation owns_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the number of destroyers for a given nation |
 
 ### buySubmarine
 
@@ -10376,17 +14366,40 @@ function decreaseDestroyerCount(uint256 amount, uint256 id) public
 function buySubmarine(uint256 amount, uint256 id) public
 ```
 
+this function will allow a nation owner to purchase a submarine vessel
+
+_this is a public function callable only by the nation owner
+this function will allow a nation owner to purchase a submarine vessel_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | this is the number of submarines being purchased |
+| id | uint256 | this is the naton id of the nation purchasing vessels |
+
 ### getSubmarineCount
 
 ```solidity
 function getSubmarineCount(uint256 id) public view returns (uint256)
 ```
 
-### decreaseSubmarineCount
+this functon will return the number of submarines a nation owns
 
-```solidity
-function decreaseSubmarineCount(uint256 amount, uint256 id) public
-```
+_this is a public view function that will return the number of submarines a nation owns
+this function wll return the number of submarines ttes a nation owns_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the number of submarines for a given nation |
 
 ### buyAircraftCarrier
 
@@ -10394,17 +14407,40 @@ function decreaseSubmarineCount(uint256 amount, uint256 id) public
 function buyAircraftCarrier(uint256 amount, uint256 id) public
 ```
 
+this function will allow a nation owner to purchase a aircraft carrier vessel
+
+_this is a public function callable only by the nation owner
+this function will allow a nation owner to purchase a aircraft carrier vessel_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | this is the number of aircraft carriers being purchased |
+| id | uint256 | this is the naton id of the nation purchasing vessels |
+
 ### getAircraftCarrierCount
 
 ```solidity
 function getAircraftCarrierCount(uint256 id) public view returns (uint256)
 ```
 
-### decreaseAircraftCarrierCount
+this functon will return the number of aircraft carriers a nation owns
 
-```solidity
-function decreaseAircraftCarrierCount(uint256 amount, uint256 id) public
-```
+_this is a public view function that will return the number of aircraft carriers a nation owns
+this function wll return the number of aircraft carriers a nation owns_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the number of aircraft carriers for a given nation |
 
 ### onlyNukeContract
 
@@ -10418,7 +14454,24 @@ modifier onlyNukeContract()
 function decreaseNavyFromNukeContract(uint256 defenderId) public
 ```
 
+this function will decrease the amount of ships that are vulnerable to nuclear attacks when a nation is attacked by a nuke strike
+vessels available to nuke strikes are corvettes, landing ships, cruisers and frigates
+a nuke strike will reduce the number of these ships by 25% (12% with a fallout shelter system)
+
+_this is a public function only callable from the nuke contract
+this function will decrease the amount of ships that are vulnerable to nuclear attacks when a nation is attacked by a nuke strike_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| defenderId | uint256 | this is the nation id of the nation being attacked |
+
 ## AdditionalNavyContract
+
+this contract will keep track of additional information about a nations navy
+
+_this contract inherits from the openzeppelin ownabl contract_
 
 ### navy
 
@@ -10486,11 +14539,31 @@ contract ImprovementsContract4 imp4
 function settings(address _navy, address _navalActions, address _military, address _wonders1, address _improvements4) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### getAvailablePurchases
 
 ```solidity
 function getAvailablePurchases(uint256 id) public view returns (uint256)
 ```
+
+this function will return a nations available daily navy vessel purchases
+
+_this is a public view function
+this function will return a nations available daily navy vessel purchases_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of available navy vessel purchases for the day for that nation |
 
 ### getBlockadeCapableShips
 
@@ -10498,11 +14571,45 @@ function getAvailablePurchases(uint256 id) public view returns (uint256)
 function getBlockadeCapableShips(uint256 id) public view returns (uint256)
 ```
 
+this function will return the number of blockade capable ships a nation has
+blockade capable ships include battleships, cruisers, frigates and submarines
+
+_this is a public view function that will return the number of blockade capable ships a nation has_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the number of blockade capable ships for a given nation |
+
 ### getBreakBlockadeCapableShips
 
 ```solidity
 function getBreakBlockadeCapableShips(uint256 id) public view returns (uint256)
 ```
+
+this function will return the number of ships a nation has that can break a blockade
+blockade capable ships include battleships, cruisers, frigates and destroyers
+
+_this is a public view function that will return the number of ships a nation has that can break a blockade_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 this is the number of ships that can break a blockade for a given nation |
 
 ### getVesselCountForDrydock
 
@@ -10510,13 +14617,52 @@ function getBreakBlockadeCapableShips(uint256 id) public view returns (uint256)
 function getVesselCountForDrydock(uint256 countryId) public view returns (uint256 count)
 ```
 
+this function will return the number of ships that a nations drydocks support
+a nation cannot delete a drydock if it supports a vessel
+drydocks support corvettes, battleships, cruisers and destroyers
+
+_this is a public view function that returns the number of navy vessels that a nations drydocks support_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of vessel supported by the drydocks |
+
 ### getVesselCountForShipyard
 
 ```solidity
 function getVesselCountForShipyard(uint256 countryId) public view returns (uint256 count)
 ```
 
+this function will return the number of ships that a nations shipyards support
+a nation cannot delete a shipyard if it supports a vessel
+shipyards support landing ships, frigates, submarines and aircraft carriers
+
+_this is a public view function that returns the number of navy vessels that a nations shipyards support_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of vessel supported by the shipyards |
+
 ## NavalBlockadeContract
+
+_this contract inherits from the openzeppelin ownable contract
+this contract inherits from the chainlink VRF contract_
 
 ### blockadeId
 
@@ -10645,6 +14791,19 @@ function settings(address _navy, address _additionalNavy, address _navalAction, 
 function blockade(uint256 attackerId, uint256 defenderId, uint256 warId) public
 ```
 
+this function allows a nation to blockade another nation they are at war with
+
+_this is a public function callable only from the nation owner
+this function allows a nation to blockade another nation they are at war with_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| attackerId | uint256 | is the id of the attacking nation |
+| defenderId | uint256 | is the nation id of the defending nation |
+| warId | uint256 | is the war id of the active war between the 2 nations |
+
 ### checkRequirements
 
 ```solidity
@@ -10699,6 +14858,9 @@ function checkIfBlockadeCapable(uint256 countryId) public
 ```
 
 ## BreakBlocadeContract
+
+_this contract inherits from the openzeppelin ownable contract
+this contract inherits from the chainlink VRF contract_
 
 ### breakBlockadeId
 
@@ -10956,6 +15118,19 @@ function settings(address _countryMinter, address _navalBlockade, address _navy,
 function breakBlockade(uint256 warId, uint256 attackerId, uint256 blockaderId) public
 ```
 
+this function allows a nation to break a blockade another nation imposed on them
+
+_this is a public function callable only from the nation owner
+this function allows a nation to break a blockade another nation imposed on them_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| warId | uint256 | is the war id of the active war between the 2 nations |
+| attackerId | uint256 | is the id of the attacking nation |
+| blockaderId | uint256 | is the nation id of the defending nation |
+
 ### generateBreakBlockadeStruct
 
 ```solidity
@@ -11058,6 +15233,9 @@ function getAmountToDecrease(uint256 shipType) internal pure returns (uint256)
 ```
 
 ## NavalAttackContract
+
+_this contract inherits from the openzeppelin ownable contract
+this contract inherits from the chainlink VRF contract_
 
 ### navy
 
@@ -11329,6 +15507,19 @@ function settings(address _navy, address _war, address _improvements4, address _
 function navalAttack(uint256 warId, uint256 attackerId, uint256 defenderId) public
 ```
 
+this function allows a nation to attack the navy of another nation
+
+_this is a public function callable only from the nation owner
+this function allows a nation to attack the navy of another nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| warId | uint256 | is the war id of the active war between the 2 nations |
+| attackerId | uint256 | is the id of the attacking nation |
+| defenderId | uint256 | is the nation id of the defending nation |
+
 ### generateAttackerNavyStruct
 
 ```solidity
@@ -11425,6 +15616,11 @@ function getAmountToDecrease(uint256 shipType) internal pure returns (uint256)
 ```
 
 ## NukeContract
+
+this contract will allow a nation to launch a nuclear missile at anoter nation
+
+_this contract inherits from chainlink VRF
+this contract inherits from openzeppelin ownable_
 
 ### nukeAttackId
 
@@ -11540,6 +15736,12 @@ address missiles
 address keeper
 ```
 
+### mod
+
+```solidity
+uint256 mod
+```
+
 ### mint
 
 ```solidity
@@ -11635,11 +15837,16 @@ mapping(uint256 => uint256[]) s_requestIndexToRandomWords
 constructor(address vrfCoordinatorV2, uint64 subscriptionId, bytes32 gasLane, uint32 callbackGasLimit) public
 ```
 
+_this function contains the variable necessary for chainlink randomness_
+
 ### settings
 
 ```solidity
 function settings(address _countryMinter, address _warAddress, address _wonders1, address _wonders4, address _improvements3, address _improvements4, address _infrastructure, address _forces, address _navy, address _missiles, address _keeper) public
 ```
+
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
 
 ### updateCountryMinterContract
 
@@ -11647,11 +15854,15 @@ function settings(address _countryMinter, address _warAddress, address _wonders1
 function updateCountryMinterContract(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateWarContract
 
 ```solidity
 function updateWarContract(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateWonders1Contract
 
@@ -11659,17 +15870,39 @@ function updateWarContract(address newAddress) public
 function updateWonders1Contract(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### launchNuke
 
 ```solidity
 function launchNuke(uint256 warId, uint256 attackerId, uint256 defenderId, uint256 attackType) public
 ```
 
+this function will launch a nuke strike against another nation, nations are required to be at war
+a nuke cannot be launched until a war is one day old
+attack type will be 1 for a standard attack, 2 for an infrastructre attack, 3 for a land attack and 4 for a technology attack
+if an attacking nation does not have a emp wonder, than the attack type will need to be a standard attack
+
+_this is a public function callable only by the attacking nation owner
+this function will launch a nuke strike against another nation, nations are required to be at war_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| warId | uint256 | will be the war id of the active war between the 2 nations |
+| attackerId | uint256 | will be the id of the attacking nation (launching the nuke) |
+| defenderId | uint256 | will be the id of the defending nation |
+| attackType | uint256 | determines if the attack is a standard attack or an attack targeting infrastructure, land or technology |
+
 ### fulfillRequest
 
 ```solidity
-function fulfillRequest(uint256 id) public
+function fulfillRequest(uint256 id) internal
 ```
+
+_this function will be called by the launchNuke() function
+this function will send a randomness request to the chainlink VRF contract_
 
 ### fulfillRandomWords
 
@@ -11677,22 +15910,20 @@ function fulfillRequest(uint256 id) public
 function fulfillRandomWords(uint256 requestId, uint256[] randomWords) internal
 ```
 
-fulfillRandomness handles the VRF response. Your contract must
-implement it. See "SECURITY CONSIDERATIONS" above for important
-principles to keep in mind when implementing your fulfillRandomness
-method.
+a nations default odds of a successful nuke strike are 50%
+if a defender has a strategic defense initiative the odds of a successful strike go down 20%
+if the attacker has sattelites, the odds of a succesful strike go up 5% per sattelite
+if a defender has a missile defense, the odds of a sucessful strike go down 5% per missile defense
 
-_VRFConsumerBaseV2 expects its subcontracts to have a method with this
-signature, and will call it once it has verified the proof
-associated with the randomness. (It is triggered via a call to
-rawFulfillRandomness, below.)_
+_this function will be called by the chainlink VRF contract in response to a randomness request
+the random numbers will be used to determine if the nuke strike was a success or not_
 
 #### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| requestId | uint256 | The Id initially returned by requestRandomness |
-| randomWords | uint256[] | the VRF output expanded to the requested number of words |
+| requestId | uint256 | will be the request id passed in from the fulfillRequest() function |
+| randomWords | uint256[] | is the randomly generate number for the calculation of a successful nuke strike |
 
 ### inflictNukeDamage
 
@@ -11700,11 +15931,25 @@ rawFulfillRandomness, below.)_
 function inflictNukeDamage(uint256 attackId) internal
 ```
 
+this function will take the attack tyoe and direct the type of damage to inflict
+
+_this is an internal function that will be called in the event of a succesful nuke strike_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| attackId | uint256 | this is the type of attack that was launched that will determine if the attack was a standard attack or an infrastructure, land or tech attack |
+
 ### standardAttack
 
 ```solidity
 function standardAttack(uint256 attackId) internal
 ```
+
+a standard nuke attack will decrease land, infrastructure and tech by 35%
+
+_this is the function that will be called in the event of a standard attack_
 
 ### infrastructureAttack
 
@@ -11712,11 +15957,19 @@ function standardAttack(uint256 attackId) internal
 function infrastructureAttack(uint256 attackId) internal
 ```
 
+an infrastructure nuke attack will decrease infrastructure by 45% and land and tech by 25%
+
+_this is the function that will be called in the event of a infrastructure attack_
+
 ### landAttack
 
 ```solidity
 function landAttack(uint256 attackId) internal
 ```
+
+a land nuke attack will decrease land by 45% and infrastructe and tech by 25%
+
+_this is the function that will be called in the event of a land attack_
 
 ### technologyAttack
 
@@ -11724,17 +15977,51 @@ function landAttack(uint256 attackId) internal
 function technologyAttack(uint256 attackId) internal
 ```
 
+a tech nuke attack will decrease tech by 45% and infrastructe and land by 25%
+
+_this is the function that will be called in the event of a tech attack_
+
 ### calculateNukesLandedLastSevenDays
 
 ```solidity
 function calculateNukesLandedLastSevenDays() public view returns (uint256)
 ```
 
+_this function is a public view function that will return the number of nukes launched in the game in the last 7 days
+this function will be used to calculate global radiation levels (next function)_
+
 ### getGlobalRadiation
 
 ```solidity
 function getGlobalRadiation() public view returns (uint256)
 ```
+
+this function will return the global radiation levels for the game
+global radiation is calulates by miltiplying nukes landed in the last 7 days by a modifier (default 300) and dividing by the number of countries
+
+_this is a public view function that will return the global radiation levels that will be used in a nations environment calculation_
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the global radiation level |
+
+### updateGlobalRadiationModifier
+
+```solidity
+function updateGlobalRadiationModifier(uint256 newModifier) public
+```
+
+this function will allow the owner of the contract to adjust the modifier for the global radiation level
+
+_this is a function callable by the owner of the contract that will allow the caller to update the modifier for the global radiation level_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| newModifier | uint256 | is the new modifier for the global radiation level |
 
 ### onlyKeeper
 
@@ -11748,7 +16035,15 @@ modifier onlyKeeper()
 function shiftNukesDroppedDays() public
 ```
 
+_this is a function only callable from the chainlink keeper contract
+this function will shift the nukes landed daily for the last 6 days (i.e. 2 dayss ago goes to 3 days ago)_
+
 ## ResourcesContract
+
+this contract will keep track of a nations resources and trades
+
+_this contract inherits from chainlink VRF
+this contract inherits from oepnzeppelin ownable_
 
 ### resourcesLength
 
@@ -11792,10 +16087,22 @@ address improvements2
 address countryMinter
 ```
 
+### bonusResources
+
+```solidity
+address bonusResources
+```
+
 ### mint
 
 ```solidity
 contract CountryMinter mint
+```
+
+### bonus
+
+```solidity
+contract BonusResourcesContract bonus
 ```
 
 ### Resources1
@@ -11833,24 +16140,6 @@ struct Resources2 {
 }
 ```
 
-### BonusResources
-
-```solidity
-struct BonusResources {
-  bool beer;
-  bool steel;
-  bool construction;
-  bool fastFood;
-  bool fineJewelry;
-  bool scholars;
-  bool asphalt;
-  bool automobiles;
-  bool affluentPopulation;
-  bool microchips;
-  bool radiationCleanup;
-}
-```
-
 ### idToResources1
 
 ```solidity
@@ -11861,12 +16150,6 @@ mapping(uint256 => struct ResourcesContract.Resources1) idToResources1
 
 ```solidity
 mapping(uint256 => struct ResourcesContract.Resources2) idToResources2
-```
-
-### idToBonusResources
-
-```solidity
-mapping(uint256 => struct ResourcesContract.BonusResources) idToBonusResources
 ```
 
 ### idToPlayerResources
@@ -11917,11 +16200,19 @@ event randomNumbersRequested(uint256 requestId)
 event randomNumbersFulfilled(uint256 randomResource1, uint256 randomResource2)
 ```
 
+### onlyCountryMinter
+
+```solidity
+modifier onlyCountryMinter()
+```
+
 ### constructor
 
 ```solidity
 constructor(address vrfCoordinatorV2, uint64 subscriptionId, bytes32 gasLane, uint32 callbackGasLimit) public
 ```
+
+_constructor function will accept variables for chainlink randomness_
 
 ### settings
 
@@ -11929,11 +16220,26 @@ constructor(address vrfCoordinatorV2, uint64 subscriptionId, bytes32 gasLane, ui
 function settings(address _infrastructure, address _improvements2, address _countryMinter) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### generateResources
 
 ```solidity
 function generateResources(uint256 id) public
 ```
+
+this function will allow a nation to store the resources they have access to
+
+_this is a public function that is only callable from the country minter contract when a nation is minted
+this function will allow a nation to store the resources they have access to
+this function will call the chainlink vrf contract to assign the minted nation two resources randomly_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being minted |
 
 ### fulfillRequest
 
@@ -11941,28 +16247,24 @@ function generateResources(uint256 id) public
 function fulfillRequest(uint256 id) public
 ```
 
+_this is the function that will call the chainlink vrf contract to return random numbers
+this is an internal function that can only be called from within this contract_
+
 ### fulfillRandomWords
 
 ```solidity
 function fulfillRandomWords(uint256 requestId, uint256[] randomWords) internal
 ```
 
-fulfillRandomness handles the VRF response. Your contract must
-implement it. See "SECURITY CONSIDERATIONS" above for important
-principles to keep in mind when implementing your fulfillRandomness
-method.
-
-_VRFConsumerBaseV2 expects its subcontracts to have a method with this
-signature, and will call it once it has verified the proof
-associated with the randomness. (It is triggered via a call to
-rawFulfillRandomness, below.)_
+_this is the function that the chainlink vrf contract will call when it answers
+this function will assign a nation 2 random resources and assure that they are 2 different resources_
 
 #### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| requestId | uint256 | The Id initially returned by requestRandomness |
-| randomWords | uint256[] | the VRF output expanded to the requested number of words |
+| requestId | uint256 | this is the id of the request sent to the vrf contract |
+| randomWords | uint256[] | is the random numbers being returned after being generated off chain |
 
 ### mockResourcesForTesting
 
@@ -11970,11 +16272,23 @@ rawFulfillRandomness, below.)_
 function mockResourcesForTesting(uint256 countryId, uint256 resource1, uint256 resource2) public
 ```
 
+_this is a function that is callable only from the owner of the contract
+this function was used in testing of the smart contract and should be deleted before deployment_
+
 ### setResources
 
 ```solidity
 function setResources(uint256 id) internal
 ```
+
+_this function is an internal function that will be called when a nation is minted or adds or removes a trading partner
+this will set the nations assigned resources to true and call the next funtion that will set all the resources of its trading partners to true_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation whose resources ar ebeing reset after minting or adding/removing a trading partner |
 
 ### setTrades
 
@@ -11982,11 +16296,15 @@ function setResources(uint256 id) internal
 function setTrades(uint256 id) internal
 ```
 
-### setBonusResources
+_this function is internal and can only be called by this contract
+this function will loop through a nations trading partners and set the resources partner nations to true
+this function is called from the previous setResources() function_
 
-```solidity
-function setBonusResources(uint256 id) public
-```
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation reseting their resources |
 
 ### proposeTrade
 
@@ -11994,11 +16312,42 @@ function setBonusResources(uint256 id) public
 function proposeTrade(uint256 requestorId, uint256 recipientId) public
 ```
 
+this function allows a nation owner to propose a trade with another nation
+once proposed the recipient nation will need to accept the trade
+a requesting nation can only have 3 trades active in order to propose a trade (4 with a harbor)
+a recipient nation can only have 4 trades active to accept a trade (5 with a harbor)
+
+_this is a public function that can be called by any nation owner
+this function allows a nation owner to propose a trade with another nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| requestorId | uint256 | is the nation id of the nation requesting the trading partnership |
+| recipientId | uint256 | is the nation id of the nation receiving the trade proposal |
+
 ### getProposedTradingPartners
 
 ```solidity
 function getProposedTradingPartners(uint256 id) public view returns (uint256[])
 ```
+
+this function will return a nation's proposed trading partners
+
+_this is a public view function that will return a nations proposed trading partners_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256[] | uint256 is an array of the nation id's of a nations proposed trading partners |
 
 ### isTradePossibleForRequestor
 
@@ -12006,11 +16355,35 @@ function getProposedTradingPartners(uint256 id) public view returns (uint256[])
 function isTradePossibleForRequestor(uint256 requestorId) internal view returns (bool)
 ```
 
+this function will return true if the trade is possible for the requestor
+a requestor can have a maximum of 3 active and proposed trades (4 with a harbor) in order to propose a trade
+
+_a trade proposal will only go through if a proposal is possible for the requestor and recipient
+this function is an internal function that will return a boolean true if the proposed trade is possible for the requestor_
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool is true if the trade is possible for the requestor |
+
 ### isTradePossibleForRecipient
 
 ```solidity
 function isTradePossibleForRecipient(uint256 recipientId) internal view returns (bool)
 ```
+
+this function will return true if the trade is possible for the recipient
+a recipient can have a maximum of 4 active and proposed trades (5 with a harbor) in order to have a trade proposed
+
+_a trade proposal will only go through if a proposal is possible for the requestor and recipient
+this function is an internal function that will return a boolean true if the proposed trade is possible for the recipient_
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool is true if the trade is possible for the recipient |
 
 ### fulfillTradingPartner
 
@@ -12018,11 +16391,34 @@ function isTradePossibleForRecipient(uint256 recipientId) internal view returns 
 function fulfillTradingPartner(uint256 recipientId, uint256 requestorId) public
 ```
 
+this function will allow the recipient of a trade proposal to accept a trade proposal
+once a trade proposal is accepted the requesting nations and recipient nations resources will be reset to reflect the additional resources
+
+_this is a public function callable from the recipient of a trade proposal that will allow a nation to accept a trade proposal_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| recipientId | uint256 | is the nation id of the recipient of the trade proposal |
+| requestorId | uint256 | is the nation id of the requestor of the trade proposal |
+
 ### removeTradingPartner
 
 ```solidity
 function removeTradingPartner(uint256 nationId, uint256 partnerId) public
 ```
+
+this function will allow a trade agreement to be terminated
+
+_this is a public function callable by either member of an active trade that will remove the active trade_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| nationId | uint256 | is the nation id of the nation initializing the trade cancellation |
+| partnerId | uint256 | is the nation id of the partner nation in the trade agreement being cancelled |
 
 ### isProposedTrade
 
@@ -12030,16 +16426,764 @@ function removeTradingPartner(uint256 nationId, uint256 partnerId) public
 function isProposedTrade(uint256 recipientId, uint256 requestorId) public view returns (bool isProposed)
 ```
 
+_this is a public view function that will take two trading partners in the parameters and return a boolean value
+this function will return true if there is a proposed trade between the two nation id's being passed in_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| recipientId | uint256 | is the nation id of the first nation being queried |
+| requestorId | uint256 | is the nation id of the second nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| isProposed | bool | will be true if there is an active proposal between the two nations |
+
 ### isActiveTrade
 
 ```solidity
 function isActiveTrade(uint256 country1Id, uint256 country2Id) public view returns (bool isActive)
 ```
 
+_this is a public view function that will take two trading partners in the parameters and return a boolean value
+this function will return true if there is an active trade between the two nation id's being passed in_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| country1Id | uint256 | is the nation id of the first nation being queried |
+| country2Id | uint256 | is the nation id of the second nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| isActive | bool | will be true if there is an active trae between the two nations |
+
 ### getResourcesFromTradingPartner
 
 ```solidity
 function getResourcesFromTradingPartner(uint256 partnerId) public view returns (uint256, uint256)
+```
+
+this function will return a given nations 2 randomly selected resources
+
+_this is a public view function that will return the 2 resources for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| partnerId | uint256 | this is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the numerical representation of the nations resources |
+| [1] | uint256 |  |
+
+### viewAluminium
+
+```solidity
+function viewAluminium(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the aluminium resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the aluminium resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the aluminium resource |
+
+### viewCattle
+
+```solidity
+function viewCattle(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the cattle resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the cattle resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the cattle resource |
+
+### viewCoal
+
+```solidity
+function viewCoal(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the coal resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the coal resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the coal resource |
+
+### viewFish
+
+```solidity
+function viewFish(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the fish resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the fish resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the fish resource |
+
+### viewFurs
+
+```solidity
+function viewFurs(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the furs resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the furs resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the furs resource |
+
+### viewGems
+
+```solidity
+function viewGems(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the gems resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the gems resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the gems resource |
+
+### viewGold
+
+```solidity
+function viewGold(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the gold resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the gold resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the gold resource |
+
+### viewIron
+
+```solidity
+function viewIron(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the iron resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the iron resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the iron resource |
+
+### viewLead
+
+```solidity
+function viewLead(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the lead resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the lead resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the lead resource |
+
+### viewLumber
+
+```solidity
+function viewLumber(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the lumber resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the lumber resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the lumber resource |
+
+### viewMarble
+
+```solidity
+function viewMarble(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the marble resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the marble resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the marble resource |
+
+### viewOil
+
+```solidity
+function viewOil(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the oil resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the oil resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the oil resource |
+
+### viewPigs
+
+```solidity
+function viewPigs(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the pigs resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the pigs resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the pigs resource |
+
+### viewRubber
+
+```solidity
+function viewRubber(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the rubber resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the rubber resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the rubber resource |
+
+### viewSilver
+
+```solidity
+function viewSilver(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the silver resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the silver resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the silver resource |
+
+### viewSpices
+
+```solidity
+function viewSpices(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the spices resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the spices resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the spices resource |
+
+### viewSugar
+
+```solidity
+function viewSugar(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the sugar resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the sugar resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the sugar resource |
+
+### viewUranium
+
+```solidity
+function viewUranium(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the uranium resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the uranium resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the uranium resource |
+
+### viewWater
+
+```solidity
+function viewWater(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the water resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the water resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the water resource |
+
+### viewWheat
+
+```solidity
+function viewWheat(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the wheat resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the wheat resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the wheat resource |
+
+### viewWine
+
+```solidity
+function viewWine(uint256 id) public view returns (bool)
+```
+
+this function will return a boolean value of true if a nation has access to the wine resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the wine resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the wine resource |
+
+### getPlayerResources
+
+```solidity
+function getPlayerResources(uint256 id) public view returns (uint256[])
+```
+
+this function will return an array of a nations 2 selected resources
+
+_this is a public view function that will return an array of a natons 2 resources_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256[] | uint256 is an array of the players resources for the nation id passed into the function |
+
+### getTradingPartners
+
+```solidity
+function getTradingPartners(uint256 id) public view returns (uint256[])
+```
+
+this function will return a given nation's trading partners
+
+_this is a public view function that will return an array with a nations trading partners_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256[] | uint256 is an array of the nation id's of a nations trading pertners |
+
+## BonusResourcesContract
+
+this contract will keep track of a nations bonus resources
+
+_this contract inherits from chainlink VRF
+this contract inherits from oepnzeppelin ownable_
+
+### infrastructure
+
+```solidity
+address infrastructure
+```
+
+### improvements2
+
+```solidity
+address improvements2
+```
+
+### countryMinter
+
+```solidity
+address countryMinter
+```
+
+### resources
+
+```solidity
+address resources
+```
+
+### mint
+
+```solidity
+contract CountryMinter mint
+```
+
+### res
+
+```solidity
+contract ResourcesContract res
+```
+
+### BonusResources
+
+```solidity
+struct BonusResources {
+  bool beer;
+  bool steel;
+  bool construction;
+  bool fastFood;
+  bool fineJewelry;
+  bool scholars;
+  bool asphalt;
+  bool automobiles;
+  bool affluentPopulation;
+  bool microchips;
+  bool radiationCleanup;
+}
+```
+
+### idToBonusResources
+
+```solidity
+mapping(uint256 => struct BonusResourcesContract.BonusResources) idToBonusResources
+```
+
+### onlyCountryMinter
+
+```solidity
+modifier onlyCountryMinter()
+```
+
+### onlyResources
+
+```solidity
+modifier onlyResources()
+```
+
+### settings
+
+```solidity
+function settings(address _infrastructure, address _countryMinter, address _resources) public
+```
+
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
+### generateBonusResources
+
+```solidity
+function generateBonusResources(uint256 id) public
+```
+
+this function will allow a nation to store the bonus resources they have access to
+
+_this is a public function that is only callable from the country minter contract when a nation is minted
+this function will allow a nation to store the bonus resources they have access to_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being minted |
+
+### setBonusResources
+
+```solidity
+function setBonusResources(uint256 id) public
+```
+
+bonus resources are certain resources that you can get credit for only hen you have the correct mix of primary resources and parameters
+
+_this is an internal function only callable from this contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation whose resources are being reset |
+
+### setAdditionalBonusResources
+
+```solidity
+function setAdditionalBonusResources(uint256 id) internal
+```
+
+### checkBeer
+
+```solidity
+function checkBeer(uint256 id) public view returns (bool)
+```
+
+### checkSteel
+
+```solidity
+function checkSteel(uint256 id) public view returns (bool)
+```
+
+### checkConstruction
+
+```solidity
+function checkConstruction(uint256 id) public view returns (bool)
+```
+
+### checkFastFood
+
+```solidity
+function checkFastFood(uint256 id) public view returns (bool)
+```
+
+### checkFineJewelry
+
+```solidity
+function checkFineJewelry(uint256 id) public view returns (bool)
+```
+
+### checkScholars
+
+```solidity
+function checkScholars(uint256 id) public view returns (bool)
+```
+
+### checkAsphalt
+
+```solidity
+function checkAsphalt(uint256 id) public view returns (bool)
+```
+
+### checkAutomobiles
+
+```solidity
+function checkAutomobiles(uint256 id) public view returns (bool)
+```
+
+### checkAffluentPopulation
+
+```solidity
+function checkAffluentPopulation(uint256 id) public view returns (bool)
+```
+
+### checkMicrochips
+
+```solidity
+function checkMicrochips(uint256 id) public view returns (bool)
+```
+
+### checkRadiationCleanup
+
+```solidity
+function checkRadiationCleanup(uint256 id) public view returns (bool)
 ```
 
 ### viewAffluentPopulation
@@ -12048,11 +17192,21 @@ function getResourcesFromTradingPartner(uint256 partnerId) public view returns (
 function viewAffluentPopulation(uint256 id) public view returns (bool)
 ```
 
-### viewAluminium
+this function will return a boolean value of true if a nation has access to the affluent population resource
 
-```solidity
-function viewAluminium(uint256 id) public view returns (bool)
-```
+_this is a public view function that will retrun a boolean value of true if a nation has access to the affluent population resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the affluent population resource |
 
 ### viewAsphalt
 
@@ -12060,11 +17214,43 @@ function viewAluminium(uint256 id) public view returns (bool)
 function viewAsphalt(uint256 id) public view returns (bool)
 ```
 
+this function will return a boolean value of true if a nation has access to the asphalt resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the asphalt resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the asphalt resource |
+
 ### viewAutomobiles
 
 ```solidity
 function viewAutomobiles(uint256 id) public view returns (bool)
 ```
+
+this function will return a boolean value of true if a nation has access to the automobiles resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the automobiles resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the automobiles resource |
 
 ### viewBeer
 
@@ -12072,17 +17258,21 @@ function viewAutomobiles(uint256 id) public view returns (bool)
 function viewBeer(uint256 id) public view returns (bool)
 ```
 
-### viewCattle
+this function will return a boolean value of true if a nation has access to the beer resource
 
-```solidity
-function viewCattle(uint256 id) public view returns (bool)
-```
+_this is a public view function that will retrun a boolean value of true if a nation has access to the beer resource_
 
-### viewCoal
+#### Parameters
 
-```solidity
-function viewCoal(uint256 id) public view returns (bool)
-```
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the beer resource |
 
 ### viewConstruction
 
@@ -12090,11 +17280,43 @@ function viewCoal(uint256 id) public view returns (bool)
 function viewConstruction(uint256 id) public view returns (bool)
 ```
 
+this function will return a boolean value of true if a nation has access to the construction resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the construction resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the construction resource |
+
 ### viewFastFood
 
 ```solidity
 function viewFastFood(uint256 id) public view returns (bool)
 ```
+
+this function will return a boolean value of true if a nation has access to the fast food resource
+
+_this is a public view function that will retrun a boolean value of true if a nation has access to the fast food resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the fast food resource |
 
 ### viewFineJewelry
 
@@ -12102,53 +17324,21 @@ function viewFastFood(uint256 id) public view returns (bool)
 function viewFineJewelry(uint256 id) public view returns (bool)
 ```
 
-### viewFish
+this function will return a boolean value of true if a nation has access to the fine jewelry resource
 
-```solidity
-function viewFish(uint256 id) public view returns (bool)
-```
+_this is a public view function that will retrun a boolean value of true if a nation has access to the fine jewelry resource_
 
-### viewFurs
+#### Parameters
 
-```solidity
-function viewFurs(uint256 id) public view returns (bool)
-```
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
 
-### viewGems
+#### Return Values
 
-```solidity
-function viewGems(uint256 id) public view returns (bool)
-```
-
-### viewGold
-
-```solidity
-function viewGold(uint256 id) public view returns (bool)
-```
-
-### viewIron
-
-```solidity
-function viewIron(uint256 id) public view returns (bool)
-```
-
-### viewLead
-
-```solidity
-function viewLead(uint256 id) public view returns (bool)
-```
-
-### viewLumber
-
-```solidity
-function viewLumber(uint256 id) public view returns (bool)
-```
-
-### viewMarble
-
-```solidity
-function viewMarble(uint256 id) public view returns (bool)
-```
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the fine jewelry resource |
 
 ### viewMicrochips
 
@@ -12156,17 +17346,21 @@ function viewMarble(uint256 id) public view returns (bool)
 function viewMicrochips(uint256 id) public view returns (bool)
 ```
 
-### viewOil
+this function will return a boolean value of true if a nation has access to the microships resource
 
-```solidity
-function viewOil(uint256 id) public view returns (bool)
-```
+_this is a public view function that will retrun a boolean value of true if a nation has access to the microships resource_
 
-### viewPigs
+#### Parameters
 
-```solidity
-function viewPigs(uint256 id) public view returns (bool)
-```
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the microchips resource |
 
 ### viewRadiationCleanup
 
@@ -12174,11 +17368,21 @@ function viewPigs(uint256 id) public view returns (bool)
 function viewRadiationCleanup(uint256 id) public view returns (bool)
 ```
 
-### viewRubber
+this function will return a boolean value of true if a nation has access to the radiation cleanup resource
 
-```solidity
-function viewRubber(uint256 id) public view returns (bool)
-```
+_this is a public view function that will retrun a boolean value of true if a nation has access to the radiation cleanup resource_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the radiation cleanup resource |
 
 ### viewScholars
 
@@ -12186,17 +17390,21 @@ function viewRubber(uint256 id) public view returns (bool)
 function viewScholars(uint256 id) public view returns (bool)
 ```
 
-### viewSilver
+this function will return a boolean value of true if a nation has access to the scholars resource
 
-```solidity
-function viewSilver(uint256 id) public view returns (bool)
-```
+_this is a public view function that will retrun a boolean value of true if a nation has access to the scholars resource_
 
-### viewSpices
+#### Parameters
 
-```solidity
-function viewSpices(uint256 id) public view returns (bool)
-```
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the scholars resource |
 
 ### viewSteel
 
@@ -12204,49 +17412,28 @@ function viewSpices(uint256 id) public view returns (bool)
 function viewSteel(uint256 id) public view returns (bool)
 ```
 
-### viewSugar
+this function will return a boolean value of true if a nation has access to the steel resource
 
-```solidity
-function viewSugar(uint256 id) public view returns (bool)
-```
+_this is a public view function that will retrun a boolean value of true if a nation has access to the steel resource_
 
-### viewUranium
+#### Parameters
 
-```solidity
-function viewUranium(uint256 id) public view returns (bool)
-```
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
 
-### viewWater
+#### Return Values
 
-```solidity
-function viewWater(uint256 id) public view returns (bool)
-```
-
-### viewWheat
-
-```solidity
-function viewWheat(uint256 id) public view returns (bool)
-```
-
-### viewWine
-
-```solidity
-function viewWine(uint256 id) public view returns (bool)
-```
-
-### getPlayerResources
-
-```solidity
-function getPlayerResources(uint256 id) public view returns (uint256[])
-```
-
-### getTradingPartners
-
-```solidity
-function getTradingPartners(uint256 id) public view returns (uint256[])
-```
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool this value will be true if the nation has the steel resource |
 
 ## SenateContract
+
+this contract will allow nation owners to vote for team senators
+team senators will be able to sanction nations from trading with trading partners on the same team
+
+_this contract inherits from the openzeppelin ownable contract_
 
 ### countryMinter
 
@@ -12399,6 +17586,9 @@ uint256[] sanctionVotes
 function settings(address _countryMinter, address _parameters, address _wonders3) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### params
 
 ```solidity
@@ -12447,11 +17637,23 @@ function updateCountryMinter(address newAddress) public
 function updateCountryParametersContract(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### generateVoter
 
 ```solidity
 function generateVoter(uint256 id) public
 ```
+
+this contract will allow set up a nations voting and senate capabilities upon minting
+
+_this function is only callable by the country minter contract when a nation is minted_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being minted |
 
 ### updateTeam
 
@@ -12459,11 +17661,36 @@ function generateVoter(uint256 id) public
 function updateTeam(uint256 id, uint256 newTeam) public
 ```
 
+this function will reset a nations team and votes for senator when a nation changes teams
+
+_this function is only callable from the country parameters contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation that changed team |
+| newTeam | uint256 | is the id of the new team the given nation joined |
+
 ### voteForSenator
 
 ```solidity
 function voteForSenator(uint256 idVoter, uint256 idOfSenateVote) public
 ```
+
+this function will allow a nation to vote for a team senator on their team
+this function will emit a Vote event when a nation votes
+you can only vote for a fellow team member
+you can only vote once per epoch
+
+_this is a public function callable only by the nation owner that will allow a nation to vote for a team senator_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| idVoter | uint256 | is the nation id of the nation casting the vote |
+| idOfSenateVote | uint256 | is the nation id of the nation being voted for senate |
 
 ### inaugurateTeam7Senators
 
@@ -12471,11 +17698,32 @@ function voteForSenator(uint256 idVoter, uint256 idOfSenateVote) public
 function inaugurateTeam7Senators(uint256[] newSenatorArray) public
 ```
 
+this function will make the nations who won the team 7 election senators
+
+_this is a public function that will be called from an off chain source_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| newSenatorArray | uint256[] | is the array of team 7 senators getting elected |
+
 ### sanctionTeamMember
 
 ```solidity
 function sanctionTeamMember(uint256 idSenator, uint256 idSanctioned) public
 ```
+
+this function will only work if the senator and the nation being sanctioned are on the same team
+
+_this is a public function callable by a senator_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| idSenator | uint256 | is the id of the senator calling the function that will cast the vote to sanction |
+| idSanctioned | uint256 | is the nation id of the nation who the senator is voting to sanction |
 
 ### liftSanctionVote
 
@@ -12507,7 +17755,26 @@ function checkIfSenatorVoted(uint256 senatorId, uint256 idSanctioned) internal v
 function isSenator(uint256 id) public view returns (bool)
 ```
 
+this function will return if a nation is a senator
+
+_this is a public view function that will return if a nation is a senator_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if a nation is a senator |
+
 ## SpyOperationsContract
+
+_this contact inherits from openzeppelin's ownable contract
+this contract inherits from chanlinks VRF contract_
 
 ### spyAttackId
 
@@ -12663,6 +17930,14 @@ function updateInfrastructureContract(address newAddress) public
 function conductSpyOperation(uint256 attackerId, uint256 defenderId, uint256 attackType) public
 ```
 
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| attackerId | uint256 |  |
+| defenderId | uint256 |  |
+| attackType | uint256 | is the type of attack 1. gather intelligence 2. destroy cruise missiles 3. destroy defending tanks 4. capture land 5. change governemnt 6. change religion 7. chenge threat level 8. change defcon 9. destroy spies 10. capture tech 11. sabatoge taxes 12. capture money reserves 13. capture infrastructure 14. destroy nukes |
+
 ### fulfillRequest
 
 ```solidity
@@ -12796,6 +18071,8 @@ function destroyNukes(uint256 defenderId) internal
 
 ## TaxesContract
 
+_this contract inherits from the open zeppelin ownable contract_
+
 ### countryMinter
 
 ```solidity
@@ -12890,6 +18167,12 @@ address crime
 
 ```solidity
 address additionalTaxes
+```
+
+### bonusResources
+
+```solidity
+address bonusResources
 ```
 
 ### inf
@@ -12988,11 +18271,20 @@ contract AdditionalTaxesContract addTax
 contract CountryMinter mint
 ```
 
+### bonus
+
+```solidity
+contract BonusResourcesContract bonus
+```
+
 ### settings1
 
 ```solidity
-function settings1(address _countryMinter, address _infrastructure, address _treasury, address _improvements1, address _improvements2, address _improvements3, address _additionalTaxes) public
+function settings1(address _countryMinter, address _infrastructure, address _treasury, address _improvements1, address _improvements2, address _improvements3, address _additionalTaxes, address _bonusResources) public
 ```
+
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
 
 ### settings2
 
@@ -13000,11 +18292,8 @@ function settings1(address _countryMinter, address _infrastructure, address _tre
 function settings2(address _parameters, address _wonders1, address _wonders2, address _wonders3, address _wonders4, address _resources, address _forces, address _military, address _crime) public
 ```
 
-### idToOwnerTaxes
-
-```solidity
-mapping(uint256 => address) idToOwnerTaxes
-```
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
 
 ### onlyCountryMinter
 
@@ -13018,11 +18307,15 @@ modifier onlyCountryMinter()
 function updateCountryMinter(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateInfrastructureContract
 
 ```solidity
 function updateInfrastructureContract(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateTreasuryContract
 
@@ -13030,11 +18323,15 @@ function updateInfrastructureContract(address newAddress) public
 function updateTreasuryContract(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateImprovementsContract1
 
 ```solidity
 function updateImprovementsContract1(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateImprovementsContract2
 
@@ -13042,11 +18339,15 @@ function updateImprovementsContract1(address newAddress) public
 function updateImprovementsContract2(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateImprovementsContract3
 
 ```solidity
 function updateImprovementsContract3(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateCountryParametersContract
 
@@ -13054,11 +18355,15 @@ function updateImprovementsContract3(address newAddress) public
 function updateCountryParametersContract(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateWondersContract2
 
 ```solidity
 function updateWondersContract2(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateWondersContract3
 
@@ -13066,11 +18371,15 @@ function updateWondersContract2(address newAddress) public
 function updateWondersContract3(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateResourcesContract
 
 ```solidity
 function updateResourcesContract(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateForcesContract
 
@@ -13078,17 +18387,15 @@ function updateResourcesContract(address newAddress) public
 function updateForcesContract(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateMilitaryContract
 
 ```solidity
 function updateMilitaryContract(address newAddress) public
 ```
 
-### initiateTaxes
-
-```solidity
-function initiateTaxes(uint256 id, address nationOwner) public
-```
+_this function is only callable by the contract owner_
 
 ### collectTaxes
 
@@ -13096,11 +18403,38 @@ function initiateTaxes(uint256 id, address nationOwner) public
 function collectTaxes(uint256 id) public
 ```
 
+this function will allow a nation owner to collect taxes from their citizens
+
+_this is a public function callable only by the nation owner collecting taxes_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation collecting taxes |
+
 ### getTaxesCollectible
 
 ```solidity
 function getTaxesCollectible(uint256 id) public view returns (uint256, uint256)
 ```
+
+this function will return a nations taxes collectible
+
+_this is a public view function that will return a nations taxes that are collectible_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | dailyTaxesCollectiblePerCitizen is the tax portion of each citizens income per day |
+| [1] | uint256 | taxesCollectible is the amount of taxes that are collectible (daily taxes per citizen * days since last collection * citizen count) |
 
 ### getDailyIncome
 
@@ -13108,11 +18442,44 @@ function getTaxesCollectible(uint256 id) public view returns (uint256, uint256)
 function getDailyIncome(uint256 id) public view returns (uint256)
 ```
 
+this function will return the gross income per citizen for a given nation
+
+_this is a public view function that will return the daily gross income per citizen for a given nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the daily income of each citizen for a nation |
+
 ### getHappiness
 
 ```solidity
 function getHappiness(uint256 id) public view returns (uint256)
 ```
+
+this function will return a nations happiness
+the higher a nations happiness the more money its citizens will make
+
+_this is a publci view function that will return a nations happiness_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | happiness is the happiness for the queried nation |
 
 ### getHappinessPointsToAdd
 
@@ -13234,24 +18601,28 @@ function soldierToPopulationRatio(uint256 id) public view returns (uint256, bool
 function getPointsFromCriminals(uint256 id) public view returns (uint256)
 ```
 
-### getPointsToSubtractFromImprovements
-
-```solidity
-function getPointsToSubtractFromImprovements(uint256 id) public view returns (uint256)
-```
-
-### getUniversityPoints
-
-```solidity
-function getUniversityPoints(uint256 id) public view returns (uint256)
-```
-
 ## AdditionalTaxesContract
+
+this contract will have additional formulas that will allow a nation to collect taxes from its citizens
+
+_tis contract inherits from openzeppelin's ownable contract_
 
 ### infrastructure
 
 ```solidity
 address infrastructure
+```
+
+### improvements2
+
+```solidity
+address improvements2
+```
+
+### improvements3
+
+```solidity
+address improvements3
 ```
 
 ### parameters
@@ -13296,10 +18667,28 @@ address resources
 address military
 ```
 
+### bonusResources
+
+```solidity
+address bonusResources
+```
+
 ### inf
 
 ```solidity
 contract InfrastructureContract inf
+```
+
+### imp2
+
+```solidity
+contract ImprovementsContract2 imp2
+```
+
+### imp3
+
+```solidity
+contract ImprovementsContract3 imp3
 ```
 
 ### params
@@ -13344,11 +18733,29 @@ contract ResourcesContract res
 contract MilitaryContract mil
 ```
 
+### bonus
+
+```solidity
+contract BonusResourcesContract bonus
+```
+
 ### settings
 
 ```solidity
-function settings(address _parameters, address _wonders1, address _wonders2, address _wonders3, address _wonders4, address _resources, address _military, address _infrastructure) public
+function settings(address _parameters, address _wonders1, address _wonders2, address _wonders3, address _wonders4, address _resources, address _military, address _infrastructure, address _bonusResources) public
 ```
+
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
+### settings2
+
+```solidity
+function settings2(address _improvements2, address _improvements3) public
+```
+
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
 
 ### getIncomeAdjustments
 
@@ -13380,7 +18787,23 @@ function getPointsFromTrades(uint256 id) public view returns (uint256)
 function getPointsFromDefcon(uint256 id) public view returns (uint256)
 ```
 
+### getPointsToSubtractFromImprovements
+
+```solidity
+function getPointsToSubtractFromImprovements(uint256 id) public view returns (uint256)
+```
+
+### getUniversityPoints
+
+```solidity
+function getUniversityPoints(uint256 id) public view returns (uint256)
+```
+
 ## TechnologyMarketContract
+
+this contract allows a nation owner to purchase technology
+
+_this contract inherits from openzeppelin's ownable contract_
 
 ### countryMinter
 
@@ -13428,6 +18851,12 @@ address wonders4
 
 ```solidity
 address treasury
+```
+
+### bonusResources
+
+```solidity
+address bonusResources
 ```
 
 ### mint
@@ -13478,11 +18907,20 @@ contract WondersContract4 won4
 contract InfrastructureContract inf
 ```
 
+### bonus
+
+```solidity
+contract BonusResourcesContract bonus
+```
+
 ### settings
 
 ```solidity
-function settings(address _resources, address _improvements3, address _infrastructure, address _wonders2, address _wonders3, address _wonders4, address _treasury, address _countryMinter) public
+function settings(address _resources, address _improvements3, address _infrastructure, address _wonders2, address _wonders3, address _wonders4, address _treasury, address _countryMinter, address _bonusResources) public
 ```
+
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
 
 ### buyTech
 
@@ -13490,11 +18928,39 @@ function settings(address _resources, address _improvements3, address _infrastru
 function buyTech(uint256 id, uint256 amount) public
 ```
 
+this function will allow a nation owner to purchase technology
+
+_this is a public function that is only callable by the nation owner_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the nation buying technology |
+| amount | uint256 | this is the amount of technology being purchased |
+
 ### getTechCost
 
 ```solidity
 function getTechCost(uint256 id, uint256 amount) public view returns (uint256)
 ```
+
+this function will return the cost of a technology purchase
+
+_this is a public view function taht will return the cost of a technology purchase_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation buying technology |
+| amount | uint256 | is the amount of technology being purchased |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the cost of a technology purchase |
 
 ### getTechCostPerLevel
 
@@ -13502,11 +18968,29 @@ function getTechCost(uint256 id, uint256 amount) public view returns (uint256)
 function getTechCostPerLevel(uint256 id) public view returns (uint256)
 ```
 
+this function willreturn the cost a nation has to pay for technology per level
+
+_this is a public view function that will return the cost a nation has to pay for technology per level_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the cost a nation has to pey for technology per level |
+
 ### getTechCostMultiplier
 
 ```solidity
 function getTechCostMultiplier(uint256 id) public view returns (uint256)
 ```
+
+_this function will adjust a nations tech cost based on wonders improvements and resources_
 
 ### destroyTech
 
@@ -13514,7 +18998,14 @@ function getTechCostMultiplier(uint256 id) public view returns (uint256)
 function destroyTech(uint256 id, uint256 amount) public
 ```
 
+_this function allows a nation to destroy technology_
+
 ## TreasuryContract
+
+this contact will allow a nation owner
+
+_this contract will allow the game owner to withdraw game revenues from the in game purchases
+this contract inherits from the openzeppelin ownable contract_
 
 ### counter
 
@@ -13653,16 +19144,22 @@ mapping(uint256 => struct TreasuryContract.Treasury) idToTreasury
 function settings1(address _warBucksAddress, address _wonders1, address _improvements1, address _infrastructure, address _forces, address _navy, address _fighters, address _aid, address _taxes, address _bills, address _spyAddress) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### settings2
 
 ```solidity
 function settings2(address _groundBattle, address _countryMinter, address _keeper) public
 ```
 
-### generateTreasury
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
+### onlyCountryMinter
 
 ```solidity
-function generateTreasury(uint256 id) public
+modifier onlyCountryMinter()
 ```
 
 ### onlyTaxesContract
@@ -13675,12 +19172,6 @@ modifier onlyTaxesContract()
 
 ```solidity
 modifier onlySpyContract()
-```
-
-### increaseBalanceOnTaxCollection
-
-```solidity
-function increaseBalanceOnTaxCollection(uint256 id, uint256 amount) public
 ```
 
 ### onlyBillsContract
@@ -13701,11 +19192,53 @@ modifier onlyInfrastructure()
 modifier onlyKeeper()
 ```
 
+### generateTreasury
+
+```solidity
+function generateTreasury(uint256 id) public
+```
+
+this function will be called when a nation is minted and will allow a nation to undergo treasury operations
+
+_this function is only callable from the country minter contract_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being minted |
+
+### increaseBalanceOnTaxCollection
+
+```solidity
+function increaseBalanceOnTaxCollection(uint256 id, uint256 amount) public
+```
+
+_this function is only callable by the taxes contract
+this function will increase a nations balance when taxes are collected_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | this is the nation id of the country collecting taxes |
+| amount | uint256 | this is the amount of taxes being collected |
+
 ### decreaseBalanceOnBillsPaid
 
 ```solidity
 function decreaseBalanceOnBillsPaid(uint256 id, uint256 amount) public
 ```
+
+_this function is only callable from the bills contract
+this function will decrease a nations balance when bils are paid_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation paying bills |
+| amount | uint256 | is the amount of bills being paid |
 
 ### spendBalance
 
@@ -13713,11 +19246,26 @@ function decreaseBalanceOnBillsPaid(uint256 id, uint256 amount) public
 function spendBalance(uint256 id, uint256 cost) public
 ```
 
+this function will decrease a nation owner's balance when money is spent within the game
+
+_this function is public but only callable by contracts within the game where funds are being spent
+this function will decrease a nation owner's balance when money is spent within the game_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation spending funds |
+| cost | uint256 | is the cost of the expense |
+
 ### viewTaxRevenues
 
 ```solidity
 function viewTaxRevenues() public view returns (uint256)
 ```
+
+_this function will show the balance of warbucks within the contract
+when money is spent within the game it can be taxed an deposited within this contract_
 
 ### withdrawTaxRevenues
 
@@ -13725,11 +19273,17 @@ function viewTaxRevenues() public view returns (uint256)
 function withdrawTaxRevenues(uint256 amount) public
 ```
 
+_when money is spent within the game it can be taxed an deposited within this contract
+this function will allow the contract owner to withdraw the warbucks from this contract into the owners wallet_
+
 ### returnBalance
 
 ```solidity
 function returnBalance(uint256 id, uint256 cost) public
 ```
+
+_this function is only callable from the infrastructure contract
+this function will compensate a nation when they sell land, tech or infrastructure_
 
 ### onlyAidContract
 
@@ -13743,6 +19297,17 @@ modifier onlyAidContract()
 function sendAidBalance(uint256 idSender, uint256 idRecipient, uint256 amount) public
 ```
 
+_this function is only callable from the aid contract
+this function will send the balance in an aid package from the sender nation to the recipient nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| idSender | uint256 | is the sender of an aid package |
+| idRecipient | uint256 | is the recipient of an aid package |
+| amount | uint256 | is the amount of balance being included in the aid package |
+
 ### onlyGroundBattle
 
 ```solidity
@@ -13755,11 +19320,34 @@ modifier onlyGroundBattle()
 function transferSpoils(uint256 randomNumber, uint256 attackerId, uint256 defenderId) public
 ```
 
+_this function is only callable from the ground battle contract
+this function will transfer the balance lost in a ground battle to the winning nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| randomNumber | uint256 | is the amount of balance being transferred |
+| attackerId | uint256 | is the nation id of the attacking nation |
+| defenderId | uint256 | is the nation id of the defending nation |
+
 ### withdrawFunds
 
 ```solidity
 function withdrawFunds(uint256 amount, uint256 id) public
 ```
+
+this function allows a nation owner to withdraw funds from their nation
+
+_this function is only callable from a nation owner
+this function allows a nation owner to withdraw funds from their nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of funds being withdrawn |
+| id | uint256 | is the nation id of the nation withdrawing funds |
 
 ### addFunds
 
@@ -13767,11 +19355,29 @@ function withdrawFunds(uint256 amount, uint256 id) public
 function addFunds(uint256 amount, uint256 id) public
 ```
 
+this function allows a nation owner to add funds to their nation
+
+_this function is only callable from a nation owner
+this function allows a nation owner to add funds to their nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| amount | uint256 | is the amount of funds being added |
+| id | uint256 | is the nation id of the nation withdrawing funds |
+
 ### incrementDaysSince
 
 ```solidity
 function incrementDaysSince() external
 ```
+
+this function will increment the number of days since bills wre paid and taxes were collected
+if a nation does not pay thir bills for a set amount of time (default is 20 days) the nation will be put into inactive mode
+
+_ths function is only callable from the keeper contract
+this function will increment the number of days since bills wre paid and taxes were collected_
 
 ### setGameTaxRate
 
@@ -13779,11 +19385,22 @@ function incrementDaysSince() external
 function setGameTaxRate(uint256 newPercentage) public
 ```
 
+_this function allows the contract owner to set the tax rate in game purchases are taxed at
+the tax rate will be the % of the purchase price that is minted into this contract that can be withdrawn later_
+
 ### getGameTaxRate
 
 ```solidity
 function getGameTaxRate() public view returns (uint256)
 ```
+
+_this funtion will reuturn the game tax rate_
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 will be the tax rate at which purchases in the game are taxed at |
 
 ### setDaysToInactive
 
@@ -13791,11 +19408,32 @@ function getGameTaxRate() public view returns (uint256)
 function setDaysToInactive(uint256 newDays) public
 ```
 
+this function will allow the contract owner to set the number of days a nation cannot pay bill until it becomes inactive
+
+_this function is only callable from the contract owner
+this function will allow the contract owner to set the number of days a nation cannot pay bill until it becomes inactive_
+
 ### getDaysSinceLastTaxCollection
 
 ```solidity
 function getDaysSinceLastTaxCollection(uint256 id) public view returns (uint256)
 ```
+
+this funtion will return the number of days it has been since a nation has collected taxes
+
+_this funtion is a public view function that will return the number of days it has been since a nation has collected taxes_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of days since a nation has collected taxes |
 
 ### getDaysSinceLastBillsPaid
 
@@ -13803,11 +19441,43 @@ function getDaysSinceLastTaxCollection(uint256 id) public view returns (uint256)
 function getDaysSinceLastBillsPaid(uint256 id) public view returns (uint256)
 ```
 
+this funtion will return the number of days it has been since a nation has paid bills
+
+_this funtion is a public view function that will return the number of days it has been since a nation has paid bills_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the number of days since a nation has paid bills |
+
 ### checkBalance
 
 ```solidity
 function checkBalance(uint256 id) public view returns (uint256)
 ```
+
+this function will return a given nations in game balance
+
+_this is a public view function that will return a nations in game balance_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queries |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 is the balance of war bucks for the nation |
 
 ### transferBalance
 
@@ -13815,13 +19485,44 @@ function checkBalance(uint256 id) public view returns (uint256)
 function transferBalance(uint256 toId, uint256 fromId, uint256 amount) public
 ```
 
+_this function is only callable from the spy contract
+this function will allow the spy contract to transfer a nations balance to an attacking nation upon a successful spy attack_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| toId | uint256 | is the nation id of the nation recieving the balance (attacking nation) |
+| fromId | uint256 | is the nation id of the nation recieving the balance (receiving nation) |
+| amount | uint256 | is the amount of balance being transferred |
+
 ### checkInactive
 
 ```solidity
 function checkInactive(uint256 id) public view returns (bool)
 ```
 
+this function will retun if a nation is inactive
+
+_this is a public view function that will return if a nation is inactive_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation is inactive |
+
 ## WarContract
+
+this contact will allow a naion owner to declare war on another nation
+
+_this contract inherits from openzeppelin's ownable contract_
 
 ### warId
 
@@ -14106,11 +19807,16 @@ mapping(uint256 => uint256[]) idToOffensiveWars
 function settings(address _countryMinter, address _nationStrength, address _military, address _breakBlockadeAddress, address _navalAttackAddress, address _airBattleAddress, address _groundBattle, address _cruiseMissile, address _forces, address _wonders1, address _keeper) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### updateCountryMinterContract
 
 ```solidity
 function updateCountryMinterContract(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateNationStrengthContract
 
@@ -14118,11 +19824,15 @@ function updateCountryMinterContract(address newAddress) public
 function updateNationStrengthContract(address newAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateMilitaryContract
 
 ```solidity
 function updateMilitaryContract(address newAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### onlyCountryMinter
 
@@ -14142,11 +19852,26 @@ modifier onlyCruiseMissileContract()
 function declareWar(uint256 offenseId, uint256 defenseId) public
 ```
 
+this function allows a nation to declare war on another nation
+when war is declared the nations can attack each other
+a nation can only have a maximum of 4 offensive wars (5 with a foreign army base)
+
+_this function is only callable from a nation owner and allow a natio nto eclare war on another nation_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| offenseId | uint256 | is the nation id of the nation declaring war |
+| defenseId | uint256 | is the nation id of the nation having war declared on it |
+
 ### initializeDeployments
 
 ```solidity
 function initializeDeployments(uint256 _warId) internal
 ```
+
+_this is an internal function that will be balled by the declare war function and set up severla structs that will keep track of each war_
 
 ### checkStrength
 
@@ -14154,17 +19879,50 @@ function initializeDeployments(uint256 _warId) internal
 function checkStrength(uint256 offenseId, uint256 defenseId) public view returns (bool)
 ```
 
+this function will return a boolean value of true if the nations are able to fight eachother
+in order for a war to be declared the offense strength must be within 75% and 133% of the defending nation
+
+_this is a public view function that will return a boolean value if the nations are able to fight eachother_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| offenseId | uint256 | is the nation id of the aggressor nation |
+| defenseId | uint256 | if the nation id of the defending nation |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nations are within range where war is possible |
+
 ### offerPeace
 
 ```solidity
 function offerPeace(uint256 offerId, uint256 _warId) public
 ```
 
+this funtion will allow a nation involved in a war to offer peace
+if the offense and the defense offer peace then peace will be declares
+an attack will nullify any existing peace offers
+
+_this is a public function that will allow a nation involved in a war to offer peace_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| offerId | uint256 | is the nation offering peace |
+| _warId | uint256 | is the war id for the war where peace is being offered |
+
 ### removeActiveWar
 
 ```solidity
 function removeActiveWar(uint256 _warId) internal
 ```
+
+_this is an internal function that will remove the active war from each nation when peace is declared or the war expires_
 
 ### onlyKeeper
 
@@ -14178,11 +19936,21 @@ modifier onlyKeeper()
 function decrementWarDaysLeft() public
 ```
 
+wars expire after 7 days and will be removed from active wars when daysLeft reaches 0
+
+_this function is only callable from the keeper contract
+wars expire after 7 days and will be removed from active wars when daysLeft reaches 0_
+
 ### resetCruiseMissileLaunches
 
 ```solidity
 function resetCruiseMissileLaunches() public
 ```
+
+this function will reset cruise missile launches daily to 0
+a nation can only launch 2 cruise missiles per day per war
+
+_this function is only callable from the keeper contract_
 
 ### onlyNavyBattle
 
@@ -14196,11 +19964,17 @@ modifier onlyNavyBattle()
 function addNavyCasualties(uint256 _warId, uint256 nationId, uint256 navyCasualties) public
 ```
 
+_this function is only callable from the navy battle contract and will increment navy casualties_
+
 ### incrementCruiseMissileAttack
 
 ```solidity
 function incrementCruiseMissileAttack(uint256 _warId, uint256 nationId) public
 ```
+
+this function will only allow a nation to launch 2 cruise missiles per war per day
+
+_this function is only callable from the cruise missile contract and will only allow a nation to launch 2 cruise missiles per war per day_
 
 ### isWarActive
 
@@ -14208,11 +19982,42 @@ function incrementCruiseMissileAttack(uint256 _warId, uint256 nationId) public
 function isWarActive(uint256 _warId) public view returns (bool)
 ```
 
+this function will return whether a war is active or not
+
+_this is a public view function that will take a war id as a parameter and return whether the war is active or not_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _warId | uint256 | is the warId being queries |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the war is active |
+
 ### getInvolvedParties
 
 ```solidity
 function getInvolvedParties(uint256 _warId) public view returns (uint256, uint256)
 ```
+
+_this is a public view function that will return the two members f a given warId_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _warId | uint256 | is the warId of the war being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | offenseId is the nation id of the offensive nation in the war |
+| [1] | uint256 | defenseId is the nation id of the defensive nation in the war |
 
 ### isPeaceOffered
 
@@ -14220,11 +20025,30 @@ function getInvolvedParties(uint256 _warId) public view returns (uint256, uint25
 function isPeaceOffered(uint256 _warId) public view returns (bool)
 ```
 
+this function will return true if one of the nations has offered peace
+
+_this is a public view function that will return true if one of the nations has offered peace_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _warId | uint256 | is the war id of the war being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if one of the nation has offered peace |
+
 ### getDaysLeft
 
 ```solidity
 function getDaysLeft(uint256 _warId) public view returns (uint256)
 ```
+
+_this is a publci view function that will return the number of days left in a war
+wars expire after 7 days when days left == 0_
 
 ### getDeployedFightersLowStrength
 
@@ -14274,6 +20098,9 @@ function decrementLosses(uint256 _warId, uint256[] defenderLosses, uint256 defen
 function addAirBattleCasualties(uint256 _warId, uint256 nationId, uint256 battleCausalties) public
 ```
 
+_this function is only callable fro mthe air battle contract
+this function will increment air battle casualties_
+
 ### onlyForcesContract
 
 ```solidity
@@ -14286,11 +20113,31 @@ modifier onlyForcesContract()
 function deploySoldiers(uint256 nationId, uint256 _warId, uint256 amountToDeploy) public
 ```
 
+this function will allow a nation to deploy ground forces (soldiers and tanks) to a given war
+
+_this function is only callable from the forces contact_
+
 ### getDeployedGroundForces
 
 ```solidity
 function getDeployedGroundForces(uint256 _warId, uint256 attackerId) public view returns (uint256, uint256)
 ```
+
+_this is a public view function that will return the number of ground forces a nation has deploed to a war_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| _warId | uint256 | is the war id of the war where the forces are deployed |
+| attackerId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | soldiersDeployed is the soldiers the given nation has deployed to the given war |
+| [1] | uint256 | tanksDeployed is the tanks the given nation has deployed to the given war |
 
 ### onlyGroundBattle
 
@@ -14303,6 +20150,9 @@ modifier onlyGroundBattle()
 ```solidity
 function decreaseGroundBattleLosses(uint256 soldierLosses, uint256 tankLosses, uint256 attackerId, uint256 _warId) public
 ```
+
+_this function is only callable from the groun battle contract
+this function will increment ground forces casualties_
 
 ## WarBucks
 
@@ -14369,6 +20219,10 @@ function burnFromTreasury(address account, uint256 amount) external
 _This function can only be called from the treasury contract_
 
 ## WondersContract1
+
+this contract will strore information about a nations wonders
+
+_this contract inherits from openzeppelin's ownable contract_
 
 ### treasuryAddress
 
@@ -14521,11 +20375,16 @@ modifier onlyCountryMinter()
 function settings(address _treasuryAddress, address _wonderContract2Address, address _wonderContract3Address, address _wonderContract4Address, address _infrastructureAddress, address _countryMinter) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### updateTreasuryAddress
 
 ```solidity
 function updateTreasuryAddress(address _newTreasuryAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateWondersAddresses
 
@@ -14533,11 +20392,15 @@ function updateTreasuryAddress(address _newTreasuryAddress) public
 function updateWondersAddresses(address _wonderContract2Address, address _wonderContract3Address, address _wonderContract4Address) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateInfrastructureAddresses
 
 ```solidity
 function updateInfrastructureAddresses(address _infrastructureAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### getWonderCount
 
@@ -14545,11 +20408,30 @@ function updateInfrastructureAddresses(address _infrastructureAddress) public
 function getWonderCount(uint256 id) public view returns (uint256 count)
 ```
 
+this function will return the number of wonders a given nation owns
+
+_this is a public view function that will return the number of wonders a given nation owns_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| count | uint256 | is the number of wonder a given nation owns |
+
 ### addWonderCount
 
 ```solidity
 function addWonderCount(uint256 id) public
 ```
+
+_this function is only callable from other wonder contracts
+this function will increment the number of wonders a nation owns when a wonder is purchased in another contract_
 
 ### subtractWonderCount
 
@@ -14557,11 +20439,18 @@ function addWonderCount(uint256 id) public
 function subtractWonderCount(uint256 id) public
 ```
 
+_this function is only callable from other wonder contracts
+this function will decremeny the number of wonders a nation owns when a wonder is deleted in another contract_
+
 ### generateWonders1
 
 ```solidity
 function generateWonders1(uint256 id) public
 ```
+
+this function will be called when a nation is minted and allow a nation to buy the wonders in this contract
+
+_this function is only callable from the country minter contract_
 
 ### updateAgricultureDevelopmentCost
 
@@ -14569,11 +20458,15 @@ function generateWonders1(uint256 id) public
 function updateAgricultureDevelopmentCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateAntiAirDefenseNetworkCost
 
 ```solidity
 function updateAntiAirDefenseNetworkCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateCentralIntelligenceAgencyCost
 
@@ -14581,11 +20474,15 @@ function updateAntiAirDefenseNetworkCost(uint256 newPrice) public
 function updateCentralIntelligenceAgencyCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateDisasterReliefAgencyCost
 
 ```solidity
 function updateDisasterReliefAgencyCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateEmpWeaponizationCost
 
@@ -14593,11 +20490,15 @@ function updateDisasterReliefAgencyCost(uint256 newPrice) public
 function updateEmpWeaponizationCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateFalloutShelterSystemCost
 
 ```solidity
 function updateFalloutShelterSystemCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateFederalAidCommissionCost
 
@@ -14605,11 +20506,15 @@ function updateFalloutShelterSystemCost(uint256 newPrice) public
 function updateFederalAidCommissionCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateFederalReserveCost
 
 ```solidity
 function updateFederalReserveCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateForeignAirForceBaseCost
 
@@ -14617,11 +20522,15 @@ function updateFederalReserveCost(uint256 newPrice) public
 function updateForeignAirForceBaseCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateForeignArmyBaseCost
 
 ```solidity
 function updateForeignArmyBaseCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateForeignNavalBaseCost
 
@@ -14629,11 +20538,20 @@ function updateForeignArmyBaseCost(uint256 newPrice) public
 function updateForeignNavalBaseCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### buyWonder1
 
 ```solidity
 function buyWonder1(uint256 countryId, uint256 wonderId) public
 ```
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 |  |
+| wonderId | uint256 | is the id of the wonder 1. agricultrual development program 2. air defense network 3. central intelligence agency 4. disaster relief agency 5. emp weaponization 6. fallout shelter system  7. federal aid commission 8. federal reserve 9. foreign air force base 10. foreign army base 11. foreign naval base |
 
 ### deleteWonder1
 
@@ -14641,11 +20559,33 @@ function buyWonder1(uint256 countryId, uint256 wonderId) public
 function deleteWonder1(uint256 countryId, uint256 wonderId) public
 ```
 
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 |  |
+| wonderId | uint256 | is the id of the wonder 1. agricultrual development program 2. air defense network 3. central intelligence agency 4. disaster relief agency 5. emp weaponization 6. fallout shelter system  7. federal aid commission 8. federal reserve 9. foreign air force base 10. foreign army base 11. foreign naval base |
+
 ### getAgriculturalDevelopmentProgram
 
 ```solidity
 function getAgriculturalDevelopmentProgram(uint256 id) public view returns (bool)
 ```
+
+_this is a public view function that will return true if a nation has the agriculture development program wonder
+this function will return true if a nation has the agriculture development program wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
 
 ### getAntiAirDefenseNewtwork
 
@@ -14653,11 +20593,41 @@ function getAgriculturalDevelopmentProgram(uint256 id) public view returns (bool
 function getAntiAirDefenseNewtwork(uint256 id) public view returns (bool)
 ```
 
+_this is a public view function that will return true if a nation has the anti air defense network wonder
+this function will return true if a nation has the anti air defense network wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
+
 ### getCentralIntelligenceAgency
 
 ```solidity
 function getCentralIntelligenceAgency(uint256 id) public view returns (bool)
 ```
+
+_this is a public view function that will return true if a nation has the central intelligence agency wonder
+this function will return true if a nation has the central intelligence agency wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
 
 ### getDisasterReliefAgency
 
@@ -14665,11 +20635,41 @@ function getCentralIntelligenceAgency(uint256 id) public view returns (bool)
 function getDisasterReliefAgency(uint256 id) public view returns (bool)
 ```
 
+_this is a public view function that will return true if a nation has the disaster relief agency wonder
+this function will return true if a nation has the disaster relief agency wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
+
 ### getEmpWeaponization
 
 ```solidity
 function getEmpWeaponization(uint256 id) public view returns (bool)
 ```
+
+_this is a public view function that will return true if a nation has the emp weaponization wonder
+this function will return true if a nation has the emp weaponization wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
 
 ### getFalloutShelterSystem
 
@@ -14677,11 +20677,41 @@ function getEmpWeaponization(uint256 id) public view returns (bool)
 function getFalloutShelterSystem(uint256 id) public view returns (bool)
 ```
 
+_this is a public view function that will return true if a nation has the fallout shelter system wonder
+this function will return true if a nation has the fallout shelter system wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
+
 ### getFederalAidComission
 
 ```solidity
 function getFederalAidComission(uint256 id) public view returns (bool)
 ```
+
+_this is a public view function that will return true if a nation has the federal aig commission wonder
+this function will return true if a nation has the federal aig commission wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
 
 ### getFederalReserve
 
@@ -14689,11 +20719,41 @@ function getFederalAidComission(uint256 id) public view returns (bool)
 function getFederalReserve(uint256 id) public view returns (bool)
 ```
 
+_this is a public view function that will return true if a nation has the federal reserve wonder
+this function will return true if a nation has the federal reserve wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
+
 ### getForeignAirforceBase
 
 ```solidity
 function getForeignAirforceBase(uint256 id) public view returns (bool)
 ```
+
+_this is a public view function that will return true if a nation has the foreign air force base wonder
+this function will return true if a nation has the foreign air force base wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
 
 ### getForeignArmyBase
 
@@ -14701,11 +20761,41 @@ function getForeignAirforceBase(uint256 id) public view returns (bool)
 function getForeignArmyBase(uint256 id) public view returns (bool)
 ```
 
+_this is a public view function that will return true if a nation has the foreign army base wonder
+this function will return true if a nation has the foreign army base wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
+
 ### getForeignNavalBase
 
 ```solidity
 function getForeignNavalBase(uint256 id) public view returns (bool)
 ```
+
+_this is a public view function that will return true if a nation has the foreign naval base wonder
+this function will return true if a nation has the foreign naval base wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
 
 ### getWonderCosts1
 
@@ -14713,7 +20803,13 @@ function getForeignNavalBase(uint256 id) public view returns (bool)
 function getWonderCosts1() public view returns (uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256)
 ```
 
+_this function will return the costs of the wonders in this contract_
+
 ## WondersContract2
+
+this contract will strore information about a nations wonders
+
+_this contract inherits from openzeppelin's ownable contract_
 
 ### treasuryAddress
 
@@ -14839,11 +20935,16 @@ mapping(uint256 => struct WondersContract2.Wonders2) idToWonders2
 function settings(address _treasury, address _infrastructure, address _wonders1, address _wonders3, address _wonders4, address _countryMinter) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### updateTreasuryAddress
 
 ```solidity
 function updateTreasuryAddress(address _newTreasuryAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateWonderContract1Address
 
@@ -14851,11 +20952,15 @@ function updateTreasuryAddress(address _newTreasuryAddress) public
 function updateWonderContract1Address(address _wonderContract1Address) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateWonderContract3Address
 
 ```solidity
 function updateWonderContract3Address(address _wonderContract3Address) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateWonderContract4Address
 
@@ -14863,11 +20968,15 @@ function updateWonderContract3Address(address _wonderContract3Address) public
 function updateWonderContract4Address(address _wonderContract4Address) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateInfrastructureAddress
 
 ```solidity
 function updateInfrastructureAddress(address _infrastructureAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### onlyCountryMinter
 
@@ -14881,11 +20990,17 @@ modifier onlyCountryMinter()
 function generateWonders2(uint256 id) public
 ```
 
+this function will be called when a nation is minted and allow a nation to buy the wonders in this contract
+
+_this function is only callable from the country minter contract_
+
 ### updateGreatMonumentCost
 
 ```solidity
 function updateGreatMonumentCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateGreatTempleCost
 
@@ -14893,11 +21008,15 @@ function updateGreatMonumentCost(uint256 newPrice) public
 function updateGreatTempleCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateGreatUniversityCost
 
 ```solidity
 function updateGreatUniversityCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateHiddenNuclearMissileSiloCost
 
@@ -14905,11 +21024,15 @@ function updateGreatUniversityCost(uint256 newPrice) public
 function updateHiddenNuclearMissileSiloCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateInterceptorMissileSystemCost
 
 ```solidity
 function updateInterceptorMissileSystemCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateInternetCost
 
@@ -14917,11 +21040,15 @@ function updateInterceptorMissileSystemCost(uint256 newPrice) public
 function updateInternetCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateInterstateSystemCost
 
 ```solidity
 function updateInterstateSystemCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateManhattanProjectCost
 
@@ -14929,11 +21056,15 @@ function updateInterstateSystemCost(uint256 newPrice) public
 function updateManhattanProjectCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateMiningIndustryConsortiumCost
 
 ```solidity
 function updateMiningIndustryConsortiumCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### buyWonder2
 
@@ -14941,11 +21072,25 @@ function updateMiningIndustryConsortiumCost(uint256 newPrice) public
 function buyWonder2(uint256 countryId, uint256 wonderId) public
 ```
 
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 |  |
+| wonderId | uint256 | is the id of the wonder 1. great monumnet 2. great temple 3. great university 4. hidden nuclear missile silo 5. interceptor missile system 6. internat 7. interstate system 8. manhattan project 9. minimg industry consortium |
+
 ### deleteWonder2
 
 ```solidity
 function deleteWonder2(uint256 countryId, uint256 wonderId) public
 ```
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 |  |
+| wonderId | uint256 | is the id of the wonder 1. great monumnet 2. great temple 3. great university 4. hidden nuclear missile silo 5. interceptor missile system 6. internat 7. interstate system 8. manhattan project 9. minimg industry consortium |
 
 ### getGreatMonument
 
@@ -14953,11 +21098,41 @@ function deleteWonder2(uint256 countryId, uint256 wonderId) public
 function getGreatMonument(uint256 id) public view returns (bool)
 ```
 
+_this is a public view function that will return true if a nation has the great monument wonder
+this function will return true if a nation has the great monument wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
+
 ### getGreatTemple
 
 ```solidity
 function getGreatTemple(uint256 id) public view returns (bool)
 ```
+
+_this is a public view function that will return true if a nation has the great temple wonder
+this function will return true if a nation has the great temple wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| id | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
 
 ### getGreatUniversity
 
@@ -14965,11 +21140,41 @@ function getGreatTemple(uint256 id) public view returns (bool)
 function getGreatUniversity(uint256 countryId) public view returns (bool)
 ```
 
+_this is a public view function that will return true if a nation has the great university wonder
+this function will return true if a nation has the great university wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
+
 ### getHiddenNuclearMissileSilo
 
 ```solidity
 function getHiddenNuclearMissileSilo(uint256 countryId) public view returns (bool)
 ```
+
+_this is a public view function that will return true if a nation has the hidden nuclear missile silo wonder
+this function will return true if a nation has the hidden nuclear missile silo wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
 
 ### getInterceptorMissileSystem
 
@@ -14977,11 +21182,41 @@ function getHiddenNuclearMissileSilo(uint256 countryId) public view returns (boo
 function getInterceptorMissileSystem(uint256 countryId) public view returns (bool)
 ```
 
+_this is a public view function that will return true if a nation has the intereptor missile system wonder
+this function will return true if a nation has the intereptor missile system wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
+
 ### getInternet
 
 ```solidity
 function getInternet(uint256 countryId) public view returns (bool)
 ```
+
+_this is a public view function that will return true if a nation has the internet wonder
+this function will return true if a nation has the internet wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
 
 ### getInterstateSystem
 
@@ -14989,11 +21224,41 @@ function getInternet(uint256 countryId) public view returns (bool)
 function getInterstateSystem(uint256 countryId) public view returns (bool)
 ```
 
+_this is a public view function that will return true if a nation has the interstate system wonder
+this function will return true if a nation has the interstate system wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
+
 ### getManhattanProject
 
 ```solidity
 function getManhattanProject(uint256 countryId) public view returns (bool)
 ```
+
+_this is a public view function that will return true if a nation has the manhattan project wonder
+this function will return true if a nation has the manhattan project wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
 
 ### getMiningIndustryConsortium
 
@@ -15001,13 +21266,34 @@ function getManhattanProject(uint256 countryId) public view returns (bool)
 function getMiningIndustryConsortium(uint256 countryId) public view returns (bool)
 ```
 
+_this is a public view function that will return true if a nation has the mining industry consortium wonder
+this function will return true if a nation has the mining industry consortium wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
+
 ### getWonderCosts2
 
 ```solidity
 function getWonderCosts2() public view returns (uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256)
 ```
 
+_this function will return the costs of the wonders in this contract_
+
 ## WondersContract3
+
+this contract will strore information about a nations wonders
+
+_this contract inherits from openzeppelin's ownable contract_
 
 ### treasuryAddress
 
@@ -15145,11 +21431,16 @@ mapping(uint256 => struct WondersContract3.Wonders3) idToWonders3
 function settings(address _treasuryAddress, address _infrastructureAddress, address _forces, address _wonders1, address _wonders2, address _wonders4, address _countryMinter) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### updateTreasuryAddress
 
 ```solidity
 function updateTreasuryAddress(address _newTreasuryAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateInfrastructureAddress
 
@@ -15157,11 +21448,15 @@ function updateTreasuryAddress(address _newTreasuryAddress) public
 function updateInfrastructureAddress(address _newInfrastructureAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateWonderContract1Address
 
 ```solidity
 function updateWonderContract1Address(address _wonderContract1Address) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateWonderContract2Address
 
@@ -15169,11 +21464,15 @@ function updateWonderContract1Address(address _wonderContract1Address) public
 function updateWonderContract2Address(address _wonderContract2Address) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateWonderContract4Address
 
 ```solidity
 function updateWonderContract4Address(address _wonderContract4Address) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### onlyCountryMinter
 
@@ -15187,11 +21486,17 @@ modifier onlyCountryMinter()
 function generateWonders3(uint256 id) public
 ```
 
+this function will be called when a nation is minted and allow a nation to buy the wonders in this contract
+
+_this function is only callable from the country minter contract_
+
 ### updateMovieIndustryCost
 
 ```solidity
 function updateMovieIndustryCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateNationalCemetaryCost
 
@@ -15199,11 +21504,15 @@ function updateMovieIndustryCost(uint256 newPrice) public
 function updateNationalCemetaryCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateNationalEnvironmentOfficeCost
 
 ```solidity
 function updateNationalEnvironmentOfficeCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateNationalResearchLabCost
 
@@ -15211,11 +21520,15 @@ function updateNationalEnvironmentOfficeCost(uint256 newPrice) public
 function updateNationalResearchLabCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateNationalWarMemorialCost
 
 ```solidity
 function updateNationalWarMemorialCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateNuclearPowerPlantCost
 
@@ -15223,11 +21536,15 @@ function updateNationalWarMemorialCost(uint256 newPrice) public
 function updateNuclearPowerPlantCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updatePentagonCost
 
 ```solidity
 function updatePentagonCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updatePoliticalLobbyistsCost
 
@@ -15235,11 +21552,15 @@ function updatePentagonCost(uint256 newPrice) public
 function updatePoliticalLobbyistsCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateScientificDevelopmentCenterCost
 
 ```solidity
 function updateScientificDevelopmentCenterCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### buyWonder3
 
@@ -15247,11 +21568,25 @@ function updateScientificDevelopmentCenterCost(uint256 newPrice) public
 function buyWonder3(uint256 countryId, uint256 wonderId) public
 ```
 
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 |  |
+| wonderId | uint256 | is the id of the wonder 1. movie industry 2. national cemetary 3. national environmental office 4. national research lab 5. national war memorial 6. nuclear power plant 7. pentagon 8. political lobbyists 9. scientific development center |
+
 ### deleteWonder3
 
 ```solidity
 function deleteWonder3(uint256 countryId, uint256 wonderId) public
 ```
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 |  |
+| wonderId | uint256 | is the id of the wonder 1. movie industry 2. national cemetary 3. national environmental office 4. national research lab 5. national war memorial 6. nuclear power plant 7. pentagon 8. political lobbyists 9. scientific development center |
 
 ### getMovieIndustry
 
@@ -15259,11 +21594,41 @@ function deleteWonder3(uint256 countryId, uint256 wonderId) public
 function getMovieIndustry(uint256 countryId) public view returns (bool)
 ```
 
+_this is a public view function that will return true if a nation has the movie industry wonder
+this function will return true if a nation has the movie industry wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
+
 ### getNationalCemetary
 
 ```solidity
 function getNationalCemetary(uint256 countryId) public view returns (bool)
 ```
+
+_this is a public view function that will return true if a nation has the national cemetary wonder
+this function will return true if a nation has the national cemetary wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
 
 ### getNationalEnvironmentOffice
 
@@ -15271,11 +21636,41 @@ function getNationalCemetary(uint256 countryId) public view returns (bool)
 function getNationalEnvironmentOffice(uint256 countryId) public view returns (bool)
 ```
 
+_this is a public view function that will return true if a nation has the national environmental office wonder
+this function will return true if a nation has the national environmental office wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
+
 ### getNationalResearchLab
 
 ```solidity
 function getNationalResearchLab(uint256 countryId) public view returns (bool)
 ```
+
+_this is a public view function that will return true if a nation has the national research lab wonder
+this function will return true if a nation has the national research lab wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
 
 ### getNationalWarMemorial
 
@@ -15283,11 +21678,41 @@ function getNationalResearchLab(uint256 countryId) public view returns (bool)
 function getNationalWarMemorial(uint256 countryId) public view returns (bool)
 ```
 
+_this is a public view function that will return true if a nation has the national war memorial wonder
+this function will return true if a nation has the national war memorial wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
+
 ### getNuclearPowerPlant
 
 ```solidity
 function getNuclearPowerPlant(uint256 countryId) public view returns (bool)
 ```
+
+_this is a public view function that will return true if a nation has the nuclear power plant wonder
+this function will return true if a nation has the nuclear power plant wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
 
 ### getPentagon
 
@@ -15295,11 +21720,41 @@ function getNuclearPowerPlant(uint256 countryId) public view returns (bool)
 function getPentagon(uint256 countryId) public view returns (bool)
 ```
 
+_this is a public view function that will return true if a nation has the pentagon wonder
+this function will return true if a nation has the pentagon wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
+
 ### getPoliticalLobbyists
 
 ```solidity
 function getPoliticalLobbyists(uint256 countryId) public view returns (bool)
 ```
+
+_this is a public view function that will return true if a nation has the political lobbyists wonder
+this function will return true if a nation has the political lobbyists wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
 
 ### getScientificDevelopmentCenter
 
@@ -15307,13 +21762,34 @@ function getPoliticalLobbyists(uint256 countryId) public view returns (bool)
 function getScientificDevelopmentCenter(uint256 countryId) public view returns (bool)
 ```
 
+_this is a public view function that will return true if a nation has the scientific development center wonder
+this function will return true if a nation has the scientific development center wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
+
 ### getWonderCosts3
 
 ```solidity
 function getWonderCosts3() public view returns (uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256, uint256)
 ```
 
+_this function will return the costs of the wonders in this contract_
+
 ## WondersContract4
+
+this contract will strore information about a nations wonders
+
+_this contract inherits from openzeppelin's ownable contract_
 
 ### treasuryAddress
 
@@ -15437,11 +21913,16 @@ mapping(uint256 => struct WondersContract4.Wonders4) idToWonders4
 function settings(address _treasuryAddress, address _improvementsContract2Address, address _improvementsContract3Address, address _improvementsContract4Address, address _infrastructureAddress, address _wonders1, address _wonders3, address _countryMinter) public
 ```
 
+_this function is only callable by the contract owner
+this function will be called immediately after contract deployment in order to set contract pointers_
+
 ### updateTreasuryAddress
 
 ```solidity
 function updateTreasuryAddress(address _newTreasuryAddress) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateWonderContract1Address
 
@@ -15449,11 +21930,15 @@ function updateTreasuryAddress(address _newTreasuryAddress) public
 function updateWonderContract1Address(address _wonderContract1Address) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateWonderContract3Address
 
 ```solidity
 function updateWonderContract3Address(address _wonderContract3Address) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateInfrastructureAddress
 
@@ -15461,11 +21946,15 @@ function updateWonderContract3Address(address _wonderContract3Address) public
 function updateInfrastructureAddress(address _infrastructureAddress) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateImprovementContractAddresses
 
 ```solidity
 function updateImprovementContractAddresses(address _improvementsContract2Address, address _improvementsContract3Address) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### onlyCountryMinter
 
@@ -15479,11 +21968,17 @@ modifier onlyCountryMinter()
 function generateWonders4(uint256 id) public
 ```
 
+this function will be called when a nation is minted and allow a nation to buy the wonders in this contract
+
+_this function is only callable from the country minter contract_
+
 ### updateSocialSecuritySystemCost
 
 ```solidity
 function updateSocialSecuritySystemCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateSpaceProgramCost
 
@@ -15491,11 +21986,15 @@ function updateSocialSecuritySystemCost(uint256 newPrice) public
 function updateSpaceProgramCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateStockMarketCost
 
 ```solidity
 function updateStockMarketCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateStrategicDefenseInitiativeCost
 
@@ -15503,11 +22002,15 @@ function updateStockMarketCost(uint256 newPrice) public
 function updateStrategicDefenseInitiativeCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateSuperiorLogisticalSupportCost
 
 ```solidity
 function updateSuperiorLogisticalSupportCost(uint256 newPrice) public
 ```
+
+_this function is only callable by the contract owner_
 
 ### updateUniversalHealthcareCost
 
@@ -15515,17 +22018,28 @@ function updateSuperiorLogisticalSupportCost(uint256 newPrice) public
 function updateUniversalHealthcareCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### updateWeaponsResearchCenterCost
 
 ```solidity
 function updateWeaponsResearchCenterCost(uint256 newPrice) public
 ```
 
+_this function is only callable by the contract owner_
+
 ### buyWonder4
 
 ```solidity
 function buyWonder4(uint256 countryId, uint256 wonderId) public
 ```
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 |  |
+| wonderId | uint256 | is the id of the wonder 1. social security system 2. space program 3. stock market 4. strategic defense initiative 5. superior logistical support 6. universal healthcare 7. weapons research center |
 
 ### deleteWonder4
 
@@ -15539,11 +22053,41 @@ function deleteWonder4(uint256 countryId, uint256 wonderId) public
 function getSocialSecuritySystem(uint256 countryId) public view returns (bool)
 ```
 
+_this is a public view function that will return true if a nation has the social security system wonder
+this function will return true if a nation has the social security system wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
+
 ### getSpaceProgram
 
 ```solidity
 function getSpaceProgram(uint256 countryId) public view returns (bool)
 ```
+
+_this is a public view function that will return true if a nation has the space program wonder
+this function will return true if a nation has the space program wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
 
 ### getStockMarket
 
@@ -15551,11 +22095,41 @@ function getSpaceProgram(uint256 countryId) public view returns (bool)
 function getStockMarket(uint256 countryId) public view returns (bool)
 ```
 
+_this is a public view function that will return true if a nation has the stock market wonder
+this function will return true if a nation has the stock market wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
+
 ### getStrategicDefenseInitiative
 
 ```solidity
 function getStrategicDefenseInitiative(uint256 countryId) public view returns (bool)
 ```
+
+_this is a public view function that will return true if a nation has the strategic defense initiative wonder
+this function will return true if a nation has the strategic defense initiative wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
 
 ### getSuperiorLogisticalSupport
 
@@ -15563,11 +22137,41 @@ function getStrategicDefenseInitiative(uint256 countryId) public view returns (b
 function getSuperiorLogisticalSupport(uint256 countryId) public view returns (bool)
 ```
 
+_this is a public view function that will return true if a nation has the superior logistical support wonder
+this function will return true if a nation has the superior logistical support wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
+
 ### getUniversalHealthcare
 
 ```solidity
 function getUniversalHealthcare(uint256 countryId) public view returns (bool)
 ```
+
+_this is a public view function that will return true if a nation has the universal healthcare wonder
+this function will return true if a nation has the universal healthcare wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
 
 ### getWeaponsResearchCenter
 
@@ -15575,16 +22179,33 @@ function getUniversalHealthcare(uint256 countryId) public view returns (bool)
 function getWeaponsResearchCenter(uint256 countryId) public view returns (bool)
 ```
 
+_this is a public view function that will return true if a nation has the weapons research center wonder
+this function will return true if a nation has the weapons research center wonder_
+
+#### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| countryId | uint256 | is the nation id of the nation being queried |
+
+#### Return Values
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | bool | bool will be true if the nation has the wonder |
+
 ### getWonderCosts4
 
 ```solidity
 function getWonderCosts4() public view returns (uint256, uint256, uint256, uint256, uint256, uint256, uint256)
 ```
 
+_this function will return the costs of the wonders in this contract_
+
 ## MetaNationsGovToken
 
 This token will be spent to purchase your nation NFT
-This token is spent at the amount equivalent cost in USDC to the seed money of the nation (initiallt 2,000,000 WarBucks)
+This token is spent at the amount equivalent cost in USDC to the seed money of the nation
 
 ### constructor
 
