@@ -9,6 +9,10 @@ import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
+///@title WondersContract1
+///@author OxSnosh
+///@dev this contract inherits from openzeppelin's ownable contract
+///@notice this contract will strore information about a nations wonders
 contract WondersContract1 is Ownable {
     address public treasuryAddress;
     address public wondersContract2Address;
@@ -122,6 +126,8 @@ contract WondersContract1 is Ownable {
         _;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
         address _treasuryAddress,
         address _wonderContract2Address,
@@ -139,12 +145,14 @@ contract WondersContract1 is Ownable {
         mint = CountryMinter(_countryMinter);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateTreasuryAddress(
         address _newTreasuryAddress
     ) public onlyOwner {
         treasuryAddress = _newTreasuryAddress;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWondersAddresses(
         address _wonderContract2Address,
         address _wonderContract3Address,
@@ -155,25 +163,36 @@ contract WondersContract1 is Ownable {
         wondersContract4Address = _wonderContract4Address;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateInfrastructureAddresses(
         address _infrastructureAddress
     ) public onlyOwner {
         infrastructureAddress = _infrastructureAddress;
     }
 
+    ///@dev this is a public view function that will return the number of wonders a given nation owns
+    ///@notice this function will return the number of wonders a given nation owns
+    ///@param id is the nation id of the nation being queried
+    ///@return count is the number of wonder a given nation owns
     function getWonderCount(uint256 id) public view returns (uint256 count) {
         count = idToWonders1[id].wonderCount;
         return count;
     }
 
+    ///@dev this function is only callable from other wonder contracts
+    ///@dev this function will increment the number of wonders a nation owns when a wonder is purchased in another contract
     function addWonderCount(uint256 id) public approvedAddress {
         idToWonders1[id].wonderCount += 1;
     }
 
+    ///@dev this function is only callable from other wonder contracts
+    ///@dev this function will decremeny the number of wonders a nation owns when a wonder is deleted in another contract
     function subtractWonderCount(uint256 id) public approvedAddress {
         idToWonders1[id].wonderCount -= 1;
     }
 
+    ///@dev this function is only callable from the country minter contract
+    ///@notice this function will be called when a nation is minted and allow a nation to buy the wonders in this contract
     function generateWonders1(uint256 id) public onlyCountryMinter {
         Wonders1 memory newWonders1 = Wonders1(
             0,
@@ -192,56 +211,84 @@ contract WondersContract1 is Ownable {
         idToWonders1[id] = newWonders1;
     }
 
+    
+    ///@dev this function is only callable by the contract owner
     function updateAgricultureDevelopmentCost(
         uint256 newPrice
     ) public onlyOwner {
         agricultureDevelopmentCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateAntiAirDefenseNetworkCost(
         uint256 newPrice
     ) public onlyOwner {
         antiAirDefenseNetworkCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateCentralIntelligenceAgencyCost(
         uint256 newPrice
     ) public onlyOwner {
         centralIntelligenceAgencyCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateDisasterReliefAgencyCost(uint256 newPrice) public onlyOwner {
         disasterReliefAgencyCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateEmpWeaponizationCost(uint256 newPrice) public onlyOwner {
         empWeaponizationCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateFalloutShelterSystemCost(uint256 newPrice) public onlyOwner {
         falloutShelterSystemCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateFederalAidCommissionCost(uint256 newPrice) public onlyOwner {
         federalAidCommissionCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateFederalReserveCost(uint256 newPrice) public onlyOwner {
         federalReserveCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateForeignAirForceBaseCost(uint256 newPrice) public onlyOwner {
         foreignAirForceBaseCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateForeignArmyBaseCost(uint256 newPrice) public onlyOwner {
         foreignArmyBaseCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateForeignNavalBaseCost(uint256 newPrice) public onlyOwner {
         foreignNavalBaseCost = newPrice;
     }
 
+    ///@dev this function is only callable from a nation owner and allows a nation to purchase the wonders in this contract
+    ///@notice this function allows a nation owner to purchase the wonders in this contract
+    ///@param countryId is the nationId of the country purchasing a wonder
+    /**@param wonderId is the id of the wonder
+     * 1. agricultrual development program
+     * 2. air defense network
+     * 3. central intelligence agency
+     * 4. disaster relief agency
+     * 5. emp weaponization
+     * 6. fallout shelter system 
+     * 7. federal aid commission
+     * 8. federal reserve
+     * 9. foreign air force base
+     * 10. foreign army base
+     * 11. foreign naval base
+    */
     function buyWonder1(uint256 countryId, uint256 wonderId) public {
         bool isOwner = mint.checkOwnership(countryId, msg.sender);
         require(isOwner, "!nation owner");
@@ -430,6 +477,23 @@ contract WondersContract1 is Ownable {
         }
     }
 
+    ///@dev this function will allow a nation owner to delete a wonder
+    ///@dev this function is only callable by a nation owner
+    ///@notice this funtion will allow a nation owner to delete a wonder
+    ///@param countryId is the nation deleting the woner
+    /**@param wonderId is the id of the wonder
+     * 1. agricultrual development program
+     * 2. air defense network
+     * 3. central intelligence agency
+     * 4. disaster relief agency
+     * 5. emp weaponization
+     * 6. fallout shelter system 
+     * 7. federal aid commission
+     * 8. federal reserve
+     * 9. foreign air force base
+     * 10. foreign army base
+     * 11. foreign naval base
+    */
     function deleteWonder1(uint256 countryId, uint256 wonderId) public {
         bool isOwner = mint.checkOwnership(countryId, msg.sender);
         require(isOwner, "!nation owner");
@@ -494,54 +558,99 @@ contract WondersContract1 is Ownable {
         }
     }
 
+    ///@dev this is a public view function that will return true if a nation has the agriculture development program wonder
+    ///@dev this function will return true if a nation has the agriculture development program wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getAgriculturalDevelopmentProgram(
         uint256 id
     ) public view returns (bool) {
         return idToWonders1[id].agricultureDevelopmentProgram;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the anti air defense network wonder
+    ///@dev this function will return true if a nation has the anti air defense network wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getAntiAirDefenseNewtwork(uint256 id) public view returns (bool) {
         return idToWonders1[id].antiAirDefenseNetwork;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the central intelligence agency wonder
+    ///@dev this function will return true if a nation has the central intelligence agency wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getCentralIntelligenceAgency(
         uint256 id
     ) public view returns (bool) {
         return idToWonders1[id].centralIntelligenceAgency;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the disaster relief agency wonder
+    ///@dev this function will return true if a nation has the disaster relief agency wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getDisasterReliefAgency(uint256 id) public view returns (bool) {
         return idToWonders1[id].disasterReliefAgency;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the emp weaponization wonder
+    ///@dev this function will return true if a nation has the emp weaponization wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getEmpWeaponization(uint256 id) public view returns (bool) {
         return idToWonders1[id].empWeaponization;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the fallout shelter system wonder
+    ///@dev this function will return true if a nation has the fallout shelter system wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getFalloutShelterSystem(uint256 id) public view returns (bool) {
         return idToWonders1[id].falloutShelterSystem;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the federal aig commission wonder
+    ///@dev this function will return true if a nation has the federal aig commission wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getFederalAidComission(uint256 id) public view returns (bool) {
         return idToWonders1[id].federalAidCommission;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the federal reserve wonder
+    ///@dev this function will return true if a nation has the federal reserve wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getFederalReserve(uint256 id) public view returns (bool) {
         return idToWonders1[id].federalReserve;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the foreign air force base wonder
+    ///@dev this function will return true if a nation has the foreign air force base wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getForeignAirforceBase(uint256 id) public view returns (bool) {
         return idToWonders1[id].foreignAirForceBase;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the foreign army base wonder
+    ///@dev this function will return true if a nation has the foreign army base wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getForeignArmyBase(uint256 id) public view returns (bool) {
         return idToWonders1[id].foreignArmyBase;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the foreign naval base wonder
+    ///@dev this function will return true if a nation has the foreign naval base wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getForeignNavalBase(uint256 id) public view returns (bool) {
         return idToWonders1[id].foreignNavalBase;
     }
 
+    ///@dev this function will return the costs of the wonders in this contract
     function getWonderCosts1()
         public
         view
@@ -575,6 +684,10 @@ contract WondersContract1 is Ownable {
     }
 }
 
+///@title WondersContract2
+///@author OxSnosh
+///@dev this contract inherits from openzeppelin's ownable contract
+///@notice this contract will strore information about a nations wonders
 contract WondersContract2 is Ownable {
     address public treasuryAddress;
     address public infrastructureAddress;
@@ -647,6 +760,8 @@ contract WondersContract2 is Ownable {
 
     mapping(uint256 => Wonders2) public idToWonders2;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
         address _treasury,
         address _infrastructure,
@@ -664,30 +779,35 @@ contract WondersContract2 is Ownable {
         mint = CountryMinter(_countryMinter);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateTreasuryAddress(
         address _newTreasuryAddress
     ) public onlyOwner {
         treasuryAddress = _newTreasuryAddress;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWonderContract1Address(
         address _wonderContract1Address
     ) public onlyOwner {
         wonderContract1Address = _wonderContract1Address;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWonderContract3Address(
         address _wonderContract3Address
     ) public onlyOwner {
         wonderContract3Address = _wonderContract3Address;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWonderContract4Address(
         address _wonderContract4Address
     ) public onlyOwner {
         wonderContract4Address = _wonderContract4Address;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateInfrastructureAddress(
         address _infrastructureAddress
     ) public onlyOwner {
@@ -702,6 +822,8 @@ contract WondersContract2 is Ownable {
         _;
     }
 
+    ///@dev this function is only callable from the country minter contract
+    ///@notice this function will be called when a nation is minted and allow a nation to buy the wonders in this contract
     function generateWonders2(uint256 id) public onlyCountryMinter {
         Wonders2 memory newWonders2 = Wonders2(
             false,
@@ -717,48 +839,71 @@ contract WondersContract2 is Ownable {
         idToWonders2[id] = newWonders2;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateGreatMonumentCost(uint256 newPrice) public onlyOwner {
         greatMonumentCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateGreatTempleCost(uint256 newPrice) public onlyOwner {
         greatTempleCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateGreatUniversityCost(uint256 newPrice) public onlyOwner {
         greatUniversityCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateHiddenNuclearMissileSiloCost(
         uint256 newPrice
     ) public onlyOwner {
         hiddenNuclearMissileSiloCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateInterceptorMissileSystemCost(
         uint256 newPrice
     ) public onlyOwner {
         interceptorMissileSystemCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateInternetCost(uint256 newPrice) public onlyOwner {
         internetCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateInterstateSystemCost(uint256 newPrice) public onlyOwner {
         interstateSystemCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateManhattanProjectCost(uint256 newPrice) public onlyOwner {
         manhattanProjectCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateMiningIndustryConsortiumCost(
         uint256 newPrice
     ) public onlyOwner {
         miningIndustryConsortiumCost = newPrice;
     }
 
+    ///@dev this function is only callable from a nation owner and allows a nation to purchase the wonders in this contract
+    ///@notice this function allows a nation owner to purchase the wonders in this contract
+    ///@param countryId is the nationId of the country purchasing a wonder
+    /**@param wonderId is the id of the wonder
+     * 1. great monumnet
+     * 2. great temple
+     * 3. great university
+     * 4. hidden nuclear missile silo
+     * 5. interceptor missile system
+     * 6. internat
+     * 7. interstate system
+     * 8. manhattan project
+     * 9. minimg industry consortium
+    */
     function buyWonder2(uint256 countryId, uint256 wonderId) public {
         bool isOwner = mint.checkOwnership(countryId, msg.sender);
         require(isOwner, "!nation owner");
@@ -912,6 +1057,21 @@ contract WondersContract2 is Ownable {
         }
     }
 
+    ///@dev this function will allow a nation owner to delete a wonder
+    ///@dev this function is only callable by a nation owner
+    ///@notice this funtion will allow a nation owner to delete a wonder
+    ///@param countryId is the nation deleting the woner
+    /**@param wonderId is the id of the wonder
+     * 1. great monumnet
+     * 2. great temple
+     * 3. great university
+     * 4. hidden nuclear missile silo
+     * 5. interceptor missile system
+     * 6. internat
+     * 7. interstate system
+     * 8. manhattan project
+     * 9. minimg industry consortium
+    */
     function deleteWonder2(uint256 countryId, uint256 wonderId) public {
         bool isOwner = mint.checkOwnership(countryId, msg.sender);
         require(isOwner, "!nation owner");
@@ -986,48 +1146,85 @@ contract WondersContract2 is Ownable {
         }
     }
 
+    ///@dev this is a public view function that will return true if a nation has the great monument wonder
+    ///@dev this function will return true if a nation has the great monument wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getGreatMonument(uint256 id) public view returns (bool) {
         return idToWonders2[id].greatMonument;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the great temple wonder
+    ///@dev this function will return true if a nation has the great temple wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getGreatTemple(uint256 id) public view returns (bool) {
         return idToWonders2[id].greatTemple;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the great university wonder
+    ///@dev this function will return true if a nation has the great university wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getGreatUniversity(uint256 countryId) public view returns (bool) {
         return idToWonders2[countryId].greatUniversity;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the hidden nuclear missile silo wonder
+    ///@dev this function will return true if a nation has the hidden nuclear missile silo wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getHiddenNuclearMissileSilo(
         uint256 countryId
     ) public view returns (bool) {
         return idToWonders2[countryId].hiddenNuclearMissileSilo;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the intereptor missile system wonder
+    ///@dev this function will return true if a nation has the intereptor missile system wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getInterceptorMissileSystem(
         uint256 countryId
     ) public view returns (bool) {
         return idToWonders2[countryId].interceptorMissileSystem;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the internet wonder
+    ///@dev this function will return true if a nation has the internet wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getInternet(uint256 countryId) public view returns (bool) {
         return idToWonders2[countryId].internet;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the interstate system wonder
+    ///@dev this function will return true if a nation has the interstate system wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getInterstateSystem(uint256 countryId) public view returns (bool) {
         return idToWonders2[countryId].interstateSystem;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the manhattan project wonder
+    ///@dev this function will return true if a nation has the manhattan project wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getManhattanProject(uint256 countryId) public view returns (bool) {
         return idToWonders2[countryId].manhattanProject;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the mining industry consortium wonder
+    ///@dev this function will return true if a nation has the mining industry consortium wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getMiningIndustryConsortium(
         uint256 countryId
     ) public view returns (bool) {
         return idToWonders2[countryId].miningIndustryConsortium;
     }
 
+    ///@dev this function will return the costs of the wonders in this contract
     function getWonderCosts2() public view returns(
         uint256,
         uint256,
@@ -1053,6 +1250,10 @@ contract WondersContract2 is Ownable {
     }
 }
 
+///@title WondersContract3
+///@author OxSnosh
+///@dev this contract inherits from openzeppelin's ownable contract
+///@notice this contract will strore information about a nations wonders
 contract WondersContract3 is Ownable {
     address public treasuryAddress;
     address public infrastructureAddress;
@@ -1140,6 +1341,8 @@ contract WondersContract3 is Ownable {
 
     mapping(uint256 => Wonders3) public idToWonders3;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
         address _treasuryAddress,
         address _infrastructureAddress,
@@ -1160,30 +1363,35 @@ contract WondersContract3 is Ownable {
         mint = CountryMinter(_countryMinter);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateTreasuryAddress(
         address _newTreasuryAddress
     ) public onlyOwner {
         treasuryAddress = _newTreasuryAddress;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateInfrastructureAddress(
         address _newInfrastructureAddress
     ) public onlyOwner {
         infrastructureAddress = _newInfrastructureAddress;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWonderContract1Address(
         address _wonderContract1Address
     ) public onlyOwner {
         wonderContract1Address = _wonderContract1Address;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWonderContract2Address(
         address _wonderContract2Address
     ) public onlyOwner {
         wonderContract2Address = _wonderContract2Address;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWonderContract4Address(
         address _wonderContract4Address
     ) public onlyOwner {
@@ -1198,6 +1406,8 @@ contract WondersContract3 is Ownable {
         _;
     }
 
+    ///@dev this function is only callable from the country minter contract
+    ///@notice this function will be called when a nation is minted and allow a nation to buy the wonders in this contract
     function generateWonders3(uint256 id) public onlyCountryMinter {
         Wonders3 memory newWonders3 = Wonders3(
             false,
@@ -1213,14 +1423,17 @@ contract WondersContract3 is Ownable {
         idToWonders3[id] = newWonders3;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateMovieIndustryCost(uint256 newPrice) public onlyOwner {
         movieIndustryCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateNationalCemetaryCost(uint256 newPrice) public onlyOwner {
         nationalCemetaryCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateNationalEnvironmentOfficeCost(uint256 newPrice)
         public
         onlyOwner
@@ -1228,26 +1441,32 @@ contract WondersContract3 is Ownable {
         nationalEnvironmentOfficeCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateNationalResearchLabCost(uint256 newPrice) public onlyOwner {
         nationalResearchLabCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateNationalWarMemorialCost(uint256 newPrice) public onlyOwner {
         nationalWarMemorialCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateNuclearPowerPlantCost(uint256 newPrice) public onlyOwner {
         nuclearPowerPlantCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updatePentagonCost(uint256 newPrice) public onlyOwner {
         pentagonCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updatePoliticalLobbyistsCost(uint256 newPrice) public onlyOwner {
         politicalLobbyistsCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateScientificDevelopmentCenterCost(uint256 newPrice)
         public
         onlyOwner
@@ -1255,6 +1474,20 @@ contract WondersContract3 is Ownable {
         scientificDevelopmentCenterCost = newPrice;
     }
 
+    ///@dev this function is only callable from a nation owner and allows a nation to purchase the wonders in this contract
+    ///@notice this function allows a nation owner to purchase the wonders in this contract
+    ///@param countryId is the nationId of the country purchasing a wonder
+    /**@param wonderId is the id of the wonder
+     * 1. movie industry
+     * 2. national cemetary
+     * 3. national environmental office
+     * 4. national research lab
+     * 5. national war memorial
+     * 6. nuclear power plant
+     * 7. pentagon
+     * 8. political lobbyists
+     * 9. scientific development center
+    */
     function buyWonder3(uint256 countryId, uint256 wonderId) public {
         bool isOwner = mint.checkOwnership(countryId, msg.sender);
         require(isOwner, "!nation owner");
@@ -1419,6 +1652,21 @@ contract WondersContract3 is Ownable {
         }
     }
 
+    ///@dev this function will allow a nation owner to delete a wonder
+    ///@dev this function is only callable by a nation owner
+    ///@notice this funtion will allow a nation owner to delete a wonder
+    ///@param countryId is the nation deleting the woner
+    /**@param wonderId is the id of the wonder
+     * 1. movie industry
+     * 2. national cemetary
+     * 3. national environmental office
+     * 4. national research lab
+     * 5. national war memorial
+     * 6. nuclear power plant
+     * 7. pentagon
+     * 8. political lobbyists
+     * 9. scientific development center
+    */
     function deleteWonder3(uint256 countryId, uint256 wonderId) public {
         bool isOwner = mint.checkOwnership(countryId, msg.sender);
         require(isOwner, "!nation owner");
@@ -1491,54 +1739,91 @@ contract WondersContract3 is Ownable {
         }
     }
 
+    ///@dev this is a public view function that will return true if a nation has the movie industry wonder
+    ///@dev this function will return true if a nation has the movie industry wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getMovieIndustry(uint256 countryId) public view returns (bool) {
         return idToWonders3[countryId].movieIndustry;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the national cemetary wonder
+    ///@dev this function will return true if a nation has the national cemetary wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getNationalCemetary(uint256 countryId) public view returns (bool) {
         return idToWonders3[countryId].nationalCemetary;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the national environmental office wonder
+    ///@dev this function will return true if a nation has the national environmental office wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getNationalEnvironmentOffice(
         uint256 countryId
     ) public view returns (bool) {
         return idToWonders3[countryId].nationalEnvironmentOffice;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the national research lab wonder
+    ///@dev this function will return true if a nation has the national research lab wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getNationalResearchLab(
         uint256 countryId
     ) public view returns (bool) {
         return idToWonders3[countryId].nationalResearchLab;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the national war memorial wonder
+    ///@dev this function will return true if a nation has the national war memorial wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getNationalWarMemorial(
         uint256 countryId
     ) public view returns (bool) {
         return idToWonders3[countryId].nationalWarMemorial;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the nuclear power plant wonder
+    ///@dev this function will return true if a nation has the nuclear power plant wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getNuclearPowerPlant(
         uint256 countryId
     ) public view returns (bool) {
         return idToWonders3[countryId].nuclearPowerPlant;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the pentagon wonder
+    ///@dev this function will return true if a nation has the pentagon wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getPentagon(uint256 countryId) public view returns (bool) {
         return idToWonders3[countryId].pentagon;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the political lobbyists wonder
+    ///@dev this function will return true if a nation has the political lobbyists wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getPoliticalLobbyists(
         uint256 countryId
     ) public view returns (bool) {
         return idToWonders3[countryId].politicalLobbyists;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the scientific development center wonder
+    ///@dev this function will return true if a nation has the scientific development center wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getScientificDevelopmentCenter(
         uint256 countryId
     ) public view returns (bool) {
         return idToWonders3[countryId].scientificDevelopmentCenter;
     }
 
+    ///@dev this function will return the costs of the wonders in this contract
     function getWonderCosts3() public view returns(
         uint256,
         uint256,
@@ -1564,6 +1849,10 @@ contract WondersContract3 is Ownable {
     }
 }
 
+///@title WondersContract4
+///@author OxSnosh
+///@dev this contract inherits from openzeppelin's ownable contract
+///@notice this contract will strore information about a nations wonders
 contract WondersContract4 is Ownable {
     address public treasuryAddress;
     address public infrastructureAddress;
@@ -1632,6 +1921,8 @@ contract WondersContract4 is Ownable {
 
     mapping(uint256 => Wonders4) public idToWonders4;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
         address _treasuryAddress,
         address _improvementsContract2Address,
@@ -1653,30 +1944,35 @@ contract WondersContract4 is Ownable {
         mint = CountryMinter(_countryMinter);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateTreasuryAddress(
         address _newTreasuryAddress
     ) public onlyOwner {
         treasuryAddress = _newTreasuryAddress;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWonderContract1Address(
         address _wonderContract1Address
     ) public onlyOwner {
         wonderContract1Address = _wonderContract1Address;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWonderContract3Address(
         address _wonderContract3Address
     ) public onlyOwner {
         wonderContract3Address = _wonderContract3Address;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateInfrastructureAddress(
         address _infrastructureAddress
     ) public onlyOwner {
         infrastructureAddress = _infrastructureAddress;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateImprovementContractAddresses(
         address _improvementsContract2Address,
         address _improvementsContract3Address
@@ -1693,6 +1989,8 @@ contract WondersContract4 is Ownable {
         _;
     }
 
+    ///@dev this function is only callable from the country minter contract
+    ///@notice this function will be called when a nation is minted and allow a nation to buy the wonders in this contract
     function generateWonders4(uint256 id) public onlyCountryMinter {
         Wonders4 memory newWonders4 = Wonders4(
             false,
@@ -1706,40 +2004,59 @@ contract WondersContract4 is Ownable {
         idToWonders4[id] = newWonders4;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateSocialSecuritySystemCost(uint256 newPrice) public onlyOwner {
         socialSecuritySystemCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateSpaceProgramCost(uint256 newPrice) public onlyOwner {
         spaceProgramCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateStockMarketCost(uint256 newPrice) public onlyOwner {
         stockMarketCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateStrategicDefenseInitiativeCost(
         uint256 newPrice
     ) public onlyOwner {
         strategicDefenseInitiativeCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateSuperiorLogisticalSupportCost(
         uint256 newPrice
     ) public onlyOwner {
         superiorLogisticalSupportCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateUniversalHealthcareCost(uint256 newPrice) public onlyOwner {
         universalHealthcareCost = newPrice;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWeaponsResearchCenterCost(
         uint256 newPrice
     ) public onlyOwner {
         weaponsResearchCenterCost = newPrice;
     }
 
+    ///@dev this function is only callable from a nation owner and allows a nation to purchase the wonders in this contract
+    ///@notice this function allows a nation owner to purchase the wonders in this contract
+    ///@param countryId is the nationId of the country purchasing a wonder
+    /**@param wonderId is the id of the wonder
+     * 1. social security system
+     * 2. space program
+     * 3. stock market
+     * 4. strategic defense initiative
+     * 5. superior logistical support
+     * 6. universal healthcare
+     * 7. weapons research center
+    */
     function buyWonder4(uint256 countryId, uint256 wonderId) public {
         bool isOwner = mint.checkOwnership(countryId, msg.sender);
         require(isOwner, "!nation owner");
@@ -1957,44 +2274,73 @@ contract WondersContract4 is Ownable {
         }
     }
 
+    ///@dev this is a public view function that will return true if a nation has the social security system wonder
+    ///@dev this function will return true if a nation has the social security system wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getSocialSecuritySystem(
         uint256 countryId
     ) public view returns (bool) {
         return idToWonders4[countryId].socialSecuritySystem;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the space program wonder
+    ///@dev this function will return true if a nation has the space program wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getSpaceProgram(uint256 countryId) public view returns (bool) {
         return idToWonders4[countryId].spaceProgram;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the stock market wonder
+    ///@dev this function will return true if a nation has the stock market wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getStockMarket(uint256 countryId) public view returns (bool) {
         return idToWonders4[countryId].stockMarket;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the strategic defense initiative wonder
+    ///@dev this function will return true if a nation has the strategic defense initiative wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getStrategicDefenseInitiative(
         uint256 countryId
     ) public view returns (bool) {
         return idToWonders4[countryId].strategicDefenseInitiative;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the superior logistical support wonder
+    ///@dev this function will return true if a nation has the superior logistical support wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getSuperiorLogisticalSupport(
         uint256 countryId
     ) public view returns (bool) {
         return idToWonders4[countryId].superiorLogisticalSupport;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the universal healthcare wonder
+    ///@dev this function will return true if a nation has the universal healthcare wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getUniversalHealthcare(
         uint256 countryId
     ) public view returns (bool) {
         return idToWonders4[countryId].universalHealthcare;
     }
 
+    ///@dev this is a public view function that will return true if a nation has the weapons research center wonder
+    ///@dev this function will return true if a nation has the weapons research center wonder
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation has the wonder
     function getWeaponsResearchCenter(
         uint256 countryId
     ) public view returns (bool) {
         return idToWonders4[countryId].weaponsResearchCenter;
     }
 
+    ///@dev this function will return the costs of the wonders in this contract
     function getWonderCosts4() public view returns(
         uint256,
         uint256,
