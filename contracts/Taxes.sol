@@ -31,6 +31,7 @@ contract TaxesContract is Ownable {
     address public military;
     address public crime;
     address public additionalTaxes;
+    address public bonusResources;
 
     InfrastructureContract inf;
     TreasuryContract tsy;
@@ -48,6 +49,7 @@ contract TaxesContract is Ownable {
     CrimeContract crm;
     AdditionalTaxesContract addTax;
     CountryMinter mint;
+    BonusResourcesContract bonus;
 
     function settings1 (
         address _countryMinter,
@@ -56,7 +58,8 @@ contract TaxesContract is Ownable {
         address _improvements1,
         address _improvements2,
         address _improvements3,
-        address _additionalTaxes
+        address _additionalTaxes,
+        address _bonusResources
     ) public onlyOwner {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
@@ -72,6 +75,8 @@ contract TaxesContract is Ownable {
         imp3 = ImprovementsContract3(_improvements3);
         additionalTaxes = _additionalTaxes;
         addTax = AdditionalTaxesContract(_additionalTaxes);
+        bonusResources = _bonusResources;
+        bonus = BonusResourcesContract(_bonusResources);
     }
 
     function settings2 (
@@ -214,7 +219,7 @@ contract TaxesContract is Ownable {
         uint256 ministries = imp2.getForeignMinistryCount(id);
         uint256 harbors = imp2.getHarborCount(id);
         uint256 schools = imp3.getSchoolCount(id);
-        uint256 universityPoints = getUniversityPoints(id);
+        uint256 universityPoints = addTax.getUniversityPoints(id);
         //detractors
         uint256 casinos = imp1.getCasinoCount(id);
         uint256 guerillaCamp = imp2.getGuerillaCampCount(id);
@@ -285,7 +290,7 @@ contract TaxesContract is Ownable {
         uint256 taxRatePoints = getTaxRatePoints(id);
         uint256 pointsFromStability = getPointsFromMilitary(id);
         uint256 pointsFromCrime = getPointsFromCriminals(id);
-        uint256 pointsFromImprovements = getPointsToSubtractFromImprovements(
+        uint256 pointsFromImprovements = addTax.getPointsToSubtractFromImprovements(
             id
         );
         uint256 pointsFromIntelAgencies = getPointsFromIntelAgencies(id);
@@ -371,15 +376,15 @@ contract TaxesContract is Ownable {
         if (wine) {
             pointsFromResources += 3;
         }
-        bool beer = res.viewBeer(id);
+        bool beer = bonus.viewBeer(id);
         if (beer) {
             pointsFromResources += 2;
         }
-        bool fastFood = res.viewFastFood(id);
+        bool fastFood = bonus.viewFastFood(id);
         if (fastFood) {
             pointsFromResources += 2;
         }
-        bool fineJewelry = res.viewFineJewelry(id);
+        bool fineJewelry = bonus.viewFineJewelry(id);
         if (fineJewelry) {
             pointsFromResources += 3;
         }
@@ -394,11 +399,11 @@ contract TaxesContract is Ownable {
         returns (uint256)
     {
         uint256 additionalPointsFromResources;
-        bool automobiles = res.viewAutomobiles(id);
+        bool automobiles = bonus.viewAutomobiles(id);
         if (automobiles) {
             additionalPointsFromResources += 3;
         }
-        bool microchips = res.viewMicrochips(id);
+        bool microchips = bonus.viewMicrochips(id);
         if (microchips) {
             additionalPointsFromResources += 2;
         }
@@ -751,32 +756,32 @@ contract TaxesContract is Ownable {
         return pointsFromCrime;
     }
 
-    function getPointsToSubtractFromImprovements(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
-        uint256 pointsToSubtractFromImprovements;
-        uint256 laborCamps = imp2.getLaborCampCount(id);
-        if (laborCamps > 0) {
-            pointsToSubtractFromImprovements += (laborCamps * 1);
-        }
-        return pointsToSubtractFromImprovements;
-    }
+    // function getPointsToSubtractFromImprovements(uint256 id)
+    //     public
+    //     view
+    //     returns (uint256)
+    // {
+    //     uint256 pointsToSubtractFromImprovements;
+    //     uint256 laborCamps = imp2.getLaborCampCount(id);
+    //     if (laborCamps > 0) {
+    //         pointsToSubtractFromImprovements += (laborCamps * 1);
+    //     }
+    //     return pointsToSubtractFromImprovements;
+    // }
 
-    function getUniversityPoints(uint256 id) public view returns (uint256) {
-        uint256 universities = imp3.getUniversityCount(id);
-        uint256 universityPoints = 0;
-        bool scientificDevelopmentCenter = won3.getScientificDevelopmentCenter(id);
-        if (universities > 0) {
-            if (!scientificDevelopmentCenter) {
-                universityPoints = (universities * 8);
-            } else if (scientificDevelopmentCenter) {
-                universityPoints = (universities * 10);
-            }
-        }
-        return universityPoints;
-    }
+    // function getUniversityPoints(uint256 id) public view returns (uint256) {
+    //     uint256 universities = imp3.getUniversityCount(id);
+    //     uint256 universityPoints = 0;
+    //     bool scientificDevelopmentCenter = won3.getScientificDevelopmentCenter(id);
+    //     if (universities > 0) {
+    //         if (!scientificDevelopmentCenter) {
+    //             universityPoints = (universities * 8);
+    //         } else if (scientificDevelopmentCenter) {
+    //             universityPoints = (universities * 10);
+    //         }
+    //     }
+    //     return universityPoints;
+    // }
 }
 
 contract AdditionalTaxesContract is Ownable {
@@ -784,8 +789,8 @@ contract AdditionalTaxesContract is Ownable {
     address public infrastructure;
     // address public treasury;
     // address public improvements1;
-    // address public improvements2;
-    // address public improvements3;
+    address public improvements2;
+    address public improvements3;
     address public parameters;
     address public wonders1;
     address public wonders2;
@@ -795,12 +800,13 @@ contract AdditionalTaxesContract is Ownable {
     // address public forces;
     address public military;
     // address public crime;
+    address public bonusResources;
 
     InfrastructureContract inf;
     // TreasuryContract tsy;
     // ImprovementsContract1 imp1;
-    // ImprovementsContract2 imp2;
-    // ImprovementsContract3 imp3;
+    ImprovementsContract2 imp2;
+    ImprovementsContract3 imp3;
     CountryParametersContract params;
     WondersContract1 won1;
     WondersContract2 won2;
@@ -810,6 +816,7 @@ contract AdditionalTaxesContract is Ownable {
     // ForcesContract frc;
     MilitaryContract mil;
     // CrimeContract crm;
+    BonusResourcesContract bonus;
 
     function settings (
         address _parameters,
@@ -819,7 +826,8 @@ contract AdditionalTaxesContract is Ownable {
         address _wonders4,
         address _resources,
         address _military,
-        address _infrastructure
+        address _infrastructure,
+        address _bonusResources
     ) public onlyOwner {
         parameters = _parameters;
         params = CountryParametersContract(_parameters);
@@ -837,6 +845,15 @@ contract AdditionalTaxesContract is Ownable {
         mil = MilitaryContract(_military);
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
+        bonusResources = _bonusResources;
+        bonus = BonusResourcesContract(_bonusResources);
+    }
+
+    function settings2(address _improvements2, address _improvements3) public onlyOwner {
+        improvements2 = _improvements2;
+        imp2 = ImprovementsContract2(_improvements2);
+        improvements3 = _improvements3;
+        imp3 = ImprovementsContract3(_improvements3);
     }
 
     function getIncomeAdjustments(uint256 id) public view returns (uint256) {
@@ -857,7 +874,7 @@ contract AdditionalTaxesContract is Ownable {
         if (silver) {
             adjustments += 2;
         }
-        bool scholars = res.viewScholars(id);
+        bool scholars = bonus.viewScholars(id);
         if (scholars) {
             adjustments += 3;
         }
@@ -953,5 +970,32 @@ contract AdditionalTaxesContract is Ownable {
             pointsFromDefcon = 0;
         }
         return pointsFromDefcon;
+    }
+
+    function getPointsToSubtractFromImprovements(uint256 id)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 pointsToSubtractFromImprovements;
+        uint256 laborCamps = imp2.getLaborCampCount(id);
+        if (laborCamps > 0) {
+            pointsToSubtractFromImprovements += (laborCamps * 1);
+        }
+        return pointsToSubtractFromImprovements;
+    }
+
+    function getUniversityPoints(uint256 id) public view returns (uint256) {
+        uint256 universities = imp3.getUniversityCount(id);
+        uint256 universityPoints = 0;
+        bool scientificDevelopmentCenter = won3.getScientificDevelopmentCenter(id);
+        if (universities > 0) {
+            if (!scientificDevelopmentCenter) {
+                universityPoints = (universities * 8);
+            } else if (scientificDevelopmentCenter) {
+                universityPoints = (universities * 10);
+            }
+        }
+        return universityPoints;
     }
 }

@@ -18,6 +18,7 @@ contract TechnologyMarketContract is Ownable {
     address public wonders3;
     address public wonders4;
     address public treasury;
+    address public bonusResources;
 
     CountryMinter mint;
     ResourcesContract res;
@@ -27,6 +28,7 @@ contract TechnologyMarketContract is Ownable {
     WondersContract3 won3;
     WondersContract4 won4;
     InfrastructureContract inf;
+    BonusResourcesContract bonus;
 
     function settings (
         address _resources,
@@ -36,7 +38,8 @@ contract TechnologyMarketContract is Ownable {
         address _wonders3,
         address _wonders4,
         address _treasury,
-        address _countryMinter
+        address _countryMinter,
+        address _bonusResources
     ) public onlyOwner {
         resources = _resources;
         res = ResourcesContract(_resources);
@@ -54,6 +57,8 @@ contract TechnologyMarketContract is Ownable {
         tsy = TreasuryContract(_treasury);
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
+        bonusResources = _bonusResources;
+        bonus = BonusResourcesContract(_bonusResources);
     }
 
     function buyTech(uint256 id, uint256 amount) public {
@@ -144,7 +149,7 @@ contract TechnologyMarketContract is Ownable {
     function getTechCostMultiplier(uint256 id) public view returns (uint256) {
         uint256 numberToSubtract = 0;
         bool isGold = res.viewGold(id);
-        bool isMicrochips = res.viewMicrochips(id);
+        bool isMicrochips = bonus.viewMicrochips(id);
         uint256 universityCount = imp3.getUniversityCount(id);
         bool greatUniversity = won2.getGreatUniversity(id);
         bool isSpaceProgram = won4.getSpaceProgram(id);

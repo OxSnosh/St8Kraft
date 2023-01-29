@@ -1014,6 +1014,7 @@ contract FightersMarketplace1 is Ownable {
     address public wonders1;
     address public wonders4;
     address public navy;
+    address public bonusResources;
     uint256 public yak9Cost = 10000;
     uint256 public yak9RequiredInfrastructure = 100;
     uint256 public yak9RequiredTech = 30;
@@ -1038,6 +1039,7 @@ contract FightersMarketplace1 is Ownable {
     WondersContract4 won4;
     FightersContract fight;
     NavyContract nav;
+    BonusResourcesContract bonus;
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -1071,6 +1073,11 @@ contract FightersMarketplace1 is Ownable {
         infrastructure = _infrastructure;
         navy = _navy;
         nav = NavyContract(_navy);
+    }
+
+    function settings2(address _bonusResources) public onlyOwner {
+        bonusResources = _bonusResources;
+        bonus = BonusResourcesContract(_bonusResources);
     }
 
     mapping(uint256 => address) public idToOwnerFightersMarket;
@@ -1359,7 +1366,7 @@ contract FightersMarketplace1 is Ownable {
     ///@return uint256 is the maximum amount of aircraft a nation can own    
     function getMaxAircraftCount(uint256 id) public view returns (uint256) {
         uint256 maxAircraftCount = 50;
-        bool construction = res.viewConstruction(id);
+        bool construction = bonus.viewConstruction(id);
         if (construction) {
             maxAircraftCount += 10;
         }

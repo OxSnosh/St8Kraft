@@ -179,6 +179,7 @@ contract NavyContract is Ownable {
     address public countryMinter;
     address public navalActions;
     address public additionalNavy;
+    address public bonusResources;
     uint256 public corvetteCost = 300000;
     uint256 public landingShipCost = 300000;
     uint256 public battleshipCost = 300000;
@@ -210,6 +211,7 @@ contract NavyContract is Ownable {
     NavalActionsContract navAct;
     CountryMinter mint;
     AdditionalNavyContract addNav;
+    BonusResourcesContract bonus;
 
     modifier onlyCountryMinter() {
         require(
@@ -254,9 +256,11 @@ contract NavyContract is Ownable {
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings2(address _countryMinter) public onlyOwner {
+    function settings2(address _countryMinter, address _bonusResources) public onlyOwner {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
+        bonusResources = _bonusResources;
+        bonus = BonusResourcesContract(_bonusResources);
     }
 
     ///@dev this is a public function only callable from the countryMinter contract
@@ -384,7 +388,7 @@ contract NavyContract is Ownable {
         ).getDrydockCount(id);
         require(drydockAmount > 0, "Must own a drydock to purchase");
         uint256 purchasePrice = corvetteCost * amount;
-        bool steel = res.viewSteel(id);
+        bool steel = bonus.viewSteel(id);
         if (steel) {
             purchasePrice = ((purchasePrice * 85) / 100);
         }
@@ -424,7 +428,7 @@ contract NavyContract is Ownable {
         ).getShipyardCount(id);
         require(shipyardAmount > 0, "Must own a shipyard to purchase");
         uint256 purchasePrice = landingShipCost * amount;
-        bool steel = res.viewSteel(id);
+        bool steel = bonus.viewSteel(id);
         if (steel) {
             purchasePrice = ((purchasePrice * 85) / 100);
         }
@@ -464,7 +468,7 @@ contract NavyContract is Ownable {
         ).getDrydockCount(id);
         require(drydockAmount > 0, "Must own a drydock to purchase");
         uint256 purchasePrice = battleshipCost * amount;
-        bool steel = res.viewSteel(id);
+        bool steel = bonus.viewSteel(id);
         if (steel) {
             purchasePrice = ((purchasePrice * 85) / 100);
         }
@@ -504,7 +508,7 @@ contract NavyContract is Ownable {
         ).getDrydockCount(id);
         require(drydockAmount > 0, "Must own a drydock to purchase");
         uint256 purchasePrice = cruiserCost * amount;
-        bool steel = res.viewSteel(id);
+        bool steel = bonus.viewSteel(id);
         if (steel) {
             purchasePrice = ((purchasePrice * 85) / 100);
         }
@@ -544,11 +548,11 @@ contract NavyContract is Ownable {
         ).getShipyardCount(id);
         require(shipyardAmount > 0, "Must own a shipyard to purchase");
         uint256 purchasePrice = frigateCost * amount;
-        bool steel = res.viewSteel(id);
+        bool steel = bonus.viewSteel(id);
         if (steel) {
             purchasePrice = ((purchasePrice * 85) / 100);
         }
-        bool microchips = res.viewMicrochips(id);
+        bool microchips = bonus.viewMicrochips(id);
         if (microchips) {
             purchasePrice = ((purchasePrice * 90) / 100);
         }
@@ -588,11 +592,11 @@ contract NavyContract is Ownable {
         ).getDrydockCount(id);
         require(drydockAmount > 0, "Must own a drydock to purchase");
         uint256 purchasePrice = destroyerCost * amount;
-        bool steel = res.viewSteel(id);
+        bool steel = bonus.viewSteel(id);
         if (steel) {
             purchasePrice = ((purchasePrice * 85) / 100);
         }
-        bool microchips = res.viewMicrochips(id);
+        bool microchips = bonus.viewMicrochips(id);
         if (microchips) {
             purchasePrice = ((purchasePrice * 90) / 100);
         }
@@ -632,11 +636,11 @@ contract NavyContract is Ownable {
         ).getShipyardCount(id);
         require(shipyardAmount > 0, "Must own a shipyard to purchase");
         uint256 purchasePrice = submarineCost * amount;
-        bool steel = res.viewSteel(id);
+        bool steel = bonus.viewSteel(id);
         if (steel) {
             purchasePrice = ((purchasePrice * 85) / 100);
         }
-        bool microchips = res.viewMicrochips(id);
+        bool microchips = bonus.viewMicrochips(id);
         if (microchips) {
             purchasePrice = ((purchasePrice * 90) / 100);
         }
@@ -677,11 +681,11 @@ contract NavyContract is Ownable {
         ).getShipyardCount(id);
         require(shipyardAmount > 0, "Must own a shipyard to purchase");
         uint256 purchasePrice = aircraftCarrierCost * amount;
-        bool steel = res.viewSteel(id);
+        bool steel = bonus.viewSteel(id);
         if (steel) {
             purchasePrice = ((purchasePrice * 85) / 100);
         }
-        bool microchips = res.viewMicrochips(id);
+        bool microchips = bonus.viewMicrochips(id);
         if (microchips) {
             purchasePrice = ((purchasePrice * 90) / 100);
         }

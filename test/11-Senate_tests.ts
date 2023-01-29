@@ -51,6 +51,7 @@ import {
     WondersContract2,
     WondersContract3,
     WondersContract4,
+    BonusResourcesContract,
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
@@ -96,6 +97,7 @@ describe("Senate Contract", async function () {
     let navalattackcontract: NavalAttackContract
     let nukecontract: NukeContract
     let resourcescontract: ResourcesContract
+    let bonusresourcescontract: BonusResourcesContract
     let senatecontract: SenateContract
     let spyoperationscontract: SpyOperationsContract
     let taxescontract: TaxesContract
@@ -361,6 +363,10 @@ describe("Senate Contract", async function () {
         resourcescontract = await ResourcesContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as ResourcesContract
         await resourcescontract.deployed()
         // console.log(`ResourcesContract deployed to ${resourcescontract.address}`)
+
+        const BonusResourcesContract = await ethers.getContractFactory("BonusResourcesContract")
+        bonusresourcescontract = await BonusResourcesContract.deploy() as BonusResourcesContract
+        await bonusresourcescontract.deployed()
     
         const SenateContract = await ethers.getContractFactory("SenateContract")
         senatecontract = await SenateContract.deploy() as SenateContract
@@ -418,6 +424,7 @@ describe("Senate Contract", async function () {
         // console.log(`Wonders4 deployed to ${wonderscontract4.address}`)
     
         // console.log("contracts deployed")
+
         await warbucks.settings(
             treasurycontract.address
         )
@@ -454,7 +461,8 @@ describe("Senate Contract", async function () {
             improvementscontract2.address,
             missilescontract.address,
             wonderscontract4.address,
-            infrastructurecontract.address)
+            infrastructurecontract.address,
+            bonusresourcescontract.address)
         
         await bomberscontract.settings(
             countryminter.address, 
@@ -551,7 +559,8 @@ describe("Senate Contract", async function () {
         await environmentcontract.settings2(
             improvementscontract1.address,
             improvementscontract3.address,
-            improvementscontract4.address)
+            improvementscontract4.address,
+            bonusresourcescontract.address)
         
         await fighterscontract.settings(
             countryminter.address,
@@ -584,6 +593,9 @@ describe("Senate Contract", async function () {
             wonderscontract1.address,
             wonderscontract4.address,
             navycontract.address)
+        await fightersmarketplace1.settings2(
+            bonusresourcescontract.address
+        )
         
         await fightersmarketplace2.settings(
             countryminter.address,
@@ -678,7 +690,8 @@ describe("Senate Contract", async function () {
             improvementscontract4.address,
             infrastructuremarketplace.address,
             technologymarketcontrat.address,
-            landmarketcontract.address
+            landmarketcontract.address,
+            bonusresourcescontract.address
         )
         await infrastructurecontract.settings2(
             wonderscontract1.address,
@@ -709,7 +722,8 @@ describe("Senate Contract", async function () {
             wonderscontract2.address,
             wonderscontract3.address,
             treasurycontract.address,
-            infrastructurecontract.address
+            infrastructurecontract.address,
+            bonusresourcescontract.address
         )
 
         await keepercontract.settings(
@@ -756,7 +770,8 @@ describe("Senate Contract", async function () {
             additionalnavycontract.address
         )
         await navycontract.settings2(
-            countryminter.address
+            countryminter.address,
+            bonusresourcescontract.address
         )
 
         await navalactionscontract.settings(
@@ -818,6 +833,11 @@ describe("Senate Contract", async function () {
             improvementscontract2.address,
             countryminter.address
         )
+        await bonusresourcescontract.settings(
+            infrastructurecontract.address,
+            countryminter.address,
+            resourcescontract.address
+        )
 
         await senatecontract.settings(
             countryminter.address,
@@ -843,7 +863,8 @@ describe("Senate Contract", async function () {
             improvementscontract1.address,
             improvementscontract2.address,
             improvementscontract3.address,
-            additionaltaxescontract.address
+            additionaltaxescontract.address,
+            bonusresourcescontract.address
         )
         await taxescontract.settings2(
             countryparameterscontract.address,
@@ -865,7 +886,12 @@ describe("Senate Contract", async function () {
             wonderscontract4.address,
             resourcescontract.address,
             militarycontract.address,
-            infrastructurecontract.address
+            infrastructurecontract.address,
+            bonusresourcescontract.address
+        )
+        await additionaltaxescontract.settings2(
+            improvementscontract2.address,
+            improvementscontract3.address
         )
 
         await technologymarketcontrat.settings(
@@ -876,7 +902,8 @@ describe("Senate Contract", async function () {
             wonderscontract3.address,
             wonderscontract4.address,
             treasurycontract.address,
-            countryminter.address
+            countryminter.address,
+            bonusresourcescontract.address
         )
 
         await treasurycontract.settings1(

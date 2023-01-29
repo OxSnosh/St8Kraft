@@ -32,6 +32,7 @@ contract BillsContract is Ownable {
     address public improvements2;
     address public resources;
     address public missiles;
+    address public bonusResources;
 
     TreasuryContract tsy;
     WondersContract1 won1;
@@ -47,6 +48,7 @@ contract BillsContract is Ownable {
     ResourcesContract res;
     MissilesContract mis;
     CountryMinter mint;
+    BonusResourcesContract bonus;
 
     mapping(uint256 => address) public idToOwnerBills;
 
@@ -93,7 +95,8 @@ contract BillsContract is Ownable {
         address _improvements2,
         address _missiles,
         address _wonders4,
-        address _infrastructure
+        address _infrastructure,
+        address _bonusResources
     ) public onlyOwner {
         improvements1 = _improvements1;
         imp1 = ImprovementsContract1(_improvements1);
@@ -105,6 +108,8 @@ contract BillsContract is Ownable {
         won4 = WondersContract4(_wonders4);
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
+        bonusResources = _bonusResources;
+        bonus = BonusResourcesContract(_bonusResources);
     }
 
     function updateCountryMinter(address newAddress) public onlyOwner {
@@ -305,6 +310,10 @@ contract BillsContract is Ownable {
         bool uranium = res.viewUranium(id);
         if (uranium) {
             infrastructureUpkeepModifier -= 3;
+        }
+        bool asphalt = bonus.viewAsphalt(id);
+        if (asphalt) {
+            infrastructureUpkeepModifier -= 5;
         }
         uint256 laborCamps = imp2.getLaborCampCount(id);
         if (laborCamps > 0) {

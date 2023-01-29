@@ -30,6 +30,7 @@ contract EnvironmentContract is Ownable {
     address public taxes;
     address public missiles;
     address public nukes;
+    address public bonusResources;
 
     CountryMinter mint;
     ResourcesContract res;
@@ -44,6 +45,7 @@ contract EnvironmentContract is Ownable {
     TaxesContract tax;
     MissilesContract mis;
     NukeContract nuke;
+    BonusResourcesContract bonus;
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers 
@@ -86,7 +88,8 @@ contract EnvironmentContract is Ownable {
     function settings2 (
         address _improvements1,
         address _improvements3,
-        address _improvements4
+        address _improvements4,
+        address _bonusResources
     ) public onlyOwner {
         improvements1 = _improvements1;
         imp1 = ImprovementsContract1(_improvements1);
@@ -94,6 +97,8 @@ contract EnvironmentContract is Ownable {
         imp3 = ImprovementsContract3(_improvements3);
         improvements4 = _improvements4;
         imp4 = ImprovementsContract4(_improvements4);
+        bonusResources = _bonusResources;
+        bonus = BonusResourcesContract(_bonusResources);
     }
 
     ///@dev this function is only callable by the contract owner
@@ -181,10 +186,7 @@ contract EnvironmentContract is Ownable {
     function getEnvironmentScore(uint256 id) public view returns (uint256) {
         uint256 environmentScore;
         int256 grossScore = getGrossEnvironmentScore(id);
-        uint256 countries = mint.getCountryCount();
-        uint256 nukesLanded = nuke.calculateNukesLandedLastSevenDays();
-        uint256 mod = 300;
-        uint256 globalRadiation = ((nukesLanded * mod) / countries);
+        uint256 globalRadiation = nuke.getGlobalRadiation();
         if (globalRadiation > 5) {
             globalRadiation = 5;
         }
@@ -192,6 +194,10 @@ contract EnvironmentContract is Ownable {
             .getRadiationContainmentChamberCount(id);
         if (radiationContainmentChambers >= 0) {
             globalRadiation -= radiationContainmentChambers;
+        }
+        bool radiationCleanup = bonus.viewRadiationCleanup(id);
+        if (radiationCleanup) {
+            globalRadiation = (globalRadiation / 2);
         }
         if (grossScore <= 0) {
             environmentScore = 0;
@@ -267,7 +273,7 @@ contract EnvironmentContract is Ownable {
         bool isOil = res.viewOil(id);
         bool isUranium = res.viewUranium(id);
         bool isWater = res.viewWater(id);
-        bool isRadiationCleanup = res.viewRadiationCleanup(id);
+        bool isRadiationCleanup = bonus.viewRadiationCleanup(id);
         bool nationalEnvironmentalOffice = won3.getNationalEnvironmentOffice(id);
         if (isCoal && !nationalEnvironmentalOffice) {
             pointsFromResources += 10;

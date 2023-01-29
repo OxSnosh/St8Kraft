@@ -41,6 +41,7 @@ contract InfrastructureContract is Ownable {
     address public airBattle;
     address public groundBattle;
     address public crime;
+    address public bonusResources;
 
     CountryMinter mint;
     ResourcesContract res;
@@ -53,6 +54,7 @@ contract InfrastructureContract is Ownable {
     WondersContract4 won4;
     CrimeContract crim;
     ForcesContract forc;
+    BonusResourcesContract bonus;
 
     struct Infrastructure {
         uint256 landArea;
@@ -75,7 +77,8 @@ contract InfrastructureContract is Ownable {
         address _improvements4,
         address _infrastructureMarket,
         address _techMarket,
-        address _landMarket
+        address _landMarket,
+        address _bonusResources
     ) public onlyOwner {
         resources = _resources;
         res = ResourcesContract(_resources);
@@ -90,6 +93,8 @@ contract InfrastructureContract is Ownable {
         infrastructureMarket = _infrastructureMarket;
         techMarket = _techMarket;
         landMarket = _landMarket;
+        bonusResources = _bonusResources;
+        bonus = BonusResourcesContract(_bonusResources);
     }
 
     ///@dev this function is only callable by the contract owner
@@ -735,7 +740,7 @@ contract InfrastructureContract is Ownable {
         if (wheat) {
             populationModifier += 8;
         }
-        bool affluentPopulation = res.viewAffluentPopulation(id);
+        bool affluentPopulation = bonus.viewAffluentPopulation(id);
         if (affluentPopulation) {
             populationModifier += 5;
         }

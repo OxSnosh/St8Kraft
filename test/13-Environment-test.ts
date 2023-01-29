@@ -51,6 +51,7 @@ import {
     WondersContract2,
     WondersContract3,
     WondersContract4,
+    BonusResourcesContract,
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
@@ -96,6 +97,7 @@ describe("Environment Contract", async function () {
     let navalattackcontract: NavalAttackContract
     let nukecontract: NukeContract
     let resourcescontract: ResourcesContract
+    let bonusresourcescontract: BonusResourcesContract
     let senatecontract: SenateContract
     let spyoperationscontract: SpyOperationsContract
     let taxescontract: TaxesContract
@@ -347,6 +349,10 @@ describe("Environment Contract", async function () {
         resourcescontract = await ResourcesContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as ResourcesContract
         await resourcescontract.deployed()
         // console.log(`ResourcesContract deployed to ${resourcescontract.address}`)
+
+        const BonusResourcesContract = await ethers.getContractFactory("BonusResourcesContract")
+        bonusresourcescontract = await BonusResourcesContract.deploy() as BonusResourcesContract
+        await bonusresourcescontract.deployed()
     
         const SenateContract = await ethers.getContractFactory("SenateContract")
         senatecontract = await SenateContract.deploy() as SenateContract
@@ -404,6 +410,7 @@ describe("Environment Contract", async function () {
         // console.log(`Wonders4 deployed to ${wonderscontract4.address}`)
     
         // console.log("contracts deployed")
+
         await warbucks.settings(
             treasurycontract.address
         )
@@ -440,7 +447,8 @@ describe("Environment Contract", async function () {
             improvementscontract2.address,
             missilescontract.address,
             wonderscontract4.address,
-            infrastructurecontract.address)
+            infrastructurecontract.address,
+            bonusresourcescontract.address)
         
         await bomberscontract.settings(
             countryminter.address, 
@@ -537,7 +545,8 @@ describe("Environment Contract", async function () {
         await environmentcontract.settings2(
             improvementscontract1.address,
             improvementscontract3.address,
-            improvementscontract4.address)
+            improvementscontract4.address,
+            bonusresourcescontract.address)
         
         await fighterscontract.settings(
             countryminter.address,
@@ -570,6 +579,9 @@ describe("Environment Contract", async function () {
             wonderscontract1.address,
             wonderscontract4.address,
             navycontract.address)
+        await fightersmarketplace1.settings2(
+            bonusresourcescontract.address
+        )
         
         await fightersmarketplace2.settings(
             countryminter.address,
@@ -664,7 +676,8 @@ describe("Environment Contract", async function () {
             improvementscontract4.address,
             infrastructuremarketplace.address,
             technologymarketcontrat.address,
-            landmarketcontract.address
+            landmarketcontract.address,
+            bonusresourcescontract.address
         )
         await infrastructurecontract.settings2(
             wonderscontract1.address,
@@ -695,7 +708,8 @@ describe("Environment Contract", async function () {
             wonderscontract2.address,
             wonderscontract3.address,
             treasurycontract.address,
-            infrastructurecontract.address
+            infrastructurecontract.address,
+            bonusresourcescontract.address
         )
 
         await keepercontract.settings(
@@ -742,7 +756,8 @@ describe("Environment Contract", async function () {
             additionalnavycontract.address
         )
         await navycontract.settings2(
-            countryminter.address
+            countryminter.address,
+            bonusresourcescontract.address
         )
 
         await navalactionscontract.settings(
@@ -804,6 +819,11 @@ describe("Environment Contract", async function () {
             improvementscontract2.address,
             countryminter.address
         )
+        await bonusresourcescontract.settings(
+            infrastructurecontract.address,
+            countryminter.address,
+            resourcescontract.address
+        )
 
         await senatecontract.settings(
             countryminter.address,
@@ -829,7 +849,8 @@ describe("Environment Contract", async function () {
             improvementscontract1.address,
             improvementscontract2.address,
             improvementscontract3.address,
-            additionaltaxescontract.address
+            additionaltaxescontract.address,
+            bonusresourcescontract.address
         )
         await taxescontract.settings2(
             countryparameterscontract.address,
@@ -851,7 +872,12 @@ describe("Environment Contract", async function () {
             wonderscontract4.address,
             resourcescontract.address,
             militarycontract.address,
-            infrastructurecontract.address
+            infrastructurecontract.address,
+            bonusresourcescontract.address
+        )
+        await additionaltaxescontract.settings2(
+            improvementscontract2.address,
+            improvementscontract3.address
         )
 
         await technologymarketcontrat.settings(
@@ -862,7 +888,8 @@ describe("Environment Contract", async function () {
             wonderscontract3.address,
             wonderscontract4.address,
             treasurycontract.address,
-            countryminter.address
+            countryminter.address,
+            bonusresourcescontract.address
         )
 
         await treasurycontract.settings1(
@@ -1014,12 +1041,12 @@ describe("Environment Contract", async function () {
             await resourcescontract.mockResourcesForTesting(1, 0, 7);
             await resourcescontract.connect(signer2).proposeTrade(1, 0);
             await resourcescontract.connect(signer1).fulfillTradingPartner(0, 1);
-            const steel = await resourcescontract.viewSteel(0);
+            const steel = await bonusresourcescontract.viewSteel(0);
             // console.log("steel for nation 1", steel);
             await resourcescontract.mockResourcesForTesting(2, 9, 10);
             await resourcescontract.connect(signer3).proposeTrade(2, 0);
             await resourcescontract.connect(signer1).fulfillTradingPartner(0, 2);
-            const construction = await resourcescontract.viewConstruction(0);
+            const construction = await bonusresourcescontract.viewConstruction(0);
             // console.log("construction for nation 1", construction);
             const proposalsForNation1 = await resourcescontract.getProposedTradingPartners(0);
             // console.log(proposalsForNation1);
@@ -1027,9 +1054,9 @@ describe("Environment Contract", async function () {
             await technologymarketcontrat.connect(signer1).buyTech(0, 15);
             await resourcescontract.connect(signer4).proposeTrade(3, 0);
             await resourcescontract.connect(signer1).fulfillTradingPartner(0, 3);
-            const microchips = await resourcescontract.viewMicrochips(0);
+            const microchips = await bonusresourcescontract.viewMicrochips(0);
             // console.log("microchips for nation 1", microchips);
-            const radiationCleanup = await resourcescontract.viewRadiationCleanup(0);
+            const radiationCleanup = await bonusresourcescontract.viewRadiationCleanup(0);
             // console.log("radiation cleanup for nation 1", radiationCleanup);
             const resourcesScore2 = await environmentcontract.getEnvironmentScoreFromResources(0);
             expect(resourcesScore2).to.equal(10);

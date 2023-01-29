@@ -22,6 +22,7 @@ contract InfrastructureMarketContract is Ownable {
     address public wonders3;
     address public treasury;
     address public parameters;
+    address public bonusResources;
 
     CountryMinter mint;
     ResourcesContract res;
@@ -31,6 +32,7 @@ contract InfrastructureMarketContract is Ownable {
     CountryParametersContract param;
     InfrastructureContract inf;
     TreasuryContract tsy;
+    BonusResourcesContract bonus;
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -42,7 +44,8 @@ contract InfrastructureMarketContract is Ownable {
         address _wonders2,
         address _wonders3,
         address _treasury,
-        address _infrastructure
+        address _infrastructure,
+        address _bonusResources
     ) public onlyOwner {
         resources = _resources;
         res = ResourcesContract(_resources);
@@ -60,6 +63,8 @@ contract InfrastructureMarketContract is Ownable {
         tsy = TreasuryContract(_treasury);
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
+        bonusResources = _bonusResources;
+        bonus = BonusResourcesContract(_bonusResources);
     }
 
     ///@dev this is a public view function that will allow a nation owner to buy infrastructure
@@ -178,7 +183,7 @@ contract InfrastructureMarketContract is Ownable {
         uint256 accomodativeGovernmentMultiplier = 0;
         uint256 factoryMultiplier = 0;
         bool isRubber = res.viewRubber(id);
-        bool isConstruction = res.viewConstruction(id);
+        bool isConstruction = bonus.viewConstruction(id);
         bool isInterstateSystem = won2.getInterstateSystem(id);
         bool isAccomodativeGovernment = checkAccomodativeGovernment(id);
         uint256 factoryCount = imp1.getFactoryCount(id);
@@ -229,8 +234,8 @@ contract InfrastructureMarketContract is Ownable {
         uint256 asphaltMultiplier = 0;
         bool isAluminium = res.viewAluminium(id);
         bool isCoal = res.viewCoal(id);
-        bool isSteel = res.viewSteel(id);
-        bool isAsphalt = res.viewAsphalt(id);
+        bool isSteel = bonus.viewSteel(id);
+        bool isAsphalt = bonus.viewAsphalt(id);
         if (isAluminium) {
             aluminiumMultiplier = 7;
         }
