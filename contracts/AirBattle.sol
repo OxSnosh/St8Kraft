@@ -213,7 +213,6 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2 {
         airBattleId++;
     }
 
-    ///@dev this is an internal function that will 
     function generateAttackerFighterStruct(
         uint256 warId,
         uint256 battleId,

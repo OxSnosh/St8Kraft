@@ -10,6 +10,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
+///@title NavalBlocadeContract
+///@author OxSnosh
+///@dev this contract inherits from the openzeppelin ownable contract
+///@dev this contract inherits from the chainlink VRF contract
 contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
     uint256 public blockadeId;
     address public navy;
@@ -76,6 +80,12 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
         war = WarContract(_war);
     }
 
+    ///@dev this is a public function callable only from the nation owner
+    ///@dev this function allows a nation to blockade another nation they are at war with
+    ///@notice this function allows a nation to blockade another nation they are at war with
+    ///@param attackerId is the id of the attacking nation
+    ///@param defenderId is the nation id of the defending nation
+    ///@param warId is the war id of the active war between the 2 nations
     function blockade(
         uint256 attackerId,
         uint256 defenderId,
@@ -225,6 +235,10 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
     }
 }
 
+///@title BreakBlocadeContract
+///@author OxSnosh
+///@dev this contract inherits from the openzeppelin ownable contract
+///@dev this contract inherits from the chainlink VRF contract
 contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     uint256 public breakBlockadeId;
     address public countryMinter;
@@ -327,6 +341,12 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         navAct = NavalActionsContract(_navalActions);
     }
 
+    ///@dev this is a public function callable only from the nation owner
+    ///@dev this function allows a nation to break a blockade another nation imposed on them
+    ///@notice this function allows a nation to break a blockade another nation imposed on them
+    ///@param warId is the war id of the active war between the 2 nations
+    ///@param attackerId is the id of the attacking nation
+    ///@param defenderId is the nation id of the defending nation
     function breakBlockade(
         uint256 warId,
         uint256 attackerId,
@@ -789,6 +809,10 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     }
 }
 
+///@title NavalAttackContract
+///@author OxSnosh
+///@dev this contract inherits from the openzeppelin ownable contract
+///@dev this contract inherits from the chainlink VRF contract
 contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
     address public navy;
     uint256 public navyBattleId;
@@ -884,6 +908,12 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         navAct = NavalActionsContract(_navalActions);
     }
 
+    ///@dev this is a public function callable only from the nation owner
+    ///@dev this function allows a nation to attack the navy of another nation
+    ///@notice this function allows a nation to attack the navy of another nation
+    ///@param warId is the war id of the active war between the 2 nations
+    ///@param attackerId is the id of the attacking nation
+    ///@param defenderId is the nation id of the defending nation
     function navalAttack(
         uint256 warId,
         uint256 attackerId,

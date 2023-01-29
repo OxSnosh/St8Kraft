@@ -12,6 +12,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
+///@title SpyOperationsContract
+///@author OxSnosh
+///@dev this contact inherits from openzeppelin's ownable contract
+///@dev this contract inherits from chanlinks VRF contract
 contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
     uint256 public spyAttackId;
     address public forces;
@@ -96,6 +100,26 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         inf = InfrastructureContract(newAddress);
     }
 
+    ///@dev this functin is callable only by a nation owner and will allow a naton to conduct a spy operation
+    ///@notice this function will allow a nation to conduct a spy operation against another nation
+    ///@param attackerId is the id of the attacking nation
+    ///@param defenderId is the id of the defending nation
+    /**@param attackType is the type of attack
+     * 1. gather intelligence
+     * 2. destroy cruise missiles
+     * 3. destroy defending tanks
+     * 4. capture land
+     * 5. change governemnt
+     * 6. change religion
+     * 7. chenge threat level
+     * 8. change defcon
+     * 9. destroy spies
+     * 10. capture tech
+     * 11. sabatoge taxes
+     * 12. capture money reserves
+     * 13. capture infrastructure
+     * 14. destroy nukes
+    */
     function conductSpyOperation(
         uint256 attackerId,
         uint256 defenderId,

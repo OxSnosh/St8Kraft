@@ -12,6 +12,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 
+///@title GroundBattleContract
+///@author OxSnosh
+///@dev this contract inherits from the openzeppelin ownable contract
+///@dev this contract inherits from the chainlink vrf contract
 contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     uint256 groundBattleId;
     address warAddress;
@@ -141,12 +145,19 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         won4 = WondersContract4(newAddress);
     }
 
+    ///@dev this is a public function callable only from a nation owner
+    ///@dev this contract allows nations at war to launch a ground attack against each other
+    ///@notice this contract allows nations at war to launch a ground attack against each other
+    ///@param warId is the war id of the war between the 2 nations in the battle
+    ///@param attackerId is the nation id of the attacking nation
+    ///@param defenderId is the nation id of the defending nation
+    ///@param attackType 1. planned 2. standard 3. aggressive 4. bezerk
     function groundAttack(
         uint256 warId,
         uint256 attackerId,
         uint256 defenderId,
         uint256 attackType
-    ) internal {
+    ) public {
         bool isOwner = mint.checkOwnership(attackerId, msg.sender);
         require (isOwner, "!nation owner");
         bool isActiveWar = war.isWarActive(warId);
