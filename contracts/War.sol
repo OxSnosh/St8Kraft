@@ -7,6 +7,10 @@ import "./Wonders.sol";
 import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+///@title WarContract
+///@author OxSnosh
+///@notice this contact will allow a naion owner to declare war on another nation
+///@dev this contract inherits from openzeppelin's ownable contract
 contract WarContract is Ownable {
     uint256 public warId;
     address public countryMinter;
@@ -130,6 +134,8 @@ contract WarContract is Ownable {
     mapping(uint256 => uint256[]) public idToActiveWars;
     mapping(uint256 => uint256[]) public idToOffensiveWars;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings (
         address _countryMinter,
         address _nationStrength,
@@ -160,15 +166,18 @@ contract WarContract is Ownable {
         keeper = _keeper;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateCountryMinterContract(address newAddress) public onlyOwner {
         countryMinter = newAddress;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateNationStrengthContract(address newAddress) public onlyOwner {
         nationStrength = newAddress;
         nsc = NationStrengthContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateMilitaryContract(address newAddress) public onlyOwner {
         military = newAddress;
         mil = MilitaryContract(newAddress);
@@ -190,6 +199,12 @@ contract WarContract is Ownable {
         _;
     }
 
+    ///@dev this function is only callable from a nation owner and allow a natio nto eclare war on another nation
+    ///@notice this function allows a nation to declare war on another nation
+    ///@notice when war is declared the nations can attack each other
+    ///@param offenseId is the nation id of the nation declaring war
+    ///@param defenseId is the nation id of the nation having war declared on it
+    ///@notice a nation can only have a maximum of 4 offensive wars (5 with a foreign army base)
     function declareWar(uint256 offenseId, uint256 defenseId) public {
         bool isOwner = mint.checkOwnership(offenseId, msg.sender);
         require (isOwner, "!nation owner");
@@ -259,6 +274,7 @@ contract WarContract is Ownable {
         warId++;
     }
 
+    ///@dev this is an internal function that will be balled by the declare war function and set up severla structs that will keep track of each war
     function initializeDeployments(uint256 _warId) internal {
         OffenseDeployed1 memory newOffenseDeployed1 = OffenseDeployed1(
             0,
@@ -314,6 +330,12 @@ contract WarContract is Ownable {
         warIdToDefenseDeployed2[_warId] = newDefenseDeployed2;
     }
 
+    ///@dev this is a public view function that will return a boolean value if the nations are able to fight eachother
+    ///@notice this function will return a boolean value of true if the nations are able to fight eachother
+    ///@notice in order for a war to be declared the offense strength must be within 75% and 133% of the defending nation
+    ///@param offenseId is the nation id of the aggressor nation
+    ///@param defenseId if the nation id of the defending nation
+    ///@return bool will be true if the nations are within range where war is possible
     function checkStrength(uint256 offenseId, uint256 defenseId)
         public
         view
@@ -331,6 +353,12 @@ contract WarContract is Ownable {
         }
     }
 
+    ///@dev this is a public function that will allow a nation involved in a war to offer peace
+    ///@notice this funtion will allow a nation involved in a war to offer peace
+    ///@param offerId is the nation offering peace
+    ///@param _warId is the war id for the war where peace is being offered
+    ///@notice if the offense and the defense offer peace then peace will be declares
+    ///@notice an attack will nullify any existing peace offers
     function offerPeace(uint256 offerId, uint256 _warId) public {
         bool isOwner = mint.checkOwnership(offerId, msg.sender);
         require (isOwner, "!nation owner");
@@ -355,6 +383,7 @@ contract WarContract is Ownable {
         }
     }
 
+    ///@dev this is an internal function that will remove the active war from each nation when peace is declared or the war expires
     function removeActiveWar(
         uint256 _warId
     ) internal {
@@ -397,6 +426,9 @@ contract WarContract is Ownable {
         _;
     }
 
+    ///@dev this function is only callable from the keeper contract
+    ///@dev wars expire after 7 days and will be removed from active wars when daysLeft reaches 0
+    ///@notice wars expire after 7 days and will be removed from active wars when daysLeft reaches 0
     function decrementWarDaysLeft() public onlyKeeper {
         for(uint256 i = 0; i < activeWars.length; i++) {
             uint256 war = activeWars[i];
@@ -407,6 +439,9 @@ contract WarContract is Ownable {
         }
     }
 
+    ///@dev this function is only callable from the keeper contract
+    ///@notice this function will reset cruise missile launches daily to 0
+    ///@notice a nation can only launch 2 cruise missiles per day per war
     function resetCruiseMissileLaunches() public onlyKeeper {
         for (uint256 i = 0; i < activeWars.length; i++) {
             uint256 war = activeWars[i];
@@ -423,6 +458,7 @@ contract WarContract is Ownable {
         _;
     }
 
+    ///@dev this function is only callable from the navy battle contract and will increment navy casualties
     function addNavyCasualties(
         uint256 _warId,
         uint256 nationId,
@@ -437,6 +473,8 @@ contract WarContract is Ownable {
         }
     }
 
+    ///@dev this function is only callable from the cruise missile contract and will only allow a nation to launch 2 cruise missiles per war per day
+    ///@notice this function will only allow a nation to launch 2 cruise missiles per war per day
     function incrementCruiseMissileAttack(uint256 _warId, uint256 nationId)
         public
         onlyCruiseMissileContract
@@ -456,11 +494,19 @@ contract WarContract is Ownable {
         }
     }
 
+    ///@dev this is a public view function that will take a war id as a parameter and return whether the war is active or not
+    ///@notice this function will return whether a war is active or not
+    ///@param _warId is the warId being queries
+    ///@return bool will be true if the war is active
     function isWarActive(uint256 _warId) public view returns (bool) {
         bool isActive = warIdToWar[_warId].active;
         return isActive;
     }
 
+    ///@dev this is a public view function that will return the two members f a given warId
+    ///@param _warId is the warId of the war being queried
+    ///@return offenseId is the nation id of the offensive nation in the war
+    ///@return defenseId is the nation id of the defensive nation in the war
     function getInvolvedParties(uint256 _warId)
         public
         view
@@ -471,6 +517,10 @@ contract WarContract is Ownable {
         return (offenseId, defenseId);
     }
 
+    ///@dev this is a public view function that will return true if one of the nations has offered peace
+    ///@notice this function will return true if one of the nations has offered peace
+    ///@param _warId is the war id of the war being queried
+    ///@return bool will be true if one of the nation has offered peace
     function isPeaceOffered(uint256 _warId) public view returns (bool) {
         bool peaceOffered = false;
         if (
@@ -482,6 +532,8 @@ contract WarContract is Ownable {
         return peaceOffered;
     }
 
+    ///@dev this is a publci view function that will return the number of days left in a war
+    ///@dev wars expire after 7 days when days left == 0
     function getDaysLeft(uint256 _warId) public view returns (uint256) {
         uint256 daysLeft = warIdToWar[_warId].daysLeft;
         return daysLeft;
@@ -788,6 +840,8 @@ contract WarContract is Ownable {
         }
     }
 
+    ///@dev this function is only callable fro mthe air battle contract
+    ///@dev this function will increment air battle casualties
     function addAirBattleCasualties(
         uint256 _warId,
         uint256 nationId,
@@ -807,6 +861,8 @@ contract WarContract is Ownable {
         _;
     }
 
+    ///@dev this function is only callable from the forces contact
+    ///@notice this function will allow a nation to deploy ground forces (soldiers and tanks) to a given war
     function deploySoldiers(
         uint256 nationId,
         uint256 _warId,
@@ -826,6 +882,11 @@ contract WarContract is Ownable {
         }
     }
 
+    ///@dev this is a public view function that will return the number of ground forces a nation has deploed to a war
+    ///@param _warId is the war id of the war where the forces are deployed
+    ///@param attackerId is the nation id of the nation being queried
+    ///@return soldiersDeployed is the soldiers the given nation has deployed to the given war
+    ///@return tanksDeployed is the tanks the given nation has deployed to the given war
     function getDeployedGroundForces(uint256 _warId, uint256 attackerId)
         public
         view
@@ -853,6 +914,8 @@ contract WarContract is Ownable {
         _;
     }
 
+    ///@dev this function is only callable from the groun battle contract
+    ///@dev this function will increment ground forces casualties
     function decreaseGroundBattleLosses(
         uint256 soldierLosses,
         uint256 tankLosses,
