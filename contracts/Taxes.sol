@@ -14,6 +14,9 @@ import "./CountryMinter.sol";
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+///@title TaxesContract
+///@author OxSnosh
+///@dev this contract inherits from the open zeppelin ownable contract
 contract TaxesContract is Ownable {
     address public countryMinter;
     address public infrastructure;
@@ -51,6 +54,8 @@ contract TaxesContract is Ownable {
     CountryMinter mint;
     BonusResourcesContract bonus;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings1 (
         address _countryMinter,
         address _infrastructure,
@@ -79,6 +84,8 @@ contract TaxesContract is Ownable {
         bonus = BonusResourcesContract(_bonusResources);
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings2 (
         address _parameters,
         address _wonders1,
@@ -110,8 +117,6 @@ contract TaxesContract is Ownable {
         crm = CrimeContract(_crime);
     }
 
-    mapping(uint256 => address) public idToOwnerTaxes;
-
     modifier onlyCountryMinter() {
         require(
             msg.sender == countryMinter,
@@ -120,35 +125,42 @@ contract TaxesContract is Ownable {
         _;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateCountryMinter(address newAddress) public onlyOwner {
         countryMinter = newAddress;
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateInfrastructureContract(address newAddress) public onlyOwner {
         infrastructure = newAddress;
         inf = InfrastructureContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateTreasuryContract(address newAddress) public onlyOwner {
         treasury = newAddress;
         tsy = TreasuryContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateImprovementsContract1(address newAddress) public onlyOwner {
         improvements1 = newAddress;
         imp1 = ImprovementsContract1(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateImprovementsContract2(address newAddress) public onlyOwner {
         improvements2 = newAddress;
         imp2 = ImprovementsContract2(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateImprovementsContract3(address newAddress) public onlyOwner {
         improvements3 = newAddress;
         imp3 = ImprovementsContract3(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateCountryParametersContract(address newAddress)
         public
         onlyOwner
@@ -157,47 +169,53 @@ contract TaxesContract is Ownable {
         params = CountryParametersContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWondersContract2(address newAddress) public onlyOwner {
         wonders2 = newAddress;
         won2 = WondersContract2(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateWondersContract3(address newAddress) public onlyOwner {
         wonders3 = newAddress;
         won3 = WondersContract3(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateResourcesContract(address newAddress) public onlyOwner {
         resources = newAddress;
         res = ResourcesContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateForcesContract(address newAddress) public onlyOwner {
         forces = newAddress;
         frc = ForcesContract(newAddress);
     }
 
+    ///@dev this function is only callable by the contract owner
     function updateMilitaryContract(address newAddress) public onlyOwner {
         military = newAddress;
         mil = MilitaryContract(newAddress);
     }
 
-    function initiateTaxes(uint256 id, address nationOwner)
-        public
-        onlyCountryMinter
-    {
-        idToOwnerTaxes[id] = nationOwner;
-    }
-
-    //need to reduce taxes collectible by a percentage for each blockade against
+    ///@dev this is a public function callable only by the nation owner collecting taxes
+    ///@notice this function will allow a nation owner to collect taxes from their citizens
+    ///@param id this is the nation id of the nation collecting taxes
     function collectTaxes(uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require (isOwner, "!nation owner");
         (, uint256 taxesCollectible) = getTaxesCollectible(id);
         inf.toggleCollectionNeededToChangeRate(id);
         tsy.increaseBalanceOnTaxCollection(id, taxesCollectible);
+        //need to reduce taxes collectible by a percentage for each blockade against
     }
 
+    ///@dev this is a public view function that will return a nations taxes that are collectible
+    ///@notice this function will return a nations taxes collectible
+    ///@param id is the nation id of the nation being queried
+    ///@return dailyTaxesCollectiblePerCitizen is the tax portion of each citizens income per day
+    ///@return taxesCollectible is the amount of taxes that are collectible (daily taxes per citizen * days since last collection * citizen count)    
     function getTaxesCollectible(uint256 id) public view returns (uint256, uint256) {
         uint256 dailyIncomePerCitizen = getDailyIncome(id);
         uint256 daysSinceLastTaxCollection = tsy.getDaysSinceLastTaxCollection(
@@ -212,6 +230,10 @@ contract TaxesContract is Ownable {
         return (dailyTaxesCollectiblePerCitizen, taxesCollectible);        
     }
 
+    ///@dev this is a public view function that will return the daily gross income per citizen for a given nation
+    ///@notice this function will return the gross income per citizen for a given nation
+    ///@param id is the nation id of the nation being queried
+    ///@return uint256 is the daily income of each citizen for a nation
     function getDailyIncome(uint256 id) public view returns (uint256) {
         uint256 happiness = getHappiness(id);
         //increasers
@@ -239,6 +261,11 @@ contract TaxesContract is Ownable {
         return dailyIncomePerCitizen;
     }
 
+    ///@dev this is a publci view function that will return a nations happiness
+    ///@notice this function will return a nations happiness
+    ///@notice the higher a nations happiness the more money its citizens will make
+    ///@param id is the nation id of the nation being queried
+    ///@return happiness is the happiness for the queried nation
     function getHappiness(uint256 id) public view returns (uint256) {
         uint256 happinessAdditions = getHappinessPointsToAdd(id);
         uint256 happinessSubtractions = getHappinessPointsToSubtract(id);
@@ -784,6 +811,10 @@ contract TaxesContract is Ownable {
     // }
 }
 
+///@title AdditionalTaxesContract
+///@author OxSnosh 
+///@dev tis contract inherits from openzeppelin's ownable contract
+///@notice this contract will have additional formulas that will allow a nation to collect taxes from its citizens
 contract AdditionalTaxesContract is Ownable {
     // address public countryMinter;
     address public infrastructure;
@@ -818,6 +849,8 @@ contract AdditionalTaxesContract is Ownable {
     // CrimeContract crm;
     BonusResourcesContract bonus;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings (
         address _parameters,
         address _wonders1,
@@ -849,6 +882,8 @@ contract AdditionalTaxesContract is Ownable {
         bonus = BonusResourcesContract(_bonusResources);
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings2(address _improvements2, address _improvements3) public onlyOwner {
         improvements2 = _improvements2;
         imp2 = ImprovementsContract2(_improvements2);

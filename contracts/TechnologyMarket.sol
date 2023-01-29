@@ -9,6 +9,10 @@ import "./Wonders.sol";
 import "./Treasury.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+///@title TechnologyMarketContract
+///@author OxSnosh
+///@dev this contract inherits from openzeppelin's ownable contract
+///@notice this contract allows a nation owner to purchase technology
 contract TechnologyMarketContract is Ownable {
     address public countryMinter;
     address public infrastructure;
@@ -30,6 +34,8 @@ contract TechnologyMarketContract is Ownable {
     InfrastructureContract inf;
     BonusResourcesContract bonus;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings (
         address _resources,
         address _improvements3,
@@ -61,6 +67,10 @@ contract TechnologyMarketContract is Ownable {
         bonus = BonusResourcesContract(_bonusResources);
     }
 
+    ///@dev this is a public function that is only callable by the nation owner
+    ///@notice this function will allow a nation owner to purchase technology
+    ///@param id this is the nation id of the nation buying technology
+    ///@param amount this is the amount of technology being purchased
     function buyTech(uint256 id, uint256 amount) public {
         bool owner = mint.checkOwnership(id, msg.sender);
         require(owner, "!nation owner");
@@ -69,12 +79,21 @@ contract TechnologyMarketContract is Ownable {
         tsy.spendBalance(id, cost);
     }
 
+    ///@dev this is a public view function taht will return the cost of a technology purchase
+    ///@notice this function will return the cost of a technology purchase
+    ///@param id is the nation id of the nation buying technology
+    ///@param amount is the amount of technology being purchased
+    ///@return uint256 is the cost of a technology purchase
     function getTechCost(uint256 id, uint256 amount) public view returns (uint256) {
         uint256 costPerLevel = getTechCostPerLevel(id);
         uint256 cost = (costPerLevel * amount);
         return cost;
     }
 
+    ///@dev this is a public view function that will return the cost a nation has to pay for technology per level
+    ///@notice this function willreturn the cost a nation has to pay for technology per level
+    ///@param id is the nation id of the nation being queried
+    ///@return uint256 is the cost a nation has to pey for technology per level
     function getTechCostPerLevel(uint256 id)
         public
         view
@@ -146,6 +165,7 @@ contract TechnologyMarketContract is Ownable {
         return costPerLevel;
     }
 
+    ///@dev this function will adjust a nations tech cost based on wonders improvements and resources
     function getTechCostMultiplier(uint256 id) public view returns (uint256) {
         uint256 numberToSubtract = 0;
         bool isGold = res.viewGold(id);
@@ -176,6 +196,7 @@ contract TechnologyMarketContract is Ownable {
         return multiplier;
     }
 
+    ///@dev this function allows a nation to destroy technology
     function destroyTech(uint256 id, uint256 amount) public {
         bool owner = mint.checkOwnership(id, msg.sender);
         require(owner, "!nation owner");

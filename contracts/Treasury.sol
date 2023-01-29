@@ -11,6 +11,11 @@ import "./Fighters.sol";
 import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+///@title TreasuyContract
+///@author OxSnosh
+///@dev this contract will allow the game owner to withdraw game revenues from the in game purchases
+///@dev this contract inherits from the openzeppelin ownable contract
+///@notice this contact will allow a nation owner 
 contract TreasuryContract is Ownable {
     uint256 public counter;
     address public wonders1;
@@ -48,6 +53,8 @@ contract TreasuryContract is Ownable {
 
     mapping(uint256 => Treasury) public idToTreasury;
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings1(
         address _warBucksAddress,
         address _wonders1,
@@ -74,6 +81,8 @@ contract TreasuryContract is Ownable {
         spyAddress = _spyAddress;
     }
 
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings2(
         address _groundBattle,
         address _countryMinter,
@@ -85,22 +94,9 @@ contract TreasuryContract is Ownable {
         keeper = _keeper;
     }
 
-    function generateTreasury(uint256 id) public {
-        Treasury memory newTreasury = Treasury(
-            0,
-            0,
-            0,
-            0,
-            0,
-            1,
-            0,
-            1,
-            0,
-            false
-        );
-        idToTreasury[id] = newTreasury;
-        idToTreasury[id].balance += seedMoney;
-        counter++;
+    modifier onlyCountryMinter() {
+        require(msg.sender == countryMinter, "function only callable from country minter contract");
+        _;
     }
 
     modifier onlyTaxesContract() {
@@ -111,14 +107,6 @@ contract TreasuryContract is Ownable {
     modifier onlySpyContract() {
         require(msg.sender == spyAddress, "only callable from spy contract");
         _;
-    }
-
-    function increaseBalanceOnTaxCollection(uint256 id, uint256 amount)
-        public
-        onlyTaxesContract
-    {
-        idToTreasury[id].balance += amount;
-        idToTreasury[id].daysSinceLastTaxCollection = 0;
     }
 
     modifier onlyBillsContract() {
@@ -139,6 +127,43 @@ contract TreasuryContract is Ownable {
         _;
     }
 
+    ///@dev this function is only callable from the country minter contract
+    ///@notice this function will be called when a nation is minted and will allow a nation to undergo treasury operations
+    ///@param id is the nation id of the nation being minted
+    function generateTreasury(uint256 id) public onlyCountryMinter {
+        Treasury memory newTreasury = Treasury(
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            1,
+            0,
+            false
+        );
+        idToTreasury[id] = newTreasury;
+        idToTreasury[id].balance += seedMoney;
+        counter++;
+    }
+
+    ///@dev this function is only callable by the taxes contract
+    ///@dev this function will increase a nations balance when taxes are collected
+    ///@param id this is the nation id of the country collecting taxes
+    ///@param amount this is the amount of taxes being collected
+    function increaseBalanceOnTaxCollection(uint256 id, uint256 amount)
+        public
+        onlyTaxesContract
+    {
+        idToTreasury[id].balance += amount;
+        idToTreasury[id].daysSinceLastTaxCollection = 0;
+    }
+
+    ///@dev this function is only callable from the bills contract
+    ///@dev this function will decrease a nations balance when bils are paid
+    ///@param id is the nation id of the nation paying bills
+    ///@param amount is the amount of bills being paid
     function decreaseBalanceOnBillsPaid(uint256 id, uint256 amount)
         public
         onlyBillsContract
@@ -148,6 +173,11 @@ contract TreasuryContract is Ownable {
         idToTreasury[id].inactive = false;
     }
 
+    ///@dev this function is public but only callable by contracts within the game where funds are being spent
+    ///@dev this function will decrease a nation owner's balance when money is spent within the game
+    ///@notice this function will decrease a nation owner's balance when money is spent within the game
+    ///@param id is the nation id of the nation spending funds
+    ///@param cost is the cost of the expense
     function spendBalance(uint256 id, uint256 cost) public {
         //need a way to only allow the nation owner to do this
         uint256 balance = idToTreasury[id].balance;
@@ -163,16 +193,21 @@ contract TreasuryContract is Ownable {
         }
     }
 
+    ///@dev this function will show the balance of warbucks within the contract
+    ///@dev when money is spent within the game it can be taxed an deposited within this contract
     function viewTaxRevenues() public view returns (uint256) {
         return (WarBucks(warBucksAddress).balanceOf(address(this)));
     }
 
+    ///@dev when money is spent within the game it can be taxed an deposited within this contract
+    ///@dev this function will allow the contract owner to withdraw the warbucks from this contract into the owners wallet
     function withdrawTaxRevenues(uint256 amount) public onlyOwner {
         WarBucks(warBucksAddress).approve(address(this), amount);
         WarBucks(warBucksAddress).transferFrom(address(this), msg.sender, amount);
     }
 
-    // need modifier
+    ///@dev this function is only callable from the infrastructure contract
+    ///@dev this function will compensate a nation when they sell land, tech or infrastructure
     function returnBalance(uint256 id, uint256 cost) public onlyInfrastructure {
         //need a way to only allow the nation owner to do this
         idToTreasury[id].balance += cost;
@@ -183,6 +218,11 @@ contract TreasuryContract is Ownable {
         _;
     }
 
+    ///@dev this function is only callable from the aid contract
+    ///@dev this function will send the balance in an aid package from the sender nation to the recipient nation
+    ///@param idSender is the sender of an aid package
+    ///@param idRecipient is the recipient of an aid package
+    ///@param amount is the amount of balance being included in the aid package
     function sendAidBalance(
         uint256 idSender,
         uint256 idRecipient,
@@ -202,6 +242,11 @@ contract TreasuryContract is Ownable {
         _;
     }
 
+    ///@dev this function is only callable from the ground battle contract
+    ///@dev this function will transfer the balance lost in a ground battle to the winning nation
+    ///@param randomNumber is the amount of balance being transferred
+    ///@param attackerId is the nation id of the attacking nation
+    ///@param defenderId is the nation id of the defending nation
     function transferSpoils(
         uint256 randomNumber,
         uint256 attackerId,
@@ -218,6 +263,11 @@ contract TreasuryContract is Ownable {
         }
     }
 
+    ///@dev this function is only callable from a nation owner
+    ///@dev this function allows a nation owner to withdraw funds from their nation
+    ///@notice this function allows a nation owner to withdraw funds from their nation
+    ///@param amount is the amount of funds being withdrawn
+    ///@param id is the nation id of the nation withdrawing funds
     function withdrawFunds(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
@@ -227,6 +277,11 @@ contract TreasuryContract is Ownable {
         IWarBucks(warBucksAddress).mintFromTreasury(msg.sender, amount);
     }
 
+    ///@dev this function is only callable from a nation owner
+    ///@dev this function allows a nation owner to add funds to their nation
+    ///@notice this function allows a nation owner to add funds to their nation
+    ///@param amount is the amount of funds being added
+    ///@param id is the nation id of the nation withdrawing funds
     function addFunds(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
@@ -239,6 +294,10 @@ contract TreasuryContract is Ownable {
         IWarBucks(warBucksAddress).burnFromTreasury(msg.sender, amount);
     }
 
+    ///@dev ths function is only callable from the keeper contract
+    ///@dev this function will increment the number of days since bills wre paid and taxes were collected
+    ///@notice this function will increment the number of days since bills wre paid and taxes were collected
+    ///@notice if a nation does not pay thir bills for a set amount of time (default is 20 days) the nation will be put into inactive mode
     function incrementDaysSince() external onlyKeeper {
         uint256 i;
         for (i = 0; i < counter; i++) {
@@ -250,18 +309,29 @@ contract TreasuryContract is Ownable {
         }
     }
 
+    ///@dev this function allows the contract owner to set the tax rate in game purchases are taxed at
+    ///@dev the tax rate will be the % of the purchase price that is minted into this contract that can be withdrawn later
     function setGameTaxRate(uint256 newPercentage) public onlyOwner {
         gameTaxPercentage = newPercentage;
     }
 
+    ///@dev this funtion will reuturn the game tax rate
+    ///@return uint256 will be the tax rate at which purchases in the game are taxed at
     function getGameTaxRate() public view onlyOwner returns (uint256) {
         return gameTaxPercentage;
     }
 
+    ///@dev this function is only callable from the contract owner
+    ///@dev this function will allow the contract owner to set the number of days a nation cannot pay bill until it becomes inactive
+    ///@notice this function will allow the contract owner to set the number of days a nation cannot pay bill until it becomes inactive
     function setDaysToInactive(uint256 newDays) public onlyOwner {
         daysToInactive = newDays;
     }
 
+    ///@dev this funtion is a public view function that will return the number of days it has been since a nation has collected taxes
+    ///@notice this funtion will return the number of days it has been since a nation has collected taxes
+    ///@param id is the nation id of the nation being queried
+    ///@return uint256 is the number of days since a nation has collected taxes
     function getDaysSinceLastTaxCollection(uint256 id)
         public
         view
@@ -270,6 +340,10 @@ contract TreasuryContract is Ownable {
         return idToTreasury[id].daysSinceLastTaxCollection;
     }
 
+    ///@dev this funtion is a public view function that will return the number of days it has been since a nation has paid bills
+    ///@notice this funtion will return the number of days it has been since a nation has paid bills
+    ///@param id is the nation id of the nation being queried
+    ///@return uint256 is the number of days since a nation has paid bills
     function getDaysSinceLastBillsPaid(uint256 id)
         public
         view
@@ -278,10 +352,19 @@ contract TreasuryContract is Ownable {
         return idToTreasury[id].daysSinceLastBillPaid;
     }
 
+    ///@dev this is a public view function that will return a nations in game balance
+    ///@notice this function will return a given nations in game balance
+    ///@param id is the nation id of the nation being queries
+    ///@return uint256 is the balance of war bucks for the nation
     function checkBalance(uint256 id) public view returns (uint256) {
         return idToTreasury[id].balance;
     }
 
+    ///@dev this function is only callable from the spy contract
+    ///@dev this function will allow the spy contract to transfer a nations balance to an attacking nation upon a successful spy attack
+    ///@param toId is the nation id of the nation recieving the balance (attacking nation)
+    ///@param fromId is the nation id of the nation recieving the balance (receiving nation)
+    ///@param amount is the amount of balance being transferred
     function transferBalance(
         uint256 toId,
         uint256 fromId,
@@ -291,6 +374,10 @@ contract TreasuryContract is Ownable {
         idToTreasury[fromId].balance -= amount;
     }
 
+    ///@dev this is a public view function that will return if a nation is inactive
+    ///@notice this function will retun if a nation is inactive
+    ///@param id is the nation id of the nation being queried
+    ///@return bool will be true if the nation is inactive
     function checkInactive(uint256 id) public view returns (bool) {
         return idToTreasury[id].inactive;
     }
