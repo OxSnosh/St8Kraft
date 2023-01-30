@@ -816,7 +816,8 @@ describe("Forces Contract", async function () {
         await resourcescontract.settings(
             infrastructurecontract.address,
             improvementscontract2.address,
-            countryminter.address
+            countryminter.address,
+            bonusresourcescontract.address
         )
         await bonusresourcescontract.settings(
             infrastructurecontract.address,
@@ -982,10 +983,31 @@ describe("Forces Contract", async function () {
             expect(tanks.toNumber()).to.equal(0);
         })
 
-        it("tests that buySoldiers() reverts correctly", async function () {
-            var population = await infrastructurecontract.getTotalPopulationCount(0);
-            // console.log(population.toNumber());
+        it("tests that buySoldiers() works correctly", async function () {
             await expect(forcescontract.connect(signer1).buySoldiers(500, 0)).to.be.revertedWith("population cannot support that many soldiers");
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500)
+            // var population = await infrastructurecontract.getTotalPopulationCount(0);
+            // console.log(population.toNumber());
+            await forcescontract.connect(signer1).buySoldiers(500, 0)
+            // var soldiers = await forcescontract.getDefendingSoldierCount(0);
+            // console.log(soldiers.toNumber())
+            await forcescontract.connect(signer1).buySoldiers(2350, 0);
+            // var soldiers = await forcescontract.getDefendingSoldierCount(0);
+            // console.log(soldiers.toNumber())
+            await expect(forcescontract.connect(signer1).buySoldiers(150, 0)).to.be.revertedWith("population cannot support that many soldiers");
+            var soldierCount = await forcescontract.getSoldierCount(0);
+            expect(soldierCount.toNumber()).to.equal(2870)
+        })
+
+        it("tests that getSoldierCost() works correctly", async function () {
+            var cost = await forcescontract.getSoldierCost(0)
+            expect(cost.toNumber()).to.equal(12);
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 7, 8)
+            var cost = await forcescontract.getSoldierCost(0)
+            expect(cost.toNumber()).to.equal(9);
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 7, 11)
+            var cost = await forcescontract.getSoldierCost(0)
+            expect(cost.toNumber()).to.equal(6);
         })
 
 

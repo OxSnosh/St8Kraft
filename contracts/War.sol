@@ -6,6 +6,7 @@ import "./Military.sol";
 import "./Wonders.sol";
 import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
 
 ///@title WarContract
 ///@author OxSnosh
@@ -136,7 +137,7 @@ contract WarContract is Ownable {
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings (
+    function settings(
         address _countryMinter,
         address _nationStrength,
         address _military,
@@ -207,15 +208,15 @@ contract WarContract is Ownable {
     ///@notice a nation can only have a maximum of 4 offensive wars (5 with a foreign army base)
     function declareWar(uint256 offenseId, uint256 defenseId) public {
         bool isOwner = mint.checkOwnership(offenseId, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         bool isWarOkOffense = mil.getWarPeacePreference(offenseId);
         require(isWarOkOffense == true, "you are in peace mode");
-        bool isWarOkDefense = mil.getWarPeacePreference(offenseId);
+        bool isWarOkDefense = mil.getWarPeacePreference(defenseId);
         require(isWarOkDefense == true, "nation in peace mode");
         bool isStrengthWithinRange = checkStrength(offenseId, defenseId);
         require(
             isStrengthWithinRange == true,
-            "nation strength is not within range"
+            "nation strength is not within range to declare war"
         );
         War memory newWar = War(
             warId,
@@ -260,18 +261,26 @@ contract WarContract is Ownable {
         warIdToDefenseLosses[warId] = newDefenseLosses;
         uint256[] storage offensiveWars = idToOffensiveWars[offenseId];
         uint256 maxOffensiveWars = 4;
-        bool foreignArmyBase = won1.getForeignArmyBase(offenseId);
-        if(foreignArmyBase) {
-            maxOffensiveWars = 5;
-        }
-        require (offensiveWars.length <= maxOffensiveWars, "you do not have a war slot available");
+        // bool foreignArmyBase = won1.getForeignArmyBase(offenseId);
+        // if (foreignArmyBase) {
+        //     maxOffensiveWars = 5;
+        // }
+        require(
+            offensiveWars.length <= maxOffensiveWars,
+            "you do not have an offensive war slot available"
+        );
         uint256[] storage offenseActiveWars = idToActiveWars[offenseId];
         offenseActiveWars.push(warId);
         uint256[] storage defenseActiveWars = idToActiveWars[defenseId];
         defenseActiveWars.push(warId);
-        initializeDeployments(warId);
-        activeWars[warId] = warId;
+        offensiveWars.push(warId);
         warId++;
+        initializeDeployments(warId);
+    }
+
+    function offensiveWarLengthForTesting(uint256 offenseId) public view returns (uint256) {
+        uint256[] memory offensiveWars = idToOffensiveWars[offenseId];
+        return offensiveWars.length;
     }
 
     ///@dev this is an internal function that will be balled by the declare war function and set up severla structs that will keep track of each war
@@ -336,11 +345,10 @@ contract WarContract is Ownable {
     ///@param offenseId is the nation id of the aggressor nation
     ///@param defenseId if the nation id of the defending nation
     ///@return bool will be true if the nations are within range where war is possible
-    function checkStrength(uint256 offenseId, uint256 defenseId)
-        public
-        view
-        returns (bool)
-    {
+    function checkStrength(
+        uint256 offenseId,
+        uint256 defenseId
+    ) public view returns (bool) {
         uint256 offenseStrength = nsc.getNationStrength(offenseId);
         uint256 defenseStrength = nsc.getNationStrength(defenseId);
         uint256 strengthRatio = ((offenseStrength * 100) / defenseStrength);
@@ -361,7 +369,7 @@ contract WarContract is Ownable {
     ///@notice an attack will nullify any existing peace offers
     function offerPeace(uint256 offerId, uint256 _warId) public {
         bool isOwner = mint.checkOwnership(offerId, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         uint256 offenseNation = warIdToWar[_warId].offenseId;
         uint256 defenseNation = warIdToWar[_warId].defenseId;
         require(
@@ -384,9 +392,7 @@ contract WarContract is Ownable {
     }
 
     ///@dev this is an internal function that will remove the active war from each nation when peace is declared or the war expires
-    function removeActiveWar(
-        uint256 _warId
-    ) internal {
+    function removeActiveWar(uint256 _warId) internal {
         (uint256 offenseId, uint256 defenseId) = getInvolvedParties(_warId);
         uint256[] storage offenseActiveWars = idToActiveWars[offenseId];
         for (uint256 i = 0; i < offenseActiveWars.length; i++) {
@@ -401,9 +407,7 @@ contract WarContract is Ownable {
         uint256[] storage offensiveWars = idToOffensiveWars[offenseId];
         for (uint256 i = 0; i < offensiveWars.length; i++) {
             if (offensiveWars[i] == _warId) {
-                offensiveWars[i] = offensiveWars[
-                    offenseActiveWars.length - 1
-                ];
+                offensiveWars[i] = offensiveWars[offenseActiveWars.length - 1];
                 offensiveWars.pop();
                 idToOffensiveWars[offenseId] = offenseActiveWars;
             }
@@ -422,7 +426,10 @@ contract WarContract is Ownable {
     }
 
     modifier onlyKeeper() {
-        require(msg.sender == keeper, "function only callable from keeper file");
+        require(
+            msg.sender == keeper,
+            "function only callable from keeper file"
+        );
         _;
     }
 
@@ -430,7 +437,7 @@ contract WarContract is Ownable {
     ///@dev wars expire after 7 days and will be removed from active wars when daysLeft reaches 0
     ///@notice wars expire after 7 days and will be removed from active wars when daysLeft reaches 0
     function decrementWarDaysLeft() public onlyKeeper {
-        for(uint256 i = 0; i < activeWars.length; i++) {
+        for (uint256 i = 0; i < activeWars.length; i++) {
             uint256 war = activeWars[i];
             warIdToWar[war].daysLeft -= 1;
             if (warIdToWar[war].daysLeft == 0) {
@@ -452,7 +459,8 @@ contract WarContract is Ownable {
 
     modifier onlyNavyBattle() {
         require(
-            msg.sender == breakBlockadeAddress || msg.sender == navalAttackAddress,
+            msg.sender == breakBlockadeAddress ||
+                msg.sender == navalAttackAddress,
             "function only callable from navy battle contract"
         );
         _;
@@ -475,10 +483,10 @@ contract WarContract is Ownable {
 
     ///@dev this function is only callable from the cruise missile contract and will only allow a nation to launch 2 cruise missiles per war per day
     ///@notice this function will only allow a nation to launch 2 cruise missiles per war per day
-    function incrementCruiseMissileAttack(uint256 _warId, uint256 nationId)
-        public
-        onlyCruiseMissileContract
-    {
+    function incrementCruiseMissileAttack(
+        uint256 _warId,
+        uint256 nationId
+    ) public onlyCruiseMissileContract {
         (uint256 offenseId, uint256 defenseId) = getInvolvedParties(warId);
         if (nationId == offenseId) {
             uint256 launchesToday = warIdToWar[_warId]
@@ -507,11 +515,9 @@ contract WarContract is Ownable {
     ///@param _warId is the warId of the war being queried
     ///@return offenseId is the nation id of the offensive nation in the war
     ///@return defenseId is the nation id of the defensive nation in the war
-    function getInvolvedParties(uint256 _warId)
-        public
-        view
-        returns (uint256, uint256)
-    {
+    function getInvolvedParties(
+        uint256 _warId
+    ) public view returns (uint256, uint256) {
         uint256 offenseId = warIdToWar[_warId].offenseId;
         uint256 defenseId = warIdToWar[_warId].defenseId;
         return (offenseId, defenseId);
@@ -539,17 +545,10 @@ contract WarContract is Ownable {
         return daysLeft;
     }
 
-    function getDeployedFightersLowStrength(uint256 _warId, uint256 countryId)
-        public
-        view
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256
-        )
-    {
+    function getDeployedFightersLowStrength(
+        uint256 _warId,
+        uint256 countryId
+    ) public view returns (uint256, uint256, uint256, uint256, uint256) {
         uint256 yak9Count;
         uint256 p51MustangCount;
         uint256 f86SabreCount;
@@ -582,16 +581,10 @@ contract WarContract is Ownable {
         );
     }
 
-    function getDeployedFightersHighStrength(uint256 _warId, uint256 countryId)
-        public
-        view
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            uint256
-        )
-    {
+    function getDeployedFightersHighStrength(
+        uint256 _warId,
+        uint256 countryId
+    ) public view returns (uint256, uint256, uint256, uint256) {
         uint256 f35LightningCount;
         uint256 f15EagleCount;
         uint256 su30MkiCount;
@@ -613,17 +606,10 @@ contract WarContract is Ownable {
         return (f35LightningCount, f15EagleCount, su30MkiCount, f22RaptorCount);
     }
 
-    function getDeployedBombersLowStrength(uint256 _warId, uint256 countryId)
-        public
-        view
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            uint256,
-            uint256
-        )
-    {
+    function getDeployedBombersLowStrength(
+        uint256 _warId,
+        uint256 countryId
+    ) public view returns (uint256, uint256, uint256, uint256, uint256) {
         uint256 ah1CobraDeployed;
         uint256 ah64ApacheDeployed;
         uint256 bristolBlenheimDeployed;
@@ -660,16 +646,10 @@ contract WarContract is Ownable {
         );
     }
 
-    function getDeployedBombersHighStrength(uint256 _warId, uint256 countryId)
-        public
-        view
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            uint256
-        )
-    {
+    function getDeployedBombersHighStrength(
+        uint256 _warId,
+        uint256 countryId
+    ) public view returns (uint256, uint256, uint256, uint256) {
         uint256 b52StratofortressDeployed;
         uint256 b2SpiritDeployed;
         uint256 b1bLancerDeployed;
@@ -708,10 +688,10 @@ contract WarContract is Ownable {
         _;
     }
 
-    function resetDeployedBombers(uint256 _warId, uint256 countryId)
-        public
-        onlyAirBattle
-    {
+    function resetDeployedBombers(
+        uint256 _warId,
+        uint256 countryId
+    ) public onlyAirBattle {
         if (warIdToWar[_warId].offenseId == countryId) {
             warIdToOffenseDeployed2[_warId].ah1CobraDeployed = 0;
             warIdToOffenseDeployed2[_warId].ah64ApacheDeployed = 0;
@@ -887,11 +867,10 @@ contract WarContract is Ownable {
     ///@param attackerId is the nation id of the nation being queried
     ///@return soldiersDeployed is the soldiers the given nation has deployed to the given war
     ///@return tanksDeployed is the tanks the given nation has deployed to the given war
-    function getDeployedGroundForces(uint256 _warId, uint256 attackerId)
-        public
-        view
-        returns (uint256, uint256)
-    {
+    function getDeployedGroundForces(
+        uint256 _warId,
+        uint256 attackerId
+    ) public view returns (uint256, uint256) {
         uint256 soldiersDeployed;
         uint256 tanksDeployed;
         (uint256 offenseId, uint256 defenseId) = getInvolvedParties(_warId);

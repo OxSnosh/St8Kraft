@@ -817,7 +817,8 @@ describe("Taxes Contract", async function () {
         await resourcescontract.settings(
             infrastructurecontract.address,
             improvementscontract2.address,
-            countryminter.address
+            countryminter.address,
+            bonusresourcescontract.address
         )
         await bonusresourcescontract.settings(
             infrastructurecontract.address,

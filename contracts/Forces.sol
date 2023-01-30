@@ -187,7 +187,7 @@ contract ForcesContract is Ownable {
         uint256 soldierCost = getSoldierCost(id);
         uint256 purchasePrice = soldierCost * amount;
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice);
+        require(balance >= purchasePrice, "insufficient funds for soldier purchase");
         idToForces[id].numberOfSoldiers += amount;
         idToForces[id].defendingSoldiers += amount;
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);

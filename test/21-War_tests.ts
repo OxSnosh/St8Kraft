@@ -55,9 +55,8 @@ import {
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
-import { BigNumber } from "ethers";
 
-describe("Nation Strength Contract", async function () {
+describe("Forces Contract", async function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -115,6 +114,8 @@ describe("Nation Strength Contract", async function () {
     let signer3: SignerWithAddress
     let signer4: SignerWithAddress
     let signer5: SignerWithAddress
+    let signer6: SignerWithAddress
+    let signer7: SignerWithAddress
     let signers: SignerWithAddress[]
     let addrs
 
@@ -129,6 +130,8 @@ describe("Nation Strength Contract", async function () {
         signer3 = signers[3];
         signer4 = signers[4];
         signer5 = signers[5];
+        signer6 = signers[6];
+        signer7 = signers[7];
         
         let chainId: any
         chainId = network.config.chainId
@@ -971,68 +974,123 @@ describe("Nation Strength Contract", async function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        await warbucks.connect(signer0).approve(warbucks.address, BigInt(3000000000*(10**18)));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(3000000000*(10**18)));
-        await treasurycontract.connect(signer1).addFunds(BigInt(2000000000*(10**18)), 0);
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0);
+        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500)
+        await technologymarketcontrat.connect(signer1).buyTech(0, 100)
+        await forcescontract.connect(signer1).buySoldiers(500, 0)
+        await forcescontract.connect(signer1).buyTanks(50, 0)
+
+        await countryminter.connect(signer2).generateCountry(
+            "TestRuler2",
+            "TestNationName2",
+            "TestCapitalCity2",
+            "TestNationSlogan2"
+        )
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(2000000000*(10**18)));
+        await treasurycontract.connect(signer2).addFunds(BigInt(2000000000*(10**18)), 1);
     });
 
-    describe("Nation Strength", function () {
-        it("strength1 tests strength", async function () {
-            var strength = await nationstrengthcontract.getNationStrength(0);
-            // console.log(strength.toNumber(), "strength initial");
-            expect(strength.toNumber()).to.equal(90);
-            var commodityStrength = await nationstrengthcontract.getNationStrengthFromCommodities(0);
-            // console.log(commodityStrength.toNumber(), "initial commidity strength");
-            expect(commodityStrength.toNumber()).to.equal(90);
-            await landmarketcontract.connect(signer1).buyLand(0, 100);
-            var strength = await nationstrengthcontract.getNationStrength(0);
-            // console.log(strength.toNumber(), "strength after land");
-            expect(strength.toNumber()).to.equal(240);
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
-            var strength = await nationstrengthcontract.getNationStrength(0);
-            // console.log(strength.toNumber(), "strength after infrastructure");
-            expect(strength.toNumber()).to.equal(3240);
-            await technologymarketcontrat.connect(signer1).buyTech(0, 500);
-            var strength = await nationstrengthcontract.getNationStrength(0);
-            // console.log(strength.toNumber(), "strength after tech");
-            expect(strength.toNumber()).to.equal(5740);
-            await forcescontract.connect(signer1).buySoldiers(5000, 0);
-            var strength = await nationstrengthcontract.getNationStrength(0);
-            // console.log(strength.toNumber(), "strength after soldiers");
-            expect(strength.toNumber()).to.equal(5840);
-            await missilescontract.connect(signer1).buyCruiseMissiles(40, 0);
-            var strength = await nationstrengthcontract.getNationStrength(0);
-            // console.log(strength.toNumber(), "strength after cruise missiles");
-            expect(strength.toNumber()).to.equal(6240);
-            await fightersmarketplace2.connect(signer1).buyF22Raptor(20, 0);
-            var strength = await nationstrengthcontract.getNationStrength(0);
-            // console.log(strength.toNumber(), "strength after fighters");
-            expect(strength.toNumber()).to.equal(7140);
-            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4);
-            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 10);
-            await navycontract.connect(signer1).buyDestroyer(1, 0);
-            var strength = await nationstrengthcontract.getNationStrength(0);
-            expect(strength.toNumber()).to.equal(7250);
-            await technologymarketcontrat.connect(signer1).buyTech(0, 31000);
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000);
-            await resourcescontract.mockResourcesForTesting(0, 17, 18);
-            await keepercontract.resetNukesPurchasedTodayByOwner();
-            await missilescontract.connect(signer1).buyNukes(0);
-            var strength = await nationstrengthcontract.getNationStrength(0);
-            await keepercontract.resetNukesPurchasedTodayByOwner();
-            await missilescontract.connect(signer1).buyNukes(0);
-            var strength = await nationstrengthcontract.getNationStrength(0);
-            await keepercontract.resetNukesPurchasedTodayByOwner();
-            await missilescontract.connect(signer1).buyNukes(0);
-            var strength = await nationstrengthcontract.getNationStrength(0);
-            await keepercontract.resetNukesPurchasedTodayByOwner();
-            await missilescontract.connect(signer1).buyNukes(0);
-            var strength = await nationstrengthcontract.getNationStrength(0);
-            await keepercontract.resetNukesPurchasedTodayByOwner();
-            await missilescontract.connect(signer1).buyNukes(0);
-            var strength = await nationstrengthcontract.getNationStrength(0);
-            expect(strength.toNumber()).to.equal(168500);
+    describe("War Tests", function () {
+        it("tests that declareWar() works correctly", async function () {
+            await expect(warcontract.connect(signer1).declareWar(1, 0)).to.be.revertedWith("!nation owner")
+            await expect(warcontract.connect(signer1).declareWar(0, 1)).to.be.revertedWith("you are in peace mode")
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await expect(warcontract.connect(signer1).declareWar(0, 1)).to.be.revertedWith("nation in peace mode")
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await expect(warcontract.connect(signer1).declareWar(0, 1)).to.be.revertedWith("nation strength is not within range to declare war")
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
+            await forcescontract.connect(signer2).buySoldiers(500, 1)
+            await forcescontract.connect(signer2).buyTanks(50, 1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            var isActive = await warcontract.isWarActive(0);
+            // console.log(isActive)
+            expect(isActive).to.equal(true);            
         })
-    
+
+        it("tests that a nation can max out offensive wars", async function () {
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
+            await forcescontract.connect(signer2).buySoldiers(500, 1)
+            await forcescontract.connect(signer2).buyTanks(50, 1)
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+
+            await countryminter.connect(signer3).generateCountry(
+                "TestRuler3",
+                "TestNationName3",
+                "TestCapitalCity3",
+                "TestNationSlogan3"
+            )
+            await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
+            await warbucks.connect(signer0).transfer(signer3.address, BigInt(2000000000*(10**18)));
+            await treasurycontract.connect(signer3).addFunds(BigInt(2000000000*(10**18)), 2);
+            await infrastructuremarketplace.connect(signer3).buyInfrastructure(2, 500)
+            await technologymarketcontrat.connect(signer3).buyTech(2, 100)
+            await forcescontract.connect(signer3).buySoldiers(500, 2)
+            await forcescontract.connect(signer3).buyTanks(50, 2)
+            await militarycontract.connect(signer3).toggleWarPeacePreference(2)
+            await warcontract.connect(signer1).declareWar(0, 2)
+
+            await countryminter.connect(signer4).generateCountry(
+                "TestRuler4",
+                "TestNationName4",
+                "TestCapitalCity4",
+                "TestNationSlogan4"
+            )
+            await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
+            await warbucks.connect(signer0).transfer(signer4.address, BigInt(2000000000*(10**18)));
+            await treasurycontract.connect(signer4).addFunds(BigInt(2000000000*(10**18)), 3);
+            await infrastructuremarketplace.connect(signer4).buyInfrastructure(3, 500)
+            await technologymarketcontrat.connect(signer4).buyTech(3, 100)
+            await forcescontract.connect(signer4).buySoldiers(500, 3)
+            await forcescontract.connect(signer4).buyTanks(50, 3)
+            await militarycontract.connect(signer4).toggleWarPeacePreference(3)
+            await warcontract.connect(signer1).declareWar(0, 3)
+
+            await countryminter.connect(signer5).generateCountry(
+                "TestRuler5",
+                "TestNationName5",
+                "TestCapitalCity5",
+                "TestNationSlogan5"
+            )
+            await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
+            await warbucks.connect(signer0).transfer(signer5.address, BigInt(2000000000*(10**18)));
+            await treasurycontract.connect(signer5).addFunds(BigInt(2000000000*(10**18)), 4);
+            await infrastructuremarketplace.connect(signer5).buyInfrastructure(4, 500)
+            await technologymarketcontrat.connect(signer5).buyTech(4, 100)
+            await forcescontract.connect(signer5).buySoldiers(500, 4)
+            await forcescontract.connect(signer5).buyTanks(50, 4)
+            await militarycontract.connect(signer5).toggleWarPeacePreference(4)
+            await warcontract.connect(signer1).declareWar(0, 4)
+            console.log("4th offensive war declared by nation 0")
+
+            var nationZeroOffensiveWars = await warcontract.offensiveWarLengthForTesting(0)
+            console.log(nationZeroOffensiveWars.toNumber())
+
+            await countryminter.connect(signer6).generateCountry(
+                "TestRuler6",
+                "TestNationName6",
+                "TestCapitalCity6",
+                "TestNationSlogan6"
+            )
+            await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
+            await warbucks.connect(signer0).transfer(signer6.address, BigInt(2000000000*(10**18)));
+            await treasurycontract.connect(signer6).addFunds(BigInt(2000000000*(10**18)), 5);
+            await infrastructuremarketplace.connect(signer6).buyInfrastructure(5, 500)
+            await technologymarketcontrat.connect(signer6).buyTech(5, 100)
+            await forcescontract.connect(signer6).buySoldiers(500, 5)
+            await forcescontract.connect(signer6).buyTanks(50, 5)
+            await militarycontract.connect(signer6).toggleWarPeacePreference(5)
+            console.log("you are here")
+            await warcontract.connect(signer1).declareWar(0, 5)
+
+            var nationZeroOffensiveWars = await warcontract.offensiveWarLengthForTesting(0)
+            console.log(nationZeroOffensiveWars.toNumber())
+        })
     })
 })
