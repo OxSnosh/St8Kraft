@@ -261,10 +261,11 @@ contract WarContract is Ownable {
         warIdToDefenseLosses[warId] = newDefenseLosses;
         uint256[] storage offensiveWars = idToOffensiveWars[offenseId];
         uint256 maxOffensiveWars = 4;
-        // bool foreignArmyBase = won1.getForeignArmyBase(offenseId);
-        // if (foreignArmyBase) {
-        //     maxOffensiveWars = 5;
-        // }
+        bool foreignArmyBase = won1.getForeignArmyBase(offenseId);
+        if (foreignArmyBase) {
+            maxOffensiveWars = 5;
+        }
+        offensiveWars.push(warId);
         require(
             offensiveWars.length <= maxOffensiveWars,
             "you do not have an offensive war slot available"
@@ -273,7 +274,6 @@ contract WarContract is Ownable {
         offenseActiveWars.push(warId);
         uint256[] storage defenseActiveWars = idToActiveWars[defenseId];
         defenseActiveWars.push(warId);
-        offensiveWars.push(warId);
         warId++;
         initializeDeployments(warId);
     }

@@ -1067,10 +1067,6 @@ describe("Forces Contract", async function () {
             await forcescontract.connect(signer5).buyTanks(50, 4)
             await militarycontract.connect(signer5).toggleWarPeacePreference(4)
             await warcontract.connect(signer1).declareWar(0, 4)
-            console.log("4th offensive war declared by nation 0")
-
-            var nationZeroOffensiveWars = await warcontract.offensiveWarLengthForTesting(0)
-            console.log(nationZeroOffensiveWars.toNumber())
 
             await countryminter.connect(signer6).generateCountry(
                 "TestRuler6",
@@ -1086,11 +1082,7 @@ describe("Forces Contract", async function () {
             await forcescontract.connect(signer6).buySoldiers(500, 5)
             await forcescontract.connect(signer6).buyTanks(50, 5)
             await militarycontract.connect(signer6).toggleWarPeacePreference(5)
-            console.log("you are here")
-            await warcontract.connect(signer1).declareWar(0, 5)
-
-            var nationZeroOffensiveWars = await warcontract.offensiveWarLengthForTesting(0)
-            console.log(nationZeroOffensiveWars.toNumber())
+            await expect(warcontract.connect(signer1).declareWar(0, 5)).to.be.revertedWith("you do not have an offensive war slot available")
         })
     })
 })
