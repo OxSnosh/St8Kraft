@@ -52,6 +52,7 @@ import {
     WondersContract3,
     WondersContract4,
     BonusResourcesContract,
+    ForcesContract__factory,
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
@@ -970,12 +971,22 @@ describe("Forces Contract", async function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        await warbucks.connect(signer0).approve(warbucks.address, BigInt(25000000000*(10**18)));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000*(10**18)));
-        await treasurycontract.connect(signer1).addFunds(BigInt(20000000000*(10**18)), 0);
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0);
+
+        await countryminter.connect(signer2).generateCountry(
+            "TestRuler2",
+            "TestNationName2",
+            "TestCapitalCity2",
+            "TestNationSlogan2"
+        )
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0);
     });
 
-    describe("Forces", function () {
+    describe("Buy Forces", function () {
         it("tests that forces are intialized correctly", async function () {
             var soldiers = await forcescontract.getSoldierCount(0);
             expect(soldiers.toNumber()).to.equal(20);
@@ -1010,6 +1021,55 @@ describe("Forces Contract", async function () {
             expect(cost.toNumber()).to.equal(6);
         })
 
+        it("tests that buyTanks() works correctly", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500)
+            await forcescontract.connect(signer1).buySoldiers(480, 0)
+            var maxTankCount1 = await forcescontract.getMaxTankCount(0);
+            // console.log("max tanks", maxTankCount1.toNumber())
+            expect(maxTankCount1.toNumber()).to.equal(50);
+            await forcescontract.connect(signer1).buySoldiers(2000, 0)
+            var maxTankCount2 = await forcescontract.getMaxTankCount(0);
+            // console.log("max tanks", maxTankCount2.toNumber())
+            expect(maxTankCount2.toNumber()).to.equal(126);
+            await expect(forcescontract.connect(signer1).buyTanks(127, 0)).to.be.revertedWith("cannot buy that many tanks")
+            await forcescontract.connect(signer1).buyTanks(125, 0);
+            var totalTankCount = await forcescontract.getTankCount(0);
+            var defendingTankCount = await forcescontract.getDefendingTankCount(0)
+            expect(totalTankCount.toNumber()).to.equal(125)
+            expect(defendingTankCount.toNumber()).to.equal(125)
+        })
+    })
 
+    describe("Deploy Forces", function () {
+        it("tests that soldiers are deployed correctly", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500)
+            await forcescontract.connect(signer1).buySoldiers(500, 0)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await forcescontract.connect(signer2).buySoldiers(500, 1)
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await expect(forcescontract.connect(signer1).deploySoldiers(500, 0, 0)).to.be.revertedWith("deployment exceeds max deployable percentage")
+            await forcescontract.connect(signer1).deploySoldiers(300, 0, 0)
+            var deployedSoldiers = await forcescontract.getDeployedSoldierCount(0);
+            var defendingSoldiers = await forcescontract.getDefendingSoldierCount(0);
+            var totalSoldiers = await forcescontract.getSoldierCount(0);
+            expect(deployedSoldiers.toNumber()).to.equal(300)
+            expect(defendingSoldiers.toNumber()).to.equal(220)
+            expect(totalSoldiers.toNumber()).to.equal(520)
+        })
+
+        it("tests that tanks are deployed correctly", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500)
+            await forcescontract.connect(signer1).buySoldiers(500, 0)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await forcescontract.connect(signer2).buySoldiers(1000, 1)
+            await forcescontract.connect(signer1).buyTanks(100, 0);
+            var totalTankCount = await forcescontract.getTankCount(0);
+            var defendingTankCount = await forcescontract.getDefendingTankCount(0)
+            expect(totalTankCount.toNumber()).to.equal(100)
+            expect(defendingTankCount.toNumber()).to.equal(100)
+            
+        })
     })
 })

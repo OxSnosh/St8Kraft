@@ -10,6 +10,7 @@ import "./CountryMinter.sol";
 import "./War.sol";
 import "./NationStrength.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+// import "hardhat/console.sol";
 
 ///@title ForcesContract
 ///@author OxSnosh
@@ -57,7 +58,7 @@ contract ForcesContract is Ownable {
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings (
+    function settings(
         address _treasuryAddress,
         address _aid,
         address _spyAddress,
@@ -80,7 +81,7 @@ contract ForcesContract is Ownable {
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings2 (
+    function settings2(
         address _infrastructure,
         address _resources,
         address _improvements1,
@@ -108,7 +109,20 @@ contract ForcesContract is Ownable {
     ///@notice this function allows a nation to purchase forces once a country is minted
     ///@param id this is the nation ID of the nation being minted
     function generateForces(uint256 id) public {
-        Forces memory newForces = Forces(20, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, true);
+        Forces memory newForces = Forces(
+            20,
+            20,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            true
+        );
         idToForces[id] = newForces;
     }
 
@@ -181,13 +195,19 @@ contract ForcesContract is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         uint256 populationCount = inf.getTotalPopulationCount(0);
-        uint256 maxSoldierCount = ((populationCount*70)/100);
+        uint256 maxSoldierCount = ((populationCount * 70) / 100);
         uint256 currentSoldierCount = idToForces[id].numberOfSoldiers;
-        require((currentSoldierCount + amount) <= maxSoldierCount, "population cannot support that many soldiers");
+        require(
+            (currentSoldierCount + amount) <= maxSoldierCount,
+            "population cannot support that many soldiers"
+        );
         uint256 soldierCost = getSoldierCost(id);
         uint256 purchasePrice = soldierCost * amount;
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "insufficient funds for soldier purchase");
+        require(
+            balance >= purchasePrice,
+            "insufficient funds for soldier purchase"
+        );
         idToForces[id].numberOfSoldiers += amount;
         idToForces[id].defendingSoldiers += amount;
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
@@ -240,22 +260,22 @@ contract ForcesContract is Ownable {
     ///@notice this function will return the number of defending soldiers for a nation
     ///@param id is the nation ID of the nation being queried
     ///@return uint256 is the number of defending soldiers for the queried nation
-    function getDefendingSoldierCount(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
+    function getDefendingSoldierCount(
+        uint256 id
+    ) public view returns (uint256) {
         uint256 count = idToForces[id].defendingSoldiers;
         return count;
     }
 
     ///@dev this is a public function that will allow a nation woner to deploy soldiers to a war
     ///@notice this function allows a nation owner to deploy soldiers to an active war
-    ///@param amountToDeploy is the number of soldiers being deployed
+    ///@param soldiersToDeploy is the number of soldiers being deployed
+    ///@param tanksToDeploy is the number of tanks being deployed
     ///@param id is the nation id of the nation deploying soldiers
     ///@param warId is the id of the active war
-    function deploySoldiers(
-        uint256 amountToDeploy,
+    function deployForces(
+        uint256 soldiersToDeploy,
+        uint256 tanksToDeploy,
         uint256 id,
         uint256 warId
     ) public {
@@ -265,25 +285,24 @@ contract ForcesContract is Ownable {
         uint256 deployedSoldiers = getDeployedSoldierCount(id);
         uint256 maxDeployablePercentage = getMaxDeployablePercentage(id);
         require(
-            (((deployedSoldiers + amountToDeploy) * 100) / totalSoldiers) <=
-                maxDeployablePercentage
+            (((deployedSoldiers + soldiersToDeploy) * 100) / totalSoldiers) <=
+                maxDeployablePercentage,
+            "deployment exceeds max deployable percentage"
         );
-        war.deploySoldiers(id, warId, amountToDeploy);
         uint256 defendingSoldierCount = idToForces[id].defendingSoldiers;
-        require(defendingSoldierCount >= amountToDeploy);
-        idToForces[id].defendingSoldiers -= amountToDeploy;
-        idToForces[id].deployedSoldiers += amountToDeploy;
+        require(defendingSoldierCount >= soldiersToDeploy, "cannot deploy that many soldiers");
+        idToForces[id].defendingSoldiers -= soldiersToDeploy;
+        idToForces[id].deployedSoldiers += soldiersToDeploy;
+        war.deploySoldiers(id, warId, soldiersToDeploy, tanksToDeploy);
     }
 
     ///@dev this is a public view function that will return the maximum percentage of a population that is deployable
     ///@notice this function returns the maximum percentage of a population that is deployable to war
     ///@param id is the nation id of the nation deploying soldiers
     ///@return uint256 is the maximum percentage of a nations population that is deployable
-    function getMaxDeployablePercentage(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
+    function getMaxDeployablePercentage(
+        uint256 id
+    ) public view returns (uint256) {
         uint256 maxDeployablePercentage = 80;
         uint256 borderFortificationCount = imp1.getBorderFortificationCount(id);
         if (borderFortificationCount > 0) {
@@ -310,10 +329,9 @@ contract ForcesContract is Ownable {
     ///@notice this function will decrease the amount of soldiers from a nuke strike
     ///@notice a fallout shelter system will decrease the number of soldiers lost by 50%
     ///@param id is the nation ID of the nation being attacked
-    function decreaseDefendingSoldierCountFromNukeAttack(uint256 id)
-        public
-        onlyNukeContract
-    {
+    function decreaseDefendingSoldierCountFromNukeAttack(
+        uint256 id
+    ) public onlyNukeContract {
         bool falloutShelter = won1.getFalloutShelterSystem(id);
         if (!falloutShelter) {
             uint256 numberOfDefendingSoldiers = idToForces[id]
@@ -321,8 +339,7 @@ contract ForcesContract is Ownable {
             idToForces[id].defendingSoldiers = 0;
             idToForces[id].numberOfSoldiers -= numberOfDefendingSoldiers;
             idToForces[id].soldierCasualties += numberOfDefendingSoldiers;
-        }
-        else {
+        } else {
             uint256 numberOfDefendingSoldierCasualties = ((
                 idToForces[id].defendingSoldiers
             ) / 2);
@@ -330,7 +347,8 @@ contract ForcesContract is Ownable {
                 .defendingSoldiers = numberOfDefendingSoldierCasualties;
             idToForces[id]
                 .numberOfSoldiers -= numberOfDefendingSoldierCasualties;
-            idToForces[id].soldierCasualties += numberOfDefendingSoldierCasualties;
+            idToForces[id]
+                .soldierCasualties += numberOfDefendingSoldierCasualties;
         }
     }
 
@@ -338,11 +356,9 @@ contract ForcesContract is Ownable {
     ///@notice this function will return the number of soldiers a nation has
     ///@param id this is the nation ID of the nation being queried
     ///@return soldiers is the nations soldier count
-    function getSoldierCount(uint256 id)
-        public
-        view
-        returns (uint256 soldiers)
-    {
+    function getSoldierCount(
+        uint256 id
+    ) public view returns (uint256 soldiers) {
         uint256 soldierAmount = idToForces[id].numberOfSoldiers;
         return soldierAmount;
     }
@@ -350,12 +366,10 @@ contract ForcesContract is Ownable {
     ///@dev this is a public view function that will return a nations deployed soldier count
     ///@notice this function returns the amount of deployed solders a nation has
     ///@param id is the nation ID for the nation being queried
-    ///@return soldiers is the number of deployed soldiers for that nation 
-    function getDeployedSoldierCount(uint256 id)
-        public
-        view
-        returns (uint256 soldiers)
-    {
+    ///@return soldiers is the number of deployed soldiers for that nation
+    function getDeployedSoldierCount(
+        uint256 id
+    ) public view returns (uint256 soldiers) {
         uint256 soldierAmount = idToForces[id].deployedSoldiers;
         return soldierAmount;
     }
@@ -365,11 +379,9 @@ contract ForcesContract is Ownable {
     ///@notice aluminium, coal, oil, pigs, barracks, guerilla camps all increase the efficiency od deployed soldiers
     ///@param id this is the nation ID for the nation being queried
     ///@return uint256 this is the percentage modifier for a nations deployed forces
-    function getDeployedSoldierEfficiencyModifier(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
+    function getDeployedSoldierEfficiencyModifier(
+        uint256 id
+    ) public view returns (uint256) {
         uint256 efficiencyModifier = 100;
         bool aluminum = res.viewAluminium(id);
         if (aluminum) {
@@ -403,11 +415,9 @@ contract ForcesContract is Ownable {
     ///@notice aluminium, coal, oil, pigs, barracks, border fortifications and forward operating bases all increase the efficiency od defending soldiers
     ///@param id this is the nation ID for the nation being queried
     ///@return uint256 this is the percentage modifier for a nations defending forces
-    function getDefendingSoldierEfficiencyModifier(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
+    function getDefendingSoldierEfficiencyModifier(
+        uint256 id
+    ) public view returns (uint256) {
         uint256 efficiencyModifier = 100;
         bool aluminum = res.viewAluminium(id);
         if (aluminum) {
@@ -447,12 +457,15 @@ contract ForcesContract is Ownable {
     ///@dev this is a public function that allows a nation owner to decommission soldiers
     ///@notice this function allows a nation owner to decomission soldiers
     ///@param amount is the amount of soldiers being decomissioned
-    ///@param id is the nation ID of the nation 
+    ///@param id is the nation ID of the nation
     function decomissionSoldiers(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         uint256 defendingSoldierCount = getDefendingSoldierCount(id);
-        require((defendingSoldierCount - amount) >= 0, "not enough defending soldiers");
+        require(
+            (defendingSoldierCount - amount) >= 0,
+            "not enough defending soldiers"
+        );
         idToForces[id].defendingSoldiers -= amount;
         idToForces[id].numberOfSoldiers -= amount;
     }
@@ -468,7 +481,10 @@ contract ForcesContract is Ownable {
         require(isOwner, "!nation owner");
         uint256 maxTanks = getMaxTankCount(id);
         uint256 currentTanks = idToForces[id].numberOfTanks;
-        require((currentTanks + amount) <= maxTanks, "cannot own that many tanks");
+        require(
+            (currentTanks + amount) <= maxTanks,
+            "cannot buy that many tanks"
+        );
         uint256 soldierCost = getSoldierCost(id);
         uint256 purchasePrice = soldierCost * 40;
         uint256 factoryCount = imp1.getFactoryCount(id);
@@ -494,7 +510,7 @@ contract ForcesContract is Ownable {
         uint256 efficiency = getDefendingSoldierEfficiencyModifier(id);
         uint256 modifiedSoldierCount = ((soldiers * efficiency) / 100);
         uint256 tankMax = (modifiedSoldierCount / 10);
-        uint256 citizenCount = inf.getTotalPopulationCount(id);
+        uint256 citizenCount = inf.getTaxablePopulationCount(id);
         uint256 tankMaxByCitizen = ((citizenCount * 8) / 100);
         if (tankMaxByCitizen < tankMax) {
             tankMax = tankMaxByCitizen;
@@ -524,10 +540,10 @@ contract ForcesContract is Ownable {
     ///@notice this funtion will allow the spy contract to decrease the number of defending tanks in a spy attack
     ///@param amount is the amount of tanks being decreased
     ///@param id is the nation id of the nation being attacked
-    function decreaseDefendingTankCount(uint256 amount, uint256 id)
-        public
-        onlySpyContract
-    {
+    function decreaseDefendingTankCount(
+        uint256 amount,
+        uint256 id
+    ) public onlySpyContract {
         idToForces[id].defendingTanks -= amount;
         idToForces[id].numberOfTanks -= amount;
     }
@@ -547,17 +563,17 @@ contract ForcesContract is Ownable {
     ///@dev this is a public function that can only be called from the nuke contract
     ///@notice this funtion will allow the cruise missile contact to decrease the number of tanks in a nuke attack
     ///@param id is the nation id of the nation being attacked
-    function decreaseDefendingTankCountFromNukeContract(uint256 id)
-        public
-        onlyNukeContract
-    {
+    function decreaseDefendingTankCountFromNukeContract(
+        uint256 id
+    ) public onlyNukeContract {
         uint256 defendingTanks = idToForces[id].defendingTanks;
         uint256 percentage = 35;
         bool falloutShelter = won1.getFalloutShelterSystem(id);
         if (falloutShelter) {
             percentage = 25;
         }
-        uint256 defendingTanksToDecrease = ((defendingTanks * percentage) / 100);
+        uint256 defendingTanksToDecrease = ((defendingTanks * percentage) /
+            100);
         idToForces[id].numberOfTanks -= defendingTanksToDecrease;
         idToForces[id].defendingTanks -= defendingTanksToDecrease;
     }
@@ -593,11 +609,9 @@ contract ForcesContract is Ownable {
     ///@notice this function will return the number of deployed tanks for a nation
     ///@param id is the nation id for the nation being queried
     ///@return tanks is the number of deployed tanks for the nation being queried
-    function getDeployedTankCount(uint256 id)
-        public
-        view
-        returns (uint256 tanks)
-    {
+    function getDeployedTankCount(
+        uint256 id
+    ) public view returns (uint256 tanks) {
         uint256 tankAmount = idToForces[id].deployedTanks;
         return tankAmount;
     }
@@ -606,11 +620,9 @@ contract ForcesContract is Ownable {
     ///@notice this function will return the number of defending tanks for a nation
     ///@param id is the nation id for the nation being queried
     ///@return tanks is the number of defending tanks for the nation being queried
-    function getDefendingTankCount(uint256 id)
-        public
-        view
-        returns (uint256 tanks)
-    {
+    function getDefendingTankCount(
+        uint256 id
+    ) public view returns (uint256 tanks) {
         uint256 tankAmount = idToForces[id].defendingTanks;
         return tankAmount;
     }
@@ -667,10 +679,10 @@ contract ForcesContract is Ownable {
     ///@notice this function will allow the spy contract to decrease the number of spies lost during a spy attack
     ///@param amount is the number of spies lost during the attack
     ///@param id is the nation suffering losses during the spy attack
-    function decreaseDefenderSpyCount(uint256 amount, uint256 id)
-        public
-        onlySpyContract
-    {
+    function decreaseDefenderSpyCount(
+        uint256 amount,
+        uint256 id
+    ) public onlySpyContract {
         idToForces[id].numberOfSpies -= amount;
     }
 
@@ -678,11 +690,9 @@ contract ForcesContract is Ownable {
     ///@notice this function will return a nations current spy count
     ///@param countryId is the nation ID of the nation being queried
     ///@return count is the spy count for a given nation
-    function getSpyCount(uint256 countryId)
-        public
-        view
-        returns (uint256 count)
-    {
+    function getSpyCount(
+        uint256 countryId
+    ) public view returns (uint256 count) {
         uint256 spyAmount = idToForces[countryId].numberOfSpies;
         return spyAmount;
     }
@@ -724,7 +734,10 @@ contract ForcesContract is Ownable {
     }
 
     ///@dev this is a function for the development environment that will assist in testing wonders and improvements that are available after a certain number of casualties
-    function increaseSoldierCasualties(uint256 id, uint256 amount) public onlyOwner {
+    function increaseSoldierCasualties(
+        uint256 id,
+        uint256 amount
+    ) public onlyOwner {
         idToForces[id].soldierCasualties += amount;
     }
 
@@ -779,7 +792,7 @@ contract MissilesContract is Ownable {
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings (
+    function settings(
         address _treasury,
         address _spyAddress,
         address _nukeAddress,
@@ -803,7 +816,7 @@ contract MissilesContract is Ownable {
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings2 (
+    function settings2(
         address _resources,
         address _improvements1,
         address _wonders1,
@@ -918,7 +931,10 @@ contract MissilesContract is Ownable {
     }
 
     modifier onlyKeeper() {
-        require(msg.sender == keeper, "function only callable from keeper contract");
+        require(
+            msg.sender == keeper,
+            "function only callable from keeper contract"
+        );
         _;
     }
 
@@ -939,7 +955,9 @@ contract MissilesContract is Ownable {
     ///@notice this function will return the cost per cruise missile for a given nation
     ///@param id is the nation id of the nation purchasing missiles
     ///@return cost is the cost per missile of cruise missiles for that nation
-    function getCruiseMissileCost(uint256 id) public view returns (uint256 cost) {
+    function getCruiseMissileCost(
+        uint256 id
+    ) public view returns (uint256 cost) {
         uint256 basePurchasePrice = cruiseMissileCost;
         uint256 factoryCount = imp1.getFactoryCount(id);
         uint256 costModifier = 100;
@@ -961,31 +979,31 @@ contract MissilesContract is Ownable {
 
     ///@dev this is a public function that will decrease the number of cruise missiles only callable from the spy contract
     ///@notice this function will decrease the number of cruise missiles lost during a spy attack
-    ///@param amount this is the number of missiles being destroyed 
+    ///@param amount this is the number of missiles being destroyed
     ///@param id this is the nation id of the nation being attacked
-    function decreaseCruiseMissileCount(uint256 amount, uint256 id)
-        public
-        onlySpyContract
-    {
+    function decreaseCruiseMissileCount(
+        uint256 amount,
+        uint256 id
+    ) public onlySpyContract {
         idToMissiles[id].cruiseMissiles -= amount;
     }
 
     ///@dev this is a public function that will decrease the number of cruise missiles only callable from the nuke contract
     ///@notice this function will decrease the number of cruise missiles lost during a nuke attack
-    ///@notice a succesful nuke attack will destroy 35% of your nations cruise missiles 
+    ///@notice a succesful nuke attack will destroy 35% of your nations cruise missiles
     ///@notice a fallout shelter system will reduce the number of missiles lost during a nuke attack to 25%
     ///@param id this is the nation id of the nation being attacked
-    function decreaseCruiseMissileCountFromNukeContract(uint256 id)
-        public
-        onlyNukeContract
-    {
+    function decreaseCruiseMissileCountFromNukeContract(
+        uint256 id
+    ) public onlyNukeContract {
         uint256 cruiseMissiles = idToMissiles[id].cruiseMissiles;
         uint256 percentage = 35;
         bool falloutShelter = won1.getFalloutShelterSystem(id);
         if (falloutShelter) {
             percentage = 25;
         }
-        uint256 cruiseMissilesToDecrease = ((cruiseMissiles * percentage) / 100);
+        uint256 cruiseMissilesToDecrease = ((cruiseMissiles * percentage) /
+            100);
         idToMissiles[id].cruiseMissiles -= cruiseMissilesToDecrease;
     }
 
@@ -1023,14 +1041,20 @@ contract MissilesContract is Ownable {
         require(isUranium, "no uranium");
         uint256 nationStrength = stren.getNationStrength(id);
         bool manhattanProject = won2.getManhattanProject(id);
-        require (nationStrength > 150000 || manhattanProject, "nation strength too low");
+        require(
+            nationStrength > 150000 || manhattanProject,
+            "nation strength too low"
+        );
         uint256 nukesPurchasedToday = idToMissiles[id].nukesPurchasedToday;
         uint256 maxNukesPerDay = 1;
         bool weaponsResearchCenter = won4.getWeaponsResearchCenter(id);
         if (weaponsResearchCenter) {
             maxNukesPerDay = 2;
         }
-        require(nukesPurchasedToday < maxNukesPerDay, "already purchased nuke today");
+        require(
+            nukesPurchasedToday < maxNukesPerDay,
+            "already purchased nuke today"
+        );
         uint256 cost = getNukeCost(id);
         idToMissiles[id].nukesPurchasedToday += 1;
         idToMissiles[id].nuclearWeapons += 1;
@@ -1061,10 +1085,9 @@ contract MissilesContract is Ownable {
     ///@dev this function is only callable from the nuke contract
     ///@notice this function will decrease a nations nuke count by 1 when a nuke is launched
     ///@param id is the nation id of the nation launching the nuke that will have its nuke count decreased by 1
-    function decreaseNukeCountFromNukeContract(uint256 id)
-        public
-        onlyNukeContract
-    {
+    function decreaseNukeCountFromNukeContract(
+        uint256 id
+    ) public onlyNukeContract {
         idToMissiles[id].nuclearWeapons -= 1;
     }
 
@@ -1072,17 +1095,16 @@ contract MissilesContract is Ownable {
     ///@dev this function is only callable from the spy contract
     ///@notice this function will decrease a nations nuke count if they are successfully attacked by a spy
     ///@param id is the nation id of the nation that was attacked and is losing a nuke
-    function decreaseNukeCountFromSpyContract(uint256 id)
-        public
-        onlySpyContract
-    {
+    function decreaseNukeCountFromSpyContract(
+        uint256 id
+    ) public onlySpyContract {
         bool silo = won2.getHiddenNuclearMissileSilo(id);
         uint256 nukeCount = getNukeCount(id);
         uint256 requiredNukeAmount = 1;
         if (silo) {
             requiredNukeAmount = 6;
         }
-        require (nukeCount >= requiredNukeAmount, "no nukes to destroy");
+        require(nukeCount >= requiredNukeAmount, "no nukes to destroy");
         idToMissiles[id].nuclearWeapons -= 1;
     }
 
@@ -1091,7 +1113,7 @@ contract MissilesContract is Ownable {
     ///@dev this function will be called daily
     function resetNukesPurchasedToday() public onlyKeeper {
         uint256 countryCount = mint.getCountryCount();
-        for(uint i = 0; i < countryCount; i++) {
+        for (uint i = 0; i < countryCount; i++) {
             idToMissiles[i].nukesPurchasedToday = 0;
         }
     }
