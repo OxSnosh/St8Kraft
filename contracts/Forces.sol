@@ -284,16 +284,22 @@ contract ForcesContract is Ownable {
         uint256 totalSoldiers = getSoldierCount(id);
         uint256 deployedSoldiers = getDeployedSoldierCount(id);
         uint256 maxDeployablePercentage = getMaxDeployablePercentage(id);
-        require(
-            (((deployedSoldiers + soldiersToDeploy) * 100) / totalSoldiers) <=
-                maxDeployablePercentage,
-            "deployment exceeds max deployable percentage"
-        );
         uint256 defendingSoldierCount = idToForces[id].defendingSoldiers;
         require(defendingSoldierCount >= soldiersToDeploy, "cannot deploy that many soldiers");
+        if(soldiersToDeploy > 0) {
+            require(
+                (((deployedSoldiers + soldiersToDeploy) * 100) / totalSoldiers) <=
+                    maxDeployablePercentage,
+                "deployment exceeds max deployable percentage"
+            );
+        }
+        uint256 defendingTankCount = idToForces[id].defendingTanks;
+        require(defendingTankCount >= tanksToDeploy, "deploying too many tanks");
         idToForces[id].defendingSoldiers -= soldiersToDeploy;
         idToForces[id].deployedSoldiers += soldiersToDeploy;
-        war.deploySoldiers(id, warId, soldiersToDeploy, tanksToDeploy);
+        idToForces[id].defendingTanks -= tanksToDeploy;
+        idToForces[id].deployedTanks += tanksToDeploy;
+        war.deployForcesToWar(id, warId, soldiersToDeploy, tanksToDeploy);
     }
 
     ///@dev this is a public view function that will return the maximum percentage of a population that is deployable

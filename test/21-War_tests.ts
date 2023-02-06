@@ -1118,11 +1118,20 @@ describe("War Contract", async function () {
             await militarycontract.connect(signer1).toggleWarPeacePreference(0)
             await militarycontract.connect(signer2).toggleWarPeacePreference(1)
             await warcontract.connect(signer1).declareWar(0, 1)
-            await forcescontract.connect(signer1).deploySoldiers(300, 0, 0);
+            await forcescontract.connect(signer1).deployForces(300, 20, 0, 0);
             var deployedForces : any = await warcontract.getDeployedGroundForces(0, 0);
             var soldiersDeployed = deployedForces[0];
-            // var tanksDeployed = deployedForces[1];
+            var tanksDeployed = deployedForces[1];
             expect(soldiersDeployed.toNumber()).to.equal(300);  
+            expect(tanksDeployed.toNumber()).to.equal(20);
+            await expect(forcescontract.connect(signer1).deployForces(50, 20, 0, 0)).to.be.revertedWith("already deployed forces today");
+            await keepercontract.connect(signer0).resetDeploymentsByOwner();
+            await forcescontract.connect(signer1).deployForces(0, 20, 0, 0);
+            var deployedForces2 : any = await warcontract.getDeployedGroundForces(0, 0);
+            var soldiersDeployed2 = deployedForces2[0];
+            var tanksDeployed2 = deployedForces2[1];
+            expect(soldiersDeployed2.toNumber()).to.equal(300);  
+            expect(tanksDeployed2.toNumber()).to.equal(40);
         })
     })
 })

@@ -48,6 +48,7 @@ contract WarContract is Ownable {
     }
 
     struct OffenseDeployed1 {
+        bool offenseDeployedToday;
         uint256 soldiersDeployed;
         uint256 tanksDeployed;
         uint256 yak9Deployed;
@@ -74,6 +75,7 @@ contract WarContract is Ownable {
     }
 
     struct DefenseDeployed1 {
+        bool defenseDeployedToday;
         uint256 soldiersDeployed;
         uint256 tanksDeployed;
         uint256 yak9Deployed;
@@ -286,6 +288,7 @@ contract WarContract is Ownable {
     ///@dev this is an internal function that will be balled by the declare war function and set up several structs that will keep track of each war
     function initializeDeployments(uint256 _warId) internal {
         OffenseDeployed1 memory newOffenseDeployed1 = OffenseDeployed1(
+            false,
             0,
             0,
             0,
@@ -312,6 +315,7 @@ contract WarContract is Ownable {
         );
         warIdToOffenseDeployed2[_warId] = newOffenseDeployed2;
         DefenseDeployed1 memory newDefenseDeployed1 = DefenseDeployed1(
+            false,
             0,
             0,
             0,
@@ -337,6 +341,7 @@ contract WarContract is Ownable {
             0
         );
         warIdToDefenseDeployed2[_warId] = newDefenseDeployed2;
+        activeWars.push(_warId);
     }
 
     ///@dev this is a public view function that will return a boolean value if the nations are able to fight eachother
@@ -407,9 +412,9 @@ contract WarContract is Ownable {
         uint256[] storage offensiveWars = idToOffensiveWars[offenseId];
         for (uint256 i = 0; i < offensiveWars.length; i++) {
             if (offensiveWars[i] == _warId) {
-                offensiveWars[i] = offensiveWars[offenseActiveWars.length - 1];
+                offensiveWars[i] = offensiveWars[offensiveWars.length - 1];
                 offensiveWars.pop();
-                idToOffensiveWars[offenseId] = offenseActiveWars;
+                idToOffensiveWars[offenseId] = offensiveWars;
             }
         }
         uint256[] storage defenseActiveWars = idToActiveWars[defenseId];
@@ -454,6 +459,17 @@ contract WarContract is Ownable {
             uint256 war = activeWars[i];
             warIdToWar[war].offenseCruiseMissileLaunchesToday = 0;
             warIdToWar[war].defenseCruiseMissileLaunchesToday = 0;
+        }
+    }
+
+    ///@dev this function is only callable from the keeper contract
+    ///@notice this function will reset the active wars daily so that forces can be deployed again 
+    ///@notice a nation can only deploy forces to a war once per day
+    function resetDeployedToday() public onlyKeeper {
+        for (uint256 i = 0; i < activeWars.length; i++) {
+            uint256 war = activeWars[i];
+            warIdToOffenseDeployed1[war].offenseDeployedToday = false;
+            warIdToDefenseDeployed1[war].defenseDeployedToday = false;
         }
     }
 
@@ -843,10 +859,10 @@ contract WarContract is Ownable {
 
     ///@dev this function is only callable from the forces contact
     ///@notice this function will allow a nation to deploy ground forces (soldiers and tanks) to a given war
-    function deploySoldiers(
+    function deployForcesToWar(
         uint256 nationId,
         uint256 _warId,
-        uint256 soldiersToDeploy
+        uint256 soldiersToDeploy,
         uint256 tanksToDeploy
     ) public onlyForcesContract {
         bool isActive = isWarActive(_warId);
@@ -857,11 +873,17 @@ contract WarContract is Ownable {
             "nation not involved"
         );
         if (nationId == offenseId) {
+            bool deployedToday = warIdToOffenseDeployed1[_warId].offenseDeployedToday;
+            require(!deployedToday, "already deployed forces today");
             warIdToOffenseDeployed1[_warId].soldiersDeployed += soldiersToDeploy;
             warIdToOffenseDeployed1[_warId].tanksDeployed += tanksToDeploy;
+            warIdToOffenseDeployed1[_warId].offenseDeployedToday = true;
         } else if (nationId == defenseId) {
-            warIdToDefenseDeployed1[_warId].soldiersDeployed += amountToDeploy;
+            bool deployedToday = warIdToDefenseDeployed1[_warId].defenseDeployedToday;
+            require(!deployedToday, "already deployed forces today");
+            warIdToDefenseDeployed1[_warId].soldiersDeployed += soldiersToDeploy;
             warIdToDefenseDeployed1[_warId].tanksDeployed += tanksToDeploy;
+            warIdToDefenseDeployed1[_warId].defenseDeployedToday = true;
         }
     }
 

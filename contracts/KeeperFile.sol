@@ -67,6 +67,7 @@ contract KeeperContract is Ownable {
         resetNukesPurchasedToday();
         resetActionsToday();
         incrementDaysSinceForParameters();
+        resetDeployments();
     }
 
     ///@dev this function can be called by the contract owner in the event the keeper fails
@@ -79,6 +80,7 @@ contract KeeperContract is Ownable {
         resetNukesPurchasedToday();
         resetActionsToday();
         incrementDaysSinceForParameters();
+        resetDeployments();
     }
 
     function shiftNukeDays() internal {
@@ -127,5 +129,13 @@ contract KeeperContract is Ownable {
 
     function incrementDaysSinceForParametersByOwner() public onlyOwner {
         params.incrementDaysSince();
+    }
+
+    function resetDeployments() public {
+        war.resetDeployedToday();
+    }
+
+    function resetDeploymentsByOwner() public onlyOwner {
+        war.resetDeployedToday();
     }
 }

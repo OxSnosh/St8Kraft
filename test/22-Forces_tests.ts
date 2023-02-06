@@ -1049,8 +1049,8 @@ describe("Forces Contract", async function () {
             await militarycontract.connect(signer1).toggleWarPeacePreference(0)
             await militarycontract.connect(signer2).toggleWarPeacePreference(1)
             await warcontract.connect(signer1).declareWar(0, 1)
-            await expect(forcescontract.connect(signer1).deploySoldiers(500, 0, 0)).to.be.revertedWith("deployment exceeds max deployable percentage")
-            await forcescontract.connect(signer1).deploySoldiers(300, 0, 0)
+            await expect(forcescontract.connect(signer1).deployForces(500, 0, 0, 0)).to.be.revertedWith("deployment exceeds max deployable percentage")
+            await forcescontract.connect(signer1).deployForces(300, 0, 0, 0)
             var deployedSoldiers = await forcescontract.getDeployedSoldierCount(0);
             var defendingSoldiers = await forcescontract.getDefendingSoldierCount(0);
             var totalSoldiers = await forcescontract.getSoldierCount(0);
@@ -1060,16 +1060,25 @@ describe("Forces Contract", async function () {
         })
 
         it("tests that tanks are deployed correctly", async function () {
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500)
-            await forcescontract.connect(signer1).buySoldiers(500, 0)
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
-            await forcescontract.connect(signer2).buySoldiers(1000, 1)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
+            await forcescontract.connect(signer1).buySoldiers(2000, 0)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 1000)
+            await forcescontract.connect(signer2).buySoldiers(2000, 1)
             await forcescontract.connect(signer1).buyTanks(100, 0);
             var totalTankCount = await forcescontract.getTankCount(0);
             var defendingTankCount = await forcescontract.getDefendingTankCount(0)
             expect(totalTankCount.toNumber()).to.equal(100)
             expect(defendingTankCount.toNumber()).to.equal(100)
-            
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await forcescontract.connect(signer1).deployForces(200, 100, 0, 0)
+            var totalTankCount = await forcescontract.getTankCount(0);
+            var defendingTankCount = await forcescontract.getDefendingTankCount(0)
+            var deployedTankCount = await forcescontract.getDeployedTankCount(0)
+            expect(totalTankCount.toNumber()).to.equal(100)
+            expect(defendingTankCount.toNumber()).to.equal(0)
+            expect(deployedTankCount.toNumber()).to.equal(100);
         })
     })
 })
