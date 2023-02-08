@@ -491,14 +491,8 @@ contract ForcesContract is Ownable {
             (currentTanks + amount) <= maxTanks,
             "cannot buy that many tanks"
         );
-        uint256 soldierCost = getSoldierCost(id);
-        uint256 purchasePrice = soldierCost * 40;
-        uint256 factoryCount = imp1.getFactoryCount(id);
-        uint256 costModifier = 100;
-        if (factoryCount > 0) {
-            costModifier -= (factoryCount * 5);
-        }
-        uint256 cost = (amount * ((purchasePrice * costModifier) / 100));
+        uint256 costPerTank = getTankCost(id);
+        uint256 cost = (costPerTank * amount);
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= cost);
         idToForces[id].numberOfTanks += amount;
@@ -524,13 +518,21 @@ contract ForcesContract is Ownable {
         return tankMax;
     }
 
-    function deployTanks(uint256 amountToDeploy, uint256 id) public {
-        bool isOwner = mint.checkOwnership(id, msg.sender);
-        require(isOwner, "!nation owner");
-        uint256 defendingTankCount = idToForces[id].defendingTanks;
-        require(defendingTankCount >= amountToDeploy);
-        idToForces[id].defendingTanks -= amountToDeploy;
-        idToForces[id].deployedTanks += amountToDeploy;
+    ///@dev this is a public view function that will return the cost a nation has to pay for tanks
+    ///@notice the default cost of a tnak is soldier cost * 40
+    ///@notice tank cost will be reduced by 5% for every factory owned
+    ///@param id is the nation id of the nation buying tanks
+    ///@return cost is the cost per tank for a given nation
+    function getTankCost(uint256 id) public view returns (uint256) {
+        uint256 soldierCost = getSoldierCost(id);
+        uint256 purchasePrice = soldierCost * 40;
+        uint256 factoryCount = imp1.getFactoryCount(id);
+        uint256 costModifier = 100;
+        if (factoryCount > 0) {
+            costModifier -= (factoryCount * 5);
+        }
+        uint256 cost = ((purchasePrice * costModifier) / 100);
+        return cost;
     }
 
     function withdrawTanks(uint256 amountToWithdraw, uint256 id) public {

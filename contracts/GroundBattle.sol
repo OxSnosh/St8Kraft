@@ -230,14 +230,9 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             uint256
         )
     {
-        (uint256 soldiersDeployed, uint256 tanksDeployed) = war
-            .getDeployedGroundForces(warId, attackerId);
-        uint256 efficiencyModifier = force
-            .getDeployedSoldierEfficiencyModifier(attackerId);
-        uint256 soldierStrength = ((soldiersDeployed * efficiencyModifier) /
-            100);
-        uint256 tankStrength = (15 * tanksDeployed);
-        uint256 strength = (soldierStrength + tankStrength);
+        (, uint256 tanksDeployed) = war.getDeployedGroundForces(warId, attackerId);
+        uint256 soldierEfficiency = getAttackingSoldierEfficiency(attackerId, warId);
+        uint256 strength = (soldierEfficiency + (15 * tanksDeployed));
         uint256 mod = 100;
         bool pentagon = won3.getPentagon(attackerId);
         if (pentagon) {
@@ -251,6 +246,15 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         return strength;
     }
 
+
+    function getAttackingSoldierEfficiency(uint256 attackerId, uint256 _warId) public view returns (uint256) {
+        (uint256 attackingSoldiers, ) = war.getDeployedGroundForces(_warId, attackerId);
+        uint256 attackingEfficiencyModifier = force.getDefendingSoldierEfficiencyModifier(attackerId);
+        uint256 attackingSoldierEfficiency = ((attackingSoldiers * attackingEfficiencyModifier) / 100);
+        return attackingSoldierEfficiency;
+    }
+
+
     function getDefenderForcesStrength(uint256 defenderId, uint256 battleId)
         public
         view
@@ -258,12 +262,9 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             uint256
         )
     {
-        uint256 soldiers = force.getDefendingSoldierCount(defenderId);
+        uint256 soldierEfficiency = getDefendingSoldierEfficiency(defenderId);
         uint256 tanks = force.getDefendingTankCount(defenderId);
-        uint256 efficiencyModifier = force
-            .getDefendingSoldierEfficiencyModifier(defenderId);
-        uint256 strength = ((soldiers * efficiencyModifier) /
-            100) + (17 * tanks);
+        uint256 strength = ((soldierEfficiency) + (17 * tanks));
         uint256 attackerId = groundBattleIdToAttackerForces[battleId].countryId;
         uint256 officeOfPropagandaCount = imp3.getOfficeOfPropagandaCount(attackerId);
         bool pentagon = won3.getPentagon(defenderId);
@@ -280,6 +281,13 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         }
         strength = ((strength * mod) / 100);
         return strength;
+    }
+
+    function getDefendingSoldierEfficiency(uint256 id) public view returns (uint256) {
+        uint256 defendingSoldiers = force.getDefendingSoldierCount(id);
+        uint256 defendingEfficiencyModifier = force.getDefendingSoldierEfficiencyModifier(id);
+        uint256 defendingSoldierEfficiency = ((defendingSoldiers * defendingEfficiencyModifier) / 100);
+        return defendingSoldierEfficiency;
     }
 
     function fulfillRequest(uint256 battleId) public {

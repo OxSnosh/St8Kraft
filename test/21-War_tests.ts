@@ -1134,4 +1134,10 @@ describe("War Contract", async function () {
             expect(tanksDeployed2.toNumber()).to.equal(40);
         })
     })
+
+    describe("Soldier Efficiency", function () {
+        it("tests that deployed soldier efficiency works correctly", async function () {
+            
+        })
+    })
 })

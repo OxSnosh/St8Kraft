@@ -1038,6 +1038,24 @@ describe("Forces Contract", async function () {
             expect(totalTankCount.toNumber()).to.equal(125)
             expect(defendingTankCount.toNumber()).to.equal(125)
         })
+
+        it("tests that getTankCost() works correctly", async function () {
+            var cost = await forcescontract.getTankCost(0)
+            // console.log(cost.toNumber(), "cost 1");
+            expect(cost.toNumber()).to.equal(480);
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 7, 8)
+            var cost = await forcescontract.getTankCost(0)
+            // console.log(cost.toNumber(), "cost 2");
+            expect(cost.toNumber()).to.equal(360);
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 7, 11)
+            var cost = await forcescontract.getTankCost(0)
+            expect(cost.toNumber()).to.equal(240);
+            // console.log(cost.toNumber(), "cost 3");
+            await improvementscontract1.connect(signer1).buyImprovement1(5, 0, 11)
+            var cost = await forcescontract.getTankCost(0)
+            expect(cost.toNumber()).to.equal(180);
+            // console.log(cost.toNumber(), "cost 4");
+        })
     })
 
     describe("Deploy Forces", function () {
