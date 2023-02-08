@@ -81,6 +81,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         address _treasury
     ) public onlyOwner {
         warAddress = _warAddress;
+        war = WarContract(_warAddress);
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
         forces = _forces;

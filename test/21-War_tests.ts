@@ -1137,6 +1137,81 @@ describe("War Contract", async function () {
 
     describe("Soldier Efficiency", function () {
         it("tests that deployed soldier efficiency works correctly", async function () {
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
+            await forcescontract.connect(signer2).buySoldiers(1000, 1)
+            await forcescontract.connect(signer2).buyTanks(50, 1)
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await forcescontract.connect(signer1).buySoldiers(500, 0)
+            await forcescontract.connect(signer1).deployForces(500, 20, 0, 0);
+            var attackingSoldierEfficiency = await groundbattlecontract.getAttackingSoldierEfficiency(0, 0);
+            // console.log(attackingSoldierEfficiency.toNumber(), "default efficiency");
+            expect(attackingSoldierEfficiency.toNumber()).to.equal(500)
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 0, 2);
+            var attackingSoldierEfficiency = await groundbattlecontract.getAttackingSoldierEfficiency(0, 0);
+            // console.log(attackingSoldierEfficiency.toNumber(), "aluminium and coal efficiency");
+            expect(attackingSoldierEfficiency.toNumber()).to.equal(640)
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 11, 12);
+            var attackingSoldierEfficiency = await groundbattlecontract.getAttackingSoldierEfficiency(0, 0);
+            // console.log(attackingSoldierEfficiency.toNumber(), "oil and pigs efficiency");
+            expect(attackingSoldierEfficiency.toNumber()).to.equal(625)
+            await improvementscontract1.connect(signer1).buyImprovement1(3, 0, 3)
+            var attackingSoldierEfficiency = await groundbattlecontract.getAttackingSoldierEfficiency(0, 0);
+            // console.log(attackingSoldierEfficiency.toNumber(), "barracks efficiency");
+            expect(attackingSoldierEfficiency.toNumber()).to.equal(775)
+            await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 3)
+            var attackingSoldierEfficiency = await groundbattlecontract.getAttackingSoldierEfficiency(0, 0);
+            // console.log(attackingSoldierEfficiency.toNumber(), "guerilla camp efficiency");
+            expect(attackingSoldierEfficiency.toNumber()).to.equal(1650)
+        })
+
+        it("tests that defending soldier efficiency works correctly", async function () {
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
+            await forcescontract.connect(signer2).buySoldiers(1000, 1)
+            await forcescontract.connect(signer2).buyTanks(50, 1)
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await forcescontract.connect(signer1).buySoldiers(480, 0)
+            await forcescontract.connect(signer1).deployForces(500, 20, 0, 0);
+            var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
+            // console.log(defendingSoldierEfficiency.toNumber(), "default efficiency");
+            expect(defendingSoldierEfficiency.toNumber()).to.equal(500)
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 0, 2);
+            var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
+            // console.log(defendingSoldierEfficiency.toNumber(), "aluminium and coal efficiency");
+            expect(defendingSoldierEfficiency.toNumber()).to.equal(640)
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 11, 12);
+            var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
+            // console.log(defendingSoldierEfficiency.toNumber(), "oil and pigs efficiency");
+            expect(defendingSoldierEfficiency.toNumber()).to.equal(625)
+            await improvementscontract1.connect(signer1).buyImprovement1(3, 0, 3)
+            var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
+            // console.log(defendingSoldierEfficiency.toNumber(), "barracks efficiency");
+            expect(defendingSoldierEfficiency.toNumber()).to.equal(775)
+            await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 3)
+            var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
+            // console.log(defendingSoldierEfficiency.toNumber(), "guerilla camp efficiency");
+            expect(defendingSoldierEfficiency.toNumber()).to.equal(1650)
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5)
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5)
+            await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 4)
+            var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
+            // console.log(defendingSoldierEfficiency.toNumber(), "border fortification efficiency");
+            await improvementscontract1.connect(signer1).deleteImprovement1(2, 0, 4)
+            expect(defendingSoldierEfficiency.toNumber()).to.equal(1670)
+            await improvementscontract2.connect(signer1).buyImprovement2(2, 0, 2)
+            var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
+            // console.log(defendingSoldierEfficiency.toNumber(), "forward operating base efficiency");
+            expect(defendingSoldierEfficiency.toNumber()).to.equal(1620)
+        })
+    })
+
+    describe("Wars Ending", function () {
+        it("tests that offerPeace() works correctly", async function () {
             
         })
     })
