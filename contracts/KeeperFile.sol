@@ -99,6 +99,10 @@ contract KeeperContract is Ownable {
         war.decrementWarDaysLeft();
     }
 
+    function decremenWarDaysByOwner() public onlyOwner {
+        war.decrementWarDaysLeft();
+    }
+
     function resetCruiseMissileLaunches() internal {
         war.resetCruiseMissileLaunches();
     }

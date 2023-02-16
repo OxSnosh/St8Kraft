@@ -1212,7 +1212,159 @@ describe("War Contract", async function () {
 
     describe("Wars Ending", function () {
         it("tests that offerPeace() works correctly", async function () {
-            
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
+            await forcescontract.connect(signer2).buySoldiers(1000, 1)
+            await forcescontract.connect(signer2).buyTanks(50, 1)
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            var isActive = await warcontract.isWarActive(0);
+            console.log(isActive)
+            expect(isActive).to.equal(true)
+            await warcontract.connect(signer2).offerPeace(1, 0)
+            var arr : any = await warcontract.checkWar(0)
+            var offenseOffered = arr[0]
+            var defenseOffered = arr[1]
+            var active = arr[2]
+            var peaceDeclared = arr[3]
+            var expired = arr[4]
+            // console.log(defenseOffered, "defense peace offered")
+            // console.log(offenseOffered, "offense peace offered")
+            // console.log(active, "is war active")
+            // console.log(peaceDeclared, "is peace declared")
+            // console.log(expired, "is war expired")
+            expect(defenseOffered).to.equal(true)
         })
+
+        it("offerPeace stops a war when both sides offer peace", async function () {
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
+            await forcescontract.connect(signer2).buySoldiers(1000, 1)
+            await forcescontract.connect(signer2).buyTanks(50, 1)
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await warcontract.connect(signer2).offerPeace(1, 0)
+            await warcontract.connect(signer1).offerPeace(0, 0)
+            var arr : any = await warcontract.checkWar(0)
+            var offenseOffered = arr[0]
+            var defenseOffered = arr[1]
+            var active = arr[2]
+            var peaceDeclared = arr[3]
+            var expired = arr[4]
+            // console.log(defenseOffered, "defense peace offered")
+            // console.log(offenseOffered, "offense peace offered")
+            // console.log(active, "is war active")
+            // console.log(peaceDeclared, "is peace declared")
+            // console.log(expired, "is war expired")
+            expect(offenseOffered).to.equal(true)
+            expect(defenseOffered).to.equal(true)
+            expect(peaceDeclared).to.equal(true)
+            expect(active).to.equal(false)
+        })
+
+        it("tests that removeActiveWar function works correctly", async function () {
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
+            await forcescontract.connect(signer2).buySoldiers(1000, 1)
+            await forcescontract.connect(signer2).buyTanks(50, 1)
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await warcontract.connect(signer2).offerPeace(1, 0)
+            var isActive = await warcontract.isWarActive(0);
+            expect(isActive).to.equal(true)
+            var offenseOffensiveWars : any = await warcontract.offensiveWarReturnForTesting(0)
+            var defenseOffensiveWars : any = await warcontract.offensiveWarReturnForTesting(1)
+            var offenseActiveWars : any = await warcontract.nationActiveWarsReturnForTesting(0)
+            var defenseActiveWars : any = await warcontract.nationActiveWarsReturnForTesting(1)
+            expect(offenseOffensiveWars.length).to.equal(1)
+            expect(defenseOffensiveWars.length).to.equal(0)
+            expect(offenseActiveWars.length).to.equal(1)
+            expect(defenseActiveWars.length).to.equal(1)
+
+            await warcontract.connect(signer1).offerPeace(0, 0)
+            var arr : any = await warcontract.checkWar(0)
+            var offenseOffered = arr[0]
+            var defenseOffered = arr[1]
+            var active = arr[2]
+            var peaceDeclared = arr[3]
+            var expired = arr[4]
+            // console.log(defenseOffered, "defense peace offered")
+            // console.log(offenseOffered, "offense peace offered")
+            // console.log(active, "is war active")
+            // console.log(peaceDeclared, "is peace declared")
+            // console.log(expired, "is war expired")
+            expect(offenseOffered).to.equal(true)
+            expect(defenseOffered).to.equal(true)
+            expect(peaceDeclared).to.equal(true)
+            expect(active).to.equal(false)
+            var offenseOffensiveWars : any = await warcontract.offensiveWarReturnForTesting(0)
+            var defenseOffensiveWars : any = await warcontract.offensiveWarReturnForTesting(1)
+            var offenseActiveWars : any = await warcontract.nationActiveWarsReturnForTesting(0)
+            var defenseActiveWars : any = await warcontract.nationActiveWarsReturnForTesting(1)
+            expect(offenseOffensiveWars.length).to.equal(0)
+            expect(defenseOffensiveWars.length).to.equal(0)
+            expect(offenseActiveWars.length).to.equal(0)
+            expect(defenseActiveWars.length).to.equal(0)
+        })
+
+        it("tests that removeActiveWar deletes war from active wars array", async function () {
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
+            await forcescontract.connect(signer2).buySoldiers(1000, 1)
+            await forcescontract.connect(signer2).buyTanks(50, 1)
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await warcontract.connect(signer2).offerPeace(1, 0)
+            var isActive = await warcontract.isWarActive(0);
+            expect(isActive).to.equal(true)
+            var activeWars : any = await warcontract.gameActiveWars();
+            expect(activeWars.length).to.equal(1)
+            expect(activeWars[0].toNumber()).to.equal(0)
+            await warcontract.connect(signer1).offerPeace(0, 0)
+            var activeWars : any = await warcontract.gameActiveWars();
+            expect(activeWars.length).to.equal(0)
+        })
+
+        it("tests that wars can expire", async function () {
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
+            await forcescontract.connect(signer2).buySoldiers(1000, 1)
+            await forcescontract.connect(signer2).buyTanks(50, 1)
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await warcontract.connect(signer2).offerPeace(1, 0)
+            var isActive = await warcontract.isWarActive(0);
+            expect(isActive).to.equal(true)
+            var daysLeft = await warcontract.getDaysLeft(0)
+            // console.log(daysLeft.toNumber())
+            expect(daysLeft).to.equal(7)
+            var warDetails : any = await warcontract.checkWar(0)
+            // console.log("expired", warDetails[4])
+            expect(warDetails[4]).to.equal(false)
+            await keepercontract.decremenWarDaysByOwner()
+            await keepercontract.decremenWarDaysByOwner()
+            await keepercontract.decremenWarDaysByOwner()
+            await keepercontract.decremenWarDaysByOwner()
+            await keepercontract.decremenWarDaysByOwner()
+            await keepercontract.decremenWarDaysByOwner()
+            await keepercontract.decremenWarDaysByOwner()
+            var isActive = await warcontract.isWarActive(0);
+            expect(isActive).to.equal(false)
+            // console.log("active after expiration", isActive)
+            var daysLeft = await warcontract.getDaysLeft(0)
+            // console.log(daysLeft.toNumber())
+            expect(daysLeft).to.equal(0)
+            // console.log("days left", daysLeft.toNumber())
+            var warDetails : any = await warcontract.checkWar(0)
+            // console.log("expired", warDetails[4])
+            expect(warDetails[4]).to.equal(true)
+        })
+
+        
     })
 })

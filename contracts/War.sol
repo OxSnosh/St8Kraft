@@ -6,6 +6,7 @@ import "./Military.sol";
 import "./Wonders.sol";
 import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+
 // import "hardhat/console.sol";
 
 ///@title WarContract
@@ -33,12 +34,12 @@ contract WarContract is Ownable {
     CountryMinter mint;
 
     struct War {
-        uint256 warId;
         uint256 offenseId;
         uint256 defenseId;
         bool active;
         uint256 daysLeft;
         bool peaceDeclared;
+        bool expired;
         bool offensePeaceOffered;
         bool defensePeaceOffered;
         uint256 offenseBlockades;
@@ -221,11 +222,11 @@ contract WarContract is Ownable {
             "nation strength is not within range to declare war"
         );
         War memory newWar = War(
-            warId,
             offenseId,
             defenseId,
             true,
             7,
+            false,
             false,
             false,
             false,
@@ -280,9 +281,29 @@ contract WarContract is Ownable {
         warId++;
     }
 
-    function offensiveWarLengthForTesting(uint256 offenseId) public view returns (uint256) {
+    function offensiveWarLengthForTesting(
+        uint256 offenseId
+    ) public view returns (uint256) {
         uint256[] memory offensiveWars = idToOffensiveWars[offenseId];
         return offensiveWars.length;
+    }
+
+    function offensiveWarReturnForTesting(
+        uint256 offenseId
+    ) public view returns (uint256[] memory) {
+        uint256[] memory offensiveWars = idToOffensiveWars[offenseId];
+        return offensiveWars;
+    }
+
+    function nationActiveWarsReturnForTesting(
+        uint256 offenseId
+    ) public view returns (uint256[] memory) {
+        uint256[] memory activeWarsArray = idToActiveWars[offenseId];
+        return activeWarsArray;
+    }
+
+    function gameActiveWars() public view returns (uint256[] memory) {
+        return activeWars;
     }
 
     ///@dev this is an internal function that will be balled by the declare war function and set up several structs that will keep track of each war
@@ -387,13 +408,38 @@ contract WarContract is Ownable {
         if (offerId == defenseNation) {
             warIdToWar[_warId].defensePeaceOffered = true;
         }
-        bool offensePeaceOffered = warIdToWar[_warId].offensePeaceOffered;
-        bool defensePeaceOffered = warIdToWar[_warId].defensePeaceOffered;
-        if (offensePeaceOffered == true && defensePeaceOffered == true) {
+        bool offensePeaceCheck = warIdToWar[_warId].offensePeaceOffered;
+        bool defensePeaceCheck = warIdToWar[_warId].defensePeaceOffered;
+        if (offensePeaceCheck == true && defensePeaceCheck == true) {
             warIdToWar[_warId].peaceDeclared = true;
             warIdToWar[_warId].active = false;
             removeActiveWar(_warId);
         }
+    }
+
+    ///@dev this is a public view function that will return information about a war
+    ///@notice this function will return information about a war
+    ///@param _warId is the war id of the war being queried
+    ///@return offensePeaceOffered is a boolean value that will be true if the offense offered peace
+    ///@return defensePeaceOffered is a boolean value that will be true if the defense nation offered peace
+    ///@return warActive will return a boolean true if the war is still active
+    ///@return peaceDeclared will return a boolean true of peace was declared by both sides
+    ///@return expired will return a boolean true if the war expired (days left reached 0)
+    function checkWar(
+        uint256 _warId
+    ) public view returns (bool, bool, bool, bool, bool) {
+        bool offensePeaceOffered = warIdToWar[_warId].offensePeaceOffered;
+        bool defensePeaceOffered = warIdToWar[_warId].defensePeaceOffered;
+        bool warActive = warIdToWar[_warId].active;
+        bool peaceDeclared = warIdToWar[_warId].peaceDeclared;
+        bool expired = warIdToWar[_warId].expired;
+        return (
+            offensePeaceOffered,
+            defensePeaceOffered,
+            warActive,
+            peaceDeclared,
+            expired
+        );
     }
 
     ///@dev this is an internal function that will remove the active war from each nation when peace is declared or the war expires
@@ -406,7 +452,6 @@ contract WarContract is Ownable {
                     offenseActiveWars.length - 1
                 ];
                 offenseActiveWars.pop();
-                idToActiveWars[offenseId] = offenseActiveWars;
             }
         }
         uint256[] storage offensiveWars = idToOffensiveWars[offenseId];
@@ -414,7 +459,6 @@ contract WarContract is Ownable {
             if (offensiveWars[i] == _warId) {
                 offensiveWars[i] = offensiveWars[offensiveWars.length - 1];
                 offensiveWars.pop();
-                idToOffensiveWars[offenseId] = offensiveWars;
             }
         }
         uint256[] storage defenseActiveWars = idToActiveWars[defenseId];
@@ -424,10 +468,14 @@ contract WarContract is Ownable {
                     defenseActiveWars.length - 1
                 ];
                 defenseActiveWars.pop();
-                idToActiveWars[defenseId] = defenseActiveWars;
             }
         }
-        delete activeWars[_warId];
+        for (uint256 i = 0; i < activeWars.length; i++) {
+            if(activeWars[i] == _warId) {
+                activeWars[i] = activeWars[activeWars.length - 1];
+                activeWars.pop();
+            }
+        }
     }
 
     modifier onlyKeeper() {
@@ -446,6 +494,8 @@ contract WarContract is Ownable {
             uint256 war = activeWars[i];
             warIdToWar[war].daysLeft -= 1;
             if (warIdToWar[war].daysLeft == 0) {
+                warIdToWar[war].expired = true;
+                warIdToWar[war].active = false;
                 removeActiveWar(war);
             }
         }
@@ -463,7 +513,7 @@ contract WarContract is Ownable {
     }
 
     ///@dev this function is only callable from the keeper contract
-    ///@notice this function will reset the active wars daily so that forces can be deployed again 
+    ///@notice this function will reset the active wars daily so that forces can be deployed again
     ///@notice a nation can only deploy forces to a war once per day
     function resetDeployedToday() public onlyKeeper {
         for (uint256 i = 0; i < activeWars.length; i++) {
@@ -873,15 +923,19 @@ contract WarContract is Ownable {
             "nation not involved"
         );
         if (nationId == offenseId) {
-            bool deployedToday = warIdToOffenseDeployed1[_warId].offenseDeployedToday;
+            bool deployedToday = warIdToOffenseDeployed1[_warId]
+                .offenseDeployedToday;
             require(!deployedToday, "already deployed forces today");
-            warIdToOffenseDeployed1[_warId].soldiersDeployed += soldiersToDeploy;
+            warIdToOffenseDeployed1[_warId]
+                .soldiersDeployed += soldiersToDeploy;
             warIdToOffenseDeployed1[_warId].tanksDeployed += tanksToDeploy;
             warIdToOffenseDeployed1[_warId].offenseDeployedToday = true;
         } else if (nationId == defenseId) {
-            bool deployedToday = warIdToDefenseDeployed1[_warId].defenseDeployedToday;
+            bool deployedToday = warIdToDefenseDeployed1[_warId]
+                .defenseDeployedToday;
             require(!deployedToday, "already deployed forces today");
-            warIdToDefenseDeployed1[_warId].soldiersDeployed += soldiersToDeploy;
+            warIdToDefenseDeployed1[_warId]
+                .soldiersDeployed += soldiersToDeploy;
             warIdToDefenseDeployed1[_warId].tanksDeployed += tanksToDeploy;
             warIdToDefenseDeployed1[_warId].defenseDeployedToday = true;
         }
@@ -902,8 +956,7 @@ contract WarContract is Ownable {
         if (attackerId == offenseId) {
             soldiersDeployed = warIdToOffenseDeployed1[_warId].soldiersDeployed;
             tanksDeployed = warIdToOffenseDeployed1[_warId].tanksDeployed;
-        }
-        else if (attackerId == defenseId) {
+        } else if (attackerId == defenseId) {
             soldiersDeployed = warIdToDefenseDeployed1[_warId].soldiersDeployed;
             tanksDeployed = warIdToDefenseDeployed1[_warId].tanksDeployed;
         }
