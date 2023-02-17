@@ -981,7 +981,8 @@ async function main() {
         warcontract.address,
         infrastructurecontract.address,
         forcescontract.address,
-        treasurycontract.address)
+        treasurycontract.address,
+        countryminter.address)
     await groundbattlecontract.settings2(
         improvementscontract2.address,
         improvementscontract3.address,

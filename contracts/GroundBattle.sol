@@ -11,6 +11,7 @@ import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+import "hardhat/console.sol";
 
 ///@title GroundBattleContract
 ///@author OxSnosh
@@ -62,6 +63,20 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
+    event randomNumbersRequested(uint256 indexed requestId);
+    event randomNumbersFulfilled(
+        uint256 indexed randomResource1,
+        uint256 indexed randomResource2
+    );
+    event battleResults(
+        uint256 indexed battleId,
+        uint256 attackSolderLosses,
+        uint256 attackTankLosses,
+        uint256 defenderSoldierLosses,
+        uint256 defenderTankLosses,
+        bool indexed attackVictory
+    );
+
     constructor(
         address vrfCoordinatorV2,
         uint64 subscriptionId,
@@ -74,11 +89,12 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         i_callbackGasLimit = callbackGasLimit;
     }
 
-    function settings (
+    function settings(
         address _warAddress,
         address _infrastructure,
         address _forces,
-        address _treasury
+        address _treasury,
+        address _countryMinter
     ) public onlyOwner {
         warAddress = _warAddress;
         war = WarContract(_warAddress);
@@ -88,9 +104,11 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         force = ForcesContract(_forces);
         treasury = _treasury;
         tsy = TreasuryContract(_treasury);
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
     }
 
-    function settings2 (
+    function settings2(
         address _improvements2,
         address _improvements3,
         address _wonders3,
@@ -146,6 +164,35 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         won4 = WondersContract4(newAddress);
     }
 
+    function battleOdds(
+        uint256 _warId,
+        uint256 attackerId
+    ) public view returns (uint256 attackerOdds, uint256 defenderOdds) {
+        (uint256 warOffense, uint256 warDefense) = war.getInvolvedParties(
+            _warId
+        );
+        uint256 attackerStrength;
+        uint256 defenderStrength;
+        uint256 attackerOddsOfVictory;
+        uint256 defenderOddsOfVictory;
+        if (attackerId == warOffense) {
+            attackerStrength = getAttackerForcesStrength(warOffense, _warId);
+            defenderStrength = getDefenderForcesStrength(warDefense, _warId);
+            attackerOddsOfVictory = ((attackerStrength * 100) /
+                (attackerStrength + defenderStrength));
+            defenderOddsOfVictory = ((defenderStrength * 100) /
+                (attackerStrength + defenderStrength));
+        } else if (attackerId == warDefense) {
+            attackerStrength = getAttackerForcesStrength(warDefense, _warId);
+            defenderStrength = getDefenderForcesStrength(warOffense, _warId);
+            attackerOddsOfVictory = ((attackerStrength * 100) /
+                (attackerStrength + defenderStrength));
+            defenderOddsOfVictory = ((defenderStrength * 100) /
+                (attackerStrength + defenderStrength));
+        }
+        return (attackerOddsOfVictory, defenderOddsOfVictory);
+    }
+
     ///@dev this is a public function callable only from a nation owner
     ///@dev this contract allows nations at war to launch a ground attack against each other
     ///@notice this contract allows nations at war to launch a ground attack against each other
@@ -160,7 +207,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 attackType
     ) public {
         bool isOwner = mint.checkOwnership(attackerId, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         bool isActiveWar = war.isWarActive(warId);
         require(isActiveWar, "!not active war");
         (uint256 warOffense, uint256 warDefense) = war.getInvolvedParties(
@@ -174,6 +221,13 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             warDefense == attackerId || warDefense == defenderId,
             "invalid parameters"
         );
+        require(
+            attackType == 1 ||
+                attackType == 2 ||
+                attackType == 3 ||
+                attackType == 4,
+            "invalid attack type"
+        );
         generateAttackerForcesStruct(
             warId,
             groundBattleId,
@@ -181,7 +235,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             attackType
         );
         generateDefenderForcesStruct(warId, groundBattleId, defenderId);
-        fulfillRequest(groundBattleId);
+        // fulfillRequest(groundBattleId);
         groundBattleId++;
     }
 
@@ -193,7 +247,10 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     ) internal {
         (uint256 soldiersDeployed, uint256 tanksDeployed) = war
             .getDeployedGroundForces(warId, attackerId);
-        uint256 attackerForcesStrength = getAttackerForcesStrength(attackerId, warId);
+        uint256 attackerForcesStrength = getAttackerForcesStrength(
+            attackerId,
+            warId
+        );
         GroundForcesToBattle memory newGroundForces = GroundForcesToBattle(
             attackType,
             soldiersDeployed,
@@ -205,6 +262,34 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         groundBattleIdToAttackerForces[battleId] = newGroundForces;
     }
 
+    function returnAttackerForcesStruct(
+        uint256 battleId
+    )
+        public
+        view
+        returns (uint256, uint256, uint256, uint256, uint256, uint256)
+    {
+        uint256 attackType = groundBattleIdToAttackerForces[battleId]
+            .attackType;
+        uint256 soldiersDeployed = groundBattleIdToAttackerForces[battleId]
+            .soldierCount;
+        uint256 tanksDeployed = groundBattleIdToAttackerForces[battleId]
+            .tankCount;
+        uint256 attackerForcesStrength = groundBattleIdToAttackerForces[
+            battleId
+        ].strength;
+        uint256 attackerId = groundBattleIdToAttackerForces[battleId].countryId;
+        uint256 warId = groundBattleIdToAttackerForces[battleId].warId;
+        return (
+            attackType,
+            soldiersDeployed,
+            tanksDeployed,
+            attackerForcesStrength,
+            attackerId,
+            warId
+        );
+    }
+
     function generateDefenderForcesStruct(
         uint256 warId,
         uint256 battleId,
@@ -212,7 +297,10 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     ) internal {
         uint256 soldiers = force.getDefendingSoldierCount(defenderId);
         uint256 tanks = force.getDefendingTankCount(defenderId);
-        uint256 defenderForcesStrength = getDefenderForcesStrength(defenderId, battleId);
+        uint256 defenderForcesStrength = getDefenderForcesStrength(
+            defenderId,
+            battleId
+        );
         GroundForcesToBattle memory newGroundForces = GroundForcesToBattle(
             0,
             soldiers,
@@ -221,18 +309,42 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             defenderId,
             warId
         );
-        groundBattleIdToAttackerForces[battleId] = newGroundForces;
+        groundBattleIdToDefenderForces[battleId] = newGroundForces;
     }
 
-    function getAttackerForcesStrength(uint256 attackerId, uint256 warId)
-        public
-        view
-        returns (
-            uint256
-        )
-    {
-        (, uint256 tanksDeployed) = war.getDeployedGroundForces(warId, attackerId);
-        uint256 soldierEfficiency = getAttackingSoldierEfficiency(attackerId, warId);
+    function returnDefenderForcesStruct(
+        uint256 battleId
+    ) public view returns (uint256, uint256, uint256, uint256, uint256) {
+        uint256 soldiersDefending = groundBattleIdToDefenderForces[battleId]
+            .soldierCount;
+        uint256 tanksDefending = groundBattleIdToDefenderForces[battleId]
+            .tankCount;
+        uint256 defendingForcesStrength = groundBattleIdToDefenderForces[
+            battleId
+        ].strength;
+        uint256 defenderId = groundBattleIdToDefenderForces[battleId].countryId;
+        uint256 warId = groundBattleIdToDefenderForces[battleId].warId;
+        return (
+            soldiersDefending,
+            tanksDefending,
+            defendingForcesStrength,
+            defenderId,
+            warId
+        );
+    }
+
+    function getAttackerForcesStrength(
+        uint256 attackerId,
+        uint256 warId
+    ) public view returns (uint256) {
+        (, uint256 tanksDeployed) = war.getDeployedGroundForces(
+            warId,
+            attackerId
+        );
+        uint256 soldierEfficiency = getAttackingSoldierEfficiency(
+            attackerId,
+            warId
+        );
         uint256 strength = (soldierEfficiency + (15 * tanksDeployed));
         uint256 mod = 100;
         bool pentagon = won3.getPentagon(attackerId);
@@ -247,31 +359,44 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         return strength;
     }
 
-
-    function getAttackingSoldierEfficiency(uint256 attackerId, uint256 _warId) public view returns (uint256) {
-        (uint256 attackingSoldiers, ) = war.getDeployedGroundForces(_warId, attackerId);
-        uint256 attackingEfficiencyModifier = force.getDefendingSoldierEfficiencyModifier(attackerId);
-        uint256 attackingSoldierEfficiency = ((attackingSoldiers * attackingEfficiencyModifier) / 100);
+    function getAttackingSoldierEfficiency(
+        uint256 attackerId,
+        uint256 _warId
+    ) public view returns (uint256) {
+        (uint256 attackingSoldiers, ) = war.getDeployedGroundForces(
+            _warId,
+            attackerId
+        );
+        uint256 attackingEfficiencyModifier = force
+            .getDefendingSoldierEfficiencyModifier(attackerId);
+        uint256 attackingSoldierEfficiency = ((attackingSoldiers *
+            attackingEfficiencyModifier) / 100);
         return attackingSoldierEfficiency;
     }
 
-
-    function getDefenderForcesStrength(uint256 defenderId, uint256 battleId)
-        public
-        view
-        returns (
-            uint256
-        )
-    {
+    function getDefenderForcesStrength(
+        uint256 defenderId,
+        uint256 _warId
+    ) public view returns (uint256) {
         uint256 soldierEfficiency = getDefendingSoldierEfficiency(defenderId);
         uint256 tanks = force.getDefendingTankCount(defenderId);
         uint256 strength = ((soldierEfficiency) + (17 * tanks));
-        uint256 attackerId = groundBattleIdToAttackerForces[battleId].countryId;
-        uint256 officeOfPropagandaCount = imp3.getOfficeOfPropagandaCount(attackerId);
+        (uint256 warOffense, uint256 warDefense) = war.getInvolvedParties(
+            _warId
+        );
+        uint256 attackerId;
+        if (defenderId == warOffense ) {
+            attackerId = warDefense;
+        } else if (defenderId == warDefense) {
+            attackerId = warOffense;
+        }
+        uint256 officeOfPropagandaCount = imp3.getOfficeOfPropagandaCount(
+            attackerId
+        );
         bool pentagon = won3.getPentagon(defenderId);
         bool logisticalSupport = won4.getSuperiorLogisticalSupport(defenderId);
         uint256 mod = 100;
-        if(officeOfPropagandaCount > 0) {
+        if (officeOfPropagandaCount > 0) {
             mod -= (5 * officeOfPropagandaCount);
         }
         if (pentagon) {
@@ -284,14 +409,19 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         return strength;
     }
 
-    function getDefendingSoldierEfficiency(uint256 id) public view returns (uint256) {
+    function getDefendingSoldierEfficiency(
+        uint256 id
+    ) public view returns (uint256) {
         uint256 defendingSoldiers = force.getDefendingSoldierCount(id);
-        uint256 defendingEfficiencyModifier = force.getDefendingSoldierEfficiencyModifier(id);
-        uint256 defendingSoldierEfficiency = ((defendingSoldiers * defendingEfficiencyModifier) / 100);
+        uint256 defendingEfficiencyModifier = force
+            .getDefendingSoldierEfficiencyModifier(id);
+        uint256 defendingSoldierEfficiency = ((defendingSoldiers *
+            defendingEfficiencyModifier) / 100);
         return defendingSoldierEfficiency;
     }
 
     function fulfillRequest(uint256 battleId) public {
+        console.log("please work", battleId);
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
@@ -300,12 +430,13 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             NUM_WORDS
         );
         s_requestIdToRequestIndex[requestId] = battleId;
+        emit randomNumbersRequested(requestId);
     }
 
-    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords)
-        internal
-        override
-    {
+    function fulfillRandomWords(
+        uint256 requestId,
+        uint256[] memory randomWords
+    ) internal override {
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
         s_requestIndexToRandomWords[requestNumber] = randomWords;
         s_randomWords = randomWords;
@@ -332,6 +463,14 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
                 defenderTankLosses
             ) = attackVictory(requestNumber);
             collectSpoils(requestNumber, attackerId);
+            emit battleResults(
+                requestNumber,
+                attackerSoldierLosses,
+                attackerTankLosses,
+                defenderSoldierLosses,
+                defenderTankLosses,
+                true
+            );
         } else if (randomNumberForOutcomeSelection > attackerStrength) {
             (
                 attackerSoldierLosses,
@@ -339,6 +478,14 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
                 defenderSoldierLosses,
                 defenderTankLosses
             ) = defenseVictory(requestNumber);
+            emit battleResults(
+                requestNumber,
+                attackerSoldierLosses,
+                attackerTankLosses,
+                defenderSoldierLosses,
+                defenderTankLosses,
+                false
+            );
         }
         war.decreaseGroundBattleLosses(
             attackerSoldierLosses,
@@ -358,16 +505,9 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         );
     }
 
-    function getPercentageLosses(uint256 battleId)
-        public
-        view
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            uint256
-        )
-    {
+    function getPercentageLosses(
+        uint256 battleId
+    ) public view returns (uint256, uint256, uint256, uint256) {
         uint256[] memory randomWords = s_requestIndexToRandomWords[battleId];
         uint256 outcomeModifierForWinnerSoldiers = randomWords[1];
         uint256 outcomeModifierForWinnerTanks = randomWords[2];
@@ -408,11 +548,9 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         );
     }
 
-    function getLoserPercentageLosses(uint256 battleId)
-        public
-        view
-        returns (uint256, uint256)
-    {
+    function getLoserPercentageLosses(
+        uint256 battleId
+    ) public view returns (uint256, uint256) {
         uint256[] memory randomWords = s_requestIndexToRandomWords[battleId];
         uint256 outcomeModifierForLoserSoldiers = randomWords[3];
         uint256 outcomeModifierForLoserTanks = randomWords[4];
@@ -444,16 +582,9 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         return (loserSoldierLossesPercentage, loserTankLossesPercentage);
     }
 
-    function attackVictory(uint256 battleId)
-        internal
-        view
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            uint256
-        )
-    {
+    function attackVictory(
+        uint256 battleId
+    ) internal view returns (uint256, uint256, uint256, uint256) {
         (
             uint256 winnerSoldierLossesPercentage,
             uint256 winnerTankLossesPercentage,
@@ -482,16 +613,9 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         );
     }
 
-    function defenseVictory(uint256 battleId)
-        internal
-        view
-        returns (
-            uint256,
-            uint256,
-            uint256,
-            uint256
-        )
-    {
+    function defenseVictory(
+        uint256 battleId
+    ) internal view returns (uint256, uint256, uint256, uint256) {
         (
             uint256 winnerSoldierLossesPercentage,
             uint256 winnerTankLossesPercentage,

@@ -52,12 +52,11 @@ import {
     WondersContract3,
     WondersContract4,
     BonusResourcesContract,
-    ForcesContract__factory,
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("Forces Contract", async function () {
+describe("War Contract", async function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -115,6 +114,8 @@ describe("Forces Contract", async function () {
     let signer3: SignerWithAddress
     let signer4: SignerWithAddress
     let signer5: SignerWithAddress
+    let signer6: SignerWithAddress
+    let signer7: SignerWithAddress
     let signers: SignerWithAddress[]
     let addrs
 
@@ -129,6 +130,8 @@ describe("Forces Contract", async function () {
         signer3 = signers[3];
         signer4 = signers[4];
         signer5 = signers[5];
+        signer6 = signers[6];
+        signer7 = signers[7];
         
         let chainId: any
         chainId = network.config.chainId
@@ -965,6 +968,10 @@ describe("Forces Contract", async function () {
             wonderscontract3.address,
             countryminter.address
         )
+        
+        if(chainId == 31337) {
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, groundbattlecontract.address);
+        }
 
         await countryminter.connect(signer1).generateCountry(
             "TestRuler",
@@ -975,6 +982,10 @@ describe("Forces Contract", async function () {
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
         await treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0);
+        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500)
+        await technologymarketcontrat.connect(signer1).buyTech(0, 100)
+        await forcescontract.connect(signer1).buySoldiers(500, 0)
+        await forcescontract.connect(signer1).buyTanks(50, 0)
 
         await countryminter.connect(signer2).generateCountry(
             "TestRuler2",
@@ -982,122 +993,70 @@ describe("Forces Contract", async function () {
             "TestCapitalCity2",
             "TestNationSlogan2"
         )
-        await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
-        await treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0);
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(2000000000*(10**18)));
+        await treasurycontract.connect(signer2).addFunds(BigInt(2000000000*(10**18)), 1);
+        await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+        await technologymarketcontrat.connect(signer2).buyTech(1, 100)
+        await forcescontract.connect(signer2).buySoldiers(1000, 1)
+        await forcescontract.connect(signer2).buyTanks(50, 1)
+        await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+        await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+        await warcontract.connect(signer1).declareWar(0, 1)
+        await forcescontract.connect(signer1).deployForces(200, 0, 0, 0)
     });
 
-    describe("Buy Forces", function () {
-        it("tests that forces are intialized correctly", async function () {
-            var soldiers = await forcescontract.getSoldierCount(0);
-            expect(soldiers.toNumber()).to.equal(20);
-            var tanks = await forcescontract.getTankCount(0);
-            expect(tanks.toNumber()).to.equal(0);
-        })
+    describe("Ground Battle Works", function () {
 
-        it("tests that buySoldiers() works correctly", async function () {
-            await expect(forcescontract.connect(signer1).buySoldiers(500, 0)).to.be.revertedWith("population cannot support that many soldiers");
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500)
-            // var population = await infrastructurecontract.getTotalPopulationCount(0);
-            // console.log(population.toNumber());
-            await forcescontract.connect(signer1).buySoldiers(500, 0)
-            // var soldiers = await forcescontract.getDefendingSoldierCount(0);
-            // console.log(soldiers.toNumber())
-            await forcescontract.connect(signer1).buySoldiers(2350, 0);
-            // var soldiers = await forcescontract.getDefendingSoldierCount(0);
-            // console.log(soldiers.toNumber())
-            await expect(forcescontract.connect(signer1).buySoldiers(150, 0)).to.be.revertedWith("population cannot support that many soldiers");
-            var soldierCount = await forcescontract.getSoldierCount(0);
-            expect(soldierCount.toNumber()).to.equal(2870)
-        })
+        it("tests that ground battle gets set up correctly", async function () {
+            await groundbattlecontract.connect(signer1).groundAttack(0, 0, 1, 1)
+            var attackerStruct : any = await groundbattlecontract.returnAttackerForcesStruct(0)
+            console.log(attackerStruct[0].toNumber(), "attack type")
+            expect(attackerStruct[0].toNumber()).to.equal(1)
+            console.log(attackerStruct[1].toNumber(), "soldiers deployed")
+            expect(attackerStruct[1].toNumber()).to.equal(200)
+            console.log(attackerStruct[2].toNumber(), "tanks deployed")
+            expect(attackerStruct[2].toNumber()).to.equal(0)
+            console.log(attackerStruct[3].toNumber(), "attacker strength")
+            expect(attackerStruct[3].toNumber()).to.equal(200)
+            console.log(attackerStruct[4].toNumber(), "attacker Id")
+            expect(attackerStruct[4].toNumber()).to.equal(0)
+            console.log(attackerStruct[5].toNumber(), "war ID")
+            expect(attackerStruct[5].toNumber()).to.equal(0)
+            var defenderStruct : any = await groundbattlecontract.returnDefenderForcesStruct(0)
+            console.log(defenderStruct[0].toNumber(), "soldiers defending")
+            expect(defenderStruct[0].toNumber()).to.equal(1020)
+            console.log(defenderStruct[1].toNumber(), "tanks defending")
+            expect(defenderStruct[1].toNumber()).to.equal(50)
+            console.log(defenderStruct[2].toNumber(), "defender strength")
+            expect(defenderStruct[2].toNumber()).to.equal(1870)
+            console.log(defenderStruct[3].toNumber(), "defender Id")
+            expect(defenderStruct[3].toNumber()).to.equal(1)
+            console.log(defenderStruct[4].toNumber(), "war ID")
+            expect(defenderStruct[4].toNumber()).to.equal(0)
+        }) 
 
-        it("tests that getSoldierCost() works correctly", async function () {
-            var cost = await forcescontract.getSoldierCost(0)
-            expect(cost.toNumber()).to.equal(12);
-            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 7, 8)
-            var cost = await forcescontract.getSoldierCost(0)
-            expect(cost.toNumber()).to.equal(9);
-            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 7, 11)
-            var cost = await forcescontract.getSoldierCost(0)
-            expect(cost.toNumber()).to.equal(6);
-        })
+        it("tests that battle odds work correctly", async function () {
+            const battleOdds : any = await groundbattlecontract.battleOdds(0, 0)
+            console.log(battleOdds[0].toNumber(), "attacker victory odds", battleOdds[1].toNumber(), "defender victory odds")
+        }) 
 
-        it("tests that buyTanks() works correctly", async function () {
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500)
-            await forcescontract.connect(signer1).buySoldiers(480, 0)
-            var maxTankCount1 = await forcescontract.getMaxTankCount(0);
-            // console.log("max tanks", maxTankCount1.toNumber())
-            expect(maxTankCount1.toNumber()).to.equal(50);
-            await forcescontract.connect(signer1).buySoldiers(2000, 0)
-            var maxTankCount2 = await forcescontract.getMaxTankCount(0);
-            // console.log("max tanks", maxTankCount2.toNumber())
-            expect(maxTankCount2.toNumber()).to.equal(126);
-            await expect(forcescontract.connect(signer1).buyTanks(127, 0)).to.be.revertedWith("cannot buy that many tanks")
-            await forcescontract.connect(signer1).buyTanks(125, 0);
-            var totalTankCount = await forcescontract.getTankCount(0);
-            var defendingTankCount = await forcescontract.getDefendingTankCount(0)
-            expect(totalTankCount.toNumber()).to.equal(125)
-            expect(defendingTankCount.toNumber()).to.equal(125)
-        })
+        it("tests that battle happens", async function () {
+            await groundbattlecontract.connect(signer1).groundAttack(0, 0, 1, 1)
+            const tx1 = await groundbattlecontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 = txReceipt1?.events?.[1].args?.requestId;
+            const tx2 = await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, groundbattlecontract.address);
+            let txReceipt2 = await tx1.wait(1);
+            let attackVictory = txReceipt2?.events?.[1].args?.attackVictory;
+            console.log(attackVictory, "attacker victory")
 
-        it("tests that getTankCost() works correctly", async function () {
-            var cost = await forcescontract.getTankCost(0)
-            // console.log(cost.toNumber(), "cost 1");
-            expect(cost.toNumber()).to.equal(480);
-            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 7, 8)
-            var cost = await forcescontract.getTankCost(0)
-            // console.log(cost.toNumber(), "cost 2");
-            expect(cost.toNumber()).to.equal(360);
-            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 7, 11)
-            var cost = await forcescontract.getTankCost(0)
-            expect(cost.toNumber()).to.equal(240);
-            // console.log(cost.toNumber(), "cost 3");
-            await improvementscontract1.connect(signer1).buyImprovement1(5, 0, 11)
-            var cost = await forcescontract.getTankCost(0)
-            expect(cost.toNumber()).to.equal(180);
-            // console.log(cost.toNumber(), "cost 4");
-        })
-    })
 
-    describe("Deploy Forces", function () {
-        it("tests that soldiers are deployed correctly", async function () {
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500)
-            await forcescontract.connect(signer1).buySoldiers(500, 0)
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
-            await forcescontract.connect(signer2).buySoldiers(500, 1)
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
-            await warcontract.connect(signer1).declareWar(0, 1)
-            await expect(forcescontract.connect(signer1).deployForces(500, 0, 0, 0)).to.be.revertedWith("deployment exceeds max deployable percentage")
-            await forcescontract.connect(signer1).deployForces(300, 0, 0, 0)
-            var deployedSoldiers = await forcescontract.getDeployedSoldierCount(0);
-            var defendingSoldiers = await forcescontract.getDefendingSoldierCount(0);
-            var totalSoldiers = await forcescontract.getSoldierCount(0);
-            expect(deployedSoldiers.toNumber()).to.equal(300)
-            expect(defendingSoldiers.toNumber()).to.equal(220)
-            expect(totalSoldiers.toNumber()).to.equal(520)
-        })
 
-        it("tests that tanks are deployed correctly", async function () {
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
-            await forcescontract.connect(signer1).buySoldiers(2000, 0)
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 1000)
-            await forcescontract.connect(signer2).buySoldiers(2000, 1)
-            await forcescontract.connect(signer1).buyTanks(100, 0);
-            var totalTankCount = await forcescontract.getTankCount(0);
-            var defendingTankCount = await forcescontract.getDefendingTankCount(0)
-            expect(totalTankCount.toNumber()).to.equal(100)
-            expect(defendingTankCount.toNumber()).to.equal(100)
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
-            await warcontract.connect(signer1).declareWar(0, 1)
-            await forcescontract.connect(signer1).deployForces(200, 100, 0, 0)
-            var totalTankCount = await forcescontract.getTankCount(0);
-            var defendingTankCount = await forcescontract.getDefendingTankCount(0)
-            var deployedTankCount = await forcescontract.getDeployedTankCount(0)
-            expect(totalTankCount.toNumber()).to.equal(100)
-            expect(defendingTankCount.toNumber()).to.equal(0)
-            expect(deployedTankCount.toNumber()).to.equal(100);
-        })
+            var attackerDeployedForces : any = await warcontract.getDeployedGroundForces(0, 0)
+            console.log(attackerDeployedForces[0].toNumber())
+        }) 
+        
+        
     })
 })

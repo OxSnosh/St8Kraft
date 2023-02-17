@@ -633,7 +633,8 @@ describe("War Contract", async function () {
             warcontract.address,
             infrastructurecontract.address,
             forcescontract.address,
-            treasurycontract.address)
+            treasurycontract.address,
+            countryminter.address)
         await groundbattlecontract.settings2(
             improvementscontract2.address,
             improvementscontract3.address,
@@ -1365,6 +1366,6 @@ describe("War Contract", async function () {
             expect(warDetails[4]).to.equal(true)
         })
 
-        
+
     })
 })
