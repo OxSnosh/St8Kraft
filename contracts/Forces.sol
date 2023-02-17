@@ -182,7 +182,7 @@ contract ForcesContract is Ownable {
     modifier onlyGroundBattle() {
         require(
             msg.sender == groundBattle,
-            "only callable from air battle contract"
+            "only callable from ground battle contract"
         );
         _;
     }
@@ -708,9 +708,9 @@ contract ForcesContract is Ownable {
     ///@dev this is a public function only callable from the ground battle contract
     ///@dev this function will decrease the losses of an attacker during a ground battle
     ///@notice this function will decrease the number of losses of an attacker during a ground battle
-    ///@param attackerSoldierLosses is the soldier losses for an attacker from a battle
-    ///@param attackerTankLosses is the tank losses for an attacker from a battle
-    ///@param attackerId is the nation ID of the nation suffering losses
+    // /@param attackerSoldierLosses is the soldier losses for an attacker from a battle
+    // /@param attackerTankLosses is the tank losses for an attacker from a battle
+    // /@param attackerId is the nation ID of the nation suffering losses
     function decreaseDeployedUnits(
         uint256 attackerSoldierLosses,
         uint256 attackerTankLosses,
@@ -718,7 +718,7 @@ contract ForcesContract is Ownable {
     ) public onlyGroundBattle {
         idToForces[attackerId].numberOfSoldiers -= attackerSoldierLosses;
         idToForces[attackerId].deployedSoldiers -= attackerSoldierLosses;
-        idToForces[attackerId].soldierCasualties += attackerSoldierLosses;
+        // idToForces[attackerId].soldierCasualties += attackerSoldierLosses;
         idToForces[attackerId].numberOfTanks -= attackerTankLosses;
         idToForces[attackerId].deployedTanks -= attackerTankLosses;
     }
@@ -726,19 +726,19 @@ contract ForcesContract is Ownable {
     ///@dev this is a public function only callable from the ground battle contract
     ///@dev this function will decrease the losses of an defender during a ground battle
     ///@notice this function will decrease the number of losses of an defender during a ground battle
-    ///@param defenderSoldierLosses is the soldier losses for an defender from a battle
-    ///@param defenderTankLosses is the tank losses for an defender from a battle
-    ///@param defenderId is the nation ID of the nation suffering losses
+    // /@param defenderSoldierLosses is the soldier losses for an defender from a battle
+    // /@param defenderTankLosses is the tank losses for an defender from a battle
+    // /@param defenderId is the nation ID of the nation suffering losses
     function decreaseDefendingUnits(
-        uint256 defenderSoldierLosses,
-        uint256 defenderTankLosses,
+        // uint256 defenderSoldierLosses,
+        // uint256 defenderTankLosses,
         uint256 defenderId
     ) public onlyGroundBattle {
-        idToForces[defenderId].numberOfSoldiers -= defenderSoldierLosses;
-        idToForces[defenderId].defendingSoldiers -= defenderSoldierLosses;
-        idToForces[defenderId].soldierCasualties += defenderSoldierLosses;
-        idToForces[defenderId].numberOfTanks -= defenderTankLosses;
-        idToForces[defenderId].defendingTanks -= defenderTankLosses;
+        // idToForces[defenderId].numberOfSoldiers -= defenderSoldierLosses;
+        // idToForces[defenderId].defendingSoldiers -= defenderSoldierLosses;
+        // idToForces[defenderId].soldierCasualties += defenderSoldierLosses;
+        // idToForces[defenderId].numberOfTanks -= defenderTankLosses;
+        // idToForces[defenderId].defendingTanks -= defenderTankLosses;
     }
 
     ///@dev this is a function for the development environment that will assist in testing wonders and improvements that are available after a certain number of casualties
