@@ -38,6 +38,16 @@ const POLYGONSCAN_API_KEY =
 const REPORT_GAS = process.env.REPORT_GAS || false
 
 const config: HardhatUserConfig = {
+  solidity: {
+    compilers: [
+      {
+        version: "0.8.7"
+      },
+      {
+        version: "0.8.17"
+      },
+    ],
+  },
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
@@ -112,13 +122,6 @@ const config: HardhatUserConfig = {
     user1: {
       default: 1,
     },
-  },
-  solidity: {
-    compilers: [
-      {
-        version: "0.8.7",
-      },
-    ],
   },
   mocha: {
     timeout: 200000, // 200 seconds max for running tests

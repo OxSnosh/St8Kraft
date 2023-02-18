@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: Unlicense
-pragma solidity 0.8.7;
+pragma solidity 0.8.17;
 
 import "./Treasury.sol";
 import "./Infrastructure.sol";
@@ -10,7 +10,7 @@ import "./CountryMinter.sol";
 import "./War.sol";
 import "./NationStrength.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 ///@title ForcesContract
 ///@author OxSnosh
@@ -716,11 +716,14 @@ contract ForcesContract is Ownable {
         uint256 attackerTankLosses,
         uint256 attackerId
     ) public onlyGroundBattle {
+        console.log(attackerSoldierLosses, attackerTankLosses, attackerId, "WTF attacker");
         idToForces[attackerId].numberOfSoldiers -= attackerSoldierLosses;
         idToForces[attackerId].deployedSoldiers -= attackerSoldierLosses;
         // idToForces[attackerId].soldierCasualties += attackerSoldierLosses;
+        // idToForces[attackerId].cruiseMissiles += 1;
         idToForces[attackerId].numberOfTanks -= attackerTankLosses;
         idToForces[attackerId].deployedTanks -= attackerTankLosses;
+
     }
 
     ///@dev this is a public function only callable from the ground battle contract
@@ -730,10 +733,11 @@ contract ForcesContract is Ownable {
     // /@param defenderTankLosses is the tank losses for an defender from a battle
     // /@param defenderId is the nation ID of the nation suffering losses
     function decreaseDefendingUnits(
-        // uint256 defenderSoldierLosses,
-        // uint256 defenderTankLosses,
+        uint256 defenderSoldierLosses,
+        uint256 defenderTankLosses,
         uint256 defenderId
     ) public onlyGroundBattle {
+        // console.log(defenderSoldierLosses, defenderTankLosses, defenderId, "WTF defender");
         // idToForces[defenderId].numberOfSoldiers -= defenderSoldierLosses;
         // idToForces[defenderId].defendingSoldiers -= defenderSoldierLosses;
         // idToForces[defenderId].soldierCasualties += defenderSoldierLosses;
@@ -748,6 +752,13 @@ contract ForcesContract is Ownable {
     ) public onlyOwner {
         idToForces[id].soldierCasualties += amount;
     }
+
+    // function increaseSoldierCasualtiesInternal(
+    //     uint256 id,
+    //     uint256 amount
+    // ) internal {
+    //     idToForces[id].soldierCasualties += amount;
+    // }
 
     ///@dev this is a public view function that will return a nations casualty count
     ///@notice this function will return a nations casualty count

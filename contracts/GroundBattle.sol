@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: Unlicense
-pragma solidity 0.8.7;
+pragma solidity 0.8.17;
 
 import "./War.sol";
 import "./Infrastructure.sol";
@@ -434,7 +434,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     }
 
     function fulfillRequest(uint256 battleId) public {
-        console.log("please work", battleId);
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
@@ -450,9 +449,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 requestId,
         uint256[] memory randomWords
     ) internal override {
-        console.log("did we get here");
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
-        console.log("Request Number", requestNumber);
         s_requestIndexToRandomWords[requestNumber] = randomWords;
         uint256 attackerStrength = groundBattleIdToAttackerForces[requestNumber]
             .strength;
@@ -460,12 +457,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             .strength;
         uint256 randomNumberForOutcomeSelection = (randomWords[0] %
             (attackerStrength + defenderStrength));
-        console.log(
-            "if",
-            randomNumberForOutcomeSelection,
-            "is less than",
-            attackerStrength
-        );
         uint256 attackerSoldierLosses;
         uint256 attackerTankLosses;
         uint256 defenderSoldierLosses;
@@ -482,15 +473,8 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
                 defenderSoldierLosses,
                 defenderTankLosses
             ) = attackVictory(requestNumber);
-            console.log(
-                "soldier losses in battle function",
-                attackerSoldierLosses,
-                "defender soldier losses",
-                defenderSoldierLosses
-            );
             // collectSpoils(requestNumber, attackerId);
             groundBattleIdToAtackerVictory[requestNumber] = true;
-            console.log("Request Number 3", requestNumber);
             emit battleResults(
                 requestNumber,
                 attackerSoldierLosses,
@@ -499,7 +483,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
                 defenderTankLosses,
                 true
             );
-            console.log("did the results get here?");
+            // console.log("did the results get here?");
         } else if (randomNumberForOutcomeSelection > attackerStrength) {
             (
                 attackerSoldierLosses,
@@ -507,14 +491,14 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
                 defenderSoldierLosses,
                 defenderTankLosses
             ) = defenseVictory(requestNumber);
-            console.log(
-                "soldier losses in battle function defense",
-                attackerSoldierLosses,
-                "defender soldier losses defensee",
-                defenderSoldierLosses
-            );
+            // console.log(
+            //     "soldier losses in battle function defense",
+            //     attackerSoldierLosses,
+            //     "defender soldier losses defensee",
+            //     defenderSoldierLosses
+            // );
             groundBattleIdToAtackerVictory[requestNumber] = false;
-            console.log("Request Number 2", requestNumber);
+            // console.log("Request Number 2", requestNumber);
             emit battleResults(
                 requestNumber,
                 attackerSoldierLosses,
@@ -524,7 +508,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
                 false
             );
         }
-        console.log("RESULTS LOGGED");
+        console.log("RESULTS LOGGED", attackerSoldierLosses, defenderSoldierLosses);
         BattleResults memory newBattleAttackerResults = BattleResults(
             attackerId,
             attackerSoldierLosses,
@@ -553,7 +537,8 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         //     defenderSoldierLosses,
         //     defenderTankLosses
         // );
-        completeBattleSequence(requestNumber, warId);
+        // console.log("RESULTS LOGGED 2", attackerSoldierLosses, defenderSoldierLosses);
+        // completeBattleSequence(requestNumber, warId);
     }
 
     function completeBattleSequence(uint256 battleId, uint256 warId) internal {
@@ -589,22 +574,22 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             attackerId
         );
         force.decreaseDefendingUnits(
-            // defenderSoldierLosses,
-            // defenderTankLosses,
-            defenderId
-        );
-        console.log(
-            "THIS",
-            attackerSoldierLosses,
-            attackerTankLosses,
-            attackerId
-        );
-        console.log(
-            "THIS 2",
             defenderSoldierLosses,
             defenderTankLosses,
             defenderId
         );
+        // console.log(
+        //     "THIS",
+        //     attackerSoldierLosses,
+        //     attackerTankLosses,
+        //     attackerId
+        // );
+        // console.log(
+        //     "THIS 2",
+        //     defenderSoldierLosses,
+        //     defenderTankLosses,
+        //     defenderId
+        // );
     }
 
     function returnBattleResults(
@@ -630,7 +615,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 defenderTankLosses = groundBattleIdToBattleDefenderResults[
             battleId
         ].tankLosses;
-        console.log(attackerSoldierLosses, "attacker losses being returned");
+        // console.log(attackerSoldierLosses, "attacker losses being returned");
         return (
             attackerId,
             attackerSoldierLosses,
