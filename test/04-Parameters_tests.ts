@@ -601,7 +601,8 @@ describe("ParametersContract", async function () {
             improvementscontract1.address,
             improvementscontract2.address,
             wonderscontract1.address,
-            countryminter.address)
+            countryminter.address,
+            keepercontract.address)
         
         await missilescontract.settings(
             treasurycontract.address,

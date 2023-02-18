@@ -611,7 +611,8 @@ describe("War Contract", async function () {
             improvementscontract1.address,
             improvementscontract2.address,
             wonderscontract1.address,
-            countryminter.address)
+            countryminter.address,
+            keepercontract.address)
         
         await missilescontract.settings(
             treasurycontract.address,
@@ -1061,18 +1062,18 @@ describe("War Contract", async function () {
             var defenderTankLosses = results[5].toNumber()
             console.log(defenderTankLosses, "defender tank losses")
 
-            var resultsAttempt2 : any = await groundbattlecontract.returnBattleResults(0)
-            // console.log(results);
-            var attackerId2 : any = resultsAttempt2[0].toNumber()
-            console.log(attackerId2, "next attackerId")
-            var attackerSoldierLosses2 = resultsAttempt2[1].toNumber()
-            console.log(attackerSoldierLosses2, "next attacker soldier losses")
-            var attackerTankLosses2 = resultsAttempt2[2].toNumber()
-            console.log(attackerTankLosses2, "next attacker tank losses")
-            var defenderSoldierLosses2 = resultsAttempt2[4].toNumber()
-            console.log(defenderSoldierLosses2, "next defender soldier losses")
-            var defenderTankLosses2 = resultsAttempt2[5].toNumber()
-            console.log(defenderTankLosses2, "next defender tank losses")
+            // var resultsAttempt2 : any = await groundbattlecontract.returnBattleResults(0)
+            // // console.log(results);
+            // var attackerId2 : any = resultsAttempt2[0].toNumber()
+            // console.log(attackerId2, "next attackerId")
+            // var attackerSoldierLosses2 = resultsAttempt2[1].toNumber()
+            // console.log(attackerSoldierLosses2, "next attacker soldier losses")
+            // var attackerTankLosses2 = resultsAttempt2[2].toNumber()
+            // console.log(attackerTankLosses2, "next attacker tank losses")
+            // var defenderSoldierLosses2 = resultsAttempt2[4].toNumber()
+            // console.log(defenderSoldierLosses2, "next defender soldier losses")
+            // var defenderTankLosses2 = resultsAttempt2[5].toNumber()
+            // console.log(defenderTankLosses2, "next defender tank losses")
 
             var attackVictory = await groundbattlecontract.returnAttackVictorious(0);
             console.log(attackVictory, "attacker victory")
@@ -1080,30 +1081,30 @@ describe("War Contract", async function () {
             var attackerDeployedForces : any = await warcontract.getDeployedGroundForces(0, 0)
             console.log(attackerDeployedForces[0].toNumber(), "attacker deployed forces")
 
-            // await groundbattlecontract.connect(signer1).groundAttack(0, 0, 1, 3)
-            // const tx2 = await groundbattlecontract.fulfillRequest(1);
-            // let txReceipt2 = await tx2.wait(1);
-            // let requestId2 : any  = txReceipt2?.events?.[1].args?.requestId;
-            // console.log(requestId2.toNumber(), "requestId2")
-            // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, groundbattlecontract.address);
-            // var results2 : any = await groundbattlecontract.returnBattleResults(0)
-            // // console.log(results);
-            // var attackerId2 = results[0].toNumber()
-            // console.log(attackerId2, "attackerId")
-            // var attackerSoldierLosses2 = results2[1].toNumber()
-            // console.log(attackerSoldierLosses2, "attacker soldier losses")
-            // var attackerTankLosses2 = results2[2].toNumber()
-            // console.log(attackerTankLosses2, "attacker tank losses")
-            // var defenderSoldierLosses2 = results2[4].toNumber()
-            // console.log(defenderSoldierLosses2, "defender soldier losses")
-            // var defenderTankLosses2 = results2[5].toNumber()
-            // console.log(defenderTankLosses2, "defender tank losses")
+            await groundbattlecontract.connect(signer1).groundAttack(0, 0, 1, 3)
+            const tx2 = await groundbattlecontract.fulfillRequest(1);
+            let txReceipt2 = await tx2.wait(1);
+            let requestId2 : any  = txReceipt2?.events?.[1].args?.requestId;
+            console.log(requestId2.toNumber(), "requestId2")
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, groundbattlecontract.address);
+            var results2 : any = await groundbattlecontract.returnBattleResults(1)
+            // console.log(results);
+            var attackerId2 = results2[0].toNumber()
+            console.log(attackerId2, "attackerId")
+            var attackerSoldierLosses2 = results2[1].toNumber()
+            console.log(attackerSoldierLosses2, "attacker soldier losses")
+            var attackerTankLosses2 = results2[2].toNumber()
+            console.log(attackerTankLosses2, "attacker tank losses")
+            var defenderSoldierLosses2 = results2[4].toNumber()
+            console.log(defenderSoldierLosses2, "defender soldier losses")
+            var defenderTankLosses2 = results2[5].toNumber()
+            console.log(defenderTankLosses2, "defender tank losses")
 
-            // var attackVictory = await groundbattlecontract.returnAttackVictorious(1);
-            // console.log(attackVictory, "attacker victory")
+            var attackVictory = await groundbattlecontract.returnAttackVictorious(1);
+            console.log(attackVictory, "attacker victory")
 
-            // var attackerDeployedForces : any = await warcontract.getDeployedGroundForces(0, 0)
-            // console.log(attackerDeployedForces[0].toNumber(), "attacker deployed forces")
+            var attackerDeployedForces : any = await warcontract.getDeployedGroundForces(0, 0)
+            console.log(attackerDeployedForces[0].toNumber(), "attacker deployed forces")
         }) 
         
         

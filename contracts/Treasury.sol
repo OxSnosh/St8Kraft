@@ -9,6 +9,7 @@ import "./Forces.sol";
 import "./Navy.sol";
 import "./Fighters.sol";
 import "./CountryMinter.sol";
+import "./GroundBattle.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 ///@title TreasuyContract
@@ -37,6 +38,7 @@ contract TreasuryContract is Ownable {
     uint256 public seedMoney = 2000000*10**18;
 
     CountryMinter mint;
+    GroundBattleContract ground;
 
     struct Treasury {
         uint256 grossIncomePerCitizenPerDay;
@@ -89,6 +91,7 @@ contract TreasuryContract is Ownable {
         address _keeper
     ) public onlyOwner {
         groundBattle = _groundBattle;
+        ground = GroundBattleContract(_groundBattle);
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
         keeper = _keeper;
@@ -249,17 +252,21 @@ contract TreasuryContract is Ownable {
     ///@param defenderId is the nation id of the defending nation
     function transferSpoils(
         uint256 randomNumber,
+        uint256 battleId,
         uint256 attackerId,
         uint256 defenderId
     ) public onlyGroundBattle {
         uint256 defenderBalance = idToTreasury[defenderId].balance;
+        ( , , , , uint256 defenderSoldierLosses, uint256 defenderTankLosses) = ground.returnBattleResults(battleId);
+        uint256 maximumFundsToTransfer = ((defenderSoldierLosses * 4) + (defenderTankLosses * 150));
         uint256 fundsToTransfer = ((defenderBalance * randomNumber) / 100);
-        if (fundsToTransfer < 2000000) {
-            idToTreasury[defenderId].balance -= fundsToTransfer;
+        if(fundsToTransfer >= maximumFundsToTransfer) {
+            fundsToTransfer = maximumFundsToTransfer;
+        }
+        if (fundsToTransfer < 1000000) {
             idToTreasury[attackerId].balance += fundsToTransfer;
         } else {
-            idToTreasury[defenderId].balance -= 2000000;
-            idToTreasury[attackerId].balance += 2000000;
+            idToTreasury[attackerId].balance += 1000000;
         }
     }
 

@@ -808,32 +808,30 @@ contract InfrastructureContract is Ownable {
     }
 
     ///@dev this is a public function only callable from the ground battle contract
-    ///@notice this function will transfer land and technology lost during a ground battle
-    ///@param landMiles is the amount of land being transferred
-    ///@param techLevels is the amount of technology being transferred
+    ///@notice this function will transfer land and infrastructure lost during a ground battle
+    ///@param landMiles is the amount of land being won
+    ///@param infrastructureLevels is the amount of infrastructure being won
     ///@param attackerId is the ID of the attack nation
     ///@param defenderId is the ID of the defending nation
-    function transferLandAndTech(
+    function transferLandAndInfrastructure(
         uint256 landMiles,
-        uint256 techLevels,
+        uint256 infrastructureLevels,
         uint256 attackerId,
         uint256 defenderId
     ) public onlyGroundBattle {
         uint256 defenderLand = idToInfrastructure[defenderId].landArea;
-        uint256 defenderTech = idToInfrastructure[defenderId].technologyCount;
+        uint256 defenderInfrastructure = idToInfrastructure[defenderId].infrastructureCount;
         if (defenderLand <= landMiles) {
-            idToInfrastructure[defenderId].landArea = 0;
             idToInfrastructure[attackerId].landArea += defenderLand;
+            landMiles = defenderLand;
         } else {
-            idToInfrastructure[defenderId].landArea -= landMiles;
             idToInfrastructure[attackerId].landArea += landMiles;
         }
-        if (defenderTech <= techLevels) {
-            idToInfrastructure[defenderId].technologyCount = 0;
-            idToInfrastructure[attackerId].technologyCount += defenderTech;
+        if (defenderInfrastructure <= infrastructureLevels) {
+            idToInfrastructure[attackerId].infrastructureCount += defenderInfrastructure;
+            infrastructureLevels = defenderInfrastructure;
         } else {
-            idToInfrastructure[defenderId].technologyCount = techLevels;
-            idToInfrastructure[attackerId].technologyCount += techLevels;
+            idToInfrastructure[attackerId].infrastructureCount += infrastructureLevels;
         }
     }
 }
