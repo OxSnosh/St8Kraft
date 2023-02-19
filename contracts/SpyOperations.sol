@@ -8,9 +8,11 @@ import "./NationStrength.sol";
 import "./Treasury.sol";
 import "./CountryParameters.sol";
 import "./Wonders.sol";
+import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+import "hardhat/console.sol";
 
 ///@title SpyOperationsContract
 ///@author OxSnosh
@@ -26,6 +28,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
     address public parameters;
     address public missiles;
     address public wonders1;
+    address public countryMinter;
 
     //Chainlik Variables
     uint256[] private s_randomWords;
@@ -44,6 +47,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
     CountryParametersContract params;
     MissilesContract mis;
     WondersContract1 won1;
+    CountryMinter mint;
 
     struct SpyAttack {
         uint256 attackerId;
@@ -54,6 +58,8 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => SpyAttack) spyAttackIdToSpyAttack;
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
+
+    event randomNumbersRequested(uint256 indexed requestId);
 
     constructor(
         address vrfCoordinatorV2,
@@ -75,7 +81,8 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         address _wonders1,
         address _treasury,
         address _parameters,
-        address _missiles
+        address _missiles,
+        address _countryMinter
     ) public onlyOwner {
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
@@ -93,6 +100,8 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         params = CountryParametersContract(_parameters);
         missiles = _missiles;
         mis = MissilesContract(_missiles);
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
     }
 
     function updateInfrastructureContract(address newAddress) public onlyOwner {
@@ -125,6 +134,8 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         uint256 defenderId,
         uint256 attackType
     ) public {
+        bool isOwner = mint.checkOwnership(attackerId, msg.sender);
+        require(isOwner, "!nation owner");
         bool warPreference = mil.getWarPeacePreference(defenderId);
         if (warPreference == false) {
             require(attackType == 1, "invalid attack type");
@@ -133,6 +144,8 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
             require(attackType >= 1, "invalid attack type");
             require(attackType <= 15, "invalid attack type");
         }
+        uint256 attackerSpyCount = force.getSpyCount(attackerId);
+        require(attackerSpyCount > 0, "you do not have spies to attack with");
         SpyAttack memory newSpyAttack = SpyAttack(
             attackerId,
             defenderId,
@@ -143,7 +156,8 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         spyAttackId++;
     }
 
-    function fulfillRequest(uint256 id) internal {
+    //make internal
+    function fulfillRequest(uint256 id) public {
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
@@ -152,6 +166,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
             NUM_WORDS
         );
         s_requestIdToRequestIndex[requestId] = id;
+        emit randomNumbersRequested(requestId);
     }
 
     function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords)
@@ -160,6 +175,9 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
     {
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
         s_requestIndexToRandomWords[requestNumber] = randomWords;
+        console.log(randomWords[0]);
+        console.log(randomWords[1]);
+        console.log(randomWords[2]);
         s_randomWords = randomWords;
         uint256 attackType = spyAttackIdToSpyAttack[requestNumber].attackType;
         uint256 attackerId = spyAttackIdToSpyAttack[requestNumber].attackerId;
@@ -168,32 +186,29 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         uint256 defenderSuccessScore = getDefenseSuccessScore(defenderId);
         uint256 totalSuccessScore = defenderSuccessScore + attackerSuccessScore;
         uint256 randomSuccessNumber = (s_randomWords[0] % totalSuccessScore);
-        if (randomSuccessNumber <= (attackerSuccessScore / 2)) {
-            // Mission Success Not Caught
+        console.log(randomSuccessNumber, "needs to be lower than", attackerSuccessScore);
+        if (randomSuccessNumber <= attackerSuccessScore) {
+            console.log("Success");
+            uint256 randomNumber2 = randomWords[1];
             executeSpyOperation(
                 attackerId,
                 defenderId,
                 attackType,
-                requestNumber
+                requestNumber,
+                randomNumber2
             );
-        } else if (randomSuccessNumber <= attackerSuccessScore) {
-            // mission success caught
-            executeSpyOperation(
-                attackerId,
-                defenderId,
-                attackType,
-                requestNumber
-            );
-            force.decreaseAttackerSpyCount(attackerId);
-        } else if (
-            randomSuccessNumber <=
-            (attackerSuccessScore + (defenderSuccessScore / 2))
-        ) {
-            // mission failed not caught
         } else {
-            // mission failed caught
             force.decreaseAttackerSpyCount(attackerId);
+            console.log("Mission Failed");
         }
+    }
+
+    function attackOdds(uint256 attackerId, uint256 defenderId) public view returns (uint256, uint256) {
+        uint256 attackerSuccess = getAttackerSuccessScore(attackerId);
+        uint256 defenderSuccess = getDefenseSuccessScore(defenderId);
+        uint256 attackerOdds = ((attackerSuccess * 100) / (attackerSuccess + defenderSuccess));
+        uint256 defenderOdds = ((defenderSuccess * 100) / (attackerSuccess + defenderSuccess));
+        return (attackerOdds, defenderOdds);
     }
 
     function getAttackerSuccessScore(uint256 countryId)
@@ -203,7 +218,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
     {
         uint256 spyCount = force.getSpyCount(countryId);
         uint256 techAmount = inf.getTechnologyCount(countryId);
-        uint256 attackSuccessScore = (spyCount + (techAmount / 20));
+        uint256 attackSuccessScore = (spyCount + (techAmount / 15));
         bool cia = won1.getCentralIntelligenceAgency(countryId);
         if (cia) {
             attackSuccessScore = ((attackSuccessScore * 110) / 100);
@@ -242,17 +257,22 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         uint256 attackerId,
         uint256 defenderId,
         uint256 attackType,
-        uint256 attackId
+        uint256 attackId,
+        uint256 randomNumber2
     ) internal {
+        console.log("Are we in the execute operation function?");
         uint256 defenderStrength = strength.getNationStrength(defenderId);
         if (attackType == 1) {
             uint256 cost = (200000 + (defenderStrength * 2));
             tsy.spendBalance(attackerId, cost);
             gatherIntelligence(); /*attackerId, defenderId, attackId*/
         } else if (attackType == 2) {
+            console.log("did we get to attack type 2");
             uint256 cost = (100000 + (defenderStrength));
-            tsy.spendBalance(attackerId, cost);
-            destroyCruiseMissiles(defenderId, attackId);
+            console.log(cost);
+            destroyCruiseMissiles(defenderId, attackId, randomNumber2, attackerId);
+            // tsy.spendBalance(attackerId, cost);
+            // console.log("did we spend the $?");
         } else if (attackType == 3) {
             uint256 cost = (100000 + (defenderStrength * 2));
             tsy.spendBalance(attackerId, cost);
@@ -311,13 +331,22 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
 
     }
 
-    function destroyCruiseMissiles(uint256 defenderId, uint256 attackId)
+    function destroyCruiseMissiles(uint256 defenderId, uint256 attackId, uint256 randomNumber2, uint256 attackerId)
         internal
     {
         //random number between 3 and 5
-        uint256[] memory randomNumbers = s_requestIndexToRandomWords[attackId];
-        uint256 randomNumber = ((randomNumbers[1] % 3) + 2);
-        mis.decreaseCruiseMissileCount(randomNumber, defenderId);
+        console.log("did we get to destroy cruise missiles function");
+        // uint256[] storage randomNumbers = s_requestIndexToRandomWords[attackId];
+        // console.log(randomNumbers[1]);
+        // uint256 randomNumber = ((randomNumbers[1] % 3) + 2);
+        console.log(randomNumber2);
+        mis.decreaseCruiseMissileCount(randomNumber2, defenderId);
+        console.log("missiles decreased?");
+        uint256 defenderStrength = strength.getNationStrength(defenderId);
+        uint256 cost = (100000 + (defenderStrength));
+        console.log(cost);
+        tsy.spendBalance(attackerId, cost);
+        console.log("did we spend the $?");
     }
 
     function destroyDefendingTanks(uint256 defenderId, uint256 attackId)
@@ -450,7 +479,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
 
     function sabotogeTaxes(uint256 defenderId, uint256 attackId) internal {
         uint256[] memory randomNumbers = s_requestIndexToRandomWords[attackId];
-        uint256 randomNumberToSetTaxes = ((randomNumbers[1] % 4) + 23);
+        uint256 randomNumberToSetTaxes = ((randomNumbers[1] % 4) + 20);
         inf.setTaxRateFromSpyContract(defenderId, randomNumberToSetTaxes);
     }
 

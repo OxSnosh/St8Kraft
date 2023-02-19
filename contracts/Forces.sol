@@ -152,10 +152,6 @@ contract ForcesContract is Ownable {
         imp1 = ImprovementsContract1(newAddress);
     }
 
-    function updateSpyCost(uint256 newPrice) public onlyOwner {
-        spyCost = newPrice;
-    }
-
     modifier onlyAidContract() {
         require(msg.sender == aid);
         _;
@@ -673,9 +669,13 @@ contract ForcesContract is Ownable {
         );
         uint256 purchasePrice = spyCost * amount;
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice);
+        require(balance >= purchasePrice, "insufficient balance to purchase spies");
         idToForces[id].numberOfSpies += amount;
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+    }
+
+    function updateSpyPrice(uint256 newCost) public onlyOwner {
+        spyCost = newCost;
     }
 
     ///@dev this is a public view function that will return the maximum amount of spies a given country can own
@@ -688,7 +688,7 @@ contract ForcesContract is Ownable {
     function getMaxSpyCount(uint256 id) public view returns (uint256) {
         uint256 maxSpyCount = 50;
         uint256 intelAgencies = imp2.getIntelAgencyCount(id);
-        if (maxSpyCount > 0) {
+        if (intelAgencies > 0) {
             maxSpyCount += (intelAgencies * 100);
         }
         bool cia = won1.getCentralIntelligenceAgency(id);
@@ -725,6 +725,10 @@ contract ForcesContract is Ownable {
     ) public view returns (uint256 count) {
         uint256 spyAmount = idToForces[countryId].numberOfSpies;
         return spyAmount;
+    }
+
+    function getSpyPrice() public view returns (uint256) {
+        return spyCost;
     }
 
     ///@dev this is a public function only callable from the ground battle contract
@@ -1014,8 +1018,8 @@ contract MissilesContract is Ownable {
         require(isOwner, "!nation owner");
         uint256 costPerMissile = getCruiseMissileCost(id);
         uint256 cost = (costPerMissile * amount);
-        idToMissiles[id].cruiseMissiles += amount;
         tsy.spendBalance(id, cost);
+        idToMissiles[id].cruiseMissiles += amount;
     }
 
     ///@dev this is a public view function that will return the cost per missiile of cruise missiles for a nation
@@ -1052,7 +1056,12 @@ contract MissilesContract is Ownable {
         uint256 amount,
         uint256 id
     ) public onlySpyContract {
+        console.log("are we here in FORCES?");
+        // uint256 missiles = idToMissiles[id].cruiseMissiles;
+        // uint256 newAmount = (missiles - amount);
+        // idToMissiles[id].cruiseMissiles = newAmount;
         idToMissiles[id].cruiseMissiles -= amount;
+        console.log("did we get here in FORCES after function?");
     }
 
     ///@dev this is a public function that will decrease the number of cruise missiles only callable from the nuke contract

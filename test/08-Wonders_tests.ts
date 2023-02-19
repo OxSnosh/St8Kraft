@@ -835,7 +835,8 @@ describe("Wonders", async function () {
             wonderscontract1.address,
             treasurycontract.address,
             countryparameterscontract.address,
-            missilescontract.address
+            missilescontract.address,
+            countryminter.address
         )
 
         await taxescontract.settings1(
