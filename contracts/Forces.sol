@@ -53,9 +53,6 @@ contract ForcesContract is Ownable {
         uint256 numberOfTanks;
         uint256 defendingTanks;
         uint256 deployedTanks;
-        uint256 cruiseMissiles;
-        uint256 nuclearWeapons;
-        uint256 nukesPurchasedToday;
         uint256 numberOfSpies;
         bool nationExists;
     }
@@ -126,9 +123,6 @@ contract ForcesContract is Ownable {
         Forces memory newForces = Forces(
             20,
             20,
-            0,
-            0,
-            0,
             0,
             0,
             0,
@@ -795,24 +789,24 @@ contract ForcesContract is Ownable {
     // ) public onlyGroundBattle {
     // }
 
-    function incrementCasualties() external onlyKeeperContract {
-        uint256[] memory todaysBattles = ground.returnTodaysGroundBattles();
-        for (uint i = 0; i < todaysBattles.length; i++) {
-            uint256 battleId = todaysBattles[i];
-            (
-                uint256 attackerId,
-                uint256 attackerSoldierLosses,
-                uint256 attackerTankLosses,
-                uint256 defenderId,
-                uint256 defenderSoldierLosses,
-                uint256 defenderTankLosses
-            ) = ground.returnBattleResults(battleId);
-            idToCasualties[attackerId].soldierCasualties += attackerSoldierLosses;
-            idToCasualties[attackerId].tankCasualties += attackerTankLosses;
-            idToCasualties[defenderId].soldierCasualties += defenderSoldierLosses;
-            idToCasualties[defenderId].tankCasualties += defenderTankLosses;
-        }
-    }
+    // function incrementCasualties() external onlyKeeperContract {
+    //     uint256[] memory todaysBattles = ground.returnTodaysGroundBattles();
+    //     for (uint i = 0; i < todaysBattles.length; i++) {
+    //         uint256 battleId = todaysBattles[i];
+    //         (
+    //             uint256 attackerId,
+    //             uint256 attackerSoldierLosses,
+    //             uint256 attackerTankLosses,
+    //             uint256 defenderId,
+    //             uint256 defenderSoldierLosses,
+    //             uint256 defenderTankLosses
+    //         ) = ground.returnBattleResults(battleId);
+    //         idToCasualties[attackerId].soldierCasualties += attackerSoldierLosses;
+    //         idToCasualties[attackerId].tankCasualties += attackerTankLosses;
+    //         idToCasualties[defenderId].soldierCasualties += defenderSoldierLosses;
+    //         idToCasualties[defenderId].tankCasualties += defenderTankLosses;
+    //     }
+    // }
 
     ///@dev this is a public view function that will return a nations casualty count
     ///@notice this function will return a nations casualty count

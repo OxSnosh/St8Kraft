@@ -59,11 +59,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 defenderTankLosses;
     }
 
-    // struct GroundBattleCasualties {
-    //     uint256 soldierCasualties;
-    //     uint256 tankCasualties; 
-    // }
-
     //Chainlik Variables
     uint256[] private s_randomWords;
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
@@ -227,6 +222,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 defenderId,
         uint256 attackType
     ) public {
+        console.log("GROUND BATTLE ID INITIAL", groundBattleId);
         bool isOwner = mint.checkOwnership(attackerId, msg.sender);
         require(isOwner, "!nation owner");
         bool isActiveWar = war.isWarActive(warId);
@@ -256,8 +252,8 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             attackType
         );
         generateDefenderForcesStruct(warId, groundBattleId, defenderId);
+        // todaysGroundBattles.push(groundBattleId);
         // fulfillRequest(groundBattleId);
-        todaysGroundBattles.push(groundBattleId);
         groundBattleId++;
     }
 
@@ -451,6 +447,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             NUM_WORDS
         );
         s_requestIdToRequestIndex[requestId] = battleId;
+        console.log(requestId, "REQ ID", battleId, "BATT ID");
         emit randomNumbersRequested(requestId);
     }
 
@@ -459,11 +456,13 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256[] memory randomWords
     ) internal override {
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
+        console.log(requestNumber, "REQUEST NUMBER");
         s_requestIndexToRandomWords[requestNumber] = randomWords;
         uint256 attackerStrength = groundBattleIdToAttackerForces[requestNumber]
             .strength;
         uint256 defenderStrength = groundBattleIdToDefenderForces[requestNumber]
             .strength;
+
         uint256 randomNumberForOutcomeSelection = (randomWords[0] %
             (attackerStrength + defenderStrength));
         uint256 attackerSoldierLosses;
@@ -538,12 +537,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         //     defenderTankLosses
         // );
         // console.log("RESULTS LOGGED 2", attackerSoldierLosses, defenderSoldierLosses);
-        war.decreaseGroundBattleLosses(
-            attackerSoldierLosses,
-            attackerTankLosses,
-            attackerId,
-            warId
-        );
         // console.log(
         //     "THIS",
         //     attackerSoldierLosses,
@@ -568,41 +561,46 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         // idToCasualties[defenderId].tankCasualties += defenderTankLosses;
         // force.decreaseDefendingUnits(
         // );
-        force.decreaseDeployedUnits(
+        // force.decreaseDeployedUnits(
+        //     attackerSoldierLosses,
+        //     attackerTankLosses,
+        //     attackerId,
+        //     defenderSoldierLosses,
+        //     defenderTankLosses,
+        //     defenderId
+        // );
+        // force.addGroundBattle(requestNumber);
+        completeBattleSequence(requestNumber, warId);
+    }
+
+    function completeBattleSequence(uint256 battleId, uint256 warId) internal {
+        (
+            uint256 attackerId,
+            uint256 attackerSoldierLosses,
+            uint256 attackerTankLosses,
+            uint256 defenderId,
+            uint256 defenderSoldierLosses,
+            uint256 defenderTankLosses
+        ) = returnBattleResults(battleId);
+        war.decreaseGroundBattleLosses(
             attackerSoldierLosses,
             attackerTankLosses,
             attackerId,
+            warId
+        );
+        console.log(
+            "THIS",
+            attackerSoldierLosses,
+            attackerTankLosses,
+            attackerId
+        );
+        console.log(
+            "THIS 2",
             defenderSoldierLosses,
             defenderTankLosses,
             defenderId
         );
-        
-        // force.addGroundBattle(requestNumber);
-        // completeBattleSequence(requestNumber, warId);
     }
-
-    // function completeBattleSequence(uint256 battleId, uint256 warId) internal {
-    //     (
-    //         uint256 attackerId,
-    //         uint256 attackerSoldierLosses,
-    //         uint256 attackerTankLosses,
-    //         uint256 defenderId,
-    //         uint256 defenderSoldierLosses,
-    //         uint256 defenderTankLosses
-    //     ) = returnBattleResults(battleId);
-    //     // console.log(
-    //     //     "THIS",
-    //     //     attackerSoldierLosses,
-    //     //     attackerTankLosses,
-    //     //     attackerId
-    //     // );
-    //     // console.log(
-    //     //     "THIS 2",
-    //     //     defenderSoldierLosses,
-    //     //     defenderTankLosses,
-    //     //     defenderId
-    //     // );
-    // }
 
     function returnBattleResults(
         uint256 battleId
