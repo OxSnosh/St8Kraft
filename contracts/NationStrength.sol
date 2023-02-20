@@ -250,20 +250,20 @@ contract NationStrengthContract is Ownable {
         view
         returns (uint256)
     {
-        uint256 yak9Count = fight.getDeployedYak9Count(id);
-        uint256 p51MustangCount = fight.getDeployedP51MustangCount(id);
-        uint256 f86SabreCount = fight.getDeployedF86SabreCount(id);
-        uint256 mig15Count = fight.getDeployedMig15Count(id);
-        uint256 f100SuperSabreCount = fight.getDeployedF100SuperSabreCount(id);
-        uint256 additionalFighterStrength = getAdditionalStrengthFromDeployedFighters(
-                id
-            );
-        uint256 strengthFromFighters = (((yak9Count * 1) +
+        // uint256 yak9Count = fight.getDeployedYak9Count(id);
+        // uint256 p51MustangCount = fight.getDeployedP51MustangCount(id);
+        // uint256 f86SabreCount = fight.getDeployedF86SabreCount(id);
+        // uint256 mig15Count = fight.getDeployedMig15Count(id);
+        // uint256 f100SuperSabreCount = fight.getDeployedF100SuperSabreCount(id);
+        // uint256 additionalFighterStrength = getAdditionalStrengthFromDeployedFighters(
+        //         id
+        //     );
+        uint256 strengthFromFighters = 0; /*(((yak9Count * 1) +
             (p51MustangCount * 2) +
             (f86SabreCount * 3) +
             (mig15Count * 4) +
             (f100SuperSabreCount * 5) +
-            additionalFighterStrength) * 5);
+            additionalFighterStrength) * 5);*/
         return strengthFromFighters;
     }
 
@@ -272,14 +272,14 @@ contract NationStrengthContract is Ownable {
         view
         returns (uint256)
     {
-        uint256 f35LightningCount = fight.getDeployedF35LightningCount(id);
-        uint256 f15EagleCount = fight.getDeployedF15EagleCount(id);
-        uint256 su30MkiCount = fight.getDeployedSu30MkiCount(id);
-        uint256 f22RaptorCount = fight.getDeployedF22RaptorCount(id);
-        uint256 additionalFighterStrength = ((f35LightningCount * 6) +
+        // uint256 f35LightningCount = fight.getDeployedF35LightningCount(id);
+        // uint256 f15EagleCount = fight.getDeployedF15EagleCount(id);
+        // uint256 su30MkiCount = fight.getDeployedSu30MkiCount(id);
+        // uint256 f22RaptorCount = fight.getDeployedF22RaptorCount(id);
+        uint256 additionalFighterStrength = 0; /*= ((f35LightningCount * 6) +
             (f15EagleCount * 7) +
             (su30MkiCount * 8) +
-            (f22RaptorCount * 9));
+            (f22RaptorCount * 9));*/
         return additionalFighterStrength;
     }
 
@@ -288,23 +288,23 @@ contract NationStrengthContract is Ownable {
         view
         returns (uint256)
     {
-        uint256 ah1CobraCount = bomb.getDeployedAh1CobraCount(id);
-        uint256 ah64ApacheCount = bomb.getDeployedAh64ApacheCount(id);
-        uint256 bristolBlenheimCount = bomb.getDeployedBristolBlenheimCount(
-            id
-        );
-        uint256 b52MitchellCount = bomb.getDeployedB52MitchellCount(id);
-        uint256 b17gFlyingFortressCount = bomb
-            .getDeployedB17gFlyingFortressCount(id);
-        uint256 additionalStrengthFromBombers = getAdditionalStrengthFromDeployedBombers(
-                id
-            );
-        uint256 strengthFromBombers = (((ah1CobraCount * 1) +
+        // uint256 ah1CobraCount = bomb.getDeployedAh1CobraCount(id);
+        // uint256 ah64ApacheCount = bomb.getDeployedAh64ApacheCount(id);
+        // uint256 bristolBlenheimCount = bomb.getDeployedBristolBlenheimCount(
+        //     id
+        // );
+        // uint256 b52MitchellCount = bomb.getDeployedB52MitchellCount(id);
+        // uint256 b17gFlyingFortressCount = bomb
+        //     .getDeployedB17gFlyingFortressCount(id);
+        // uint256 additionalStrengthFromBombers = getAdditionalStrengthFromDeployedBombers(
+        //         id
+        //     );
+        uint256 strengthFromBombers = 0; /*(((ah1CobraCount * 1) +
             (ah64ApacheCount * 2) +
             (bristolBlenheimCount * 3) +
             (b52MitchellCount * 4) +
             (b17gFlyingFortressCount * 5) +
-            additionalStrengthFromBombers) * 5);
+            additionalStrengthFromBombers) * 5);*/
         return strengthFromBombers;
     }
 
@@ -313,15 +313,15 @@ contract NationStrengthContract is Ownable {
         view
         returns (uint256)
     {
-        uint256 b52StratofortressCount = bomb
-            .getDeployedB52StratofortressCount(id);
-        uint256 b2SpiritCount = bomb.getDeployedB2SpiritCount(id);
-        uint256 b1bLancerCount = bomb.getDeployedB1bLancer(id);
-        uint256 tupolevTu160Count = bomb.getDeployedTupolevTu160(id);
-        uint256 additionalStrengthFromBombers = ((b52StratofortressCount * 6) +
+        // uint256 b52StratofortressCount = bomb
+        //     .getDeployedB52StratofortressCount(id);
+        // uint256 b2SpiritCount = bomb.getDeployedB2SpiritCount(id);
+        // uint256 b1bLancerCount = bomb.getDeployedB1bLancer(id);
+        // uint256 tupolevTu160Count = bomb.getDeployedTupolevTu160(id);
+        uint256 additionalStrengthFromBombers = 0; /*((b52StratofortressCount * 6) +
             (b2SpiritCount * 7) +
             (b1bLancerCount * 8) +
-            (tupolevTu160Count * 9));
+            (tupolevTu160Count * 9));*/
         return additionalStrengthFromBombers;
     }
 

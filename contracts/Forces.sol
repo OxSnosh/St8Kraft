@@ -528,7 +528,7 @@ contract ForcesContract is Ownable {
         uint256 efficiency = getDefendingSoldierEfficiencyModifier(id);
         uint256 modifiedSoldierCount = ((soldiers * efficiency) / 100);
         uint256 tankMax = (modifiedSoldierCount / 10);
-        uint256 citizenCount = inf.getTaxablePopulationCount(id);
+        uint256 citizenCount = inf.getTotalPopulationCount(id);
         uint256 tankMaxByCitizen = ((citizenCount * 8) / 100);
         if (tankMaxByCitizen < tankMax) {
             tankMax = tankMaxByCitizen;

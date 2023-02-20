@@ -274,7 +274,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
             console.log("did we get to attack type 2");
             uint256 cost = (100000 + (defenderStrength));
             console.log(cost);
-            destroyCruiseMissiles(defenderId, attackId, randomNumber2, attackerId);
+            destroyCruiseMissiles(defenderId, /*attackId,*/ randomNumber2, attackerId);
             // tsy.spendBalance(attackerId, cost);
             // console.log("did we spend the $?");
         } else if (attackType == 3) {
@@ -335,7 +335,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
 
     }
 
-    function destroyCruiseMissiles(uint256 defenderId, uint256 attackId, uint256 randomNumber2, uint256 attackerId)
+    function destroyCruiseMissiles(uint256 defenderId, /*uint256 attackId,*/ uint256 randomNumber2, uint256 attackerId)
         internal
     {
         //random number between 3 and 5
