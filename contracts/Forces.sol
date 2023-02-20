@@ -826,7 +826,8 @@ contract ForcesContract is Ownable {
 ///@dev this contract will allow a nation to purchase cruise missiles and nukes
 ///@dev this contract inherits from the openzeppelin ownable contract
 contract MissilesContract is Ownable {
-    uint256 public cruiseMissileCost = 20000;
+    uint256 public cruiseMissileCost = 20000 * (10**18);
+    uint256 public defaultNukeCost = 500000 * (10**18);
     uint256 public nukeCost;
     address public countryMinter;
     address public treasury;
@@ -978,11 +979,6 @@ contract MissilesContract is Ownable {
         mint = CountryMinter(newAddress);
     }
 
-    ///@dev this function is only callable by the contract owner
-    function updateCruiseMissileCost(uint256 newPrice) public onlyOwner {
-        cruiseMissileCost = newPrice;
-    }
-
     modifier onlySpyContract() {
         require(msg.sender == spyAddress, "only callable from spy contract");
         _;
@@ -1016,10 +1012,17 @@ contract MissilesContract is Ownable {
     function buyCruiseMissiles(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
+        uint256 techAmount = inf.getTechnologyCount(id);
+        require(techAmount >= 15, "requires 15 tech");
         uint256 costPerMissile = getCruiseMissileCost(id);
         uint256 cost = (costPerMissile * amount);
         tsy.spendBalance(id, cost);
         idToMissiles[id].cruiseMissiles += amount;
+    }
+
+    ///@dev this function is only callable by the contract owner
+    function updateCruiseMissileCost(uint256 newPrice) public onlyOwner {
+        cruiseMissileCost = newPrice;
     }
 
     ///@dev this is a public view function that will return the cost per missiile of cruise missiles for a nation
@@ -1034,6 +1037,10 @@ contract MissilesContract is Ownable {
         uint256 costModifier = 100;
         if (factoryCount > 0) {
             costModifier -= (factoryCount * 5);
+        }
+        bool lead = res.viewLead(id);
+        if (lead) {
+            costModifier -= 20;
         }
         uint256 costPerMissile = ((basePurchasePrice * costModifier) / 100);
         return costPerMissile;
@@ -1060,7 +1067,8 @@ contract MissilesContract is Ownable {
         // uint256 missiles = idToMissiles[id].cruiseMissiles;
         // uint256 newAmount = (missiles - amount);
         // idToMissiles[id].cruiseMissiles = newAmount;
-        idToMissiles[id].cruiseMissiles -= amount;
+        Missiles storage missiles = idToMissiles[id];
+        missiles.cruiseMissiles -= amount;
         console.log("did we get here in FORCES after function?");
     }
 
@@ -1110,7 +1118,7 @@ contract MissilesContract is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         uint256 techAmount = inf.getTechnologyCount(id);
-        require(techAmount >= 75, "insufficient tech");
+        require(techAmount >= 75, "requires 75 tech");
         uint256 infrastructureAmount = inf.getInfrastructureCount(id);
         require(infrastructureAmount >= 1000, "insufficient infrastructure");
         bool isUranium = res.viewUranium(id);
@@ -1144,8 +1152,20 @@ contract MissilesContract is Ownable {
     ///@return uint256 is the cost per nuke for a given nation
     function getNukeCost(uint256 id) public view returns (uint256) {
         uint256 nukeCount = idToMissiles[id].nuclearWeapons;
-        uint256 cost = (500000 + (nukeCount * 50000));
+        uint256 cost = (defaultNukeCost + (nukeCount * 50000));
+        bool lead = res.viewLead(id);
+        if (lead) {
+            cost = ((cost * 80) / 100);
+        }
         return cost;
+    }
+
+    function updateDefaultNukeCost(uint256 newCost) public onlyOwner {
+        defaultNukeCost = newCost;
+    }
+
+    function getDefaultNukeCost() public view returns (uint256) {
+        return defaultNukeCost;
     }
 
     ///@dev this is a public view function that will retrun a nations current nuke count

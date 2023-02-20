@@ -146,12 +146,13 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         }
         uint256 attackerSpyCount = force.getSpyCount(attackerId);
         require(attackerSpyCount > 0, "you do not have spies to attack with");
-        SpyAttack memory newSpyAttack = SpyAttack(
-            attackerId,
-            defenderId,
-            attackType
-        );
-        spyAttackIdToSpyAttack[spyAttackId] = newSpyAttack;
+        SpyAttack storage newSpyAttack = spyAttackIdToSpyAttack[spyAttackId];
+        newSpyAttack.attackerId = attackerId;
+        newSpyAttack.defenderId = defenderId;
+        newSpyAttack.attackType = attackType;
+        // spyAttackIdToSpyAttack[spyAttackId].attackerId = attackerId;
+        // spyAttackIdToSpyAttack[spyAttackId].defenderId = defenderId;
+        // spyAttackIdToSpyAttack[spyAttackId].attackType = attackType;
         fulfillRequest(spyAttackId);
         spyAttackId++;
     }
@@ -185,6 +186,9 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         uint256 defenderId = spyAttackIdToSpyAttack[requestNumber].defenderId;
         uint256 defenderSuccessScore = getDefenseSuccessScore(defenderId);
         uint256 totalSuccessScore = defenderSuccessScore + attackerSuccessScore;
+        console.log(attackType, "attackType");
+        console.log(attackerId, "attackerId");
+        console.log(defenderId, "defenderId");
         uint256 randomSuccessNumber = (s_randomWords[0] % totalSuccessScore);
         console.log(randomSuccessNumber, "needs to be lower than", attackerSuccessScore);
         if (randomSuccessNumber <= attackerSuccessScore) {

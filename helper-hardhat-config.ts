@@ -24,7 +24,7 @@ const networkConfig: any = {
       subscriptionId: "588",
       gasLane: "0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc", // 30 gwei
       keepersUpdateInterval: "30",
-      callbackGasLimit: "500000", // 500,000 gas
+      callbackGasLimit: "2500000", // 2,000,000 gas
       vrfCoordinatorV2: "0x2Ca8E0C643bDe4C2E08ab1fA0da3401AdAD7734D",
   },
   5: {
@@ -41,7 +41,7 @@ const networkConfig: any = {
   },
 }
 
-const VERIFICATION_BLOCK_CONFIRMATIONS = 6
+const VERIFICATION_BLOCK_CONFIRMATIONS = 2
 
 export {
   config,
