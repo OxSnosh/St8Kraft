@@ -980,7 +980,7 @@ describe("Cruise Missiles and Nukes", async function () {
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
         await treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0);
-        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 5000)
+        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500)
         await technologymarketcontrat.connect(signer1).buyTech(0, 10)
         await forcescontract.connect(signer1).buySoldiers(2000, 0)
         await forcescontract.connect(signer1).buyTanks(40, 0)
@@ -995,7 +995,7 @@ describe("Cruise Missiles and Nukes", async function () {
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
         await warbucks.connect(signer0).transfer(signer2.address, BigInt(2000000000*(10**18)));
         await treasurycontract.connect(signer2).addFunds(BigInt(2000000000*(10**18)), 1);
-        await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 5000)
+        await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
         await technologymarketcontrat.connect(signer2).buyTech(1, 10)
         await forcescontract.connect(signer2).buySoldiers(1000, 1)
         await forcescontract.connect(signer2).buyTanks(20, 1)
@@ -1050,16 +1050,48 @@ describe("Cruise Missiles and Nukes", async function () {
             // console.log(BigInt(defualtCost))
             expect(defualtCost).to.equal(BigInt(399999999999999966445568));
         }) 
-        
-        it("tests that updateDefaultNukeCost works correctly", async function () {
-            var defualtCost : any = await missilescontract.getDefaultNukeCost();
+
+        it("tests that nuke cost updates correctly", async function () {
+            var defualtCost : any = await missilescontract.getNukeCost(0);
             var cost : any = BigInt(defualtCost/(10**18))
             // console.log(cost)
             expect(cost).to.equal(BigInt(500000));
-            await missilescontract.connect(signer0).updateDefaultNukeCost(BigInt(400000 * (10**18)))
-            var defualtCost : any = await missilescontract.getDefaultNukeCost();
-            // console.log(BigInt(defualtCost))
-            expect(defualtCost).to.equal(BigInt(399999999999999966445568));
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 8, 1);
+            var defualtCost : any = await missilescontract.getNukeCost(0);
+            // var cost : any = BigInt(defualtCost)
+            // console.log(cost)
+            expect(defualtCost).to.equal(BigInt("400000000000000000000000"));
+        }) 
+
+        it("tests that buyNukes reverts correctly", async function () {
+            await expect(missilescontract.connect(signer1).buyNukes(1)).to.be.revertedWith("!nation owner")
+            await expect(missilescontract.connect(signer1).buyNukes(0)).to.be.revertedWith("requires 75 tech")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 75);
+            await expect(missilescontract.connect(signer1).buyNukes(0)).to.be.revertedWith("insufficient infrastructure")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 600)
+            await expect(missilescontract.connect(signer1).buyNukes(0)).to.be.revertedWith("no uranium")
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 17, 1);
+            await expect(missilescontract.connect(signer1).buyNukes(0)).to.be.revertedWith("nation strength too low")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 400);
+            await wonderscontract2.connect(signer1).buyWonder2(0, 8);
+            await missilescontract.connect(signer1).buyNukes(0)
+            var count = await missilescontract.getNukeCount(0);
+            expect(count).to.equal(1)
+            await expect(missilescontract.connect(signer1).buyNukes(0)).to.be.revertedWith("already purchased nuke today")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 8000)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
+            await wonderscontract3.connect(signer1).buyWonder3(0, 7)
+            await wonderscontract3.connect(signer1).buyWonder3(0, 4)
+            await wonderscontract4.connect(signer1).buyWonder4(0, 7)
+            await missilescontract.connect(signer1).buyNukes(0)
+            var count = await missilescontract.getNukeCount(0);
+            expect(count).to.equal(2)
+            await expect(missilescontract.connect(signer1).buyNukes(0)).to.be.revertedWith("already purchased nuke today")
+            await keepercontract.connect(signer0).resetNukesPurchasedTodayByOwner()
+            await missilescontract.connect(signer1).buyNukes(0)
+            var count = await missilescontract.getNukeCount(0);
+            expect(count).to.equal(3)
         }) 
     })
 })

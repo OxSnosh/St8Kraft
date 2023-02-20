@@ -1153,10 +1153,12 @@ contract MissilesContract is Ownable {
     function getNukeCost(uint256 id) public view returns (uint256) {
         uint256 nukeCount = idToMissiles[id].nuclearWeapons;
         uint256 cost = (defaultNukeCost + (nukeCount * 50000));
+        uint256 mod = 100;
         bool lead = res.viewLead(id);
         if (lead) {
-            cost = ((cost * 80) / 100);
+            mod = 80;
         }
+        cost = ((cost * mod) / 100);
         return cost;
     }
 
