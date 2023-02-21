@@ -1178,7 +1178,7 @@ contract BombersMarketplace1 is Ownable {
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseAh64ApacheCount(id, amount);
-        fight.increaseAircraftCount(amount, id);
+        // fight.increaseAircraftCount(amount, id);
         tsy.spendBalance(id, purchasePrice);
     }
 
@@ -1210,7 +1210,7 @@ contract BombersMarketplace1 is Ownable {
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseBristolBlenheimCount(id, amount);
-        fight.increaseAircraftCount(amount, id);
+        // fight.increaseAircraftCount(amount, id);
         tsy.spendBalance(id, purchasePrice);
     }
 
@@ -1242,7 +1242,7 @@ contract BombersMarketplace1 is Ownable {
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseB52MitchellCount(id, amount);
-        fight.increaseAircraftCount(amount, id);
+        // fight.increaseAircraftCount(amount, id);
         tsy.spendBalance(id, purchasePrice);
     }
 
@@ -1274,7 +1274,7 @@ contract BombersMarketplace1 is Ownable {
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseB17gFlyingFortressCount(id, amount);
-        fight.increaseAircraftCount(amount, id);
+        // fight.increaseAircraftCount(amount, id);
         tsy.spendBalance(id, purchasePrice);
     }
 
@@ -1492,7 +1492,7 @@ contract BombersMarketplace2 is Ownable {
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseB52StratofortressCount(id, amount);
-        fight.increaseAircraftCount(amount, id);
+        // fight.increaseAircraftCount(amount, id);
         tsy.spendBalance(id, purchasePrice);
     }
 
@@ -1524,7 +1524,7 @@ contract BombersMarketplace2 is Ownable {
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseB2SpiritCount(id, amount);
-        fight.increaseAircraftCount(amount, id);
+        // fight.increaseAircraftCount(amount, id);
         tsy.spendBalance(id, purchasePrice);
     }
 
@@ -1556,7 +1556,7 @@ contract BombersMarketplace2 is Ownable {
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseB1bLancerCount(id, amount);
-        fight.increaseAircraftCount(amount, id);
+        // fight.increaseAircraftCount(amount, id);
         tsy.spendBalance(id, purchasePrice);
     }
 
@@ -1588,7 +1588,7 @@ contract BombersMarketplace2 is Ownable {
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseTupolevTu160Count(id, amount);
-        fight.increaseAircraftCount(amount, id);
+        // fight.increaseAircraftCount(amount, id);
         tsy.spendBalance(id, purchasePrice);
     }
 
