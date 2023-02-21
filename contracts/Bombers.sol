@@ -206,17 +206,17 @@ contract BombersContract is Ownable {
         return count;
     }
 
-    ///@notice this function will return the amount of deployed Ah1cobras a nation owns
-    ///@param id is the nation ID of the nation
-    ///@return uint256 is the number of deployed AH1 Cobra aircraft for the nation
-    function getDeployedAh1CobraCount(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
-        uint256 count = idToDeployedBombers[id].ah1CobraCount;
-        return count;
-    }
+    // ///@notice this function will return the amount of deployed Ah1cobras a nation owns
+    // ///@param id is the nation ID of the nation
+    // ///@return uint256 is the number of deployed AH1 Cobra aircraft for the nation
+    // function getDeployedAh1CobraCount(uint256 id)
+    //     public
+    //     view
+    //     returns (uint256)
+    // {
+    //     uint256 count = idToDeployedBombers[id].ah1CobraCount;
+    //     return count;
+    // }
 
     ///@dev this function is only callabel from the Bomber marketplace contract
     ///@notice this function will increase the number of aircraft when they are purchased in the marketplace
@@ -244,19 +244,19 @@ contract BombersContract is Ownable {
         idToDefendingBombers[id].defendingAircraft -= amount;
     }
 
-    ///@dev this function is only callable from the Air Battle contract
-    ///@notice this function will decrease the amount of aircraft lost in battle
-    ///@param id is the nation ID of the nation
-    ///@param amount is the amount of aircraft being destroyed
-    function decreaseDeployedAh1CobraCount(uint256 amount, uint256 id)
-        public
-        onlyAirBattle
-    {
-        uint256 currentAmount = idToDeployedBombers[id].ah1CobraCount;
-        require((currentAmount - amount) >= 0, "cannot decrease that many");
-        idToDeployedBombers[id].ah1CobraCount -= amount;
-        idToDeployedBombers[id].deployedAircraft -= amount;
-    }
+    // ///@dev this function is only callable from the Air Battle contract
+    // ///@notice this function will decrease the amount of aircraft lost in battle
+    // ///@param id is the nation ID of the nation
+    // ///@param amount is the amount of aircraft being destroyed
+    // function decreaseDeployedAh1CobraCount(uint256 amount, uint256 id)
+    //     public
+    //     onlyAirBattle
+    // {
+    //     uint256 currentAmount = idToDeployedBombers[id].ah1CobraCount;
+    //     require((currentAmount - amount) >= 0, "cannot decrease that many");
+    //     idToDeployedBombers[id].ah1CobraCount -= amount;
+    //     idToDeployedBombers[id].deployedAircraft -= amount;
+    // }
 
     ///@notice this function will allow a nation owner to decommission Ah1Cobras
     ///@param id is the nation ID of the nation
@@ -265,9 +265,14 @@ contract BombersContract is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 currentAmount = idToDefendingBombers[id].ah1CobraCount;
-        require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToDefendingBombers[id].ah1CobraCount -= amount;
-        idToDefendingBombers[id].defendingAircraft -= amount;
+        if (currentAmount < amount) {
+            require(currentAmount >= amount, "cannot delete that many");
+            idToDefendingBombers[id].ah1CobraCount -= amount;
+            idToDefendingBombers[id].defendingAircraft -= amount;
+        } else {
+            idToDefendingBombers[id].ah1CobraCount -= amount;
+            idToDefendingBombers[id].defendingAircraft -= amount;
+        }
     }
 
     ///@notice this function will return the amount of defending A64Apaches a nation owns
@@ -282,17 +287,17 @@ contract BombersContract is Ownable {
         return count;
     }
 
-    ///@notice this function will return the amount of deployed A64Apaches a nation owns
-    ///@param id is the nation ID of the nation
-    ///@return uint256 is the number of deployed A64Apaches aircraft for the nation
-    function getDeployedAh64ApacheCount(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
-        uint256 count = idToDeployedBombers[id].ah64ApacheCount;
-        return count;
-    }
+    // ///@notice this function will return the amount of deployed A64Apaches a nation owns
+    // ///@param id is the nation ID of the nation
+    // ///@return uint256 is the number of deployed A64Apaches aircraft for the nation
+    // function getDeployedAh64ApacheCount(uint256 id)
+    //     public
+    //     view
+    //     returns (uint256)
+    // {
+    //     uint256 count = idToDeployedBombers[id].ah64ApacheCount;
+    //     return count;
+    // }
 
     ///@dev this function is only callabel from the Bomber marketplace contract
     ///@notice this function will increase the number of aircraft when they are purchased in the marketplace
@@ -320,19 +325,19 @@ contract BombersContract is Ownable {
         idToDefendingBombers[id].defendingAircraft -= amount;
     }
 
-    ///@dev this function is only callable from the Air Battle contract
-    ///@notice this function will decrease the amount of aircraft lost in battle
-    ///@param id is the nation ID of the nation
-    ///@param amount is the amount of aircraft being destroyed
-    function decreaseDeployedAh64ApacheCount(uint256 amount, uint256 id)
-        public
-        onlyAirBattle
-    {
-        uint256 currentAmount = idToDeployedBombers[id].ah64ApacheCount;
-        require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToDeployedBombers[id].ah64ApacheCount -= amount;
-        idToDeployedBombers[id].deployedAircraft -= amount;
-    }
+    // ///@dev this function is only callable from the Air Battle contract
+    // ///@notice this function will decrease the amount of aircraft lost in battle
+    // ///@param id is the nation ID of the nation
+    // ///@param amount is the amount of aircraft being destroyed
+    // function decreaseDeployedAh64ApacheCount(uint256 amount, uint256 id)
+    //     public
+    //     onlyAirBattle
+    // {
+    //     uint256 currentAmount = idToDeployedBombers[id].ah64ApacheCount;
+    //     require((currentAmount - amount) >= 0, "cannot delete that many");
+    //     idToDeployedBombers[id].ah64ApacheCount -= amount;
+    //     idToDeployedBombers[id].deployedAircraft -= amount;
+    // }
 
     ///@notice this function will allow a nation owner to decommission Ah64 Apache's
     ///@param id is the nation ID of the nation
@@ -341,9 +346,14 @@ contract BombersContract is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 currentAmount = idToDefendingBombers[id].ah64ApacheCount;
-        require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToDefendingBombers[id].ah64ApacheCount -= amount;
-        idToDefendingBombers[id].defendingAircraft -= amount;
+        if (currentAmount < amount) {
+            require(currentAmount >= amount, "cannot delete that many");
+            idToDefendingBombers[id].ah64ApacheCount -= amount;
+            idToDefendingBombers[id].defendingAircraft -= amount;
+        } else {
+            idToDefendingBombers[id].ah64ApacheCount -= amount;
+            idToDefendingBombers[id].defendingAircraft -= amount;
+        }
     }
 
     ///@notice this function will return the amount of defending Bristol Blenheim's a nation owns
@@ -358,17 +368,17 @@ contract BombersContract is Ownable {
         return count;
     }
 
-    ///@notice this function will return the amount of deployed Bristol Blenheim's a nation owns
-    ///@param id is the nation ID of the nation
-    ///@return uint256 is the number of deployed Bristol Blenheim aircraft for the nation
-    function getDeployedBristolBlenheimCount(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
-        uint256 count = idToDeployedBombers[id].bristolBlenheimCount;
-        return count;
-    }
+    // ///@notice this function will return the amount of deployed Bristol Blenheim's a nation owns
+    // ///@param id is the nation ID of the nation
+    // ///@return uint256 is the number of deployed Bristol Blenheim aircraft for the nation
+    // function getDeployedBristolBlenheimCount(uint256 id)
+    //     public
+    //     view
+    //     returns (uint256)
+    // {
+    //     uint256 count = idToDeployedBombers[id].bristolBlenheimCount;
+    //     return count;
+    // }
 
     ///@dev this function is only callabel from the Bomber marketplace contract
     ///@notice this function will increase the number of aircraft when they are purchased in the marketplace
@@ -396,19 +406,19 @@ contract BombersContract is Ownable {
         idToDefendingBombers[id].defendingAircraft -= amount;
     }
 
-    ///@dev this function is only callable from the Air Battle contract
-    ///@notice this function will decrease the amount of aircraft lost in battle
-    ///@param id is the nation ID of the nation
-    ///@param amount is the amount of aircraft being destroyed
-    function decreaseDeployedBristolBlenheimCount(uint256 amount, uint256 id)
-        public
-        onlyAirBattle
-    {
-        uint256 currentAmount = idToDeployedBombers[id].bristolBlenheimCount;
-        require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToDeployedBombers[id].bristolBlenheimCount -= amount;
-        idToDeployedBombers[id].deployedAircraft -= amount;
-    }
+    // ///@dev this function is only callable from the Air Battle contract
+    // ///@notice this function will decrease the amount of aircraft lost in battle
+    // ///@param id is the nation ID of the nation
+    // ///@param amount is the amount of aircraft being destroyed
+    // function decreaseDeployedBristolBlenheimCount(uint256 amount, uint256 id)
+    //     public
+    //     onlyAirBattle
+    // {
+    //     uint256 currentAmount = idToDeployedBombers[id].bristolBlenheimCount;
+    //     require((currentAmount - amount) >= 0, "cannot delete that many");
+    //     idToDeployedBombers[id].bristolBlenheimCount -= amount;
+    //     idToDeployedBombers[id].deployedAircraft -= amount;
+    // }
 
     ///@notice this function will allow a nation owner to decommission Bristol Blenheim's
     ///@param id is the nation ID of the nation
@@ -417,9 +427,14 @@ contract BombersContract is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 currentAmount = idToDefendingBombers[id].bristolBlenheimCount;
-        require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToDefendingBombers[id].bristolBlenheimCount -= amount;
-        idToDefendingBombers[id].defendingAircraft -= amount;
+        if (currentAmount < amount) {
+            require(currentAmount >= amount, "cannot delete that many");
+            idToDefendingBombers[id].bristolBlenheimCount -= amount;
+            idToDefendingBombers[id].defendingAircraft -= amount;
+        } else {
+            idToDefendingBombers[id].bristolBlenheimCount -= amount;
+            idToDefendingBombers[id].defendingAircraft -= amount;
+        }
     }
 
     ///@notice this function will return the amount of defending b52 Mitchell's a nation owns
@@ -434,17 +449,17 @@ contract BombersContract is Ownable {
         return count;
     }
 
-    ///@notice this function will return the amount of deployed B52 Mitchell's a nation owns
-    ///@param id is the nation ID of the nation
-    ///@return uint256 is the number of deployed B52 Mitchell aircraft for the nation
-    function getDeployedB52MitchellCount(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
-        uint256 count = idToDeployedBombers[id].b52MitchellCount;
-        return count;
-    }
+    // ///@notice this function will return the amount of deployed B52 Mitchell's a nation owns
+    // ///@param id is the nation ID of the nation
+    // ///@return uint256 is the number of deployed B52 Mitchell aircraft for the nation
+    // function getDeployedB52MitchellCount(uint256 id)
+    //     public
+    //     view
+    //     returns (uint256)
+    // {
+    //     uint256 count = idToDeployedBombers[id].b52MitchellCount;
+    //     return count;
+    // }
 
     ///@dev this function is only callabel from the Bomber marketplace contract
     ///@notice this function will increase the number of aircraft when they are purchased in the marketplace
@@ -472,19 +487,19 @@ contract BombersContract is Ownable {
         idToDefendingBombers[id].defendingAircraft -= amount;
     }
 
-    ///@dev this function is only callable from the Air Battle contract
-    ///@notice this function will decrease the amount of aircraft lost in battle
-    ///@param id is the nation ID of the nation
-    ///@param amount is the amount of aircraft being destroyed
-    function decreaseDeployedB52MitchellCount(uint256 amount, uint256 id)
-        public
-        onlyAirBattle
-    {
-        uint256 currentAmount = idToDeployedBombers[id].b52MitchellCount;
-        require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToDeployedBombers[id].b52MitchellCount -= amount;
-        idToDeployedBombers[id].deployedAircraft -= amount;
-    }
+    // ///@dev this function is only callable from the Air Battle contract
+    // ///@notice this function will decrease the amount of aircraft lost in battle
+    // ///@param id is the nation ID of the nation
+    // ///@param amount is the amount of aircraft being destroyed
+    // function decreaseDeployedB52MitchellCount(uint256 amount, uint256 id)
+    //     public
+    //     onlyAirBattle
+    // {
+    //     uint256 currentAmount = idToDeployedBombers[id].b52MitchellCount;
+    //     require((currentAmount - amount) >= 0, "cannot delete that many");
+    //     idToDeployedBombers[id].b52MitchellCount -= amount;
+    //     idToDeployedBombers[id].deployedAircraft -= amount;
+    // }
 
     ///@notice this function will allow a nation owner to decommission B52 Mitchell
     ///@param id is the nation ID of the nation
@@ -493,9 +508,14 @@ contract BombersContract is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 currentAmount = idToDefendingBombers[id].b52MitchellCount;
-        require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToDefendingBombers[id].b52MitchellCount -= amount;
-        idToDefendingBombers[id].defendingAircraft -= amount;
+        if (currentAmount < amount) {
+            require(currentAmount >= amount, "cannot delete that many");
+            idToDefendingBombers[id].b52MitchellCount -= amount;
+            idToDefendingBombers[id].defendingAircraft -= amount;
+        } else {
+            idToDefendingBombers[id].b52MitchellCount -= amount;
+            idToDefendingBombers[id].defendingAircraft -= amount;
+        }
     }
 
     ///@notice this function will return the amount of defending B17's a nation owns
@@ -510,17 +530,17 @@ contract BombersContract is Ownable {
         return count;
     }
 
-    ///@notice this function will return the amount of deployed B17's a nation owns
-    ///@param id is the nation ID of the nation
-    ///@return uint256 is the number of deployed B17 aircraft for the nation
-    function getDeployedB17gFlyingFortressCount(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
-        uint256 count = idToDeployedBombers[id].b17gFlyingFortressCount;
-        return count;
-    }
+    // ///@notice this function will return the amount of deployed B17's a nation owns
+    // ///@param id is the nation ID of the nation
+    // ///@return uint256 is the number of deployed B17 aircraft for the nation
+    // function getDeployedB17gFlyingFortressCount(uint256 id)
+    //     public
+    //     view
+    //     returns (uint256)
+    // {
+    //     uint256 count = idToDeployedBombers[id].b17gFlyingFortressCount;
+    //     return count;
+    // }
 
     ///@dev this function is only callabel from the Bomber marketplace contract
     ///@notice this function will increase the number of aircraft when they are purchased in the marketplace
@@ -549,19 +569,19 @@ contract BombersContract is Ownable {
         idToDefendingBombers[id].defendingAircraft -= amount;
     }
 
-    ///@dev this function is only callable from the Air Battle contract
-    ///@notice this function will decrease the amount of aircraft lost in battle
-    ///@param id is the nation ID of the nation
-    ///@param amount is the amount of aircraft being destroyed
-    function decreaseDeployedB17gFlyingFortressCount(uint256 amount, uint256 id)
-        public
-        onlyAirBattle
-    {
-        uint256 currentAmount = idToDeployedBombers[id].b17gFlyingFortressCount;
-        require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToDeployedBombers[id].b17gFlyingFortressCount -= amount;
-        idToDeployedBombers[id].deployedAircraft -= amount;
-    }
+    // ///@dev this function is only callable from the Air Battle contract
+    // ///@notice this function will decrease the amount of aircraft lost in battle
+    // ///@param id is the nation ID of the nation
+    // ///@param amount is the amount of aircraft being destroyed
+    // function decreaseDeployedB17gFlyingFortressCount(uint256 amount, uint256 id)
+    //     public
+    //     onlyAirBattle
+    // {
+    //     uint256 currentAmount = idToDeployedBombers[id].b17gFlyingFortressCount;
+    //     require((currentAmount - amount) >= 0, "cannot delete that many");
+    //     idToDeployedBombers[id].b17gFlyingFortressCount -= amount;
+    //     idToDeployedBombers[id].deployedAircraft -= amount;
+    // }
 
     ///@notice this function will allow a nation owner to decommission B17 Flying Fortresses
     ///@param id is the nation ID of the nation
@@ -571,9 +591,14 @@ contract BombersContract is Ownable {
         require(isOwner, "!nation ruler");
         uint256 currentAmount = idToDefendingBombers[id]
             .b17gFlyingFortressCount;
-        require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToDefendingBombers[id].b17gFlyingFortressCount -= amount;
-        idToDefendingBombers[id].defendingAircraft -= amount;
+        if (currentAmount < amount) {
+            require(currentAmount >= amount, "cannot delete that many");
+            idToDefendingBombers[id].b17gFlyingFortressCount -= amount;
+            idToDefendingBombers[id].defendingAircraft -= amount;
+        } else {
+            idToDefendingBombers[id].b17gFlyingFortressCount -= amount;
+            idToDefendingBombers[id].defendingAircraft -= amount;
+        }
     }
 
     ///@notice this function will return the amount of defending b52Stratofortresses a nation owns
@@ -588,17 +613,17 @@ contract BombersContract is Ownable {
         return count;
     }
 
-    ///@notice this function will return the amount of deployed b52Stratofortresses a nation owns
-    ///@param id is the nation ID of the nation
-    ///@return uint256 is the number of deployed b52Stratofortress aircraft for the nation
-    function getDeployedB52StratofortressCount(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
-        uint256 count = idToDeployedBombers[id].b52StratofortressCount;
-        return count;
-    }
+    // ///@notice this function will return the amount of deployed b52Stratofortresses a nation owns
+    // ///@param id is the nation ID of the nation
+    // ///@return uint256 is the number of deployed b52Stratofortress aircraft for the nation
+    // function getDeployedB52StratofortressCount(uint256 id)
+    //     public
+    //     view
+    //     returns (uint256)
+    // {
+    //     uint256 count = idToDeployedBombers[id].b52StratofortressCount;
+    //     return count;
+    // }
 
     ///@dev this function is only callabel from the Bomber marketplace contract
     ///@notice this function will increase the number of aircraft when they are purchased in the marketplace
@@ -626,19 +651,19 @@ contract BombersContract is Ownable {
         idToDefendingBombers[id].defendingAircraft -= amount;
     }
 
-    ///@dev this function is only callable from the Air Battle contract
-    ///@notice this function will decrease the amount of aircraft lost in battle
-    ///@param id is the nation ID of the nation
-    ///@param amount is the amount of aircraft being destroyed
-    function decreaseDeployedB52StratofortressCount(uint256 amount, uint256 id)
-        public
-        onlyAirBattle
-    {
-        uint256 currentAmount = idToDeployedBombers[id].b52StratofortressCount;
-        require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToDeployedBombers[id].b52StratofortressCount -= amount;
-        idToDeployedBombers[id].deployedAircraft -= amount;
-    }
+    // ///@dev this function is only callable from the Air Battle contract
+    // ///@notice this function will decrease the amount of aircraft lost in battle
+    // ///@param id is the nation ID of the nation
+    // ///@param amount is the amount of aircraft being destroyed
+    // function decreaseDeployedB52StratofortressCount(uint256 amount, uint256 id)
+    //     public
+    //     onlyAirBattle
+    // {
+    //     uint256 currentAmount = idToDeployedBombers[id].b52StratofortressCount;
+    //     require((currentAmount - amount) >= 0, "cannot delete that many");
+    //     idToDeployedBombers[id].b52StratofortressCount -= amount;
+    //     idToDeployedBombers[id].deployedAircraft -= amount;
+    // }
 
     ///@notice this function will allow a nation owner to decommission B52 Stratofortresses
     ///@param id is the nation ID of the nation
@@ -647,9 +672,14 @@ contract BombersContract is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 currentAmount = idToDefendingBombers[id].b52StratofortressCount;
-        require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToDefendingBombers[id].b52StratofortressCount -= amount;
-        idToDefendingBombers[id].defendingAircraft -= amount;
+        if (currentAmount < amount) {
+            require(currentAmount >= amount, "cannot delete that many");
+            idToDefendingBombers[id].b52StratofortressCount -= amount;
+            idToDefendingBombers[id].defendingAircraft -= amount;
+        } else {
+            idToDefendingBombers[id].b52StratofortressCount -= amount;
+            idToDefendingBombers[id].defendingAircraft -= amount;
+        }
     }
 
     ///@notice this function will return the amount of defending B2Spirits's a nation owns
@@ -664,16 +694,16 @@ contract BombersContract is Ownable {
         return count;
     }
 
-    ///@notice this function will return the amount of deployed B2Spirit's a nation owns
-    ///@param id is the nation ID of the nation
-    function getDeployedB2SpiritCount(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
-        uint256 count = idToDeployedBombers[id].b2SpiritCount;
-        return count;
-    }
+    // ///@notice this function will return the amount of deployed B2Spirit's a nation owns
+    // ///@param id is the nation ID of the nation
+    // function getDeployedB2SpiritCount(uint256 id)
+    //     public
+    //     view
+    //     returns (uint256)
+    // {
+    //     uint256 count = idToDeployedBombers[id].b2SpiritCount;
+    //     return count;
+    // }
 
     ///@dev this function is only callabel from the Bomber marketplace contract
     ///@notice this function will increase the number of aircraft when they are purchased in the marketplace
@@ -701,19 +731,19 @@ contract BombersContract is Ownable {
         idToDefendingBombers[id].defendingAircraft -= amount;
     }
 
-    ///@dev this function is only callable from the Air Battle contract
-    ///@notice this function will decrease the amount of aircraft lost in battle
-    ///@param id is the nation ID of the nation
-    ///@param amount is the amount of aircraft being destroyed
-    function decreaseDeployedB2SpiritCount(uint256 amount, uint256 id)
-        public
-        onlyAirBattle
-    {
-        uint256 currentAmount = idToDeployedBombers[id].b2SpiritCount;
-        require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToDeployedBombers[id].b2SpiritCount -= amount;
-        idToDeployedBombers[id].deployedAircraft -= amount;
-    }
+    // ///@dev this function is only callable from the Air Battle contract
+    // ///@notice this function will decrease the amount of aircraft lost in battle
+    // ///@param id is the nation ID of the nation
+    // ///@param amount is the amount of aircraft being destroyed
+    // function decreaseDeployedB2SpiritCount(uint256 amount, uint256 id)
+    //     public
+    //     onlyAirBattle
+    // {
+    //     uint256 currentAmount = idToDeployedBombers[id].b2SpiritCount;
+    //     require((currentAmount - amount) >= 0, "cannot delete that many");
+    //     idToDeployedBombers[id].b2SpiritCount -= amount;
+    //     idToDeployedBombers[id].deployedAircraft -= amount;
+    // }
 
     ///@notice this function will allow a nation owner to decommission B2 Spirit's
     ///@param id is the nation ID of the nation
@@ -722,9 +752,14 @@ contract BombersContract is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 currentAmount = idToDefendingBombers[id].b2SpiritCount;
-        require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToDefendingBombers[id].b2SpiritCount -= amount;
-        idToDefendingBombers[id].defendingAircraft -= amount;
+        if (currentAmount < amount) {
+            require(currentAmount >= amount, "cannot delete that many");
+            idToDefendingBombers[id].b2SpiritCount -= amount;
+            idToDefendingBombers[id].defendingAircraft -= amount;
+        } else {
+            idToDefendingBombers[id].b2SpiritCount -= amount;
+            idToDefendingBombers[id].defendingAircraft -= amount;
+        }
     }
 
     ///@notice this function will return the amount of defending B1bLancer's a nation owns
@@ -735,12 +770,12 @@ contract BombersContract is Ownable {
         return count;
     }
 
-    ///@notice this function will return the amount of deployed B1bLancer's a nation owns
-    ///@param id is the nation ID of the nation
-    function getDeployedB1bLancer(uint256 id) public view returns (uint256) {
-        uint256 count = idToDeployedBombers[id].b1bLancerCount;
-        return count;
-    }
+    // ///@notice this function will return the amount of deployed B1bLancer's a nation owns
+    // ///@param id is the nation ID of the nation
+    // function getDeployedB1bLancer(uint256 id) public view returns (uint256) {
+    //     uint256 count = idToDeployedBombers[id].b1bLancerCount;
+    //     return count;
+    // }
 
     ///@dev this function is only callabel from the Bomber marketplace contract
     ///@notice this function will increase the number of aircraft when they are purchased in the marketplace
@@ -768,19 +803,19 @@ contract BombersContract is Ownable {
         idToDefendingBombers[id].defendingAircraft -= amount;
     }
 
-    ///@dev this function is only callable from the Air Battle contract
-    ///@notice this function will decrease the amount of aircraft lost in battle
-    ///@param id is the nation ID of the nation
-    ///@param amount is the amount of aircraft being destroyed
-    function decreaseDeployedB1bLancerCount(uint256 amount, uint256 id)
-        public
-        onlyAirBattle
-    {
-        uint256 currentAmount = idToDeployedBombers[id].b1bLancerCount;
-        require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToDeployedBombers[id].b1bLancerCount -= amount;
-        idToDeployedBombers[id].deployedAircraft -= amount;
-    }
+    // ///@dev this function is only callable from the Air Battle contract
+    // ///@notice this function will decrease the amount of aircraft lost in battle
+    // ///@param id is the nation ID of the nation
+    // ///@param amount is the amount of aircraft being destroyed
+    // function decreaseDeployedB1bLancerCount(uint256 amount, uint256 id)
+    //     public
+    //     onlyAirBattle
+    // {
+    //     uint256 currentAmount = idToDeployedBombers[id].b1bLancerCount;
+    //     require((currentAmount - amount) >= 0, "cannot delete that many");
+    //     idToDeployedBombers[id].b1bLancerCount -= amount;
+    //     idToDeployedBombers[id].deployedAircraft -= amount;
+    // }
 
     ///@notice this function will allow a nation owner to decommission B1B Lancers
     ///@param id is the nation ID of the nation
@@ -789,9 +824,14 @@ contract BombersContract is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 currentAmount = idToDefendingBombers[id].b1bLancerCount;
-        require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToDefendingBombers[id].b1bLancerCount -= amount;
-        idToDefendingBombers[id].defendingAircraft -= amount;
+        if (currentAmount < amount) {
+            require(currentAmount >= amount, "cannot delete that many");
+            idToDefendingBombers[id].b1bLancerCount -= amount;
+            idToDefendingBombers[id].defendingAircraft -= amount;
+        } else {
+            idToDefendingBombers[id].b1bLancerCount -= amount;
+            idToDefendingBombers[id].defendingAircraft -= amount;
+        }
     }
 
     
@@ -807,12 +847,12 @@ contract BombersContract is Ownable {
         return count;
     }
 
-    ///@notice this function will return the amount of deployed Tu160's a nation owns
-    ///@param id is the nation ID of the nation
-    function getDeployedTupolevTu160(uint256 id) public view returns (uint256) {
-        uint256 count = idToDeployedBombers[id].tupolevTu160Count;
-        return count;
-    }
+    // ///@notice this function will return the amount of deployed Tu160's a nation owns
+    // ///@param id is the nation ID of the nation
+    // function getDeployedTupolevTu160(uint256 id) public view returns (uint256) {
+    //     uint256 count = idToDeployedBombers[id].tupolevTu160Count;
+    //     return count;
+    // }
 
     ///@dev this function is only callabel from the Bomber marketplace contract
     ///@notice this function will increase the number of aircraft when they are purchased in the marketplace
@@ -840,19 +880,19 @@ contract BombersContract is Ownable {
         idToDefendingBombers[id].defendingAircraft -= amount;
     }
 
-    ///@dev this function is only callable from the Air Battle contract
-    ///@notice this function will decrease the amount of aircraft lost in battle
-    ///@param id is the nation ID of the nation
-    ///@param amount is the amount of aircraft being destroyed
-    function decreaseDeployedTupolevTu160Count(uint256 amount, uint256 id)
-        public
-        onlyAirBattle
-    {
-        uint256 currentAmount = idToDeployedBombers[id].tupolevTu160Count;
-        require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToDeployedBombers[id].tupolevTu160Count -= amount;
-        idToDeployedBombers[id].deployedAircraft -= amount;
-    }
+    // ///@dev this function is only callable from the Air Battle contract
+    // ///@notice this function will decrease the amount of aircraft lost in battle
+    // ///@param id is the nation ID of the nation
+    // ///@param amount is the amount of aircraft being destroyed
+    // function decreaseDeployedTupolevTu160Count(uint256 amount, uint256 id)
+    //     public
+    //     onlyAirBattle
+    // {
+    //     uint256 currentAmount = idToDeployedBombers[id].tupolevTu160Count;
+    //     require((currentAmount - amount) >= 0, "cannot delete that many");
+    //     idToDeployedBombers[id].tupolevTu160Count -= amount;
+    //     idToDeployedBombers[id].deployedAircraft -= amount;
+    // }
 
     ///@notice this function will allow a nation owner to decommission Tupolev TU160's
     ///@param id is the nation ID of the nation
@@ -861,9 +901,14 @@ contract BombersContract is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 currentAmount = idToDefendingBombers[id].tupolevTu160Count;
-        require((currentAmount - amount) >= 0, "cannot delete that many");
-        idToDefendingBombers[id].tupolevTu160Count -= amount;
-        idToDefendingBombers[id].defendingAircraft -= amount;
+        if (currentAmount < amount) {
+            require(currentAmount >= amount, "cannot delete that many");
+            idToDefendingBombers[id].tupolevTu160Count -= amount;
+            idToDefendingBombers[id].defendingAircraft -= amount;
+        } else {
+            idToDefendingBombers[id].tupolevTu160Count -= amount;
+            idToDefendingBombers[id].defendingAircraft -= amount;
+        }
     }
 }
 
@@ -877,19 +922,19 @@ contract BombersMarketplace1 is Ownable {
     address public fightersMarket1;
     address public infrastructure;
     address public treasury;
-    uint256 public ah1CobraCost = 10000;
+    uint256 public ah1CobraCost = 10000 * (10**18);
     uint256 public ah1CobraRequiredInfrastructure = 100;
     uint256 public ah1CobraRequiredTech = 30;
-    uint256 public ah64ApacheCost = 15000;
+    uint256 public ah64ApacheCost = 15000 * (10**18);
     uint256 public ah64ApacheRequiredInfrastructure = 200;
     uint256 public ah64ApacheRequiredTech = 65;
-    uint256 public bristolBlenheimCost = 20000;
+    uint256 public bristolBlenheimCost = 20000 * (10**18);
     uint256 public bristolBlenheimRequiredInfrastructure = 300;
     uint256 public bristolBlenheimRequiredTech = 105;
-    uint256 public b52MitchellCost = 25000;
+    uint256 public b52MitchellCost = 25000 * (10**18);
     uint256 public b52MitchellRequiredInfrastructure = 400;
     uint256 public b52MitchellRequiredTech = 150;
-    uint256 public b17gFlyingFortressCost = 30000;
+    uint256 public b17gFlyingFortressCost = 30000 * (10**18);
     uint256 public b17gFlyingFortressRequiredInfrastructure = 500;
     uint256 public b17gFlyingFortressRequiredTech = 200;
 
@@ -971,6 +1016,18 @@ contract BombersMarketplace1 is Ownable {
         ah1CobraRequiredTech = newTech;
     }
 
+    function getAh1CobraSpecs()
+        public
+        view
+        returns (uint256, uint256, uint256)
+    {
+        return (
+            ah1CobraCost,
+            ah1CobraRequiredInfrastructure,
+            ah1CobraRequiredTech
+        );
+    }
+
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be used to update the price, infrastructure requirement and tech requirement in order to purchase a A64 Apache
     function updateAh64ApacheSpecs(
@@ -981,6 +1038,18 @@ contract BombersMarketplace1 is Ownable {
         ah64ApacheCost = newPrice;
         ah64ApacheRequiredInfrastructure = newInfra;
         ah64ApacheRequiredTech = newTech;
+    }
+
+    function getAh64ApacheSpecs()
+        public
+        view
+        returns (uint256, uint256, uint256)
+    {
+        return (
+            ah64ApacheCost,
+            ah64ApacheRequiredInfrastructure,
+            ah64ApacheRequiredTech
+        );
     }
 
     ///@dev this function is only callable by the contract owner
@@ -995,6 +1064,18 @@ contract BombersMarketplace1 is Ownable {
         bristolBlenheimRequiredTech = newTech;
     }
 
+    function getBristolBlenheimSpecs()
+        public
+        view
+        returns (uint256, uint256, uint256)
+    {
+        return (
+            bristolBlenheimCost,
+            bristolBlenheimRequiredInfrastructure,
+            bristolBlenheimRequiredTech
+        );
+    }
+
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be used to update the price, infrastructure requirement and tech requirement in order to purchase a B52 Mitchell
     function updateB52MitchellSpecs(
@@ -1007,6 +1088,18 @@ contract BombersMarketplace1 is Ownable {
         b52MitchellRequiredTech = newTech;
     }
 
+    function getB52MitchellSpecs()
+        public
+        view
+        returns (uint256, uint256, uint256)
+    {
+        return (
+            b52MitchellCost,
+            b52MitchellRequiredInfrastructure,
+            b52MitchellRequiredTech
+        );
+    }
+
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be used to update the price, infrastructure requirement and tech requirement in order to purchase a B17 Flying Fortress
     function updateB17gFlyingFortressSpecs(
@@ -1017,6 +1110,18 @@ contract BombersMarketplace1 is Ownable {
         b17gFlyingFortressCost = newPrice;
         b17gFlyingFortressRequiredInfrastructure = newInfra;
         b17gFlyingFortressRequiredTech = newTech;
+    }
+
+    function getB17gFlyingFortressSpecs()
+        public
+        view
+        returns (uint256, uint256, uint256)
+    {
+        return (
+            b17gFlyingFortressCost,
+            b17gFlyingFortressRequiredInfrastructure,
+            b17gFlyingFortressRequiredTech
+        );
     }
 
     ///@dev this is a public view function that will allow the caller to purchase an AH1 Cobra for their nation
@@ -1036,12 +1141,19 @@ contract BombersMarketplace1 is Ownable {
         );
         uint256 callerTech = inf.getTechnologyCount(id);
         require(callerTech >= ah1CobraRequiredTech, "!enough tech");
-        uint256 purchasePrice = (ah1CobraCost * amount);
+        uint256 cost = getAh1CobraCost(id);
+        uint256 purchasePrice = (cost * amount);
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseAh1CobraCount(id, amount);
-        fight.increaseAircraftCount(amount, id);
+        // fight.increaseAircraftCount(amount, id);
         tsy.spendBalance(id, purchasePrice);
+    }
+
+    function getAh1CobraCost(uint256 id) public view returns (uint256) {
+        uint256 mod = fightMarket1.getAircraftPurchaseCostModifier(id);
+        uint256 cost = ((ah1CobraCost * mod) / 100);
+        return cost;
     }
 
     ///@dev this is a public view function that will allow the caller to purchase an A64 Apache for their nation
@@ -1061,12 +1173,19 @@ contract BombersMarketplace1 is Ownable {
         );
         uint256 callerTech = inf.getTechnologyCount(id);
         require(callerTech >= ah64ApacheRequiredTech, "!enough tech");
-        uint256 purchasePrice = (ah64ApacheCost * amount);
+        uint256 cost = getAh64ApacheCost(id);
+        uint256 purchasePrice = (cost * amount);
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseAh64ApacheCount(id, amount);
         fight.increaseAircraftCount(amount, id);
         tsy.spendBalance(id, purchasePrice);
+    }
+
+    function getAh64ApacheCost(uint256 id) public view returns (uint256) {
+        uint256 mod = fightMarket1.getAircraftPurchaseCostModifier(id);
+        uint256 cost = ((ah64ApacheCost * mod) / 100);
+        return cost;
     }
 
     ///@dev this is a public view function that will allow the caller to purchase a Bristol Blenheim for their nation
@@ -1086,12 +1205,19 @@ contract BombersMarketplace1 is Ownable {
         );
         uint256 callerTech = inf.getTechnologyCount(id);
         require(callerTech >= bristolBlenheimRequiredTech, "!enough tech");
-        uint256 purchasePrice = (bristolBlenheimCost * amount);
+        uint256 cost = getBristolBlenheimCost(id);
+        uint256 purchasePrice = (cost * amount);
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseBristolBlenheimCount(id, amount);
         fight.increaseAircraftCount(amount, id);
         tsy.spendBalance(id, purchasePrice);
+    }
+
+    function getBristolBlenheimCost(uint256 id) public view returns (uint256) {
+        uint256 mod = fightMarket1.getAircraftPurchaseCostModifier(id);
+        uint256 cost = ((bristolBlenheimCost * mod) / 100);
+        return cost;
     }
 
     ///@dev this is a public view function that will allow the caller to purchase a B52 Mitchell for their nation
@@ -1111,12 +1237,19 @@ contract BombersMarketplace1 is Ownable {
         );
         uint256 callerTech = inf.getTechnologyCount(id);
         require(callerTech >= b52MitchellRequiredTech, "!enough tech");
-        uint256 purchasePrice = (b52MitchellCost * amount);
+        uint256 cost = getB52MitchellCost(id);
+        uint256 purchasePrice = (cost * amount);
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseB52MitchellCount(id, amount);
         fight.increaseAircraftCount(amount, id);
         tsy.spendBalance(id, purchasePrice);
+    }
+
+    function getB52MitchellCost(uint256 id) public view returns (uint256) {
+        uint256 mod = fightMarket1.getAircraftPurchaseCostModifier(id);
+        uint256 cost = ((b52MitchellCost * mod) / 100);
+        return cost;
     }
 
     ///@dev this is a public view function that will allow the caller to purchase a B17 Flying Fortress for their nation
@@ -1136,12 +1269,19 @@ contract BombersMarketplace1 is Ownable {
         );
         uint256 callerTech = inf.getTechnologyCount(id);
         require(callerTech >= b17gFlyingFortressRequiredTech, "!enough tech");
-        uint256 purchasePrice = (b17gFlyingFortressCost * amount);
+        uint256 cost = getB17gFlyingFortressCost(id);
+        uint256 purchasePrice = (cost * amount);
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseB17gFlyingFortressCount(id, amount);
         fight.increaseAircraftCount(amount, id);
         tsy.spendBalance(id, purchasePrice);
+    }
+
+    function getB17gFlyingFortressCost(uint256 id) public view returns (uint256) {
+        uint256 mod = fightMarket1.getAircraftPurchaseCostModifier(id);
+        uint256 cost = ((b17gFlyingFortressCost * mod) / 100);
+        return cost;
     }
 }
 
@@ -1155,16 +1295,16 @@ contract BombersMarketplace2 is Ownable {
     address public fightersMarket1;
     address public infrastructure;
     address public treasury;
-    uint256 public b52StratofortressCost = 35000;
+    uint256 public b52StratofortressCost = 35000 * (10**18);
     uint256 public b52StratofortressRequiredInfrastructure = 600;
     uint256 public b52StratofortressRequiredTech = 255;
-    uint256 public b2SpiritCost = 40000;
+    uint256 public b2SpiritCost = 40000 * (10**18);
     uint256 public b2SpiritRequiredInfrastructure = 700;
     uint256 public b2SpiritRequiredTech = 315;
-    uint256 public b1bLancerCost = 45000;
+    uint256 public b1bLancerCost = 45000 * (10**18);
     uint256 public b1bLancerRequiredInfrastructure = 850;
     uint256 public b1bLancerRequiredTech = 405;
-    uint256 public tupolevTu160Cost = 50000;
+    uint256 public tupolevTu160Cost = 50000 * (10**18);
     uint256 public tupolevTu160RequiredInfrastructure = 1000;
     uint256 public tupolevTu160RequiredTech = 500;
 
@@ -1246,6 +1386,18 @@ contract BombersMarketplace2 is Ownable {
         b52StratofortressRequiredTech = newTech;
     }
 
+    function getB52StratofortressSpecs()
+        public
+        view
+        returns (uint256, uint256, uint256)
+    {
+        return (
+            b52StratofortressCost,
+            b52StratofortressRequiredInfrastructure,
+            b52StratofortressRequiredTech
+        );
+    }
+
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be used to update the price, infrastructure requirement and tech requirement in order to purchase a B2 Spirit
     function updateb2SpiritSpecs(
@@ -1256,6 +1408,18 @@ contract BombersMarketplace2 is Ownable {
         b2SpiritCost = newPrice;
         b2SpiritRequiredInfrastructure = newInfra;
         b2SpiritRequiredTech = newTech;
+    }
+
+    function getb2SpiritSpecs()
+        public
+        view
+        returns (uint256, uint256, uint256)
+    {
+        return (
+            b2SpiritCost,
+            b2SpiritRequiredInfrastructure,
+            b2SpiritRequiredTech
+        );
     }
 
     ///@dev this function is only callable by the contract owner
@@ -1270,6 +1434,18 @@ contract BombersMarketplace2 is Ownable {
         b1bLancerRequiredTech = newTech;
     }
 
+    function getB1bLancerSpecs()
+        public
+        view
+        returns (uint256, uint256, uint256)
+    {
+        return (
+            b1bLancerCost,
+            b1bLancerRequiredInfrastructure,
+            b1bLancerRequiredTech
+        );
+    }
+
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be used to update the price, infrastructure requirement and tech requirement in order to purchase a Tupolev TU160
     function updateTupolevTu160Specs(
@@ -1280,6 +1456,18 @@ contract BombersMarketplace2 is Ownable {
         tupolevTu160Cost = newPrice;
         tupolevTu160RequiredInfrastructure = newInfra;
         tupolevTu160RequiredTech = newTech;
+    }
+
+    function getTupolevTu160Specs()
+        public
+        view
+        returns (uint256, uint256, uint256)
+    {
+        return (
+            tupolevTu160Cost,
+            tupolevTu160RequiredInfrastructure,
+            tupolevTu160RequiredTech
+        );
     }
 
     ///@dev this is a public view function that will allow the caller to purchase a B52 Stratofortress for their nation
@@ -1299,12 +1487,19 @@ contract BombersMarketplace2 is Ownable {
         );
         uint256 callerTech = inf.getTechnologyCount(id);
         require(callerTech >= b52StratofortressRequiredTech, "!enough tech");
-        uint256 purchasePrice = (b52StratofortressCost * amount);
+        uint256 cost = getB52StratofortressCost(id);
+        uint256 purchasePrice = (cost * amount);
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseB52StratofortressCount(id, amount);
         fight.increaseAircraftCount(amount, id);
         tsy.spendBalance(id, purchasePrice);
+    }
+
+    function getB52StratofortressCost(uint256 id) public view returns (uint256) {
+        uint256 mod = fightMarket1.getAircraftPurchaseCostModifier(id);
+        uint256 cost = ((b52StratofortressCost * mod) / 100);
+        return cost;
     }
 
     ///@dev this is a public view function that will allow the caller to purchase a B2 Spirit for their nation
@@ -1324,12 +1519,19 @@ contract BombersMarketplace2 is Ownable {
         );
         uint256 callerTech = inf.getTechnologyCount(id);
         require(callerTech >= b2SpiritRequiredTech, "!enough tech");
-        uint256 purchasePrice = (b2SpiritCost * amount);
+        uint256 cost = getB2SpiritCost(id);
+        uint256 purchasePrice = (cost * amount);
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseB2SpiritCount(id, amount);
         fight.increaseAircraftCount(amount, id);
         tsy.spendBalance(id, purchasePrice);
+    }
+
+    function getB2SpiritCost(uint256 id) public view returns (uint256) {
+        uint256 mod = fightMarket1.getAircraftPurchaseCostModifier(id);
+        uint256 cost = ((b2SpiritCost * mod) / 100);
+        return cost;
     }
 
     ///@dev this is a public view function that will allow the caller to purchase a B1B Lancer for their nation
@@ -1349,12 +1551,19 @@ contract BombersMarketplace2 is Ownable {
         );
         uint256 callerTech = inf.getTechnologyCount(id);
         require(callerTech >= b1bLancerRequiredTech, "!enough tech");
-        uint256 purchasePrice = (b1bLancerCost * amount);
+        uint256 cost = getB1bLancerCost(id);
+        uint256 purchasePrice = (cost * amount);
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseB1bLancerCount(id, amount);
         fight.increaseAircraftCount(amount, id);
         tsy.spendBalance(id, purchasePrice);
+    }
+
+    function getB1bLancerCost(uint256 id) public view returns (uint256) {
+        uint256 mod = fightMarket1.getAircraftPurchaseCostModifier(id);
+        uint256 cost = ((b1bLancerCost * mod) / 100);
+        return cost;
     }
 
     ///@dev this is a public view function that will allow the caller to purchase a Tupolev TU160 for their nation
@@ -1374,11 +1583,18 @@ contract BombersMarketplace2 is Ownable {
         );
         uint256 callerTech = inf.getTechnologyCount(id);
         require(callerTech >= tupolevTu160RequiredTech, "!enough tech");
-        uint256 purchasePrice = (tupolevTu160Cost * amount);
+        uint256 cost = getTupolevTu160Cost(id);
+        uint256 purchasePrice = (cost * amount);
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseTupolevTu160Count(id, amount);
         fight.increaseAircraftCount(amount, id);
         tsy.spendBalance(id, purchasePrice);
+    }
+
+    function getTupolevTu160Cost(uint256 id) public view returns (uint256) {
+        uint256 mod = fightMarket1.getAircraftPurchaseCostModifier(id);
+        uint256 cost = ((tupolevTu160Cost * mod) / 100);
+        return cost;
     }
 }
