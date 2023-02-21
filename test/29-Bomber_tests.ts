@@ -52,6 +52,7 @@ import {
     WondersContract3,
     WondersContract4,
     BonusResourcesContract,
+    BombersMarketplace2__factory,
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
@@ -1351,6 +1352,77 @@ describe("Bombers", async function () {
             var cost6 : any = await bombersmarketplace1.getB17gFlyingFortressCost(0)
             // console.log(BigInt(cost6), "space program")
             expect(cost6).to.equal(BigInt("26100000000000000000000"))
+        })
+
+        it("tests that a nation can buy and scrap B52 Stratofortress's", async function () {
+            var aircraftCount : any = await fighterscontract.getAircraftCount(0);
+            // console.log(aircraftCount.toNumber())
+            expect(aircraftCount).to.equal(0)
+            await expect(bombersmarketplace2.connect(signer1).buyB52Stratofortress(2, 1)).to.be.revertedWith("!nation ruler")
+            var maxAircraftCount = await fightersmarketplace1.getMaxAircraftCount(0)
+            // console.log(maxAircraftCount.toNumber())
+            expect(maxAircraftCount).to.equal(50);
+            await expect(bombersmarketplace2.connect(signer1).buyB52Stratofortress(2, 0)).to.be.revertedWith("!enough infrastructure")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
+            await expect(bombersmarketplace2.connect(signer1).buyB52Stratofortress(2, 0)).to.be.revertedWith("!enough tech")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 255)
+            await bombersmarketplace2.connect(signer1).buyB52Stratofortress(2, 0)
+            var aircraftCount : any = await fighterscontract.getAircraftCount(0);
+            // console.log(aircraftCount.toNumber())
+            expect(aircraftCount).to.equal(2)
+            var yak9Count = await bomberscontract.getDefendingB52StratofortressCount(0)
+            // console.log(yak9Count.toNumber())
+            expect(yak9Count).to.equal(2)
+            await expect(bomberscontract.connect(signer1).scrapB52Stratofortress(2, 1)).to.be.revertedWith("!nation ruler")
+            await expect(bomberscontract.connect(signer1).scrapB52Stratofortress(3, 0)).to.be.revertedWith("cannot delete that many")
+            await bomberscontract.connect(signer1).scrapB52Stratofortress(2, 0)
+            var yak9Count = await bomberscontract.getDefendingB52StratofortressCount(0)
+            // console.log(yak9Count.toNumber())
+            expect(yak9Count).to.equal(0)
+        })
+
+        it("tests that owner can update B52 Stratofortress specs", async function () {
+            var specs : any = await bombersmarketplace2.getB52StratofortressSpecs()
+            var price = BigInt(specs[0])
+            // console.log(price)
+            // console.log(specs[1].toNumber())
+            // console.log(specs[2].toNumber())
+            expect(specs[0]).to.equal(BigInt("35000000000000000000000"))
+            expect(specs[1]).to.equal(600)
+            expect(specs[2]).to.equal(255)
+            await bombersmarketplace2.connect(signer0).updateB52StratofortressSpecs(1000, 1000, 1000)
+            var specs : any = await bombersmarketplace2.getB52StratofortressSpecs()
+            // console.log(specs[0].toNumber())
+            // console.log(specs[1].toNumber())
+            // console.log(specs[2].toNumber())
+            expect(specs[0]).to.equal(1000)
+            expect(specs[1]).to.equal(1000)
+            expect(specs[2]).to.equal(1000)
+        })
+
+        it("tests that B52 Stratofortress cost updates correctly", async function () {
+            var cost : any = await bombersmarketplace2.getB52StratofortressCost(0)
+            expect(cost).to.equal(BigInt("35000000000000000000000"))
+            await resourcescontract.mockResourcesForTesting(0, 0, 2)
+            var cost2 : any = await bombersmarketplace2.getB52StratofortressCost(0)
+            // console.log(BigInt(cost2), "aluminium")
+            expect(cost2).to.equal(BigInt("32200000000000000000000"))
+            await resourcescontract.mockResourcesForTesting(0, 11, 2)
+            var cost3 : any = await bombersmarketplace2.getB52StratofortressCost(0)
+            // console.log(BigInt(cost3), "oil")
+            expect(cost3).to.equal(BigInt("33600000000000000000000"))
+            await resourcescontract.mockResourcesForTesting(0, 13, 2)
+            var cost4 : any = await bombersmarketplace2.getB52StratofortressCost(0)
+            // console.log(BigInt(cost4), "rubber")
+            expect(cost4).to.equal(BigInt("33600000000000000000000"))
+            await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 1)
+            var cost5 : any = await bombersmarketplace2.getB52StratofortressCost(0)
+            // console.log(BigInt(cost5), "2 airports")
+            expect(cost5).to.equal(BigInt("32200000000000000000000"))
+            await wonderscontract4.connect(signer1).buyWonder4(0, 2)
+            var cost6 : any = await bombersmarketplace2.getB52StratofortressCost(0)
+            // console.log(BigInt(cost6), "space program")
+            expect(cost6).to.equal(BigInt("30450000000000000000000"))
         })
     }) 
 })
