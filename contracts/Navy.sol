@@ -65,7 +65,7 @@ contract NavalActionsContract is Ownable {
             msg.sender == navalBlockade ||
                 msg.sender == breakBlockade ||
                 msg.sender == navalAttack,
-            "!valid caller"
+            "function only callable from navy contracts"
         );
         _;
     }
@@ -89,7 +89,7 @@ contract NavalActionsContract is Ownable {
     }
 
     modifier onlyNavy() {
-        require(msg.sender == navy, "!valid caller");
+        require(msg.sender == navy, "function only callable from navy contract");
         _;
     }
 
@@ -104,7 +104,7 @@ contract NavalActionsContract is Ownable {
     }
 
     modifier onlyBlockade() {
-        require(msg.sender == navalBlockade, "!valid caller");
+        require(msg.sender == navalBlockade, "function only callable from blockade contract");
         _;
     }
 
@@ -180,14 +180,14 @@ contract NavyContract is Ownable {
     address public navalActions;
     address public additionalNavy;
     address public bonusResources;
-    uint256 public corvetteCost = 300000;
-    uint256 public landingShipCost = 300000;
-    uint256 public battleshipCost = 300000;
-    uint256 public cruiserCost = 500000;
-    uint256 public frigateCost = 750000;
-    uint256 public destroyerCost = 1000000;
-    uint256 public submarineCost = 1500000;
-    uint256 public aircraftCarrierCost = 2000000;
+    uint256 public corvetteCost = 300000 * (10**18);
+    uint256 public landingShipCost = 300000 * (10**18); 
+    uint256 public battleshipCost = 300000 * (10**18);
+    uint256 public cruiserCost = 500000 * (10**18);
+    uint256 public frigateCost = 750000 * (10**18);
+    uint256 public destroyerCost = 1000000 * (10**18);
+    uint256 public submarineCost = 1500000 * (10**18);
+    uint256 public aircraftCarrierCost = 2000000 * (10**18);
 
     struct Navy {
         uint256 navyVessels;
@@ -378,7 +378,7 @@ contract NavyContract is Ownable {
     function buyCorvette(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
-        uint256 availablePurchases = addNav.getAvailablePurchases(id);
+        (uint256 availablePurchases, ) = addNav.getAvailablePurchases(id);
         require(
             amount <= availablePurchases,
             "purchase exceeds daily purchase limit"
@@ -418,7 +418,7 @@ contract NavyContract is Ownable {
     function buyLandingShip(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
-        uint256 availablePurchases = addNav.getAvailablePurchases(id);
+        (uint256 availablePurchases, ) = addNav.getAvailablePurchases(id);
         require(
             amount <= availablePurchases,
             "purchase exceeds daily purchase limit"
@@ -458,7 +458,7 @@ contract NavyContract is Ownable {
     function buyBattleship(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
-        uint256 availablePurchases = addNav.getAvailablePurchases(id);
+        (uint256 availablePurchases, ) = addNav.getAvailablePurchases(id);
         require(
             amount <= availablePurchases,
             "purchase exceeds daily purchase limit"
@@ -498,7 +498,7 @@ contract NavyContract is Ownable {
     function buyCruiser(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
-        uint256 availablePurchases = addNav.getAvailablePurchases(id);
+        (uint256 availablePurchases, ) = addNav.getAvailablePurchases(id);
         require(
             amount <= availablePurchases,
             "purchase exceeds daily purchase limit"
@@ -538,7 +538,7 @@ contract NavyContract is Ownable {
     function buyFrigate(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
-        uint256 availablePurchases = addNav.getAvailablePurchases(id);
+        (uint256 availablePurchases, ) = addNav.getAvailablePurchases(id);
         require(
             amount <= availablePurchases,
             "purchase exceeds daily purchase limit"
@@ -582,7 +582,7 @@ contract NavyContract is Ownable {
     function buyDestroyer(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
-        uint256 availablePurchases = addNav.getAvailablePurchases(id);
+        (uint256 availablePurchases, ) = addNav.getAvailablePurchases(id);
         require(
             amount <= availablePurchases,
             "purchase exceeds daily purchase limit"
@@ -626,7 +626,7 @@ contract NavyContract is Ownable {
     function buySubmarine(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
-        uint256 availablePurchases = addNav.getAvailablePurchases(id);
+        (uint256 availablePurchases, ) = addNav.getAvailablePurchases(id);
         require(
             amount <= availablePurchases,
             "purchase exceeds daily purchase limit"
@@ -671,7 +671,7 @@ contract NavyContract is Ownable {
     function buyAircraftCarrier(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
-        uint256 availablePurchases = addNav.getAvailablePurchases(id);
+        (uint256 availablePurchases, ) = addNav.getAvailablePurchases(id);
         require(
             amount <= availablePurchases,
             "purchase exceeds daily purchase limit"
@@ -785,7 +785,7 @@ contract AdditionalNavyContract is Ownable {
     ///@notice this function will return a nations available daily navy vessel purchases
     ///@param id this is the nation id of the nation being queried
     ///@return uint256 is the number of available navy vessel purchases for the day for that nation
-    function getAvailablePurchases(uint256 id) public view returns (uint256) {
+    function getAvailablePurchases(uint256 id) public view returns (uint256, uint256) {
         uint256 purchasesToday = navAct.getPurchasesToday(id);
         uint256 maxDailyPurchases;
         bool isWar = mil.getWarPeacePreference(id);
@@ -808,7 +808,7 @@ contract AdditionalNavyContract is Ownable {
             maxDailyPurchases += navalConstructionYards;
         }
         uint256 availablePurchases = (maxDailyPurchases - purchasesToday);
-        return availablePurchases;
+        return (availablePurchases, maxDailyPurchases);
     }
 
     ///@dev this is a public view function that will return the number of blockade capable ships a nation has
