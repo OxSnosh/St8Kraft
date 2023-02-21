@@ -10,6 +10,7 @@ import "./Nuke.sol";
 import "./Wonders.sol";
 import "./CountryMinter.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
 
 ///@title NavalActionsContract
 ///@author OxSnosh
@@ -181,13 +182,29 @@ contract NavyContract is Ownable {
     address public additionalNavy;
     address public bonusResources;
     uint256 public corvetteCost = 300000 * (10**18);
+    uint256 public corvetteRequiredInfrastructure = 2000;
+    uint256 public corvetteRequiredTechnology = 200;
     uint256 public landingShipCost = 300000 * (10**18); 
+    uint256 public landingShipRequiredInfrastructure = 2500;
+    uint256 public landingShipRequiredTechnology = 200;
     uint256 public battleshipCost = 300000 * (10**18);
+    uint256 public battleshipRequiredInfrastructure = 2500;
+    uint256 public battleshipRequiredTechnology = 300;
     uint256 public cruiserCost = 500000 * (10**18);
+    uint256 public cruiserRequiredInfrastructure = 3000;
+    uint256 public cruiserRequiredTechnology = 350;
     uint256 public frigateCost = 750000 * (10**18);
+    uint256 public frigateRequiredInfrastructure = 3500;
+    uint256 public frigateRequiredTechnology = 400;
     uint256 public destroyerCost = 1000000 * (10**18);
+    uint256 public destroyerRequiredInfrastructure = 4000;
+    uint256 public destroyerRequiredTechnology = 600;
     uint256 public submarineCost = 1500000 * (10**18);
+    uint256 public submarineRequiredInfrastructure = 4500;
+    uint256 public submarineRequiredTechnology = 750;
     uint256 public aircraftCarrierCost = 2000000 * (10**18);
+    uint256 public aircraftCarrierRequiredInfrastructure = 5000;
+    uint256 public aircraftCarrierRequiredTechnology = 1000;
 
     struct Navy {
         uint256 navyVessels;
@@ -387,7 +404,7 @@ contract NavyContract is Ownable {
             improvementsContract1Address
         ).getDrydockCount(id);
         require(drydockAmount > 0, "Must own a drydock to purchase");
-        uint256 purchasePrice = corvetteCost * amount;
+        uint256 purchasePrice = (corvetteCost * amount);
         bool steel = bonus.viewSteel(id);
         if (steel) {
             purchasePrice = ((purchasePrice * 85) / 100);
