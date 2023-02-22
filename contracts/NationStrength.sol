@@ -19,6 +19,7 @@ contract NationStrengthContract is Ownable {
     address public bombers;
     address public navy;
     address public missiles;
+    address public navy2;
 
     InfrastructureContract inf;
     ForcesContract frc;
@@ -26,6 +27,7 @@ contract NationStrengthContract is Ownable {
     BombersContract bomb;
     NavyContract nav;
     MissilesContract mis;
+    NavyContract2 nav2;
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -35,7 +37,8 @@ contract NationStrengthContract is Ownable {
         address _fighters,
         address _bombers,
         address _navy,
-        address _missiles
+        address _missiles,
+        address _navy2
     ) public onlyOwner {
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
@@ -49,6 +52,8 @@ contract NationStrengthContract is Ownable {
         nav = NavyContract(_navy);
         missiles = _missiles;
         mis = MissilesContract(_missiles);
+        navy2 = _navy2;
+        nav2 = NavyContract2(_navy2);
     }
 
     
@@ -344,10 +349,10 @@ contract NationStrengthContract is Ownable {
         view
         returns (uint256)
     {
-        uint256 frigateCount = nav.getFrigateCount(id);
-        uint256 destroyerCount = nav.getDestroyerCount(id);
-        uint256 submarineCount = nav.getSubmarineCount(id);
-        uint256 aircraftCarrierCount = nav.getAircraftCarrierCount(id);
+        uint256 frigateCount = nav2.getFrigateCount(id);
+        uint256 destroyerCount = nav2.getDestroyerCount(id);
+        uint256 submarineCount = nav2.getSubmarineCount(id);
+        uint256 aircraftCarrierCount = nav2.getAircraftCarrierCount(id);
         uint256 additionalNavyStrength = ((frigateCount * 8) +
             (destroyerCount * 11) +
             (submarineCount * 12) +

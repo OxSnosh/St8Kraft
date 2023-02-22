@@ -247,6 +247,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     address public warAddress;
     address public improvements4;
     address public navalActions;
+    address public navy2;
     uint256 battleshipStrength = 5;
     uint256 cruiserStrength = 6;
     uint256 frigateStrength = 8;
@@ -273,6 +274,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     WarContract war;
     ImprovementsContract4 imp4;
     NavalActionsContract navAct;
+    NavyContract2 nav2;
 
     struct BreakBlockade {
         uint256 battleshipCount;
@@ -325,7 +327,8 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         address _navy,
         address _warAddress,
         address _improvements4,
-        address _navalActions
+        address _navalActions,
+        address _navy2
     ) public onlyOwner {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
@@ -339,6 +342,8 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         imp4 = ImprovementsContract4(_improvements4);
         navalActions = _navalActions;
         navAct = NavalActionsContract(_navalActions);
+        navy2 = _navy2;
+        nav2 = NavyContract2(_navy2);
     }
 
     ///@dev this is a public function callable only from the nation owner
@@ -386,8 +391,8 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     ) internal {
         uint256 battleships = nav.getBattleshipCount(attackerId);
         uint256 cruisers = nav.getCruiserCount(attackerId);
-        uint256 frigates = nav.getFrigateCount(attackerId);
-        uint256 destroyers = nav.getDestroyerCount(attackerId);
+        uint256 frigates = nav2.getFrigateCount(attackerId);
+        uint256 destroyers = nav2.getDestroyerCount(attackerId);
         uint256 breakerStrength = getBreakerStrength(attackerId);
         BreakBlockade memory newBreakBlockade = BreakBlockade(
             battleships,
@@ -408,8 +413,8 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     ) internal {
         uint256 battleships = nav.getBattleshipCount(defenderId);
         uint256 cruisers = nav.getCruiserCount(defenderId);
-        uint256 frigates = nav.getFrigateCount(defenderId);
-        uint256 submarines = nav.getSubmarineCount(defenderId);
+        uint256 frigates = nav2.getFrigateCount(defenderId);
+        uint256 submarines = nav2.getSubmarineCount(defenderId);
         uint256 defenderStrength = getDefenderStrength(defenderId);
         DefendBlockade memory newDefendBlockade = DefendBlockade(
             battleships,
@@ -681,8 +686,8 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     {
         uint256 battleshipCount = nav.getBattleshipCount(countryId);
         uint256 cruiserCount = nav.getCruiserCount(countryId);
-        uint256 frigateCount = nav.getFrigateCount(countryId);
-        uint256 destroyerCount = nav.getDestroyerCount(countryId);
+        uint256 frigateCount = nav2.getFrigateCount(countryId);
+        uint256 destroyerCount = nav2.getDestroyerCount(countryId);
         uint256 count = (battleshipCount +
             cruiserCount +
             frigateCount +
@@ -697,8 +702,8 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
     {
         uint256 battleshipCount = nav.getBattleshipCount(countryId);
         uint256 cruiserCount = nav.getCruiserCount(countryId);
-        uint256 frigateCount = nav.getFrigateCount(countryId);
-        uint256 submarineCount = nav.getSubmarineCount(countryId);
+        uint256 frigateCount = nav2.getFrigateCount(countryId);
+        uint256 submarineCount = nav2.getSubmarineCount(countryId);
         uint256 count = (battleshipCount +
             cruiserCount +
             frigateCount +
@@ -820,6 +825,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
     address public warAddress;
     address public improvements4;
     address public navalActions;
+    address public navy2;
 
     uint256 corvetteStrength = 1;
     uint256 landingShipStrength = 3;
@@ -852,6 +858,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
     WarContract war;
     ImprovementsContract4 imp4;
     NavalActionsContract navAct;
+    NavyContract2 nav2;
 
     struct NavyForces {
         uint256 corvetteCount;
@@ -896,7 +903,8 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         address _navy,
         address _war,
         address _improvements4,
-        address _navalActions
+        address _navalActions,
+        address _navy2
     ) public onlyOwner {
         navy = _navy;
         nav = NavyContract(_navy);
@@ -906,6 +914,8 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         imp4 = ImprovementsContract4(_improvements4);
         navalActions = _navalActions;
         navAct = NavalActionsContract(_navalActions);
+        navy2 = _navy2;
+        nav2 = NavyContract2(_navy2);
     }
 
     ///@dev this is a public function callable only from the nation owner
@@ -952,10 +962,10 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         uint256 landingShipCount = nav.getLandingShipCount(countryId);
         uint256 battleshipCount = nav.getBattleshipCount(countryId);
         uint256 cruiserCount = nav.getCruiserCount(countryId);
-        uint256 frigateCount = nav.getFrigateCount(countryId);
-        uint256 destroyerCount = nav.getDestroyerCount(countryId);
-        uint256 submarineCount = nav.getSubmarineCount(countryId);
-        uint256 aircraftCarrierCount = nav.getAircraftCarrierCount(countryId);
+        uint256 frigateCount = nav2.getFrigateCount(countryId);
+        uint256 destroyerCount = nav2.getDestroyerCount(countryId);
+        uint256 submarineCount = nav2.getSubmarineCount(countryId);
+        uint256 aircraftCarrierCount = nav2.getAircraftCarrierCount(countryId);
         uint256 strengthAttacker = getAttackerStrength(navyBattleId);
         NavyForces memory newNavyForces = NavyForces(
             corvetteCount,
@@ -982,10 +992,10 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         uint256 landingShipCount = nav.getLandingShipCount(countryId);
         uint256 battleshipCount = nav.getBattleshipCount(countryId);
         uint256 cruiserCount = nav.getCruiserCount(countryId);
-        uint256 frigateCount = nav.getFrigateCount(countryId);
-        uint256 destroyerCount = nav.getDestroyerCount(countryId);
-        uint256 submarineCount = nav.getSubmarineCount(countryId);
-        uint256 aircraftCarrierCount = nav.getAircraftCarrierCount(countryId);
+        uint256 frigateCount = nav2.getFrigateCount(countryId);
+        uint256 destroyerCount = nav2.getDestroyerCount(countryId);
+        uint256 submarineCount = nav2.getSubmarineCount(countryId);
+        uint256 aircraftCarrierCount = nav2.getAircraftCarrierCount(countryId);
         uint256 defnederStrength = getDefenderStrength(navyBattleId);
         NavyForces memory newNavyForces = NavyForces(
             corvetteCount,
@@ -1337,10 +1347,10 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         uint256 landingShipCount = nav.getLandingShipCount(countryId);
         uint256 battleshipCount = nav.getBattleshipCount(countryId);
         uint256 cruiserCount = nav.getCruiserCount(countryId);
-        uint256 frigateCount = nav.getFrigateCount(countryId);
-        uint256 destroyerCount = nav.getDestroyerCount(countryId);
-        uint256 submarineCount = nav.getSubmarineCount(countryId);
-        uint256 aircraftCarrierCount = nav.getAircraftCarrierCount(countryId);
+        uint256 frigateCount = nav2.getFrigateCount(countryId);
+        uint256 destroyerCount = nav2.getDestroyerCount(countryId);
+        uint256 submarineCount = nav2.getSubmarineCount(countryId);
+        uint256 aircraftCarrierCount = nav2.getAircraftCarrierCount(countryId);
         uint256 count = (corvetteCount +
             landingShipCount +
             battleshipCount +

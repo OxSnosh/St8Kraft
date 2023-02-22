@@ -33,6 +33,7 @@ contract BillsContract is Ownable {
     address public resources;
     address public missiles;
     address public bonusResources;
+    address public navy2;
 
     TreasuryContract tsy;
     WondersContract1 won1;
@@ -49,6 +50,7 @@ contract BillsContract is Ownable {
     MissilesContract mis;
     CountryMinter mint;
     BonusResourcesContract bonus;
+    NavyContract2 nav2;
 
     mapping(uint256 => address) public idToOwnerBills;
 
@@ -96,7 +98,8 @@ contract BillsContract is Ownable {
         address _missiles,
         address _wonders4,
         address _infrastructure,
-        address _bonusResources
+        address _bonusResources,
+        address _navy2
     ) public onlyOwner {
         improvements1 = _improvements1;
         imp1 = ImprovementsContract1(_improvements1);
@@ -110,6 +113,8 @@ contract BillsContract is Ownable {
         inf = InfrastructureContract(_infrastructure);
         bonusResources = _bonusResources;
         bonus = BonusResourcesContract(_bonusResources);
+        navy2 = _navy2;
+        nav2 = NavyContract2(_navy2);
     }
 
     function updateCountryMinter(address newAddress) public onlyOwner {
@@ -507,13 +512,13 @@ contract BillsContract is Ownable {
     ///@param id this is the nation ID of the nation where the additional navy upkeep is being calculated
     ///@return uint256 this is additional navy upkeep costs that will be added to the daily navy upkeep costs
     function getNavyUpkeepAppended(uint256 id) internal view returns (uint256) {
-        uint256 frigateCount = nav.getFrigateCount(id);
+        uint256 frigateCount = nav2.getFrigateCount(id);
         uint256 frigateUpkeep = (frigateCount * 15000);
-        uint256 destroyerCount = nav.getDestroyerCount(id);
+        uint256 destroyerCount = nav2.getDestroyerCount(id);
         uint256 destroyerUpkeep = (destroyerCount * 20000);
-        uint256 submarineCount = nav.getSubmarineCount(id);
+        uint256 submarineCount = nav2.getSubmarineCount(id);
         uint256 submarineUpkeep = (submarineCount * 25000);
-        uint256 aircraftCarrierCount = nav.getAircraftCarrierCount(id);
+        uint256 aircraftCarrierCount = nav2.getAircraftCarrierCount(id);
         uint256 aircraftCarrierUpkeep = (aircraftCarrierCount * 30000);
         bool uranium = res.viewUranium(id);
         if (uranium) {

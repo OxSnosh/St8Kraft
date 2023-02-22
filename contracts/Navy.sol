@@ -90,7 +90,10 @@ contract NavalActionsContract is Ownable {
     }
 
     modifier onlyNavy() {
-        require(msg.sender == navy, "function only callable from navy contract");
+        require(
+            msg.sender == navy,
+            "function only callable from navy contract"
+        );
         _;
     }
 
@@ -105,7 +108,10 @@ contract NavalActionsContract is Ownable {
     }
 
     modifier onlyBlockade() {
-        require(msg.sender == navalBlockade, "function only callable from blockade contract");
+        require(
+            msg.sender == navalBlockade,
+            "function only callable from blockade contract"
+        );
         _;
     }
 
@@ -180,31 +186,20 @@ contract NavyContract is Ownable {
     address public countryMinter;
     address public navalActions;
     address public additionalNavy;
+    address public navy2Contract;
     address public bonusResources;
-    uint256 public corvetteCost = 300000 * (10**18);
+    uint256 public corvetteCost = 300000 * (10 ** 18);
     uint256 public corvetteRequiredInfrastructure = 2000;
     uint256 public corvetteRequiredTechnology = 200;
-    uint256 public landingShipCost = 300000 * (10**18); 
+    uint256 public landingShipCost = 300000 * (10 ** 18);
     uint256 public landingShipRequiredInfrastructure = 2500;
     uint256 public landingShipRequiredTechnology = 200;
-    uint256 public battleshipCost = 300000 * (10**18);
+    uint256 public battleshipCost = 300000 * (10 ** 18);
     uint256 public battleshipRequiredInfrastructure = 2500;
     uint256 public battleshipRequiredTechnology = 300;
-    uint256 public cruiserCost = 500000 * (10**18);
+    uint256 public cruiserCost = 500000 * (10 ** 18);
     uint256 public cruiserRequiredInfrastructure = 3000;
     uint256 public cruiserRequiredTechnology = 350;
-    uint256 public frigateCost = 750000 * (10**18);
-    uint256 public frigateRequiredInfrastructure = 3500;
-    uint256 public frigateRequiredTechnology = 400;
-    uint256 public destroyerCost = 1000000 * (10**18);
-    uint256 public destroyerRequiredInfrastructure = 4000;
-    uint256 public destroyerRequiredTechnology = 600;
-    uint256 public submarineCost = 1500000 * (10**18);
-    uint256 public submarineRequiredInfrastructure = 4500;
-    uint256 public submarineRequiredTechnology = 750;
-    uint256 public aircraftCarrierCost = 2000000 * (10**18);
-    uint256 public aircraftCarrierRequiredInfrastructure = 5000;
-    uint256 public aircraftCarrierRequiredTechnology = 1000;
 
     struct Navy {
         uint256 navyVessels;
@@ -212,10 +207,6 @@ contract NavyContract is Ownable {
         uint256 landingShipCount;
         uint256 battleshipCount;
         uint256 cruiserCount;
-        uint256 frigateCount;
-        uint256 destroyerCount;
-        uint256 submarineCount;
-        uint256 aircraftCarrierCount;
     }
 
     mapping(uint256 => Navy) public idToNavy;
@@ -229,11 +220,19 @@ contract NavyContract is Ownable {
     CountryMinter mint;
     AdditionalNavyContract addNav;
     BonusResourcesContract bonus;
+    NavyContract2 navy2;
 
     modifier onlyCountryMinter() {
         require(
             msg.sender == countryMinter,
             "function only callable from countryMinter"
+        );
+        _;
+    }
+
+    modifier onlyNavy2Contract() {
+        require(
+            msg.sender == navy2Contract, "function only callable from navy contract 2"
         );
         _;
     }
@@ -273,11 +272,17 @@ contract NavyContract is Ownable {
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings2(address _countryMinter, address _bonusResources) public onlyOwner {
+    function settings2(
+        address _countryMinter,
+        address _bonusResources,
+        address _navy2
+    ) public onlyOwner {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
         bonusResources = _bonusResources;
         bonus = BonusResourcesContract(_bonusResources);
+        navy2Contract = _navy2;
+        navy2 = NavyContract2(_navy2);
     }
 
     ///@dev this is a public function only callable from the countryMinter contract
@@ -285,48 +290,96 @@ contract NavyContract is Ownable {
     ///@notice this function will allow a nation owner to buy navy vessels
     ///@param id this is the nation id of the nation being minted
     function generateNavy(uint256 id) public onlyCountryMinter {
-        Navy memory newNavy = Navy(0, 0, 0, 0, 0, 0, 0, 0, 0);
+        Navy memory newNavy = Navy(0, 0, 0, 0, 0);
         idToNavy[id] = newNavy;
     }
 
     ///@dev this function is only callable by the contract owner
-    function updateCorvetteCost(uint256 newPrice) public onlyOwner {
+    function updateCorvetteSpecs(
+        uint256 newPrice,
+        uint256 newRequiredInf,
+        uint256 newRequiredTech
+    ) public onlyOwner {
         corvetteCost = newPrice;
+        corvetteRequiredInfrastructure = newRequiredInf;
+        corvetteRequiredTechnology = newRequiredTech;
+    }
+
+    function getCorvetteSpecs()
+        public
+        view
+        returns (uint256, uint256, uint256)
+    {
+        return (
+            corvetteCost,
+            corvetteRequiredInfrastructure,
+            corvetteRequiredTechnology
+        );
     }
 
     ///@dev this function is only callable by the contract owner
-    function updateLandingShipCost(uint256 newPrice) public onlyOwner {
+    function updateLandingShipSpecs(
+        uint256 newPrice,
+        uint256 newRequiredInf,
+        uint256 newRequiredTech
+    ) public onlyOwner {
         landingShipCost = newPrice;
+        landingShipRequiredInfrastructure = newRequiredInf;
+        landingShipRequiredTechnology = newRequiredTech;
+    }
+
+    function getLandingShipSpecs()
+        public
+        view
+        returns (uint256, uint256, uint256)
+    {
+        return (
+            landingShipCost,
+            landingShipRequiredInfrastructure,
+            landingShipRequiredTechnology
+        );
     }
 
     ///@dev this function is only callable by the contract owner
-    function updateBattleshipCost(uint256 newPrice) public onlyOwner {
+    function updateBattleshipSpecs(
+        uint256 newPrice,
+        uint256 newRequiredInf,
+        uint256 newRequiredTech
+    ) public onlyOwner {
         battleshipCost = newPrice;
+        battleshipRequiredInfrastructure = newRequiredInf;
+        battleshipRequiredTechnology = newRequiredTech;
+    }
+
+    function getBattleshipSpecs()
+        public
+        view
+        returns (uint256, uint256, uint256)
+    {
+        return (
+            battleshipCost,
+            battleshipRequiredInfrastructure,
+            battleshipRequiredTechnology
+        );
     }
 
     ///@dev this function is only callable by the contract owner
-    function updateCruiserCost(uint256 newPrice) public onlyOwner {
+    function updateCruiserSpecs(
+        uint256 newPrice,
+        uint256 newRequiredInf,
+        uint256 newRequiredTech
+    ) public onlyOwner {
         cruiserCost = newPrice;
+        cruiserRequiredInfrastructure = newRequiredInf;
+        cruiserRequiredTechnology = newRequiredTech;
     }
 
-    ///@dev this function is only callable by the contract owner
-    function updateFrigateCost(uint256 newPrice) public onlyOwner {
-        frigateCost = newPrice;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateDestroyerCost(uint256 newPrice) public onlyOwner {
-        destroyerCost = newPrice;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateSubmarineCost(uint256 newPrice) public onlyOwner {
-        submarineCost = newPrice;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateAircraftCarrierCost(uint256 newPrice) public onlyOwner {
-        aircraftCarrierCost = newPrice;
+    function getCruiserSpecs() public view returns (uint256, uint256, uint256) {
+        return (
+            cruiserCost,
+            cruiserRequiredInfrastructure,
+            cruiserRequiredTechnology
+        );
     }
 
     modifier onlyBattle() {
@@ -357,13 +410,13 @@ contract NavyContract is Ownable {
             } else if (defenderLosses[i] == 4) {
                 idToNavy[defenderId].cruiserCount -= 1;
             } else if (defenderLosses[i] == 5) {
-                idToNavy[defenderId].frigateCount -= 1;
+                navy2.decreaseFrigateCount(defenderId, 1);
             } else if (defenderLosses[i] == 6) {
-                idToNavy[defenderId].destroyerCount -= 1;
+                navy2.decreaseDestroyerCount(defenderId, 1);
             } else if (defenderLosses[i] == 7) {
-                idToNavy[defenderId].submarineCount -= 1;
+                navy2.decreaseSubmarineCount(defenderId, 1);
             } else if (defenderLosses[i] == 8) {
-                idToNavy[defenderId].aircraftCarrierCount -= 1;
+                navy2.decreaseAircraftCarrierCount(defenderId, 1);
             }
         }
         for (uint256 i; i < attackerLosses.length; i++) {
@@ -376,15 +429,39 @@ contract NavyContract is Ownable {
             } else if (defenderLosses[i] == 4) {
                 idToNavy[attackerId].cruiserCount -= 1;
             } else if (defenderLosses[i] == 5) {
-                idToNavy[attackerId].frigateCount -= 1;
+                navy2.decreaseFrigateCount(attackerId, 1);
             } else if (defenderLosses[i] == 6) {
-                idToNavy[attackerId].destroyerCount -= 1;
+                navy2.decreaseDestroyerCount(attackerId, 1);
             } else if (defenderLosses[i] == 7) {
-                idToNavy[attackerId].submarineCount -= 1;
+                navy2.decreaseSubmarineCount(attackerId, 1);
             } else if (defenderLosses[i] == 8) {
-                idToNavy[attackerId].aircraftCarrierCount -= 1;
+                navy2.decreaseAircraftCarrierCount(attackerId, 1);
             }
         }
+    }
+
+    function getNavyVesselCount(uint256 id) public view returns (uint256) {
+        uint256 corvetteCount = idToNavy[id].corvetteCount;
+        uint256 landingShipCount = idToNavy[id].landingShipCount;
+        uint256 battleshipCount = idToNavy[id].battleshipCount;
+        uint256 cruiserCount = idToNavy[id].cruiserCount;
+        uint256 frigateCount = navy2.getFrigateCount(id);
+        uint256 destroyerCount = navy2.getDestroyerCount(id);
+        uint256 submarineCount = navy2.getSubmarineCount(id);
+        uint256 aircraftCarrierCount = navy2.getAircraftCarrierCount(id);
+        uint256 navyVessels = (corvetteCount +
+            landingShipCount +
+            battleshipCount +
+            cruiserCount +
+            frigateCount +
+            destroyerCount +
+            submarineCount +
+            aircraftCarrierCount);
+        return navyVessels;
+    }
+
+    function increaseNavyVesselCount(uint256 id, uint256 amount) public onlyNavy2Contract {
+        idToNavy[id].navyVessels += amount;
     }
 
     ///@dev this is a public function callable only by the nation owner
@@ -547,6 +624,254 @@ contract NavyContract is Ownable {
         return cruiserAmount;
     }
 
+    modifier onlyNukeContract() {
+        require(msg.sender == nukes, "only callable from nuke contract");
+        _;
+    }
+
+    ///@dev this is a public function only callable from the nuke contract
+    ///@dev this function will decrease the amount of ships that are vulnerable to nuclear attacks when a nation is attacked by a nuke strike
+    ///@notice this function will decrease the amount of ships that are vulnerable to nuclear attacks when a nation is attacked by a nuke strike
+    ///@notice vessels available to nuke strikes are corvettes, landing ships, cruisers and frigates
+    ///@notice a nuke strike will reduce the number of these ships by 25% (12% with a fallout shelter system)
+    ///@param defenderId this is the nation id of the nation being attacked
+    function decreaseNavyFromNukeContract(
+        uint256 defenderId
+    ) public onlyNukeContract {
+        //corvettes, landing ships, cruisers, frigates
+        uint256 corvetteCount = idToNavy[defenderId].corvetteCount;
+        uint256 landingShipCount = idToNavy[defenderId].landingShipCount;
+        uint256 cruiserCount = idToNavy[defenderId].cruiserCount;
+        uint256 frigateCount = navy2.getFrigateCount(defenderId);
+        uint256 percentage = 25;
+        bool falloutShelter = won1.getFalloutShelterSystem(defenderId);
+        if (falloutShelter) {
+            percentage = 12;
+        }
+        idToNavy[defenderId].corvetteCount -= ((corvetteCount * percentage) /
+            100);
+        idToNavy[defenderId].landingShipCount -= ((landingShipCount *
+            percentage) / 100);
+        idToNavy[defenderId].cruiserCount -= ((cruiserCount * percentage) /
+            100);
+        uint256 frigatesToReduce = ((frigateCount * percentage) / 100);
+        navy2.decreaseFrigateCount(defenderId, frigatesToReduce);
+    }
+}
+
+///@title NavyContract
+///@author OxSnosh
+///@dev this contract inherits from openzeppelin's ownable contract
+///@notice this contract will allow a user to purchase navy vessels
+contract NavyContract2 is Ownable {
+    address public treasuryAddress;
+    address public improvementsContract1Address;
+    address public improvementsContract3Address;
+    address public improvements4;
+    address public resources;
+    address public navyBattleAddress;
+    address public military;
+    address public nukes;
+    address public wonders1;
+    address public countryMinter;
+    address public navalActions;
+    address public additionalNavy;
+    address public bonusResources;
+    address public navy1Address;
+    uint256 public frigateCost = 750000 * (10 ** 18);
+    uint256 public frigateRequiredInfrastructure = 3500;
+    uint256 public frigateRequiredTechnology = 400;
+    uint256 public destroyerCost = 1000000 * (10 ** 18);
+    uint256 public destroyerRequiredInfrastructure = 4000;
+    uint256 public destroyerRequiredTechnology = 600;
+    uint256 public submarineCost = 1500000 * (10 ** 18);
+    uint256 public submarineRequiredInfrastructure = 4500;
+    uint256 public submarineRequiredTechnology = 750;
+    uint256 public aircraftCarrierCost = 2000000 * (10 ** 18);
+    uint256 public aircraftCarrierRequiredInfrastructure = 5000;
+    uint256 public aircraftCarrierRequiredTechnology = 1000;
+
+    struct Navy {
+        uint256 frigateCount;
+        uint256 destroyerCount;
+        uint256 submarineCount;
+        uint256 aircraftCarrierCount;
+    }
+
+    mapping(uint256 => Navy) public idToNavy;
+
+    ResourcesContract res;
+    MilitaryContract mil;
+    ImprovementsContract4 imp4;
+    NukeContract nuke;
+    WondersContract1 won1;
+    NavalActionsContract navAct;
+    CountryMinter mint;
+    AdditionalNavyContract addNav;
+    BonusResourcesContract bonus;
+    NavyContract navy1;
+
+    modifier onlyCountryMinter() {
+        require(
+            msg.sender == countryMinter,
+            "function only callable from countryMinter"
+        );
+        _;
+    }
+
+    modifier onlyNavy1Contract() {
+        require(
+            msg.sender == navy1Address,
+            "function only callable from navy contract 1"
+        );
+        _;
+    }
+
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
+    function settings(
+        address _treasuryAddress,
+        address _improvementsContract1Address,
+        address _improvementsContract3Address,
+        address _improvements4,
+        address _resources,
+        address _military,
+        address _nukes,
+        address _wonders1,
+        address _navalActions,
+        address _additionalNavy
+    ) public onlyOwner {
+        treasuryAddress = _treasuryAddress;
+        improvementsContract1Address = _improvementsContract1Address;
+        improvementsContract3Address = _improvementsContract3Address;
+        improvements4 = _improvements4;
+        imp4 = ImprovementsContract4(_improvements4);
+        resources = _resources;
+        res = ResourcesContract(_resources);
+        military = _military;
+        mil = MilitaryContract(_military);
+        nukes = _nukes;
+        nuke = NukeContract(_nukes);
+        wonders1 = _wonders1;
+        won1 = WondersContract1(_wonders1);
+        navalActions = _navalActions;
+        navAct = NavalActionsContract(_navalActions);
+        additionalNavy = _additionalNavy;
+        addNav = AdditionalNavyContract(_additionalNavy);
+    }
+
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
+    function settings2(
+        address _countryMinter,
+        address _bonusResources,
+        address _navy1
+    ) public onlyOwner {
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
+        bonusResources = _bonusResources;
+        bonus = BonusResourcesContract(_bonusResources);
+        navy1Address = _navy1;
+        navy1 = NavyContract(_navy1);
+    }
+
+    ///@dev this is a public function only callable from the countryMinter contract
+    ///@dev this function will allow a nation owner to buy navy vessels
+    ///@notice this function will allow a nation owner to buy navy vessels
+    ///@param id this is the nation id of the nation being minted
+    function generateNavy(uint256 id) public onlyCountryMinter {
+        Navy memory newNavy = Navy(0, 0, 0, 0);
+        idToNavy[id] = newNavy;
+    }
+
+    ///@dev this function is only callable by the contract owner
+    function updateFrigateSpecs(
+        uint256 newPrice,
+        uint256 newRequiredInf,
+        uint256 newRequiredTech
+    ) public onlyOwner {
+        frigateCost = newPrice;
+        frigateRequiredInfrastructure = newRequiredInf;
+        frigateRequiredTechnology = newRequiredTech;
+    }
+
+    function getFrigateSpecs() public view returns (uint256, uint256, uint256) {
+        return (
+            frigateCost,
+            frigateRequiredInfrastructure,
+            frigateRequiredTechnology
+        );
+    }
+
+    ///@dev this function is only callable by the contract owner
+    function updateDestroyerSpecs(
+        uint256 newPrice,
+        uint256 newRequiredInf,
+        uint256 newRequiredTech
+    ) public onlyOwner {
+        destroyerCost = newPrice;
+        destroyerRequiredInfrastructure = newRequiredInf;
+        destroyerRequiredTechnology = newRequiredTech;
+    }
+
+    function getDestroyerSpecs()
+        public
+        view
+        returns (uint256, uint256, uint256)
+    {
+        return (
+            destroyerCost,
+            destroyerRequiredInfrastructure,
+            destroyerRequiredTechnology
+        );
+    }
+
+    ///@dev this function is only callable by the contract owner
+    function updateSubmarineSpecs(
+        uint256 newPrice,
+        uint256 newRequiredInf,
+        uint256 newRequiredTech
+    ) public onlyOwner {
+        submarineCost = newPrice;
+        submarineRequiredInfrastructure = newRequiredInf;
+        submarineRequiredTechnology = newRequiredTech;
+    }
+
+    function getSubmarineSpecs()
+        public
+        view
+        returns (uint256, uint256, uint256)
+    {
+        return (
+            submarineCost,
+            submarineRequiredInfrastructure,
+            submarineRequiredTechnology
+        );
+    }
+
+    ///@dev this function is only callable by the contract owner
+    function updateAircraftCarrierSpecs(
+        uint256 newPrice,
+        uint256 newRequiredInf,
+        uint256 newRequiredTech
+    ) public onlyOwner {
+        aircraftCarrierCost = newPrice;
+        aircraftCarrierRequiredInfrastructure = newRequiredInf;
+        aircraftCarrierRequiredTechnology = newRequiredTech;
+    }
+
+    function getAircraftCarrierSpecs()
+        public
+        view
+        returns (uint256, uint256, uint256)
+    {
+        return (
+            aircraftCarrierCost,
+            aircraftCarrierRequiredInfrastructure,
+            aircraftCarrierRequiredTechnology
+        );
+    }
+
     ///@dev this is a public function callable only by the nation owner
     ///@dev this function will allow a nation owner to purchase a frigates vessel
     ///@notice this function will allow a nation owner to purchase a frigates vessel
@@ -576,7 +901,7 @@ contract NavyContract is Ownable {
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].frigateCount += amount;
-        idToNavy[id].navyVessels += amount;
+        navy1.increaseNavyVesselCount(id, amount);
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
@@ -589,6 +914,13 @@ contract NavyContract is Ownable {
     function getFrigateCount(uint256 id) public view returns (uint256) {
         uint256 frigateAmount = idToNavy[id].frigateCount;
         return frigateAmount;
+    }
+
+    function decreaseFrigateCount(
+        uint256 id,
+        uint256 amount
+    ) public onlyNavy1Contract {
+        idToNavy[id].frigateCount -= amount;
     }
 
     ///@dev this is a public function callable only by the nation owner
@@ -620,7 +952,7 @@ contract NavyContract is Ownable {
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].destroyerCount += amount;
-        idToNavy[id].navyVessels += amount;
+        navy1.increaseNavyVesselCount(id, amount);
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
@@ -633,6 +965,13 @@ contract NavyContract is Ownable {
     function getDestroyerCount(uint256 id) public view returns (uint256) {
         uint256 destroyerAmount = idToNavy[id].destroyerCount;
         return destroyerAmount;
+    }
+
+    function decreaseDestroyerCount(
+        uint256 id,
+        uint256 amount
+    ) public onlyNavy1Contract {
+        idToNavy[id].destroyerCount -= amount;
     }
 
     ///@dev this is a public function callable only by the nation owner
@@ -664,12 +1003,11 @@ contract NavyContract is Ownable {
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].submarineCount += amount;
-        idToNavy[id].navyVessels += amount;
+        navy1.increaseNavyVesselCount(id, amount);
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
-    
     ///@dev this is a public view function that will return the number of submarines a nation owns
     ///@dev this function wll return the number of submarines ttes a nation owns
     ///@notice this functon will return the number of submarines a nation owns
@@ -678,6 +1016,13 @@ contract NavyContract is Ownable {
     function getSubmarineCount(uint256 id) public view returns (uint256) {
         uint256 submarineAmount = idToNavy[id].submarineCount;
         return submarineAmount;
+    }
+
+    function decreaseSubmarineCount(
+        uint256 id,
+        uint256 amount
+    ) public onlyNavy1Contract {
+        idToNavy[id].submarineCount -= amount;
     }
 
     ///@dev this is a public function callable only by the nation owner
@@ -709,7 +1054,7 @@ contract NavyContract is Ownable {
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].aircraftCarrierCount += amount;
-        idToNavy[id].navyVessels += amount;
+        navy1.increaseNavyVesselCount(id, amount);
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
@@ -724,38 +1069,11 @@ contract NavyContract is Ownable {
         return aircraftCarrierAmount;
     }
 
-    modifier onlyNukeContract() {
-        require(msg.sender == nukes, "only callable from nuke contract");
-        _;
-    }
-
-    ///@dev this is a public function only callable from the nuke contract
-    ///@dev this function will decrease the amount of ships that are vulnerable to nuclear attacks when a nation is attacked by a nuke strike
-    ///@notice this function will decrease the amount of ships that are vulnerable to nuclear attacks when a nation is attacked by a nuke strike
-    ///@notice vessels available to nuke strikes are corvettes, landing ships, cruisers and frigates
-    ///@notice a nuke strike will reduce the number of these ships by 25% (12% with a fallout shelter system)
-    ///@param defenderId this is the nation id of the nation being attacked
-    function decreaseNavyFromNukeContract(
-        uint256 defenderId
-    ) public onlyNukeContract {
-        //corvettes, landing ships, cruisers, frigates
-        uint256 corvetteCount = idToNavy[defenderId].corvetteCount;
-        uint256 landingShipCount = idToNavy[defenderId].landingShipCount;
-        uint256 cruiserCount = idToNavy[defenderId].cruiserCount;
-        uint256 frigateCount = idToNavy[defenderId].frigateCount;
-        uint256 percentage = 25;
-        bool falloutShelter = won1.getFalloutShelterSystem(defenderId);
-        if (falloutShelter) {
-            percentage = 12;
-        }
-        idToNavy[defenderId].corvetteCount -= ((corvetteCount * percentage) /
-            100);
-        idToNavy[defenderId].landingShipCount -= ((landingShipCount *
-            percentage) / 100);
-        idToNavy[defenderId].cruiserCount -= ((cruiserCount * percentage) /
-            100);
-        idToNavy[defenderId].frigateCount -= ((frigateCount * percentage) /
-            100);
+    function decreaseAircraftCarrierCount(
+        uint256 id,
+        uint256 amount
+    ) public onlyNavy1Contract {
+        idToNavy[id].aircraftCarrierCount -= amount;
     }
 }
 
@@ -769,12 +1087,14 @@ contract AdditionalNavyContract is Ownable {
     address public military;
     address public wonders1;
     address public improvements4;
+    address public navy2;
 
     NavyContract nav;
     NavalActionsContract navAct;
     MilitaryContract mil;
     WondersContract1 won1;
     ImprovementsContract4 imp4;
+    NavyContract2 nav2;
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -783,7 +1103,8 @@ contract AdditionalNavyContract is Ownable {
         address _navalActions,
         address _military,
         address _wonders1,
-        address _improvements4
+        address _improvements4,
+        address _navy2
     ) public onlyOwner {
         navy = _navy;
         nav = NavyContract(_navy);
@@ -795,6 +1116,8 @@ contract AdditionalNavyContract is Ownable {
         won1 = WondersContract1(_wonders1);
         improvements4 = _improvements4;
         imp4 = ImprovementsContract4(_improvements4);
+        navy2 = _navy2;
+        nav2 = NavyContract2(_navy2);
     }
 
     ///@dev this is a public view function
@@ -802,7 +1125,9 @@ contract AdditionalNavyContract is Ownable {
     ///@notice this function will return a nations available daily navy vessel purchases
     ///@param id this is the nation id of the nation being queried
     ///@return uint256 is the number of available navy vessel purchases for the day for that nation
-    function getAvailablePurchases(uint256 id) public view returns (uint256, uint256) {
+    function getAvailablePurchases(
+        uint256 id
+    ) public view returns (uint256, uint256) {
         uint256 purchasesToday = navAct.getPurchasesToday(id);
         uint256 maxDailyPurchases;
         bool isWar = mil.getWarPeacePreference(id);
@@ -836,8 +1161,8 @@ contract AdditionalNavyContract is Ownable {
     function getBlockadeCapableShips(uint256 id) public view returns (uint256) {
         uint256 battleships = nav.getBattleshipCount(id);
         uint256 cruisers = nav.getCruiserCount(id);
-        uint256 frigates = nav.getFrigateCount(id);
-        uint256 subs = nav.getSubmarineCount(id);
+        uint256 frigates = nav2.getFrigateCount(id);
+        uint256 subs = nav2.getSubmarineCount(id);
         uint256 blockadeCapableShips = (battleships +
             cruisers +
             frigates +
@@ -855,8 +1180,8 @@ contract AdditionalNavyContract is Ownable {
     ) public view returns (uint256) {
         uint256 battleships = nav.getBattleshipCount(id);
         uint256 cruisers = nav.getCruiserCount(id);
-        uint256 frigates = nav.getFrigateCount(id);
-        uint256 destroyers = nav.getDestroyerCount(id);
+        uint256 frigates = nav2.getFrigateCount(id);
+        uint256 destroyers = nav2.getDestroyerCount(id);
         uint256 breakBlockadeCapableShips = (battleships +
             cruisers +
             frigates +
@@ -864,7 +1189,7 @@ contract AdditionalNavyContract is Ownable {
         return breakBlockadeCapableShips;
     }
 
-    ///@dev this is a public view function that returns the number of navy vessels that a nations drydocks support 
+    ///@dev this is a public view function that returns the number of navy vessels that a nations drydocks support
     ///@notice this function will return the number of ships that a nations drydocks support
     ///@notice a nation cannot delete a drydock if it supports a vessel
     ///@notice drydocks support corvettes, battleships, cruisers and destroyers
@@ -876,7 +1201,7 @@ contract AdditionalNavyContract is Ownable {
         uint256 corvetteAmount = nav.getCorvetteCount(countryId);
         uint256 battleshipAmount = nav.getBattleshipCount(countryId);
         uint256 cruiserAmount = nav.getCruiserCount(countryId);
-        uint256 destroyerAmount = nav.getDestroyerCount(countryId);
+        uint256 destroyerAmount = nav2.getDestroyerCount(countryId);
         uint256 shipCount = (corvetteAmount +
             battleshipAmount +
             cruiserAmount +
@@ -884,7 +1209,7 @@ contract AdditionalNavyContract is Ownable {
         return shipCount;
     }
 
-    ///@dev this is a public view function that returns the number of navy vessels that a nations shipyards support 
+    ///@dev this is a public view function that returns the number of navy vessels that a nations shipyards support
     ///@notice this function will return the number of ships that a nations shipyards support
     ///@notice a nation cannot delete a shipyard if it supports a vessel
     ///@notice shipyards support landing ships, frigates, submarines and aircraft carriers
@@ -894,9 +1219,9 @@ contract AdditionalNavyContract is Ownable {
         uint256 countryId
     ) public view returns (uint256 count) {
         uint256 landingShipAmount = nav.getLandingShipCount(countryId);
-        uint256 frigateAmount = nav.getFrigateCount(countryId);
-        uint256 submarineAmount = nav.getSubmarineCount(countryId);
-        uint256 aircraftCarrierAmount = nav.getAircraftCarrierCount(countryId);
+        uint256 frigateAmount = nav2.getFrigateCount(countryId);
+        uint256 submarineAmount = nav2.getSubmarineCount(countryId);
+        uint256 aircraftCarrierAmount = nav2.getAircraftCarrierCount(countryId);
         uint256 shipCount = (landingShipAmount +
             frigateAmount +
             submarineAmount +
