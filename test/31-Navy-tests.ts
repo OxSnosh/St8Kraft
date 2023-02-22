@@ -321,7 +321,7 @@ describe("Navy", async function () {
         // console.log(`NavyContract deployed to ${navycontract.address}`)
 
         const NavyContract2 = await ethers.getContractFactory("NavyContract2")
-        navycontract2 = await NavyContract2.deploy() as NavyContract
+        navycontract2 = await NavyContract2.deploy() as NavyContract2
         await navycontract2.deployed()
         // console.log(`NavyContract2 deployed to ${navycontract2.address}`)
 
@@ -809,7 +809,8 @@ describe("Navy", async function () {
             navalactionscontract.address,
             militarycontract.address,
             wonderscontract1.address,
-            improvementscontract4.address
+            improvementscontract4.address,
+            navycontract2.address
         )
 
         await navalblockadecontract.settings(
@@ -825,14 +826,16 @@ describe("Navy", async function () {
             navycontract.address,
             warcontract.address,
             improvementscontract4.address,
-            navalactionscontract.address
+            navalactionscontract.address,
+            navycontract2.address
         )
 
         await navalattackcontract.settings(
             navycontract.address,
             warcontract.address,
             improvementscontract4.address,
-            navalactionscontract.address
+            navalactionscontract.address,
+            navycontract2.address
         )
 
         await nukecontract.settings(

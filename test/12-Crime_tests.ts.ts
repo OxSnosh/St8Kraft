@@ -34,6 +34,7 @@ import {
     NationStrengthContract,
     NavalActionsContract,
     NavyContract,
+    NavyContract2,
     AdditionalNavyContract,
     NavalBlockadeContract,
     BreakBlocadeContract,
@@ -90,6 +91,7 @@ describe("Crime Contract", async function () {
     let nationstrengthcontract: NationStrengthContract
     let navalactionscontract: NavalActionsContract
     let navycontract: NavyContract
+    let navycontract2: NavyContract2
     let additionalnavycontract: AdditionalNavyContract
     let navalblockadecontract: NavalBlockadeContract
     let breakblockadecontract: BreakBlocadeContract
@@ -111,6 +113,11 @@ describe("Crime Contract", async function () {
     let signer0: SignerWithAddress
     let signer1: SignerWithAddress
     let signer2: SignerWithAddress
+    let signer3: SignerWithAddress
+    let signer4: SignerWithAddress
+    let signer5: SignerWithAddress
+    let signer6: SignerWithAddress
+    let signer7: SignerWithAddress
     let signers: SignerWithAddress[]
     let addrs
 
@@ -122,6 +129,11 @@ describe("Crime Contract", async function () {
         signer0 = signers[0];
         signer1 = signers[1];
         signer2 = signers[2];
+        signer3 = signers[3];
+        signer4 = signers[4];
+        signer5 = signers[5];
+        signer6 = signers[6];
+        signer7 = signers[7];
         
         let chainId: any
         chainId = network.config.chainId
@@ -308,6 +320,11 @@ describe("Crime Contract", async function () {
         await navycontract.deployed()
         // console.log(`NavyContract deployed to ${navycontract.address}`)
 
+        const NavyContract2 = await ethers.getContractFactory("NavyContract2")
+        navycontract2 = await NavyContract2.deploy() as NavyContract2
+        await navycontract2.deployed()
+        // console.log(`NavyContract2 deployed to ${navycontract2.address}`)
+
         const AdditionalNavyContract = await ethers.getContractFactory("AdditionalNavyContract")
         additionalnavycontract = await AdditionalNavyContract.deploy() as AdditionalNavyContract
         await additionalnavycontract.deployed()
@@ -441,7 +458,8 @@ describe("Crime Contract", async function () {
             missilescontract.address,
             wonderscontract4.address,
             infrastructurecontract.address,
-            bonusresourcescontract.address)
+            bonusresourcescontract.address,
+            navycontract2.address)
         
         await bomberscontract.settings(
             countryminter.address, 
@@ -573,7 +591,8 @@ describe("Crime Contract", async function () {
             wonderscontract4.address,
             navycontract.address)
         await fightersmarketplace1.settings2(
-            bonusresourcescontract.address
+            bonusresourcescontract.address,
+            navycontract2.address
         )
         
         await fightersmarketplace2.settings(
@@ -735,7 +754,8 @@ describe("Crime Contract", async function () {
             fighterscontract.address,
             bomberscontract.address,
             navycontract.address,
-            missilescontract.address
+            missilescontract.address,
+            navycontract2.address
         )
 
         await navycontract.settings(
@@ -752,8 +772,28 @@ describe("Crime Contract", async function () {
         )
         await navycontract.settings2(
             countryminter.address,
-            bonusresourcescontract.address
+            bonusresourcescontract.address,
+            navycontract2.address
         )
+
+        await navycontract2.settings(
+            treasurycontract.address,
+            improvementscontract1.address,
+            improvementscontract3.address,
+            improvementscontract4.address,
+            resourcescontract.address,
+            militarycontract.address,
+            nukecontract.address,
+            wonderscontract1.address,
+            navalactionscontract.address,
+            additionalnavycontract.address
+        )
+        await navycontract2.settings2(
+            countryminter.address,
+            bonusresourcescontract.address,
+            navycontract.address
+        )
+
 
         await navalactionscontract.settings(
             navalblockadecontract.address,
@@ -769,7 +809,8 @@ describe("Crime Contract", async function () {
             navalactionscontract.address,
             militarycontract.address,
             wonderscontract1.address,
-            improvementscontract4.address
+            improvementscontract4.address,
+            navycontract2.address
         )
 
         await navalblockadecontract.settings(
@@ -785,14 +826,16 @@ describe("Crime Contract", async function () {
             navycontract.address,
             warcontract.address,
             improvementscontract4.address,
-            navalactionscontract.address
+            navalactionscontract.address,
+            navycontract2.address
         )
 
         await navalattackcontract.settings(
             navycontract.address,
             warcontract.address,
             improvementscontract4.address,
-            navalactionscontract.address
+            navalactionscontract.address,
+            navycontract2.address
         )
 
         await nukecontract.settings(

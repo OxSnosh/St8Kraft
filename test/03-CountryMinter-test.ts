@@ -35,6 +35,7 @@ import {
     NationStrengthContract,
     NavalActionsContract,
     NavyContract,
+    NavyContract2,
     AdditionalNavyContract,
     NavalBlockadeContract,
     BreakBlocadeContract,
@@ -60,7 +61,6 @@ import { networkConfig } from "../helper-hardhat-config"
 
 describe("CountryMinter", function () {
 
-    
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
     let aidcontract: AidContract
@@ -93,6 +93,7 @@ describe("CountryMinter", function () {
     let nationstrengthcontract: NationStrengthContract
     let navalactionscontract: NavalActionsContract
     let navycontract: NavyContract
+    let navycontract2: NavyContract2
     let additionalnavycontract: AdditionalNavyContract
     let navalblockadecontract: NavalBlockadeContract
     let breakblockadecontract: BreakBlocadeContract
@@ -114,23 +115,33 @@ describe("CountryMinter", function () {
     let signer0: SignerWithAddress
     let signer1: SignerWithAddress
     let signer2: SignerWithAddress
+    let signer3: SignerWithAddress
+    let signer4: SignerWithAddress
+    let signer5: SignerWithAddress
+    let signer6: SignerWithAddress
+    let signer7: SignerWithAddress
     let signers: SignerWithAddress[]
     let addrs
 
-    beforeEach(async function () {
+    let vrfCoordinatorV2Mock: any
 
+    beforeEach(async function () {
+        
         signers = await ethers.getSigners();
         signer0 = signers[0];
         signer1 = signers[1];
         signer2 = signers[2];
+        signer3 = signers[3];
+        signer4 = signers[4];
+        signer5 = signers[5];
+        signer6 = signers[6];
+        signer7 = signers[7];
         
-
-        let chainId = network.config.chainId
-        let subscriptionId: any    
-        let vrfCoordinatorV2Mock
-        let vrfCoordinatorV2Address    
-
-        
+        let chainId: any
+        chainId = network.config.chainId
+        let subscriptionId: any 
+        let vrfCoordinatorV2Address: any
+    
         if (chainId == 31337) {
             // console.log("local network detected")
             const FUND_AMOUNT = ethers.utils.parseEther("10")
@@ -147,10 +158,10 @@ describe("CountryMinter", function () {
             // Our mock makes it so we don't actually have to worry about sending fund
             await vrfCoordinatorV2Mock.fundSubscription(subscriptionId, FUND_AMOUNT)
         } else {
-            // vrfCoordinatorV2Address = networkConfig[chainId]["vrfCoordinatorV2"]
-            // subscriptionId = networkConfig[chainId]["subscriptionId"]
+            vrfCoordinatorV2Address = networkConfig[chainId]["vrfCoordinatorV2"]
+            subscriptionId = networkConfig[chainId]["subscriptionId"]
         }
-
+    
         var gasLane = networkConfig[31337]["gasLane"]
         var callbackGasLimit =  networkConfig[31337]["callbackGasLimit"]
     
@@ -311,6 +322,11 @@ describe("CountryMinter", function () {
         await navycontract.deployed()
         // console.log(`NavyContract deployed to ${navycontract.address}`)
 
+        const NavyContract2 = await ethers.getContractFactory("NavyContract2")
+        navycontract2 = await NavyContract2.deploy() as NavyContract2
+        await navycontract2.deployed()
+        // console.log(`NavyContract2 deployed to ${navycontract2.address}`)
+
         const AdditionalNavyContract = await ethers.getContractFactory("AdditionalNavyContract")
         additionalnavycontract = await AdditionalNavyContract.deploy() as AdditionalNavyContract
         await additionalnavycontract.deployed()
@@ -444,7 +460,8 @@ describe("CountryMinter", function () {
             missilescontract.address,
             wonderscontract4.address,
             infrastructurecontract.address,
-            bonusresourcescontract.address)
+            bonusresourcescontract.address,
+            navycontract2.address)
         
         await bomberscontract.settings(
             countryminter.address, 
@@ -576,7 +593,8 @@ describe("CountryMinter", function () {
             wonderscontract4.address,
             navycontract.address)
         await fightersmarketplace1.settings2(
-            bonusresourcescontract.address
+            bonusresourcescontract.address,
+            navycontract2.address
         )
         
         await fightersmarketplace2.settings(
@@ -738,7 +756,8 @@ describe("CountryMinter", function () {
             fighterscontract.address,
             bomberscontract.address,
             navycontract.address,
-            missilescontract.address
+            missilescontract.address,
+            navycontract2.address
         )
 
         await navycontract.settings(
@@ -755,8 +774,28 @@ describe("CountryMinter", function () {
         )
         await navycontract.settings2(
             countryminter.address,
-            bonusresourcescontract.address
+            bonusresourcescontract.address,
+            navycontract2.address
         )
+
+        await navycontract2.settings(
+            treasurycontract.address,
+            improvementscontract1.address,
+            improvementscontract3.address,
+            improvementscontract4.address,
+            resourcescontract.address,
+            militarycontract.address,
+            nukecontract.address,
+            wonderscontract1.address,
+            navalactionscontract.address,
+            additionalnavycontract.address
+        )
+        await navycontract2.settings2(
+            countryminter.address,
+            bonusresourcescontract.address,
+            navycontract.address
+        )
+
 
         await navalactionscontract.settings(
             navalblockadecontract.address,
@@ -772,7 +811,8 @@ describe("CountryMinter", function () {
             navalactionscontract.address,
             militarycontract.address,
             wonderscontract1.address,
-            improvementscontract4.address
+            improvementscontract4.address,
+            navycontract2.address
         )
 
         await navalblockadecontract.settings(
@@ -788,14 +828,16 @@ describe("CountryMinter", function () {
             navycontract.address,
             warcontract.address,
             improvementscontract4.address,
-            navalactionscontract.address
+            navalactionscontract.address,
+            navycontract2.address
         )
 
         await navalattackcontract.settings(
             navycontract.address,
             warcontract.address,
             improvementscontract4.address,
-            navalactionscontract.address
+            navalactionscontract.address,
+            navycontract2.address
         )
 
         await nukecontract.settings(
