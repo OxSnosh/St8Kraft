@@ -480,6 +480,32 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         idToProposedTradingPartners[requestorId].push(recipientId);
     }
 
+    ///@dev this is a public function but is only callable from the nation owner
+    ///@notice this function will allow a nation owner to cancel a proposed trande
+    ///@param nationId this is the nation Id of the nation owner looking to cancel a proposed trade
+    ///@param partnerId this is the nation Id of the proposed trading partner that is getting the proposed trade cancelled
+    ///@dev this function will revert if the partnerId parameter is not a current proposed trade
+    function cancelProposedTrade(uint256 nationId, uint256 partnerId) public {
+        bool isOwner = mint.checkOwnership(nationId, msg.sender);
+        require(isOwner, "!nation owner");
+        uint256[] storage nationProposedTrades = idToProposedTradingPartners[nationId];
+        uint256[] storage partnerProposedTrades = idToProposedTradingPartners[partnerId];
+        for (uint i = 0; i <= nationProposedTrades.length; i++) {
+            if (nationProposedTrades[i] == partnerId) {
+                nationProposedTrades[i] = nationProposedTrades[nationProposedTrades.length - 1];
+                nationProposedTrades.pop();
+                for (uint j = 0; j <= partnerProposedTrades.length; j++) {
+                    if (partnerProposedTrades[j] == nationId) {
+                        partnerProposedTrades[j] = partnerProposedTrades[partnerProposedTrades.length - 1];
+                        partnerProposedTrades.pop();
+                    }
+                }
+            } else {
+                revert("No proposed trade with this partner");
+            }
+        }
+    }
+
     ///@dev this is a public view function that will return a nations proposed trading partners
     ///@notice this function will return a nation's proposed trading partners
     ///@return uint256 is an array of the nation id's of a nations proposed trading partners

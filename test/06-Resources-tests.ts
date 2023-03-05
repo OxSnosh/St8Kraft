@@ -1100,6 +1100,34 @@ describe("ResourcesContract", async function () {
         })
     })
 
+    describe("Cancel Proposed Partner", function () {
+        it("Test that a nation can cancel a proposed trade", async function () {
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            var partners = await resourcescontract.getProposedTradingPartners(0)
+            var partners1 = await resourcescontract.getProposedTradingPartners(1)
+            expect(partners.length).to.equal(1)
+            expect(partners1.length).to.equal(1)
+            await resourcescontract.connect(signer1).cancelProposedTrade(0, 1)
+            var partners = await resourcescontract.getProposedTradingPartners(0)
+            var partners1 = await resourcescontract.getProposedTradingPartners(1)
+            expect(partners.length).to.equal(0)
+            expect(partners1.length).to.equal(0)
+        })
+
+        it("Test that the other nation can cancel a proposed trade", async function () {
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            var partners = await resourcescontract.getProposedTradingPartners(0)
+            var partners1 = await resourcescontract.getProposedTradingPartners(1)
+            expect(partners.length).to.equal(1)
+            expect(partners1.length).to.equal(1)
+            await resourcescontract.connect(signer2).cancelProposedTrade(1, 0)
+            var partners = await resourcescontract.getProposedTradingPartners(0)
+            var partners1 = await resourcescontract.getProposedTradingPartners(1)
+            expect(partners.length).to.equal(0)
+            expect(partners1.length).to.equal(0)
+        })
+    })
+
     describe("Remove Trading Partners", async function () {
         it("Nation one in a trade can remove the trade", async function () {
             await resourcescontract.connect(signer1).proposeTrade(0, 1);

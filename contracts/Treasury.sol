@@ -20,18 +20,31 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract TreasuryContract is Ownable {
     uint256 public counter;
     address public wonders1;
+    address public wonders2;
+    address public wonders3;
+    address public wonders4;
     address public improvements1;
+    address public improvements2;
+    address public improvements3;
+    address public improvements4;
     address public infrastructure;
     address public navy;
+    address public navy2;
     address public fighters;
+    address public bombers;
     address public warBucksAddress;
     address public forces;
+    address public missiles;
     address public aid;
     address public taxes;
     address public bills;
     address public spyAddress;
     address public groundBattle;
     address public countryMinter;
+    address public spyOperations;
+    address public landMarket;
+    address public techMarket;
+    address public infrastructureMarket;
     address public keeper;
     uint256 public daysToInactive = 20;
     uint256 private gameTaxPercentage = 0;
@@ -60,27 +73,25 @@ contract TreasuryContract is Ownable {
     function settings1(
         address _warBucksAddress,
         address _wonders1,
+        address _wonders2,
+        address _wonders3,
+        address _wonders4,
         address _improvements1,
-        address _infrastructure,
-        address _forces,
-        address _navy,
-        address _fighters,
-        address _aid,
-        address _taxes,
-        address _bills,
-        address _spyAddress
+        address _improvements2,
+        address _improvements3,
+        address _improvements4,
+        address _infrastructure
     ) public onlyOwner {
         warBucksAddress = _warBucksAddress;
         wonders1 = _wonders1;
+        wonders1 = _wonders2;
+        wonders1 = _wonders3;
+        wonders1 = _wonders4;
         improvements1 = _improvements1;
+        improvements2 = _improvements2;
+        improvements3 = _improvements3;
+        improvements4 = _improvements4;
         infrastructure = _infrastructure;
-        forces = _forces;
-        navy = _navy;
-        fighters = _fighters;
-        aid = _aid;
-        taxes = _taxes;
-        bills = _bills;
-        spyAddress = _spyAddress;
     }
 
     ///@dev this function is only callable by the contract owner
@@ -88,13 +99,45 @@ contract TreasuryContract is Ownable {
     function settings2(
         address _groundBattle,
         address _countryMinter,
-        address _keeper
+        address _keeper,
+        address _forces,
+        address _navy,
+        address _fighters,
+        address _bombers,
+        address _aid,
+        address _taxes,
+        address _bills,
+        address _spyAddress
     ) public onlyOwner {
         groundBattle = _groundBattle;
         ground = GroundBattleContract(_groundBattle);
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
         keeper = _keeper;
+        forces = _forces;
+        navy = _navy;
+        fighters = _fighters;
+        bombers = _bombers;
+        aid = _aid;
+        taxes = _taxes;
+        bills = _bills;
+        spyAddress = _spyAddress;
+    }
+
+    function settings3(
+        address _navy2,
+        address _missiles,
+        address _infrastructureMarket,
+        address _landMarket,
+        address _techMarket,
+        address _spyOperations
+    ) public onlyOwner {
+        navy2 = _navy2;
+        missiles = _missiles;
+        infrastructureMarket = _infrastructureMarket;
+        landMarket = _landMarket;
+        techMarket = _techMarket;
+        spyOperations = _spyOperations;
     }
 
     modifier onlyCountryMinter() {
@@ -127,6 +170,29 @@ contract TreasuryContract is Ownable {
 
     modifier onlyKeeper() {
         require(msg.sender == keeper, "function only callable from keeper");
+        _;
+    }
+
+    modifier approvedSpendCaller() {
+        require(msg.sender == bombers ||
+            msg.sender == fighters ||
+            msg.sender == forces ||
+            msg.sender == missiles ||
+            msg.sender == navy ||
+            msg.sender == navy2 ||
+            msg.sender == improvements1 ||
+            msg.sender == improvements2 ||
+            msg.sender == improvements3 ||
+            msg.sender == improvements4 ||
+            msg.sender == wonders1 ||
+            msg.sender == wonders2 ||
+            msg.sender == wonders3 ||
+            msg.sender == wonders4 ||
+            msg.sender == infrastructureMarket ||
+            msg.sender == techMarket ||
+            msg.sender == landMarket ||
+            msg.sender == spyOperations, "cannot call spendBalance()"
+        );
         _;
     }
 
@@ -171,6 +237,7 @@ contract TreasuryContract is Ownable {
         public
         onlyBillsContract
     {
+        require(idToTreasury[id].balance >= amount, "balance not high enough to pay bills");
         idToTreasury[id].balance -= amount;
         idToTreasury[id].daysSinceLastBillPaid = 0;
         idToTreasury[id].inactive = false;
