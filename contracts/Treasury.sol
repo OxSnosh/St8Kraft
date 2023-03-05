@@ -129,15 +129,13 @@ contract TreasuryContract is Ownable {
         address _missiles,
         address _infrastructureMarket,
         address _landMarket,
-        address _techMarket,
-        address _spyOperations
+        address _techMarket
     ) public onlyOwner {
         navy2 = _navy2;
         missiles = _missiles;
         infrastructureMarket = _infrastructureMarket;
         landMarket = _landMarket;
         techMarket = _techMarket;
-        spyOperations = _spyOperations;
     }
 
     modifier onlyCountryMinter() {
@@ -248,7 +246,7 @@ contract TreasuryContract is Ownable {
     ///@notice this function will decrease a nation owner's balance when money is spent within the game
     ///@param id is the nation id of the nation spending funds
     ///@param cost is the cost of the expense
-    function spendBalance(uint256 id, uint256 cost) public {
+    function spendBalance(uint256 id, uint256 cost) public approvedSpendCaller {
         //need a way to only allow the nation owner to do this
         uint256 balance = idToTreasury[id].balance;
         require(balance >= cost, "insufficient balance");
