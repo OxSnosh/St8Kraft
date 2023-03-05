@@ -801,6 +801,7 @@ describe("Improvements", async function () {
             navalattackcontract.address,
             keepercontract.address,
             navycontract.address,
+            navycontract2.address,
             countryminter.address
         )
 

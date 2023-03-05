@@ -19,6 +19,7 @@ import "hardhat/console.sol";
 contract NavalActionsContract is Ownable {
     address public keeper;
     address public navy;
+    address public navy2;
     address public navalBlockade;
     address public breakBlockade;
     address public navalAttack;
@@ -42,12 +43,14 @@ contract NavalActionsContract is Ownable {
         address _navalAttack,
         address _keeper,
         address _navy,
+        address _navy2,
         address _countryMinter
     ) public onlyOwner {
         navalBlockade = _navalBlockade;
         breakBlockade = _breakBlockade;
         navalAttack = _navalAttack;
         navy = _navy;
+        navy2 = _navy2;
         keeper = _keeper;
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
@@ -91,7 +94,8 @@ contract NavalActionsContract is Ownable {
 
     modifier onlyNavy() {
         require(
-            msg.sender == navy,
+            msg.sender == navy ||
+            msg.sender == navy2,
             "function only callable from navy contract"
         );
         _;

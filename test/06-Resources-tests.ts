@@ -801,6 +801,7 @@ describe("ResourcesContract", async function () {
             navalattackcontract.address,
             keepercontract.address,
             navycontract.address,
+            navycontract2.address,
             countryminter.address
         )
 
@@ -1003,6 +1004,10 @@ describe("ResourcesContract", async function () {
             wonderscontract3.address,
             countryminter.address
         )
+    
+        if(chainId == 31337) {
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
+        }
 
         // console.log("country 1");
         await countryminter.connect(signer1).generateCountry(
