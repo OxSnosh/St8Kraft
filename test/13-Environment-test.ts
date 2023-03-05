@@ -1148,8 +1148,8 @@ describe("Environment Contract", async function () {
         })
         
         it("environment1 military density affects environment", async function () {
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 100);
-            await forcescontract.connect(signer1).buySoldiers(700, 0);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200);
+            await forcescontract.connect(signer1).buySoldiers(1200, 0);
             const militaryDensityPenalty = await taxescontract.soldierToPopulationRatio(0);
             expect(militaryDensityPenalty[1]).to.equal(true);
             const densityScore = await environmentcontract.getEnvironmentScoreFromMilitaryDensity(0);

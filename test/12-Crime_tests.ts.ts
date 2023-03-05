@@ -1083,9 +1083,9 @@ describe("Crime Contract", async function () {
             expect(crimeIndex1.toNumber()).to.equal(6);
             expect(criminalCount1.toNumber()).to.equal(14011);
             expect(govPoints1.toNumber()).to.equal(50);
-            await countryparameterscontract.incrementDaysSince();
-            await countryparameterscontract.incrementDaysSince();
-            await countryparameterscontract.incrementDaysSince();
+            await keepercontract.incrementDaysSinceForParametersByOwner();
+            await keepercontract.incrementDaysSinceForParametersByOwner();
+            await keepercontract.incrementDaysSinceForParametersByOwner();
             await countryparameterscontract.connect(signer1).setGovernment(0, 4);
             var cps3 = await crimecontract.getCrimePreventionScore(0);
             var crimeIndex3 = await crimecontract.getCrimeIndex(0);

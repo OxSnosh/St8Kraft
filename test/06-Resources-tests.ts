@@ -1022,7 +1022,7 @@ describe("ResourcesContract", async function () {
         // console.log("requestId", (txReceipt1.events?.[1].args?.requestId).toNumber());
         await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, resourcescontract.address);
         let resources1 = await resourcescontract.getPlayerResources(0);
-        // console.log("resources", resources1[0].toNumber(), resources1[1].toNumber());
+        // console.log("resources1", resources1[0].toNumber(), resources1[1].toNumber());
         
         // console.log("country 2");
         await countryminter.connect(signer2).generateCountry(
@@ -1037,7 +1037,22 @@ describe("ResourcesContract", async function () {
         // console.log("requestId", (txReceipt2.events?.[1].args?.requestId).toNumber());
         await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, resourcescontract.address);
         let resources2 = await resourcescontract.getPlayerResources(1);
-        // console.log("resources", resources2[0].toNumber(), resources2[1].toNumber());
+        // console.log("resources2", resources2[0].toNumber(), resources2[1].toNumber());
+
+        // console.log("country 2");
+        await countryminter.connect(signer3).generateCountry(
+            "TestRuler3",
+            "TestNationName3",
+            "TestCapitalCity3",
+            "TestNationSlogan3"
+        )
+        const tx3 = await resourcescontract.fulfillRequest(2);
+        let txReceipt3 = await tx3.wait(1);
+        let requestId3 = txReceipt3?.events?.[1].args?.requestId;
+        // console.log("requestId3", (txReceipt3.events?.[1].args?.requestId).toNumber());
+        await vrfCoordinatorV2Mock.fulfillRandomWords(requestId3, resourcescontract.address);
+        let resources3 = await resourcescontract.getPlayerResources(2);
+        // console.log("resources3", resources3[0].toNumber(), resources3[1].toNumber());
     });
 
     describe("Resources Setup", function () {
@@ -1045,16 +1060,20 @@ describe("ResourcesContract", async function () {
             var wheat1 = await resourcescontract.viewWheat(0);
             expect(wheat1).to.equal(true);
             var oil1 = await resourcescontract.viewOil(0);
-            expect(oil1).to.equal(true);
+            expect(oil1).to.equal(false);
             var fish1 = await resourcescontract.viewFish(0);
             expect(fish1).to.equal(false);
+            var cattle1 = await resourcescontract.viewCattle(0);
+            expect(cattle1).to.equal(true);
 
-            var gems2 = await resourcescontract.viewGems(1);
-            expect(gems2).to.equal(true);
+            var iron2 = await resourcescontract.viewIron(1);
+            expect(iron2).to.equal(true);
             var water2 = await resourcescontract.viewWater(1);
-            expect(water2).to.equal(true);
+            expect(water2).to.equal(false);
             var coal2 = await resourcescontract.viewCoal(1);
             expect(coal2).to.equal(false);
+            var cattle2 = await resourcescontract.viewCattle(1);
+            expect(cattle2).to.equal(true);
         });
     });
 

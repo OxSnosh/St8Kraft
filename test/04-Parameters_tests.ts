@@ -56,6 +56,7 @@ import {
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
+import { hasUncaughtExceptionCaptureCallback } from "process";
 
 describe("ParametersContract", async function () {
 
@@ -1050,8 +1051,10 @@ describe("ParametersContract", async function () {
             await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, countryparameterscontract.address);
             let preferredReligion1 = await countryparameterscontract.getReligionPreference(0);
             // console.log("Rel 1", preferredReligion1.toNumber());
+            expect(preferredReligion1).to.equal(2)
             let preferredGovernment1 = await countryparameterscontract.getGovernmentPreference(0);
             // console.log("Gov 1", preferredGovernment1.toNumber());
+            expect(preferredGovernment1).to.equal(2)
 
             const tx2 = await countryparameterscontract.fulfillRequest(1);
             let txReceipt2 = await tx2.wait(1);
@@ -1059,8 +1062,10 @@ describe("ParametersContract", async function () {
             await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, countryparameterscontract.address);
             let preferredReligion2 = await countryparameterscontract.getReligionPreference(1);
             // console.log("Rel 2", preferredReligion2.toNumber());
+            expect(preferredReligion2).to.equal(6)
             let preferredGovernment2 = await countryparameterscontract.getGovernmentPreference(1);
             // console.log("Gov 2", preferredGovernment2.toNumber());
+            expect(preferredGovernment2).to.equal(8)
 
             const tx3 = await countryparameterscontract.fulfillRequest(2);
             let txReceipt3 = await tx3.wait(1);
@@ -1068,8 +1073,10 @@ describe("ParametersContract", async function () {
             await vrfCoordinatorV2Mock.fulfillRandomWords(requestId3, countryparameterscontract.address);
             let preferredReligion3 = await countryparameterscontract.getReligionPreference(2);
             // console.log("Rel 3", preferredReligion3.toNumber());
+            expect(preferredReligion3).to.equal(1)
             let preferredGovernment3 = await countryparameterscontract.getGovernmentPreference(2);
             // console.log("Gov 3", preferredGovernment3.toNumber());
+            expect(preferredGovernment3).to.equal(9)
             // console.log("done");
         });
     });

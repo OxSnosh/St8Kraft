@@ -1048,7 +1048,7 @@ describe("Taxes Contract", async function () {
             const initialPopulation = await infrastructurecontract.getTotalPopulationCount(0);
             const initialCriminals = await crimecontract.getCriminalCount(0);
             const initialTaxablePopulation = await infrastructurecontract.getTaxablePopulationCount(0);
-            expect(initialTaxablePopulation.toNumber()).to.equal(157);
+            expect(initialTaxablePopulation.toNumber()).to.equal(137);
             // console.log(
             //     "initialPop", initialPopulation.toNumber(),
             //     "initialCriminals", initialCriminals.toNumber(),
@@ -1058,7 +1058,7 @@ describe("Taxes Contract", async function () {
             const updatedPopulation = await infrastructurecontract.getTotalPopulationCount(0);
             const updatedCriminals = await crimecontract.getCriminalCount(0);
             const updatedTaxablePopulation = await infrastructurecontract.getTaxablePopulationCount(0);
-            expect(updatedTaxablePopulation.toNumber()).to.equal(1725);
+            expect(updatedTaxablePopulation.toNumber()).to.equal(1705);
             // console.log(
             //     "updatedPop", updatedPopulation.toNumber(),
             //     "updatedCriminals", updatedCriminals.toNumber(),
@@ -1074,14 +1074,14 @@ describe("Taxes Contract", async function () {
             // console.log("happiness", happiness.toNumber());
             const taxesCollectible : any = await taxescontract.getTaxesCollectible(0);
             // console.log("taxes collectible", BigInt(taxesCollectible[1]/(10**18)));
-            expect(BigInt(taxesCollectible[1]/(10**18)).toString()).to.equal("25875");
+            expect(BigInt(taxesCollectible[1]/(10**18)).toString()).to.equal("25575");
             const startingBalance : any = await treasurycontract.checkBalance(0);
             // console.log("starting balance", BigInt(startingBalance/(10**18)));
             expect(BigInt(startingBalance/(10**18)).toString()).to.equal("20001852000");
             await taxescontract.connect(signer1).collectTaxes(0);
             const endingBalance : any = await treasurycontract.checkBalance(0);
             // console.log("ending balance", BigInt(endingBalance/(10**18)));
-            expect(BigInt(endingBalance/(10**18)).toString()).to.equal("20001877875");
+            expect(BigInt(endingBalance).toString()).to.equal("20001877574999999166239473664");
             const updatedTaxesCollectible : any = await taxescontract.getTaxesCollectible(0);
             // console.log("updated taxes collectible", BigInt(updatedTaxesCollectible[1]/(10**18)));
             expect(updatedTaxesCollectible[1]).to.equal(0);

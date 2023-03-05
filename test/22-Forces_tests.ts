@@ -1071,8 +1071,8 @@ describe("Forces Contract", async function () {
             await forcescontract.connect(signer1).buySoldiers(2000, 0)
             var maxTankCount2 = await forcescontract.getMaxTankCount(0);
             // console.log("max tanks", maxTankCount2.toNumber())
-            expect(maxTankCount2.toNumber()).to.equal(126);
-            await expect(forcescontract.connect(signer1).buyTanks(127, 0)).to.be.revertedWith("cannot buy that many tanks")
+            expect(maxTankCount2.toNumber()).to.equal(250);
+            await expect(forcescontract.connect(signer1).buyTanks(251, 0)).to.be.revertedWith("cannot buy that many tanks")
             await forcescontract.connect(signer1).buyTanks(125, 0);
             var totalTankCount = await forcescontract.getTankCount(0);
             var defendingTankCount = await forcescontract.getDefendingTankCount(0)

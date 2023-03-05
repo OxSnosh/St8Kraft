@@ -13,6 +13,7 @@ import "./Crime.sol";
 import "./CountryMinter.sol";
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
 
 ///@title TaxesContract
 ///@author OxSnosh
