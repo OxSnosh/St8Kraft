@@ -343,6 +343,8 @@ contract TreasuryContract is Ownable {
     function withdrawFunds(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
+        uint256 daysSince = idToTreasury[id].daysSinceLastBillPaid;
+        require (daysSince == 0, "pay bills before withdrawing funds");
         uint256 gameBalance = idToTreasury[id].balance;
         require(gameBalance >= amount, "insufficient game balance");
         idToTreasury[id].balance -= amount;
