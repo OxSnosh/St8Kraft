@@ -16,6 +16,8 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     uint256[] private s_randomWords;
     address public countryMinter;
     address public keeper;
+    address public nuke;
+    address public groundBattle;
 
     //chainlink variables
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
@@ -51,6 +53,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         uint256 daysSinceGovernmentChenge;
         uint256 nationalReligion;
         uint256 daysSinceReligionChange;
+        uint256 anarchyClock;
     }
 
     mapping(uint256 => CountryParameters) public idToCountryParameters;
@@ -61,6 +64,14 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     mapping(uint256 => uint256) private idToGovernmentPreference;
 
     // mapping(uint256 => address) public idToOwnerParameters;
+
+    modifier onlyNukeAndGroundBattle() {
+        require(
+            msg.sender == nuke || msg.sender == groundBattle,
+            "function only callable from nuke or battle contract"
+        );
+        _;
+    }
 
     ///@dev the consructor will inherit parameters required to initialize the chainlinh VRF functionality
     constructor(
@@ -81,7 +92,9 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         address _spy,
         address _countryMinter,
         address _senate,
-        address _keeper
+        address _keeper,
+        address _nuke,
+        address _groundBattle
     ) public onlyOwner {
         spyAddress = _spy;
         countryMinter = _countryMinter;
@@ -89,6 +102,8 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         senateAddress = _senate;
         senate = SenateContract(_senate);
         keeper = _keeper;
+        nuke = _nuke;
+        groundBattle = _groundBattle;
     }
 
     modifier onlySpyContract() {
@@ -146,7 +161,8 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
             0,
             3,
             0,
-            3
+            3,
+            6
         );
         idToCountryParameters[id] = newCountryParameters;
         idToCountrySettings[id] = newCountrySettings;
@@ -266,6 +282,8 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     function setGovernment(uint256 id, uint256 newType) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
+        uint256 anarchyDays = idToCountrySettings[id].anarchyClock;
+        require(anarchyDays > 5, "nation in anarchy");
         uint256 daysSinceChange = idToCountrySettings[id]
             .daysSinceGovernmentChenge;
         require(daysSinceChange >= 3, "need to wait 3 days before changing");
@@ -315,6 +333,11 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         idToReligionPreference[id] = newType;
     }
 
+    function inflictAnarchy(uint256 id) public onlyNukeAndGroundBattle {
+        idToCountrySettings[id].governmentType = 0;
+        idToCountrySettings[id].anarchyClock = 0;
+    }
+
     //needs to be called by a keeper
     ///@dev this is an esterna function that is only callable from the keeper contract
     ///@dev this function will increment the days since a religion and goverment change
@@ -325,6 +348,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         for (i = 0; i < countryCount; i++) {
             idToCountrySettings[i].daysSinceGovernmentChenge++;
             idToCountrySettings[i].daysSinceReligionChange++;
+            idToCountrySettings[i].anarchyClock++;
         }
     }
 

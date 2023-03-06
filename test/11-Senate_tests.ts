@@ -531,7 +531,9 @@ describe("Senate Contract", async function () {
             spyoperationscontract.address,
             countryminter.address,
             senatecontract.address,
-            keepercontract.address
+            keepercontract.address,
+            nukecontract.address,
+            groundbattlecontract.address
         )
 
         await crimecontract.settings(
@@ -862,6 +864,9 @@ describe("Senate Contract", async function () {
             navycontract.address,
             missilescontract.address,
             keepercontract.address
+        )
+        await nukecontract.settings2(
+            countryparameterscontract.address
         )
 
         await resourcescontract.settings(

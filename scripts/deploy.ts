@@ -868,7 +868,9 @@ async function main() {
         spyoperationscontract.address,
         countryminter.address,
         senatecontract.address,
-        keepercontract.address
+        keepercontract.address,
+        nukecontract.address,
+        groundbattlecontract.address
     )
 
     await crimecontract.settings(
@@ -1199,6 +1201,9 @@ async function main() {
         navycontract.address,
         missilescontract.address,
         keepercontract.address
+    )
+    await nukecontract.settings2(
+        countryparameterscontract.address
     )
 
     await resourcescontract.settings(

@@ -37,6 +37,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     address navy;
     address missiles;
     address keeper;
+    address parameters;
     uint256 mod = 300;
 
     //Chainlik Variables
@@ -58,6 +59,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     ForcesContract force;
     NavyContract nav;
     MissilesContract mis;
+    CountryParametersContract param;
 
     struct NukeAttack {
         uint256 warId;
@@ -119,6 +121,13 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         missiles = _missiles;
         mis = MissilesContract(_missiles);
         keeper = _keeper;
+    }
+
+    function settings2(
+        address _parameters
+    ) public onlyOwner {
+        parameters = _parameters;
+        param = CountryParametersContract(_parameters);
     }
 
     ///@dev this function is only callable by the contract owner
@@ -241,6 +250,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         if (randomNukeSuccessNumber > thwartOdds) {
             inflictNukeDamage(requestNumber);
             mis.decreaseNukeCountFromNukeContract(attackerId);
+            param.inflictAnarchy(defenderId);
             nukesDroppedToday++;
         } else {
             //thwart event
