@@ -5,6 +5,7 @@ import "./NationStrength.sol";
 import "./Military.sol";
 import "./Wonders.sol";
 import "./CountryMinter.sol";
+import "./Treasury.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 // import "hardhat/console.sol";
@@ -26,12 +27,14 @@ contract WarContract is Ownable {
     address public forces;
     address public wonders1;
     address public keeper;
+    address public treasury;
     uint256[] public activeWars;
 
     NationStrengthContract nsc;
     MilitaryContract mil;
     WondersContract1 won1;
     CountryMinter mint;
+    TreasuryContract tres;
 
     struct War {
         uint256 offenseId;
@@ -170,6 +173,13 @@ contract WarContract is Ownable {
         keeper = _keeper;
     }
 
+    function settings2  (
+        address _treasury
+    ) public onlyOwner {
+        treasury = _treasury;
+        tres = TreasuryContract(_treasury);
+    }
+
     ///@dev this function is only callable by the contract owner
     function updateCountryMinterContract(address newAddress) public onlyOwner {
         countryMinter = newAddress;
@@ -212,15 +222,8 @@ contract WarContract is Ownable {
     function declareWar(uint256 offenseId, uint256 defenseId) public {
         bool isOwner = mint.checkOwnership(offenseId, msg.sender);
         require(isOwner, "!nation owner");
-        bool isWarOkOffense = mil.getWarPeacePreference(offenseId);
-        require(isWarOkOffense == true, "you are in peace mode");
-        bool isWarOkDefense = mil.getWarPeacePreference(defenseId);
-        require(isWarOkDefense == true, "nation in peace mode");
-        bool isStrengthWithinRange = checkStrength(offenseId, defenseId);
-        require(
-            isStrengthWithinRange == true,
-            "nation strength is not within range to declare war"
-        );
+        bool check = warCheck(offenseId, defenseId);
+        require(check, "didn't make it here");
         War memory newWar = War(
             offenseId,
             defenseId,
@@ -279,6 +282,25 @@ contract WarContract is Ownable {
         defenseActiveWars.push(warId);
         initializeDeployments(warId);
         warId++;
+    }
+
+    function warCheck(uint256 offenseId, uint256 defenseId) internal view returns (bool) {
+        bool warCheckReturn = false;
+        bool isWarOkOffense = mil.getWarPeacePreference(offenseId);
+        require(isWarOkOffense == true, "you are in peace mode");
+        bool isWarOkDefense = mil.getWarPeacePreference(defenseId);
+        require(isWarOkDefense == true, "nation in peace mode");
+        bool isStrengthWithinRange = checkStrength(offenseId, defenseId);
+        require(
+            isStrengthWithinRange == true,
+            "nation strength is not within range to declare war"
+        );
+        bool defenderInactive = tres.checkInactive(defenseId);
+        require (!defenderInactive, "defender inactive");
+        bool offenseInactive = tres.checkInactive(offenseId);
+        require (!offenseInactive, "nation inactive");
+        warCheckReturn = true;
+        return warCheckReturn;
     }
 
     function offensiveWarLengthForTesting(
