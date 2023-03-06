@@ -64,6 +64,7 @@ contract TreasuryContract is Ownable {
         uint256 daysSinceLastTaxCollection;
         uint256 balance;
         bool inactive;
+        bool demonitized;
     }
 
     mapping(uint256 => Treasury) public idToTreasury;
@@ -84,9 +85,9 @@ contract TreasuryContract is Ownable {
     ) public onlyOwner {
         warBucksAddress = _warBucksAddress;
         wonders1 = _wonders1;
-        wonders1 = _wonders2;
-        wonders1 = _wonders3;
-        wonders1 = _wonders4;
+        wonders2 = _wonders2;
+        wonders3 = _wonders3;
+        wonders4 = _wonders4;
         improvements1 = _improvements1;
         improvements2 = _improvements2;
         improvements3 = _improvements3;
@@ -208,6 +209,7 @@ contract TreasuryContract is Ownable {
             0,
             1,
             0,
+            false,
             false
         );
         idToTreasury[id] = newTreasury;
@@ -250,6 +252,8 @@ contract TreasuryContract is Ownable {
         //need a way to only allow the nation owner to do this
         uint256 balance = idToTreasury[id].balance;
         require(balance >= cost, "insufficient balance");
+        bool demonitized = idToTreasury[id].demonitized;
+        require(demonitized == false, "ERROR");
         idToTreasury[id].balance -= cost;
         //TAXES here
         uint256 taxLevied = ((cost * gameTaxPercentage) / 100);
@@ -347,6 +351,8 @@ contract TreasuryContract is Ownable {
         require (daysSince == 0, "pay bills before withdrawing funds");
         uint256 gameBalance = idToTreasury[id].balance;
         require(gameBalance >= amount, "insufficient game balance");
+        bool demonitized = idToTreasury[id].demonitized;
+        require(demonitized == false, "ERROR");
         idToTreasury[id].balance -= amount;
         IWarBucks(warBucksAddress).mintFromTreasury(msg.sender, amount);
     }
@@ -359,6 +365,8 @@ contract TreasuryContract is Ownable {
     function addFunds(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
+        bool demonitized = idToTreasury[id].demonitized;
+        require(demonitized == false, "ERROR");
         uint256 coinBalance = IWarBucks(warBucksAddress).balanceOf(msg.sender);
         require(
             coinBalance >= amount,
@@ -454,5 +462,13 @@ contract TreasuryContract is Ownable {
     ///@return bool will be true if the nation is inactive
     function checkInactive(uint256 id) public view returns (bool) {
         return idToTreasury[id].inactive;
+    }
+
+    function demonitizeNation(uint256 id) public onlyOwner {
+        idToTreasury[id].demonitized = true;
+    }
+
+    function remonitizeNation(uint256 id) public onlyOwner {
+        idToTreasury[id].demonitized = false;
     }
 }

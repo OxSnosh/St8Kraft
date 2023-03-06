@@ -125,7 +125,8 @@ contract ImprovementsContract1 is Ownable {
         address _navy,
         address _additionalNavy,
         address _countryMinter,
-        address _wonders1
+        address _wonders1,
+        address _infrastructure
     ) public onlyOwner {
         treasury = _treasury;
         tres = TreasuryContract(_treasury);
@@ -138,6 +139,8 @@ contract ImprovementsContract1 is Ownable {
         mint = CountryMinter(_countryMinter);
         wonders1 = _wonders1;
         won1 = WondersContract1(_wonders1);
+        infrastructure = _infrastructure;
+        inf = InfrastructureContract(_infrastructure);
     }
 
     modifier approvedAddress() {
@@ -328,15 +331,15 @@ contract ImprovementsContract1 is Ownable {
         uint256 id,
         uint256 amount
     ) public view returns (bool) {
-        bool purchase = false;
+        bool possible = false;
         uint256 totalPopulation = inf.getTotalPopulationCount(id);
         uint256 improvementCount = idToImprovements1[id].improvementCount;
         require(
-            (totalPopulation / 1000) >= (improvementCount + amount),
+            ((totalPopulation / 1000) >= (improvementCount + amount)),
             "population too low to purchase improvement"
         );
-        purchase = true;
-        return purchase;
+        possible = true;
+        return (possible);
     }
 
     ///@dev this is a public function that allows a nation owner to purchase improvements

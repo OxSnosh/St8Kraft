@@ -661,7 +661,8 @@ describe("Bombers", async function () {
             navycontract.address,
             additionalnavycontract.address,
             countryminter.address,
-            wonderscontract1.address)
+            wonderscontract1.address,
+            infrastructurecontract.address)
         
         await improvementscontract2.settings(
             treasurycontract.address,
