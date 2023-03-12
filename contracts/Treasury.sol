@@ -18,6 +18,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 ///@dev this contract inherits from the openzeppelin ownable contract
 ///@notice this contact will allow a nation owner 
 contract TreasuryContract is Ownable {
+    uint256 public totalGameBalance;
     uint256 public counter;
     address public wonders1;
     address public wonders2;
@@ -48,7 +49,7 @@ contract TreasuryContract is Ownable {
     address public keeper;
     uint256 public daysToInactive = 22;
     uint256 private gameTaxPercentage = 0;
-    uint256 public seedMoney = 2000000*10**18;
+    uint256 public seedMoney = 2000000*(10**18);
 
     CountryMinter mint;
     GroundBattleContract ground;
@@ -214,6 +215,7 @@ contract TreasuryContract is Ownable {
         );
         idToTreasury[id] = newTreasury;
         idToTreasury[id].balance += seedMoney;
+        totalGameBalance += seedMoney;
         counter++;
     }
 
@@ -226,6 +228,7 @@ contract TreasuryContract is Ownable {
         onlyTaxesContract
     {
         idToTreasury[id].balance += amount;
+        totalGameBalance += amount;
         idToTreasury[id].daysSinceLastTaxCollection = 0;
     }
 
@@ -239,6 +242,7 @@ contract TreasuryContract is Ownable {
     {
         require(idToTreasury[id].balance >= amount, "balance not high enough to pay bills");
         idToTreasury[id].balance -= amount;
+        totalGameBalance -= amount;
         idToTreasury[id].daysSinceLastBillPaid = 0;
         idToTreasury[id].inactive = false;
     }
@@ -255,6 +259,7 @@ contract TreasuryContract is Ownable {
         bool demonitized = idToTreasury[id].demonitized;
         require(demonitized == false, "ERROR");
         idToTreasury[id].balance -= cost;
+        totalGameBalance -= cost;
         //TAXES here
         uint256 taxLevied = ((cost * gameTaxPercentage) / 100);
         if (taxLevied > 0) {
@@ -354,6 +359,7 @@ contract TreasuryContract is Ownable {
         bool demonitized = idToTreasury[id].demonitized;
         require(demonitized == false, "ERROR");
         idToTreasury[id].balance -= amount;
+        totalGameBalance -= amount;
         IWarBucks(warBucksAddress).mintFromTreasury(msg.sender, amount);
     }
 
@@ -373,6 +379,7 @@ contract TreasuryContract is Ownable {
             "deposit amount exceeds balance in wallet"
         );
         idToTreasury[id].balance += amount;
+        totalGameBalance += amount;
         IWarBucks(warBucksAddress).burnFromTreasury(msg.sender, amount);
     }
 
@@ -383,10 +390,12 @@ contract TreasuryContract is Ownable {
     function incrementDaysSince() external onlyKeeper {
         uint256 i;
         for (i = 0; i < counter; i++) {
-            idToTreasury[i].daysSinceLastBillPaid++;
-            idToTreasury[i].daysSinceLastTaxCollection++;
-            if (idToTreasury[i].daysSinceLastBillPaid > daysToInactive) {
-                idToTreasury[i].inactive == true;
+            if(idToTreasury[i].inactive == false) {
+                idToTreasury[i].daysSinceLastBillPaid++;
+                idToTreasury[i].daysSinceLastTaxCollection++;
+                if (idToTreasury[i].daysSinceLastBillPaid > daysToInactive) {
+                    idToTreasury[i].inactive == true;
+                }
             }
         }
     }
