@@ -480,4 +480,8 @@ contract TreasuryContract is Ownable {
     function remonitizeNation(uint256 id) public onlyOwner {
         idToTreasury[id].demonitized = false;
     }
+
+    function getTotalGameBalance() public view returns (uint256) {
+        return totalGameBalance;
+    }
 }
