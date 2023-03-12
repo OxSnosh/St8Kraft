@@ -985,6 +985,9 @@ describe("War Contract", async function () {
             wonderscontract1.address,
             keepercontract.address
         )
+        await warcontract.settings2(
+            treasurycontract.address
+        )
 
         await wonderscontract1.settings(
             treasurycontract.address,

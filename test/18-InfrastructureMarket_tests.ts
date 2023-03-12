@@ -973,6 +973,23 @@ describe("Infrastructure Market Contract", async function () {
             technologymarketcontrat.address
         )
 
+        await warcontract.settings(
+            countryminter.address,
+            nationstrengthcontract.address,
+            militarycontract.address,
+            breakblockadecontract.address,
+            navalattackcontract.address,
+            airbattlecontract.address,
+            groundbattlecontract.address,
+            cruisemissileconract.address,
+            forcescontract.address,
+            wonderscontract1.address,
+            keepercontract.address
+        )
+        await warcontract.settings2(
+            treasurycontract.address
+        )
+
         await wonderscontract1.settings(
             treasurycontract.address,
             wonderscontract2.address,
