@@ -1509,7 +1509,7 @@ contract WondersContract3 is Ownable {
             require(balance >= nationalCemetaryCost, "Insufficient balance");
             bool existingWonder = idToWonders3[countryId].nationalCemetary;
             require(existingWonder == false, "Already owned");
-            uint256 casualties = frc.getCasualties(countryId);
+            (uint256 casualties , ) = frc.getCasualties(countryId);
             require(casualties >= 5000000, "not enough casualties to purchase");
             bool nationalWarMemorial = idToWonders3[countryId]
                 .nationalWarMemorial;
@@ -1558,7 +1558,7 @@ contract WondersContract3 is Ownable {
             require(balance >= nationalWarMemorialCost, "Insufficient balance");
             bool existingWonder = idToWonders3[countryId].nationalWarMemorial;
             require(existingWonder == false, "Already owned");
-            uint256 casualties = frc.getCasualties(countryId);
+            (uint256 casualties , ) = frc.getCasualties(countryId);
             require(casualties >= 50000, "not enough casualties");
             idToWonders3[countryId].nationalWarMemorial = true;
             WondersContract1(wonderContract1Address).addWonderCount(countryId);

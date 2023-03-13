@@ -745,7 +745,7 @@ contract ForcesContract is Ownable {
         uint256 defenderTankLosses,
         uint256 defenderId
     ) public onlyGroundBattle {
-        // console.log(attackerSoldierLosses, attackerTankLosses, attackerId, "WTF attacker");
+        console.log(attackerSoldierLosses, attackerTankLosses, attackerId, "WTF attacker");
         idToForces[attackerId].numberOfSoldiers -= attackerSoldierLosses;
         idToForces[attackerId].deployedSoldiers -= attackerSoldierLosses;
         idToForces[attackerId].numberOfTanks -= attackerTankLosses;
@@ -754,8 +754,10 @@ contract ForcesContract is Ownable {
         idToForces[defenderId].defendingSoldiers -= defenderSoldierLosses;
         idToForces[defenderId].numberOfTanks -= defenderTankLosses;
         idToForces[defenderId].defendingTanks -= defenderTankLosses;
-        // idToCasualties[attackerId] += attackerSoldierLosses;
-        // idToCasualties[defenderId] += defenderSoldierLosses;
+        idToCasualties[attackerId].soldierCasualties += attackerSoldierLosses;
+        idToCasualties[attackerId].tankCasualties += attackerTankLosses;
+        idToCasualties[defenderId].soldierCasualties += defenderSoldierLosses;
+        idToCasualties[defenderId].tankCasualties += defenderTankLosses;
     }
 
     // ///@dev this is a public function only callable from the ground battle contract
@@ -782,7 +784,7 @@ contract ForcesContract is Ownable {
         uint256 id,
         uint256 amount
     ) public onlyOwner {
-        idToForces[id].soldierCasualties += amount;
+        idToCasualties[id].soldierCasualties += amount;
     }
 
     // function increaseSoldierCasualtiesFromGroundBattle(
@@ -815,9 +817,12 @@ contract ForcesContract is Ownable {
     ///@dev this is a public view function that will return a nations casualty count
     ///@notice this function will return a nations casualty count
     ///@param id is a nation id for the nation being queried
-    ///@return uint256 is the casualty count for a given nation
-    function getCasualties(uint256 id) public view returns (uint256) {
-        return idToForces[id].soldierCasualties;
+    ///@return uint256 is the soldier casualty count for a given nation
+    ///@return uint256 is the tank casualty count for a given nation
+    function getCasualties(uint256 id) public view returns (uint256, uint256) {
+        uint256 soldierCasualties = idToCasualties[id].soldierCasualties;
+        uint256 tankCasualties = idToCasualties[id].tankCasualties;
+        return (soldierCasualties, tankCasualties);
     }
 }
 

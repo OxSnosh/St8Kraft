@@ -651,7 +651,9 @@ describe("Spy Operations", async function () {
             improvementscontract2.address,
             improvementscontract3.address,
             wonderscontract3.address,
-            wonderscontract4.address)
+            wonderscontract4.address,
+            taxescontract.address,
+            countryparameterscontract.address)
         
         await improvementscontract1.settings(
             treasurycontract.address,

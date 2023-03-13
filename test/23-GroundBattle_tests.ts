@@ -651,7 +651,9 @@ describe("War Contract", async function () {
             improvementscontract2.address,
             improvementscontract3.address,
             wonderscontract3.address,
-            wonderscontract4.address)
+            wonderscontract4.address,
+            taxescontract.address,
+            countryparameterscontract.address)
         
         await improvementscontract1.settings(
             treasurycontract.address,
@@ -1069,34 +1071,36 @@ describe("War Contract", async function () {
         it("tests that ground battle gets set up correctly", async function () {
             await groundbattlecontract.connect(signer1).groundAttack(0, 0, 1, 1)
             var attackerStruct : any = await groundbattlecontract.returnAttackerForcesStruct(0)
-            console.log(attackerStruct[0].toNumber(), "attack type")
+            // console.log(attackerStruct[0].toNumber(), "attack type")
             expect(attackerStruct[0].toNumber()).to.equal(1)
-            console.log(attackerStruct[1].toNumber(), "soldiers deployed")
-            expect(attackerStruct[1].toNumber()).to.equal(200)
-            console.log(attackerStruct[2].toNumber(), "tanks deployed")
-            expect(attackerStruct[2].toNumber()).to.equal(0)
-            console.log(attackerStruct[3].toNumber(), "attacker strength")
-            expect(attackerStruct[3].toNumber()).to.equal(200)
-            console.log(attackerStruct[4].toNumber(), "attacker Id")
+            // console.log(attackerStruct[1].toNumber(), "soldiers deployed")
+            expect(attackerStruct[1].toNumber()).to.equal(1000)
+            // console.log(attackerStruct[2].toNumber(), "tanks deployed")
+            expect(attackerStruct[2].toNumber()).to.equal(30)
+            // console.log(attackerStruct[3].toNumber(), "attacker strength")
+            expect(attackerStruct[3].toNumber()).to.equal(1450)
+            // console.log(attackerStruct[4].toNumber(), "attacker Id")
             expect(attackerStruct[4].toNumber()).to.equal(0)
-            console.log(attackerStruct[5].toNumber(), "war ID")
+            // console.log(attackerStruct[5].toNumber(), "war ID")
             expect(attackerStruct[5].toNumber()).to.equal(0)
             var defenderStruct : any = await groundbattlecontract.returnDefenderForcesStruct(0)
-            console.log(defenderStruct[0].toNumber(), "soldiers defending")
+            // console.log(defenderStruct[0].toNumber(), "soldiers defending")
             expect(defenderStruct[0].toNumber()).to.equal(1020)
-            console.log(defenderStruct[1].toNumber(), "tanks defending")
-            expect(defenderStruct[1].toNumber()).to.equal(50)
-            console.log(defenderStruct[2].toNumber(), "defender strength")
-            expect(defenderStruct[2].toNumber()).to.equal(1870)
-            console.log(defenderStruct[3].toNumber(), "defender Id")
+            // console.log(defenderStruct[1].toNumber(), "tanks defending")
+            expect(defenderStruct[1].toNumber()).to.equal(20)
+            // console.log(defenderStruct[2].toNumber(), "defender strength")
+            expect(defenderStruct[2].toNumber()).to.equal(1360)
+            // console.log(defenderStruct[3].toNumber(), "defender Id")
             expect(defenderStruct[3].toNumber()).to.equal(1)
-            console.log(defenderStruct[4].toNumber(), "war ID")
+            // console.log(defenderStruct[4].toNumber(), "war ID")
             expect(defenderStruct[4].toNumber()).to.equal(0)
         }) 
 
         it("tests that battle odds work correctly", async function () {
             const battleOdds : any = await groundbattlecontract.battleOdds(0, 0)
-            console.log(battleOdds[0].toNumber(), "attacker victory odds", battleOdds[1].toNumber(), "defender victory odds")
+            // console.log(battleOdds[0].toNumber(), "attacker victory odds", battleOdds[1].toNumber(), "defender victory odds")
+            expect(battleOdds[0]).to.equal(51);
+            expect(battleOdds[1]).to.equal(48);
         }) 
 
         it("tests that battle happens", async function () {
@@ -1104,96 +1108,56 @@ describe("War Contract", async function () {
             const tx1 = await groundbattlecontract.fulfillRequest(0);
             let txReceipt1 = await tx1.wait(1);
             let requestId1 : any  = txReceipt1?.events?.[1].args?.requestId;
-            console.log(requestId1.toNumber(), "requestId FIRST")
             await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, groundbattlecontract.address);
             const results : any = await groundbattlecontract.returnBattleResults(0)
             // console.log(results);
             var attackerId : any = results[0].toNumber()
-            console.log(attackerId, "attackerId")
+            // console.log(attackerId, "attackerId")
             var attackerSoldierLosses = results[1].toNumber()
-            console.log(attackerSoldierLosses, "attacker soldier losses")
+            // console.log(attackerSoldierLosses, "attacker soldier losses")
+            expect(attackerSoldierLosses).to.equal(102);
             var attackerTankLosses = results[2].toNumber()
-            console.log(attackerTankLosses, "attacker tank losses")
+            // console.log(attackerTankLosses, "attacker tank losses")
+            expect(attackerTankLosses).to.equal(1);
             var defenderSoldierLosses = results[4].toNumber()
-            console.log(defenderSoldierLosses, "defender soldier losses")
+            // console.log(defenderSoldierLosses, "defender soldier losses")
+            expect(defenderSoldierLosses).to.equal(204);
             var defenderTankLosses = results[5].toNumber()
-            console.log(defenderTankLosses, "defender tank losses")
+            // console.log(defenderTankLosses, "defender tank losses")
+            expect(defenderTankLosses).to.equal(4);
 
             var attackVictory = await groundbattlecontract.returnAttackVictorious(0);
-            console.log(attackVictory, "attacker victory")
+            expect(attackVictory).to.equal(true);
+            // console.log(attackVictory, "attacker victory")
 
             var attackerDeployedForces : any = await warcontract.getDeployedGroundForces(0, 0)
-            console.log(attackerDeployedForces[0].toNumber(), "attacker deployed forces")
+            // console.log(attackerDeployedForces[0].toNumber(), "attacker deployed forces")
+            expect(attackerDeployedForces[0].toNumber()).to.equal(898);        
+        }) 
 
+        it("tests that casualties increase from ground battle", async function () {
+            var attackerSoldiers = await forcescontract.getSoldierCount(0);
+            console.log(attackerSoldiers, "attacker soldiers");
+            var attackerTanks = await forcescontract.getTankCount(0);
+            console.log(attackerTanks, "attackerTanks");            
 
             await groundbattlecontract.connect(signer1).groundAttack(0, 0, 1, 1)
-            const tx2 = await groundbattlecontract.fulfillRequest(1);
-            let txReceipt2 = await tx2.wait(1);
-            let requestId2 : any  = txReceipt2?.events?.[1].args?.requestId;
-            console.log(requestId2.toNumber(), "requestId 2SECOND")
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, groundbattlecontract.address);
-            const results2 : any = await groundbattlecontract.returnBattleResults(1)
+            const tx1 = await groundbattlecontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 : any  = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, groundbattlecontract.address);
+            const results : any = await groundbattlecontract.returnBattleResults(0)
             // console.log(results);
-            var attackerId2 = results2[0].toNumber()
-            console.log(attackerId2, "attackerId 2")
-            var attackerSoldierLosses2 = results2[1].toNumber()
-            console.log(attackerSoldierLosses2, "attacker soldier losses 2")
-            var attackerTankLosses2 = results2[2].toNumber()
-            console.log(attackerTankLosses2, "attacker tank losses 2")
-            var defenderSoldierLosses2 = results2[4].toNumber()
-            console.log(defenderSoldierLosses2, "defender soldier losses 2")
-            var defenderTankLosses2 = results2[5].toNumber()
-            console.log(defenderTankLosses2, "defender tank losses 2")
-
-            var attackVictory = await groundbattlecontract.returnAttackVictorious(1);
-            console.log(attackVictory, "attacker victory")
-
-            var attackerDeployedForces : any = await warcontract.getDeployedGroundForces(0, 0)
-            console.log(attackerDeployedForces[0].toNumber(), "attacker deployed forces")
-        
-            await groundbattlecontract.connect(signer1).groundAttack(0, 0, 1, 1)
-            const tx3 = await groundbattlecontract.fulfillRequest(2);
-            let txReceipt3 = await tx3.wait(1);
-            let requestId3 : any  = txReceipt3?.events?.[1].args?.requestId;
-            console.log(requestId3.toNumber(), "requestId3 THIRD")
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId3, groundbattlecontract.address);
-            const results3 : any = await groundbattlecontract.returnBattleResults(2)
-            // console.log(results);
-            var attackerId3 = results3[0].toNumber()
-            console.log(attackerId3, "attackerId 3")
-            var attackerSoldierLosses3 = results3[1].toNumber()
-            console.log(attackerSoldierLosses3, "attacker soldier losses 3")
-            var attackerTankLosses3 = results3[2].toNumber()
-            console.log(attackerTankLosses3, "attacker tank losses 3")
-            var defenderSoldierLosses3 = results3[4].toNumber()
-            console.log(defenderSoldierLosses3, "defender soldier losses 3")
-            var defenderTankLosses3 = results3[5].toNumber()
-            console.log(defenderTankLosses3, "defender tank losses 3")
-
-            var attackVictory = await groundbattlecontract.returnAttackVictorious(1);
-            console.log(attackVictory, "attacker victory")
-
-            var attackerDeployedForces : any = await warcontract.getDeployedGroundForces(0, 0)
-            console.log(attackerDeployedForces[0].toNumber(), "attacker deployed forces")
-        
-            var results4 : any = await groundbattlecontract.returnBattleResults(3)
-            // console.log(results);
-            var attackerId4 = results4[0].toNumber()
-            console.log(attackerId4, "attackerId 4")
-            var attackerSoldierLosses4 = results4[1].toNumber()
-            console.log(attackerSoldierLosses4, "attacker soldier losses 4")
-            var attackerTankLosses4 = results4[2].toNumber()
-            console.log(attackerTankLosses4, "attacker tank losses 4")
-            var defenderSoldierLosses4 = results4[4].toNumber()
-            console.log(defenderSoldierLosses4, "defender soldier losses 4")
-            var defenderTankLosses4 = results4[5].toNumber()
-            console.log(defenderTankLosses4, "defender tank losses 4")
-        
-        
-        
-        
-        
-        
+            var attackerId : any = results[0].toNumber()
+            // console.log(attackerId, "attackerId")
+            var attackerSoldierLosses = results[1].toNumber()
+            console.log(attackerSoldierLosses, "attacker soldier losses")
+            expect(attackerSoldierLosses).to.equal(102);
+            var attackerTankLosses = results[2].toNumber()
+            console.log(attackerTankLosses, "attacker tank losses")
+            expect(attackerTankLosses).to.equal(1);   
+            
+            
         }) 
     })
 })

@@ -382,7 +382,7 @@ contract EnvironmentContract is Ownable {
         returns (int256)
     {
         int256 pointsFromMilitaryRatiio;
-        (, bool environmentPenalty) = tax.soldierToPopulationRatio(id);
+        ( , bool environmentPenalty, ) = tax.soldierToPopulationRatio(id);
         if (environmentPenalty) {
             pointsFromMilitaryRatiio += 10;
         }

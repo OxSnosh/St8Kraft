@@ -173,9 +173,7 @@ contract WarContract is Ownable {
         keeper = _keeper;
     }
 
-    function settings2  (
-        address _treasury
-    ) public onlyOwner {
+    function settings2(address _treasury) public onlyOwner {
         treasury = _treasury;
         tres = TreasuryContract(_treasury);
     }
@@ -284,7 +282,10 @@ contract WarContract is Ownable {
         warId++;
     }
 
-    function warCheck(uint256 offenseId, uint256 defenseId) internal view returns (bool) {
+    function warCheck(
+        uint256 offenseId,
+        uint256 defenseId
+    ) internal view returns (bool) {
         bool warCheckReturn = false;
         bool isWarOkOffense = mil.getWarPeacePreference(offenseId);
         require(isWarOkOffense == true, "you are in peace mode");
@@ -296,9 +297,9 @@ contract WarContract is Ownable {
             "nation strength is not within range to declare war"
         );
         bool defenderInactive = tres.checkInactive(defenseId);
-        require (!defenderInactive, "defender inactive");
+        require(!defenderInactive, "defender inactive");
         bool offenseInactive = tres.checkInactive(offenseId);
-        require (!offenseInactive, "nation inactive");
+        require(!offenseInactive, "nation inactive");
         warCheckReturn = true;
         return warCheckReturn;
     }
@@ -493,7 +494,7 @@ contract WarContract is Ownable {
             }
         }
         for (uint256 i = 0; i < activeWars.length; i++) {
-            if(activeWars[i] == _warId) {
+            if (activeWars[i] == _warId) {
                 activeWars[i] = activeWars[activeWars.length - 1];
                 activeWars.pop();
             }
@@ -624,6 +625,19 @@ contract WarContract is Ownable {
             peaceOffered = true;
         }
         return peaceOffered;
+    }
+
+    modifier onlyBattle() {
+        require(
+            msg.sender == groundBattle,
+            "function only callable dring an attack"
+        );
+        _;
+    }
+
+    function cancelPeaceOffersUponAttack(uint256 _warId) public onlyBattle {
+        warIdToWar[_warId].offensePeaceOffered = false;
+        warIdToWar[_warId].defensePeaceOffered = false;
     }
 
     ///@dev this is a publci view function that will return the number of days left in a war

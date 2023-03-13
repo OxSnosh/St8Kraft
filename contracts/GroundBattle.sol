@@ -8,6 +8,8 @@ import "./Treasury.sol";
 import "./Improvements.sol";
 import "./Wonders.sol";
 import "./CountryMinter.sol";
+import "./Taxes.sol";
+import "./CountryParameters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
@@ -28,6 +30,8 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     address wonders3;
     address wonders4;
     address countryMinter;
+    address taxes;
+    address parameters;
 
     uint256[] public todaysGroundBattles;
 
@@ -40,6 +44,8 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     WondersContract3 won3;
     WondersContract4 won4;
     CountryMinter mint;
+    TaxesContract tax;
+    CountryParametersContract param;
 
     struct GroundForcesToBattle {
         uint256 attackType;
@@ -128,7 +134,9 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         address _improvements2,
         address _improvements3,
         address _wonders3,
-        address _wonders4
+        address _wonders4,
+        address _taxes,
+        address _parameters
     ) public onlyOwner {
         improvements2 = _improvements2;
         imp2 = ImprovementsContract2(_improvements2);
@@ -138,6 +146,10 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         won3 = WondersContract3(_wonders3);
         wonders4 = _wonders4;
         won4 = WondersContract4(_wonders4);
+        taxes = _taxes;
+        tax = TaxesContract(_taxes);
+        parameters = _parameters;
+        param = CountryParametersContract(_parameters);
     }
 
     function updateWarContract(address newAddress) public onlyOwner {
@@ -222,7 +234,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 defenderId,
         uint256 attackType
     ) public {
-        console.log("GROUND BATTLE ID INITIAL", groundBattleId);
         bool isOwner = mint.checkOwnership(attackerId, msg.sender);
         require(isOwner, "!nation owner");
         bool isActiveWar = war.isWarActive(warId);
@@ -252,7 +263,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             attackType
         );
         generateDefenderForcesStruct(warId, groundBattleId, defenderId);
-        // todaysGroundBattles.push(groundBattleId);
         // fulfillRequest(groundBattleId);
         groundBattleId++;
     }
@@ -447,7 +457,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             NUM_WORDS
         );
         s_requestIdToRequestIndex[requestId] = battleId;
-        console.log(requestId, "REQ ID", battleId, "BATT ID");
         emit randomNumbersRequested(requestId);
     }
 
@@ -456,7 +465,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256[] memory randomWords
     ) internal override {
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
-        console.log(requestNumber, "REQUEST NUMBER");
         s_requestIndexToRandomWords[requestNumber] = randomWords;
         uint256 attackerStrength = groundBattleIdToAttackerForces[requestNumber]
             .strength;
@@ -483,7 +491,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             ) = attackVictory(requestNumber);
             collectSpoils(requestNumber, attackerId);
             groundBattleIdToAtackerVictory[requestNumber] = true;
-            // console.log("did the results get here?");
         } else if (randomNumberForOutcomeSelection > attackerStrength) {
             (
                 attackerSoldierLosses,
@@ -491,14 +498,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
                 defenderSoldierLosses,
                 defenderTankLosses
             ) = defenseVictory(requestNumber);
-            // console.log(
-            //     "soldier losses in battle function defense",
-            //     attackerSoldierLosses,
-            //     "defender soldier losses defensee",
-            //     defenderSoldierLosses
-            // );
             groundBattleIdToAtackerVictory[requestNumber] = false;
-            // console.log("Request Number 2", requestNumber);
         }
         emit battleResults(
             requestNumber,
@@ -507,7 +507,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             defenderSoldierLosses,
             defenderTankLosses
         );
-        // console.log("RESULTS LOGGED", attackerSoldierLosses, defenderSoldierLosses);
         BattleResults memory newBattleAttackerResults = BattleResults(
             attackerId,
             attackerSoldierLosses,
@@ -519,57 +518,14 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         groundBattleIdToBattleAttackerResults[
             requestNumber
         ] = newBattleAttackerResults;
-        // BattleResults memory newBattleDefenderResults = BattleResults(
-        //     defenderId,
-        //     defenderSoldierLosses,
-        //     defenderTankLosses
-        // );
-        // groundBattleIdToBattleDefenderResults[
-        //     requestNumber
-        // ] = newBattleDefenderResults;
-        // completeBattleSequence(
-        //     warId,
-        //     attackerId,
-        //     attackerSoldierLosses,
-        //     attackerTankLosses,
-        //     defenderId,
-        //     defenderSoldierLosses,
-        //     defenderTankLosses
-        // );
-        // console.log("RESULTS LOGGED 2", attackerSoldierLosses, defenderSoldierLosses);
-        // console.log(
-        //     "THIS",
-        //     attackerSoldierLosses,
-        //     attackerTankLosses,
-        //     attackerId
-        // );
-        // console.log(
-        //     "THIS 2",
-        //     defenderSoldierLosses,
-        //     defenderTankLosses,
-        //     defenderId
-        // );
-        // force.increaseSoldierCasualtiesFromGroundBattle(
-        //     attackerSoldierLosses,
-        //     attackerId,
-        //     defenderSoldierLosses,
-        //     defenderId 
-        // );
-        // idToCasualties[attackerId].soldierCasualties += attackerSoldierLosses;
-        // idToCasualties[attackerId].tankCasualties += attackerTankLosses;
-        // idToCasualties[defenderId].soldierCasualties += attackerSoldierLosses;
-        // idToCasualties[defenderId].tankCasualties += defenderTankLosses;
-        // force.decreaseDefendingUnits(
-        // );
-        // force.decreaseDeployedUnits(
-        //     attackerSoldierLosses,
-        //     attackerTankLosses,
-        //     attackerId,
-        //     defenderSoldierLosses,
-        //     defenderTankLosses,
-        //     defenderId
-        // );
-        // force.addGroundBattle(requestNumber);
+        force.decreaseDeployedUnits(
+            attackerSoldierLosses,
+            attackerTankLosses,
+            attackerId,
+            defenderSoldierLosses,
+            defenderTankLosses,
+            defenderId
+        );
         completeBattleSequence(requestNumber, warId);
     }
 
@@ -579,8 +535,8 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             uint256 attackerSoldierLosses,
             uint256 attackerTankLosses,
             uint256 defenderId,
-            uint256 defenderSoldierLosses,
-            uint256 defenderTankLosses
+            ,
+
         ) = returnBattleResults(battleId);
         war.decreaseGroundBattleLosses(
             attackerSoldierLosses,
@@ -588,18 +544,19 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             attackerId,
             warId
         );
-        console.log(
-            "THIS",
-            attackerSoldierLosses,
-            attackerTankLosses,
-            attackerId
-        );
-        console.log(
-            "THIS 2",
-            defenderSoldierLosses,
-            defenderTankLosses,
+        war.cancelPeaceOffersUponAttack(warId);
+        (, , bool anarchyCheckDefender) = tax.soldierToPopulationRatio(
             defenderId
         );
+        (, , bool anarchyCheckAttacker) = tax.soldierToPopulationRatio(
+            attackerId
+        );
+        if (anarchyCheckDefender) {
+            param.inflictAnarchy(defenderId);
+        }
+        if (anarchyCheckAttacker) {
+            param.inflictAnarchy(attackerId);
+        }
     }
 
     function returnBattleResults(
@@ -678,12 +635,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             winnerTankLossesPercentage = (25 +
                 (outcomeModifierForWinnerTanks % 10));
         }
-        console.log(
-            "winner soldier loss percentage",
-            winnerSoldierLossesPercentage,
-            "loser soldier loss percentage",
-            loserSoldierLossesPercentage
-        );
         return (
             winnerSoldierLossesPercentage,
             winnerTankLossesPercentage,
@@ -757,12 +708,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         if (attackerTankLosses > (defenderTankLosses / 2)) {
             attackerTankLosses = (defenderTankLosses / 2);
         }
-        console.log(
-            "attack victory attacker soldier losses",
-            attackerSoldierLosses,
-            "attack victory defender soldier losses",
-            defenderSoldierLosses
-        );
         return (
             attackerSoldierLosses,
             attackerTankLosses,
@@ -802,12 +747,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         if (defenderTankLosses > (attackerTankLosses / 2)) {
             defenderTankLosses = (attackerTankLosses / 2);
         }
-        console.log(
-            "defense victory attacker soldier losses",
-            attackerSoldierLosses,
-            "defense victory defender soldier losses",
-            defenderSoldierLosses
-        );
         return (
             attackerSoldierLosses,
             attackerTankLosses,
@@ -819,9 +758,9 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     function collectSpoils(uint256 battleId, uint256 attackerId) public {
         uint256 defenderId = groundBattleIdToDefenderForces[battleId].countryId;
         uint256[] memory randomWords = s_requestIndexToRandomWords[battleId];
-        uint256 randomBalancePercentage;
+        // uint256 randomBalancePercentage;
         uint256 randomLandMiles;
-        uint256 randomInfrastructureMiles;
+        uint256 randomInfrastructure;
         uint256 attackType = groundBattleIdToAttackerForces[battleId]
             .attackType;
         uint256 fobCount = imp2.getForwardOperatingBaseCount(attackerId);
@@ -830,40 +769,48 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             attackModifier = (2 * fobCount);
         }
         if (attackType == 1) {
-            randomBalancePercentage = (0 +
-                attackModifier +
-                (randomWords[5] % 10));
+            // randomBalancePercentage = (0 +
+            //     attackModifier +
+            //     (randomWords[5] % 10));
             randomLandMiles = (1 + fobCount + (randomWords[6] % 2));
-            randomInfrastructureMiles = (1 + fobCount + ((randomWords[7]) % 2));
+            console.log((randomWords[6] % 2), "random modulus");
+            console.log((randomWords[6]), "random");
+            randomInfrastructure = (1 + fobCount + ((randomWords[7]) % 2));
         } else if (attackType == 2) {
-            randomBalancePercentage = (5 +
-                attackModifier +
-                (randomWords[5] % 10));
+            // randomBalancePercentage = (5 +
+            //     attackModifier +
+            //     (randomWords[5] % 10));
             randomLandMiles = (2 + fobCount + (randomWords[6] % 2));
-            randomInfrastructureMiles = (2 + fobCount + ((randomWords[7]) % 2));
+            randomInfrastructure = (2 + fobCount + ((randomWords[7]) % 2));
         } else if (attackType == 3) {
-            randomBalancePercentage = (10 +
-                attackModifier +
-                (randomWords[5] % 15));
+            // randomBalancePercentage = (10 +
+            //     attackModifier +
+            //     (randomWords[5] % 15));
             randomLandMiles = (3 + fobCount + (randomWords[6] % 3));
-            randomInfrastructureMiles = (3 + fobCount + ((randomWords[7]) % 3));
+            randomInfrastructure = (3 + fobCount + ((randomWords[7]) % 3));
         } else if (attackType == 4) {
-            randomBalancePercentage = (10 +
-                attackModifier +
-                (randomWords[5] % 20));
+            // randomBalancePercentage = (10 +
+            //     attackModifier +
+            //     (randomWords[5] % 20));
             randomLandMiles = (4 + fobCount + (randomWords[6] % 3));
-            randomInfrastructureMiles = (4 + fobCount + ((randomWords[7]) % 3));
+            randomInfrastructure = (4 + fobCount + ((randomWords[7]) % 3));
         }
-        tsy.transferSpoils(randomBalancePercentage, battleId, attackerId, defenderId);
+        // tsy.transferSpoils(randomBalancePercentage, battleId, attackerId, defenderId);
+        console.log(randomLandMiles, "RANDOM LAND");
+        console.log(randomInfrastructure, "RANDOM INF");
         inf.transferLandAndInfrastructure(
             randomLandMiles,
-            randomInfrastructureMiles,
+            randomInfrastructure,
             attackerId,
             defenderId
         );
     }
 
-    function returnTodaysGroundBattles() public view returns (uint256[] memory) {
+    function returnTodaysGroundBattles()
+        public
+        view
+        returns (uint256[] memory)
+    {
         return todaysGroundBattles;
     }
 }

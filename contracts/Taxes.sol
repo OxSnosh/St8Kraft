@@ -595,7 +595,7 @@ contract TaxesContract is Ownable {
 
     function getCasualtyPoints(uint256 id) public view returns (uint256) {
         bool nationalCemetary = won3.getNationalCemetary(id);
-        uint256 casualties = frc.getCasualties(id);
+        (uint256 casualties, ) = frc.getCasualties(id);
         uint256 casualtyPoints = 0;
         if (nationalCemetary) {
             if(casualties > 5000000) {
@@ -731,7 +731,7 @@ contract TaxesContract is Ownable {
 
 
     function getPointsFromMilitary(uint256 id) public view returns (uint256) {
-        (uint256 ratio, ) = soldierToPopulationRatio(id);
+        (uint256 ratio, , ) = soldierToPopulationRatio(id);
         uint256 pointsFromMilitaryToSubtract;
         if (ratio > 80) {
             //unsure about this number
@@ -750,7 +750,7 @@ contract TaxesContract is Ownable {
     function soldierToPopulationRatio(uint256 id)
         public
         view
-        returns (uint256, bool)
+        returns (uint256, bool, bool)
     {
         uint256 soldierCount = frc.getSoldierCount(id);
         if(soldierCount == 0) {
@@ -759,10 +759,14 @@ contract TaxesContract is Ownable {
         uint256 populationCount = inf.getTotalPopulationCount(id);
         uint256 soldierPopulationRatio = ((soldierCount * 100 / populationCount));
         bool environmentPenalty = false;
+        bool anarchyCheck = false;
         if (soldierPopulationRatio > 60) {
             environmentPenalty = true;
         }
-        return (soldierPopulationRatio, environmentPenalty);
+        if (soldierPopulationRatio < 10) {
+            anarchyCheck = true;
+        }
+        return (soldierPopulationRatio, environmentPenalty, anarchyCheck);
     }
 
     function getPointsFromCriminals(uint256 id) public view returns (uint256) {
