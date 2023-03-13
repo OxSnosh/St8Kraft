@@ -737,7 +737,7 @@ contract ForcesContract is Ownable {
     ///@param attackerSoldierLosses is the soldier losses for an attacker from a battle
     ///@param attackerTankLosses is the tank losses for an attacker from a battle
     ///@param attackerId is the nation ID of the nation suffering losses
-    function decreaseDeployedUnits(
+    function decreaseUnits(
         uint256 attackerSoldierLosses,
         uint256 attackerTankLosses,
         uint256 attackerId,
@@ -745,7 +745,6 @@ contract ForcesContract is Ownable {
         uint256 defenderTankLosses,
         uint256 defenderId
     ) public onlyGroundBattle {
-        console.log(attackerSoldierLosses, attackerTankLosses, attackerId, "WTF attacker");
         idToForces[attackerId].numberOfSoldiers -= attackerSoldierLosses;
         idToForces[attackerId].deployedSoldiers -= attackerSoldierLosses;
         idToForces[attackerId].numberOfTanks -= attackerTankLosses;
@@ -760,25 +759,6 @@ contract ForcesContract is Ownable {
         idToCasualties[defenderId].tankCasualties += defenderTankLosses;
     }
 
-    // ///@dev this is a public function only callable from the ground battle contract
-    // ///@dev this function will decrease the losses of an defender during a ground battle
-    // ///@notice this function will decrease the number of losses of an defender during a ground battle
-    // ///@param defenderSoldierLosses is the soldier losses for an defender from a battle
-    // ///@param defenderTankLosses is the tank losses for an defender from a battle
-    // ///@param defenderId is the nation ID of the nation suffering losses
-    // function decreaseDefendingUnits(
-    //     uint256 defenderSoldierLosses,
-    //     uint256 defenderTankLosses,
-    //     uint256 defenderId
-    // ) public onlyGroundBattle {
-    // console.log(defenderSoldierLosses, defenderTankLosses, defenderId, "WTF defender");
-    //     idToForces[defenderId].numberOfSoldiers -= defenderSoldierLosses;
-    //     idToForces[defenderId].defendingSoldiers -= defenderSoldierLosses;
-    //     idToForces[defenderId].soldierCasualties += defenderSoldierLosses;
-    //     idToForces[defenderId].numberOfTanks -= defenderTankLosses;
-    //     idToForces[defenderId].defendingTanks -= defenderTankLosses;
-    // }
-
     ///@dev this is a function for the development environment that will assist in testing wonders and improvements that are available after a certain number of casualties
     function increaseSoldierCasualties(
         uint256 id,
@@ -786,33 +766,6 @@ contract ForcesContract is Ownable {
     ) public onlyOwner {
         idToCasualties[id].soldierCasualties += amount;
     }
-
-    // function increaseSoldierCasualtiesFromGroundBattle(
-    //     uint256 attackerSoldierLosses,
-    //     uint256 attackerId,
-    //     uint256 defenderSoldierLosses,
-    //     uint256 defenderId
-    // ) public onlyGroundBattle {
-    // }
-
-    // function incrementCasualties() external onlyKeeperContract {
-    //     uint256[] memory todaysBattles = ground.returnTodaysGroundBattles();
-    //     for (uint i = 0; i < todaysBattles.length; i++) {
-    //         uint256 battleId = todaysBattles[i];
-    //         (
-    //             uint256 attackerId,
-    //             uint256 attackerSoldierLosses,
-    //             uint256 attackerTankLosses,
-    //             uint256 defenderId,
-    //             uint256 defenderSoldierLosses,
-    //             uint256 defenderTankLosses
-    //         ) = ground.returnBattleResults(battleId);
-    //         idToCasualties[attackerId].soldierCasualties += attackerSoldierLosses;
-    //         idToCasualties[attackerId].tankCasualties += attackerTankLosses;
-    //         idToCasualties[defenderId].soldierCasualties += defenderSoldierLosses;
-    //         idToCasualties[defenderId].tankCasualties += defenderTankLosses;
-    //     }
-    // }
 
     ///@dev this is a public view function that will return a nations casualty count
     ///@notice this function will return a nations casualty count

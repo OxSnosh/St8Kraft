@@ -821,9 +821,7 @@ contract InfrastructureContract is Ownable {
         uint256 defenderId
     ) public onlyGroundBattle {
         uint256 defenderLand = idToInfrastructure[defenderId].landArea;
-        console.log(defenderLand, "defenderLand");
         uint256 defenderInfrastructure = idToInfrastructure[defenderId].infrastructureCount;
-        console.log(defenderInfrastructure, "defenderInf");
         if (defenderLand <= landMiles) {
             idToInfrastructure[attackerId].landArea += defenderLand;
             landMiles = defenderLand;
@@ -831,8 +829,6 @@ contract InfrastructureContract is Ownable {
         } else {
             idToInfrastructure[attackerId].landArea += landMiles;
             idToInfrastructure[defenderId].landArea -= landMiles;
-            console.log(landMiles, "land miles to reduce");
-            console.log(idToInfrastructure[defenderId].landArea, "newDefenderLand");
         }
         if (defenderInfrastructure <= infrastructureLevels) {
             idToInfrastructure[attackerId].infrastructureCount += defenderInfrastructure;
@@ -841,8 +837,6 @@ contract InfrastructureContract is Ownable {
         } else {
             idToInfrastructure[attackerId].infrastructureCount += infrastructureLevels;
             idToInfrastructure[defenderId].infrastructureCount -= infrastructureLevels;
-            console.log(infrastructureLevels, "inf to reduce");
-            console.log(idToInfrastructure[defenderId].infrastructureCount, "newDefenderInf");
         }
 
     }

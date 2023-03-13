@@ -1137,9 +1137,10 @@ describe("War Contract", async function () {
 
         it("tests that casualties increase from ground battle", async function () {
             var attackerSoldiers = await forcescontract.getSoldierCount(0);
-            console.log(attackerSoldiers, "attacker soldiers");
+            // console.log(attackerSoldiers.toNumber(), "attacker soldiers");
+
             var attackerTanks = await forcescontract.getTankCount(0);
-            console.log(attackerTanks, "attackerTanks");            
+            // console.log(attackerTanks.toNumber(), "attackerTanks");            
 
             await groundbattlecontract.connect(signer1).groundAttack(0, 0, 1, 1)
             const tx1 = await groundbattlecontract.fulfillRequest(0);
@@ -1151,13 +1152,41 @@ describe("War Contract", async function () {
             var attackerId : any = results[0].toNumber()
             // console.log(attackerId, "attackerId")
             var attackerSoldierLosses = results[1].toNumber()
-            console.log(attackerSoldierLosses, "attacker soldier losses")
+            // console.log(attackerSoldierLosses, "attacker soldier losses")
             expect(attackerSoldierLosses).to.equal(102);
             var attackerTankLosses = results[2].toNumber()
-            console.log(attackerTankLosses, "attacker tank losses")
+            // console.log(attackerTankLosses, "attacker tank losses")
             expect(attackerTankLosses).to.equal(1);   
+
+            var attackerSoldiers = await forcescontract.getSoldierCount(0);
+            // console.log(attackerSoldiers.toNumber(), "attacker soldiers");
+            expect(attackerSoldiers).to.equal(1918);
+            var attackerTanks = await forcescontract.getTankCount(0);
+            // console.log(attackerTanks.toNumber(), "attackerTanks");   
+            expect(attackerTanks).to.equal(39);
+
+            var casualties : any = await forcescontract.getCasualties(0);
+            expect(casualties[0]).to.equal(102)
+            expect(casualties[1]).to.equal(1)
             
+        }) 
+
+        it("tests that infrastructure damage occurs from ground battle", async function () {    
+            var defenderInfrastructure = await infrastructurecontract.getInfrastructureCount(1)
+            var defenderLand = await infrastructurecontract.getLandCount(1);
+            expect(defenderLand).to.equal(20)
+            expect(defenderInfrastructure).to.equal(5020)
             
+            await groundbattlecontract.connect(signer1).groundAttack(0, 0, 1, 1)
+            const tx1 = await groundbattlecontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 : any  = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, groundbattlecontract.address);
+
+            var defenderInfrastructure = await infrastructurecontract.getInfrastructureCount(1)
+            var defenderLand = await infrastructurecontract.getLandCount(1);
+            expect(defenderLand).to.equal(18)
+            expect(defenderInfrastructure).to.equal(5019)
         }) 
     })
 })

@@ -518,7 +518,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         groundBattleIdToBattleAttackerResults[
             requestNumber
         ] = newBattleAttackerResults;
-        force.decreaseDeployedUnits(
+        force.decreaseUnits(
             attackerSoldierLosses,
             attackerTankLosses,
             attackerId,
@@ -773,8 +773,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             //     attackModifier +
             //     (randomWords[5] % 10));
             randomLandMiles = (1 + fobCount + (randomWords[6] % 2));
-            console.log((randomWords[6] % 2), "random modulus");
-            console.log((randomWords[6]), "random");
             randomInfrastructure = (1 + fobCount + ((randomWords[7]) % 2));
         } else if (attackType == 2) {
             // randomBalancePercentage = (5 +
@@ -796,21 +794,11 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             randomInfrastructure = (4 + fobCount + ((randomWords[7]) % 3));
         }
         // tsy.transferSpoils(randomBalancePercentage, battleId, attackerId, defenderId);
-        console.log(randomLandMiles, "RANDOM LAND");
-        console.log(randomInfrastructure, "RANDOM INF");
         inf.transferLandAndInfrastructure(
             randomLandMiles,
             randomInfrastructure,
             attackerId,
             defenderId
         );
-    }
-
-    function returnTodaysGroundBattles()
-        public
-        view
-        returns (uint256[] memory)
-    {
-        return todaysGroundBattles;
     }
 }
