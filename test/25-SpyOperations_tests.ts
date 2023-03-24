@@ -137,7 +137,7 @@ describe("Spy Operations", async function () {
         
         let chainId: any
         chainId = network.config.chainId
-        let subscriptionId: any 
+        let subscriptionId: any
         let vrfCoordinatorV2Address: any
     
         if (chainId == 31337) {
@@ -1032,6 +1032,7 @@ describe("Spy Operations", async function () {
         
         if(chainId == 31337) {
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, spyoperationscontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address)
         }
 
         await countryminter.connect(signer1).generateCountry(
@@ -1055,6 +1056,10 @@ describe("Spy Operations", async function () {
             "TestCapitalCity2",
             "TestNationSlogan2"
         )
+        const tx2 = await countryparameterscontract.fulfillRequest(1);
+        let txReceipt2 = await tx2.wait(1);
+        let requestId2 = txReceipt2?.events?.[1].args?.requestId;
+        await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, countryparameterscontract.address);
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
         await warbucks.connect(signer0).transfer(signer2.address, BigInt(2000000000*(10**18)));
         await treasurycontract.connect(signer2).addFunds(BigInt(2000000000*(10**18)), 1);
@@ -1170,11 +1175,17 @@ describe("Spy Operations", async function () {
 
         //please make a test for spy operations #5 change governement  
         it("tests spy operations #5 change government", async function () {
+            var desiredGovt = await countryparameterscontract.getGovernmentPreference(1);
+            // console.log("desiredGovt", desiredGovt.toNumber())
+            expect(desiredGovt.toNumber()).to.equal(10) 
             await spyoperationscontract.connect(signer1).conductSpyOperation(0, 1, 5);
             const tx1 = await spyoperationscontract.fulfillRequest(0);
             let txReceipt1 = await tx1.wait(1);
             let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
             await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, spyoperationscontract.address);
+            var desiredGovt2 = await countryparameterscontract.getGovernmentPreference(1);
+            // console.log("desiredGovt", desiredGovt2.toNumber())
+            expect(desiredGovt2.toNumber()).to.equal(2) 
         })
     })
 })

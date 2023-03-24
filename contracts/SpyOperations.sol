@@ -176,9 +176,6 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
     {
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
         s_requestIndexToRandomWords[requestNumber] = randomWords;
-        console.log(randomWords[0]);
-        console.log(randomWords[1]);
-        console.log(randomWords[2]);
         s_randomWords = randomWords;
         uint256 attackType = spyAttackIdToSpyAttack[requestNumber].attackType;
         uint256 attackerId = spyAttackIdToSpyAttack[requestNumber].attackerId;
@@ -186,13 +183,10 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         uint256 defenderId = spyAttackIdToSpyAttack[requestNumber].defenderId;
         uint256 defenderSuccessScore = getDefenseSuccessScore(defenderId);
         uint256 totalSuccessScore = defenderSuccessScore + attackerSuccessScore;
-        console.log(attackType, "attackType");
-        console.log(attackerId, "attackerId");
-        console.log(defenderId, "defenderId");
         uint256 randomSuccessNumber = (s_randomWords[0] % totalSuccessScore);
         console.log(randomSuccessNumber, "needs to be lower than", attackerSuccessScore);
         if (randomSuccessNumber <= attackerSuccessScore) {
-            console.log("Success");
+            console.log("Mission Success");
             uint256 randomNumber2 = randomWords[1];
             executeSpyOperation(
                 attackerId,
@@ -264,18 +258,14 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         uint256 attackId,
         uint256 randomNumber2
     ) internal {
-        console.log("Are we in the execute operation function?");
         uint256 defenderStrength = strength.getNationStrength(defenderId);
         if (attackType == 1) {
             uint256 cost = (200000 + (defenderStrength * 2));
             tsy.spendBalance(attackerId, cost);
-            gatherIntelligence(); /*attackerId, defenderId, attackId*/
+            gatherIntelligence();
         } else if (attackType == 2) {
-            console.log("did we get to attack type 2");
             uint256 cost = ((100000 + defenderStrength) * (10**18));
             tsy.spendBalance(attackerId, cost);
-            console.log(cost);
-            console.log("did we spend the $?");
             destroyCruiseMissiles(defenderId, /*attackId,*/ randomNumber2, attackerId);
         } else if (attackType == 3) {
             uint256 cost = (100000 + (defenderStrength * 2));
@@ -288,11 +278,11 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         } else if (attackType == 5) {
             uint256 cost = (100000 + (defenderStrength * 3));
             tsy.spendBalance(attackerId, cost);
-            changeGovernment(defenderId, attackId);
+            changeDesiredGovernment(defenderId, attackId);
         } else if (attackType == 6) {
             uint256 cost = (100000 + (defenderStrength * 3));
             tsy.spendBalance(attackerId, cost);
-            changeReligion(defenderId, attackId);
+            changeDesiredReligion(defenderId, attackId);
         } else if (attackType == 7) {
             uint256 cost = (150000 + (defenderStrength));
             tsy.spendBalance(attackerId, cost);
@@ -338,10 +328,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
     function destroyCruiseMissiles(uint256 defenderId, /*uint256 attackId,*/ uint256 randomNumber2, uint256 attackerId)
         internal
     {
-        console.log("did we get to destroy cruise missiles function");
-        console.log(randomNumber2);
         mis.decreaseCruiseMissileCount(randomNumber2, defenderId);
-        console.log("missiles decreased?");
     }
 
     function destroyDefendingTanks(uint256 defenderId, uint256 attackId)
@@ -376,7 +363,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         );
     }
 
-    function changeGovernment(uint256 defenderId, uint256 attackId) internal {
+    function changeDesiredGovernment(uint256 defenderId, uint256 attackId) internal {
         //new government randomly chosen
         uint256[] memory randomNumbers = s_requestIndexToRandomWords[attackId];
         uint256 governmentPreference = params.getGovernmentPreference(
@@ -393,7 +380,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         params.updateDesiredGovernment(defenderId, newPreference);
     }
 
-    function changeReligion(uint256 defenderId, uint256 attackId) internal {
+    function changeDesiredReligion(uint256 defenderId, uint256 attackId) internal {
         //new religion randomly chosen
         uint256[] memory randomNumbers = s_requestIndexToRandomWords[attackId];
         uint256 religionPreference = params.getReligionPreference(defenderId);

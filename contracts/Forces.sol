@@ -1021,7 +1021,6 @@ contract MissilesContract is Ownable {
         uint256 amount,
         uint256 id
     ) public onlySpyContract {
-        console.log("are we here in FORCES?");
         uint256 missilesToDecrease = ((amount % 5) + 1);
         uint256 missiles = idToMissiles[id].cruiseMissiles;
         if (missilesToDecrease >= missiles) {
@@ -1029,7 +1028,6 @@ contract MissilesContract is Ownable {
         } else {
             idToMissiles[id].cruiseMissiles -= missilesToDecrease;
         }
-        console.log("did we get here in FORCES after function?");
     }
 
     ///@dev this is a public function that will decrease the number of cruise missiles only callable from the nuke contract
