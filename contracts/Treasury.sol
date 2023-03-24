@@ -39,10 +39,9 @@ contract TreasuryContract is Ownable {
     address public aid;
     address public taxes;
     address public bills;
-    address public spyAddress;
+    address public spyOperations;
     address public groundBattle;
     address public countryMinter;
-    address public spyOperations;
     address public landMarket;
     address public techMarket;
     address public infrastructureMarket;
@@ -109,7 +108,7 @@ contract TreasuryContract is Ownable {
         address _aid,
         address _taxes,
         address _bills,
-        address _spyAddress
+        address _spyOperations
     ) public onlyOwner {
         groundBattle = _groundBattle;
         ground = GroundBattleContract(_groundBattle);
@@ -123,7 +122,7 @@ contract TreasuryContract is Ownable {
         aid = _aid;
         taxes = _taxes;
         bills = _bills;
-        spyAddress = _spyAddress;
+        spyOperations = _spyOperations;
     }
 
     function settings3(
@@ -151,7 +150,7 @@ contract TreasuryContract is Ownable {
     }
 
     modifier onlySpyContract() {
-        require(msg.sender == spyAddress, "only callable from spy contract");
+        require(msg.sender == spyOperations, "only callable from spy contract");
         _;
     }
 
@@ -252,7 +251,7 @@ contract TreasuryContract is Ownable {
     ///@notice this function will decrease a nation owner's balance when money is spent within the game
     ///@param id is the nation id of the nation spending funds
     ///@param cost is the cost of the expense
-    function spendBalance(uint256 id, uint256 cost) public approvedSpendCaller {
+    function spendBalance(uint256 id, uint256 cost) external approvedSpendCaller {
         //need a way to only allow the nation owner to do this
         uint256 balance = idToTreasury[id].balance;
         require(balance >= cost, "insufficient balance");

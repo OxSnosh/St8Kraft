@@ -1022,11 +1022,13 @@ contract MissilesContract is Ownable {
         uint256 id
     ) public onlySpyContract {
         console.log("are we here in FORCES?");
-        // uint256 missiles = idToMissiles[id].cruiseMissiles;
-        // uint256 newAmount = (missiles - amount);
-        // idToMissiles[id].cruiseMissiles = newAmount;
-        Missiles storage missiles = idToMissiles[id];
-        missiles.cruiseMissiles -= amount;
+        uint256 missilesToDecrease = ((amount % 5) + 1);
+        uint256 missiles = idToMissiles[id].cruiseMissiles;
+        if (missilesToDecrease >= missiles) {
+            idToMissiles[id].cruiseMissiles = 0;
+        } else {
+            idToMissiles[id].cruiseMissiles -= missilesToDecrease;
+        }
         console.log("did we get here in FORCES after function?");
     }
 

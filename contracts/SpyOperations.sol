@@ -272,11 +272,11 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
             gatherIntelligence(); /*attackerId, defenderId, attackId*/
         } else if (attackType == 2) {
             console.log("did we get to attack type 2");
-            uint256 cost = (100000 + (defenderStrength));
+            uint256 cost = ((100000 + defenderStrength) * (10**18));
+            tsy.spendBalance(attackerId, cost);
             console.log(cost);
+            console.log("did we spend the $?");
             destroyCruiseMissiles(defenderId, /*attackId,*/ randomNumber2, attackerId);
-            // tsy.spendBalance(attackerId, cost);
-            // console.log("did we spend the $?");
         } else if (attackType == 3) {
             uint256 cost = (100000 + (defenderStrength * 2));
             tsy.spendBalance(attackerId, cost);
@@ -338,19 +338,10 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
     function destroyCruiseMissiles(uint256 defenderId, /*uint256 attackId,*/ uint256 randomNumber2, uint256 attackerId)
         internal
     {
-        //random number between 3 and 5
         console.log("did we get to destroy cruise missiles function");
-        // uint256[] storage randomNumbers = s_requestIndexToRandomWords[attackId];
-        // console.log(randomNumbers[1]);
-        // uint256 randomNumber = ((randomNumbers[1] % 3) + 2);
         console.log(randomNumber2);
         mis.decreaseCruiseMissileCount(randomNumber2, defenderId);
         console.log("missiles decreased?");
-        uint256 defenderStrength = strength.getNationStrength(defenderId);
-        uint256 cost = (100000 + (defenderStrength));
-        console.log(cost);
-        tsy.spendBalance(attackerId, cost);
-        console.log("did we spend the $?");
     }
 
     function destroyDefendingTanks(uint256 defenderId, uint256 attackId)

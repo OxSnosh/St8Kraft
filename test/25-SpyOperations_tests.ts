@@ -1120,17 +1120,61 @@ describe("Spy Operations", async function () {
             var missileCount = await missilescontract.getCruiseMissileCount(1)
             // console.log(missileCount.toNumber())
             expect(missileCount).to.equal(15)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
             await spyoperationscontract.connect(signer1).conductSpyOperation(0, 1, 2);
-            // const tx1 = await spyoperationscontract.fulfillRequest(0);
-            // let txReceipt1 = await tx1.wait(1);
-            // let requestId1 = txReceipt1?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(1, spyoperationscontract.address);
-            var missileCount = await missilescontract.getCruiseMissileCount(1)
-            console.log(missileCount.toNumber())
-            // expect(missileCount).to.equal(15)
+            const tx1 = await spyoperationscontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, spyoperationscontract.address);
+            var missileCount2 = await missilescontract.getCruiseMissileCount(1)
+            console.log(missileCount2.toNumber())
+            // expect(missileCount).to.equal(12)
 
         })
 
+        it("tests spy operations #3 destroy tanks", async function () {
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 1000)
+            await forcescontract.connect(signer2).buySoldiers(1000, 1)
+            await forcescontract.connect(signer2).buyTanks(150, 1)
+            var tankCount = await forcescontract.getTankCount(1)
+            console.log(tankCount.toNumber())
+            expect(tankCount).to.equal(170)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
+            await spyoperationscontract.connect(signer1).conductSpyOperation(0, 1, 3);
+            const tx1 = await spyoperationscontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, spyoperationscontract.address);
+            var tankCount2 = await forcescontract.getTankCount(1)
+            console.log(tankCount2.toNumber())
+            expect(tankCount2).to.equal(159)
+        })
 
+        it("tests spy operations #4 capture land", async function () {
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 1000)
+            await landmarketcontract.connect(signer2).buyLand(1, 1000)
+            var land = await infrastructurecontract.getLandCount(1);
+            console.log("land", land.toNumber())
+            expect(land.toNumber()).to.equal(1020)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
+            await spyoperationscontract.connect(signer1).conductSpyOperation(0, 1, 4);
+            const tx1 = await spyoperationscontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, spyoperationscontract.address);
+            var land2 = await infrastructurecontract.getLandCount(1);
+            console.log("land", land2.toNumber())
+            expect(land2.toNumber()).to.equal(1008)
+            // expect(soldierCount2).to.equal(990)
+        })
+
+        //please make a test for spy operations #5 change governement  
+        it("tests spy operations #5 change government", async function () {
+            await spyoperationscontract.connect(signer1).conductSpyOperation(0, 1, 5);
+            const tx1 = await spyoperationscontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, spyoperationscontract.address);
+        })
     })
 })
