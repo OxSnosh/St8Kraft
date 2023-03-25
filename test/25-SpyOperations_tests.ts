@@ -885,6 +885,7 @@ describe("Spy Operations", async function () {
             militarycontract.address,
             nationstrengthcontract.address,
             wonderscontract1.address,
+            wonderscontract2.address,
             treasurycontract.address,
             countryparameterscontract.address,
             missilescontract.address,
@@ -1132,8 +1133,8 @@ describe("Spy Operations", async function () {
             let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
             await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, spyoperationscontract.address);
             var missileCount2 = await missilescontract.getCruiseMissileCount(1)
-            console.log(missileCount2.toNumber())
-            // expect(missileCount).to.equal(12)
+            // console.log(missileCount2.toNumber())
+            expect(missileCount2).to.equal(13)
 
         })
 
@@ -1142,7 +1143,7 @@ describe("Spy Operations", async function () {
             await forcescontract.connect(signer2).buySoldiers(1000, 1)
             await forcescontract.connect(signer2).buyTanks(150, 1)
             var tankCount = await forcescontract.getTankCount(1)
-            console.log(tankCount.toNumber())
+            // console.log(tankCount.toNumber())
             expect(tankCount).to.equal(170)
             await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
             await spyoperationscontract.connect(signer1).conductSpyOperation(0, 1, 3);
@@ -1151,15 +1152,15 @@ describe("Spy Operations", async function () {
             let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
             await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, spyoperationscontract.address);
             var tankCount2 = await forcescontract.getTankCount(1)
-            console.log(tankCount2.toNumber())
-            expect(tankCount2).to.equal(159)
+            // console.log(tankCount2.toNumber())
+            expect(tankCount2).to.equal(160)
         })
 
         it("tests spy operations #4 capture land", async function () {
             await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 1000)
             await landmarketcontract.connect(signer2).buyLand(1, 1000)
             var land = await infrastructurecontract.getLandCount(1);
-            console.log("land", land.toNumber())
+            // console.log("land", land.toNumber())
             expect(land.toNumber()).to.equal(1020)
             await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
             await spyoperationscontract.connect(signer1).conductSpyOperation(0, 1, 4);
@@ -1168,9 +1169,8 @@ describe("Spy Operations", async function () {
             let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
             await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, spyoperationscontract.address);
             var land2 = await infrastructurecontract.getLandCount(1);
-            console.log("land", land2.toNumber())
-            expect(land2.toNumber()).to.equal(1008)
-            // expect(soldierCount2).to.equal(990)
+            // console.log("land", land2.toNumber())
+            expect(land2.toNumber()).to.equal(1014)
         })
 
         //please make a test for spy operations #5 change governement  
@@ -1187,5 +1187,173 @@ describe("Spy Operations", async function () {
             // console.log("desiredGovt", desiredGovt2.toNumber())
             expect(desiredGovt2.toNumber()).to.equal(2) 
         })
+
+        it("tests spy operations #6 change religion", async function () {
+            var desiredReligion = await countryparameterscontract.getReligionPreference(1);
+            // console.log("desiredReligion", desiredReligion.toNumber())
+            expect(desiredReligion.toNumber()).to.equal(10) 
+            await spyoperationscontract.connect(signer1).conductSpyOperation(0, 1, 6);
+            const tx1 = await spyoperationscontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, spyoperationscontract.address);
+            var desiredReligion2 = await countryparameterscontract.getReligionPreference(1);
+            // console.log("desiredReligion", desiredReligion2.toNumber())
+            expect(desiredReligion2.toNumber()).to.equal(8)
+        })
+
+        it("tests spy operations #7 change threat level", async function () {
+            var threatLevel : any = await militarycontract.getThreatLevel(1);
+            // console.log("threatLevel", threatLevel.toNumber())
+            expect(threatLevel.toNumber()).to.equal(1)
+            await spyoperationscontract.connect(signer1).conductSpyOperation(0, 1, 7);
+            const tx1 = await spyoperationscontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, spyoperationscontract.address);
+            var threatLevel2 : any = await militarycontract.getThreatLevel(1);
+            // console.log("threatLevel2", threatLevel2.toNumber())
+            expect(threatLevel2.toNumber()).to.equal(2)
+        })
+
+        it("tests spy operations #8 change DEFCON level", async function () {
+            var defconLevel : any = await militarycontract.getDefconLevel(1);
+            // console.log("defconLevel", defconLevel.toNumber())
+            expect(defconLevel.toNumber()).to.equal(5)
+            await spyoperationscontract.connect(signer1).conductSpyOperation(0, 1, 8);
+            const tx1 = await spyoperationscontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, spyoperationscontract.address);
+            var defconLevel2 : any = await militarycontract.getDefconLevel(1);
+            // console.log("defconLevel2", defconLevel2.toNumber())
+            expect(defconLevel2.toNumber()).to.equal(2)
+        })
+
+        it("tests spy operations #9 destroy spies", async function () {
+            await forcescontract.connect(signer2).buySpies(30, 1)
+            var spyCount = await forcescontract.getSpyCount(1);
+            // console.log("spyCount", spyCount.toNumber())
+            expect(spyCount.toNumber()).to.equal(30)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
+            await spyoperationscontract.connect(signer1).conductSpyOperation(0, 1, 9);
+            const tx1 = await spyoperationscontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, spyoperationscontract.address);
+            var spyCount2 = await forcescontract.getSpyCount(1);
+            // console.log("spyCount2", spyCount2.toNumber())
+            expect(spyCount2.toNumber()).to.equal(18)
+        })
+
+        it("tests spy operations #10 capture technology", async function () {
+            var techCount = await infrastructurecontract.getTechnologyCount(1);
+            // console.log("techCount", techCount.toNumber())
+            expect(techCount.toNumber()).to.equal(300)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
+            var attackerTechCount = await infrastructurecontract.getTechnologyCount(0);
+            // console.log("attacker techCount", attackerTechCount.toNumber())
+            expect(attackerTechCount.toNumber()).to.equal(2000)
+            await spyoperationscontract.connect(signer1).conductSpyOperation(0, 1, 10);
+            const tx1 = await spyoperationscontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, spyoperationscontract.address);
+            var techCount2 = await infrastructurecontract.getTechnologyCount(1);
+            // console.log("techCount2", techCount2.toNumber())
+            expect(techCount2.toNumber()).to.equal(294)
+            var attackerTechCount2 = await infrastructurecontract.getTechnologyCount(0);
+            // console.log("attacker techCount", attackerTechCount2.toNumber())
+            expect(attackerTechCount2.toNumber()).to.equal(2006)
+        })
+
+        it("tests spy operations #11 sabatoge taxes", async function () {
+            var taxRate = await infrastructurecontract.getTaxRate(1);
+            // console.log("taxRate", taxRate.toNumber())
+            expect(taxRate.toNumber()).to.equal(16)
+            await spyoperationscontract.connect(signer1).conductSpyOperation(0, 1, 11);
+            const tx1 = await spyoperationscontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, spyoperationscontract.address);
+            var taxRate2 = await infrastructurecontract.getTaxRate(1);
+            // console.log("taxRate2", taxRate2.toNumber())
+            expect(taxRate2.toNumber()).to.equal(23)
+            await expect(infrastructurecontract.connect(signer2).setTaxRate(1, 28)).to.be.revertedWith("need to collect taxes before changing tax rate");
+            await taxescontract.connect(signer2).collectTaxes(1);
+            await infrastructurecontract.connect(signer2).setTaxRate(1, 28);
+            var taxRate3 = await infrastructurecontract.getTaxRate(1);
+            // console.log("taxRate3", taxRate3.toNumber())
+            expect(taxRate3.toNumber()).to.equal(28)
+        })
+
+        it("tests spy operations #12 capture money reserves", async function () {
+            var balance : any = await treasurycontract.checkBalance(1);
+            // console.log("balance", BigInt(balance))
+            expect(BigInt(balance).toString()).to.equal("1998270000000000026575088544")
+            var attackerBalance : any = await treasurycontract.checkBalance(0);
+            // console.log("attackerBalance", BigInt(attackerBalance))
+            expect(BigInt(attackerBalance).toString()).to.equal("9998199999999999583116693632")
+            await spyoperationscontract.connect(signer1).conductSpyOperation(0, 1, 12);
+            const tx1 = await spyoperationscontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, spyoperationscontract.address);
+            var balance2 : any = await treasurycontract.checkBalance(1);
+            // console.log("balance2", BigInt(balance2))
+            expect(BigInt(balance2).toString()).to.equal("1997270000000000026575088544")
+            var attackerBalance2 : any = await treasurycontract.checkBalance(0);
+            // console.log("attackerBalance2", BigInt(attackerBalance2))
+            expect(BigInt(attackerBalance2).toString()).to.equal("9998950789999999583116393632")
+        })
+
+        it("tests spy operations #13 capture infrastructure", async function () {
+            var infrastructureCount = await infrastructurecontract.getInfrastructureCount(1);
+            // console.log("infrastructureCount", infrastructureCount.toNumber())
+            expect(infrastructureCount.toNumber()).to.equal(5020)
+            var attackerInfrastructure = await infrastructurecontract.getInfrastructureCount(0);
+            // console.log("attackerInfrastructure", attackerInfrastructure.toNumber())
+            expect(attackerInfrastructure.toNumber()).to.equal(5020)
+            await spyoperationscontract.connect(signer1).conductSpyOperation(0, 1, 13);
+            const tx1 = await spyoperationscontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, spyoperationscontract.address);
+            var infrastructureCount2 = await infrastructurecontract.getInfrastructureCount(1);
+            // console.log("infrastructureCount2", infrastructureCount2.toNumber())
+            expect(infrastructureCount2.toNumber()).to.equal(5014)
+            var attackerInfrastructure2 = await infrastructurecontract.getInfrastructureCount(0);
+            // console.log("attackerInfrastructure2", attackerInfrastructure2.toNumber())
+            expect(attackerInfrastructure2.toNumber()).to.equal(5026)
+        })
+
+        it("tests spy operations #14 destroy nukes", async function () {
+            await expect(spyoperationscontract.connect(signer1).conductSpyOperation(0, 1, 14)).to.be.revertedWith("defender does not have enough nukes to conduct operation")
+            await resourcescontract.mockResourcesForTesting(1, 17, 1)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 35000);
+            await technologymarketcontrat.connect(signer1).buyTech(0, 500000);
+            await missilescontract.connect(signer2).buyNukes(1)
+            await keepercontract.resetNukesPurchasedTodayByOwner()
+            await missilescontract.connect(signer2).buyNukes(1)
+            await keepercontract.resetNukesPurchasedTodayByOwner()
+            await missilescontract.connect(signer2).buyNukes(1)
+            await keepercontract.resetNukesPurchasedTodayByOwner()
+            await missilescontract.connect(signer2).buyNukes(1)
+            await keepercontract.resetNukesPurchasedTodayByOwner()
+            await missilescontract.connect(signer2).buyNukes(1)
+            await keepercontract.resetNukesPurchasedTodayByOwner()
+            var nukeCount = await missilescontract.getNukeCount(1);
+            // console.log("nukeCount", nukeCount.toNumber())
+            expect(nukeCount.toNumber()).to.equal(5)
+            spyoperationscontract.connect(signer1).conductSpyOperation(0, 1, 14)
+            const tx1 = await spyoperationscontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, spyoperationscontract.address);
+            var nukeCount2 = await missilescontract.getNukeCount(1);
+            // console.log("nukeCount2", nukeCount2.toNumber())
+            expect(nukeCount2.toNumber()).to.equal(4)
+        })
+
     })
 })

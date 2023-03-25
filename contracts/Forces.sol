@@ -1021,12 +1021,11 @@ contract MissilesContract is Ownable {
         uint256 amount,
         uint256 id
     ) public onlySpyContract {
-        uint256 missilesToDecrease = ((amount % 5) + 1);
         uint256 missiles = idToMissiles[id].cruiseMissiles;
-        if (missilesToDecrease >= missiles) {
+        if (amount >= missiles) {
             idToMissiles[id].cruiseMissiles = 0;
         } else {
-            idToMissiles[id].cruiseMissiles -= missilesToDecrease;
+            idToMissiles[id].cruiseMissiles -= amount;
         }
     }
 

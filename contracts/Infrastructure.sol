@@ -680,8 +680,6 @@ contract InfrastructureContract is Ownable {
         public
         onlySpyContract
     {
-        require(newTaxRate >= 28, "cannot tax above 28%");
-        require(newTaxRate <= 15, "cannot tax below 15%");
         idToInfrastructure[id].taxRate = newTaxRate;
         idToInfrastructure[id].collectionNeededToChangeRate = true;
     }

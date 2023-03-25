@@ -886,6 +886,7 @@ describe("Infrastructure Market Contract", async function () {
             militarycontract.address,
             nationstrengthcontract.address,
             wonderscontract1.address,
+            wonderscontract2.address,
             treasurycontract.address,
             countryparameterscontract.address,
             missilescontract.address,
