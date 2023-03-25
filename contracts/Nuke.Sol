@@ -11,6 +11,7 @@ import "./Improvements.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+import "hardhat/console.sol";
 
 ///@title NukeContract
 ///@author OxSnosh
@@ -71,6 +72,8 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => NukeAttack) nukeAttackIdToNukeAttack;
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
+
+    event randomNumbersRequested(uint256 indexed requestId);
 
     ///@dev this function contains the variable necessary for chainlink randomness
     constructor(
@@ -197,13 +200,13 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
             attackType
         );
         nukeAttackIdToNukeAttack[nukeAttackId] = newAttack;
-        fulfillRequest(nukeAttackId);
+        // fulfillRequest(nukeAttackId);
         nukeAttackId++;
     }
 
     ///@dev this function will be called by the launchNuke() function
     ///@dev this function will send a randomness request to the chainlink VRF contract
-    function fulfillRequest(uint256 id) internal {
+    function fulfillRequest(uint256 id) public {
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
@@ -212,6 +215,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
             NUM_WORDS
         );
         s_requestIdToRequestIndex[requestId] = id;
+        emit randomNumbersRequested(requestId);
     }
 
     ///@dev this function will be called by the chainlink VRF contract in response to a randomness request
@@ -231,12 +235,33 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         s_randomWords = randomWords;
         uint256 attackerId = nukeAttackIdToNukeAttack[requestNumber].attackerId;
         uint256 defenderId = nukeAttackIdToNukeAttack[requestNumber].defenderId;
+        uint256 thwartOdds = getThwartOdds(attackerId, defenderId);
+        console.log("thwartOdds", thwartOdds);
+        uint256 randomNukeSuccessNumber = ((s_randomWords[0] % 100) + 1);
+        console.log("randomNukeSuccessNumber", randomNukeSuccessNumber);
+        if (randomNukeSuccessNumber > thwartOdds) {
+            console.log("Nuke attaq success");
+            inflictNukeDamage(requestNumber);
+            mis.decreaseNukeCountFromNukeContract(attackerId);
+            param.inflictAnarchy(defenderId);
+            nukesDroppedToday++;
+        } else {
+            //thwart event
+            console.log("Nuke attaq thwarted");
+            mis.decreaseNukeCountFromNukeContract(attackerId);
+        }
+    }
+
+    function getThwartOdds(
+        uint256 attackerId,
+        uint256 defenderId
+    ) public view returns (uint256) {
+        uint256 thwartOdds = 50;
+        bool strategicDefenseInitiative = won4.getStrategicDefenseInitiative(defenderId);
         uint256 defenderMissileDefenses = imp4.getMissileDefenseCount(
             defenderId
         );
-        bool strategicDefenseInitiative = won4.getStrategicDefenseInitiative(defenderId);
         uint256 attackerSattelites = imp3.getSatelliteCount(attackerId);
-        uint256 thwartOdds = 50;
         if (strategicDefenseInitiative) {
             thwartOdds += 20;
         }
@@ -246,16 +271,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         if (attackerSattelites > 0) {
             thwartOdds -= (attackerSattelites * 5);
         }
-        uint256 randomNukeSuccessNumber = ((s_randomWords[0] % 100) + 1);
-        if (randomNukeSuccessNumber > thwartOdds) {
-            inflictNukeDamage(requestNumber);
-            mis.decreaseNukeCountFromNukeContract(attackerId);
-            param.inflictAnarchy(defenderId);
-            nukesDroppedToday++;
-        } else {
-            //thwart event
-            mis.decreaseNukeCountFromNukeContract(attackerId);
-        }
+        return thwartOdds;
     }
 
     ///@dev this is an internal function that will be called in the event of a succesful nuke strike
