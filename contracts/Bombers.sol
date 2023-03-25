@@ -765,7 +765,7 @@ contract BombersContract is Ownable {
     ///@notice this function will return the amount of defending B1bLancer's a nation owns
     ///@param id is the nation ID of the nation
     ///@return uint256 is the number of defending B1bLancer aircraft for the nation
-    function getDefendingB1bLancer(uint256 id) public view returns (uint256) {
+    function getDefendingB1bLancerCount(uint256 id) public view returns (uint256) {
         uint256 count = idToDefendingBombers[id].b1bLancerCount;
         return count;
     }
@@ -838,7 +838,7 @@ contract BombersContract is Ownable {
     ///@notice this function will return the amount of defending Tu160's a nation owns
     ///@param id is the nation ID of the nation
     ///@return uint256 is the number of defending Tu160 aircraft for the nation
-    function getDefendingTupolevTu160(uint256 id)
+    function getDefendingTupolevTu160Count(uint256 id)
         public
         view
         returns (uint256)
