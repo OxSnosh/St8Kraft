@@ -57,7 +57,7 @@ import {
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("War Contract", async function () {
+describe("Cruise Missile Attack", async function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -1030,6 +1030,11 @@ describe("War Contract", async function () {
             wonderscontract3.address,
             countryminter.address
         )
+        
+        if(chainId == 31337) {
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, cruisemissilecontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, nukecontract.address);
+        }
 
         await countryminter.connect(signer1).generateCountry(
             "TestRuler",
@@ -1040,10 +1045,12 @@ describe("War Contract", async function () {
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
         await treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0);
-        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500)
-        await technologymarketcontrat.connect(signer1).buyTech(0, 100)
-        await forcescontract.connect(signer1).buySoldiers(500, 0)
-        await forcescontract.connect(signer1).buyTanks(50, 0)
+        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+        await technologymarketcontrat.connect(signer1).buyTech(0, 20)
+        await forcescontract.connect(signer1).buySoldiers(2000, 0)
+        await forcescontract.connect(signer1).buyTanks(40, 0)
+        await forcescontract.connect(signer1).buySpies(30, 0)
+        await billscontract.connect(signer1).payBills(0)
 
         await countryminter.connect(signer2).generateCountry(
             "TestRuler2",
@@ -1054,380 +1061,151 @@ describe("War Contract", async function () {
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
         await warbucks.connect(signer0).transfer(signer2.address, BigInt(2000000000*(10**18)));
         await treasurycontract.connect(signer2).addFunds(BigInt(2000000000*(10**18)), 1);
+        await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 2000)
+        await technologymarketcontrat.connect(signer2).buyTech(1, 10)
+        await forcescontract.connect(signer2).buySoldiers(1000, 1)
+        await forcescontract.connect(signer2).buyTanks(20, 1)
+        await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+        await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+
+        await warcontract.connect(signer1).declareWar(0, 1)
+        await forcescontract.connect(signer1).deployForces(1000, 30, 0, 0)
+        await billscontract.connect(signer2).payBills(1)
+        
+        // await missilescontract.connect(signer1).buyCruiseMissiles(20, 0)
     });
 
-    describe("Declare War Tests", function () {
-        it("tests that declareWar() works correctly", async function () {
-            await expect(warcontract.connect(signer1).declareWar(1, 0)).to.be.revertedWith("!nation owner")
-            await expect(warcontract.connect(signer1).declareWar(0, 1)).to.be.revertedWith("you are in peace mode")
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await expect(warcontract.connect(signer1).declareWar(0, 1)).to.be.revertedWith("nation in peace mode")
-            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
-            await expect(warcontract.connect(signer1).declareWar(0, 1)).to.be.revertedWith("nation strength is not within range to declare war")
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
-            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
-            await forcescontract.connect(signer2).buySoldiers(500, 1)
-            await forcescontract.connect(signer2).buyTanks(50, 1)
-            await warcontract.connect(signer1).declareWar(0, 1)
-            var isActive = await warcontract.isWarActive(0);
-            // console.log(isActive)
-            // expect(isActive).to.equal(true);            
+    describe("Cruise Missile Attack", function () {
+        it("tests that launchCruiseMissile reverts correctly", async function () {
+            await expect(cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(1, 0, 0)).to.be.revertedWith("!nation owner")
+            await expect(cruisemissilecontract.connect(signer2).launchCruiseMissileAttack(1, 0, 0)).to.be.revertedWith("no cruise missiles")
+            await missilescontract.connect(signer1).buyCruiseMissiles(20, 0)
+            await expect(cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 1)).to.be.revertedWith("not active war")
+            await expect(cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 2, 0)).to.be.revertedWith("not involved in war")
+        })
+        
+        it("tests that getSuccessOdds works correctly", async function () {
+            var oddsOfSuccess = await cruisemissilecontract.getSuccessOdds(0, 1);
+            expect(oddsOfSuccess).to.equal(75)
+            await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 7)
+            var oddsOfSuccess2 = await cruisemissilecontract.getSuccessOdds(0, 1);
+            expect(oddsOfSuccess2).to.equal(100)
+            await improvementscontract4.connect(signer2).buyImprovement4(5, 1, 1)
+            var oddsOfSuccess3 = await cruisemissilecontract.getSuccessOdds(0, 1);
+            expect(oddsOfSuccess3).to.equal(75)
+            await improvementscontract3.connect(signer2).buyImprovement3(5, 1, 7)
+            await wonderscontract4.connect(signer2).buyWonder4(1, 4)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 5000)
+            await wonderscontract2.connect(signer2).buyWonder2(1, 5)
+            var oddsOfSuccess4 = await cruisemissilecontract.getSuccessOdds(0, 1);
+            expect(oddsOfSuccess4).to.equal(50)
+            
         })
 
-        it("tests that a nation can max out offensive wars", async function () {
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
-            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
-            await forcescontract.connect(signer2).buySoldiers(500, 1)
-            await forcescontract.connect(signer2).buyTanks(50, 1)
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
-            await warcontract.connect(signer1).declareWar(0, 1)
-
-            await countryminter.connect(signer3).generateCountry(
-                "TestRuler3",
-                "TestNationName3",
-                "TestCapitalCity3",
-                "TestNationSlogan3"
-            )
-            await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
-            await warbucks.connect(signer0).transfer(signer3.address, BigInt(2000000000*(10**18)));
-            await treasurycontract.connect(signer3).addFunds(BigInt(2000000000*(10**18)), 2);
-            await infrastructuremarketplace.connect(signer3).buyInfrastructure(2, 500)
-            await technologymarketcontrat.connect(signer3).buyTech(2, 100)
-            await forcescontract.connect(signer3).buySoldiers(500, 2)
-            await forcescontract.connect(signer3).buyTanks(50, 2)
-            await militarycontract.connect(signer3).toggleWarPeacePreference(2)
-            await warcontract.connect(signer1).declareWar(0, 2)
-
-            await countryminter.connect(signer4).generateCountry(
-                "TestRuler4",
-                "TestNationName4",
-                "TestCapitalCity4",
-                "TestNationSlogan4"
-            )
-            await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
-            await warbucks.connect(signer0).transfer(signer4.address, BigInt(2000000000*(10**18)));
-            await treasurycontract.connect(signer4).addFunds(BigInt(2000000000*(10**18)), 3);
-            await infrastructuremarketplace.connect(signer4).buyInfrastructure(3, 500)
-            await technologymarketcontrat.connect(signer4).buyTech(3, 100)
-            await forcescontract.connect(signer4).buySoldiers(500, 3)
-            await forcescontract.connect(signer4).buyTanks(50, 3)
-            await militarycontract.connect(signer4).toggleWarPeacePreference(3)
-            await warcontract.connect(signer1).declareWar(0, 3)
-
-            await countryminter.connect(signer5).generateCountry(
-                "TestRuler5",
-                "TestNationName5",
-                "TestCapitalCity5",
-                "TestNationSlogan5"
-            )
-            await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
-            await warbucks.connect(signer0).transfer(signer5.address, BigInt(2000000000*(10**18)));
-            await treasurycontract.connect(signer5).addFunds(BigInt(2000000000*(10**18)), 4);
-            await infrastructuremarketplace.connect(signer5).buyInfrastructure(4, 500)
-            await technologymarketcontrat.connect(signer5).buyTech(4, 100)
-            await forcescontract.connect(signer5).buySoldiers(500, 4)
-            await forcescontract.connect(signer5).buyTanks(50, 4)
-            await militarycontract.connect(signer5).toggleWarPeacePreference(4)
-            await warcontract.connect(signer1).declareWar(0, 4)
-
-            await countryminter.connect(signer6).generateCountry(
-                "TestRuler6",
-                "TestNationName6",
-                "TestCapitalCity6",
-                "TestNationSlogan6"
-            )
-            await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
-            await warbucks.connect(signer0).transfer(signer6.address, BigInt(2000000000*(10**18)));
-            await treasurycontract.connect(signer6).addFunds(BigInt(2000000000*(10**18)), 5);
-            await infrastructuremarketplace.connect(signer6).buyInfrastructure(5, 500)
-            await technologymarketcontrat.connect(signer6).buyTech(5, 100)
-            await forcescontract.connect(signer6).buySoldiers(500, 5)
-            await forcescontract.connect(signer6).buyTanks(50, 5)
-            await militarycontract.connect(signer6).toggleWarPeacePreference(5)
-            await expect(warcontract.connect(signer1).declareWar(0, 5)).to.be.revertedWith("you do not have an offensive war slot available")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 8000);
-            await wonderscontract1.connect(signer1).buyWonder1(0, 10)
-            await technologymarketcontrat.connect(signer6).buyTech(5, 8000);
-            await warcontract.connect(signer1).declareWar(0, 5)
-            var offensiveWars = await warcontract.offensiveWarLengthForTesting(0);
-            expect(offensiveWars.toNumber()).to.equal(5)
-
-            await countryminter.connect(signer7).generateCountry(
-                "TestRuler7",
-                "TestNationName7",
-                "TestCapitalCity7",
-                "TestNationSlogan7"
-            )
-            await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
-            await warbucks.connect(signer0).transfer(signer7.address, BigInt(2000000000*(10**18)));
-            await treasurycontract.connect(signer7).addFunds(BigInt(2000000000*(10**18)), 6);
-            await infrastructuremarketplace.connect(signer7).buyInfrastructure(6, 500)
-            await technologymarketcontrat.connect(signer7).buyTech(6, 100)
-            await forcescontract.connect(signer7).buySoldiers(500, 6)
-            await forcescontract.connect(signer7).buyTanks(50, 6)
-            await technologymarketcontrat.connect(signer7).buyTech(6, 8000);
-            await militarycontract.connect(signer7).toggleWarPeacePreference(6)
-            await expect(warcontract.connect(signer1).declareWar(0, 6)).to.be.revertedWith("you do not have an offensive war slot available")
-        })
-    })
-
-    describe("Deploy Forces", function () {
-        it("tests that forces are deployed to wars correctly", async function () {
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
-            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
-            await forcescontract.connect(signer2).buySoldiers(500, 1)
-            await forcescontract.connect(signer2).buyTanks(50, 1)
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
-            await warcontract.connect(signer1).declareWar(0, 1)
-            await forcescontract.connect(signer1).deployForces(300, 20, 0, 0);
-            var deployedForces : any = await warcontract.getDeployedGroundForces(0, 0);
-            var soldiersDeployed = deployedForces[0];
-            var tanksDeployed = deployedForces[1];
-            expect(soldiersDeployed.toNumber()).to.equal(300);  
-            expect(tanksDeployed.toNumber()).to.equal(20);
-            await expect(forcescontract.connect(signer1).deployForces(50, 20, 0, 0)).to.be.revertedWith("already deployed forces today");
-            await keepercontract.connect(signer0).resetDeploymentsByOwner();
-            await forcescontract.connect(signer1).deployForces(0, 20, 0, 0);
-            var deployedForces2 : any = await warcontract.getDeployedGroundForces(0, 0);
-            var soldiersDeployed2 = deployedForces2[0];
-            var tanksDeployed2 = deployedForces2[1];
-            expect(soldiersDeployed2.toNumber()).to.equal(300);  
-            expect(tanksDeployed2.toNumber()).to.equal(40);
-        })
-    })
-
-    describe("Soldier Efficiency", function () {
-        it("tests that deployed soldier efficiency works correctly", async function () {
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
-            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
-            await forcescontract.connect(signer2).buySoldiers(1000, 1)
-            await forcescontract.connect(signer2).buyTanks(50, 1)
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
-            await warcontract.connect(signer1).declareWar(0, 1)
-            await forcescontract.connect(signer1).buySoldiers(500, 0)
-            await forcescontract.connect(signer1).deployForces(500, 20, 0, 0);
-            var attackingSoldierEfficiency = await groundbattlecontract.getAttackingSoldierEfficiency(0, 0);
-            // console.log(attackingSoldierEfficiency.toNumber(), "default efficiency");
-            expect(attackingSoldierEfficiency.toNumber()).to.equal(500)
-            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 0, 2);
-            var attackingSoldierEfficiency = await groundbattlecontract.getAttackingSoldierEfficiency(0, 0);
-            // console.log(attackingSoldierEfficiency.toNumber(), "aluminium and coal efficiency");
-            expect(attackingSoldierEfficiency.toNumber()).to.equal(640)
-            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 11, 12);
-            var attackingSoldierEfficiency = await groundbattlecontract.getAttackingSoldierEfficiency(0, 0);
-            // console.log(attackingSoldierEfficiency.toNumber(), "oil and pigs efficiency");
-            expect(attackingSoldierEfficiency.toNumber()).to.equal(625)
-            await improvementscontract1.connect(signer1).buyImprovement1(3, 0, 3)
-            var attackingSoldierEfficiency = await groundbattlecontract.getAttackingSoldierEfficiency(0, 0);
-            // console.log(attackingSoldierEfficiency.toNumber(), "barracks efficiency");
-            expect(attackingSoldierEfficiency.toNumber()).to.equal(775)
-            await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 3)
-            var attackingSoldierEfficiency = await groundbattlecontract.getAttackingSoldierEfficiency(0, 0);
-            // console.log(attackingSoldierEfficiency.toNumber(), "guerilla camp efficiency");
-            expect(attackingSoldierEfficiency.toNumber()).to.equal(1650)
+        it("tests that launchCruiseMissile works correctly destroying tanks", async function () {
+            await missilescontract.connect(signer1).buyCruiseMissiles(20, 0)
+            await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 7)
+            var defenderTankCount = await forcescontract.getTankCount(1);
+            expect(defenderTankCount).to.equal(20);
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const tx1 = await cruisemissilecontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, cruisemissilecontract.address);
+            var defenderTankCount2 = await forcescontract.getTankCount(1);
+            expect(defenderTankCount2).to.equal(9);
         })
 
-        it("tests that defending soldier efficiency works correctly", async function () {
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
-            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
-            await forcescontract.connect(signer2).buySoldiers(1000, 1)
-            await forcescontract.connect(signer2).buyTanks(50, 1)
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
-            await warcontract.connect(signer1).declareWar(0, 1)
-            await forcescontract.connect(signer1).buySoldiers(480, 0)
-            await forcescontract.connect(signer1).deployForces(500, 20, 0, 0);
-            var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
-            // console.log(defendingSoldierEfficiency.toNumber(), "default efficiency");
-            expect(defendingSoldierEfficiency.toNumber()).to.equal(500)
-            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 0, 2);
-            var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
-            // console.log(defendingSoldierEfficiency.toNumber(), "aluminium and coal efficiency");
-            expect(defendingSoldierEfficiency.toNumber()).to.equal(640)
-            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 11, 12);
-            var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
-            // console.log(defendingSoldierEfficiency.toNumber(), "oil and pigs efficiency");
-            expect(defendingSoldierEfficiency.toNumber()).to.equal(625)
-            await improvementscontract1.connect(signer1).buyImprovement1(3, 0, 3)
-            var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
-            // console.log(defendingSoldierEfficiency.toNumber(), "barracks efficiency");
-            expect(defendingSoldierEfficiency.toNumber()).to.equal(775)
-            await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 3)
-            var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
-            // console.log(defendingSoldierEfficiency.toNumber(), "guerilla camp efficiency");
-            expect(defendingSoldierEfficiency.toNumber()).to.equal(1650)
-            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5)
-            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5)
-            await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 4)
-            var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
-            // console.log(defendingSoldierEfficiency.toNumber(), "border fortification efficiency");
-            await improvementscontract1.connect(signer1).deleteImprovement1(2, 0, 4)
-            expect(defendingSoldierEfficiency.toNumber()).to.equal(1670)
-            await improvementscontract2.connect(signer1).buyImprovement2(2, 0, 2)
-            var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
-            // console.log(defendingSoldierEfficiency.toNumber(), "forward operating base efficiency");
-            expect(defendingSoldierEfficiency.toNumber()).to.equal(1620)
-        })
-    })
-
-    describe("Wars Ending", function () {
-        it("tests that offerPeace() works correctly", async function () {
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
-            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
-            await forcescontract.connect(signer2).buySoldiers(1000, 1)
-            await forcescontract.connect(signer2).buyTanks(50, 1)
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
-            await warcontract.connect(signer1).declareWar(0, 1)
-            var isActive = await warcontract.isWarActive(0);
-            console.log(isActive)
-            expect(isActive).to.equal(true)
-            await warcontract.connect(signer2).offerPeace(1, 0)
-            var arr : any = await warcontract.checkWar(0)
-            var offenseOffered = arr[0]
-            var defenseOffered = arr[1]
-            var active = arr[2]
-            var peaceDeclared = arr[3]
-            var expired = arr[4]
-            // console.log(defenseOffered, "defense peace offered")
-            // console.log(offenseOffered, "offense peace offered")
-            // console.log(active, "is war active")
-            // console.log(peaceDeclared, "is peace declared")
-            // console.log(expired, "is war expired")
-            expect(defenseOffered).to.equal(true)
+        it("tests that launchCruiseMissile works correctly destroying tech", async function () {
+            await missilescontract.connect(signer1).buyCruiseMissiles(20, 0)
+            await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 7)
+            var defenderTech = await infrastructurecontract.getTechnologyCount(1)
+            // console.log(defenderTech.toNumber())
+            expect(defenderTech).to.equal(10)
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const tx1 = await cruisemissilecontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, cruisemissilecontract.address);
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const tx2 = await cruisemissilecontract.fulfillRequest(1);
+            let txReceipt2 = await tx2.wait(1);
+            let requestId2 : any = txReceipt2?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, cruisemissilecontract.address);
+            var defenderTech2 = await infrastructurecontract.getTechnologyCount(1)
+            // console.log(defenderTech2.toNumber())
+            expect(defenderTech2).to.equal(8)
         })
 
-        it("offerPeace stops a war when both sides offer peace", async function () {
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
-            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
-            await forcescontract.connect(signer2).buySoldiers(1000, 1)
-            await forcescontract.connect(signer2).buyTanks(50, 1)
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
-            await warcontract.connect(signer1).declareWar(0, 1)
-            await warcontract.connect(signer2).offerPeace(1, 0)
-            await warcontract.connect(signer1).offerPeace(0, 0)
-            var arr : any = await warcontract.checkWar(0)
-            var offenseOffered = arr[0]
-            var defenseOffered = arr[1]
-            var active = arr[2]
-            var peaceDeclared = arr[3]
-            var expired = arr[4]
-            // console.log(defenseOffered, "defense peace offered")
-            // console.log(offenseOffered, "offense peace offered")
-            // console.log(active, "is war active")
-            // console.log(peaceDeclared, "is peace declared")
-            // console.log(expired, "is war expired")
-            expect(offenseOffered).to.equal(true)
-            expect(defenseOffered).to.equal(true)
-            expect(peaceDeclared).to.equal(true)
-            expect(active).to.equal(false)
+        it("tests that launchCruiseMissile works correctly destroying infrastructure", async function () {
+            await missilescontract.connect(signer1).buyCruiseMissiles(20, 0)
+            await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 7)
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            var defenderInfrastructure = await infrastructurecontract.getInfrastructureCount(1)
+            // console.log(defenderInfrastructure.toNumber())
+            expect(defenderInfrastructure).to.equal(2020)
+            const tx1 = await cruisemissilecontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, cruisemissilecontract.address);
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const tx2 = await cruisemissilecontract.fulfillRequest(1);
+            let txReceipt2 = await tx2.wait(1);
+            let requestId2 : any = txReceipt2?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, cruisemissilecontract.address);
+            await keepercontract.resetCruiseMissileLaunchesByOwner()
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const tx3 = await cruisemissilecontract.fulfillRequest(2);
+            let txReceipt3 = await tx3.wait(1);
+            let requestId3 : any = txReceipt3?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId3, cruisemissilecontract.address);
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const tx4 = await cruisemissilecontract.fulfillRequest(3);
+            let txReceipt4 = await tx4.wait(1);
+            let requestId4 : any = txReceipt4?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId4, cruisemissilecontract.address);
+            await keepercontract.resetCruiseMissileLaunchesByOwner()
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const tx5 = await cruisemissilecontract.fulfillRequest(4);
+            let txReceipt5 = await tx5.wait(1);
+            let requestId5 : any = txReceipt5?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId5, cruisemissilecontract.address);
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const tx6 = await cruisemissilecontract.fulfillRequest(5);
+            let txReceipt6 = await tx6.wait(1);
+            let requestId6 : any = txReceipt6?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId6, cruisemissilecontract.address);
+            await keepercontract.resetCruiseMissileLaunchesByOwner()
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const tx7 = await cruisemissilecontract.fulfillRequest(6);
+            let txReceipt7 = await tx7.wait(1);
+            let requestId7 : any = txReceipt7?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId7, cruisemissilecontract.address);
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const tx8 = await cruisemissilecontract.fulfillRequest(7);
+            let txReceipt8 = await tx8.wait(1);
+            let requestId8 : any = txReceipt8?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId8, cruisemissilecontract.address);
+            var defenderInfrastructure2 = await infrastructurecontract.getInfrastructureCount(1)
+            // console.log(defenderInfrastructure2.toNumber())
+            expect(defenderInfrastructure2).to.equal(2006)
+
         })
 
-        it("tests that removeActiveWar function works correctly", async function () {
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
-            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
-            await forcescontract.connect(signer2).buySoldiers(1000, 1)
-            await forcescontract.connect(signer2).buyTanks(50, 1)
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
-            await warcontract.connect(signer1).declareWar(0, 1)
-            await warcontract.connect(signer2).offerPeace(1, 0)
-            var isActive = await warcontract.isWarActive(0);
-            expect(isActive).to.equal(true)
-            var offenseOffensiveWars : any = await warcontract.offensiveWarReturnForTesting(0)
-            var defenseOffensiveWars : any = await warcontract.offensiveWarReturnForTesting(1)
-            var offenseActiveWars : any = await warcontract.nationActiveWarsReturnForTesting(0)
-            var defenseActiveWars : any = await warcontract.nationActiveWarsReturnForTesting(1)
-            expect(offenseOffensiveWars.length).to.equal(1)
-            expect(defenseOffensiveWars.length).to.equal(0)
-            expect(offenseActiveWars.length).to.equal(1)
-            expect(defenseActiveWars.length).to.equal(1)
-
-            await warcontract.connect(signer1).offerPeace(0, 0)
-            var arr : any = await warcontract.checkWar(0)
-            var offenseOffered = arr[0]
-            var defenseOffered = arr[1]
-            var active = arr[2]
-            var peaceDeclared = arr[3]
-            var expired = arr[4]
-            // console.log(defenseOffered, "defense peace offered")
-            // console.log(offenseOffered, "offense peace offered")
-            // console.log(active, "is war active")
-            // console.log(peaceDeclared, "is peace declared")
-            // console.log(expired, "is war expired")
-            expect(offenseOffered).to.equal(true)
-            expect(defenseOffered).to.equal(true)
-            expect(peaceDeclared).to.equal(true)
-            expect(active).to.equal(false)
-            var offenseOffensiveWars : any = await warcontract.offensiveWarReturnForTesting(0)
-            var defenseOffensiveWars : any = await warcontract.offensiveWarReturnForTesting(1)
-            var offenseActiveWars : any = await warcontract.nationActiveWarsReturnForTesting(0)
-            var defenseActiveWars : any = await warcontract.nationActiveWarsReturnForTesting(1)
-            expect(offenseOffensiveWars.length).to.equal(0)
-            expect(defenseOffensiveWars.length).to.equal(0)
-            expect(offenseActiveWars.length).to.equal(0)
-            expect(defenseActiveWars.length).to.equal(0)
+        it("tests that launchCruiseMissile only works 2x per war per attacker per day", async function () {
+            await missilescontract.connect(signer1).buyCruiseMissiles(20, 0)
+            await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 7)
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const tx1 = await cruisemissilecontract.fulfillRequest(0);
+            let txReceipt1 = await tx1.wait(1);
+            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, cruisemissilecontract.address);
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const tx2 = await cruisemissilecontract.fulfillRequest(1);
+            let txReceipt2 = await tx2.wait(1);
+            let requestId2 : any = txReceipt2?.events?.[1].args?.requestId;
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, cruisemissilecontract.address);
+            await expect(cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)).to.be.revertedWith("too many launches today")
         })
-
-        it("tests that removeActiveWar deletes war from active wars array", async function () {
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
-            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
-            await forcescontract.connect(signer2).buySoldiers(1000, 1)
-            await forcescontract.connect(signer2).buyTanks(50, 1)
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
-            await warcontract.connect(signer1).declareWar(0, 1)
-            await warcontract.connect(signer2).offerPeace(1, 0)
-            var isActive = await warcontract.isWarActive(0);
-            expect(isActive).to.equal(true)
-            var activeWars : any = await warcontract.gameActiveWars();
-            expect(activeWars.length).to.equal(1)
-            expect(activeWars[0].toNumber()).to.equal(0)
-            await warcontract.connect(signer1).offerPeace(0, 0)
-            var activeWars : any = await warcontract.gameActiveWars();
-            expect(activeWars.length).to.equal(0)
-        })
-
-        it("tests that wars can expire", async function () {
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
-            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
-            await forcescontract.connect(signer2).buySoldiers(1000, 1)
-            await forcescontract.connect(signer2).buyTanks(50, 1)
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
-            await warcontract.connect(signer1).declareWar(0, 1)
-            await warcontract.connect(signer2).offerPeace(1, 0)
-            var isActive = await warcontract.isWarActive(0);
-            expect(isActive).to.equal(true)
-            var daysLeft = await warcontract.getDaysLeft(0)
-            // console.log(daysLeft.toNumber())
-            expect(daysLeft).to.equal(7)
-            var warDetails : any = await warcontract.checkWar(0)
-            // console.log("expired", warDetails[4])
-            expect(warDetails[4]).to.equal(false)
-            await keepercontract.decremenWarDaysByOwner()
-            await keepercontract.decremenWarDaysByOwner()
-            await keepercontract.decremenWarDaysByOwner()
-            await keepercontract.decremenWarDaysByOwner()
-            await keepercontract.decremenWarDaysByOwner()
-            await keepercontract.decremenWarDaysByOwner()
-            await keepercontract.decremenWarDaysByOwner()
-            var isActive = await warcontract.isWarActive(0);
-            expect(isActive).to.equal(false)
-            // console.log("active after expiration", isActive)
-            var daysLeft = await warcontract.getDaysLeft(0)
-            // console.log(daysLeft.toNumber())
-            expect(daysLeft).to.equal(0)
-            // console.log("days left", daysLeft.toNumber())
-            var warDetails : any = await warcontract.checkWar(0)
-            // console.log("expired", warDetails[4])
-            expect(warDetails[4]).to.equal(true)
-        })
-
-
     })
 })

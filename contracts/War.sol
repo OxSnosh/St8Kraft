@@ -581,13 +581,13 @@ contract WarContract is Ownable {
             uint256 launchesToday = warIdToWar[_warId]
                 .offenseCruiseMissileLaunchesToday;
             require(launchesToday < 2, "too many launches today");
-            warIdToWar[warId].offenseCruiseMissileLaunchesToday += 1;
+            warIdToWar[_warId].offenseCruiseMissileLaunchesToday += 1;
         }
         if (nationId == defenseId) {
             uint256 launchesToday = warIdToWar[_warId]
                 .defenseCruiseMissileLaunchesToday;
             require(launchesToday < 2, "too many launches today");
-            warIdToWar[warId].defenseCruiseMissileLaunchesToday += 1;
+            warIdToWar[_warId].defenseCruiseMissileLaunchesToday += 1;
         }
     }
 

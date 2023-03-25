@@ -107,6 +107,10 @@ contract KeeperContract is Ownable {
         war.resetCruiseMissileLaunches();
     }
 
+    function resetCruiseMissileLaunchesByOwner() public onlyOwner {
+        war.resetCruiseMissileLaunches();
+    }
+
     function incrementDaysSince() internal {
         tres.incrementDaysSince();
     }

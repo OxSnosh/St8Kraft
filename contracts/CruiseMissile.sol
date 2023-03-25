@@ -9,6 +9,7 @@ import "./Wonders.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+import "hardhat/console.sol";
 
 ///@title CruiseMissileContract
 ///@author OxSnosh
@@ -58,6 +59,8 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
+    event randomNumbersRequested(uint256 indexed requestId);
+
     ///@dev this is the constructor that inherits chainlink variables to use chainlink VRF
     constructor(
         address vrfCoordinatorV2,
@@ -73,7 +76,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings (
+    function settings(
         address _forces,
         address _countryMinter,
         address _war,
@@ -94,7 +97,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings2 (
+    function settings2(
         address _improvements1,
         address _improvements3,
         address _improvements4,
@@ -169,7 +172,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
     ///@notice can only attack another nation where war is currently declared
     ///@param attackerId is the ID of the attacking nation
     ///@param defenderId is the ID of the defendin nation
-    ///@param warId is the ID for the war between the two nations 
+    ///@param warId is the ID for the war between the two nations
     function launchCruiseMissileAttack(
         uint256 attackerId,
         uint256 defenderId,
@@ -181,6 +184,12 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         require(missileCount > 0, "no cruise missiles");
         bool isWarActive = war.isWarActive(warId);
         require(isWarActive, "not active war");
+        (uint256 offense, uint256 defense) = war.getInvolvedParties(warId);
+        require(
+            (attackerId == offense && defenderId == defense) ||
+                (attackerId == defense && defenderId == offense),
+            "not involved in war"
+        );
         CruiseMissileAttack memory newAttack = CruiseMissileAttack(
             warId,
             attackerId,
@@ -191,13 +200,13 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         );
         war.incrementCruiseMissileAttack(warId, attackerId);
         attackIdToCruiseMissile[cruiseMissileAttackId] = newAttack;
-        fulfillRequest(cruiseMissileAttackId);
+        // fulfillRequest(cruiseMissileAttackId);
         cruiseMissileAttackId++;
     }
 
     ///@dev this is an internal function that will call the VRFCoordinator from randomness from chainlink
     ///@param id this is the ID of the cruise missile attack
-    function fulfillRequest(uint256 id) internal {
+    function fulfillRequest(uint256 id) public {
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
@@ -206,6 +215,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
             NUM_WORDS
         );
         s_requestIdToRequestIndex[requestId] = id;
+        emit randomNumbersRequested(requestId);
     }
 
     ///@dev this is the fnction that the ChainlinkVRF contract will call when it responds
@@ -213,33 +223,19 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
     ///@notice this function will randomly determine is the cruise missile attacke was successful
     ///@notice attacker satellites increase the odds of a successful attack
     ///@notice defender satellites and intercepor middile system will increase the odds of a missile attack being thwarted
-    ///@notice a successful cruise missile attacke will reduce defender tanks, tech or infrastructure (type selected randomly) 
+    ///@notice a successful cruise missile attacke will reduce defender tanks, tech or infrastructure (type selected randomly)
     ///@param requestId id the ID number for the request made to the VRF contract
     ///@param randomWords is the random numbers that the ChainlinkVRF contract responds with
-    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords)
-        internal
-        override
-    {
+    function fulfillRandomWords(
+        uint256 requestId,
+        uint256[] memory randomWords
+    ) internal override {
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
         s_requestIndexToRandomWords[requestNumber] = randomWords;
         s_randomWords = randomWords;
         uint256 defenderId = attackIdToCruiseMissile[requestNumber].defenderId;
         uint256 attackerId = attackIdToCruiseMissile[requestNumber].attackerId;
-        uint256 defenderMissileDefenses = imp4.getMissileDefenseCount(
-            defenderId
-        );
-        uint256 attackerSattelites = imp3.getSatelliteCount(attackerId);
-        uint256 successOdds = 75;
-        bool interceptor = won2.getInterceptorMissileSystem(defenderId);
-        if (interceptor) {
-            successOdds -= 25;
-        }
-        if (defenderMissileDefenses > 0) {
-            successOdds -= (5 * defenderMissileDefenses);
-        }
-        if (attackerSattelites > 0) {
-            successOdds += (5 * attackerSattelites);
-        }
+        uint256 successOdds = getSuccessOdds(attackerId, defenderId);
         uint256[] memory randomNumbers = s_requestIndexToRandomWords[
             requestNumber
         ];
@@ -258,10 +254,32 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         }
     }
 
+    function getSuccessOdds(
+        uint256 attackerId,
+        uint256 defenderId
+    ) public view returns (uint256) {
+        uint256 successOdds = 75;
+        uint256 defenderMissileDefenses = imp4.getMissileDefenseCount(
+            defenderId
+        );
+        uint256 attackerSattelites = imp3.getSatelliteCount(attackerId);
+        bool interceptor = won2.getInterceptorMissileSystem(defenderId);
+        if (interceptor) {
+            successOdds -= 25;
+        }
+        if (defenderMissileDefenses > 0) {
+            successOdds -= (5 * defenderMissileDefenses);
+        }
+        if (attackerSattelites > 0) {
+            successOdds += (5 * attackerSattelites);
+        }
+        return successOdds;
+    }
+
     ///@dev this is the internal function that will determine the number of tanks destroyed in a cruise missile attack
     ///@notice this function will decrease the number of tanks of the defender in a successful cruise missile attack
     ///@notice attacker munitions factories will increase the damage inflicted by a cruise missile attack on tanks
-    ///@notice defender bunkers will decrease the damage infilcted by a cruise missile attack on tanks 
+    ///@notice defender bunkers will decrease the damage infilcted by a cruise missile attack on tanks
     ///@param attackId is the ID of the cruise missile attack
     function destroyTanks(uint256 attackId) internal {
         uint256 defenderId = attackIdToCruiseMissile[attackId].defenderId;
@@ -292,23 +310,23 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
     ///@dev this is an internal function that will decrease defender Tech in the event of a successful cruise missile launch
     ///@notice this function will decrease the tech of a defending nation in the event of a successful cruise missile attack
     ///@notice attacker munitions factories will increase the damage inflicted by a cruise missile attack on tech
-    ///@notice defender bunkers will decrease the damage infilcted by a cruise missile attack on tech 
+    ///@notice defender bunkers will decrease the damage infilcted by a cruise missile attack on tech
     ///@param attackId is the ID of the cruise missile attack
     function destroyTech(uint256 attackId) internal {
         uint256 defenderId = attackIdToCruiseMissile[attackId].defenderId;
         uint256 attackerId = attackIdToCruiseMissile[attackId].attackerId;
         uint256 techCount = inf.getTechnologyCount(defenderId);
-        if (techCount >= 2) {
+        if (techCount >= 5) {
             uint256 defenderBunkerCount = imp1.getBunkerCount(defenderId);
             uint256 attackerMunitionsFactory = imp4.getMunitionsFactoryCount(
                 attackerId
             );
-            uint256 amount = 1;
+            uint256 amount = 2;
             if (defenderBunkerCount == 5) {
                 amount -= 1;
             }
             if (attackerMunitionsFactory == 5) {
-                amount += 1;
+                amount += 2;
             }
             inf.decreaseTechCountFromCruiseMissileContract(defenderId, amount);
         }
@@ -317,7 +335,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
     ///@dev this is an internal function that will decrease defender Infrastructure in the event of a successful cruise missile attack
     ///@notice this function will decrease the infrastructure of a defending nation in the event of a successful cruise missile attack
     ///@notice attacker munitions factories will increase the damage inflicted by a cruise missile attack on infrastructure
-    ///@notice defender bunkers will decrease the damage infilcted by a cruise missile attack on infrastructure 
+    ///@notice defender bunkers will decrease the damage infilcted by a cruise missile attack on infrastructure
     ///@param attackId is the ID of the cruise missile attack
     function destroyInfrastructure(uint256 attackId) internal {
         uint256 defenderId = attackIdToCruiseMissile[attackId].defenderId;
@@ -331,10 +349,11 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
             uint256 attackerMunitionsFactory = imp4.getMunitionsFactoryCount(
                 attackerId
             );
-            uint256 randomInfrastructureCount = (5 +
-                (randomNumbers[3] % 5) +
-                attackerMunitionsFactory -
-                defenderBunkerCount);
+            uint256 randomInfrastructureCount = 5;
+            uint256 randomModulus = randomNumbers[2] % 5;
+            randomInfrastructureCount += randomModulus;
+            randomInfrastructureCount += attackerMunitionsFactory;
+            randomInfrastructureCount -= defenderBunkerCount;
             inf.decreaseInfrastructureCountFromCruiseMissileContract(
                 defenderId,
                 randomInfrastructureCount

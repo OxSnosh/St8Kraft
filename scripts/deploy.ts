@@ -100,7 +100,7 @@ async function main() {
     let countryminter: CountryMinter
     let countryparameterscontract: CountryParametersContract
     let crimecontract: CrimeContract
-    let cruisemissileconract: CruiseMissileContract
+    let cruisemissilecontract: CruiseMissileContract
     let environmentcontract: EnvironmentContract
     let fighterscontract: FightersContract
     let fighterlosses: FighterLosses
@@ -264,9 +264,9 @@ async function main() {
         // address _parameters  
 
     const CruiseMissileContract = await ethers.getContractFactory("CruiseMissileContract")
-    cruisemissileconract = await CruiseMissileContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as CruiseMissileContract
-    await cruisemissileconract.deployed()
-    console.log(`CruiseMissile deployed to ${cruisemissileconract.address}`)
+    cruisemissilecontract = await CruiseMissileContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as CruiseMissileContract
+    await cruisemissilecontract.deployed()
+    console.log(`CruiseMissile deployed to ${cruisemissilecontract.address}`)
         // address _forces,
         // address _countryMinter,
         // address _war,
@@ -880,13 +880,13 @@ async function main() {
         improvementscontract3.address,
         countryparameterscontract.address)
     
-    await cruisemissileconract.settings(
+    await cruisemissilecontract.settings(
         forcescontract.address,
         countryminter.address,
         warcontract.address,
         infrastructurecontract.address,
         missilescontract.address)
-    await cruisemissileconract.settings2(
+    await cruisemissilecontract.settings2(
         improvementscontract1.address,
         improvementscontract3.address,
         improvementscontract4.address,
@@ -959,7 +959,7 @@ async function main() {
         treasurycontract.address,
         aidcontract.address,
         spyoperationscontract.address,
-        cruisemissileconract.address,
+        cruisemissilecontract.address,
         nukecontract.address,
         airbattlecontract.address,
         groundbattlecontract.address,
@@ -1059,7 +1059,7 @@ async function main() {
     await infrastructurecontract.settings3(
         spyoperationscontract.address,
         taxescontract.address,
-        cruisemissileconract.address,
+        cruisemissilecontract.address,
         nukecontract.address,
         airbattlecontract.address,
         groundbattlecontract.address,
@@ -1331,7 +1331,7 @@ async function main() {
         navalattackcontract.address,
         airbattlecontract.address,
         groundbattlecontract.address,
-        cruisemissileconract.address,
+        cruisemissilecontract.address,
         forcescontract.address,
         wonderscontract1.address,
         keepercontract.address

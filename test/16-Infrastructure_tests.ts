@@ -71,7 +71,7 @@ describe("Infrastructure Contract", async function () {
     let countryminter: CountryMinter
     let countryparameterscontract: CountryParametersContract
     let crimecontract: CrimeContract
-    let cruisemissileconract: CruiseMissileContract
+    let cruisemissilecontract: CruiseMissileContract
     let environmentcontract: EnvironmentContract
     let fighterscontract: FightersContract
     let fighterlosses: FighterLosses
@@ -138,7 +138,7 @@ describe("Infrastructure Contract", async function () {
         
         let chainId: any
         chainId = network.config.chainId
-        let subscriptionId: any 
+        let subscriptionId: any
         let vrfCoordinatorV2Address: any
     
         if (chainId == 31337) {
@@ -222,8 +222,8 @@ describe("Infrastructure Contract", async function () {
         // console.log(`CrimeContract deployed tp ${crimecontract.address}`)
 
         const CruiseMissileContract = await ethers.getContractFactory("CruiseMissileContract")
-        cruisemissileconract = await CruiseMissileContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as CruiseMissileContract
-        await cruisemissileconract.deployed()
+        cruisemissilecontract = await CruiseMissileContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as CruiseMissileContract
+        await cruisemissilecontract.deployed()
         // console.log(`CruiseMissile deployed to ${cruisemissileconract.address}`)
     
         const EnvironmentContract = await ethers.getContractFactory("EnvironmentContract")
@@ -533,13 +533,13 @@ describe("Infrastructure Contract", async function () {
             improvementscontract3.address,
             countryparameterscontract.address)
         
-        await cruisemissileconract.settings(
+        await cruisemissilecontract.settings(
             forcescontract.address,
             countryminter.address,
             warcontract.address,
             infrastructurecontract.address,
             missilescontract.address)
-        await cruisemissileconract.settings2(
+        await cruisemissilecontract.settings2(
             improvementscontract1.address,
             improvementscontract3.address,
             improvementscontract4.address,
@@ -612,7 +612,7 @@ describe("Infrastructure Contract", async function () {
             treasurycontract.address,
             aidcontract.address,
             spyoperationscontract.address,
-            cruisemissileconract.address,
+            cruisemissilecontract.address,
             nukecontract.address,
             airbattlecontract.address,
             groundbattlecontract.address,
@@ -712,7 +712,7 @@ describe("Infrastructure Contract", async function () {
         await infrastructurecontract.settings3(
             spyoperationscontract.address,
             taxescontract.address,
-            cruisemissileconract.address,
+            cruisemissilecontract.address,
             nukecontract.address,
             airbattlecontract.address,
             groundbattlecontract.address,
@@ -984,7 +984,7 @@ describe("Infrastructure Contract", async function () {
             navalattackcontract.address,
             airbattlecontract.address,
             groundbattlecontract.address,
-            cruisemissileconract.address,
+            cruisemissilecontract.address,
             forcescontract.address,
             wonderscontract1.address,
             keepercontract.address

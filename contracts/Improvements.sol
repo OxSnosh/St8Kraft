@@ -8,6 +8,7 @@ import "./Wonders.sol";
 import "./CountryMinter.sol";
 import "./Infrastructure.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
 
 ///@title ImprovementsContract1
 ///@author OxSnosh
