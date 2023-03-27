@@ -57,7 +57,7 @@ import {
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("Nuke Attack", async function () {
+describe("Air Battle", async function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -1072,10 +1072,16 @@ describe("Nuke Attack", async function () {
         await forcescontract.connect(signer1).deployForces(1000, 30, 0, 0)
         await billscontract.connect(signer2).payBills(1)
 
-        
+
     });
 
     describe("Air Battle", function () {
-
+        it("tests array", async function () {
+            const arr = [1, 0, 0, 0, 1, 3, 3, 5, 5]
+            var stuff : any = await airbattlecontract.getValuesWithZeros(arr)
+            var numArray : any = stuff[0].map((hex : any) => (parseInt(hex, 16)))
+            var strength = stuff[1];
+            console.log(numArray, strength.toNumber())
+        })
     })
 })
