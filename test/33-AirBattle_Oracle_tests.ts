@@ -53,12 +53,15 @@ import {
     WondersContract3,
     WondersContract4,
     BonusResourcesContract,
+    LinkTokenInterface
+    // AirBattleTesting
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("Navy", async function () {
 
+describe("Air Battle with Oracle", async function () {
+    
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
     let aidcontract: AidContract
@@ -110,6 +113,7 @@ describe("Navy", async function () {
     let wonderscontract2: WondersContract2
     let wonderscontract3: WondersContract3
     let wonderscontract4: WondersContract4
+    let airbattletestingcontract: any/*: AirBattleTesting*/
     let signer0: SignerWithAddress
     let signer1: SignerWithAddress
     let signer2: SignerWithAddress
@@ -122,18 +126,21 @@ describe("Navy", async function () {
     let addrs
 
     let vrfCoordinatorV2Mock: any
-
+    
+    
     beforeEach(async function () {
+        
+        console.log("wondering")
         
         signers = await ethers.getSigners();
         signer0 = signers[0];
         signer1 = signers[1];
         signer2 = signers[2];
-        // signer3 = signers[3];
-        // signer4 = signers[4];
-        // signer5 = signers[5];
-        // signer6 = signers[6];
-        // signer7 = signers[7];
+        signer3 = signers[3];
+        signer4 = signers[4];
+        signer5 = signers[5];
+        signer6 = signers[6];
+        signer7 = signers[7];
         
         let chainId: any
         chainId = network.config.chainId
@@ -151,6 +158,7 @@ describe("Navy", async function () {
             vrfCoordinatorV2Address = vrfCoordinatorV2Mock.address
             const transactionResponse = await vrfCoordinatorV2Mock.createSubscription()
             const transactionReceipt = await transactionResponse.wait()
+            
             subscriptionId = transactionReceipt.events[0].args.subId
             // Fund the subscription
             // Our mock makes it so we don't actually have to worry about sending fund
@@ -162,6 +170,19 @@ describe("Navy", async function () {
     
         var gasLane = networkConfig[31337]["gasLane"]
         var callbackGasLimit =  networkConfig[31337]["callbackGasLimit"]
+
+        const AirBattleTesting = await ethers.getContractFactory("AirBattleTesting")
+        airbattletestingcontract = await AirBattleTesting.deploy()
+        await airbattletestingcontract.deployed()
+
+        let linkToken; 
+        var linkTokenAddress = '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512'
+        linkToken = (await ethers.getContractAt(
+            "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol:LinkTokenInterface",
+            linkTokenAddress
+          )) as LinkTokenInterface;
+
+        await linkToken.transfer(airbattletestingcontract.address, ethers.utils.parseEther("1"))
     
         const WarBucks = await ethers.getContractFactory("WarBucks")
         warbucks = await WarBucks.deploy(INITIAL_SUPPLY) as WarBucks
@@ -1032,7 +1053,8 @@ describe("Navy", async function () {
         )
         
         if(chainId == 31337) {
-            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, groundbattlecontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, cruisemissilecontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, nukecontract.address);
         }
 
         await countryminter.connect(signer1).generateCountry(
@@ -1044,10 +1066,12 @@ describe("Navy", async function () {
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
         await treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0);
-        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20)
-        await technologymarketcontrat.connect(signer1).buyTech(0, 100)
-        // await forcescontract.connect(signer1).buySoldiers(2000, 0)
-        // await forcescontract.connect(signer1).buyTanks(40, 0)
+        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+        await technologymarketcontrat.connect(signer1).buyTech(0, 1000)
+        await forcescontract.connect(signer1).buySoldiers(2000, 0)
+        await forcescontract.connect(signer1).buyTanks(150, 0)
+        // await forcescontract.connect(signer1).buySpies(30, 0)
+        await billscontract.connect(signer1).payBills(0)
 
         await countryminter.connect(signer2).generateCountry(
             "TestRuler2",
@@ -1058,286 +1082,26 @@ describe("Navy", async function () {
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
         await warbucks.connect(signer0).transfer(signer2.address, BigInt(2000000000*(10**18)));
         await treasurycontract.connect(signer2).addFunds(BigInt(2000000000*(10**18)), 1);
-        await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 20)
-        await technologymarketcontrat.connect(signer2).buyTech(1, 100)
-        // await forcescontract.connect(signer2).buySoldiers(1000, 1)
-        // await forcescontract.connect(signer2).buyTanks(20, 1)
-        // await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-        // await militarycontract.connect(signer2).toggleWarPeacePreference(1)
-        // await warcontract.connect(signer1).declareWar(0, 1)
-        // await forcescontract.connect(signer1).deployForces(1000, 30, 0, 0)
+        await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 2000)
+        await technologymarketcontrat.connect(signer2).buyTech(1, 1000)
+        await forcescontract.connect(signer2).buySoldiers(2000, 1)
+        await forcescontract.connect(signer2).buyTanks(150, 1)
+        await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+        await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+
+        await warcontract.connect(signer1).declareWar(0, 1)
+        await forcescontract.connect(signer1).deployForces(1000, 30, 0, 0)
+        await billscontract.connect(signer2).payBills(1)
+
+
     });
 
-    describe("Buy Navy Tests", function () {
-        
-        it("tests that daily navy max purchases updates correctly", async function () {
-            var purchases = await additionalnavycontract.getAvailablePurchases(0);
-            // console.log(purchases[0].toNumber())
-            // console.log(purchases[1].toNumber())
-            expect(purchases[0].toNumber()).to.equal(2)
-            expect(purchases[1].toNumber()).to.equal(2)
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            var purchases = await additionalnavycontract.getAvailablePurchases(0);
-            // console.log(purchases[0].toNumber())
-            // console.log(purchases[1].toNumber())
-            expect(purchases[0]).to.equal(5)
-            expect(purchases[1]).to.equal(5)
-        })
-
-        it("tests that daily navy max purchases updates correctly part 2", async function () {
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000)            
-            await wonderscontract1.connect(signer1).buyWonder1(0, 11)
-            var purchases = await additionalnavycontract.getAvailablePurchases(0);
-            // console.log(purchases[0].toNumber())
-            // console.log(purchases[1].toNumber())
-            expect(purchases[0]).to.equal(4)
-            expect(purchases[1]).to.equal(4)
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            var purchases = await additionalnavycontract.getAvailablePurchases(0);
-            // console.log(purchases[0].toNumber())
-            // console.log(purchases[1].toNumber())
-            expect(purchases[0]).to.equal(7)
-            expect(purchases[1]).to.equal(7)
-        })
-
-        it("tests that buyCorvette() works", async function () {
-            var purchasesToday = await navalactionscontract.getPurchasesToday(0)
-            expect(purchasesToday).to.equal(0)
-            var shipCount = await navycontract.getCorvetteCount(0)
-            expect(shipCount).to.equal(0)
-            await expect(navycontract.connect(signer1).buyCorvette(2, 1)).to.be.revertedWith("!nation owner")
-            await expect(navycontract.connect(signer1).buyCorvette(3, 0)).to.be.revertedWith("purchase exceeds daily purchase limit")
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await expect(navycontract.connect(signer1).buyCorvette(3, 0)).to.be.revertedWith("Must own a drydock to purchase")
-            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
-            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 10)
-            await navycontract.connect(signer1).buyCorvette(3, 0)
-            var purchasesToday = await navalactionscontract.getPurchasesToday(0)
-            expect(purchasesToday).to.equal(3)
-            var shipCount = await navycontract.getCorvetteCount(0)
-            expect(shipCount).to.equal(3)
-        })
-
-        it("tests that updateCorvetteSpecs() works", async function () {
-            var specs : any = await navycontract.getCorvetteSpecs()
-            expect(specs[0]).to.equal(BigInt("300000000000000000000000"))
-            expect(specs[1].toNumber()).to.equal(2000)
-            expect(specs[2].toNumber()).to.equal(200)
-            await navycontract.updateCorvetteSpecs(10000, 1000, 100)
-            var specs : any = await navycontract.getCorvetteSpecs()
-            expect(specs[0]).to.equal(10000)
-            expect(specs[1].toNumber()).to.equal(1000)
-            expect(specs[2].toNumber()).to.equal(100)
-        })
-
-        it("tests that buyLandingShip() works", async function () {
-            var purchasesToday = await navalactionscontract.getPurchasesToday(0)
-            expect(purchasesToday).to.equal(0)
-            var shipCount = await navycontract.getLandingShipCount(0)
-            expect(shipCount).to.equal(0)
-            await expect(navycontract.connect(signer1).buyLandingShip(2, 1)).to.be.revertedWith("!nation owner")
-            await expect(navycontract.connect(signer1).buyLandingShip(3, 0)).to.be.revertedWith("purchase exceeds daily purchase limit")
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await expect(navycontract.connect(signer1).buyLandingShip(3, 0)).to.be.revertedWith("Must own a shipyard to purchase")
-            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
-            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 9)
-            await navycontract.connect(signer1).buyLandingShip(3, 0)
-            var purchasesToday = await navalactionscontract.getPurchasesToday(0)
-            expect(purchasesToday).to.equal(3)
-            var shipCount = await navycontract.getLandingShipCount(0)
-            expect(shipCount).to.equal(3)
-        })
-
-        it("tests that updateLandingShipSpecs() works", async function () {
-            var specs : any = await navycontract.getLandingShipSpecs()
-            expect(specs[0]).to.equal(BigInt("300000000000000000000000"))
-            expect(specs[1].toNumber()).to.equal(2500)
-            expect(specs[2].toNumber()).to.equal(200)
-            await navycontract.updateLandingShipSpecs(10000, 1000, 100)
-            var specs : any = await navycontract.getLandingShipSpecs()
-            expect(specs[0]).to.equal(10000)
-            expect(specs[1].toNumber()).to.equal(1000)
-            expect(specs[2].toNumber()).to.equal(100)
-        })
-
-        it("tests that buyBattleship() works", async function () {
-            var purchasesToday = await navalactionscontract.getPurchasesToday(0)
-            expect(purchasesToday).to.equal(0)
-            var shipCount = await navycontract.getBattleshipCount(0)
-            expect(shipCount).to.equal(0)
-            await expect(navycontract.connect(signer1).buyBattleship(2, 1)).to.be.revertedWith("!nation owner")
-            await expect(navycontract.connect(signer1).buyBattleship(3, 0)).to.be.revertedWith("purchase exceeds daily purchase limit")
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await expect(navycontract.connect(signer1).buyBattleship(3, 0)).to.be.revertedWith("Must own a drydock to purchase")
-            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
-            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 10)
-            await navycontract.connect(signer1).buyBattleship(3, 0)
-            var purchasesToday = await navalactionscontract.getPurchasesToday(0)
-            expect(purchasesToday).to.equal(3)
-            var shipCount = await navycontract.getBattleshipCount(0)
-            expect(shipCount).to.equal(3)
-        })
-
-        it("tests that updateBattleshipSpecs() works", async function () {
-            var specs : any = await navycontract.getBattleshipSpecs()
-            expect(specs[0]).to.equal(BigInt("300000000000000000000000"))
-            expect(specs[1].toNumber()).to.equal(2500)
-            expect(specs[2].toNumber()).to.equal(300)
-            await navycontract.updateBattleshipSpecs(10000, 1000, 100)
-            var specs : any = await navycontract.getBattleshipSpecs()
-            expect(specs[0]).to.equal(10000)
-            expect(specs[1].toNumber()).to.equal(1000)
-            expect(specs[2].toNumber()).to.equal(100)
-        })
-
-        it("tests that buyCruiser() works", async function () {
-            var purchasesToday = await navalactionscontract.getPurchasesToday(0)
-            expect(purchasesToday).to.equal(0)
-            var shipCount = await navycontract.getCruiserCount(0)
-            expect(shipCount).to.equal(0)
-            await expect(navycontract.connect(signer1).buyCruiser(2, 1)).to.be.revertedWith("!nation owner")
-            await expect(navycontract.connect(signer1).buyCruiser(3, 0)).to.be.revertedWith("purchase exceeds daily purchase limit")
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await expect(navycontract.connect(signer1).buyCruiser(3, 0)).to.be.revertedWith("Must own a drydock to purchase")
-            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
-            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 10)
-            await navycontract.connect(signer1).buyCruiser(3, 0)
-            var purchasesToday = await navalactionscontract.getPurchasesToday(0)
-            expect(purchasesToday).to.equal(3)
-            var shipCount = await navycontract.getCruiserCount(0)
-            expect(shipCount).to.equal(3)
-        })
-
-        it("tests that updateCruiserSpecs() works", async function () {
-            var specs : any = await navycontract.getCruiserSpecs()
-            expect(specs[0]).to.equal(BigInt("500000000000000000000000"))
-            expect(specs[1].toNumber()).to.equal(3000)
-            expect(specs[2].toNumber()).to.equal(350)
-            await navycontract.updateCruiserSpecs(10000, 1000, 100)
-            var specs : any = await navycontract.getCruiserSpecs()
-            expect(specs[0]).to.equal(10000)
-            expect(specs[1].toNumber()).to.equal(1000)
-            expect(specs[2].toNumber()).to.equal(100)
-        })
-
-        it("tests that buyFrigate() works", async function () {
-            var purchasesToday = await navalactionscontract.getPurchasesToday(0)
-            expect(purchasesToday).to.equal(0)
-            var shipCount = await navycontract2.getFrigateCount(0)
-            expect(shipCount).to.equal(0)
-            await expect(navycontract2.connect(signer1).buyFrigate(2, 1)).to.be.revertedWith("!nation owner")
-            await expect(navycontract2.connect(signer1).buyFrigate(3, 0)).to.be.revertedWith("purchase exceeds daily purchase limit")
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await expect(navycontract2.connect(signer1).buyFrigate(3, 0)).to.be.revertedWith("Must own a shipyard to purchase")
-            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
-            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 9)
-            await navycontract2.connect(signer1).buyFrigate(3, 0)
-            var purchasesToday = await navalactionscontract.getPurchasesToday(0)
-            expect(purchasesToday).to.equal(3)
-            var shipCount = await navycontract2.getFrigateCount(0)
-            expect(shipCount).to.equal(3)
-        })
-
-        it("tests that updateFrigateSpecs() works", async function () {
-            var specs : any = await navycontract2.getFrigateSpecs()
-            expect(specs[0]).to.equal(BigInt("750000000000000000000000"))
-            expect(specs[1].toNumber()).to.equal(3500)
-            expect(specs[2].toNumber()).to.equal(400)
-            await navycontract2.updateFrigateSpecs(10000, 1000, 100)
-            var specs : any = await navycontract2.getFrigateSpecs()
-            expect(specs[0]).to.equal(10000)
-            expect(specs[1].toNumber()).to.equal(1000)
-            expect(specs[2].toNumber()).to.equal(100)
-        })
-
-        it("tests that buyDestroyer() works", async function () {
-            var purchasesToday = await navalactionscontract.getPurchasesToday(0)
-            expect(purchasesToday).to.equal(0)
-            var shipCount = await navycontract2.getDestroyerCount(0)
-            expect(shipCount).to.equal(0)
-            await expect(navycontract2.connect(signer1).buyDestroyer(2, 1)).to.be.revertedWith("!nation owner")
-            await expect(navycontract2.connect(signer1).buyDestroyer(3, 0)).to.be.revertedWith("purchase exceeds daily purchase limit")
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await expect(navycontract2.connect(signer1).buyDestroyer(3, 0)).to.be.revertedWith("Must own a drydock to purchase")
-            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
-            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 10)
-            await navycontract2.connect(signer1).buyDestroyer(3, 0)
-            var purchasesToday = await navalactionscontract.getPurchasesToday(0)
-            expect(purchasesToday).to.equal(3)
-            var shipCount = await navycontract2.getDestroyerCount(0)
-            expect(shipCount).to.equal(3)
-        })
-
-        it("tests that updateDestroyerSpecs() works", async function () {
-            var specs : any = await navycontract2.getDestroyerSpecs()
-            expect(specs[0]).to.equal(BigInt("1000000000000000000000000"))
-            expect(specs[1].toNumber()).to.equal(4000)
-            expect(specs[2].toNumber()).to.equal(600)
-            await navycontract2.updateDestroyerSpecs(10000, 1000, 100)
-            var specs : any = await navycontract2.getDestroyerSpecs()
-            expect(specs[0]).to.equal(10000)
-            expect(specs[1].toNumber()).to.equal(1000)
-            expect(specs[2].toNumber()).to.equal(100)
-        })
-
-        it("tests that buySubmarine() works", async function () {
-            var purchasesToday = await navalactionscontract.getPurchasesToday(0)
-            expect(purchasesToday).to.equal(0)
-            var shipCount = await navycontract2.getSubmarineCount(0)
-            expect(shipCount).to.equal(0)
-            await expect(navycontract2.connect(signer1).buySubmarine(2, 1)).to.be.revertedWith("!nation owner")
-            await expect(navycontract2.connect(signer1).buySubmarine(3, 0)).to.be.revertedWith("purchase exceeds daily purchase limit")
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await expect(navycontract2.connect(signer1).buySubmarine(3, 0)).to.be.revertedWith("Must own a shipyard to purchase")
-            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
-            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 9)
-            await navycontract2.connect(signer1).buySubmarine(3, 0)
-            var purchasesToday = await navalactionscontract.getPurchasesToday(0)
-            expect(purchasesToday).to.equal(3)
-            var shipCount = await navycontract2.getSubmarineCount(0)
-            expect(shipCount).to.equal(3)
-        })
-
-        it("tests that updateSubmarineSpecs() works", async function () {
-            var specs : any = await navycontract2.getSubmarineSpecs()
-            expect(specs[0]).to.equal(BigInt("1500000000000000000000000"))
-            expect(specs[1].toNumber()).to.equal(4500)
-            expect(specs[2].toNumber()).to.equal(750)
-            await navycontract2.updateSubmarineSpecs(10000, 1000, 100)
-            var specs : any = await navycontract2.getSubmarineSpecs()
-            expect(specs[0]).to.equal(10000)
-            expect(specs[1].toNumber()).to.equal(1000)
-            expect(specs[2].toNumber()).to.equal(100)
-        })
-
-        it("tests that buyAircraftCarrier() works", async function () {
-            var purchasesToday = await navalactionscontract.getPurchasesToday(0)
-            expect(purchasesToday).to.equal(0)
-            var shipCount = await navycontract2.getAircraftCarrierCount(0)
-            expect(shipCount).to.equal(0)
-            await expect(navycontract2.connect(signer1).buyAircraftCarrier(2, 1)).to.be.revertedWith("!nation owner")
-            await expect(navycontract2.connect(signer1).buyAircraftCarrier(3, 0)).to.be.revertedWith("purchase exceeds daily purchase limit")
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await expect(navycontract2.connect(signer1).buyAircraftCarrier(3, 0)).to.be.revertedWith("Must own a shipyard to purchase")
-            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
-            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 9)
-            await navycontract2.connect(signer1).buyAircraftCarrier(3, 0)
-            var purchasesToday = await navalactionscontract.getPurchasesToday(0)
-            expect(purchasesToday).to.equal(3)
-            var shipCount = await navycontract2.getAircraftCarrierCount(0)
-            expect(shipCount).to.equal(3)
-        })
-
-        it("tests that updateAircraftCarrier() works", async function () {
-            var specs : any = await navycontract2.getAircraftCarrierSpecs()
-            expect(specs[0]).to.equal(BigInt("2000000000000000000000000"))
-            expect(specs[1].toNumber()).to.equal(5000)
-            expect(specs[2].toNumber()).to.equal(1000)
-            await navycontract2.updateAircraftCarrierSpecs(10000, 1000, 100)
-            var specs : any = await navycontract2.getAircraftCarrierSpecs()
-            expect(specs[0]).to.equal(10000)
-            expect(specs[1].toNumber()).to.equal(1000)
-            expect(specs[2].toNumber()).to.equal(100)
+    describe("Air Battle with Oracle", function () {
+        it("tests oracle call", async function () {
+            console.log("LFG")
+            var oracle = '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0'
+            var jobId = 'ef2c6110b8454f2ca3023f2405dad993'
+            await airbattletestingcontract.requestInfo(oracle, jobId)
         })
     })
 })

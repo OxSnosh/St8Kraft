@@ -8,6 +8,8 @@ import "dotenv/config"
 import "@nomiclabs/hardhat-solhint"
 import "@typechain/hardhat"
 import "solidity-docgen"
+import "@chainlink/hardhat-chainlink";
+import { chainlink } from "hardhat";
 import { HardhatUserConfig } from "hardhat/types"
 
 /**
@@ -45,6 +47,9 @@ const config: HardhatUserConfig = {
       },
       {
         version: "0.8.17"
+      },
+      {
+        version: "0.4.24"
       },
     ],
   },
