@@ -37,7 +37,7 @@ const POLYGONSCAN_API_KEY =
   process.env.POLYGONSCAN_API_KEY || "Your polygonscan API key"
 const REPORT_GAS = process.env.REPORT_GAS || false
 
-const config: HardhatUserConfig = {
+const config = {
   solidity: {
     compilers: [
       {
@@ -45,6 +45,9 @@ const config: HardhatUserConfig = {
       },
       {
         version: "0.8.17"
+      },
+      {
+        version: "0.7.6"
       },
     ],
   },
