@@ -1,7 +1,7 @@
 {
   "HARDHAT": {
     "countryminter": {
-      "address": "0xD0798f8308EFE28516C36D5d0dC31f68fD8D0d05",
+      "address": "0x6F6f570F45833E249e27022648a26F4076F48f78",
       "ABI": [
         {
           "inputs": [],
@@ -1021,7 +1021,7 @@
       ]
     },
     "forcescontract": {
-      "address": "0x2B4F80e20eaC049509C86f3B0742b6B4fB7C4bE2",
+      "address": "0x32EEce76C2C2e8758584A83Ee2F522D4788feA0f",
       "ABI": [
         {
           "anonymous": false,
@@ -2178,7 +2178,7 @@
       ]
     },
     "warbucks": {
-      "address": "0x68F5621191A75aa1212dbC49d7A8512Af059fb7F",
+      "address": "0xB82008565FdC7e44609fA118A4a681E92581e680",
       "ABI": [
         {
           "inputs": [
@@ -2565,7 +2565,7 @@
       ]
     },
     "treasurycontract": {
-      "address": "0xa4b6Fa80b31d641bB3f48C234d6B809801AddA78",
+      "address": "0xA56F946D6398Dd7d9D4D9B337Cf9E0F68982ca5B",
       "ABI": [
         {
           "anonymous": false,
@@ -3617,7 +3617,7 @@
       ]
     },
     "infrastructurecontract": {
-      "address": "0x7cf858d767d00942Ac1d7ADc3D7fDdA6BE980f18",
+      "address": "0x0ed64d01D0B4B655E410EF1441dD677B695639E7",
       "ABI": [
         {
           "anonymous": false,
@@ -3999,7 +3999,7 @@
       ]
     },
     "technologymarketcontract": {
-      "address": "0xE22F9f2122885512C919dbaE13Ec0beb7F21F8b3",
+      "address": "0x26B862f640357268Bd2d9E95bc81553a2Aa81D7E",
       "ABI": [
         {
           "anonymous": false,
@@ -4324,7 +4324,7 @@
       ]
     },
     "militarycontract": {
-      "address": "0xAB46585f82eFF31F9b9C290b3464A43a626f5EE6",
+      "address": "0x96F3Ce39Ad2BfDCf92C0F6E2C2CAbF83874660Fc",
       "ABI": [
         {
           "anonymous": false,
@@ -4609,7 +4609,7 @@
       ]
     },
     "warcontract": {
-      "address": "0x0B2D194E826815AD3D4d7DF0D83c4a12972A5F66",
+      "address": "0x5D42EBdBBa61412295D7b0302d6F50aC449Ddb4F",
       "ABI": [
         {
           "anonymous": false,
