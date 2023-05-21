@@ -1394,6 +1394,24 @@ async function main() {
         let forcesArtifact = await artifacts.readArtifact("ForcesContract");
         let forcesAbi = forcesArtifact.abi;
 
+        let warbucksArtifact = await artifacts.readArtifact("WarBucks");
+        let warbucksAbi = warbucksArtifact.abi;
+
+        let treasuryArtifact = await artifacts.readArtifact("TreasuryContract");
+        let treasuryAbi = treasuryArtifact.abi;
+
+        let infrastructureArtifact = await artifacts.readArtifact("InfrastructureMarketContract");
+        let infrastructureAbi = infrastructureArtifact.abi;
+
+        let technologyArtifact = await artifacts.readArtifact("TechnologyMarketContract");
+        let technologyAbi = technologyArtifact.abi;
+
+        let militaryArtifact = await artifacts.readArtifact("MilitaryContract");
+        let militaryAbi = militaryArtifact.abi;
+
+        let warArtifact = await artifacts.readArtifact("WarContract");
+        let warAbi = warArtifact.abi;
+
         // Read Contract Metadata
         try {
           if (fs.existsSync(contractMetadataLocation)) {
@@ -1420,6 +1438,61 @@ async function main() {
         fs.writeFileSync(
           contractMetadataLocation,
           JSON.stringify(contractMetadata, null, 2)
+        );
+
+        const scriptMetadataLocation = `script-metadata.json`;
+        let scriptMetadata : any;
+
+        try {
+            if (fs.existsSync(scriptMetadataLocation)) {
+                scriptMetadata = fs.readFileSync(scriptMetadataLocation).toString();
+            } else {
+                scriptMetadata = "{}";
+            }
+        } catch (e) {
+            console.log(e);
+        }
+
+        scriptMetadata = JSON.parse(scriptMetadata);
+    
+        scriptMetadata.HARDHAT = {
+            ...scriptMetadata.HARDHAT,
+            countryminter: {
+            address: countryminter.address,
+            ABI: countryMinterAbi,
+            },
+            forcescontract: {
+            address: forcescontract.address,
+            ABI: forcesAbi,
+            },
+            warbucks: {
+                address: warbucks.address,
+                ABI: warbucksAbi,
+            },
+            treasurycontract: {
+                address: treasurycontract.address,
+                ABI: treasuryAbi,
+            },
+            infrastructurecontract: {
+                address: infrastructuremarketplace.address,
+                ABI: infrastructureAbi,
+            },
+            technologymarketcontract: {
+                address: technologymarketcontrat.address,
+                ABI: technologyAbi,
+            },
+            militarycontract: {
+                address: militarycontract.address,
+                ABI: militaryAbi,
+            },
+            warcontract: {
+                address: warcontract.address,
+                ABI: warAbi,
+            }
+        };
+        fs.writeFileSync(
+            scriptMetadataLocation,
+            JSON.stringify(scriptMetadata, null, 2)
         );
     }
 }
