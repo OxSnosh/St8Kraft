@@ -1,4 +1,4 @@
-import { network, ethers } from "hardhat"
+import { network, ethers, artifacts } from "hardhat"
 import { INITIAL_SUPPLY } from "../helper-hardhat-config"
 import { 
     WarBucks, 
@@ -57,6 +57,9 @@ import {
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
+import fs from "fs"
+
+const eaPath = "../MetaNations-external-adapters/Contracts/"
 
 async function main() {
     
@@ -1380,6 +1383,45 @@ async function main() {
     )
 
     console.log("settings initiated");
+
+    if(chainId == 31337) {
+        const contractMetadataLocation = `${eaPath}/contract-metadata.json`;
+        let contractMetadata : any;
+        
+        let countryMinterArtifact = await artifacts.readArtifact("CountryMinter");
+        let countryMinterAbi = countryMinterArtifact.abi;
+
+        let forcesArtifact = await artifacts.readArtifact("ForcesContract");
+        let forcesAbi = forcesArtifact.abi;
+
+        // Read Contract Metadata
+        try {
+          if (fs.existsSync(contractMetadataLocation)) {
+            contractMetadata = fs.readFileSync(contractMetadataLocation).toString();
+          } else {
+            contractMetadata = "{}";
+          }
+        } catch (e) {
+          console.log(e);
+        }
+        contractMetadata = JSON.parse(contractMetadata);
+    
+        contractMetadata.HARDHAT = {
+          ...contractMetadata.HARDHAT,
+          countryminter: {
+            address: countryminter.address,
+            ABI: countryMinterAbi,
+          },
+          forcescontract: {
+            address: forcescontract.address,
+            ABI: forcesAbi,
+          },
+        };
+        fs.writeFileSync(
+          contractMetadataLocation,
+          JSON.stringify(contractMetadata, null, 2)
+        );
+    }
 }
 
 main().catch((error) => {
