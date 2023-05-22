@@ -8,6 +8,7 @@ import "dotenv/config"
 import "@nomiclabs/hardhat-solhint"
 import "@typechain/hardhat"
 import "solidity-docgen"
+import 'solidity-coverage'
 import { HardhatUserConfig } from "hardhat/types"
 
 /**
