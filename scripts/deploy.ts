@@ -810,7 +810,8 @@ async function main() {
         wonderscontract4.address,
         infrastructurecontract.address,
         bonusresourcescontract.address,
-        navycontract2.address)
+        navycontract2.address,
+        countryparameterscontract.address)
     
     await bomberscontract.settings(
         countryminter.address, 
@@ -974,7 +975,8 @@ async function main() {
         improvementscontract2.address,
         wonderscontract1.address,
         countryminter.address,
-        keepercontract.address)
+        keepercontract.address,
+        countryparameterscontract.address)
     
     await missilescontract.settings(
         treasurycontract.address,
@@ -1067,7 +1069,8 @@ async function main() {
         airbattlecontract.address,
         groundbattlecontract.address,
         countryminter.address,
-        crimecontract.address
+        crimecontract.address,
+        countryparameterscontract.address
     )
 
     await infrastructuremarketplace.settings(
