@@ -10,6 +10,7 @@ import "./Navy.sol";
 import "./Improvements.sol";
 import "./Resources.sol";
 import "./CountryMinter.sol";
+import "./CountryParameters.sol";
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -34,6 +35,7 @@ contract BillsContract is Ownable {
     address public missiles;
     address public bonusResources;
     address public navy2;
+    address public parameters;
 
     TreasuryContract tsy;
     WondersContract1 won1;
@@ -51,6 +53,7 @@ contract BillsContract is Ownable {
     CountryMinter mint;
     BonusResourcesContract bonus;
     NavyContract2 nav2;
+    CountryParametersContract param;
 
     mapping(uint256 => address) public idToOwnerBills;
 
@@ -99,7 +102,8 @@ contract BillsContract is Ownable {
         address _wonders4,
         address _infrastructure,
         address _bonusResources,
-        address _navy2
+        address _navy2,
+        address _parameters
     ) public onlyOwner {
         improvements1 = _improvements1;
         imp1 = ImprovementsContract1(_improvements1);
@@ -115,6 +119,8 @@ contract BillsContract is Ownable {
         bonus = BonusResourcesContract(_bonusResources);
         navy2 = _navy2;
         nav2 = NavyContract2(_navy2);
+        parameters = _parameters;
+        param = CountryParametersContract(_parameters);
     }
 
     function updateCountryMinter(address newAddress) public onlyOwner {
@@ -362,6 +368,10 @@ contract BillsContract is Ownable {
             navyUpkeep +
             nukeUpkeep +
             cruiseMissileUpkeep;
+        bool accomodativeGov = checkAccomodativeGovernmentForMilitaryUpkeep(id);
+        if (accomodativeGov) {
+            dailyMilitaryUpkeep = ((dailyMilitaryUpkeep * 95) / 100);
+        }
         return dailyMilitaryUpkeep * (10 ** 18);
     }
 
@@ -584,10 +594,16 @@ contract BillsContract is Ownable {
             upkeepPerLevel = 3000;
         }
         uint256 dailyImprovementBillsDue = (improvementCount * upkeepPerLevel);
+        uint256 modifiers = 100;
         bool nuclearPowerPlant = won3.getNuclearPowerPlant(id);
         if (nuclearPowerPlant) {
-            dailyImprovementBillsDue = ((dailyImprovementBillsDue * 95) / 100);
+            modifiers -= 5;
         }
+        bool accomodativeGovernment = checkAccomodativeGovernmentForImprovementsAndWonders(id);
+        if (accomodativeGovernment) {
+            modifiers -= 5;
+        }
+        dailyImprovementBillsDue = ((dailyImprovementBillsDue * modifiers) / 100);
         return dailyImprovementBillsDue * (10 ** 18);
     }
 
@@ -599,10 +615,53 @@ contract BillsContract is Ownable {
     ) public view returns (uint256) {
         uint256 wonderCount = won1.getWonderCount(id);
         uint256 wonderBillsPayable = (wonderCount * 5000);
+        uint256 modifiers = 100;
         bool nuclearPowerPlant = won3.getNuclearPowerPlant(id);
         if (nuclearPowerPlant) {
-            wonderBillsPayable = ((wonderBillsPayable * 95) / 100);
+            modifiers -= 5;
         }
+        bool accomodativeGovernment = checkAccomodativeGovernmentForImprovementsAndWonders(id);
+        if (accomodativeGovernment) {
+            modifiers -= 5;
+        }
+        wonderBillsPayable = ((wonderBillsPayable * modifiers) / 100);
         return wonderBillsPayable * (10 ** 18);
+    }
+
+    ///@dev this is a public view function that will return a boolean value if a nations government type accomodates a reduced upkeep for wonders and improvements
+    ///@notice this function will check if the given nation has a governemnt type that accomodate a lower the upkeep for improvements and wonders by 5%
+    ///@param countryId is the nation ID of the country being queried
+    ///@return bool will be true if the nation's government type accomodates a lower infrastructure cost
+    function checkAccomodativeGovernmentForImprovementsAndWonders(
+        uint256 countryId
+    ) public view returns (bool) {
+        uint256 governmentType = param.getGovernmentType(countryId);
+        if (
+            governmentType == 1 ||
+            governmentType == 5 ||
+            governmentType == 8 ||
+            governmentType == 10
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    ///@dev this is a public view function that will return a boolean value if a nations government type accomodates a reduced upkeep for wonders and improvements
+    ///@notice this function will check if the given nation has a governemnt type that accomodate a lower the upkeep for improvements and wonders by 5%
+    ///@param countryId is the nation ID of the country being queried
+    ///@return bool will be true if the nation's government type accomodates a lower infrastructure cost
+    function checkAccomodativeGovernmentForMilitaryUpkeep(
+        uint256 countryId
+    ) public view returns (bool) {
+        uint256 governmentType = param.getGovernmentType(countryId);
+        if (
+            governmentType == 2 ||
+            governmentType == 4 ||
+            governmentType == 9
+        ) {
+            return true;
+        }
+        return false;
     }
 }

@@ -228,31 +228,24 @@ contract InfrastructureMarketContract is Ownable {
     function getInfrastructureCostMultiplier3(
         uint256 id
     ) public view returns (uint256) {
-        uint256 aluminiumMultiplier = 0;
-        uint256 coalMultiplier = 0;
-        uint256 steelMultiplier = 0;
-        uint256 asphaltMultiplier = 0;
+        uint256 multiplier = 0;
         bool isAluminium = res.viewAluminium(id);
         bool isCoal = res.viewCoal(id);
         bool isSteel = bonus.viewSteel(id);
         bool isAsphalt = bonus.viewAsphalt(id);
         if (isAluminium) {
-            aluminiumMultiplier = 7;
+            multiplier += 7;
         }
         if (isCoal) {
-            coalMultiplier = 4;
+            multiplier += 4;
         }
         if (isSteel) {
-            steelMultiplier = 2;
+            multiplier += 2;
         }
         if (isAsphalt) {
-            asphaltMultiplier = 5;
+            multiplier += 5;
         }
-        uint256 sumOfAdjustments = (aluminiumMultiplier +
-            coalMultiplier +
-            steelMultiplier +
-            asphaltMultiplier);
-        return sumOfAdjustments;
+        return multiplier;
     }
 
     ///@dev this is a public view function that will return a boolean value if a nations government type accomodates a reduced infrastructure cost
@@ -264,12 +257,12 @@ contract InfrastructureMarketContract is Ownable {
     ) public view returns (bool) {
         uint256 governmentType = param.getGovernmentType(countryId);
         if (
-            governmentType == 2 ||
+            governmentType == 1 ||
+            governmentType == 4 ||
             governmentType == 5 ||
             governmentType == 6 ||
             governmentType == 7 ||
-            governmentType == 8 ||
-            governmentType == 9
+            governmentType == 8
         ) {
             return true;
         }

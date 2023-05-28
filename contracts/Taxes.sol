@@ -303,10 +303,12 @@ contract TaxesContract is Ownable {
         uint256 pointsFromAge = getPointsFromNationAge(id);
         uint256 pointsFromTrades = addTax.getPointsFromTrades(id);
         uint256 pointsFromDefcon = addTax.getPointsFromDefcon(id);
+        uint256 pointsFromGovt = addTax.getPointsFromGovernment(id);
         uint256 additonalHappinessPointsToAdd = (technologyPoints +
             pointsFromAge +
             pointsFromTrades +
-            pointsFromDefcon);
+            pointsFromDefcon +
+            pointsFromGovt);
         return additonalHappinessPointsToAdd;
     }
 
@@ -1037,5 +1039,19 @@ contract AdditionalTaxesContract is Ownable {
             }
         }
         return universityPoints;
+    }
+
+    function getPointsFromGovernment(uint256 id) public view returns (uint256) {
+        uint256 governmentType = params.getGovernmentType(id);
+        uint256 pointsFromGovernmentType = 0;
+        if (
+            governmentType == 3 ||
+            governmentType == 6 ||
+            governmentType == 8 ||
+            governmentType == 9
+        ){
+            pointsFromGovernmentType = 1;
+        }
+        return pointsFromGovernmentType;
     }
 }

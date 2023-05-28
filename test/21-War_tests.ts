@@ -1058,6 +1058,7 @@ describe("War Contract", async function () {
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
         await warbucks.connect(signer0).transfer(signer2.address, BigInt(2000000000*(10**18)));
         await treasurycontract.connect(signer2).addFunds(BigInt(2000000000*(10**18)), 1);
+        // await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 3000)
     });
 
     describe("Declare War Tests", function () {
@@ -1068,7 +1069,7 @@ describe("War Contract", async function () {
             await expect(warcontract.connect(signer1).declareWar(0, 1)).to.be.revertedWith("nation in peace mode")
             await militarycontract.connect(signer2).toggleWarPeacePreference(1)
             await expect(warcontract.connect(signer1).declareWar(0, 1)).to.be.revertedWith("nation strength is not within range to declare war")
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 3000)
             await technologymarketcontrat.connect(signer2).buyTech(1, 100)
             await forcescontract.connect(signer2).buySoldiers(500, 1)
             await forcescontract.connect(signer2).buyTanks(50, 1)
@@ -1079,7 +1080,7 @@ describe("War Contract", async function () {
         })
 
         it("tests that a nation can max out offensive wars", async function () {
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 3000)
             await technologymarketcontrat.connect(signer2).buyTech(1, 100)
             await forcescontract.connect(signer2).buySoldiers(500, 1)
             await forcescontract.connect(signer2).buyTanks(50, 1)
@@ -1096,7 +1097,7 @@ describe("War Contract", async function () {
             await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
             await warbucks.connect(signer0).transfer(signer3.address, BigInt(2000000000*(10**18)));
             await treasurycontract.connect(signer3).addFunds(BigInt(2000000000*(10**18)), 2);
-            await infrastructuremarketplace.connect(signer3).buyInfrastructure(2, 500)
+            await infrastructuremarketplace.connect(signer3).buyInfrastructure(2, 3000)
             await technologymarketcontrat.connect(signer3).buyTech(2, 100)
             await forcescontract.connect(signer3).buySoldiers(500, 2)
             await forcescontract.connect(signer3).buyTanks(50, 2)
@@ -1112,7 +1113,7 @@ describe("War Contract", async function () {
             await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
             await warbucks.connect(signer0).transfer(signer4.address, BigInt(2000000000*(10**18)));
             await treasurycontract.connect(signer4).addFunds(BigInt(2000000000*(10**18)), 3);
-            await infrastructuremarketplace.connect(signer4).buyInfrastructure(3, 500)
+            await infrastructuremarketplace.connect(signer4).buyInfrastructure(3, 3000)
             await technologymarketcontrat.connect(signer4).buyTech(3, 100)
             await forcescontract.connect(signer4).buySoldiers(500, 3)
             await forcescontract.connect(signer4).buyTanks(50, 3)
@@ -1128,7 +1129,7 @@ describe("War Contract", async function () {
             await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
             await warbucks.connect(signer0).transfer(signer5.address, BigInt(2000000000*(10**18)));
             await treasurycontract.connect(signer5).addFunds(BigInt(2000000000*(10**18)), 4);
-            await infrastructuremarketplace.connect(signer5).buyInfrastructure(4, 500)
+            await infrastructuremarketplace.connect(signer5).buyInfrastructure(4, 3000)
             await technologymarketcontrat.connect(signer5).buyTech(4, 100)
             await forcescontract.connect(signer5).buySoldiers(500, 4)
             await forcescontract.connect(signer5).buyTanks(50, 4)
@@ -1144,7 +1145,7 @@ describe("War Contract", async function () {
             await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
             await warbucks.connect(signer0).transfer(signer6.address, BigInt(2000000000*(10**18)));
             await treasurycontract.connect(signer6).addFunds(BigInt(2000000000*(10**18)), 5);
-            await infrastructuremarketplace.connect(signer6).buyInfrastructure(5, 500)
+            await infrastructuremarketplace.connect(signer6).buyInfrastructure(5, 3000)
             await technologymarketcontrat.connect(signer6).buyTech(5, 100)
             await forcescontract.connect(signer6).buySoldiers(500, 5)
             await forcescontract.connect(signer6).buyTanks(50, 5)
@@ -1166,7 +1167,7 @@ describe("War Contract", async function () {
             await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
             await warbucks.connect(signer0).transfer(signer7.address, BigInt(2000000000*(10**18)));
             await treasurycontract.connect(signer7).addFunds(BigInt(2000000000*(10**18)), 6);
-            await infrastructuremarketplace.connect(signer7).buyInfrastructure(6, 500)
+            await infrastructuremarketplace.connect(signer7).buyInfrastructure(6, 3000)
             await technologymarketcontrat.connect(signer7).buyTech(6, 100)
             await forcescontract.connect(signer7).buySoldiers(500, 6)
             await forcescontract.connect(signer7).buyTanks(50, 6)
@@ -1178,7 +1179,7 @@ describe("War Contract", async function () {
 
     describe("Deploy Forces", function () {
         it("tests that forces are deployed to wars correctly", async function () {
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 3000)
             await technologymarketcontrat.connect(signer2).buyTech(1, 100)
             await forcescontract.connect(signer2).buySoldiers(500, 1)
             await forcescontract.connect(signer2).buyTanks(50, 1)
@@ -1281,7 +1282,7 @@ describe("War Contract", async function () {
 
     describe("Wars Ending", function () {
         it("tests that offerPeace() works correctly", async function () {
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 3000)
             await technologymarketcontrat.connect(signer2).buyTech(1, 100)
             await forcescontract.connect(signer2).buySoldiers(1000, 1)
             await forcescontract.connect(signer2).buyTanks(50, 1)
@@ -1307,7 +1308,7 @@ describe("War Contract", async function () {
         })
 
         it("offerPeace stops a war when both sides offer peace", async function () {
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 3000)
             await technologymarketcontrat.connect(signer2).buyTech(1, 100)
             await forcescontract.connect(signer2).buySoldiers(1000, 1)
             await forcescontract.connect(signer2).buyTanks(50, 1)
@@ -1334,7 +1335,7 @@ describe("War Contract", async function () {
         })
 
         it("tests that removeActiveWar function works correctly", async function () {
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 3000)
             await technologymarketcontrat.connect(signer2).buyTech(1, 100)
             await forcescontract.connect(signer2).buySoldiers(1000, 1)
             await forcescontract.connect(signer2).buyTanks(50, 1)
@@ -1380,7 +1381,7 @@ describe("War Contract", async function () {
         })
 
         it("tests that removeActiveWar deletes war from active wars array", async function () {
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 3000)
             await technologymarketcontrat.connect(signer2).buyTech(1, 100)
             await forcescontract.connect(signer2).buySoldiers(1000, 1)
             await forcescontract.connect(signer2).buyTanks(50, 1)
@@ -1399,7 +1400,7 @@ describe("War Contract", async function () {
         })
 
         it("tests that wars can expire", async function () {
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 3000)
             await technologymarketcontrat.connect(signer2).buyTech(1, 100)
             await forcescontract.connect(signer2).buySoldiers(1000, 1)
             await forcescontract.connect(signer2).buyTanks(50, 1)

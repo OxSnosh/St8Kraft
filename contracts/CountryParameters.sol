@@ -277,7 +277,20 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     ///@notice use this function to reset a nations government type
     ///@notice this function is only callable by the nation owner
     ///@notice there are 10 government types each with different advantages
-    ///@param newType is the updated name for the nation ruler
+    ///@param newType is the updated type of government
+    /** @notice for newType:
+     * 0 = Anarchy
+     * 1 = Capitalism
+     * 2 = Communist
+     * 3 = Democracy
+     * 4 = Dictatorship
+     * 5 = Federal Government
+     * 6 = Monarchy
+     * 7 = Republic
+     * 8 = Revolutionary
+     * 9 = Totalitarian
+     * 10 = Transitional
+     ***/ 
     ///@param id is the nation ID for the update
     function setGovernment(uint256 id, uint256 newType) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);

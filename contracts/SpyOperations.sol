@@ -259,7 +259,30 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2 {
         if (cia) {
             attackSuccessScore = ((attackSuccessScore * 110) / 100);
         }
+        bool accomodativeGovt = checkAccomodativeGovernment(countryId);
+        if (accomodativeGovt) {
+            attackSuccessScore = ((attackSuccessScore * 110) / 100);
+        }
         return attackSuccessScore;
+    }
+
+    function checkAccomodativeGovernment(uint256 countryId)
+        public
+        view
+        returns (bool)
+    {
+        uint256 government = params.getGovernmentType(
+            countryId
+        );
+        if (
+            government == 2 ||
+            government == 7 ||
+            government == 10
+        ) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     function getDefenseSuccessScore(

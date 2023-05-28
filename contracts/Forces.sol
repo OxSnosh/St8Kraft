@@ -11,6 +11,7 @@ import "./War.sol";
 import "./NationStrength.sol";
 import "./GroundBattle.sol";
 import "./KeeperFile.sol";
+import "./CountryParameters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
@@ -35,6 +36,7 @@ contract ForcesContract is Ownable {
     address public groundBattle;
     address public warAddress;
     address public keeper;
+    address public parameters;
 
     CountryMinter mint;
     InfrastructureContract inf;
@@ -44,6 +46,7 @@ contract ForcesContract is Ownable {
     ImprovementsContract2 imp2;
     WarContract war;
     GroundBattleContract ground;
+    CountryParametersContract params;
 
     struct Forces {
         uint256 numberOfSoldiers;
@@ -95,7 +98,8 @@ contract ForcesContract is Ownable {
         address _improvements2,
         address _wonders1,
         address _countryMinter,
-        address _keeper
+        address _keeper,
+        address _parameters
     ) public onlyOwner {
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
@@ -110,6 +114,8 @@ contract ForcesContract is Ownable {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
         keeper = _keeper;
+        parameters = _parameters;
+        params = CountryParametersContract(_parameters);
     }
 
     mapping(uint256 => Forces) public idToForces;
@@ -431,6 +437,16 @@ contract ForcesContract is Ownable {
         if (guerillaCamps > 0) {
             efficiencyModifier += (35 * guerillaCamps);
         }
+        uint256 governmentType = params.getGovernmentType(id);
+        if (
+            governmentType == 2 ||
+            governmentType == 3 ||
+            governmentType == 4 ||
+            governmentType == 5 ||
+            governmentType == 10
+        ) {
+            efficiencyModifier += 8;
+        }
         return efficiencyModifier;
     }
 
@@ -474,6 +490,16 @@ contract ForcesContract is Ownable {
         uint256 guerillaCamps = imp2.getGuerillaCampCount(id);
         if (guerillaCamps > 0) {
             efficiencyModifier += (35 * guerillaCamps);
+        }
+        uint256 governmentType = params.getGovernmentType(id);
+        if (
+            governmentType == 2 ||
+            governmentType == 3 ||
+            governmentType == 4 ||
+            governmentType == 5 ||
+            governmentType == 10
+        ) {
+            efficiencyModifier += 8;
         }
         return efficiencyModifier;
     }

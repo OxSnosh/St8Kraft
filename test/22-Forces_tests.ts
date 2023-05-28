@@ -1123,6 +1123,7 @@ describe("Forces Contract", async function () {
             expect(cost.toNumber()).to.equal(240);
             // console.log(cost.toNumber(), "cost 3");
             await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
             await improvementscontract1.connect(signer1).buyImprovement1(5, 0, 11)
             var cost = await forcescontract.getTankCost(0)
             expect(cost.toNumber()).to.equal(180);
