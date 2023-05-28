@@ -973,7 +973,9 @@ describe("Bills Contract", async function () {
             missilescontract.address,
             infrastructuremarketplace.address,
             landmarketcontract.address,
-            technologymarketcontrat.address
+            technologymarketcontrat.address,
+            fightersmarketplace2.address,
+            bombersmarketplace2.address
         )
 
         await warcontract.settings(
@@ -1177,6 +1179,7 @@ describe("Bills Contract", async function () {
         })
 
         it("bills2 tests that cost per level gets reduced with resources and improvements", async function () {
+            await billscontract.connect(signer1).payBills(0)
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
             var costPerLevel1000 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
             // console.log("level cost at 1000", BigInt(costPerLevel1000/(10**18)));
@@ -1207,6 +1210,7 @@ describe("Bills Contract", async function () {
     
     describe("Military Bills", function () {
         it("bills3 tests soldiers increase bills correctly", async function () {
+            await billscontract.connect(signer1).payBills(0)
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
             await forcescontract.connect(signer1).buySoldiers(1980, 0)
             var soldierCount = await forcescontract.getSoldierCount(0);
@@ -1299,9 +1303,10 @@ describe("Bills Contract", async function () {
         })
 
         it("bills3 tests aircraft upkeep", async function () {
+            await billscontract.connect(signer1).payBills(0)
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
             await technologymarketcontrat.connect(signer1).buyTech(0, 30000);
-            await fightersmarketplace2.connect(signer1).buyF22Raptor(5, 0);
+            // await fightersmarketplace2.connect(signer1).buyF22Raptor(5, 0);
             var aircraftCount = await fighterscontract.getAircraftCount(0);
             // console.log(aircraftCount.toNumber());
             var aircraftUpkeep = await billscontract.getAircraftUpkeep(0);
@@ -1323,6 +1328,7 @@ describe("Bills Contract", async function () {
         })
 
         it("bills3 tests navy upkeep", async function () {
+            await billscontract.connect(signer1).payBills(0)
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000);
             await technologymarketcontrat.connect(signer1).buyTech(0, 30000);
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4);

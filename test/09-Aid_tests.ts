@@ -972,7 +972,9 @@ describe("Aid Contract", async function () {
             missilescontract.address,
             infrastructuremarketplace.address,
             landmarketcontract.address,
-            technologymarketcontrat.address
+            technologymarketcontrat.address,
+            fightersmarketplace2.address,
+            bombersmarketplace2.address
         )
 
         await warcontract.settings(
@@ -1050,7 +1052,8 @@ describe("Aid Contract", async function () {
         await warbucks.connect(signer0).transfer(signer2.address, BigInt(100000000*(10**18)));
         await treasurycontract.connect(signer2).addFunds(BigInt(100000000*(10**18)), 1);
         await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
-        await forcescontract.connect(signer1).buySoldiers(7000, 0);
+        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 10000);
+        await forcescontract.connect(signer1).buySoldiers(5000, 0);
     });
 
     describe("Aid Contract", function () {
@@ -1080,10 +1083,13 @@ describe("Aid Contract", async function () {
         })
 
         it("aid1 tests proposeAid() function reverts correctly when aid not available", async function () {
-            await treasurycontract.connect(signer1).withdrawFunds(BigInt(99999999*(10**18)), 0);
+            // var payment : any = await billscontract.getBillsPayable(0)
+            // console.log(BigInt(payment))
+            await billscontract.connect(signer1).payBills(0)
+            await treasurycontract.connect(signer1).withdrawFunds(BigInt(70999999*(10**18)), 0);
             await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("not enough funds for this porposal");
-            await treasurycontract.connect(signer1).addFunds(BigInt(88888888*(10**18)), 0);
-            await forcescontract.connect(signer1).decomissionSoldiers(7000, 0);
+            await treasurycontract.connect(signer1).addFunds(BigInt(60888888*(10**18)), 0);
+            await forcescontract.connect(signer1).decomissionSoldiers(5000, 0);
             await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("not enough soldiers for this porposal");
             await forcescontract.connect(signer1).buySoldiers(5000, 0);
             await technologymarketcontrat.connect(signer1).destroyTech(0, 10000);
@@ -1133,7 +1139,8 @@ describe("Aid Contract", async function () {
 
         it("aid1 tests acceptProposal() function reverts when proposal is deficient", async function () {
             await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
-            await treasurycontract.connect(signer1).withdrawFunds(BigInt(99999999*(10**18)), 0);
+            await billscontract.connect(signer1).payBills(0)
+            await treasurycontract.connect(signer1).withdrawFunds(BigInt(70999999*(10**18)), 0);
             await expect(aidcontract.connect(signer2).acceptProposal(0)).to.be.revertedWith("not enough funds for this porposal");
         })
 

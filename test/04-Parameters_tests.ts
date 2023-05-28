@@ -973,7 +973,9 @@ describe("ParametersContract", async function () {
             missilescontract.address,
             infrastructuremarketplace.address,
             landmarketcontract.address,
-            technologymarketcontrat.address
+            technologymarketcontrat.address,
+            fightersmarketplace2.address,
+            bombersmarketplace2.address
         )
 
         await warcontract.settings(
@@ -1183,9 +1185,9 @@ describe("ParametersContract", async function () {
         it("Tests that the setGovernment() function works", async function () {
             let government = await countryparameterscontract.connect(signer1).getGovernmentType(0);
             expect(government).to.equal(0);
-            await countryparameterscontract.incrementDaysSince();
-            await countryparameterscontract.incrementDaysSince();
-            await countryparameterscontract.incrementDaysSince();
+            await keepercontract.incrementDaysSinceForParametersByOwner();
+            await keepercontract.incrementDaysSinceForParametersByOwner();
+            await keepercontract.incrementDaysSinceForParametersByOwner();
             let daysSince = await countryparameterscontract.getDaysSince(0);
             expect(daysSince[0].toNumber()).to.equal(6);
             await countryparameterscontract.connect(signer1).setGovernment(0, 4);
@@ -1203,18 +1205,18 @@ describe("ParametersContract", async function () {
         })
 
         it("Tests that the setGovernment() function reverts correctly when called with wrong type", async function () {
-            await countryparameterscontract.incrementDaysSince();
-            await countryparameterscontract.incrementDaysSince();
-            await countryparameterscontract.incrementDaysSince();
+            await keepercontract.incrementDaysSinceForParametersByOwner();
+            await keepercontract.incrementDaysSinceForParametersByOwner();
+            await keepercontract.incrementDaysSinceForParametersByOwner();
             await expect(countryparameterscontract.connect(signer1).setGovernment(0, 15)).to.be.revertedWith("invalid type");
         })
 
         it("Tests that the setReligion() function works", async function () {
             let religion = await countryparameterscontract.connect(signer1).getReligionType(0);
             expect(religion).to.equal(0);
-            await countryparameterscontract.incrementDaysSince();
-            await countryparameterscontract.incrementDaysSince();
-            await countryparameterscontract.incrementDaysSince();
+            await keepercontract.incrementDaysSinceForParametersByOwner();
+            await keepercontract.incrementDaysSinceForParametersByOwner();
+            await keepercontract.incrementDaysSinceForParametersByOwner();
             let daysSince = await countryparameterscontract.getDaysSince(0);
             expect(daysSince[1].toNumber()).to.equal(6);
             await countryparameterscontract.connect(signer1).setReligion(0, 5);
@@ -1232,9 +1234,9 @@ describe("ParametersContract", async function () {
         })
 
         it("Tests that the setReligion() function reverts correctly when called with worng type", async function () {
-            await countryparameterscontract.incrementDaysSince();
-            await countryparameterscontract.incrementDaysSince();
-            await countryparameterscontract.incrementDaysSince();
+            await keepercontract.incrementDaysSinceForParametersByOwner();
+            await keepercontract.incrementDaysSinceForParametersByOwner();
+            await keepercontract.incrementDaysSinceForParametersByOwner();
             await expect(countryparameterscontract.connect(signer1).setReligion(0, 15)).to.be.revertedWith("invalid type");
         })
     })

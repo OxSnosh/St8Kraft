@@ -972,7 +972,9 @@ describe("Improvements", async function () {
             missilescontract.address,
             infrastructuremarketplace.address,
             landmarketcontract.address,
-            technologymarketcontrat.address
+            technologymarketcontrat.address,
+            fightersmarketplace2.address,
+            bombersmarketplace2.address
         )
 
         await warcontract.settings(

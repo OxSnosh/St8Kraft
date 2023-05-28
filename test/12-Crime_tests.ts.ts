@@ -972,7 +972,9 @@ describe("Crime Contract", async function () {
             missilescontract.address,
             infrastructuremarketplace.address,
             landmarketcontract.address,
-            technologymarketcontrat.address
+            technologymarketcontrat.address,
+            fightersmarketplace2.address,
+            bombersmarketplace2.address
         )
 
         await warcontract.settings(
@@ -1143,6 +1145,7 @@ describe("Crime Contract", async function () {
             var criminalCount3 = await crimecontract.getCriminalCount(0);
             // console.log("criminal count 3", criminalCount3.toNumber());
             expect(criminalCount3.toNumber()).to.equal(12009);
+            await billscontract.connect(signer1).payBills(0)
             await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 8);
             await improvementscontract3.connect(signer1).buyImprovement3(2, 0, 11);
             var literacyAfterSchools = await crimecontract.getLiteracy(0);
@@ -1156,6 +1159,7 @@ describe("Crime Contract", async function () {
             // console.log(criminalCount1.toNumber());
             var cps1 = await crimecontract.getCrimePreventionScore(0);
             // console.log("cps 1", cps1.toNumber());
+            await billscontract.connect(signer1).payBills(0)
             await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 8);
             await improvementscontract3.connect(signer1).buyImprovement3(2, 0, 11);
             await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 2);
@@ -1175,6 +1179,7 @@ describe("Crime Contract", async function () {
             var criminalCount1 = await crimecontract.getCriminalCount(0);
             expect(criminalCount1.toNumber()).to.equal(14011);
             
+            await billscontract.connect(signer1).payBills(0)
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 7);
             var criminalCount2 = await crimecontract.getCriminalCount(0);
             expect(criminalCount2.toNumber()).to.equal(13511);

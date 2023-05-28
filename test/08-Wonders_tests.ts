@@ -972,7 +972,9 @@ describe("Wonders", async function () {
             missilescontract.address,
             infrastructuremarketplace.address,
             landmarketcontract.address,
-            technologymarketcontrat.address
+            technologymarketcontrat.address,
+            fightersmarketplace2.address,
+            bombersmarketplace2.address
         )
 
         await warcontract.settings(
@@ -1552,6 +1554,8 @@ describe("Wonders", async function () {
         it("wonder2 interceptor misile system tests", async function () {
             let wonderCount = await wonderscontract1.getWonderCount(0);
             expect(wonderCount).to.equal(0);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
+            await billscontract.connect(signer1).payBills(0)
             await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 7);
             await improvementscontract4.connect(signer1).buyImprovement4(3, 0, 1);
             await wonderscontract4.connect(signer1).buyWonder4(0, 4);
@@ -1565,6 +1569,8 @@ describe("Wonders", async function () {
         
         it("wonder2 interceptor misile system purchase errors", async function () {
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 5)).to.be.revertedWith("Strategic Defense Inititive required to purchase");
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
+            await billscontract.connect(signer1).payBills(0)
             await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 7);
             await improvementscontract4.connect(signer1).buyImprovement4(3, 0, 1);
             await wonderscontract4.connect(signer1).buyWonder4(0, 4);
@@ -2137,6 +2143,8 @@ describe("Wonders", async function () {
         //strategic defense initiative
         it("wonder4 strategic defense initiative tests", async function () {
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 4)).to.be.revertedWith("Must own at least 3 missile defense improvements");
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             await improvementscontract4.connect(signer1).buyImprovement4(3, 0, 1);
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 4)).to.be.revertedWith("Must own at least 3 satellite improvements");
             await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 7);
@@ -2150,6 +2158,8 @@ describe("Wonders", async function () {
         })
 
         it("wonder4 strategic defense initiative purchase errors", async function () {
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             await improvementscontract4.connect(signer1).buyImprovement4(3, 0, 1);
             await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 7);
             await expect(wonderscontract4.connect(signer1).buyWonder4(1, 4)).to.be.revertedWith("!nation owner");
@@ -2210,6 +2220,8 @@ describe("Wonders", async function () {
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 6)).to.be.revertedWith("Must have 11000 Infrastructure to purchase");
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 11000);
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 6)).to.be.revertedWith("Hospital improvement required to purchase");
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 9);
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 5);
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 6)).to.be.revertedWith("National Research Lab required to Purchase");
@@ -2225,6 +2237,8 @@ describe("Wonders", async function () {
 
         it("wonder4 universal healthcare purchase errors", async function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 11000);
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 9);
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 5);
             await wonderscontract3.connect(signer1).buyWonder3(0, 4);

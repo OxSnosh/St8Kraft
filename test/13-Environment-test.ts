@@ -973,7 +973,9 @@ describe("Environment Contract", async function () {
             missilescontract.address,
             infrastructuremarketplace.address,
             landmarketcontract.address,
-            technologymarketcontrat.address
+            technologymarketcontrat.address,
+            fightersmarketplace2.address,
+            bombersmarketplace2.address
         )
 
         await warcontract.settings(
@@ -1038,9 +1040,9 @@ describe("Environment Contract", async function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        await warbucks.connect(signer0).approve(warbucks.address, BigInt(3000000000*(10**18)));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(3000000000*(10**18)));
-        await treasurycontract.connect(signer1).addFunds(BigInt(2000000000*(10**18)), 0);
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(9000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(9000000000*(10**18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(7000000000*(10**18)), 0);
 
         await countryminter.connect(signer2).generateCountry(
             "TestRuler2",
@@ -1128,6 +1130,8 @@ describe("Environment Contract", async function () {
             // console.log("radiation cleanup for nation 1", radiationCleanup);
             const resourcesScore2 = await environmentcontract.getEnvironmentScoreFromResources(0);
             expect(resourcesScore2).to.equal(10);
+            await billscontract.connect(signer1).payBills(0);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 5000)
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4);
             await resourcescontract.mockResourcesForTesting(4, 17, 18);
             await resourcescontract.connect(signer5).proposeTrade(4, 0);
@@ -1137,9 +1141,11 @@ describe("Environment Contract", async function () {
         })
 
         it("environment1 improvements and wonders affect environemnt", async function () {
+            await billscontract.connect(signer1).payBills(0);
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 13000);
             const wondersScore = await environmentcontract.getEnvironmentScoreFromImprovementsAndWonders(0);
             expect(wondersScore.toNumber()).to.equal(0);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 5000)
             await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
             await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
             const wondersScore2 = await environmentcontract.getEnvironmentScoreFromImprovementsAndWonders(0);

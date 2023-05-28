@@ -972,7 +972,9 @@ describe("ResourcesContract", async function () {
             missilescontract.address,
             infrastructuremarketplace.address,
             landmarketcontract.address,
-            technologymarketcontrat.address
+            technologymarketcontrat.address,
+            fightersmarketplace2.address,
+            bombersmarketplace2.address
         )
 
         await warcontract.settings(
@@ -1109,20 +1111,20 @@ describe("ResourcesContract", async function () {
             await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
             var wheat1 = await resourcescontract.viewWheat(0);
             expect(wheat1).to.equal(true);
-            var oil1 = await resourcescontract.viewOil(0);
-            expect(oil1).to.equal(true)
-            var gems1 = await resourcescontract.viewGems(0);
-            expect(gems1).to.equal(true);
+            var cattle1 = await resourcescontract.viewCattle(0);
+            expect(cattle1).to.equal(true)
+            var iron1 = await resourcescontract.viewIron(0);
+            expect(iron1).to.equal(true);
             var water1 = await resourcescontract.viewWater(0);
-            expect(water1).to.equal(true);
+            expect(water1).to.equal(false);
             var wheat2 = await resourcescontract.viewWheat(1);
             expect(wheat2).to.equal(true);
-            var oil2 = await resourcescontract.viewOil(1);
-            expect(oil2).to.equal(true)
-            var gems2 = await resourcescontract.viewGems(1);
-            expect(gems2).to.equal(true);
+            var cattle2 = await resourcescontract.viewCattle(1);
+            expect(cattle2).to.equal(true)
+            var iron2 = await resourcescontract.viewIron(1);
+            expect(iron2).to.equal(true);
             var water2 = await resourcescontract.viewWater(1);
-            expect(water2).to.equal(true);
+            expect(water2).to.equal(false);
         })
     })
 

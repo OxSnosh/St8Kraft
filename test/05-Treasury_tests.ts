@@ -973,7 +973,9 @@ describe("Treasury", async function () {
             missilescontract.address,
             infrastructuremarketplace.address,
             landmarketcontract.address,
-            technologymarketcontrat.address
+            technologymarketcontrat.address,
+            fightersmarketplace2.address,
+            bombersmarketplace2.address
         )
 
         await warcontract.settings(
@@ -1101,6 +1103,7 @@ describe("Treasury", async function () {
             let signer1UpdatedCoinBalanceAfterBurn = await warbucks.balanceOf(signer1.address);
             expect(signer1UpdatedCoinBalanceAfterBurn.toString()).to.equal("0");
             // console.log("signer1 updates coin balance after burn", BigInt(signer1UpdatedCoinBalanceAfterBurn.toString()));
+            await billscontract.connect(signer1).payBills(0);
             await treasurycontract.connect(signer1).withdrawFunds(BigInt(500000000*(10**18)), 0);
             let coinBalanceAfterWithdrawGross : any = await warbucks.balanceOf(signer1.address);
             let coinBalanceAfterWithdraw = (BigInt(coinBalanceAfterWithdrawGross / (10**18)));
@@ -1109,7 +1112,7 @@ describe("Treasury", async function () {
             let gameBalanceAfterWithdrawGross : any = await treasurycontract.checkBalance(0);
             let gameBalanceAfterWithdraw = (BigInt(gameBalanceAfterWithdrawGross / (10**18)));
             // console.log("game balance after withdraw", gameBalanceAfterWithdraw);
-            expect(gameBalanceAfterWithdraw.toString()).to.equal("2000000");
+            expect(gameBalanceAfterWithdraw.toString()).to.equal("1999560");
         })
 
         it("tests withdrawFunds() will revert with !nation owner caller", async function () {
@@ -1123,6 +1126,7 @@ describe("Treasury", async function () {
             await warbucks.connect(signer0).approve(warbucks.address, BigInt(500000000*(10**18)));
             await warbucks.connect(signer0).transfer(signer1.address, BigInt(500000000*(10**18)));
             await treasurycontract.connect(signer1).addFunds(BigInt(500000000*(10**18)), 0);
+            await billscontract.connect(signer1).payBills(0);
             await expect(treasurycontract.connect(signer1).withdrawFunds(BigInt(50000000000*(10**18)), 0)).to.be.revertedWith("insufficient game balance");
         })
     })
