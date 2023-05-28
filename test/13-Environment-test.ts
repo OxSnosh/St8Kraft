@@ -974,7 +974,9 @@ describe("Environment Contract", async function () {
             infrastructuremarketplace.address,
             landmarketcontract.address,
             technologymarketcontrat.address,
+            fightersmarketplace1.address,
             fightersmarketplace2.address,
+            bombersmarketplace1.address,
             bombersmarketplace2.address
         )
 

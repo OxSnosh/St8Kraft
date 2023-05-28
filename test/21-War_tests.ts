@@ -973,7 +973,9 @@ describe("War Contract", async function () {
             infrastructuremarketplace.address,
             landmarketcontract.address,
             technologymarketcontrat.address,
+            fightersmarketplace1.address,
             fightersmarketplace2.address,
+            bombersmarketplace1.address,
             bombersmarketplace2.address
         )
 
@@ -1042,7 +1044,7 @@ describe("War Contract", async function () {
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
         await treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0);
-        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500)
+        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 3000)
         await technologymarketcontrat.connect(signer1).buyTech(0, 100)
         await forcescontract.connect(signer1).buySoldiers(500, 0)
         await forcescontract.connect(signer1).buyTanks(50, 0)
@@ -1202,7 +1204,7 @@ describe("War Contract", async function () {
 
     describe("Soldier Efficiency", function () {
         it("tests that deployed soldier efficiency works correctly", async function () {
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 3000)
             await technologymarketcontrat.connect(signer2).buyTech(1, 100)
             await forcescontract.connect(signer2).buySoldiers(1000, 1)
             await forcescontract.connect(signer2).buyTanks(50, 1)
@@ -1222,6 +1224,7 @@ describe("War Contract", async function () {
             var attackingSoldierEfficiency = await groundbattlecontract.getAttackingSoldierEfficiency(0, 0);
             // console.log(attackingSoldierEfficiency.toNumber(), "oil and pigs efficiency");
             expect(attackingSoldierEfficiency.toNumber()).to.equal(625)
+            await billscontract.connect(signer1).payBills(0)
             await improvementscontract1.connect(signer1).buyImprovement1(3, 0, 3)
             var attackingSoldierEfficiency = await groundbattlecontract.getAttackingSoldierEfficiency(0, 0);
             // console.log(attackingSoldierEfficiency.toNumber(), "barracks efficiency");
@@ -1233,7 +1236,7 @@ describe("War Contract", async function () {
         })
 
         it("tests that defending soldier efficiency works correctly", async function () {
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 3000)
             await technologymarketcontrat.connect(signer2).buyTech(1, 100)
             await forcescontract.connect(signer2).buySoldiers(1000, 1)
             await forcescontract.connect(signer2).buyTanks(50, 1)
@@ -1253,6 +1256,7 @@ describe("War Contract", async function () {
             var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
             // console.log(defendingSoldierEfficiency.toNumber(), "oil and pigs efficiency");
             expect(defendingSoldierEfficiency.toNumber()).to.equal(625)
+            await billscontract.connect(signer1).payBills(0)
             await improvementscontract1.connect(signer1).buyImprovement1(3, 0, 3)
             var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
             // console.log(defendingSoldierEfficiency.toNumber(), "barracks efficiency");
@@ -1285,7 +1289,7 @@ describe("War Contract", async function () {
             await militarycontract.connect(signer2).toggleWarPeacePreference(1)
             await warcontract.connect(signer1).declareWar(0, 1)
             var isActive = await warcontract.isWarActive(0);
-            console.log(isActive)
+            // console.log(isActive)
             expect(isActive).to.equal(true)
             await warcontract.connect(signer2).offerPeace(1, 0)
             var arr : any = await warcontract.checkWar(0)

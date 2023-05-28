@@ -973,7 +973,9 @@ describe("Navy", async function () {
             infrastructuremarketplace.address,
             landmarketcontract.address,
             technologymarketcontrat.address,
+            fightersmarketplace1.address,
             fightersmarketplace2.address,
+            bombersmarketplace1.address,
             bombersmarketplace2.address
         )
 
@@ -1103,6 +1105,8 @@ describe("Navy", async function () {
         })
 
         it("tests that buyCorvette() works", async function () {
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(0)
             var shipCount = await navycontract.getCorvetteCount(0)
@@ -1133,6 +1137,8 @@ describe("Navy", async function () {
         })
 
         it("tests that buyLandingShip() works", async function () {
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(0)
             var shipCount = await navycontract.getLandingShipCount(0)
@@ -1163,6 +1169,8 @@ describe("Navy", async function () {
         })
 
         it("tests that buyBattleship() works", async function () {
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(0)
             var shipCount = await navycontract.getBattleshipCount(0)
@@ -1193,6 +1201,8 @@ describe("Navy", async function () {
         })
 
         it("tests that buyCruiser() works", async function () {
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(0)
             var shipCount = await navycontract.getCruiserCount(0)
@@ -1223,6 +1233,8 @@ describe("Navy", async function () {
         })
 
         it("tests that buyFrigate() works", async function () {
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(0)
             var shipCount = await navycontract2.getFrigateCount(0)
@@ -1253,6 +1265,8 @@ describe("Navy", async function () {
         })
 
         it("tests that buyDestroyer() works", async function () {
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(0)
             var shipCount = await navycontract2.getDestroyerCount(0)
@@ -1283,6 +1297,8 @@ describe("Navy", async function () {
         })
 
         it("tests that buySubmarine() works", async function () {
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(0)
             var shipCount = await navycontract2.getSubmarineCount(0)
@@ -1313,6 +1329,8 @@ describe("Navy", async function () {
         })
 
         it("tests that buyAircraftCarrier() works", async function () {
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(0)
             var shipCount = await navycontract2.getAircraftCarrierCount(0)

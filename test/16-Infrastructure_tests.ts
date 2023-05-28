@@ -974,7 +974,9 @@ describe("Infrastructure Contract", async function () {
             infrastructuremarketplace.address,
             landmarketcontract.address,
             technologymarketcontrat.address,
+            fightersmarketplace1.address,
             fightersmarketplace2.address,
+            bombersmarketplace1.address,
             bombersmarketplace2.address
         )
 
@@ -1138,6 +1140,7 @@ describe("Infrastructure Contract", async function () {
             var population = await infrastructurecontract.getTotalPopulationCount(0);
             // console.log(population.toNumber());
             expect(population.toNumber()).to.equal(8640);
+            await billscontract.connect(signer1).payBills(0)
             await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5)
             var population = await infrastructurecontract.getTotalPopulationCount(0);
             // console.log(population.toNumber());

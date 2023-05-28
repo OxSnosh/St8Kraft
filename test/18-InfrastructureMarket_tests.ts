@@ -974,7 +974,9 @@ describe("Infrastructure Market Contract", async function () {
             infrastructuremarketplace.address,
             landmarketcontract.address,
             technologymarketcontrat.address,
+            fightersmarketplace1.address,
             fightersmarketplace2.address,
+            bombersmarketplace1.address,
             bombersmarketplace2.address
         )
 
@@ -1120,35 +1122,37 @@ describe("Infrastructure Market Contract", async function () {
             expect(BigInt(costPerLevel).toString()).to.equal("1200500000000000000000000")
         })
 
-        it("inf market tests that infrastructure cost multipliers works correctly", async function () {
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 480);
+        it("inf market tests that resources affect cost multipliers correctly", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000);
             var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
             // console.log(BigInt(costPerLevel).toString(), "cost per level");
-            expect(BigInt(costPerLevel).toString()).to.equal("10500000000000000000000")
+            expect(BigInt(costPerLevel).toString()).to.equal("61100000000000000000000")
             await resourcescontract.mockResourcesForTesting(0, 0, 9);
             var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
             // console.log(BigInt(costPerLevel).toString(), "cost per level with lumber");
-            expect(BigInt(costPerLevel).toString()).to.equal("9135000000000000000000")
+            expect(BigInt(costPerLevel).toString()).to.equal("53157000000000000000000")
             await resourcescontract.mockResourcesForTesting(0, 0, 7);
             var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
             // console.log(BigInt(costPerLevel).toString(), "cost per level with iron");
-            expect(BigInt(costPerLevel).toString()).to.equal("9240000000000000000000")
+            expect(BigInt(costPerLevel).toString()).to.equal("53768000000000000000000")
             await resourcescontract.mockResourcesForTesting(0, 0, 10);
             var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
             // console.log(BigInt(costPerLevel).toString(), "cost per level with marble");
-            expect(BigInt(costPerLevel).toString()).to.equal("8715000000000000000000")
+            expect(BigInt(costPerLevel).toString()).to.equal("50713000000000000000000")
             await resourcescontract.mockResourcesForTesting(0, 0, 13);
             var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
             // console.log(BigInt(costPerLevel).toString(), "cost per level with rubber");
-            expect(BigInt(costPerLevel).toString()).to.equal("9450000000000000000000")
+            expect(BigInt(costPerLevel).toString()).to.equal("54990000000000000000000")
+            await billscontract.connect(signer1).payBills(0)
+
             await improvementscontract1.connect(signer1).buyImprovement1(5, 0, 11);
             var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
             // console.log(BigInt(costPerLevel).toString(), "cost per level with factories");
-            expect(BigInt(costPerLevel).toString()).to.equal("5250000000000000000000")
+            expect(BigInt(costPerLevel).toString()).to.equal("30550000000000000000000")
             await resourcescontract.mockResourcesForTesting(0, 2, 7);
             var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
             // console.log(BigInt(costPerLevel).toString(), "cost per level with steel");
-            expect(BigInt(costPerLevel).toString()).to.equal("5145000000000000000000")
+            expect(BigInt(costPerLevel).toString()).to.equal("29939000000000000000000")
         })
     })
 })

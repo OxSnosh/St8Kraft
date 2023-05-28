@@ -973,7 +973,9 @@ describe("Cruise Missiles and Nukes", async function () {
             infrastructuremarketplace.address,
             landmarketcontract.address,
             technologymarketcontrat.address,
+            fightersmarketplace1.address,
             fightersmarketplace2.address,
+            bombersmarketplace1.address,
             bombersmarketplace2.address
         )
 
@@ -1083,6 +1085,8 @@ describe("Cruise Missiles and Nukes", async function () {
             await resourcescontract.connect(signer0).mockResourcesForTesting(0, 8, 1);
             var cost : any = await missilescontract.getCruiseMissileCost(0);
             expect(cost).to.equal(BigInt(16000 * (10**18)))
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             await improvementscontract1.connect(signer1).buyImprovement1(5, 0, 11)
             var cost : any = await missilescontract.getCruiseMissileCost(0);
             expect(cost).to.equal(BigInt(11000 * (10**18)))

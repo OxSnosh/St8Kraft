@@ -32,9 +32,11 @@ contract TreasuryContract is Ownable {
     address public navy;
     address public navy2;
     address public fighters;
-    address public fighters2;
     address public bombers;
-    address public bombers2;
+    address public fightersMarket1;
+    address public fightersMarket2;
+    address public bombersMarket1;
+    address public bombersMarket2;
     address public warBucksAddress;
     address public forces;
     address public missiles;
@@ -133,16 +135,20 @@ contract TreasuryContract is Ownable {
         address _infrastructureMarket,
         address _landMarket,
         address _techMarket,
-        address _fighters2,
-        address _bombers2
+        address _fightersMarket1,
+        address _fightersMarket2,
+        address _bombersMarket1,
+        address _bombersMarket2
     ) public onlyOwner {
         navy2 = _navy2;
         missiles = _missiles;
         infrastructureMarket = _infrastructureMarket;
         landMarket = _landMarket;
         techMarket = _techMarket;
-        fighters2 = _fighters2;
-        bombers2 = _bombers2;
+        fightersMarket1 = _fightersMarket1;
+        fightersMarket2 = _fightersMarket2;
+        bombersMarket1 = _bombersMarket1;
+        bombersMarket2 = _bombersMarket2;
     }
 
     modifier onlyCountryMinter() {
@@ -180,9 +186,11 @@ contract TreasuryContract is Ownable {
 
     modifier approvedSpendCaller() {
         require(msg.sender == bombers ||
-            msg.sender == bombers2 ||
+            msg.sender == bombersMarket1 ||
+            msg.sender == bombersMarket2 ||
+            msg.sender == fightersMarket1 ||
+            msg.sender == fightersMarket2 ||
             msg.sender == fighters ||
-            msg.sender == fighters2 ||
             msg.sender == forces ||
             msg.sender == missiles ||
             msg.sender == navy ||

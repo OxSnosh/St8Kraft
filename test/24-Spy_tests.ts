@@ -974,7 +974,9 @@ describe("Spies in Forces Contract", async function () {
             infrastructuremarketplace.address,
             landmarketcontract.address,
             technologymarketcontrat.address,
+            fightersmarketplace1.address,
             fightersmarketplace2.address,
+            bombersmarketplace1.address,
             bombersmarketplace2.address
         )
 
@@ -1054,6 +1056,7 @@ describe("Spies in Forces Contract", async function () {
         })
 
         it("tests that max spy count changes with intel agencies", async function () {
+            await billscontract.connect(signer1).payBills(0)
             await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 6)
             var maxSpies = await forcescontract.getMaxSpyCount(0)
             // console.log((maxSpies).toNumber())
@@ -1061,6 +1064,7 @@ describe("Spies in Forces Contract", async function () {
         })
 
         it("tests that max spy count changes with intel agencies and CIA", async function () {
+            await billscontract.connect(signer1).payBills(0)
             await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 6)
             await wonderscontract1.connect(signer1).buyWonder1(0, 3)
             var maxSpies = await forcescontract.getMaxSpyCount(0)

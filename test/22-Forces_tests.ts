@@ -974,7 +974,9 @@ describe("Forces Contract", async function () {
             infrastructuremarketplace.address,
             landmarketcontract.address,
             technologymarketcontrat.address,
+            fightersmarketplace1.address,
             fightersmarketplace2.address,
+            bombersmarketplace1.address,
             bombersmarketplace2.address
         )
 
@@ -1120,6 +1122,7 @@ describe("Forces Contract", async function () {
             var cost = await forcescontract.getTankCost(0)
             expect(cost.toNumber()).to.equal(240);
             // console.log(cost.toNumber(), "cost 3");
+            await billscontract.connect(signer1).payBills(0)
             await improvementscontract1.connect(signer1).buyImprovement1(5, 0, 11)
             var cost = await forcescontract.getTankCost(0)
             expect(cost.toNumber()).to.equal(180);

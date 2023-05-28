@@ -973,7 +973,9 @@ describe("Fighter", async function () {
             infrastructuremarketplace.address,
             landmarketcontract.address,
             technologymarketcontrat.address,
+            fightersmarketplace1.address,
             fightersmarketplace2.address,
+            bombersmarketplace1.address,
             bombersmarketplace2.address
         )
 
@@ -1121,6 +1123,8 @@ describe("Fighter", async function () {
             var cost4 : any = await fightersmarketplace1.getYak9Cost(0)
             // console.log(BigInt(cost4), "rubber")
             expect(cost4).to.equal(BigInt(9600000000000000000000))
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500);
             await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 1)
             var cost5 : any = await fightersmarketplace1.getYak9Cost(0)
             // console.log(BigInt(cost5), "2 airports")
@@ -1192,6 +1196,8 @@ describe("Fighter", async function () {
             var cost4 : any = await fightersmarketplace1.getP51MustangCost(0)
             // console.log(BigInt(cost4), "rubber")
             expect(cost4).to.equal(BigInt(14400000000000000000000))
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500);
             await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 1)
             var cost5 : any = await fightersmarketplace1.getP51MustangCost(0)
             // console.log(BigInt(cost5), "2 airports")
@@ -1264,6 +1270,8 @@ describe("Fighter", async function () {
             var cost4 : any = await fightersmarketplace1.getF86SabreCost(0)
             // console.log(BigInt(cost4), "rubber")
             expect(cost4).to.equal(BigInt(19200000000000000000000))
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500);
             await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 1)
             var cost5 : any = await fightersmarketplace1.getF86SabreCost(0)
             // console.log(BigInt(cost5), "2 airports")
@@ -1336,6 +1344,8 @@ describe("Fighter", async function () {
             var cost4 : any = await fightersmarketplace1.getMig15Cost(0)
             // console.log(BigInt(cost4), "rubber")
             expect(cost4).to.equal(BigInt("24000000000000000000000"))
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500);
             await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 1)
             var cost5 : any = await fightersmarketplace1.getMig15Cost(0)
             // console.log(BigInt(cost5), "2 airports")
@@ -1408,6 +1418,8 @@ describe("Fighter", async function () {
             var cost4 : any = await fightersmarketplace1.getF100SuperSabreCost(0)
             // console.log(BigInt(cost4), "rubber")
             expect(cost4).to.equal(BigInt("28800000000000000000000"))
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500);
             await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 1)
             var cost5 : any = await fightersmarketplace1.getF100SuperSabreCost(0)
             // console.log(BigInt(cost5), "2 airports")
@@ -1480,6 +1492,8 @@ describe("Fighter", async function () {
             var cost4 : any = await fightersmarketplace2.getF35LightningCost(0)
             // console.log(BigInt(cost4), "rubber")
             expect(cost4).to.equal(BigInt("33600000000000000000000"))
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500);
             await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 1)
             var cost5 : any = await fightersmarketplace2.getF35LightningCost(0)
             // console.log(BigInt(cost5), "2 airports")
@@ -1552,6 +1566,8 @@ describe("Fighter", async function () {
             var cost4 : any = await fightersmarketplace2.getF15EagleCost(0)
             // console.log(BigInt(cost4), "rubber")
             expect(cost4).to.equal(BigInt("38400000000000000000000"))
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500);
             await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 1)
             var cost5 : any = await fightersmarketplace2.getF15EagleCost(0)
             // console.log(BigInt(cost5), "2 airports")
@@ -1624,6 +1640,8 @@ describe("Fighter", async function () {
             var cost4 : any = await fightersmarketplace2.getSu30MkiCost(0)
             // console.log(BigInt(cost4), "rubber")
             expect(cost4).to.equal(BigInt("43200000000000000000000"))
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500);
             await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 1)
             var cost5 : any = await fightersmarketplace2.getSu30MkiCost(0)
             // console.log(BigInt(cost5), "2 airports")
@@ -1696,6 +1714,8 @@ describe("Fighter", async function () {
             var cost4 : any = await fightersmarketplace2.getF22RaptorCost(0)
             // console.log(BigInt(cost4), "rubber")
             expect(cost4).to.equal(BigInt("48000000000000000000000"))
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500);
             await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 1)
             var cost5 : any = await fightersmarketplace2.getF22RaptorCost(0)
             // console.log(BigInt(cost5), "2 airports")

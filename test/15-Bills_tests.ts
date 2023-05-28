@@ -974,7 +974,9 @@ describe("Bills Contract", async function () {
             infrastructuremarketplace.address,
             landmarketcontract.address,
             technologymarketcontrat.address,
+            fightersmarketplace1.address,
             fightersmarketplace2.address,
+            bombersmarketplace1.address,
             bombersmarketplace2.address
         )
 
@@ -1306,7 +1308,7 @@ describe("Bills Contract", async function () {
             await billscontract.connect(signer1).payBills(0)
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
             await technologymarketcontrat.connect(signer1).buyTech(0, 30000);
-            // await fightersmarketplace2.connect(signer1).buyF22Raptor(5, 0);
+            await fightersmarketplace2.connect(signer1).buyF22Raptor(5, 0);
             var aircraftCount = await fighterscontract.getAircraftCount(0);
             // console.log(aircraftCount.toNumber());
             var aircraftUpkeep = await billscontract.getAircraftUpkeep(0);
@@ -1380,6 +1382,8 @@ describe("Bills Contract", async function () {
 
     describe("Wonders and Improvements Bills", function () {
         it("bills4 tests improvements increment bills correctly", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 5000);
+            await billscontract.connect(signer1).payBills(0)
             var upkeep : any = await billscontract.calculateDailyBillsFromImprovements(0);
             await improvementscontract1.connect(signer1).buyImprovement1(3, 0, 1);
             var upkeep : any = await billscontract.calculateDailyBillsFromImprovements(0);

@@ -974,7 +974,9 @@ describe("Technology Market Contract", async function () {
             infrastructuremarketplace.address,
             landmarketcontract.address,
             technologymarketcontrat.address,
+            fightersmarketplace1.address,
             fightersmarketplace2.address,
+            bombersmarketplace1.address,
             bombersmarketplace2.address
         )
 
@@ -1183,6 +1185,8 @@ describe("Technology Market Contract", async function () {
             var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
             // console.log(BigInt(costPerLevel).toString())
             expect(BigInt(costPerLevel).toString()).to.equal("665000000000000000000")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 3000)
+            await billscontract.connect(signer1).payBills(0)
             await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 8)
             await improvementscontract3.connect(signer1).buyImprovement3(2, 0, 11)
             var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)

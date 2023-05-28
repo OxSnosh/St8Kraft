@@ -974,7 +974,9 @@ describe("Nation Strength Contract", async function () {
             infrastructuremarketplace.address,
             landmarketcontract.address,
             technologymarketcontrat.address,
+            fightersmarketplace1.address,
             fightersmarketplace2.address,
+            bombersmarketplace1.address,
             bombersmarketplace2.address
         )
 
@@ -1077,6 +1079,7 @@ describe("Nation Strength Contract", async function () {
             var strength = await nationstrengthcontract.getNationStrength(0);
             // console.log(strength.toNumber(), "strength after fighters");
             expect(strength.toNumber()).to.equal(7140);
+            await billscontract.connect(signer1).payBills(0)
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4);
             await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 10);
             await navycontract2.connect(signer1).buyDestroyer(1, 0);
