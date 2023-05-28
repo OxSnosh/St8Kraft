@@ -298,9 +298,9 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         force.decreaseDefendingSoldierCountFromNukeAttack(defenderId);
         force.decreaseDefendingTankCountFromNukeContract(defenderId);
         nav.decreaseNavyFromNukeContract(defenderId);
-        inf.decreaseLandCountFromNukeContract(defenderId , 35);
-        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId, 35);
-        inf.decreaseTechCountFromNukeContract(defenderId, 35);
+        inf.decreaseLandCountFromNukeContract(defenderId, 35, 1);
+        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId, 35, 1);
+        inf.decreaseTechCountFromNukeContract(defenderId, 35, 1);
     }
 
     ///@dev this is the function that will be called in the event of a infrastructure attack
@@ -311,9 +311,9 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         force.decreaseDefendingSoldierCountFromNukeAttack(defenderId);
         force.decreaseDefendingTankCountFromNukeContract(defenderId);
         nav.decreaseNavyFromNukeContract(defenderId);
-        inf.decreaseLandCountFromNukeContract(defenderId, 25);
-        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId, 45);
-        inf.decreaseTechCountFromNukeContract(defenderId, 25);
+        inf.decreaseLandCountFromNukeContract(defenderId, 25, 2);
+        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId, 45, 2);
+        inf.decreaseTechCountFromNukeContract(defenderId, 25, 2);
     }
 
     ///@dev this is the function that will be called in the event of a land attack
@@ -324,9 +324,9 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         force.decreaseDefendingSoldierCountFromNukeAttack(defenderId);
         force.decreaseDefendingTankCountFromNukeContract(defenderId);
         nav.decreaseNavyFromNukeContract(defenderId);
-        inf.decreaseLandCountFromNukeContract(defenderId, 45);
-        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId, 25);
-        inf.decreaseTechCountFromNukeContract(defenderId, 25);
+        inf.decreaseLandCountFromNukeContract(defenderId, 45, 3);
+        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId, 25, 3);
+        inf.decreaseTechCountFromNukeContract(defenderId, 25, 3);
     }
 
     ///@dev this is the function that will be called in the event of a tech attack
@@ -337,9 +337,9 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         force.decreaseDefendingSoldierCountFromNukeAttack(defenderId);
         force.decreaseDefendingTankCountFromNukeContract(defenderId);
         nav.decreaseNavyFromNukeContract(defenderId);
-        inf.decreaseLandCountFromNukeContract(defenderId, 25);
-        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId, 25);
-        inf.decreaseTechCountFromNukeContract(defenderId, 45);
+        inf.decreaseLandCountFromNukeContract(defenderId, 25, 4);
+        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId, 25, 4);
+        inf.decreaseTechCountFromNukeContract(defenderId, 45, 4);
     }
 
     ///@dev this function is a public view function that will return the number of nukes launched in the game in the last 7 days

@@ -433,14 +433,24 @@ contract InfrastructureContract is Ownable {
     ///@notice the maximum amount of land that can be lost is 150 miles
     ///@param countryId this is the nation ID of the nation being attacked
     ///@param percentage this is the percentage of a nations land being lost
+    ///@param attackType is the type of attack being used in the nuke strike (1 = standard, 2 = infrastructure, 3 = land, 4 = technology)
+    ///@notice attack type can only be 2, 3 or 4 if the attacking nation has EMP weaponization
     function decreaseLandCountFromNukeContract(
         uint256 countryId,
-        uint256 percentage
+        uint256 percentage,
+        uint256 attackType
     ) public onlyNukeContract {
         uint256 landAmount = idToInfrastructure[countryId].landArea;
         uint256 landAmountToDecrease = ((landAmount * percentage) / 100);
-        if (landAmountToDecrease > 150) {
-            idToInfrastructure[countryId].landArea -= 150;
+        uint256 maxLandToDecrease = 150;
+        if (attackType == 3) {
+            maxLandToDecrease = 200;
+        }
+        if (attackType == 2 || attackType == 4) {
+            maxLandToDecrease = 100;
+        }
+        if (landAmountToDecrease > maxLandToDecrease) {
+            idToInfrastructure[countryId].landArea -= maxLandToDecrease;
         } else {
             idToInfrastructure[countryId].landArea -= landAmountToDecrease;
         }
@@ -500,14 +510,24 @@ contract InfrastructureContract is Ownable {
     ///@notice the maximum amount of tech a nation can lose in an attack is 50
     ///@param countryId this is the nation ID of the nation being attacked
     ///@param percentage is the percentage of a nations technology a nation is losing in the attack
+    ///@param attackType is the type of attack being used in the nuke strike (1 = standard, 2 = infrastructure, 3 = land, 4 = technology)
+    ///@notice attack type can only be 2, 3 or 4 if the attacking nation has EMP weaponization
     function decreaseTechCountFromNukeContract(
         uint256 countryId,
-        uint256 percentage
+        uint256 percentage,
+        uint256 attackType
     ) public onlyNukeContract {
         uint256 techAmount = idToInfrastructure[countryId].technologyCount;
         uint256 techAmountToDecrease = ((techAmount * percentage) / 100);
-        if (techAmountToDecrease > 50) {
-            idToInfrastructure[countryId].technologyCount -= 50;
+        uint256 maxTechToDecrease = 50;
+        if (attackType == 4) {
+            maxTechToDecrease = 70;
+        }
+        if (attackType == 2 || attackType == 3) {
+            maxTechToDecrease = 30;
+        }
+        if (techAmountToDecrease > maxTechToDecrease) {
+            idToInfrastructure[countryId].technologyCount -= maxTechToDecrease;
         } else {
             idToInfrastructure[countryId]
                 .technologyCount -= techAmountToDecrease;
@@ -578,10 +598,13 @@ contract InfrastructureContract is Ownable {
     ///@param defenderId is the defending nation in a nuke strike
     ///@param attackerId is an attacking nation in a nuke strike
     ///@param percentage is the percentage of infrastructure being lost before modifiers (defender bunkers and attacker munitions factories)
+    ///@param attackType is the type of attack being used in the nuke strike (1 = standard, 2 = infrastructure, 3 = land, 4 = technology)
+    ///@notice attack type can only be 2, 3 or 4 if the attacking nation has EMP weaponization
     function decreaseInfrastructureCountFromNukeContract(
         uint256 defenderId,
         uint256 attackerId,
-        uint256 percentage
+        uint256 percentage,
+        uint256 attackType
     ) public onlyNukeContract {
         uint256 infrastructureAmount = idToInfrastructure[defenderId]
             .infrastructureCount;
@@ -598,8 +621,16 @@ contract InfrastructureContract is Ownable {
         }
         uint256 infrastructureAmountToDecrease = ((infrastructureAmount *
             damagePercentage) / 100);
-        if (infrastructureAmountToDecrease > 150) {
-            idToInfrastructure[defenderId].infrastructureCount -= 150;
+        uint256 maxInfrastructureToDecrease = 150;
+        if (attackType == 2) {
+            maxInfrastructureToDecrease = 200;
+        }
+        if (attackType == 3 || attackType == 4) {
+            maxInfrastructureToDecrease = 100;
+        }
+        if (infrastructureAmountToDecrease > maxInfrastructureToDecrease) {
+            idToInfrastructure[defenderId]
+                .infrastructureCount -= maxInfrastructureToDecrease;
         } else {
             idToInfrastructure[defenderId]
                 .infrastructureCount -= infrastructureAmountToDecrease;
