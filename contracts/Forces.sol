@@ -839,12 +839,15 @@ contract MissilesContract is Ownable {
     WarContract war;
     TreasuryContract tsy;
     NationStrengthContract stren;
+    KeeperContract keep;
 
     struct Missiles {
         uint256 cruiseMissiles;
         uint256 nuclearWeapons;
         uint256 nukesPurchasedToday;
     }
+
+    mapping(uint256 => mapping(uint256 => uint256)) public idToNukesPurchasedToday;
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -891,6 +894,7 @@ contract MissilesContract is Ownable {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
         keeper = _keeper;
+        keep = KeeperContract(_keeper);
     }
 
     mapping(uint256 => Missiles) public idToMissiles;
@@ -1097,7 +1101,6 @@ contract MissilesContract is Ownable {
     ///@notice a nation owner can only purchase one nuke per day (2 with a weapons research center)
     ///@param id is the nation id of the nation purchasing nukes
     function buyNukes(uint256 id) public {
-        //tech 75 infra 1000 access to uranium
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         uint256 techAmount = inf.getTechnologyCount(id);
@@ -1112,7 +1115,8 @@ contract MissilesContract is Ownable {
             nationStrength > 150000 || manhattanProject,
             "nation strength too low"
         );
-        uint256 nukesPurchasedToday = idToMissiles[id].nukesPurchasedToday;
+        uint256 day = keep.getGameDay();
+        uint256 nukesPurchasedToday = idToNukesPurchasedToday[id][day];
         uint256 maxNukesPerDay = 1;
         bool weaponsResearchCenter = won4.getWeaponsResearchCenter(id);
         if (weaponsResearchCenter) {
@@ -1122,9 +1126,10 @@ contract MissilesContract is Ownable {
             nukesPurchasedToday < maxNukesPerDay,
             "already purchased nuke today"
         );
-        uint256 cost = getNukeCost(id);
-        idToMissiles[id].nukesPurchasedToday += 1;
+        idToNukesPurchasedToday[id][day] += 1;
+        // idToMissiles[id].nukesPurchasedToday += 1;
         idToMissiles[id].nuclearWeapons += 1;
+        uint256 cost = getNukeCost(id);
         tsy.spendBalance(id, cost);
     }
 
@@ -1151,6 +1156,11 @@ contract MissilesContract is Ownable {
 
     function getDefaultNukeCost() public view returns (uint256) {
         return defaultNukeCost;
+    }
+
+    function getNukesPurchasedToday(uint256 id) public view returns (uint256) {
+        uint256 day = keep.getGameDay();
+        return idToNukesPurchasedToday[id][day];
     }
 
     ///@dev this is a public view function that will retrun a nations current nuke count
@@ -1189,13 +1199,13 @@ contract MissilesContract is Ownable {
         idToMissiles[id].nuclearWeapons -= 1;
     }
 
-    ///@dev this is a function that is only callable from the keeper contract
-    ///@dev this function will reset the number of nukes purchased by each nation for that day back to 0
-    ///@dev this function will be called daily
-    function resetNukesPurchasedToday() public onlyKeeper {
-        uint256 countryCount = mint.getCountryCount();
-        for (uint i = 0; i < countryCount; i++) {
-            idToMissiles[i].nukesPurchasedToday = 0;
-        }
-    }
+    // ///@dev this is a function that is only callable from the keeper contract
+    // ///@dev this function will reset the number of nukes purchased by each nation for that day back to 0
+    // ///@dev this function will be called daily
+    // function resetNukesPurchasedToday() public onlyKeeper {
+    //     uint256 countryCount = mint.getCountryCount();
+    //     for (uint i = 0; i < countryCount; i++) {
+    //         idToMissiles[i].nukesPurchasedToday = 0;
+    //     }
+    // }
 }

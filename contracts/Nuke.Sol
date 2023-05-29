@@ -185,7 +185,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
             defenderId == offenseId || defenderId == defenseId,
             "defender not involved in this war"
         );
-        uint256 daysLeft = war.getDaysLeft(warId);
+        (uint256 daysLeft, ) = war.getDaysLeft(warId);
         require(daysLeft < 6, "not at war long enough to launch a nuke");
         uint256 count = mis.getNukeCount(attackerId);
         require (count >= 1, "need to own a nuke");

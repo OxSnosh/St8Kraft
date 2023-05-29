@@ -77,13 +77,13 @@ contract KeeperContract is Ownable {
     function keeperFunctionToCall() public {
         // shiftNukeDays();
         // resetAidProposals();
-        expireOldWars();
-        resetCruiseMissileLaunches();
+        // expireOldWars();
+        // resetCruiseMissileLaunches();
         incrementDaysSince();
-        resetNukesPurchasedToday();
+        // resetNukesPurchasedToday();
         resetActionsToday();
         incrementDaysSinceForParameters();
-        resetDeployments();
+        // resetDeployments();
         incrementDaysInPeaceMode();
     }
 
@@ -91,13 +91,13 @@ contract KeeperContract is Ownable {
     function keeperFunctionToCallManually() public onlyOwner {
         // shiftNukeDays();
         // resetAidProposals();
-        expireOldWars();
-        resetCruiseMissileLaunches();
+        // expireOldWars();
+        // resetCruiseMissileLaunches();
         incrementDaysSince();
-        resetNukesPurchasedToday();
+        // resetNukesPurchasedToday();
         resetActionsToday();
         incrementDaysSinceForParameters();
-        resetDeployments();
+        // resetDeployments();
         incrementDaysInPeaceMode();
     }
 
@@ -113,33 +113,33 @@ contract KeeperContract is Ownable {
     //     aid.resetAidProposals();
     // }
 
-    function expireOldWars() internal {
-        war.expireOldWars();
-    }
+    // function expireOldWars() internal {
+    //     war.expireOldWars();
+    // }
 
-    function expireOldWarsByOwner() public onlyOwner {
-        war.expireOldWars();
-    }
+    // function expireOldWarsByOwner() public onlyOwner {
+    //     war.expireOldWars();
+    // }
 
-    function resetCruiseMissileLaunches() internal {
-        war.resetCruiseMissileLaunches();
-    }
+    // function resetCruiseMissileLaunches() internal {
+    //     war.resetCruiseMissileLaunches();
+    // }
 
-    function resetCruiseMissileLaunchesByOwner() public onlyOwner {
-        war.resetCruiseMissileLaunches();
-    }
+    // function resetCruiseMissileLaunchesByOwner() public onlyOwner {
+    //     war.resetCruiseMissileLaunches();
+    // }
 
     function incrementDaysSince() internal {
         tres.incrementDaysSince();
     }
 
-    function resetNukesPurchasedToday() internal {
-        miss.resetNukesPurchasedToday();
-    }
+    // function resetNukesPurchasedToday() internal {
+    //     miss.resetNukesPurchasedToday();
+    // }
 
-    function resetNukesPurchasedTodayByOwner() public onlyOwner {
-        miss.resetNukesPurchasedToday();
-    }
+    // function resetNukesPurchasedTodayByOwner() public onlyOwner {
+    //     miss.resetNukesPurchasedToday();
+    // }
 
     function resetActionsToday() internal {
         navAct.resetActionsToday();
@@ -157,13 +157,13 @@ contract KeeperContract is Ownable {
         params.incrementDaysSince();
     }
 
-    function resetDeployments() internal {
-        war.resetDeployedToday();
-    }
+    // function resetDeployments() internal {
+    //     war.resetDeployedToday();
+    // }
 
-    function resetDeploymentsByOwner() public onlyOwner {
-        war.resetDeployedToday();
-    }
+    // function resetDeploymentsByOwner() public onlyOwner {
+    //     war.resetDeployedToday();
+    // }
 
     function incrementDaysInPeaceMode() public {
         mil.incrementDaysInPeaceMode();

@@ -29,7 +29,7 @@ contract WarContract is Ownable {
     address public wonders1;
     address public keeper;
     address public treasury;
-    uint256[] public activeWars;
+    // uint256[] public activeWars;
 
     NationStrengthContract nsc;
     MilitaryContract mil;
@@ -49,18 +49,18 @@ contract WarContract is Ownable {
         bool defensePeaceOffered;
         uint256 offenseBlockades;
         uint256 defenseBlockades;
-        uint256 offenseCruiseMissileLaunchesToday;
-        uint256 defenseCruiseMissileLaunchesToday;
+        mapping(uint256 => uint256) offenseIdToCruiseMissileLaunchesToday;
+        mapping(uint256 => uint256) defenseIdToCruiseMissileLaunchesToday;
     }
 
     struct OffenseDeployed1 {
-        bool offenseDeployedToday;
+        mapping(uint256 => bool) offenseDeployedToday;
         uint256 soldiersDeployed;
         uint256 tanksDeployed;
     }
 
     struct DefenseDeployed1 {
-        bool defenseDeployedToday;
+        mapping(uint256 => bool) defenseDeployedToday;
         uint256 soldiersDeployed;
         uint256 tanksDeployed;
     }
@@ -98,6 +98,8 @@ contract WarContract is Ownable {
     mapping(uint256 => DefenseLosses) public warIdToDefenseLosses;
     mapping(uint256 => uint256[]) public idToActiveWars;
     mapping(uint256 => uint256[]) public idToOffensiveWars;
+        
+    // mapping(uint256 => mapping (uint256 => uint256)) public nationIdToCruiseMissileLaunchesToday;
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -180,23 +182,17 @@ contract WarContract is Ownable {
         bool isOwner = mint.checkOwnership(offenseId, msg.sender);
         require(isOwner, "!nation owner");
         bool check = warCheck(offenseId, defenseId);
-        require(check, "didn't make it here");
+        require(check, "war not possible");
         uint day = keep.getGameDay();
-        War memory newWar = War(
-            offenseId,
-            defenseId,
-            true,
-            day,
-            false,
-            false,
-            false,
-            false,
-            0,
-            0,
-            0,
-            0
-        );
-        warIdToWar[warId] = newWar;
+        War storage war = warIdToWar[warId];
+            war.offenseId = offenseId;
+            war.defenseId = defenseId;
+            war.active = true;
+            war.dayStarted = day;
+            war.peaceDeclared = false;
+            war.expired = false;
+            war.offensePeaceOffered = false;
+            war.defensePeaceOffered = false;
         OffenseLosses memory newOffenseLosses = OffenseLosses(
             warId,
             0,
@@ -260,6 +256,15 @@ contract WarContract is Ownable {
         require(!defenderInactive, "defender inactive");
         bool offenseInactive = tres.checkInactive(offenseId);
         require(!offenseInactive, "nation inactive");
+        uint256[] memory activeWars = idToActiveWars[offenseId];
+        for (uint256 i = 0; i < activeWars.length; i++) {
+            uint256 war = activeWars[i];
+            (uint256 offense, uint256 defense) = getInvolvedParties(war);
+            require(
+                offense != defenseId && defense != defenseId,
+                "already at war with this nation"
+            );
+        }
         warCheckReturn = true;
         return warCheckReturn;
     }
@@ -285,25 +290,18 @@ contract WarContract is Ownable {
         return activeWarsArray;
     }
 
-    function gameActiveWars() public view returns (uint256[] memory) {
-        return activeWars;
-    }
+    // function gameActiveWars() public view returns (uint256[] memory) {
+    //     return activeWars;
+    // }
 
     ///@dev this is an internal function that will be balled by the declare war function and set up several structs that will keep track of each war
     function initializeDeployments(uint256 _warId) internal {
-        OffenseDeployed1 memory newOffenseDeployed1 = OffenseDeployed1(
-            false,
-            0,
-            0
-        );
-        warIdToOffenseDeployed1[_warId] = newOffenseDeployed1;
-        DefenseDeployed1 memory newDefenseDeployed1 = DefenseDeployed1(
-            false,
-            0,
-            0
-        );
-        warIdToDefenseDeployed1[_warId] = newDefenseDeployed1;
-        activeWars.push(_warId);
+        OffenseDeployed1 storage newOffenseDeployed1 = warIdToOffenseDeployed1[_warId];
+            newOffenseDeployed1.soldiersDeployed = 0;
+            newOffenseDeployed1.tanksDeployed = 0;
+        DefenseDeployed1 storage newDefenseDeployed1 = warIdToDefenseDeployed1[_warId];
+            newDefenseDeployed1.soldiersDeployed = 0;
+            newDefenseDeployed1.tanksDeployed = 0;
     }
 
     ///@dev this is a public view function that will return a boolean value if the nations are able to fight eachother
@@ -353,7 +351,7 @@ contract WarContract is Ownable {
         bool defensePeaceCheck = warIdToWar[_warId].defensePeaceOffered;
         if (offensePeaceCheck == true && defensePeaceCheck == true) {
             warIdToWar[_warId].peaceDeclared = true;
-            warIdToWar[_warId].active = false;
+            // warIdToWar[_warId].active = false;
             removeActiveWar(_warId);
         }
     }
@@ -411,12 +409,12 @@ contract WarContract is Ownable {
                 defenseActiveWars.pop();
             }
         }
-        for (uint256 i = 0; i < activeWars.length; i++) {
-            if (activeWars[i] == _warId) {
-                activeWars[i] = activeWars[activeWars.length - 1];
-                activeWars.pop();
-            }
-        }
+        // for (uint256 i = 0; i < activeWars.length; i++) {
+        //     if (activeWars[i] == _warId) {
+        //         activeWars[i] = activeWars[activeWars.length - 1];
+        //         activeWars.pop();
+        //     }
+        // }
     }
 
     modifier onlyKeeper() {
@@ -427,43 +425,43 @@ contract WarContract is Ownable {
         _;
     }
 
-    ///@dev this function is only callable from the keeper contract
-    ///@dev wars expire after 7 days and will be removed from active wars when 7 days have elapsed
-    ///@notice wars expire after 7 days and will be removed from active wars when 7 days have elapsed
-    function expireOldWars() public onlyKeeper {
-        uint256 day = keep.getGameDay();
-        for (uint256 i = 0; i < activeWars.length; i++) {
-            uint256 war = activeWars[i];
-            // warIdToWar[war].daysLeft -= 1;
-            if (day - warIdToWar[war].dayStarted >= 7) {
-                warIdToWar[war].expired = true;
-                warIdToWar[war].active = false;
-                removeActiveWar(war);
-            }
-        }
-    }
+    // ///@dev this function is only callable from the keeper contract
+    // ///@dev wars expire after 7 days and will be removed from active wars when 7 days have elapsed
+    // ///@notice wars expire after 7 days and will be removed from active wars when 7 days have elapsed
+    // function expireOldWars() public onlyKeeper {
+    //     uint256 day = keep.getGameDay();
+    //     for (uint256 i = 0; i < activeWars.length; i++) {
+    //         uint256 war = activeWars[i];
+    //         // warIdToWar[war].daysLeft -= 1;
+    //         if (day - warIdToWar[war].dayStarted >= 7) {
+    //             warIdToWar[war].expired = true;
+    //             warIdToWar[war].active = false;
+    //             removeActiveWar(war);
+    //         }
+    //     }
+    // }
 
-    ///@dev this function is only callable from the keeper contract
-    ///@notice this function will reset cruise missile launches daily to 0
-    ///@notice a nation can only launch 2 cruise missiles per day per war
-    function resetCruiseMissileLaunches() public onlyKeeper {
-        for (uint256 i = 0; i < activeWars.length; i++) {
-            uint256 war = activeWars[i];
-            warIdToWar[war].offenseCruiseMissileLaunchesToday = 0;
-            warIdToWar[war].defenseCruiseMissileLaunchesToday = 0;
-        }
-    }
+    // ///@dev this function is only callable from the keeper contract
+    // ///@notice this function will reset cruise missile launches daily to 0
+    // ///@notice a nation can only launch 2 cruise missiles per day per war
+    // function resetCruiseMissileLaunches() public onlyKeeper {
+    //     for (uint256 i = 0; i < activeWars.length; i++) {
+    //         uint256 war = activeWars[i];
+    //         warIdToWar[war].offenseCruiseMissileLaunchesToday = 0;
+    //         warIdToWar[war].defenseCruiseMissileLaunchesToday = 0;
+    //     }
+    // }
 
-    ///@dev this function is only callable from the keeper contract
-    ///@notice this function will reset the active wars daily so that forces can be deployed again
-    ///@notice a nation can only deploy forces to a war once per day
-    function resetDeployedToday() public onlyKeeper {
-        for (uint256 i = 0; i < activeWars.length; i++) {
-            uint256 war = activeWars[i];
-            warIdToOffenseDeployed1[war].offenseDeployedToday = false;
-            warIdToDefenseDeployed1[war].defenseDeployedToday = false;
-        }
-    }
+    // ///@dev this function is only callable from the keeper contract
+    // ///@notice this function will reset the active wars daily so that forces can be deployed again
+    // ///@notice a nation can only deploy forces to a war once per day
+    // function resetDeployedToday() public onlyKeeper {
+    //     for (uint256 i = 0; i < activeWars.length; i++) {
+    //         uint256 war = activeWars[i];
+    //         warIdToOffenseDeployed1[war].offenseDeployedToday = false;
+    //         warIdToDefenseDeployed1[war].defenseDeployedToday = false;
+    //     }
+    // }
 
     modifier onlyNavyBattle() {
         require(
@@ -496,18 +494,30 @@ contract WarContract is Ownable {
         uint256 nationId
     ) public onlyCruiseMissileContract {
         (uint256 offenseId, uint256 defenseId) = getInvolvedParties(warId);
+        uint256 day = keep.getGameDay();
+        War storage war = warIdToWar[_warId];
         if (nationId == offenseId) {
-            uint256 launchesToday = warIdToWar[_warId]
-                .offenseCruiseMissileLaunchesToday;
-            require(launchesToday < 2, "too many launches today");
-            warIdToWar[_warId].offenseCruiseMissileLaunchesToday += 1;
+            require(war.offenseIdToCruiseMissileLaunchesToday[day] < 2, "too many launches today");
+            war.offenseIdToCruiseMissileLaunchesToday[day] += 1;
         }
         if (nationId == defenseId) {
-            uint256 launchesToday = warIdToWar[_warId]
-                .defenseCruiseMissileLaunchesToday;
-            require(launchesToday < 2, "too many launches today");
-            warIdToWar[_warId].defenseCruiseMissileLaunchesToday += 1;
+            require(war.defenseIdToCruiseMissileLaunchesToday[day] < 2, "too many launches today");
+            war.defenseIdToCruiseMissileLaunchesToday[day] += 1;
         }
+    }
+
+    function getCruiseMissileLaunchesToday(uint256 _warId, uint256 id) public view returns (uint256) {
+        (uint256 offenseId, uint256 defenseId) = getInvolvedParties(_warId);
+        uint256 day = keep.getGameDay();
+        uint256 launches;
+        War storage war = warIdToWar[_warId];
+        if (id == offenseId) {
+            launches = war.offenseIdToCruiseMissileLaunchesToday[day];
+        }
+        if (id == defenseId) {
+            launches = war.defenseIdToCruiseMissileLaunchesToday[day];
+        }
+        return launches;
     }
 
     ///@dev this is a public view function that will take a war id as a parameter and return whether the war is active or not
@@ -515,7 +525,12 @@ contract WarContract is Ownable {
     ///@param _warId is the warId being queries
     ///@return bool will be true if the war is active
     function isWarActive(uint256 _warId) public view returns (bool) {
-        bool isActive = warIdToWar[_warId].active;
+        bool isActive = true;
+        (, bool expired) = getDaysLeft(_warId);
+        bool peaceDeclared = warIdToWar[_warId].peaceDeclared;
+        if (expired == true || peaceDeclared == true) {
+            isActive = false;
+        }
         return isActive;
     }
 
@@ -561,10 +576,14 @@ contract WarContract is Ownable {
 
     ///@dev this is a publci view function that will return the number of days left in a war
     ///@dev wars expire after 7 days when days left == 0
-    function getDaysLeft(uint256 _warId) public view returns (uint256) {
+    function getDaysLeft(uint256 _warId) public view returns (uint256, bool) {
         uint256 day = keep.getGameDay();
         uint256 daysLeft = (7 - (day - warIdToWar[_warId].dayStarted));
-        return daysLeft;
+        bool expired = false;
+        if (daysLeft == 0) {
+            expired = true;
+        }
+        return (daysLeft, expired);
     }
 
     modifier onlyAirBattle() {
@@ -715,22 +734,23 @@ contract WarContract is Ownable {
             nationId == offenseId || nationId == defenseId,
             "nation not involved"
         );
+        uint256 day = keep.getGameDay();
         if (nationId == offenseId) {
             bool deployedToday = warIdToOffenseDeployed1[_warId]
-                .offenseDeployedToday;
+                .offenseDeployedToday[day];
             require(!deployedToday, "already deployed forces today");
             warIdToOffenseDeployed1[_warId]
                 .soldiersDeployed += soldiersToDeploy;
             warIdToOffenseDeployed1[_warId].tanksDeployed += tanksToDeploy;
-            warIdToOffenseDeployed1[_warId].offenseDeployedToday = true;
+            warIdToOffenseDeployed1[_warId].offenseDeployedToday[day] = true;
         } else if (nationId == defenseId) {
             bool deployedToday = warIdToDefenseDeployed1[_warId]
-                .defenseDeployedToday;
+                .defenseDeployedToday[day];
             require(!deployedToday, "already deployed forces today");
             warIdToDefenseDeployed1[_warId]
                 .soldiersDeployed += soldiersToDeploy;
             warIdToDefenseDeployed1[_warId].tanksDeployed += tanksToDeploy;
-            warIdToDefenseDeployed1[_warId].defenseDeployedToday = true;
+            warIdToDefenseDeployed1[_warId].defenseDeployedToday[day] = true;
         }
     }
 
