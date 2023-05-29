@@ -79,12 +79,12 @@ contract KeeperContract is Ownable {
         // resetAidProposals();
         // expireOldWars();
         // resetCruiseMissileLaunches();
-        incrementDaysSince();
+        // incrementDaysSince();
         // resetNukesPurchasedToday();
         resetActionsToday();
-        incrementDaysSinceForParameters();
+        // incrementDaysSinceForParameters();
         // resetDeployments();
-        incrementDaysInPeaceMode();
+        // incrementDaysInPeaceMode();
     }
 
     ///@dev this function can be called by the contract owner in the event the keeper fails
@@ -93,12 +93,12 @@ contract KeeperContract is Ownable {
         // resetAidProposals();
         // expireOldWars();
         // resetCruiseMissileLaunches();
-        incrementDaysSince();
+        // incrementDaysSince();
         // resetNukesPurchasedToday();
         resetActionsToday();
-        incrementDaysSinceForParameters();
+        // incrementDaysSinceForParameters();
         // resetDeployments();
-        incrementDaysInPeaceMode();
+        // incrementDaysInPeaceMode();
     }
 
     // function shiftNukeDays() internal {
@@ -129,9 +129,9 @@ contract KeeperContract is Ownable {
     //     war.resetCruiseMissileLaunches();
     // }
 
-    function incrementDaysSince() internal {
-        tres.incrementDaysSince();
-    }
+    // function incrementDaysSince() internal {
+    //     tres.incrementDaysSince();
+    // }
 
     // function resetNukesPurchasedToday() internal {
     //     miss.resetNukesPurchasedToday();
@@ -149,13 +149,13 @@ contract KeeperContract is Ownable {
         navAct.resetActionsToday();
     }
 
-    function incrementDaysSinceForParameters() internal {
-        params.incrementDaysSince();
-    }
+    // function incrementDaysSinceForParameters() internal {
+    //     params.incrementDaysSince();
+    // }
 
-    function incrementDaysSinceForParametersByOwner() public onlyOwner {
-        params.incrementDaysSince();
-    }
+    // function incrementDaysSinceForParametersByOwner() public onlyOwner {
+    //     params.incrementDaysSince();
+    // }
 
     // function resetDeployments() internal {
     //     war.resetDeployedToday();
@@ -165,11 +165,11 @@ contract KeeperContract is Ownable {
     //     war.resetDeployedToday();
     // }
 
-    function incrementDaysInPeaceMode() public {
-        mil.incrementDaysInPeaceMode();
-    }
+    // function incrementDaysInPeaceMode() public {
+    //     mil.incrementDaysInPeaceMode();
+    // }
 
-    function incrementDaysInPeaceModeByOwner() public onlyOwner {
-        mil.incrementDaysInPeaceMode();
-    }
+    // function incrementDaysInPeaceModeByOwner() public onlyOwner {
+    //     mil.incrementDaysInPeaceMode();
+    // }
 }

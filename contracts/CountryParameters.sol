@@ -3,6 +3,7 @@ pragma solidity 0.8.17;
 
 import "./CountryMinter.sol";
 import "./Senate.sol";
+import "./KeeperFile.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -29,6 +30,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
 
     CountryMinter mint;
     SenateContract senate;
+    KeeperContract keep;
 
     event randomNumbersRequested(uint256 indexed requestId);
     event randomNumbersFulfilled(
@@ -50,10 +52,10 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         string alliance;
         uint256 nationTeam;
         uint256 governmentType;
-        uint256 daysSinceGovernmentChenge;
+        uint256 dayGovernmentChanged;
         uint256 nationalReligion;
-        uint256 daysSinceReligionChange;
-        uint256 anarchyClock;
+        uint256 dayReligionChanged;
+        uint256 dayOfAnarchy;
     }
 
     mapping(uint256 => CountryParameters) public idToCountryParameters;
@@ -102,6 +104,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         senateAddress = _senate;
         senate = SenateContract(_senate);
         keeper = _keeper;
+        keep = KeeperContract(_keeper);
         nuke = _nuke;
         groundBattle = _groundBattle;
     }
@@ -295,15 +298,16 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     function setGovernment(uint256 id, uint256 newType) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
-        uint256 anarchyDays = idToCountrySettings[id].anarchyClock;
-        require(anarchyDays > 5, "nation in anarchy");
-        uint256 daysSinceChange = idToCountrySettings[id]
-            .daysSinceGovernmentChenge;
-        require(daysSinceChange >= 3, "need to wait 3 days before changing");
+        uint256 gameDay = keep.getGameDay();
+        uint256 anarchyDay = idToCountrySettings[id].dayOfAnarchy;
+        require((gameDay - anarchyDay) >= 5, "nation in anarchy");
+        uint256 dayOfChange = idToCountrySettings[id]
+            .dayGovernmentChanged;
+        require((gameDay - dayOfChange) >= 3, "need to wait 3 days before changing");
         require(newType <= 10, "invalid type");
         require(newType > 0, "invalid type");
         idToCountrySettings[id].governmentType = newType;
-        idToCountrySettings[id].daysSinceGovernmentChenge = 0;
+        idToCountrySettings[id].dayGovernmentChanged = gameDay;
     }
 
     ///@dev this is a public function but it is only callable from the spy contract
@@ -326,13 +330,14 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     function setReligion(uint256 id, uint256 newType) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
-        uint256 daysSinceChange = idToCountrySettings[id]
-            .daysSinceReligionChange;
-        require(daysSinceChange >= 3, "need to wait 3 days before changing");
+        uint256 gameDay = keep.getGameDay();
+        uint256 dayOfChange = idToCountrySettings[id]
+            .dayReligionChanged;
+        require((gameDay - dayOfChange) >= 3, "need to wait 3 days before changing");
         require(newType > 0, "invalid type");
         require(newType <= 14, "invalid type");
         idToCountrySettings[id].nationalReligion = newType;
-        idToCountrySettings[id].daysSinceReligionChange = 0;
+        idToCountrySettings[id].dayReligionChanged = gameDay;
     }
 
     ///@dev this is a public function but it is only callable from the spy contract
@@ -347,23 +352,24 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     }
 
     function inflictAnarchy(uint256 id) public onlyNukeAndGroundBattle {
+        uint256 gameDay = keep.getGameDay();
         idToCountrySettings[id].governmentType = 0;
-        idToCountrySettings[id].anarchyClock = 0;
+        idToCountrySettings[id].dayOfAnarchy = gameDay;
     }
 
-    //needs to be called by a keeper
-    ///@dev this is an esterna function that is only callable from the keeper contract
-    ///@dev this function will increment the days since a religion and goverment change
-    ///@notice ruler must wait 3 days to change religion and government
-    function incrementDaysSince() external onlyKeeperContract {
-        uint256 countryCount = mint.getCountryCount();
-        uint256 i;
-        for (i = 0; i < countryCount; i++) {
-            idToCountrySettings[i].daysSinceGovernmentChenge++;
-            idToCountrySettings[i].daysSinceReligionChange++;
-            idToCountrySettings[i].anarchyClock++;
-        }
-    }
+    // //needs to be called by a keeper
+    // ///@dev this is an esterna function that is only callable from the keeper contract
+    // ///@dev this function will increment the days since a religion and goverment change
+    // ///@notice ruler must wait 3 days to change religion and government
+    // function incrementDaysSince() external onlyKeeperContract {
+    //     uint256 countryCount = mint.getCountryCount();
+    //     uint256 i;
+    //     for (i = 0; i < countryCount; i++) {
+    //         idToCountrySettings[i].daysSinceGovernmentChenge++;
+    //         idToCountrySettings[i].daysSinceReligionChange++;
+    //         idToCountrySettings[i].anarchyClock++;
+    //     }
+    // }
 
     ///@dev this is a view funtion that will return the ruler name for a country
     ///@param countryId this is the ID for the nation being queried
@@ -452,10 +458,13 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     ///@param id this is the ID for the nation being queried
     ///@return uint256 will return an array with [0] as the days since governemtn change and [1] as days since religion change
     function getDaysSince(uint256 id) public view returns (uint256, uint256) {
-        uint256 daysSinceGovChange = idToCountrySettings[id]
-            .daysSinceGovernmentChenge;
-        uint256 daysSinceReligionChange = idToCountrySettings[id]
-            .daysSinceReligionChange;
+        uint256 gameDay = keep.getGameDay();
+        uint256 dayOfGovChange = idToCountrySettings[id]
+            .dayGovernmentChanged;
+        uint256 daysSinceGovChange = gameDay - dayOfGovChange;
+        uint256 dayReligionChanged = idToCountrySettings[id]
+            .dayReligionChanged;
+        uint256 daysSinceReligionChange = gameDay - dayReligionChanged;
         return (daysSinceGovChange, daysSinceReligionChange);
     }
 }

@@ -10,13 +10,14 @@ import "./Navy.sol";
 import "./Fighters.sol";
 import "./CountryMinter.sol";
 import "./GroundBattle.sol";
+import "./KeeperFile.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 ///@title TreasuyContract
 ///@author OxSnosh
 ///@dev this contract will allow the game owner to withdraw game revenues from the in game purchases
 ///@dev this contract inherits from the openzeppelin ownable contract
-///@notice this contact will allow a nation owner 
+///@notice this contact will allow a nation owner
 contract TreasuryContract is Ownable {
     uint256 public totalGameBalance;
     uint256 public counter;
@@ -52,10 +53,11 @@ contract TreasuryContract is Ownable {
     address public keeper;
     uint256 public daysToInactive = 30;
     uint256 private gameTaxPercentage = 0;
-    uint256 public seedMoney = 2000000*(10**18);
+    uint256 public seedMoney = 2000000 * (10 ** 18);
 
     CountryMinter mint;
     GroundBattleContract ground;
+    KeeperContract keep;
 
     struct Treasury {
         uint256 grossIncomePerCitizenPerDay;
@@ -63,9 +65,9 @@ contract TreasuryContract is Ownable {
         uint256 netDailyTaxesCollectable;
         uint256 netDailyBillsPayable;
         uint256 lockedBalance;
-        uint256 daysSinceLastBillPaid;
+        uint256 dayOfLastBillPaid;
         uint256 lastTaxCollection;
-        uint256 daysSinceLastTaxCollection;
+        uint256 dayOfLastTaxCollection;
         uint256 balance;
         bool inactive;
         bool demonitized;
@@ -119,6 +121,7 @@ contract TreasuryContract is Ownable {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
         keeper = _keeper;
+        keep = KeeperContract(_keeper);
         forces = _forces;
         navy = _navy;
         fighters = _fighters;
@@ -152,7 +155,10 @@ contract TreasuryContract is Ownable {
     }
 
     modifier onlyCountryMinter() {
-        require(msg.sender == countryMinter, "function only callable from country minter contract");
+        require(
+            msg.sender == countryMinter,
+            "function only callable from country minter contract"
+        );
         _;
     }
 
@@ -185,28 +191,30 @@ contract TreasuryContract is Ownable {
     }
 
     modifier approvedSpendCaller() {
-        require(msg.sender == bombers ||
-            msg.sender == bombersMarket1 ||
-            msg.sender == bombersMarket2 ||
-            msg.sender == fightersMarket1 ||
-            msg.sender == fightersMarket2 ||
-            msg.sender == fighters ||
-            msg.sender == forces ||
-            msg.sender == missiles ||
-            msg.sender == navy ||
-            msg.sender == navy2 ||
-            msg.sender == improvements1 ||
-            msg.sender == improvements2 ||
-            msg.sender == improvements3 ||
-            msg.sender == improvements4 ||
-            msg.sender == wonders1 ||
-            msg.sender == wonders2 ||
-            msg.sender == wonders3 ||
-            msg.sender == wonders4 ||
-            msg.sender == infrastructureMarket ||
-            msg.sender == techMarket ||
-            msg.sender == landMarket ||
-            msg.sender == spyOperations, "cannot call spendBalance()"
+        require(
+            msg.sender == bombers ||
+                msg.sender == bombersMarket1 ||
+                msg.sender == bombersMarket2 ||
+                msg.sender == fightersMarket1 ||
+                msg.sender == fightersMarket2 ||
+                msg.sender == fighters ||
+                msg.sender == forces ||
+                msg.sender == missiles ||
+                msg.sender == navy ||
+                msg.sender == navy2 ||
+                msg.sender == improvements1 ||
+                msg.sender == improvements2 ||
+                msg.sender == improvements3 ||
+                msg.sender == improvements4 ||
+                msg.sender == wonders1 ||
+                msg.sender == wonders2 ||
+                msg.sender == wonders3 ||
+                msg.sender == wonders4 ||
+                msg.sender == infrastructureMarket ||
+                msg.sender == techMarket ||
+                msg.sender == landMarket ||
+                msg.sender == spyOperations,
+            "cannot call spendBalance()"
         );
         _;
     }
@@ -238,27 +246,32 @@ contract TreasuryContract is Ownable {
     ///@dev this function will increase a nations balance when taxes are collected
     ///@param id this is the nation id of the country collecting taxes
     ///@param amount this is the amount of taxes being collected
-    function increaseBalanceOnTaxCollection(uint256 id, uint256 amount)
-        public
-        onlyTaxesContract
-    {
+    function increaseBalanceOnTaxCollection(
+        uint256 id,
+        uint256 amount
+    ) public onlyTaxesContract {
+        uint256 day = keep.getGameDay();
         idToTreasury[id].balance += amount;
         totalGameBalance += amount;
-        idToTreasury[id].daysSinceLastTaxCollection = 0;
+        idToTreasury[id].dayOfLastTaxCollection = day;
     }
 
     ///@dev this function is only callable from the bills contract
     ///@dev this function will decrease a nations balance when bils are paid
     ///@param id is the nation id of the nation paying bills
     ///@param amount is the amount of bills being paid
-    function decreaseBalanceOnBillsPaid(uint256 id, uint256 amount)
-        public
-        onlyBillsContract
-    {
+    function decreaseBalanceOnBillsPaid(
+        uint256 id,
+        uint256 amount
+    ) public onlyBillsContract {
         idToTreasury[id].balance -= amount;
         totalGameBalance -= amount;
-        require(idToTreasury[id].balance >= amount, "balance not high enough to pay bills");
-        idToTreasury[id].daysSinceLastBillPaid = 0;
+        uint256 day = keep.getGameDay();
+        require(
+            idToTreasury[id].balance >= amount,
+            "balance not high enough to pay bills"
+        );
+        idToTreasury[id].dayOfLastBillPaid = day;
         idToTreasury[id].inactive = false;
     }
 
@@ -267,7 +280,10 @@ contract TreasuryContract is Ownable {
     ///@notice this function will decrease a nation owner's balance when money is spent within the game
     ///@param id is the nation id of the nation spending funds
     ///@param cost is the cost of the expense
-    function spendBalance(uint256 id, uint256 cost) external approvedSpendCaller {
+    function spendBalance(
+        uint256 id,
+        uint256 cost
+    ) external approvedSpendCaller {
         //need a way to only allow the nation owner to do this
         idToTreasury[id].balance -= cost;
         totalGameBalance -= cost;
@@ -297,7 +313,11 @@ contract TreasuryContract is Ownable {
     ///@dev this function will allow the contract owner to withdraw the warbucks from this contract into the owners wallet
     function withdrawTaxRevenues(uint256 amount) public onlyOwner {
         WarBucks(warBucksAddress).approve(address(this), amount);
-        WarBucks(warBucksAddress).transferFrom(address(this), msg.sender, amount);
+        WarBucks(warBucksAddress).transferFrom(
+            address(this),
+            msg.sender,
+            amount
+        );
     }
 
     ///@dev this function is only callable from the infrastructure contract
@@ -308,7 +328,7 @@ contract TreasuryContract is Ownable {
     }
 
     function updateSeedMoney(uint256 newSeedMoney) public onlyOwner {
-        seedMoney = (newSeedMoney * (10**18));
+        seedMoney = (newSeedMoney * (10 ** 18));
     }
 
     modifier onlyAidContract() {
@@ -352,10 +372,18 @@ contract TreasuryContract is Ownable {
         uint256 defenderId
     ) public onlyGroundBattle {
         uint256 defenderBalance = idToTreasury[defenderId].balance;
-        ( , , , , uint256 defenderSoldierLosses, uint256 defenderTankLosses) = ground.returnBattleResults(battleId);
-        uint256 maximumFundsToTransfer = ((defenderSoldierLosses * 4) + (defenderTankLosses * 150));
+        (
+            ,
+            ,
+            ,
+            ,
+            uint256 defenderSoldierLosses,
+            uint256 defenderTankLosses
+        ) = ground.returnBattleResults(battleId);
+        uint256 maximumFundsToTransfer = ((defenderSoldierLosses * 4) +
+            (defenderTankLosses * 150));
         uint256 fundsToTransfer = ((defenderBalance * randomNumber) / 100);
-        if(fundsToTransfer >= maximumFundsToTransfer) {
+        if (fundsToTransfer >= maximumFundsToTransfer) {
             fundsToTransfer = maximumFundsToTransfer;
         }
         if (fundsToTransfer < 1000000) {
@@ -375,8 +403,12 @@ contract TreasuryContract is Ownable {
         totalGameBalance -= amount;
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
-        uint256 daysSince = idToTreasury[id].daysSinceLastBillPaid;
-        require (daysSince == 0, "pay bills before withdrawing funds");
+        uint256 gameDay = keep.getGameDay();
+        uint256 daysOfBillsPaid = idToTreasury[id].dayOfLastBillPaid;
+        require(
+            daysOfBillsPaid == gameDay,
+            "pay bills before withdrawing funds"
+        );
         uint256 gameBalance = idToTreasury[id].balance;
         require(gameBalance >= amount, "insufficient game balance");
         bool demonitized = idToTreasury[id].demonitized;
@@ -404,25 +436,25 @@ contract TreasuryContract is Ownable {
         IWarBucks(warBucksAddress).burnFromTreasury(msg.sender, amount);
     }
 
-    ///@dev ths function is only callable from the keeper contract
-    ///@dev this function will increment the number of days since bills wre paid and taxes were collected
-    ///@notice this function will increment the number of days since bills wre paid and taxes were collected
-    ///@notice if a nation does not pay thir bills for a set amount of time (default is 20 days) the nation will be put into inactive mode
-    function incrementDaysSince() external onlyKeeper {
-        uint256 i;
-        for (i = 0; i < counter; i++) {
-            if(idToTreasury[i].inactive == false) {
-                idToTreasury[i].daysSinceLastBillPaid++;
-                idToTreasury[i].daysSinceLastTaxCollection++;
-                if (idToTreasury[i].daysSinceLastBillPaid > daysToInactive) {
-                    idToTreasury[i].inactive == true;
-                }
-            }
-            if(idToTreasury[i].daysSinceLastTaxCollection > 20) {
-                idToTreasury[i].daysSinceLastTaxCollection = 20;
-            }
-        }
-    }
+    // ///@dev ths function is only callable from the keeper contract
+    // ///@dev this function will increment the number of days since bills wre paid and taxes were collected
+    // ///@notice this function will increment the number of days since bills wre paid and taxes were collected
+    // ///@notice if a nation does not pay thir bills for a set amount of time (default is 20 days) the nation will be put into inactive mode
+    // function incrementDaysSince() external onlyKeeper {
+    //     uint256 i;
+    //     for (i = 0; i < counter; i++) {
+    //         if (idToTreasury[i].inactive == false) {
+    //             idToTreasury[i].daysSinceLastBillPaid++;
+    //             idToTreasury[i].daysSinceLastTaxCollection++;
+    //             if (idToTreasury[i].daysSinceLastBillPaid > daysToInactive) {
+    //                 idToTreasury[i].inactive == true;
+    //             }
+    //         }
+    //         if (idToTreasury[i].daysSinceLastTaxCollection > 20) {
+    //             idToTreasury[i].daysSinceLastTaxCollection = 20;
+    //         }
+    //     }
+    // }
 
     ///@dev this function allows the contract owner to set the tax rate in game purchases are taxed at
     ///@dev the tax rate will be the % of the purchase price that is minted into this contract that can be withdrawn later
@@ -447,24 +479,26 @@ contract TreasuryContract is Ownable {
     ///@notice this funtion will return the number of days it has been since a nation has collected taxes
     ///@param id is the nation id of the nation being queried
     ///@return uint256 is the number of days since a nation has collected taxes
-    function getDaysSinceLastTaxCollection(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
-        return idToTreasury[id].daysSinceLastTaxCollection;
+    function getDaysSinceLastTaxCollection(
+        uint256 id
+    ) public view returns (uint256) {
+        uint256 gameDay = keep.getGameDay();
+        uint256 dayOfLastBillPaid = idToTreasury[id].dayOfLastTaxCollection;
+        uint256 daysSince = (gameDay - dayOfLastBillPaid);
+        return daysSince;
     }
 
     ///@dev this funtion is a public view function that will return the number of days it has been since a nation has paid bills
     ///@notice this funtion will return the number of days it has been since a nation has paid bills
     ///@param id is the nation id of the nation being queried
     ///@return uint256 is the number of days since a nation has paid bills
-    function getDaysSinceLastBillsPaid(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
-        return idToTreasury[id].daysSinceLastBillPaid;
+    function getDaysSinceLastBillsPaid(
+        uint256 id
+    ) public view returns (uint256) {
+        uint256 gameDay = keep.getGameDay();
+        uint256 dayOfLastBillPaid = idToTreasury[id].dayOfLastBillPaid;
+        uint256 daysSince = (gameDay - dayOfLastBillPaid);
+        return daysSince;
     }
 
     ///@dev this is a public view function that will return a nations in game balance
@@ -494,7 +528,14 @@ contract TreasuryContract is Ownable {
     ///@param id is the nation id of the nation being queried
     ///@return bool will be true if the nation is inactive
     function checkInactive(uint256 id) public view returns (bool) {
-        return idToTreasury[id].inactive;
+        uint256 day = keep.getGameDay();
+        uint256 dayBillsPaid = idToTreasury[id].dayOfLastBillPaid;
+        uint256 elapsed = (day - dayBillsPaid);
+        bool inactive = false;
+        if (elapsed > daysToInactive) {
+            inactive = true;
+        }
+        return inactive;
     }
 
     function demonitizeNation(uint256 id) public onlyOwner {

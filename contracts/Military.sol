@@ -3,6 +3,7 @@ pragma solidity 0.8.17;
 
 import "./SpyOperations.sol";
 import "./CountryMinter.sol";
+import "./KeeperFile.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 ///@title MilitaryContract
@@ -16,12 +17,13 @@ contract MilitaryContract is Ownable {
 
     SpyOperationsContract spy;
     CountryMinter mint;
+    KeeperContract keep;
 
     struct Military {
         uint256 defconLevel;
         uint256 threatLevel;
         bool warPeacePreference;
-        uint256 daysInPeaceMode;
+        uint256 dayPeaceToggled;
     }
 
     mapping(uint256 => Military) public idToMilitary;
@@ -49,6 +51,7 @@ contract MilitaryContract is Ownable {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
         keeper = _keeper;
+        keep = KeeperContract(_keeper);
     }
 
     ///@dev this function is a public function only callable from the country minter contract
@@ -124,9 +127,10 @@ contract MilitaryContract is Ownable {
     function toggleWarPeacePreference(uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require (isOwner, "!nation owner");
+        uint256 gameDay = keep.getGameDay();
         if (idToMilitary[id].warPeacePreference == true) {
             idToMilitary[id].warPeacePreference = false;
-
+            idToMilitary[id].dayPeaceToggled = gameDay;
         } else {
             idToMilitary[id].warPeacePreference = true;
         }
@@ -156,17 +160,19 @@ contract MilitaryContract is Ownable {
         return war;
     }
 
-    function incrementDaysInPeaceMode() public onlyKeeper {
-        uint256 countryCount = mint.getCountryCount();
-        for (uint i = 0; i < countryCount-1; i++) {
-            if (idToMilitary[i].warPeacePreference == false) {
-                idToMilitary[i].daysInPeaceMode += 1;
-            }
-        }
-    }
+    // function incrementDaysInPeaceMode() public onlyKeeper {
+    //     uint256 countryCount = mint.getCountryCount();
+    //     for (uint i = 0; i < countryCount-1; i++) {
+    //         if (idToMilitary[i].warPeacePreference == false) {
+    //             idToMilitary[i].daysInPeaceMode += 1;
+    //         }
+    //     }
+    // }
 
     function getDaysInPeaceMode(uint256 id) public view returns (uint256) {
-        uint256 daysInPeaceMode = idToMilitary[id].daysInPeaceMode;
+        uint256 daysPeaceToggled = idToMilitary[id].dayPeaceToggled;
+        uint256 gameDay = keep.getGameDay();
+        uint256 daysInPeaceMode = (gameDay - daysPeaceToggled);
         return daysInPeaceMode;
     }
 }
