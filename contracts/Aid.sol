@@ -6,6 +6,7 @@ import "./Forces.sol";
 import "./Treasury.sol";
 import "./Wonders.sol";
 import "./CountryMinter.sol";
+import "./KeeperFile.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /// @title AidContract this contract facilitates aid being sent between nations
@@ -18,7 +19,11 @@ contract AidContract is Ownable {
     address public infrastructure;
     address public wonder1;
     uint256 public aidProposalId;
-    uint256 proposalExpiration = 7 days;
+    uint256 proposalExpirationDays = 7;
+
+    CountryMinter mint;
+    WondersContract1 won1;
+    KeeperContract keep;
 
     /// @dev this function is callable by the owner only
     /// @dev this function will be called after deployment to initiate contract pointers within this contract
@@ -36,16 +41,14 @@ contract AidContract is Ownable {
         forces = _forces;
         infrastructure = _infrastructure;
         keeper = _keeper;
+        keep = KeeperContract(_keeper);
         wonder1 = _wonder1;
         won1 = WondersContract1(_wonder1);
     }
 
-    CountryMinter mint;
-    WondersContract1 won1;
-
     struct Proposal {
         uint256 proposalId;
-        uint256 timeProposed;
+        uint256 dayProposed;
         uint256 idSender;
         uint256 idRecipient;
         uint256 techAid;
@@ -56,8 +59,10 @@ contract AidContract is Ownable {
     }
 
     mapping(uint256 => address) public idToOwnerAid;
-    mapping(uint256 => uint256) public idToAidSlots;
+    // mapping(uint256 => uint256) public idToAidSlots;
     mapping(uint256 => Proposal) public idToProposal;
+
+    mapping(uint256 => mapping(uint256 => uint256)) public idToAidProposalsLast10Days;
 
     /// @dev this function is only callable from the owner
     function updateCountryMinterAddress(address _newAddress) public onlyOwner {
@@ -83,6 +88,7 @@ contract AidContract is Ownable {
     /// @dev this function is only callable from the owner
     function updateKeeperAddress(address _newAddress) public onlyOwner {
         keeper = _newAddress;
+        keep = KeeperContract(_newAddress);
     }
 
     /// @dev this function is only callable from the owner
@@ -128,6 +134,8 @@ contract AidContract is Ownable {
         require(isOwner, "!nation ruler");
         bool availableAidSlot = checkAidSlots(idSender);
         require(availableAidSlot, "aid slot not available");
+        uint256 day = keep.getGameDay();
+        idToAidProposalsLast10Days[idSender][day] += 1;
         bool aidAvailable = checkAvailability(idSender, techAid, balanceAid, soldiersAid);
         require (aidAvailable, "aid not available");
         uint256 maxTech = 100;
@@ -147,7 +155,7 @@ contract AidContract is Ownable {
         require(soldiersAid <= maxSoldiers, "max soldier aid is excedded");
         Proposal memory newProposal = Proposal(
             aidProposalId,
-            block.timestamp,
+            day,
             idSender,
             idRecipient,
             techAid,
@@ -156,7 +164,7 @@ contract AidContract is Ownable {
             false,
             false
         );
-        idToAidSlots[idSender] += 1;
+        // idToAidSlots[idSender] += 1;
         idToProposal[aidProposalId] = newProposal;
         aidProposalId++;
     }
@@ -168,8 +176,9 @@ contract AidContract is Ownable {
     ///@return bool returns a boolean value if there is an aid slot available for the prpoposal
     function checkAidSlots(uint256 idSender) public view returns (bool) {
         uint256 maxAidSlots = getMaxAidSlots(idSender);
-        uint256 aidSlotsUsedToday = idToAidSlots[idSender];
-        if ((aidSlotsUsedToday + 1) <= maxAidSlots) {
+        uint256 aidProposalsLast10Days = getAidProposalsLast10Days(idSender);
+        // uint256 aidSlotsUsedToday = idToAidSlots[idSender];
+        if ((aidProposalsLast10Days + 1) <= maxAidSlots) {
             return true;
         } else {
             return false;
@@ -210,16 +219,26 @@ contract AidContract is Ownable {
 
     ///@dev this function is public but also callable from the proposeAid() function
     ///@notice this function checks max aid slots per day for a nation
-    ///@notice max aid slots allow you to propose 1 aid per day (2 proposals with a didadter relief agency)
+    ///@notice max aid slots allow you to propose 10 aid packages every 10 days (13 with a disaster relief agency)
     ///@param id id the nation ID of the nation proposing aid
     ///@return uint256 defaults to 1 aid slot per day and 2 with a disaster relief agency
     function getMaxAidSlots(uint256 id) public view returns (uint256) {
-        uint256 maxAidSlotsPerDay = 1;
+        uint256 maxAidSlotsPer10Days = 10;
         bool disasterReliefAgency = won1.getDisasterReliefAgency(id);
         if (disasterReliefAgency) {
-            maxAidSlotsPerDay += 1;
+            maxAidSlotsPer10Days += 3;
         }
-        return (maxAidSlotsPerDay);
+        return (maxAidSlotsPer10Days);
+    }
+
+    function getAidProposalsLast10Days(uint256 id) public view returns (uint256) {
+        uint256 day = keep.getGameDay();
+        uint256 proposalsLast10Days = 0;
+        for (uint256 i = 0; i < 10; i++) {
+            uint256 dayToCheck = day - i;
+            proposalsLast10Days += idToAidProposalsLast10Days[id][dayToCheck];
+        }
+        return proposalsLast10Days;
     }
 
     ///@dev this function is a public view function that is called by the proposeAid() function
@@ -244,13 +263,13 @@ contract AidContract is Ownable {
     ///@dev this finction is only callable by the owner of the contract
     ///@dev this function allows the contract owner to set how long aid proposals stay active for
     function setProposalExpiration(uint256 newExpiration) public onlyOwner {
-        proposalExpiration = newExpiration;
+        proposalExpirationDays = newExpiration;
     }
 
     ///@dev this is a view function that allows anyone to view the duration aid proposals have untile they expire
     ///@return uint256 the number of days a proposal has to be exepted otherwise it expires
     function getProposalExpiration() public view returns (uint256) {
-        return proposalExpiration;
+        return proposalExpirationDays;
     }
 
     ///@dev this function is a public view function that checks to see if an aid propoals is expired (too much time has elapsed since proposal)
@@ -258,10 +277,11 @@ contract AidContract is Ownable {
     ///@param proposalId id the ID of the aid proposal
     ///@return bool true if amount of time elapsed since proposal is greater than the proposal expiration time
     function proposalExpired(uint256 proposalId) public view returns (bool) {
-        uint256 timeProposed = idToProposal[proposalId].timeProposed;
-        uint256 timeElapsed = (block.timestamp - timeProposed);
+        uint256 day = keep.getGameDay();
+        uint256 dayProposed = idToProposal[proposalId].dayProposed;
+        uint256 timeElapsed = (day - dayProposed);
         bool expired = false;
-        if (timeElapsed > proposalExpiration) {
+        if (timeElapsed > proposalExpirationDays) {
             expired = true;
         }
         return expired;
@@ -331,15 +351,15 @@ contract AidContract is Ownable {
         _;
     }
 
-    ///@dev this function is callable by the keeper contract only
-    ///@dev this finction is called daily to reset every nations aid proposals for that day to 0
-    function resetAidProposals() public onlyKeeper {
-        uint256 countryCount = mint.getCountryCount();
-        countryCount -= 1;
-        for (uint256 i = 0; i <= countryCount; i++) {
-            idToAidSlots[i] = 0;
-        }
-    }
+    // ///@dev this function is callable by the keeper contract only
+    // ///@dev this finction is called daily to reset every nations aid proposals for that day to 0
+    // function resetAidProposals() public onlyKeeper {
+    //     uint256 countryCount = mint.getCountryCount();
+    //     countryCount -= 1;
+    //     for (uint256 i = 0; i <= countryCount; i++) {
+    //         idToAidSlots[i] = 0;
+    //     }
+    // }
 
     ///@dev this is public view function that allows a caller to return the items in a proposal struct
     ///@return uint256 this funtion returns the contects of a proposal struct
@@ -354,7 +374,7 @@ contract AidContract is Ownable {
     ) {
         return (
             idToProposal[proposalId].proposalId,
-            idToProposal[proposalId].timeProposed,
+            idToProposal[proposalId].dayProposed,
             idToProposal[proposalId].idSender,
             idToProposal[proposalId].idRecipient,
             idToProposal[proposalId].techAid,

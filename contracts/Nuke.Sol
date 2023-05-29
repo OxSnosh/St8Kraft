@@ -8,6 +8,8 @@ import "./Infrastructure.sol";
 import "./Forces.sol";
 import "./Navy.sol";
 import "./Improvements.sol";
+import "./KeeperFile.sol";
+import "./CountryParameters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
@@ -61,6 +63,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     NavyContract nav;
     MissilesContract mis;
     CountryParametersContract param;
+    KeeperContract keep;
 
     struct NukeAttack {
         uint256 warId;
@@ -125,6 +128,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         missiles = _missiles;
         mis = MissilesContract(_missiles);
         keeper = _keeper;
+        keep = KeeperContract(_keeper);
     }
 
     function settings2(
@@ -245,7 +249,9 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
             inflictNukeDamage(requestNumber);
             mis.decreaseNukeCountFromNukeContract(attackerId);
             param.inflictAnarchy(defenderId);
-            nukesDroppedToday++;
+            // nukesDroppedToday++;
+            uint256 gameDay = keep.getGameDay();
+            gameDayToNukesLanded[gameDay]++;
         } else {
             //thwart event
             console.log("Nuke attaq thwarted");
@@ -346,13 +352,11 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     ///@dev this function is a public view function that will return the number of nukes launched in the game in the last 7 days
     ///@dev this function will be used to calculate global radiation levels (next function)
     function calculateNukesLandedLastSevenDays() public view returns (uint256) {
-        uint256 sum = (nukesDroppedToday +
-            nukesDropped1DayAgo +
-            nukesDropped2DaysAgo +
-            nukesDropped3DaysAgo +
-            nukesDropped4DaysAgo +
-            nukesDropped5DaysAgo +
-            nukesDropped6DaysAgo);
+        uint256 sum = 0;
+        uint256 gameDay = keep.getGameDay();
+        for (uint256 i = 0; i < 7; i++) {
+            sum += gameDayToNukesLanded[gameDay - i];
+        }
         return sum;
     }
 
@@ -379,15 +383,15 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         _;
     }
 
-    ///@dev this is a function only callable from the chainlink keeper contract
-    ///@dev this function will shift the nukes landed daily for the last 6 days (i.e. 2 dayss ago goes to 3 days ago)
-    function shiftNukesDroppedDays() public onlyKeeper {
-        nukesDropped6DaysAgo = nukesDropped5DaysAgo;
-        nukesDropped5DaysAgo = nukesDropped4DaysAgo;
-        nukesDropped4DaysAgo = nukesDropped3DaysAgo;
-        nukesDropped3DaysAgo = nukesDropped2DaysAgo;
-        nukesDropped2DaysAgo = nukesDropped1DayAgo;
-        nukesDropped1DayAgo = nukesDroppedToday;
-        nukesDroppedToday = 0;
-    }
+    // ///@dev this is a function only callable from the chainlink keeper contract
+    // ///@dev this function will shift the nukes landed daily for the last 6 days (i.e. 2 dayss ago goes to 3 days ago)
+    // function shiftNukesDroppedDays() public onlyKeeper {
+    //     nukesDropped6DaysAgo = nukesDropped5DaysAgo;
+    //     nukesDropped5DaysAgo = nukesDropped4DaysAgo;
+    //     nukesDropped4DaysAgo = nukesDropped3DaysAgo;
+    //     nukesDropped3DaysAgo = nukesDropped2DaysAgo;
+    //     nukesDropped2DaysAgo = nukesDropped1DayAgo;
+    //     nukesDropped1DayAgo = nukesDroppedToday;
+    //     nukesDroppedToday = 0;
+    // }
 }

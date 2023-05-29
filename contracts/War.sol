@@ -6,6 +6,7 @@ import "./Military.sol";
 import "./Wonders.sol";
 import "./CountryMinter.sol";
 import "./Treasury.sol";
+import "./KeeperFile.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 // import "hardhat/console.sol";
@@ -35,12 +36,13 @@ contract WarContract is Ownable {
     WondersContract1 won1;
     CountryMinter mint;
     TreasuryContract tres;
+    KeeperContract keep;
 
     struct War {
         uint256 offenseId;
         uint256 defenseId;
         bool active;
-        uint256 daysLeft;
+        uint256 dayStarted;
         bool peaceDeclared;
         bool expired;
         bool offensePeaceOffered;
@@ -127,6 +129,7 @@ contract WarContract is Ownable {
         wonders1 = _wonders1;
         won1 = WondersContract1(_wonders1);
         keeper = _keeper;
+        keep = KeeperContract(_keeper);
     }
 
     function settings2(address _treasury) public onlyOwner {
@@ -178,11 +181,12 @@ contract WarContract is Ownable {
         require(isOwner, "!nation owner");
         bool check = warCheck(offenseId, defenseId);
         require(check, "didn't make it here");
+        uint day = keep.getGameDay();
         War memory newWar = War(
             offenseId,
             defenseId,
             true,
-            7,
+            day,
             false,
             false,
             false,
@@ -424,13 +428,14 @@ contract WarContract is Ownable {
     }
 
     ///@dev this function is only callable from the keeper contract
-    ///@dev wars expire after 7 days and will be removed from active wars when daysLeft reaches 0
-    ///@notice wars expire after 7 days and will be removed from active wars when daysLeft reaches 0
-    function decrementWarDaysLeft() public onlyKeeper {
+    ///@dev wars expire after 7 days and will be removed from active wars when 7 days have elapsed
+    ///@notice wars expire after 7 days and will be removed from active wars when 7 days have elapsed
+    function expireOldWars() public onlyKeeper {
+        uint256 day = keep.getGameDay();
         for (uint256 i = 0; i < activeWars.length; i++) {
             uint256 war = activeWars[i];
-            warIdToWar[war].daysLeft -= 1;
-            if (warIdToWar[war].daysLeft == 0) {
+            // warIdToWar[war].daysLeft -= 1;
+            if (day - warIdToWar[war].dayStarted >= 7) {
                 warIdToWar[war].expired = true;
                 warIdToWar[war].active = false;
                 removeActiveWar(war);
@@ -557,7 +562,8 @@ contract WarContract is Ownable {
     ///@dev this is a publci view function that will return the number of days left in a war
     ///@dev wars expire after 7 days when days left == 0
     function getDaysLeft(uint256 _warId) public view returns (uint256) {
-        uint256 daysLeft = warIdToWar[_warId].daysLeft;
+        uint256 day = keep.getGameDay();
+        uint256 daysLeft = (7 - (day - warIdToWar[_warId].dayStarted));
         return daysLeft;
     }
 

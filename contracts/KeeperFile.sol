@@ -75,9 +75,9 @@ contract KeeperContract is Ownable {
 
     ///@dev this functon will be called by the chainlink keeper
     function keeperFunctionToCall() public {
-        shiftNukeDays();
-        resetAidProposals();
-        decremenWarDays();
+        // shiftNukeDays();
+        // resetAidProposals();
+        expireOldWars();
         resetCruiseMissileLaunches();
         incrementDaysSince();
         resetNukesPurchasedToday();
@@ -89,9 +89,9 @@ contract KeeperContract is Ownable {
 
     ///@dev this function can be called by the contract owner in the event the keeper fails
     function keeperFunctionToCallManually() public onlyOwner {
-        shiftNukeDays();
-        resetAidProposals();
-        decremenWarDays();
+        // shiftNukeDays();
+        // resetAidProposals();
+        expireOldWars();
         resetCruiseMissileLaunches();
         incrementDaysSince();
         resetNukesPurchasedToday();
@@ -101,24 +101,24 @@ contract KeeperContract is Ownable {
         incrementDaysInPeaceMode();
     }
 
-    function shiftNukeDays() internal {
-        nuke.shiftNukesDroppedDays();
+    // function shiftNukeDays() internal {
+    //     nuke.shiftNukesDroppedDays();
+    // }
+
+    // function resetAidProposals() internal {
+    //     aid.resetAidProposals();
+    // }
+
+    // function resetAidProposalsByOwner() public onlyOwner {
+    //     aid.resetAidProposals();
+    // }
+
+    function expireOldWars() internal {
+        war.expireOldWars();
     }
 
-    function resetAidProposals() internal {
-        aid.resetAidProposals();
-    }
-
-    function resetAidProposalsByOwner() public onlyOwner {
-        aid.resetAidProposals();
-    }
-
-    function decremenWarDays() internal {
-        war.decrementWarDaysLeft();
-    }
-
-    function decremenWarDaysByOwner() public onlyOwner {
-        war.decrementWarDaysLeft();
+    function expireOldWarsByOwner() public onlyOwner {
+        war.expireOldWars();
     }
 
     function resetCruiseMissileLaunches() internal {
