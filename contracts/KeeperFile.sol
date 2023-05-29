@@ -8,12 +8,23 @@ import "./Treasury.sol";
 import "./Forces.sol";
 import "./Navy.sol";
 import "./CountryParameters.sol";
+import "./Military.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 ///@title KeeperContract
 ///@author OxSnosh
 ///@dev this contract will allow the chainlink keeper to maintain the game clock that resets everal parameters daily
 contract KeeperContract is Ownable {
+    uint256 public gameDay;
+
+    function incrementGameDay() public {
+        gameDay++;
+    }
+
+    function getGameDay() public view returns (uint256) {
+        return gameDay;
+    }
+
     address nukes;
     address aidContract;
     address warContract;
@@ -21,6 +32,7 @@ contract KeeperContract is Ownable {
     address missiles;
     address navalActions;
     address parameters;
+    address military;
 
     NukeContract nuke;
     AidContract aid;
@@ -29,6 +41,7 @@ contract KeeperContract is Ownable {
     MissilesContract miss;
     NavalActionsContract navAct;
     CountryParametersContract params;
+    MilitaryContract mil;
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -39,7 +52,8 @@ contract KeeperContract is Ownable {
         address _treasury,
         address _missiles,
         address _navalActions,
-        address _parameters
+        address _parameters,
+        address _military
     ) public onlyOwner {
         nukes = _nukes;
         nuke = NukeContract(_nukes);
@@ -55,6 +69,8 @@ contract KeeperContract is Ownable {
         navAct = NavalActionsContract(_navalActions);
         parameters = _parameters;
         params = CountryParametersContract(_parameters);
+        military = _military;
+        mil = MilitaryContract(_military);
     }
 
     ///@dev this functon will be called by the chainlink keeper
@@ -68,6 +84,7 @@ contract KeeperContract is Ownable {
         resetActionsToday();
         incrementDaysSinceForParameters();
         resetDeployments();
+        incrementDaysInPeaceMode();
     }
 
     ///@dev this function can be called by the contract owner in the event the keeper fails
@@ -81,6 +98,7 @@ contract KeeperContract is Ownable {
         resetActionsToday();
         incrementDaysSinceForParameters();
         resetDeployments();
+        incrementDaysInPeaceMode();
     }
 
     function shiftNukeDays() internal {
@@ -139,11 +157,19 @@ contract KeeperContract is Ownable {
         params.incrementDaysSince();
     }
 
-    function resetDeployments() public {
+    function resetDeployments() internal {
         war.resetDeployedToday();
     }
 
     function resetDeploymentsByOwner() public onlyOwner {
         war.resetDeployedToday();
+    }
+
+    function incrementDaysInPeaceMode() public {
+        mil.incrementDaysInPeaceMode();
+    }
+
+    function incrementDaysInPeaceModeByOwner() public onlyOwner {
+        mil.incrementDaysInPeaceMode();
     }
 }

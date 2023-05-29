@@ -50,7 +50,7 @@ contract TreasuryContract is Ownable {
     address public techMarket;
     address public infrastructureMarket;
     address public keeper;
-    uint256 public daysToInactive = 22;
+    uint256 public daysToInactive = 30;
     uint256 private gameTaxPercentage = 0;
     uint256 public seedMoney = 2000000*(10**18);
 
@@ -255,9 +255,9 @@ contract TreasuryContract is Ownable {
         public
         onlyBillsContract
     {
-        require(idToTreasury[id].balance >= amount, "balance not high enough to pay bills");
         idToTreasury[id].balance -= amount;
         totalGameBalance -= amount;
+        require(idToTreasury[id].balance >= amount, "balance not high enough to pay bills");
         idToTreasury[id].daysSinceLastBillPaid = 0;
         idToTreasury[id].inactive = false;
     }
@@ -269,12 +269,14 @@ contract TreasuryContract is Ownable {
     ///@param cost is the cost of the expense
     function spendBalance(uint256 id, uint256 cost) external approvedSpendCaller {
         //need a way to only allow the nation owner to do this
+        idToTreasury[id].balance -= cost;
+        totalGameBalance -= cost;
         uint256 balance = idToTreasury[id].balance;
         require(balance >= cost, "insufficient balance");
         bool demonitized = idToTreasury[id].demonitized;
         require(demonitized == false, "ERROR");
-        idToTreasury[id].balance -= cost;
-        totalGameBalance -= cost;
+        bool inactive = checkInactive(id);
+        require(inactive == false, "ERROR Inactive, pay bills to reactivate");
         //TAXES here
         uint256 taxLevied = ((cost * gameTaxPercentage) / 100);
         if (taxLevied > 0) {
@@ -303,6 +305,10 @@ contract TreasuryContract is Ownable {
     function returnBalance(uint256 id, uint256 cost) public onlyInfrastructure {
         //need a way to only allow the nation owner to do this
         idToTreasury[id].balance += cost;
+    }
+
+    function updateSeedMoney(uint256 newSeedMoney) public onlyOwner {
+        seedMoney = (newSeedMoney * (10**18));
     }
 
     modifier onlyAidContract() {
@@ -365,6 +371,8 @@ contract TreasuryContract is Ownable {
     ///@param amount is the amount of funds being withdrawn
     ///@param id is the nation id of the nation withdrawing funds
     function withdrawFunds(uint256 amount, uint256 id) public {
+        idToTreasury[id].balance -= amount;
+        totalGameBalance -= amount;
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         uint256 daysSince = idToTreasury[id].daysSinceLastBillPaid;
@@ -373,8 +381,6 @@ contract TreasuryContract is Ownable {
         require(gameBalance >= amount, "insufficient game balance");
         bool demonitized = idToTreasury[id].demonitized;
         require(demonitized == false, "ERROR");
-        idToTreasury[id].balance -= amount;
-        totalGameBalance -= amount;
         IWarBucks(warBucksAddress).mintFromTreasury(msg.sender, amount);
     }
 
@@ -384,6 +390,8 @@ contract TreasuryContract is Ownable {
     ///@param amount is the amount of funds being added
     ///@param id is the nation id of the nation withdrawing funds
     function addFunds(uint256 amount, uint256 id) public {
+        idToTreasury[id].balance += amount;
+        totalGameBalance += amount;
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         bool demonitized = idToTreasury[id].demonitized;
@@ -393,8 +401,6 @@ contract TreasuryContract is Ownable {
             coinBalance >= amount,
             "deposit amount exceeds balance in wallet"
         );
-        idToTreasury[id].balance += amount;
-        totalGameBalance += amount;
         IWarBucks(warBucksAddress).burnFromTreasury(msg.sender, amount);
     }
 
@@ -411,6 +417,9 @@ contract TreasuryContract is Ownable {
                 if (idToTreasury[i].daysSinceLastBillPaid > daysToInactive) {
                     idToTreasury[i].inactive == true;
                 }
+            }
+            if(idToTreasury[i].daysSinceLastTaxCollection > 20) {
+                idToTreasury[i].daysSinceLastTaxCollection = 20;
             }
         }
     }

@@ -72,6 +72,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => NukeAttack) nukeAttackIdToNukeAttack;
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
+    mapping(uint256 => uint256) public gameDayToNukesLanded;
 
     event randomNumbersRequested(uint256 indexed requestId);
 

@@ -324,12 +324,14 @@ contract TaxesContract is Ownable {
             id
         );
         uint256 pointsFromIntelAgencies = getPointsFromIntelAgencies(id);
-        uint256 happinessPointsToSubtract = (40 -
+        uint256 pointsFromPeaceMode = addTax.getPointsFromPeaceMode(id);
+        uint256 happinessPointsToSubtract = (50 -
             taxRatePoints -
             pointsFromCrime -
             pointsFromImprovements -
             pointsFromStability -
-            pointsFromIntelAgencies);
+            pointsFromIntelAgencies -
+            pointsFromPeaceMode );
         return happinessPointsToSubtract;
     }
 
@@ -1053,5 +1055,17 @@ contract AdditionalTaxesContract is Ownable {
             pointsFromGovernmentType = 1;
         }
         return pointsFromGovernmentType;
+    }
+
+    function getPointsFromPeaceMode(uint256 id) public view returns (uint256) {
+        uint256 daysInPeaceMode = mil.getDaysInPeaceMode(id);
+        uint256 pointsFromPeaceMode = 0;
+        if (daysInPeaceMode > 0) {
+            pointsFromPeaceMode = daysInPeaceMode;
+        }
+        if (pointsFromPeaceMode > 10) {
+            pointsFromPeaceMode = 10;
+        }
+        return pointsFromPeaceMode;
     }
 }

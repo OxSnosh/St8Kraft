@@ -12,6 +12,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract MilitaryContract is Ownable {
     address public spyAddress;
     address public countryMinter;
+    address public keeper;
 
     SpyOperationsContract spy;
     CountryMinter mint;
@@ -20,6 +21,7 @@ contract MilitaryContract is Ownable {
         uint256 defconLevel;
         uint256 threatLevel;
         bool warPeacePreference;
+        uint256 daysInPeaceMode;
     }
 
     mapping(uint256 => Military) public idToMilitary;
@@ -34,19 +36,25 @@ contract MilitaryContract is Ownable {
         _;
     }
 
+    modifier onlyKeeper() {
+        require(msg.sender == keeper, "only callable from keeper contract");
+        _;
+    }
+
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings (address _spyAddress, address _countryMinter) public onlyOwner {
+    function settings (address _spyAddress, address _countryMinter, address _keeper) public onlyOwner {
         spyAddress = _spyAddress;
         spy = SpyOperationsContract(_spyAddress);
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
+        keeper = _keeper;
     }
 
     ///@dev this function is a public function only callable from the country minter contract
     ///@notice this function will allow allow a nation owner to reset their defcon and threat level and toggle their war peace preference
     function generateMilitary(uint256 id) public onlyCountryMinter {
-        Military memory newMilitary = Military(5, 1, false);
+        Military memory newMilitary = Military(5, 1, false, 0);
         idToMilitary[id] = newMilitary;
     }
 
@@ -118,6 +126,7 @@ contract MilitaryContract is Ownable {
         require (isOwner, "!nation owner");
         if (idToMilitary[id].warPeacePreference == true) {
             idToMilitary[id].warPeacePreference = false;
+
         } else {
             idToMilitary[id].warPeacePreference = true;
         }
@@ -145,5 +154,19 @@ contract MilitaryContract is Ownable {
     function getWarPeacePreference(uint256 id) public view returns (bool) {
         bool war = idToMilitary[id].warPeacePreference;
         return war;
+    }
+
+    function incrementDaysInPeaceMode() public onlyKeeper {
+        uint256 countryCount = mint.getCountryCount();
+        for (uint i = 0; i < countryCount-1; i++) {
+            if (idToMilitary[i].warPeacePreference == false) {
+                idToMilitary[i].daysInPeaceMode += 1;
+            }
+        }
+    }
+
+    function getDaysInPeaceMode(uint256 id) public view returns (uint256) {
+        uint256 daysInPeaceMode = idToMilitary[id].daysInPeaceMode;
+        return daysInPeaceMode;
     }
 }
