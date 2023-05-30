@@ -48,7 +48,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     }
 
     struct CountrySettings {
-        uint256 timeCreated;
+        uint256 dayCreated;
         string alliance;
         uint256 nationTeam;
         uint256 governmentType;
@@ -157,8 +157,9 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
             capitalCity,
             nationSlogan
         );
+        uint256 day = keep.getGameDay();
         CountrySettings memory newCountrySettings = CountrySettings(
-            block.timestamp,
+            day,
             "No Alliance Yet",
             0,
             0,
@@ -434,8 +435,8 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
 
     ///@dev this is a view funtion that will return the time a nation was minted
     ///@param countryId this is the ID for the nation being queried
-    function getTimeCreated(uint256 countryId) public view returns (uint256) {
-        return idToCountrySettings[countryId].timeCreated;
+    function getDayCreated(uint256 countryId) public view returns (uint256) {
+        return idToCountrySettings[countryId].dayCreated;
     }
 
     ///@dev this is a view funtion that will return the government preference for a country

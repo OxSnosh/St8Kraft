@@ -11,7 +11,7 @@ import "./Forces.sol";
 import "./Military.sol";
 import "./Crime.sol";
 import "./CountryMinter.sol";
-import "hardhat/console.sol";
+import "./KeeperFile.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
@@ -36,6 +36,7 @@ contract TaxesContract is Ownable {
     address public crime;
     address public additionalTaxes;
     address public bonusResources;
+    address public keeper;
 
     InfrastructureContract inf;
     TreasuryContract tsy;
@@ -54,6 +55,7 @@ contract TaxesContract is Ownable {
     AdditionalTaxesContract addTax;
     CountryMinter mint;
     BonusResourcesContract bonus;
+    KeeperContract keep;
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -65,7 +67,8 @@ contract TaxesContract is Ownable {
         address _improvements2,
         address _improvements3,
         address _additionalTaxes,
-        address _bonusResources
+        address _bonusResources,
+        address _keeper
     ) public onlyOwner {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
@@ -83,6 +86,8 @@ contract TaxesContract is Ownable {
         addTax = AdditionalTaxesContract(_additionalTaxes);
         bonusResources = _bonusResources;
         bonus = BonusResourcesContract(_bonusResources);
+        keeper = _keeper;
+        keep = KeeperContract(_keeper);
     }
 
     ///@dev this function is only callable by the contract owner
@@ -652,14 +657,12 @@ contract TaxesContract is Ownable {
     }
 
     function getPointsFromNationAge(uint256 id) public view returns (uint256) {
-        uint256 nationCreated = params.getTimeCreated(id);
+        uint256 nationCreated = params.getDayCreated(id);
+        uint256 gameDay = keep.getGameDay();
         uint256 agePoints = 0;
-        if ((block.timestamp - nationCreated) < 90 days) {
+        if ((gameDay - nationCreated) < 90) {
             agePoints = 0;
-        } else if (
-            (block.timestamp - nationCreated) >= 90 days &&
-            (block.timestamp - nationCreated) < 180
-        ) {
+        } else if ((gameDay - nationCreated) < 180) {
             agePoints = 2;
         } else {
             agePoints = 4;

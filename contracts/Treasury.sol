@@ -52,6 +52,7 @@ contract TreasuryContract is Ownable {
     address public infrastructureMarket;
     address public keeper;
     uint256 public daysToInactive = 30;
+    uint256 public maxDaysOfTaxes = 20;
     uint256 private gameTaxPercentage = 0;
     uint256 public seedMoney = 2000000 * (10 ** 18);
 
@@ -69,7 +70,6 @@ contract TreasuryContract is Ownable {
         uint256 lastTaxCollection;
         uint256 dayOfLastTaxCollection;
         uint256 balance;
-        bool inactive;
         bool demonitized;
     }
 
@@ -229,11 +229,10 @@ contract TreasuryContract is Ownable {
             0,
             0,
             0,
-            1,
             0,
-            1,
             0,
-            false,
+            0,
+            0,
             false
         );
         idToTreasury[id] = newTreasury;
@@ -250,9 +249,9 @@ contract TreasuryContract is Ownable {
         uint256 id,
         uint256 amount
     ) public onlyTaxesContract {
-        uint256 day = keep.getGameDay();
         idToTreasury[id].balance += amount;
         totalGameBalance += amount;
+        uint256 day = keep.getGameDay();
         idToTreasury[id].dayOfLastTaxCollection = day;
     }
 
@@ -264,15 +263,14 @@ contract TreasuryContract is Ownable {
         uint256 id,
         uint256 amount
     ) public onlyBillsContract {
-        idToTreasury[id].balance -= amount;
-        totalGameBalance -= amount;
-        uint256 day = keep.getGameDay();
         require(
             idToTreasury[id].balance >= amount,
             "balance not high enough to pay bills"
         );
+        idToTreasury[id].balance -= amount;
+        totalGameBalance -= amount;
+        uint256 day = keep.getGameDay();
         idToTreasury[id].dayOfLastBillPaid = day;
-        idToTreasury[id].inactive = false;
     }
 
     ///@dev this function is public but only callable by contracts within the game where funds are being spent
@@ -485,7 +483,18 @@ contract TreasuryContract is Ownable {
         uint256 gameDay = keep.getGameDay();
         uint256 dayOfLastBillPaid = idToTreasury[id].dayOfLastTaxCollection;
         uint256 daysSince = (gameDay - dayOfLastBillPaid);
+        if (daysSince > maxDaysOfTaxes) {
+            daysSince = maxDaysOfTaxes;
+        }
         return daysSince;
+    }
+
+    function getMaxDaysOfTaxes() public view returns (uint256) {
+        return maxDaysOfTaxes;
+    }
+
+    function setMaxDaysOfTaxes(uint256 newMaxDays) public onlyOwner {
+        maxDaysOfTaxes = newMaxDays;
     }
 
     ///@dev this funtion is a public view function that will return the number of days it has been since a nation has paid bills
@@ -498,6 +507,9 @@ contract TreasuryContract is Ownable {
         uint256 gameDay = keep.getGameDay();
         uint256 dayOfLastBillPaid = idToTreasury[id].dayOfLastBillPaid;
         uint256 daysSince = (gameDay - dayOfLastBillPaid);
+        if (daysSince > daysToInactive) {
+            daysSince = daysToInactive;
+        }
         return daysSince;
     }
 
