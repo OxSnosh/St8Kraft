@@ -4,6 +4,7 @@ pragma solidity 0.8.17;
 import "./Infrastructure.sol";
 import "./Improvements.sol";
 import "./CountryMinter.sol";
+import "./CountryParameters.sol";
 import "hardhat/console.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
@@ -24,9 +25,12 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
     address public improvements2;
     address public countryMinter;
     address public bonusResources;
+    address public senate;
+    address public parameters;
 
     CountryMinter mint;
     BonusResourcesContract bonus;
+    CountryParametersContract params;
 
     //Chainlik Variables
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
@@ -191,7 +195,8 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         address _infrastructure,
         address _improvements2,
         address _countryMinter,
-        address _bonusResources
+        address _bonusResources,
+        address _senate
     ) public onlyOwner {
         infrastructure = _infrastructure;
         improvements2 = _improvements2;
@@ -199,6 +204,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         mint = CountryMinter(_countryMinter);
         bonusResources = _bonusResources;
         bonus = BonusResourcesContract(_bonusResources);
+        senate = _senate;
     }
 
     ///@dev this is a public function that is only callable from the country minter contract when a nation is minted
@@ -919,6 +925,42 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
     ) public view returns (uint256[] memory) {
         uint256[] memory partners = idToTradingPartners[id];
         return partners;
+    }
+
+    modifier onlySenateContract() {
+        require(
+            msg.sender == senate,
+            "this function is only callable from the senate contract"
+        );
+        _;
+    }
+
+    function removeTradingPartnersFromSanction(uint256 idSanctioned, uint256 sanctionTeam) public onlySenateContract {
+        uint256[] memory partners = idToTradingPartners[idSanctioned];
+        for (uint256 i = 0; i < partners.length; i++) {
+            uint256 partnerId = partners[i];
+            uint256 partnerTeam = params.getTeam(partnerId);
+            if (partnerTeam == sanctionTeam) {
+                for (uint256 j = 0; j < idToTradingPartners[idSanctioned].length; j++) {
+                    if (idToTradingPartners[idSanctioned][j] == partnerId) {
+                        idToTradingPartners[idSanctioned][j] = idToTradingPartners[
+                            idSanctioned
+                        ][idToTradingPartners[idSanctioned].length - 1];
+                        idToTradingPartners[idSanctioned].pop();
+                    }
+                }
+                for (uint256 k = 0; k < idToTradingPartners[partnerId].length; k++) {
+                    if (idToTradingPartners[partnerId][k] == idSanctioned) {
+                        idToTradingPartners[partnerId][k] = idToTradingPartners[
+                            partnerId
+                        ][idToTradingPartners[partnerId].length - 1];
+                        idToTradingPartners[partnerId].pop();
+                        setResources(partnerId);   
+                    }
+                }
+            }
+        }
+        setResources(idSanctioned);
     }
 }
 

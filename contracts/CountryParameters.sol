@@ -274,6 +274,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         require(newTeam <= 15, "invalid team selection");
         bool isSenator = senate.isSenator(id);
         require(isSenator == false, "cannot chenge teams as a senator");
+        senate.updateTeam(id, newTeam);
         idToCountrySettings[id].nationTeam = newTeam;
     }
 
