@@ -7,6 +7,7 @@ import "./Wonders.sol";
 import "./CountryMinter.sol";
 import "./Treasury.sol";
 import "./KeeperFile.sol";
+import "./Forces.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 // import "hardhat/console.sol";
@@ -37,6 +38,7 @@ contract WarContract is Ownable {
     CountryMinter mint;
     TreasuryContract tres;
     KeeperContract keep;
+    ForcesContract forc;
 
     struct War {
         uint256 offenseId;
@@ -98,6 +100,7 @@ contract WarContract is Ownable {
     mapping(uint256 => DefenseLosses) public warIdToDefenseLosses;
     mapping(uint256 => uint256[]) public idToActiveWars;
     mapping(uint256 => uint256[]) public idToOffensiveWars;
+    mapping(uint256 => uint256[]) public idToDeactivatedWars;
         
     // mapping(uint256 => mapping (uint256 => uint256)) public nationIdToCruiseMissileLaunchesToday;
 
@@ -134,9 +137,11 @@ contract WarContract is Ownable {
         keep = KeeperContract(_keeper);
     }
 
-    function settings2(address _treasury) public onlyOwner {
+    function settings2(address _treasury, address _forces) public onlyOwner {
         treasury = _treasury;
         tres = TreasuryContract(_treasury);
+        forces = _forces;
+        forc = ForcesContract(_forces);
     }
 
     ///@dev this function is only callable by the contract owner
@@ -385,8 +390,10 @@ contract WarContract is Ownable {
     function removeActiveWar(uint256 _warId) internal {
         (uint256 offenseId, uint256 defenseId) = getInvolvedParties(_warId);
         uint256[] storage offenseActiveWars = idToActiveWars[offenseId];
+        uint256[] storage offenseDeactivatedWars = idToDeactivatedWars[offenseId];
         for (uint256 i = 0; i < offenseActiveWars.length; i++) {
             if (offenseActiveWars[i] == _warId) {
+                offenseDeactivatedWars.push(_warId);
                 offenseActiveWars[i] = offenseActiveWars[
                     offenseActiveWars.length - 1
                 ];
@@ -401,8 +408,10 @@ contract WarContract is Ownable {
             }
         }
         uint256[] storage defenseActiveWars = idToActiveWars[defenseId];
+        uint256[] storage defenseDeactivatedWars = idToDeactivatedWars[defenseId];
         for (uint256 i = 0; i < defenseActiveWars.length; i++) {
             if (defenseActiveWars[i] == _warId) {
+                defenseDeactivatedWars.push(_warId);
                 defenseActiveWars[i] = defenseActiveWars[
                     defenseActiveWars.length - 1
                 ];
@@ -417,13 +426,13 @@ contract WarContract is Ownable {
         // }
     }
 
-    modifier onlyKeeper() {
-        require(
-            msg.sender == keeper,
-            "function only callable from keeper file"
-        );
-        _;
-    }
+    // modifier onlyKeeper() {
+    //     require(
+    //         msg.sender == keeper,
+    //         "function only callable from keeper file"
+    //     );
+    //     _;
+    // }
 
     // ///@dev this function is only callable from the keeper contract
     // ///@dev wars expire after 7 days and will be removed from active wars when 7 days have elapsed
@@ -799,6 +808,44 @@ contract WarContract is Ownable {
         } else if (defenseId == attackerId) {
             warIdToDefenseDeployed1[_warId].soldiersDeployed -= soldierLosses;
             warIdToDefenseDeployed1[_warId].tanksDeployed -= tankLosses;
+        }
+    }
+
+    function recallTroopsFromDeactivatedWars(uint256 id) public {
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
+        uint256[] memory activeWars = idToActiveWars[id];
+        for (uint256 i = 0; i < activeWars.length; i++) {
+            (,bool expired) = getDaysLeft(activeWars[i]);
+            if(expired == true) {
+                removeActiveWar(activeWars[i]);
+            }
+        }
+        uint256[] storage deactivatedWars = idToDeactivatedWars[id];
+        for (uint256 i = 0; i < deactivatedWars.length; i++) {
+            uint256 war = deactivatedWars[i];
+            (uint256 offenseId, uint256 defenseId) = getInvolvedParties(war);
+            if (id == offenseId) {
+                uint256 soldiersDeployed = warIdToOffenseDeployed1[war]
+                    .soldiersDeployed;
+                uint256 tanksDeployed = warIdToOffenseDeployed1[war]
+                    .tanksDeployed;
+                forc.withdrawSoldiers(id, soldiersDeployed);
+                forc.withdrawTanks(id, tanksDeployed);
+                warIdToOffenseDeployed1[war].soldiersDeployed = 0;
+                warIdToOffenseDeployed1[war].tanksDeployed = 0;
+            } else if (id == defenseId) {
+                uint256 soldiersDeployed = warIdToDefenseDeployed1[war]
+                    .soldiersDeployed;
+                uint256 tanksDeployed = warIdToDefenseDeployed1[war]
+                    .tanksDeployed;
+                forc.withdrawSoldiers(id, soldiersDeployed);
+                forc.withdrawTanks(id, tanksDeployed);
+                warIdToDefenseDeployed1[war].soldiersDeployed = 0;
+                warIdToDefenseDeployed1[war].tanksDeployed = 0;
+            }
+            deactivatedWars[i] = deactivatedWars[deactivatedWars.length - 1];
+            deactivatedWars.pop();
         }
     }
 }

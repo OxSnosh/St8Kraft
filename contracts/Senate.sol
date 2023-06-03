@@ -7,13 +7,16 @@ import "./CountryMinter.sol";
 import "./KeeperFile.sol";
 import "./Resources.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
 
 ///@title SenateContract
 ///@author OxSnosh
 ///@notice this contract will allow nation owners to vote for team senators
 ///@notice team senators will be able to sanction nations from trading with trading partners on the same team
 ///@dev this contract inherits from the openzeppelin ownable contract
-contract SenateContract is Ownable {
+contract SenateContract is ChainlinkClient, Ownable {
+    using Chainlink for Chainlink.Request;
+
     uint256 public epoch;
     uint256 public dayOfLastElection;
     address public countryMinter;
@@ -47,6 +50,7 @@ contract SenateContract is Ownable {
     mapping(uint256 => Voter) public idToVoter;
     mapping(uint256 => uint256[]) public teamToCurrentSanctions;
     mapping(uint256 => mapping(uint256 => uint256[])) epochToTeamToSenatorVotes;
+    mapping(uint256 => mapping(uint256 => uint256[])) epochToTeamToWinners;
 
     // mapping(uint256 => mapping(uint256 => uint256)) election;
 
@@ -160,20 +164,53 @@ contract SenateContract is Ownable {
         emit Vote(idVoter, voterTeam, idOfSenateVote, msg.sender);
     }
 
-    // ///@dev this is a public function that will be called from an off chain source
-    // ///@notice this function will make the nations who won the team 7 election senators
-    // ///@param newSenatorArray is the array of team 7 senators getting elected
-    // function inaugurateTeam7Senators(uint256[] memory newSenatorArray) public {
-    //     for (uint256 i = 0; i < team7SenatorArray.length; i++) {
-    //         uint256 countryId = team7SenatorArray[i];
-    //         idToVoter[countryId].senator = false;
-    //     }
-    //     for (uint i = 0; i < newSenatorArray.length; i++) {
-    //         uint256 newSenatorId = newSenatorArray[i];
-    //         idToVoter[newSenatorId].senator = true;
-    //     }
-    //     team7SenatorArray = newSenatorArray;
-    // }
+    ///@dev this is a public function that will be called from an off chain source
+    ///@notice this function will make the nations who won the team 7 election senators
+    ///@param _jobId is the job id for the chainlink oracle to run
+    ///@param _oracleAddress is the address of the chainlink oracle
+    ///@param _orderId is the order id of the chainlink oracle request
+    ///@param _fee is the fee paid to the chainlink oracle
+    function inaugurateTeam7Senators(
+        bytes32 _jobId,
+        address _oracleAddress,
+        uint256 _orderId,
+        uint256 _fee,
+        uint256 teamNumber,
+        uint256 _epoch
+    ) public {
+        Chainlink.Request memory req = buildChainlinkRequest(
+            _jobId,
+            address(this),
+            this.completeElection.selector
+        );
+        uint256[] memory teamVotes = epochToTeamToSenatorVotes[_epoch][
+            teamNumber
+        ];
+        req.addUint("orderId", _orderId);
+        req.addUint("teamNumber", teamNumber);
+        req.addBytes("teamVotes", abi.encodePacked(teamVotes));
+        req.addUint("epoch", _epoch);
+        sendChainlinkRequestTo(_oracleAddress, req, _fee);
+    }
+
+    function completeElection(
+        bytes32 _requestId,
+        uint256 _orderId,
+        uint256[] memory winners,
+        uint256 team,
+        uint256 _epoch
+    ) public {
+        if(epoch > 0) {
+            uint256[] memory currentSenators = epochToTeamToWinners[_epoch-1][team];
+            for (uint i = 0; i < currentSenators.length; i++) {
+                idToVoter[currentSenators[i]].senator = false;
+            }
+        }
+        for (uint256 i = 0; i < winners.length; i++) {
+            idToVoter[winners[i]].senator = true;
+        }        
+        epochToTeamToWinners[_epoch][team] = winners;
+    }
 
     ///@dev this is a public function callable by a senator
     ///@notice this function will only work if the senator and the nation being sanctioned are on the same team
