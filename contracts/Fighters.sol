@@ -36,8 +36,7 @@ contract FightersContract is Ownable {
     NavyContract nav;
     BombersContract bomb;
 
-    struct DefendingFighters {
-        uint256 defendingAircraft;
+    struct Fighters {
         uint256 yak9Count;
         uint256 p51MustangCount;
         uint256 f86SabreCount;
@@ -49,21 +48,7 @@ contract FightersContract is Ownable {
         uint256 f22RaptorCount;
     }
 
-    struct DeployedFighters {
-        uint256 deployedAircraft;
-        uint256 yak9Count;
-        uint256 p51MustangCount;
-        uint256 f86SabreCount;
-        uint256 mig15Count;
-        uint256 f100SuperSabreCount;
-        uint256 f35LightningCount;
-        uint256 f15EagleCount;
-        uint256 su30MkiCount;
-        uint256 f22RaptorCount;
-    }
-
-    mapping(uint256 => DefendingFighters) public idToDefendingFighters;
-    mapping(uint256 => DeployedFighters) public idToDeployedFighters;
+    mapping(uint256 => Fighters) public idToFighters;
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -136,163 +121,46 @@ contract FightersContract is Ownable {
     ///@notice this function allows a nation to purchase fighter aircraft once a country is minted
     ///@param id this is the nation ID of the nation being minted
     function generateFighters(uint256 id) public onlyCountryMinter {
-        DefendingFighters memory newDefendingFighters = DefendingFighters(
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-        );
-        idToDefendingFighters[id] = newDefendingFighters;
-        DeployedFighters memory newDeployedFighters = DeployedFighters(
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-        );
-        idToDeployedFighters[id] = newDeployedFighters;
+        Fighters memory newFighters = Fighters(0, 0, 0, 0, 0, 0, 0, 0, 0);
+        idToFighters[id] = newFighters;
     }
-
-    ///@dev this is a public view function that will return the total (fighters + bombers) number of a nations aircraft
-    ///@notice this function will return the total number of a nations aircraft (fighters and bombers)
-    ///@param id this is the nation ID of the nation being queried
-    ///@return uint256 this is the total aircraft count of a nation (fighters and bombers)
-    function getAircraftCount(uint256 id) public view returns (uint256) {
-        uint256 defendingCount = idToDefendingFighters[id].defendingAircraft;
-        uint256 deployedCount = idToDeployedFighters[id].deployedAircraft;
-        uint256 bomberCount = bomb.getBomberCount(id);
-        uint256 count = (defendingCount + deployedCount + bomberCount);
-        return count;
-    }
-
-    ///@notice this function will return the total number of a nations defending aircraft
-    ///@param id this is the nation ID of the nation being queried
-    ///@return uint256 this is the total number of the nations defending aircraft (fighters and bombers)
-    function getDefendingCount(uint256 id) public view returns (uint256) {
-        uint256 defendingCount = idToDefendingFighters[id].defendingAircraft;
-        return defendingCount;
-    }
-
-    // /@notice this function will return the total number of a nations deployed aircraft
-    // /@param id this is the nation ID of the nation being queried
-    // /@return uint256 this is the total number of the nations deployed aircraft (fighters and bombers)
-    // function getDeployedCount(uint256 id) public view returns (uint256) {
-    //     uint256 deployedCount = idToDeployedFighters[id].deployedAircraft;
-    //     return deployedCount;
-    // }
 
     modifier onlyBomberContract() {
         require(msg.sender == bombers);
         _;
     }
 
-    ///@dev this function is only callable from the bomber marketplace contracts
-    ///@notice this function will increase the total aricraft count when a bomber is purchased
-    ///@param amount is the number of bomber aircraft being purchased
-    ///@param id this is the nation ID of the nation being queried
-    function increaseAircraftCount(
-        uint256 amount,
-        uint256 id
-    ) public onlyBomberContract {
-        idToDefendingFighters[id].defendingAircraft += amount;
-    }
-
-    ///@dev this function is only callable from the bomber marketplace contracts
-    ///@notice this function will decrease the total aricraft count when a bomber is decommissioned
-    ///@param amount is the number of bomber aircraft being decomissioned
-    ///@param id this is the nation ID of the nation being queried
-    function decreaseDefendingAircraftCount(
-        uint256 amount,
-        uint256 id
-    ) public onlyBomberContract {
-        idToDefendingFighters[id].defendingAircraft -= amount;
-    }
-
-    ///@dev this function is only callable from the fighter losses contract
-    ///@notice this function will decrease the number of defending fighters lost in battle
-    ///@param amount this is the amount of figher aircraft lost
-    ///@param id this is the nation ID of the nation being queried
-    function decreaseDefendingAircraftCountFromLosses(
-        uint256 amount,
-        uint256 id
-    ) public onlyLossesContract {
-        idToDefendingFighters[id].defendingAircraft -= amount;
-    }
-
-    ///@dev this function is only callable from the fighter losses contract
-    ///@notice this function will decrease the number of deployed fighters lost in battle
-    ///@param amount this is the amount of figher aircraft lost
-    ///@param id this is the nation ID of the nation being queried
-    function decreaseDeployedAircraftCountFromLosses(
-        uint256 amount,
-        uint256 id
-    ) public onlyLossesContract {
-        idToDeployedFighters[id].deployedAircraft -= amount;
-    }
-
     ///@notice this function will return the amount of defending Yak9's of a nation
     ///@param id is the nation ID of the nation
     ///@return uint256 is the number of defending Yak9 aircraft for the nation
-    function getDefendingYak9Count(uint256 id) public view returns (uint256) {
-        uint256 count = idToDefendingFighters[id].yak9Count;
+    function getYak9Count(uint256 id) public view returns (uint256) {
+        uint256 count = idToFighters[id].yak9Count;
         return count;
     }
-
-    // /@notice this function will return the amount of deployed Yak9's a nation owns
-    // /@param id is the nation ID of the nation
-    // /@return uint256 is the number of deployed Yak9's a nation owns
-    // function getDeployedYak9Count(uint256 id) public view returns (uint256) {
-    //     uint256 count = idToDeployedFighters[id].yak9Count;
-    //     return count;
-    // }
 
     ///@dev this function is only callabel from the Fighter Market contracts
     ///@notice this function will increase the number of aircraft when they are purchased in the marketplace
     ///@param id is the nation ID of the nation
     ///@param amount is the amount of aircraft being purchased
     function increaseYak9Count(uint256 id, uint256 amount) public onlyMarket {
-        idToDefendingFighters[id].yak9Count += amount;
-        idToDefendingFighters[id].defendingAircraft += amount;
+        idToFighters[id].yak9Count += amount;
     }
 
     ///@dev this function is only callable from the losses contract
     ///@notice this function will decrease the amount of defending aircraft lost in a battle
     ///@param id is the nation ID of the nation
     ///@param amount is the amount of aircraft being destroyed
-    function decreaseDefendingYak9Count(
+    function decreaseYak9Count(
         uint256 amount,
         uint256 id
     ) public onlyLossesContract {
-        uint256 currentAmount = idToDefendingFighters[id].yak9Count;
-        require((currentAmount - amount) >= 0, "cannot decrease that many");
-        idToDefendingFighters[id].yak9Count -= amount;
-        idToDefendingFighters[id].defendingAircraft -= amount;
+        uint256 currentAmount = idToFighters[id].yak9Count;
+        if (currentAmount >= amount) {
+            idToFighters[id].yak9Count -= amount;
+        } else {
+            idToFighters[id].yak9Count = 0;
+        }
     }
-
-    // /@dev this function is only callable from the losses contract
-    // /@notice this function will decrease the amount of deployed aircraft lost in a battle
-    // /@param id is the nation ID of the nation
-    // /@param amount is the amount of aircraft being destroyed
-    // function decreaseDeployedYak9Count(
-    //     uint256 amount,
-    //     uint256 id
-    // ) public onlyLossesContract {
-    //     uint256 currentAmount = idToDeployedFighters[id].yak9Count;
-    //     require((currentAmount - amount) >= 0, "cannot decrease that many");
-    //     idToDeployedFighters[id].yak9Count -= amount;
-    //     idToDeployedFighters[id].deployedAircraft -= amount;
-    // }
 
     ///@notice this function will allow a nation owner to decommission Yak9's
     ///@param id is the nation ID of the nation
@@ -300,36 +168,18 @@ contract FightersContract is Ownable {
     function scrapYak9(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
-        uint256 currentAmount = idToDefendingFighters[id].yak9Count;
-        if (currentAmount < amount) {
-            require(currentAmount >= amount, "cannot delete that many");
-            idToDefendingFighters[id].yak9Count -= amount;
-            idToDefendingFighters[id].defendingAircraft -= amount;
-        } else {
-            idToDefendingFighters[id].yak9Count -= amount;
-            idToDefendingFighters[id].defendingAircraft -= amount;
-        }
+        uint256 currentAmount = idToFighters[id].yak9Count;
+        require(currentAmount >= amount, "cannot delete that many");
+        idToFighters[id].yak9Count -= amount;
     }
 
     ///@notice this function will return the amount of defending P51 Mustangs's of a nation
     ///@param id is the nation ID of the nation
     ///@return uint256 is the number of defending P51 Mustang aircraft for the nation
-    function getDefendingP51MustangCount(
-        uint256 id
-    ) public view returns (uint256) {
-        uint256 count = idToDefendingFighters[id].p51MustangCount;
+    function getP51MustangCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToFighters[id].p51MustangCount;
         return count;
     }
-
-    // /@notice this function will return the amount of deployed P51 Mustangs's of a nation
-    // /@param id is the nation ID of the nation
-    // /@return uint256 is the number of deployed P51 Mustang aircraft for the nation
-    // function getDeployedP51MustangCount(
-    //     uint256 id
-    // ) public view returns (uint256) {
-    //     uint256 count = idToDeployedFighters[id].p51MustangCount;
-    //     return count;
-    // }
 
     ///@dev this function is only callabel from the Fighter Market contracts
     ///@notice this function will increase the number of aircraft when they are purchased in the marketplace
@@ -339,37 +189,24 @@ contract FightersContract is Ownable {
         uint256 id,
         uint256 amount
     ) public onlyMarket {
-        idToDefendingFighters[id].p51MustangCount += amount;
-        idToDefendingFighters[id].defendingAircraft += amount;
+        idToFighters[id].p51MustangCount += amount;
     }
 
     ///@dev this function is only callable from the losses contract
     ///@notice this function will decrease the amount of defending aircraft lost in a battle
     ///@param id is the nation ID of the nation
     ///@param amount is the amount of aircraft being destroyed
-    function decreaseDefendingP51MustangCount(
+    function decreaseP51MustangCount(
         uint256 amount,
         uint256 id
     ) public onlyLossesContract {
-        uint256 currentAmount = idToDefendingFighters[id].p51MustangCount;
-        require((currentAmount - amount) >= 0, "cannot decrease that many");
-        idToDefendingFighters[id].p51MustangCount -= amount;
-        idToDefendingFighters[id].defendingAircraft -= amount;
+        uint256 currentAmount = idToFighters[id].p51MustangCount;
+        if (currentAmount >= amount) {
+            idToFighters[id].p51MustangCount -= amount;
+        } else {
+            idToFighters[id].p51MustangCount = 0;
+        }
     }
-
-    // /@dev this function is only callable from the losses contract
-    // /@notice this function will decrease the amount of deployed aircraft lost in a battle
-    // /@param id is the nation ID of the nation
-    // /@param amount is the amount of aircraft being destroyed
-    // function decreaseDeployedP51MustangCount(
-    //     uint256 amount,
-    //     uint256 id
-    // ) public onlyLossesContract {
-    //     uint256 currentAmount = idToDeployedFighters[id].p51MustangCount;
-    //     require((currentAmount - amount) >= 0, "cannot decrease that many");
-    //     idToDeployedFighters[id].p51MustangCount -= amount;
-    //     idToDeployedFighters[id].deployedAircraft -= amount;
-    // }
 
     ///@notice this function will allow a nation owner to decommission P51 Mustangs's
     ///@param id is the nation ID of the nation
@@ -377,36 +214,18 @@ contract FightersContract is Ownable {
     function scrapP51Mustang(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
-        uint256 currentAmount = idToDefendingFighters[id].p51MustangCount;
-        if (currentAmount < amount) {
-            require(currentAmount >= amount, "cannot delete that many");
-            idToDefendingFighters[id].p51MustangCount -= amount;
-            idToDefendingFighters[id].defendingAircraft -= amount;
-        } else {
-            idToDefendingFighters[id].p51MustangCount -= amount;
-            idToDefendingFighters[id].defendingAircraft -= amount;
-        }
+        uint256 currentAmount = idToFighters[id].p51MustangCount;
+        require(currentAmount >= amount, "cannot delete that many");
+        idToFighters[id].p51MustangCount -= amount;
     }
 
     ///@notice this function will return the amount of defending F86 Sabre's of a nation
     ///@param id is the nation ID of the nation
     ///@return uint256 is the number of defending F86 Sabre aircraft for the nation
-    function getDefendingF86SabreCount(
-        uint256 id
-    ) public view returns (uint256) {
-        uint256 count = idToDefendingFighters[id].f86SabreCount;
+    function getF86SabreCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToFighters[id].f86SabreCount;
         return count;
     }
-
-    // /@notice this function will return the amount of deployed F86 Sabre's of a nation
-    // /@param id is the nation ID of the nation
-    // /@return uint256 is the number of deployed F86 Sabre aircraft for the nation
-    // function getDeployedF86SabreCount(
-    //     uint256 id
-    // ) public view returns (uint256) {
-    //     uint256 count = idToDeployedFighters[id].f86SabreCount;
-    //     return count;
-    // }
 
     ///@dev this function is only callabel from the Fighter Market contracts
     ///@notice this function will increase the number of aircraft when they are purchased in the marketplace
@@ -416,37 +235,24 @@ contract FightersContract is Ownable {
         uint256 id,
         uint256 amount
     ) public onlyMarket {
-        idToDefendingFighters[id].f86SabreCount += amount;
-        idToDefendingFighters[id].defendingAircraft += amount;
+        idToFighters[id].f86SabreCount += amount;
     }
 
     ///@dev this function is only callable from the losses contract
     ///@notice this function will decrease the amount of defending aircraft lost in a battle
     ///@param id is the nation ID of the nation
     ///@param amount is the amount of aircraft being destroyed
-    function decreaseDefendingF86SabreCount(
+    function decreaseF86SabreCount(
         uint256 amount,
         uint256 id
     ) public onlyLossesContract {
-        uint256 currentAmount = idToDefendingFighters[id].f86SabreCount;
-        require((currentAmount - amount) >= 0, "cannot decrease that many");
-        idToDefendingFighters[id].f86SabreCount -= amount;
-        idToDefendingFighters[id].defendingAircraft -= amount;
+        uint256 currentAmount = idToFighters[id].f86SabreCount;
+        if (currentAmount >= amount) {
+            idToFighters[id].f86SabreCount -= amount;
+        } else {
+            idToFighters[id].f86SabreCount = 0;
+        }
     }
-
-    // /@dev this function is only callable from the losses contract
-    // /@notice this function will decrease the amount of deployed aircraft lost in a battle
-    // /@param id is the nation ID of the nation
-    // /@param amount is the amount of aircraft being destroyed
-    // function decreaseDeployedF86SabreCount(
-    //     uint256 amount,
-    //     uint256 id
-    // ) public onlyLossesContract {
-    //     uint256 currentAmount = idToDeployedFighters[id].f86SabreCount;
-    //     require((currentAmount - amount) >= 0, "cannot decrease that many");
-    //     idToDeployedFighters[id].f86SabreCount -= amount;
-    //     idToDeployedFighters[id].deployedAircraft -= amount;
-    // }
 
     ///@notice this function will allow a nation owner to decommission F86 Sabre's
     ///@param id is the nation ID of the nation
@@ -454,69 +260,42 @@ contract FightersContract is Ownable {
     function scrapF86Sabre(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
-        uint256 currentAmount = idToDefendingFighters[id].f86SabreCount;
-        if (currentAmount < amount) {
-            require(currentAmount >= amount, "cannot delete that many");
-            idToDefendingFighters[id].f86SabreCount -= amount;
-            idToDefendingFighters[id].defendingAircraft -= amount;
-        } else {
-            idToDefendingFighters[id].f86SabreCount -= amount;
-            idToDefendingFighters[id].defendingAircraft -= amount;
-        }
+        uint256 currentAmount = idToFighters[id].f86SabreCount;
+        require(currentAmount >= amount, "cannot delete that many");
+        idToFighters[id].f86SabreCount -= amount;
     }
 
     ///@notice this function will return the amount of defending Mig15's of a nation
     ///@param id is the nation ID of the nation
     ///@return uint256 is the number of defending Mig15's aircraft for the nation
-    function getDefendingMig15Count(uint256 id) public view returns (uint256) {
-        uint256 count = idToDefendingFighters[id].mig15Count;
+    function getMig15Count(uint256 id) public view returns (uint256) {
+        uint256 count = idToFighters[id].mig15Count;
         return count;
     }
-
-    // /@notice this function will return the amount of deployed Mig15's of a nation
-    // /@param id is the nation ID of the nation
-    // /@return uint256 is the number of deployed Mig15's aircraft for the nation
-    // function getDeployedMig15Count(uint256 id) public view returns (uint256) {
-    //     uint256 count = idToDeployedFighters[id].mig15Count;
-    //     return count;
-    // }
 
     ///@dev this function is only callabel from the Fighter Market contracts
     ///@notice this function will increase the number of aircraft when they are purchased in the marketplace
     ///@param id is the nation ID of the nation
     ///@param amount is the amount of aircraft being purchased
     function increaseMig15Count(uint256 id, uint256 amount) public onlyMarket {
-        idToDefendingFighters[id].mig15Count += amount;
-        idToDefendingFighters[id].defendingAircraft += amount;
+        idToFighters[id].mig15Count += amount;
     }
 
     ///@dev this function is only callable from the losses contract
     ///@notice this function will decrease the amount of defending aircraft lost in a battle
     ///@param id is the nation ID of the nation
     ///@param amount is the amount of aircraft being destroyed
-    function decreaseDefendingMig15Count(
+    function decreaseMig15Count(
         uint256 amount,
         uint256 id
     ) public onlyLossesContract {
-        uint256 currentAmount = idToDefendingFighters[id].mig15Count;
-        require((currentAmount - amount) >= 0, "cannot decrease that many");
-        idToDefendingFighters[id].mig15Count -= amount;
-        idToDefendingFighters[id].defendingAircraft -= amount;
+        uint256 currentAmount = idToFighters[id].mig15Count;
+        if (currentAmount >= amount) {
+            idToFighters[id].mig15Count -= amount;
+        } else {
+            idToFighters[id].mig15Count = 0;
+        }
     }
-
-    // /@dev this function is only callable from the losses contract
-    // /@notice this function will decrease the amount of deployed aircraft lost in a battle
-    // /@param id is the nation ID of the nation
-    // /@param amount is the amount of aircraft being destroyed
-    // function decreaseDeployedMig15Count(
-    //     uint256 amount,
-    //     uint256 id
-    // ) public onlyLossesContract {
-    //     uint256 currentAmount = idToDeployedFighters[id].mig15Count;
-    //     require((currentAmount - amount) >= 0, "cannot decrease that many");
-    //     idToDeployedFighters[id].mig15Count -= amount;
-    //     idToDeployedFighters[id].deployedAircraft -= amount;
-    // }
 
     ///@notice this function will allow a nation owner to decommission Mig15's
     ///@param id is the nation ID of the nation
@@ -524,36 +303,18 @@ contract FightersContract is Ownable {
     function scrapMig15(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
-        uint256 currentAmount = idToDefendingFighters[id].mig15Count;
-        if (currentAmount < amount) {
-            require(currentAmount >= amount, "cannot delete that many");
-            idToDefendingFighters[id].mig15Count -= amount;
-            idToDefendingFighters[id].defendingAircraft -= amount;
-        } else {
-            idToDefendingFighters[id].mig15Count -= amount;
-            idToDefendingFighters[id].defendingAircraft -= amount;
-        }
+        uint256 currentAmount = idToFighters[id].mig15Count;
+        require(currentAmount >= amount, "cannot delete that many");
+        idToFighters[id].mig15Count -= amount;
     }
 
     ///@notice this function will return the amount of defending F100 Super Sabre's of a nation
     ///@param id is the nation ID of the nation
     ///@return uint256 is the number of defending F100 Super Sabre aircraft for the nation
-    function getDefendingF100SuperSabreCount(
-        uint256 id
-    ) public view returns (uint256) {
-        uint256 count = idToDefendingFighters[id].f100SuperSabreCount;
+    function getF100SuperSabreCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToFighters[id].f100SuperSabreCount;
         return count;
     }
-
-    // /@notice this function will return the amount of deployed F100 Super Sabre's of a nation
-    // /@param id is the nation ID of the nation
-    // /@return uint256 is the number of dployed F100 Super Sabre aircraft for the nation
-    // function getDeployedF100SuperSabreCount(
-    //     uint256 id
-    // ) public view returns (uint256) {
-    //     uint256 count = idToDeployedFighters[id].f100SuperSabreCount;
-    //     return count;
-    // }
 
     ///@dev this function is only callabel from the Fighter Market contracts
     ///@notice this function will increase the number of aircraft when they are purchased in the marketplace
@@ -563,37 +324,24 @@ contract FightersContract is Ownable {
         uint256 id,
         uint256 amount
     ) public onlyMarket {
-        idToDefendingFighters[id].f100SuperSabreCount += amount;
-        idToDefendingFighters[id].defendingAircraft += amount;
+        idToFighters[id].f100SuperSabreCount += amount;
     }
 
     ///@dev this function is only callable from the losses contract
     ///@notice this function will decrease the amount of defending aircraft lost in a battle
     ///@param id is the nation ID of the nation
     ///@param amount is the amount of aircraft being destroyed
-    function decreaseDefendingF100SuperSabreCount(
+    function decreaseF100SuperSabreCount(
         uint256 amount,
         uint256 id
     ) public onlyLossesContract {
-        uint256 currentAmount = idToDefendingFighters[id].f100SuperSabreCount;
-        require((currentAmount - amount) >= 0, "cannot decrease that many");
-        idToDefendingFighters[id].f100SuperSabreCount -= amount;
-        idToDefendingFighters[id].defendingAircraft -= amount;
+        uint256 currentAmount = idToFighters[id].f100SuperSabreCount;
+        if (currentAmount >= amount) {
+            idToFighters[id].f100SuperSabreCount -= amount;
+        } else {
+            idToFighters[id].f100SuperSabreCount = 0;
+        }
     }
-
-    // /@dev this function is only callable from the losses contract
-    // /@notice this function will decrease the amount of deployed aircraft lost in a battle
-    // /@param id is the nation ID of the nation
-    // /@param amount is the amount of aircraft being destroyed
-    // function decreaseDeployedF100SuperSabreCount(
-    //     uint256 amount,
-    //     uint256 id
-    // ) public onlyLossesContract {
-    //     uint256 currentAmount = idToDeployedFighters[id].f100SuperSabreCount;
-    //     require((currentAmount - amount) >= 0, "cannot decrease that many");
-    //     idToDeployedFighters[id].f100SuperSabreCount -= amount;
-    //     idToDeployedFighters[id].deployedAircraft -= amount;
-    // }
 
     ///@notice this function will allow a nation owner to decommission F100 Super Sabre's
     ///@param id is the nation ID of the nation
@@ -601,36 +349,18 @@ contract FightersContract is Ownable {
     function scrapF100SuperSabre(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
-        uint256 currentAmount = idToDefendingFighters[id].f100SuperSabreCount;
-        if (currentAmount < amount) {
-            require(currentAmount >= amount, "cannot delete that many");
-            idToDefendingFighters[id].f100SuperSabreCount -= amount;
-            idToDefendingFighters[id].defendingAircraft -= amount;
-        } else {
-            idToDefendingFighters[id].f100SuperSabreCount -= amount;
-            idToDefendingFighters[id].defendingAircraft -= amount;
-        }
+        uint256 currentAmount = idToFighters[id].f100SuperSabreCount;
+        require(currentAmount >= amount, "cannot delete that many");
+        idToFighters[id].f100SuperSabreCount -= amount;
     }
 
     ///@notice this function will return the amount of defending F35 Lightning's of a nation
     ///@param id is the nation ID of the nation
     ///@return uint256 is the number of defending F35 Lightning aircraft for the nation
-    function getDefendingF35LightningCount(
-        uint256 id
-    ) public view returns (uint256) {
-        uint256 count = idToDefendingFighters[id].f35LightningCount;
+    function getF35LightningCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToFighters[id].f35LightningCount;
         return count;
     }
-
-    // /@notice this function will return the amount of deployed F35 Lightning's of a nation
-    // /@param id is the nation ID of the nation
-    // /@return uint256 is the number of deployed F35 Lightning aircraft for the nation
-    // function getDeployedF35LightningCount(
-    //     uint256 id
-    // ) public view returns (uint256) {
-    //     uint256 count = idToDeployedFighters[id].f35LightningCount;
-    //     return count;
-    // }
 
     ///@dev this function is only callabel from the Fighter Market contracts
     ///@notice this function will increase the number of aircraft when they are purchased in the marketplace
@@ -640,37 +370,24 @@ contract FightersContract is Ownable {
         uint256 id,
         uint256 amount
     ) public onlyMarket {
-        idToDefendingFighters[id].f35LightningCount += amount;
-        idToDefendingFighters[id].defendingAircraft += amount;
+        idToFighters[id].f35LightningCount += amount;
     }
 
     ///@dev this function is only callable from the losses contract
     ///@notice this function will decrease the amount of defending aircraft lost in a battle
     ///@param id is the nation ID of the nation
     ///@param amount is the amount of aircraft being destroyed
-    function decreaseDefendingF35LightningCount(
+    function decreaseF35LightningCount(
         uint256 amount,
         uint256 id
     ) public onlyLossesContract {
-        uint256 currentAmount = idToDefendingFighters[id].f35LightningCount;
-        require((currentAmount - amount) >= 0, "cannot decrease that many");
-        idToDefendingFighters[id].f35LightningCount -= amount;
-        idToDefendingFighters[id].defendingAircraft -= amount;
+        uint256 currentAmount = idToFighters[id].f35LightningCount;
+        if (currentAmount >= amount) {
+            idToFighters[id].f35LightningCount -= amount;
+        } else {
+            idToFighters[id].f35LightningCount = 0;
+        }
     }
-
-    // /@dev this function is only callable from the losses contract
-    // /@notice this function will decrease the amount of deployed aircraft lost in a battle
-    // /@param id is the nation ID of the nation
-    // /@param amount is the amount of aircraft being destroyed
-    // function decreaseDeployedF35LightningCount(
-    //     uint256 amount,
-    //     uint256 id
-    // ) public onlyLossesContract {
-    //     uint256 currentAmount = idToDeployedFighters[id].f35LightningCount;
-    //     require((currentAmount - amount) >= 0, "cannot decrease that many");
-    //     idToDeployedFighters[id].f35LightningCount -= amount;
-    //     idToDeployedFighters[id].deployedAircraft -= amount;
-    // }
 
     ///@notice this function will allow a nation owner to decommission F35's
     ///@param id is the nation ID of the nation
@@ -678,36 +395,18 @@ contract FightersContract is Ownable {
     function scrapF35Lightning(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
-        uint256 currentAmount = idToDefendingFighters[id].f35LightningCount;
-        if (currentAmount < amount) {
-            require(currentAmount >= amount, "cannot delete that many");
-            idToDefendingFighters[id].f35LightningCount -= amount;
-            idToDefendingFighters[id].defendingAircraft -= amount;
-        } else {
-            idToDefendingFighters[id].f35LightningCount -= amount;
-            idToDefendingFighters[id].defendingAircraft -= amount;
-        }
+        uint256 currentAmount = idToFighters[id].f35LightningCount;
+        require(currentAmount >= amount, "cannot delete that many");
+        idToFighters[id].f35LightningCount -= amount;
     }
 
     ///@notice this function will return the amount of defending F15 Eagle's of a nation
     ///@param id is the nation ID of the nation
     ///@return uint256 is the number of defending F15 Eagle aircraft for the nation
-    function getDefendingF15EagleCount(
-        uint256 id
-    ) public view returns (uint256) {
-        uint256 count = idToDefendingFighters[id].f15EagleCount;
+    function getF15EagleCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToFighters[id].f15EagleCount;
         return count;
     }
-
-    // /@notice this function will return the amount of deployed F15 Eagle's of a nation
-    // /@param id is the nation ID of the nation
-    // /@return uint256 is the number of deployed F15 Eagle aircraft for the nation
-    // function getDeployedF15EagleCount(
-    //     uint256 id
-    // ) public view returns (uint256) {
-    //     uint256 count = idToDeployedFighters[id].f15EagleCount;
-    //     return count;
-    // }
 
     ///@dev this function is only callabel from the Fighter Market contracts
     ///@notice this function will increase the number of aircraft when they are purchased in the marketplace
@@ -717,37 +416,24 @@ contract FightersContract is Ownable {
         uint256 id,
         uint256 amount
     ) public onlyMarket {
-        idToDefendingFighters[id].f15EagleCount += amount;
-        idToDefendingFighters[id].defendingAircraft += amount;
+        idToFighters[id].f15EagleCount += amount;
     }
 
     ///@dev this function is only callable from the losses contract
     ///@notice this function will decrease the amount of defending aircraft lost in a battle
     ///@param id is the nation ID of the nation
     ///@param amount is the amount of aircraft being destroyed
-    function decreaseDefendingF15EagleCount(
+    function decreaseF15EagleCount(
         uint256 amount,
         uint256 id
     ) public onlyLossesContract {
-        uint256 currentAmount = idToDefendingFighters[id].f15EagleCount;
-        require((currentAmount - amount) >= 0, "cannot decrease that many");
-        idToDefendingFighters[id].f15EagleCount -= amount;
-        idToDefendingFighters[id].defendingAircraft -= amount;
+        uint256 currentAmount = idToFighters[id].f15EagleCount;
+        if (currentAmount >= amount) {
+            idToFighters[id].f15EagleCount -= amount;
+        } else {
+            idToFighters[id].f15EagleCount = 0;
+        }
     }
-
-    // /@dev this function is only callable from the losses contract
-    // /@notice this function will decrease the amount of deployed aircraft lost in a battle
-    // /@param id is the nation ID of the nation
-    // /@param amount is the amount of aircraft being destroyed
-    // function decreaseDeployedF15EagleCount(
-    //     uint256 amount,
-    //     uint256 id
-    // ) public onlyLossesContract {
-    //     uint256 currentAmount = idToDeployedFighters[id].f15EagleCount;
-    //     require((currentAmount - amount) >= 0, "cannot decrease that many");
-    //     idToDeployedFighters[id].f15EagleCount -= amount;
-    //     idToDeployedFighters[id].deployedAircraft -= amount;
-    // }
 
     ///@notice this function will allow a nation owner to decommission F15's
     ///@param id is the nation ID of the nation
@@ -755,34 +441,18 @@ contract FightersContract is Ownable {
     function scrapF15Eagle(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
-        uint256 currentAmount = idToDefendingFighters[id].f15EagleCount;
-        if (currentAmount < amount) {
-            require(currentAmount >= amount, "cannot delete that many");
-            idToDefendingFighters[id].f15EagleCount -= amount;
-            idToDefendingFighters[id].defendingAircraft -= amount;
-        } else {
-            idToDefendingFighters[id].f15EagleCount -= amount;
-            idToDefendingFighters[id].defendingAircraft -= amount;
-        }
+        uint256 currentAmount = idToFighters[id].f15EagleCount;
+        require(currentAmount >= amount, "cannot delete that many");
+        idToFighters[id].f15EagleCount -= amount;
     }
 
     ///@notice this function will return the amount of defending Su30 Mki's of a nation
     ///@param id is the nation ID of the nation
     ///@return uint256 is the number of defending Su30 Mki aircraft for the nation
-    function getDefendingSu30MkiCount(
-        uint256 id
-    ) public view returns (uint256) {
-        uint256 count = idToDefendingFighters[id].su30MkiCount;
+    function getSu30MkiCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToFighters[id].su30MkiCount;
         return count;
     }
-
-    // /@notice this function will return the amount of deployed Su30 Mki's of a nation
-    // /@param id is the nation ID of the nation
-    // /@return uint256 is the number of deployed Su30 Mki aircraft for the nation
-    // function getDeployedSu30MkiCount(uint256 id) public view returns (uint256) {
-    //     uint256 count = idToDeployedFighters[id].su30MkiCount;
-    //     return count;
-    // }
 
     ///@dev this function is only callabel from the Fighter Market contracts
     ///@notice this function will increase the number of aircraft when they are purchased in the marketplace
@@ -792,37 +462,24 @@ contract FightersContract is Ownable {
         uint256 id,
         uint256 amount
     ) public onlyMarket {
-        idToDefendingFighters[id].su30MkiCount += amount;
-        idToDefendingFighters[id].defendingAircraft += amount;
+        idToFighters[id].su30MkiCount += amount;
     }
 
     ///@dev this function is only callable from the losses contract
     ///@notice this function will decrease the amount of defending aircraft lost in a battle
     ///@param id is the nation ID of the nation
     ///@param amount is the amount of aircraft being destroyed
-    function decreaseDefendingSu30MkiCount(
+    function decreaseSu30MkiCount(
         uint256 amount,
         uint256 id
     ) public onlyLossesContract {
-        uint256 currentAmount = idToDefendingFighters[id].su30MkiCount;
-        require((currentAmount - amount) >= 0, "cannot decrease that many");
-        idToDefendingFighters[id].su30MkiCount -= amount;
-        idToDefendingFighters[id].defendingAircraft -= amount;
+        uint256 currentAmount = idToFighters[id].su30MkiCount;
+        if (currentAmount >= amount) {
+            idToFighters[id].su30MkiCount -= amount;
+        } else {
+            idToFighters[id].su30MkiCount = 0;
+        }
     }
-
-    // /@dev this function is only callable from the losses contract
-    // /@notice this function will decrease the amount of deployed aircraft lost in a battle
-    // /@param id is the nation ID of the nation
-    // /@param amount is the amount of aircraft being destroyed
-    // function decreaseDeployedSu30MkiCount(
-    //     uint256 amount,
-    //     uint256 id
-    // ) public onlyLossesContract {
-    //     uint256 currentAmount = idToDeployedFighters[id].su30MkiCount;
-    //     require((currentAmount - amount) >= 0, "cannot decrease that many");
-    //     idToDeployedFighters[id].su30MkiCount -= amount;
-    //     idToDeployedFighters[id].deployedAircraft -= amount;
-    // }
 
     ///@notice this function will allow a nation owner to decommission Su30's
     ///@param id is the nation ID of the nation
@@ -830,36 +487,18 @@ contract FightersContract is Ownable {
     function scrapSu30Mki(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
-        uint256 currentAmount = idToDefendingFighters[id].su30MkiCount;
-        if (currentAmount < amount) {
-            require(currentAmount >= amount, "cannot delete that many");
-            idToDefendingFighters[id].su30MkiCount -= amount;
-            idToDefendingFighters[id].defendingAircraft -= amount;
-        } else {
-            idToDefendingFighters[id].su30MkiCount -= amount;
-            idToDefendingFighters[id].defendingAircraft -= amount;
-        }
+        uint256 currentAmount = idToFighters[id].su30MkiCount;
+        require(currentAmount >= amount, "cannot delete that many");
+        idToFighters[id].su30MkiCount -= amount;
     }
 
     ///@notice this function will return the amount of defending F22 Raptor's of a nation
     ///@param id is the nation ID of the nation
     ///@return uint256 is the number of defending F22 Raptor aircraft for the nation
-    function getDefendingF22RaptorCount(
-        uint256 id
-    ) public view returns (uint256) {
-        uint256 count = idToDefendingFighters[id].f22RaptorCount;
+    function getF22RaptorCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToFighters[id].f22RaptorCount;
         return count;
     }
-
-    // /@notice this function will return the amount of deployed F22 Raptor's of a nation
-    // /@param id is the nation ID of the nation
-    // /@return uint256 is the number of deployed F22 Raptor aircraft for the nation
-    // function getDeployedF22RaptorCount(
-    //     uint256 id
-    // ) public view returns (uint256) {
-    //     uint256 count = idToDeployedFighters[id].f22RaptorCount;
-    //     return count;
-    // }
 
     ///@dev this function is only callabel from the Fighter Market contracts
     ///@notice this function will increase the number of aircraft when they are purchased in the marketplace
@@ -869,37 +508,24 @@ contract FightersContract is Ownable {
         uint256 id,
         uint256 amount
     ) public onlyMarket {
-        idToDefendingFighters[id].f22RaptorCount += amount;
-        idToDefendingFighters[id].defendingAircraft += amount;
+        idToFighters[id].f22RaptorCount += amount;
     }
 
     ///@dev this function is only callable from the losses contract
     ///@notice this function will decrease the amount of defending aircraft lost in a battle
     ///@param id is the nation ID of the nation
     ///@param amount is the amount of aircraft being destroyed
-    function decreaseDefendingF22RaptorCount(
+    function decreaseF22RaptorCount(
         uint256 amount,
         uint256 id
     ) public onlyLossesContract {
-        uint256 currentAmount = idToDefendingFighters[id].f22RaptorCount;
-        require((currentAmount - amount) >= 0, "cannot decrease that many");
-        idToDefendingFighters[id].f22RaptorCount -= amount;
-        idToDefendingFighters[id].defendingAircraft -= amount;
+        uint256 currentAmount = idToFighters[id].f22RaptorCount;
+        if (currentAmount >= amount) {
+            idToFighters[id].f22RaptorCount -= amount;
+        } else {
+            idToFighters[id].f22RaptorCount = 0;
+        }
     }
-
-    // /@dev this function is only callable from the losses contract
-    // /@notice this function will decrease the amount of deployed aircraft lost in a battle
-    // /@param id is the nation ID of the nation
-    // /@param amount is the amount of aircraft being destroyed
-    // function decreaseDeployedF22RaptorCount(
-    //     uint256 amount,
-    //     uint256 id
-    // ) public onlyLossesContract {
-    //     uint256 currentAmount = idToDeployedFighters[id].f22RaptorCount;
-    //     require((currentAmount - amount) >= 0, "cannot decrease that many");
-    //     idToDeployedFighters[id].f22RaptorCount -= amount;
-    //     idToDeployedFighters[id].deployedAircraft -= amount;
-    // }
 
     ///@notice this function will allow a nation owner to decommission F22's
     ///@param id is the nation ID of the nation
@@ -907,15 +533,29 @@ contract FightersContract is Ownable {
     function scrapF22Raptor(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
-        uint256 currentAmount = idToDefendingFighters[id].f22RaptorCount;
-        if (currentAmount < amount) {
-            require(currentAmount >= amount, "cannot delete that many");
-            idToDefendingFighters[id].f22RaptorCount -= amount;
-            idToDefendingFighters[id].defendingAircraft -= amount;
-        } else {
-            idToDefendingFighters[id].f22RaptorCount -= amount;
-            idToDefendingFighters[id].defendingAircraft -= amount;
-        }
+        uint256 currentAmount = idToFighters[id].f22RaptorCount;
+        require(currentAmount >= amount, "cannot delete that many");
+        idToFighters[id].f22RaptorCount -= amount;
+    }
+
+    function getFighterCount(uint256 id) public view returns (uint256) {
+        uint256 count = idToFighters[id].yak9Count +
+            idToFighters[id].p51MustangCount +
+            idToFighters[id].f86SabreCount +
+            idToFighters[id].mig15Count +
+            idToFighters[id].f100SuperSabreCount +
+            idToFighters[id].f35LightningCount +
+            idToFighters[id].f15EagleCount +
+            idToFighters[id].su30MkiCount +
+            idToFighters[id].f22RaptorCount;
+        return count;
+    }
+
+    function getAircraftCount(uint256 id) public view returns (uint256) {
+        uint256 bomberCount = bomb.getBomberCount(id);
+        uint256 fighterCount = getFighterCount(id);
+        uint256 total = bomberCount + fighterCount;
+        return total;
     }
 }
 
@@ -955,66 +595,33 @@ contract FighterLosses is Ownable {
 
     ///@dev this is a public function that is only callable from the Air Battle contract
     ///@notice this function will decrease the amount of fighers lost in battle from the FighersContract
-    ///@param defenderLosses is an array of uints that represent the fighters that the defender lost in battle
-    ///@param defenderId is the nation ID of the defender
-    ///@param attackerLosses is an array of uints that represent the fighters that the attacker lost in battle
-    ///@param attackerId is the nation ID of the attacker
+    ///@param losses is an array of uints that represent the fighters that the defender lost in battle
+    ///@param id is the nation ID of the defender
     function decrementLosses(
-        uint256[] memory defenderLosses,
-        uint256 defenderId,
-        uint256[] memory attackerLosses,
-        uint256 attackerId
+        uint256[] memory losses,
+        uint256 id
     ) public onlyAirBattle {
-        fight.decreaseDefendingAircraftCountFromLosses(
-            defenderLosses.length,
-            defenderId
-        );
-        for (uint256 i; i < defenderLosses.length; i++) {
-            if (defenderLosses[i] == 1) {
-                fight.decreaseDefendingYak9Count(1, defenderId);
-            } else if (defenderLosses[i] == 2) {
-                fight.decreaseDefendingP51MustangCount(1, defenderId);
-            } else if (defenderLosses[i] == 3) {
-                fight.decreaseDefendingF86SabreCount(1, defenderId);
-            } else if (defenderLosses[i] == 4) {
-                fight.decreaseDefendingMig15Count(1, defenderId);
-            } else if (defenderLosses[i] == 5) {
-                fight.decreaseDefendingF100SuperSabreCount(1, defenderId);
-            } else if (defenderLosses[i] == 6) {
-                fight.decreaseDefendingF35LightningCount(1, defenderId);
-            } else if (defenderLosses[i] == 7) {
-                fight.decreaseDefendingF15EagleCount(1, defenderId);
-            } else if (defenderLosses[i] == 8) {
-                fight.decreaseDefendingSu30MkiCount(1, defenderId);
-            } else if (defenderLosses[i] == 9) {
-                fight.decreaseDefendingF22RaptorCount(1, defenderId);
+        for (uint256 i; i < losses.length; i++) {
+            if (losses[i] == 1) {
+                fight.decreaseYak9Count(1, id);
+            } else if (losses[i] == 2) {
+                fight.decreaseP51MustangCount(1, id);
+            } else if (losses[i] == 3) {
+                fight.decreaseF86SabreCount(1, id);
+            } else if (losses[i] == 4) {
+                fight.decreaseMig15Count(1, id);
+            } else if (losses[i] == 5) {
+                fight.decreaseF100SuperSabreCount(1, id);
+            } else if (losses[i] == 6) {
+                fight.decreaseF35LightningCount(1, id);
+            } else if (losses[i] == 7) {
+                fight.decreaseF15EagleCount(1, id);
+            } else if (losses[i] == 8) {
+                fight.decreaseSu30MkiCount(1, id);
+            } else if (losses[i] == 9) {
+                fight.decreaseF22RaptorCount(1, id);
             }
         }
-        // fight.decreaseDeployedAircraftCountFromLosses(
-        //     attackerLosses.length,
-        //     attackerId
-        // );
-        // for (uint256 i; i < attackerLosses.length; i++) {
-        //     if (attackerLosses[i] == 1) {
-        //         fight.decreaseDeployedYak9Count(1, attackerId);
-        //     } else if (attackerLosses[i] == 2) {
-        //         fight.decreaseDeployedP51MustangCount(1, attackerId);
-        //     } else if (attackerLosses[i] == 3) {
-        //         fight.decreaseDeployedF86SabreCount(1, attackerId);
-        //     } else if (attackerLosses[i] == 4) {
-        //         fight.decreaseDeployedMig15Count(1, attackerId);
-        //     } else if (attackerLosses[i] == 5) {
-        //         fight.decreaseDeployedF100SuperSabreCount(1, attackerId);
-        //     } else if (attackerLosses[i] == 6) {
-        //         fight.decreaseDeployedF35LightningCount(1, attackerId);
-        //     } else if (attackerLosses[i] == 7) {
-        //         fight.decreaseDeployedF15EagleCount(1, attackerId);
-        //     } else if (attackerLosses[i] == 8) {
-        //         fight.decreaseDeployedSu30MkiCount(1, attackerId);
-        //     } else if (attackerLosses[i] == 9) {
-        //         fight.decreaseDeployedF22RaptorCount(1, attackerId);
-        //     }
-        // }
     }
 }
 
@@ -1096,7 +703,10 @@ contract FightersMarketplace1 is Ownable {
         nav = NavyContract(_navy);
     }
 
-    function settings2(address _bonusResources, address _navy2) public onlyOwner {
+    function settings2(
+        address _bonusResources,
+        address _navy2
+    ) public onlyOwner {
         bonusResources = _bonusResources;
         bonus = BonusResourcesContract(_bonusResources);
         navy2 = _navy2;
@@ -1498,16 +1108,16 @@ contract FightersMarketplace2 is Ownable {
     address public infrastructure;
     address public resources;
     address public improvements1;
-    uint256 public f35LightningCost = 35000 * (10**18);
+    uint256 public f35LightningCost = 35000 * (10 ** 18);
     uint256 public f35LightningRequiredInfrastructure = 600;
     uint256 public f35LightningRequiredTech = 255;
-    uint256 public f15EagleCost = 40000 * (10**18);
+    uint256 public f15EagleCost = 40000 * (10 ** 18);
     uint256 public f15EagleRequiredInfrastructure = 700;
     uint256 public f15EagleRequiredTech = 315;
-    uint256 public su30MkiCost = 45000 * (10**18);
+    uint256 public su30MkiCost = 45000 * (10 ** 18);
     uint256 public su30MkiRequiredInfrastructure = 850;
     uint256 public su30MkiRequiredTech = 405;
-    uint256 public f22RaptorCost = 50000 * (10**18);
+    uint256 public f22RaptorCost = 50000 * (10 ** 18);
     uint256 public f22RaptorRequiredInfrastructure = 1000;
     uint256 public f22RaptorRequiredTech = 500;
 
@@ -1652,11 +1262,7 @@ contract FightersMarketplace2 is Ownable {
         su30MkiRequiredTech = newTech;
     }
 
-    function getSU30MkiSpecs()
-        public
-        view
-        returns (uint256, uint256, uint256)
-    {
+    function getSU30MkiSpecs() public view returns (uint256, uint256, uint256) {
         return (
             su30MkiCost,
             su30MkiRequiredInfrastructure,

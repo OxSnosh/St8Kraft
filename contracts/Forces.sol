@@ -639,6 +639,9 @@ contract ForcesContract is Ownable {
         uint256 amountToDecrease
     ) public onlyAirBattle {
         uint256 defendingTanks = idToForces[id].defendingTanks;
+        if (amountToDecrease > 30) {
+            amountToDecrease = 30;
+        }
         if (amountToDecrease >= defendingTanks) {
             idToForces[id].numberOfTanks -= defendingTanks;
             idToForces[id].defendingTanks = 0;

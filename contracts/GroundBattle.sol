@@ -10,6 +10,7 @@ import "./Wonders.sol";
 import "./CountryMinter.sol";
 import "./Taxes.sol";
 import "./CountryParameters.sol";
+import "./Military.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
@@ -32,6 +33,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     address countryMinter;
     address taxes;
     address parameters;
+    address military;
 
     uint256[] public todaysGroundBattles;
 
@@ -46,6 +48,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     CountryMinter mint;
     TaxesContract tax;
     CountryParametersContract param;
+    MilitaryContract mil;
 
     struct GroundForcesToBattle {
         uint256 attackType;
@@ -116,7 +119,8 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         address _infrastructure,
         address _forces,
         address _treasury,
-        address _countryMinter
+        address _countryMinter,
+        address _military
     ) public onlyOwner {
         warAddress = _warAddress;
         war = WarContract(_warAddress);
@@ -128,6 +132,8 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         tsy = TreasuryContract(_treasury);
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
+        military = _military;
+        mil = MilitaryContract(_military);
     }
 
     function settings2(
@@ -383,6 +389,15 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         if (logisticalSupport) {
             mod += 10;
         }
+        //tanks
+        uint256 tankModifier = (tanksDeployed / 100);
+        if (tankModifier > 75) {
+            tankModifier = 75;
+        }
+        mod += tankModifier;
+        //defcon
+        uint256 defcon = mil.getDefconLevel(attackerId);
+        mod += ((5 - defcon) * 5);
         strength = ((strength * mod) / 100);
         return strength;
     }
@@ -418,21 +433,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         } else if (defenderId == warDefense) {
             attackerId = warOffense;
         }
-        uint256 officeOfPropagandaCount = imp3.getOfficeOfPropagandaCount(
-            attackerId
-        );
-        bool pentagon = won3.getPentagon(defenderId);
-        bool logisticalSupport = won4.getSuperiorLogisticalSupport(defenderId);
-        uint256 mod = 100;
-        if (officeOfPropagandaCount > 0) {
-            mod -= (5 * officeOfPropagandaCount);
-        }
-        if (pentagon) {
-            mod += 20;
-        }
-        if (logisticalSupport) {
-            mod += 10;
-        }
+        uint256 mod = getDefenderStrengthModifier(defenderId, attackerId);
         strength = ((strength * mod) / 100);
         return strength;
     }
@@ -446,6 +447,35 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         uint256 defendingSoldierEfficiency = ((defendingSoldiers *
             defendingEfficiencyModifier) / 100);
         return defendingSoldierEfficiency;
+    }
+
+    function getDefenderStrengthModifier(uint256 defenderId, uint256 attackerId) public view returns (uint256) {
+        uint256 mod = 100;
+        uint256 officeOfPropagandaCount = imp3.getOfficeOfPropagandaCount(
+            attackerId
+        );
+        bool pentagon = won3.getPentagon(defenderId);
+        bool logisticalSupport = won4.getSuperiorLogisticalSupport(defenderId);
+        if (officeOfPropagandaCount > 0) {
+            mod -= (5 * officeOfPropagandaCount);
+        }
+        if (pentagon) {
+            mod += 20;
+        }
+        if (logisticalSupport) {
+            mod += 10;
+        }
+        //infrastructure
+        uint256 infrastructureLevel = inf.getInfrastructureCount(defenderId);
+        uint256 infrastructureModifier = (infrastructureLevel / 100);
+        if (infrastructureModifier > 75) {
+            infrastructureModifier = 75;
+        }
+        mod += infrastructureModifier;
+        //defcon
+        uint256 defcon = mil.getDefconLevel(defenderId);
+        mod += ((5 - defcon) * 5);
+        return mod;
     }
 
     function fulfillRequest(uint256 battleId) public {
@@ -708,6 +738,10 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         if (attackerTankLosses > (defenderTankLosses / 2)) {
             attackerTankLosses = (defenderTankLosses / 2);
         }
+        // attackerSoldierLosses = ((attackerSoldierLosses * (100 - (5 * groundBattleIdToAttackerForces[battleId].techBonus)))/100);
+        // attackerTankLosses = ((attackerTankLosses * (100 - (5 * groundBattleIdToAttackerForces[battleId].techBonus)))/100);
+        // defenderSoldierLosses = ((defenderSoldierLosses * (100 - (5 * groundBattleIdToDefenderForces[battleId].techBonus)))/100);
+        // defenderTankLosses = ((defenderTankLosses * (100 - (5 * groundBattleIdToDefenderForces[battleId].techBonus)))/100);
         return (
             attackerSoldierLosses,
             attackerTankLosses,

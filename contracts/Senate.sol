@@ -194,8 +194,8 @@ contract SenateContract is ChainlinkClient, Ownable {
     }
 
     function completeElection(
-        bytes32 _requestId,
-        uint256 _orderId,
+        // bytes32 _requestId,
+        // uint256 _orderId,
         uint256[] memory winners,
         uint256 team,
         uint256 _epoch

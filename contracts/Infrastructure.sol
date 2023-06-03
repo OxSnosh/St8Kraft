@@ -655,6 +655,9 @@ contract InfrastructureContract is Ownable {
             100);
         uint256 infrastructureAmount = idToInfrastructure[countryId]
             .infrastructureCount;
+        if (damage >= 20) {
+            damage = 20;
+        }
         if (damage >= infrastructureAmount) {
             idToInfrastructure[countryId].infrastructureCount = 0;
         } else {
