@@ -85,8 +85,16 @@ const initiateSpyOperationTest = async () => {
 
     console.log("Spy Operation Test Initiated")
 
-    var message = "0" // nationId
-    var signature = await signer1.signMessage(message)
+    var nationId = {
+        "nationId" : 0
+    }
+    var nationIdString = JSON.stringify(nationId)
+    var signature = await signer1.signMessage(nationIdString)
+    var message = {
+        "nationId": nationId,
+        "signature": signature
+    } // nationId
+    var messageString = JSON.stringify(message)
     console.log("Signature: ", signature)
     
     var identityOne = await EthCrypto.createIdentity()
@@ -97,7 +105,7 @@ const initiateSpyOperationTest = async () => {
 
     const encrypted = await EthCrypto.encryptWithPublicKey(
         publicKey, // publicKey
-        signature // message
+        messageString // message
       );
     console.log("encrypted: ", encrypted)
     var cipherString = EthCrypto.cipher.stringify(encrypted);
@@ -111,9 +119,20 @@ const initiateSpyOperationTest = async () => {
     );
     console.log("decrypted: ", decrypted)
 
-    var signerAddress = await ethers.utils.verifyMessage(message, decrypted)
+    const parsedDecyptedMessage = JSON.parse(decrypted)
+    console.log("parsedDecyptedMessage: ", parsedDecyptedMessage)
+
+    var signerAddress = await ethers.utils.verifyMessage(JSON.stringify(parsedDecyptedMessage.nationId), parsedDecyptedMessage.signature)
     console.log("signerAddress: ", signerAddress)
     console.log("signer1Address: ", signer1Address)
+
+    var nationId = parsedDecyptedMessage.nationId
+    console.log("nationId: ", nationId.nationId)
+
+    // var signerAddress = await ethers.utils.verifyMessage(message, decrypted)
+    // //
+    // console.log("signerAddress: ", signerAddress)
+    // console.log("signer1Address: ", signer1Address)
 }
 
 initiateSpyOperationTest().catch((error) => {

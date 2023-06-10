@@ -1430,18 +1430,23 @@ async function main() {
           console.log(e);
         }
         contractMetadata = JSON.parse(contractMetadata);
-    
-        contractMetadata.HARDHAT = {
-          ...contractMetadata.HARDHAT,
-          countryminter: {
-            address: countryminter.address,
-            ABI: countryMinterAbi,
-          },
-          forcescontract: {
-            address: forcescontract.address,
-            ABI: forcesAbi,
-          },
-        };
+        
+        if(chainId == 31337) {
+            contractMetadata.HARDHAT = {
+                ...contractMetadata.HARDHAT,
+                countryminter: {
+                    address: countryminter.address,
+                    ABI: countryMinterAbi,
+                },
+                forcescontract: {
+                    address: forcescontract.address,
+                    ABI: forcesAbi,
+                },
+            };
+        }
+        // if(chainId == fantomTestnetChainId) {
+        
+        // }
         fs.writeFileSync(
           contractMetadataLocation,
           JSON.stringify(contractMetadata, null, 2)
