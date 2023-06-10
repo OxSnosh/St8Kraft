@@ -456,17 +456,17 @@ contract InfrastructureContract is Ownable {
         }
     }
 
-    ///@dev this is a public function only callable from the spy contract
-    ///@dev this function will increase a attacking nations land after a successful spy attack
-    ///@notice this function will increase an attacking nations land after a successful spy attack
-    ///@param countryId is the nation ID of the nation gaining technology
-    ///@param amount is the amount of land area being gained
-    function increaseLandCountFromSpyContract(
-        uint256 countryId,
-        uint256 amount
-    ) public onlySpyContract {
-        idToInfrastructure[countryId].landArea += amount;
-    }
+    // ///@dev this is a public function only callable from the spy contract
+    // ///@dev this function will increase a attacking nations land after a successful spy attack
+    // ///@notice this function will increase an attacking nations land after a successful spy attack
+    // ///@param countryId is the nation ID of the nation gaining technology
+    // ///@param amount is the amount of land area being gained
+    // function increaseLandCountFromSpyContract(
+    //     uint256 countryId,
+    //     uint256 amount
+    // ) public onlySpyContract {
+    //     idToInfrastructure[countryId].landArea += amount;
+    // }
 
     ///@dev this is a public view function that will retrun the amount of technology a nation has
     ///@notice this function will return the amount of technology a nation has
@@ -534,17 +534,17 @@ contract InfrastructureContract is Ownable {
         }
     }
 
-    ///@dev this is a public function that is only callable from the spy contract
-    ///@dev this function will increase an attacking nations tech after a succesful spy attack
-    ///@notice this function will increase a nations technology from a succesful spy attack
-    ///@param countryId is the nation ID of the attacking nation gaining tech from the attack
-    ///@param amount is the amount of tech being gained
-    function increaseTechCountFromSpyContract(
-        uint256 countryId,
-        uint256 amount
-    ) public onlySpyContract {
-        idToInfrastructure[countryId].technologyCount += amount;
-    }
+    // ///@dev this is a public function that is only callable from the spy contract
+    // ///@dev this function will increase an attacking nations tech after a succesful spy attack
+    // ///@notice this function will increase a nations technology from a succesful spy attack
+    // ///@param countryId is the nation ID of the attacking nation gaining tech from the attack
+    // ///@param amount is the amount of tech being gained
+    // function increaseTechCountFromSpyContract(
+    //     uint256 countryId,
+    //     uint256 amount
+    // ) public onlySpyContract {
+    //     idToInfrastructure[countryId].technologyCount += amount;
+    // }
 
     ///@dev this is a public view function that will return the amount of infrastructure for a nation
     ///@notice this function will return a nations infrastructure count
@@ -665,17 +665,17 @@ contract InfrastructureContract is Ownable {
         }
     }
 
-    ///@dev this is a public function only callable from the spy contract
-    ///@dev this function will decrease increase the amount of infrastructure for an attacker in a succesful spy attack
-    ///@notice this function will decrease increase the amount of infrastructure for an attacker in a succesful spy attack
-    ///@param countryId is the nation ID for the nation gaining infrastructure in the attack
-    ///@param amount is the amount of infrastructre being gained
-    function increaseInfrastructureCountFromSpyContract(
-        uint256 countryId,
-        uint256 amount
-    ) public onlySpyContract {
-        idToInfrastructure[countryId].infrastructureCount += amount;
-    }
+    // ///@dev this is a public function only callable from the spy contract
+    // ///@dev this function will decrease increase the amount of infrastructure for an attacker in a succesful spy attack
+    // ///@notice this function will decrease increase the amount of infrastructure for an attacker in a succesful spy attack
+    // ///@param countryId is the nation ID for the nation gaining infrastructure in the attack
+    // ///@param amount is the amount of infrastructre being gained
+    // function increaseInfrastructureCountFromSpyContract(
+    //     uint256 countryId,
+    //     uint256 amount
+    // ) public onlySpyContract {
+    //     idToInfrastructure[countryId].infrastructureCount += amount;
+    // }
 
     ///@dev this is a public view function that will return a nations tax rate at which they tax their citizens
     ///@notice this function will return the tax rate which a nation taxes their citizens at

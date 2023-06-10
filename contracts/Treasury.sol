@@ -523,16 +523,13 @@ contract TreasuryContract is Ownable {
 
     ///@dev this function is only callable from the spy contract
     ///@dev this function will allow the spy contract to transfer a nations balance to an attacking nation upon a successful spy attack
-    ///@param toId is the nation id of the nation recieving the balance (attacking nation)
-    ///@param fromId is the nation id of the nation recieving the balance (receiving nation)
+    ///@param id is the nation id of the nation recieving the balance (receiving nation)
     ///@param amount is the amount of balance being transferred
-    function transferBalance(
-        uint256 toId,
-        uint256 fromId,
+    function destroyBalance(
+        uint256 id,
         uint256 amount
     ) public onlySpyContract {
-        idToTreasury[toId].balance += amount;
-        idToTreasury[fromId].balance -= amount;
+        idToTreasury[id].balance -= amount;
     }
 
     ///@dev this is a public view function that will return if a nation is inactive
