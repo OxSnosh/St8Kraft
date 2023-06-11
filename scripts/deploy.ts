@@ -1419,6 +1419,12 @@ async function main() {
         let warArtifact = await artifacts.readArtifact("WarContract");
         let warAbi = warArtifact.abi;
 
+        let nationStrengthArtifact = await artifacts.readArtifact("NationStrengthContract")
+        let nationStrengthAbi = nationStrengthArtifact.abi;
+
+        let spyOperationArtifact = await artifacts.readArtifact("SpyOperationContract")
+        let spyOperationAbi = spyOperationArtifact.abi
+
         // Read Contract Metadata
         try {
           if (fs.existsSync(contractMetadataLocation)) {
@@ -1442,6 +1448,42 @@ async function main() {
                     address: forcescontract.address,
                     ABI: forcesAbi,
                 },
+                nationstrengthcontract: {
+                    address: nationstrengthcontract.address,
+                    ABI: nationStrengthAbi,
+                },
+                treasurycontract: {
+                    address: treasurycontract.address,
+                    ABI: treasuryAbi,
+                },
+                spyoperationscontract: {
+                    address: spyoperationscontract.address,
+                    ABI: spyOperationAbi,
+                }
+            };
+        } else if (chainId == 4002) {
+            contractMetadata.TESTNET = {
+                ...contractMetadata.TESTNET,
+                countryminter: {
+                    address: countryminter.address,
+                    ABI: countryMinterAbi,
+                },
+                forcescontract: {
+                    address: forcescontract.address,
+                    ABI: forcesAbi,
+                },
+                nationstrengthcontract: {
+                    address: nationstrengthcontract.address,
+                    ABI: nationStrengthAbi,
+                },
+                treasurycontract: {
+                    address: treasurycontract.address,
+                    ABI: treasuryAbi,
+                },
+                spyoperationscontract: {
+                    address: spyoperationscontract.address,
+                    ABI: spyOperationAbi,
+                }
             };
         }
         // if(chainId == fantomTestnetChainId) {

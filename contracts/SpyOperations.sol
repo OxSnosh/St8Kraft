@@ -162,7 +162,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         req.addUint("attackId", attackId);
         req.addUint("encryptedAttackerId", encryptedAttackerId);
         req.addUint("encryptedDefenderId", encryptedDefenderId);
-        req.addUint("encryptedAttackType", attackType);
+        req.addUint("attackType", attackType);
         req.addBytes("msgSender", abi.encodePacked(msg.sender));
         sendChainlinkRequestTo(oracleAddress, req, fee);
         attackId++;
@@ -309,7 +309,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
             encryptedAttackerIdOfRequest
         );
         req.addBytes("encryptedPayload", encryptedPayload);
-        req.addBytes("randomNumbers", abi.encodePacked(randomWords));
+        req.addBytes("randomNumber", abi.encodePacked(randomWords[0]));
         req.addUint("randomnessRequestId", _randomnessRequestId);
         sendChainlinkRequestTo(oracleAddress, req, fee);
         // uint256 requestNumber = s_requestIdToRequestIndex[requestId];
@@ -349,128 +349,147 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     //     return (attackerOdds, defenderOdds);
     // }
 
-    // function getAttackerSuccessScore(
-    //     uint256 countryId
-    // ) public view returns (uint256) {
-    //     uint256 spyCount = force.getSpyCount(countryId);
-    //     uint256 techAmount = inf.getTechnologyCount(countryId);
-    //     uint256 attackSuccessScore = (spyCount + (techAmount / 15));
-    //     bool cia = won1.getCentralIntelligenceAgency(countryId);
-    //     if (cia) {
-    //         attackSuccessScore = ((attackSuccessScore * 110) / 100);
-    //     }
-    //     bool accomodativeGovt = checkAccomodativeGovernment(countryId);
-    //     if (accomodativeGovt) {
-    //         attackSuccessScore = ((attackSuccessScore * 110) / 100);
-    //     }
-    //     return attackSuccessScore;
-    // }
+    function getAttackerSuccessScore(
+        uint256 countryId
+    ) public view returns (uint256) {
+        uint256 spyCount = force.getSpyCount(countryId);
+        uint256 techAmount = inf.getTechnologyCount(countryId);
+        uint256 attackSuccessScore = (spyCount + (techAmount / 15));
+        bool cia = won1.getCentralIntelligenceAgency(countryId);
+        if (cia) {
+            attackSuccessScore = ((attackSuccessScore * 110) / 100);
+        }
+        bool accomodativeGovt = checkAccomodativeGovernment(countryId);
+        if (accomodativeGovt) {
+            attackSuccessScore = ((attackSuccessScore * 110) / 100);
+        }
+        return attackSuccessScore;
+    }
 
-    // function checkAccomodativeGovernment(uint256 countryId)
-    //     public
-    //     view
-    //     returns (bool)
-    // {
-    //     uint256 government = params.getGovernmentType(
-    //         countryId
-    //     );
-    //     if (
-    //         government == 2 ||
-    //         government == 7 ||
-    //         government == 10
-    //     ) {
-    //         return true;
-    //     } else {
-    //         return false;
-    //     }
-    // }
+    function checkAccomodativeGovernment(uint256 countryId)
+        public
+        view
+        returns (bool)
+    {
+        uint256 government = params.getGovernmentType(
+            countryId
+        );
+        if (
+            government == 2 ||
+            government == 7 ||
+            government == 10
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-    // function getDefenseSuccessScore(
-    //     uint256 countryId
-    // ) public view returns (uint256) {
-    //     uint256 spyCount = force.getSpyCount(countryId);
-    //     uint256 techAmount = inf.getTechnologyCount(countryId);
-    //     uint256 landAmount = inf.getLandCount(countryId);
-    //     uint256 threatLevel = mil.getThreatLevel(countryId);
-    //     uint256 defenseSuccessScoreGross = (spyCount +
-    //         (techAmount / 20) +
-    //         (landAmount / 70));
-    //     uint256 defenseSuccessScore;
-    //     if (threatLevel == 1) {
-    //         defenseSuccessScore = ((defenseSuccessScoreGross * 75) / 100);
-    //     } else if (threatLevel == 2) {
-    //         defenseSuccessScore = ((defenseSuccessScoreGross * 90) / 100);
-    //     } else if (threatLevel == 3) {
-    //         defenseSuccessScore = defenseSuccessScoreGross;
-    //     } else if (threatLevel == 4) {
-    //         defenseSuccessScore = ((defenseSuccessScoreGross * 110) / 100);
-    //     } else {
-    //         defenseSuccessScore = ((defenseSuccessScoreGross * 125) / 100);
-    //     }
-    //     return defenseSuccessScore;
-    // }
+    function getDefenseSuccessScore(
+        uint256 countryId
+    ) public view returns (uint256) {
+        uint256 spyCount = force.getSpyCount(countryId);
+        uint256 techAmount = inf.getTechnologyCount(countryId);
+        uint256 landAmount = inf.getLandCount(countryId);
+        uint256 threatLevel = mil.getThreatLevel(countryId);
+        uint256 defenseSuccessScoreGross = (spyCount +
+            (techAmount / 20) +
+            (landAmount / 70));
+        uint256 defenseSuccessScore;
+        if (threatLevel == 1) {
+            defenseSuccessScore = ((defenseSuccessScoreGross * 75) / 100);
+        } else if (threatLevel == 2) {
+            defenseSuccessScore = ((defenseSuccessScoreGross * 90) / 100);
+        } else if (threatLevel == 3) {
+            defenseSuccessScore = defenseSuccessScoreGross;
+        } else if (threatLevel == 4) {
+            defenseSuccessScore = ((defenseSuccessScoreGross * 110) / 100);
+        } else {
+            defenseSuccessScore = ((defenseSuccessScoreGross * 125) / 100);
+        }
+        return defenseSuccessScore;
+    }
+
+    event spyAttackThwart(
+        uint256 indexed attackId,
+        uint256 indexed decryptedAttackerId,
+        uint256 indexed defenderId
+    );
 
     function completeSpyAttack(
+        bool success,
+        uint256 _attackId,
+        uint256 decryptedAttackerId,
         uint256 defenderId,
         uint256 attackType,
-        uint256 _randomnessRequestId
+        uint256 _randomnessRequestId,
+        bool valid
     ) public {
-        if (attackType == 1) {
-            // uint256 cost = (200000 + (defenderStrength * 2));
-            // tsy.spendBalance(attackerId, cost);
-            gatherIntelligence();
-        } else if (attackType == 2) {
-            // uint256 cost = ((100000 + defenderStrength) * (10 ** 18));
-            // tsy.spendBalance(attackerId, cost);
-            destroyCruiseMissiles(defenderId, _randomnessRequestId);
-        } else if (attackType == 3) {
-            // uint256 cost = (100000 + (defenderStrength * 2) * (10 ** 18));
-            // tsy.spendBalance(attackerId, cost);
-            destroyDefendingTanks(defenderId, _randomnessRequestId);
-        } else if (attackType == 4) {
-            // uint256 cost = (100000 + (defenderStrength * 3) * (10 ** 18));
-            // tsy.spendBalance(attackerId, cost);
-            captureLand(defenderId, _randomnessRequestId);
-        } else if (attackType == 5) {
-            // uint256 cost = (100000 + (defenderStrength * 3) * (10 ** 18));
-            // tsy.spendBalance(attackerId, cost);
-            changeDesiredGovernment(defenderId, _randomnessRequestId);
-        } else if (attackType == 6) {
-            // uint256 cost = (100000 + (defenderStrength * 3) * (10 ** 18));
-            // tsy.spendBalance(attackerId, cost);
-            changeDesiredReligion(defenderId, _randomnessRequestId);
-        } else if (attackType == 7) {
-            // uint256 cost = (150000 + (defenderStrength) * (10 ** 18));
-            // tsy.spendBalance(attackerId, cost);
-            changeThreatLevel(defenderId, _randomnessRequestId);
-        } else if (attackType == 8) {
-            // uint256 cost = (150000 + (defenderStrength * 5) * (10 ** 18));
-            // tsy.spendBalance(attackerId, cost);
-            changeDefconLevel(defenderId, _randomnessRequestId);
-        } else if (attackType == 9) {
-            // uint256 cost = (250000 + (defenderStrength * 2) * (10 ** 18));
-            // tsy.spendBalance(attackerId, cost);
-            destroySpies(defenderId, _randomnessRequestId);
-        } else if (attackType == 10) {
-            // uint256 cost = (300000 + (defenderStrength * 2) * (10 ** 18));
-            // tsy.spendBalance(attackerId, cost);
-            captueTechnology(defenderId, _randomnessRequestId);
-        } else if (attackType == 11) {
-            // uint256 cost = (100000 + (defenderStrength * 20) * (10 ** 18));
-            // tsy.spendBalance(attackerId, cost);
-            sabotogeTaxes(defenderId, _randomnessRequestId);
-        } else if (attackType == 12) {
-            // uint256 cost = (300000 + (defenderStrength * 15) * (10 ** 18));
-            // tsy.spendBalance(attackerId, cost);
-            destroyMoneyReserves(defenderId);
-        } else if (attackType == 13) {
-            // uint256 cost = (500000 + (defenderStrength * 5) * (10 ** 18));
-            // tsy.spendBalance(attackerId, cost);
-            captureInfrastructure(defenderId, _randomnessRequestId);
-        } else {
-            // uint256 cost = (500000 + (defenderStrength * 15) * (10 ** 18));
-            // tsy.spendBalance(attackerId, cost);
-            destroyNukes(defenderId);
+        require (valid, "invalid attack");
+        if (!success) {
+            emit spyAttackThwart(
+                _attackId,
+                decryptedAttackerId,
+                defenderId
+            );
+        } else if (success) {
+            if (attackType == 1) {
+                // uint256 cost = (200000 + (defenderStrength * 2));
+                // tsy.spendBalance(attackerId, cost);
+                gatherIntelligence();
+            } else if (attackType == 2) {
+                // uint256 cost = ((100000 + defenderStrength) * (10 ** 18));
+                // tsy.spendBalance(attackerId, cost);
+                destroyCruiseMissiles(defenderId, _randomnessRequestId);
+            } else if (attackType == 3) {
+                // uint256 cost = (100000 + (defenderStrength * 2) * (10 ** 18));
+                // tsy.spendBalance(attackerId, cost);
+                destroyDefendingTanks(defenderId, _randomnessRequestId);
+            } else if (attackType == 4) {
+                // uint256 cost = (100000 + (defenderStrength * 3) * (10 ** 18));
+                // tsy.spendBalance(attackerId, cost);
+                captureLand(defenderId, _randomnessRequestId);
+            } else if (attackType == 5) {
+                // uint256 cost = (100000 + (defenderStrength * 3) * (10 ** 18));
+                // tsy.spendBalance(attackerId, cost);
+                changeDesiredGovernment(defenderId, _randomnessRequestId);
+            } else if (attackType == 6) {
+                // uint256 cost = (100000 + (defenderStrength * 3) * (10 ** 18));
+                // tsy.spendBalance(attackerId, cost);
+                changeDesiredReligion(defenderId, _randomnessRequestId);
+            } else if (attackType == 7) {
+                // uint256 cost = (150000 + (defenderStrength) * (10 ** 18));
+                // tsy.spendBalance(attackerId, cost);
+                changeThreatLevel(defenderId, _randomnessRequestId);
+            } else if (attackType == 8) {
+                // uint256 cost = (150000 + (defenderStrength * 5) * (10 ** 18));
+                // tsy.spendBalance(attackerId, cost);
+                changeDefconLevel(defenderId, _randomnessRequestId);
+            } else if (attackType == 9) {
+                // uint256 cost = (250000 + (defenderStrength * 2) * (10 ** 18));
+                // tsy.spendBalance(attackerId, cost);
+                destroySpies(defenderId, _randomnessRequestId);
+            } else if (attackType == 10) {
+                // uint256 cost = (300000 + (defenderStrength * 2) * (10 ** 18));
+                // tsy.spendBalance(attackerId, cost);
+                captueTechnology(defenderId, _randomnessRequestId);
+            } else if (attackType == 11) {
+                // uint256 cost = (100000 + (defenderStrength * 20) * (10 ** 18));
+                // tsy.spendBalance(attackerId, cost);
+                sabotogeTaxes(defenderId, _randomnessRequestId);
+            } else if (attackType == 12) {
+                // uint256 cost = (300000 + (defenderStrength * 15) * (10 ** 18));
+                // tsy.spendBalance(attackerId, cost);
+                destroyMoneyReserves(defenderId);
+            } else if (attackType == 13) {
+                // uint256 cost = (500000 + (defenderStrength * 5) * (10 ** 18));
+                // tsy.spendBalance(attackerId, cost);
+                captureInfrastructure(defenderId, _randomnessRequestId);
+            } else {
+                // uint256 cost = (500000 + (defenderStrength * 15) * (10 ** 18));
+                // tsy.spendBalance(attackerId, cost);
+                destroyNukes(defenderId);
+            }
         }
     }
 
