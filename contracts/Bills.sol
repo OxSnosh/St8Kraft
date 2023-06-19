@@ -422,6 +422,10 @@ contract BillsContract is Ownable {
         if (oil) {
             tankUpkeepModifier -= 10;
         }
+        bool lead = res.viewLead(id);
+        if (lead) {
+            tankUpkeepModifier -= 8;
+        }
         bool logisticalSupport = won4.getSuperiorLogisticalSupport(id);
         if (logisticalSupport) {
             tankUpkeepModifier -= 20;

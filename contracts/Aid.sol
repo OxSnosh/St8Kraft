@@ -62,7 +62,7 @@ contract AidContract is Ownable {
     // mapping(uint256 => uint256) public idToAidSlots;
     mapping(uint256 => Proposal) public idToProposal;
 
-    mapping(uint256 => mapping(uint256 => uint256)) public idToAidProposalsLast10Days;
+    mapping(uint256 => mapping(uint256 => uint256[])) public idToAidProposalsLast10Days;
 
     /// @dev this function is only callable from the owner
     function updateCountryMinterAddress(address _newAddress) public onlyOwner {
@@ -135,7 +135,7 @@ contract AidContract is Ownable {
         bool availableAidSlot = checkAidSlots(idSender);
         require(availableAidSlot, "aid slot not available");
         uint256 day = keep.getGameDay();
-        idToAidProposalsLast10Days[idSender][day] += 1;
+        idToAidProposalsLast10Days[idSender][day].push(aidProposalId);
         bool aidAvailable = checkAvailability(idSender, techAid, balanceAid, soldiersAid);
         require (aidAvailable, "aid not available");
         uint256 maxTech = 100;
@@ -236,7 +236,7 @@ contract AidContract is Ownable {
         uint256 proposalsLast10Days = 0;
         for (uint256 i = 0; i < 10; i++) {
             uint256 dayToCheck = day - i;
-            proposalsLast10Days += idToAidProposalsLast10Days[id][dayToCheck];
+            proposalsLast10Days += idToAidProposalsLast10Days[id][dayToCheck].length;
         }
         return proposalsLast10Days;
     }

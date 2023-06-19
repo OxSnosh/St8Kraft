@@ -12,7 +12,7 @@ contract MetaNationsGovToken is ERC20, Ownable {
 
     /// @param initialSupply is the initial supply minted of MetaNationsGovToekn
     /// @dev the initialSupply is minted to the deployer of the contract
-    constructor(uint256 initialSupply) ERC20("MetaNationsGovToken", "MNT") {
+    constructor(uint256 initialSupply) ERC20("MetaNations Governance Token", "MNT") {
         _mint(msg.sender, initialSupply);
     }
 }

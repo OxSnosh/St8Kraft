@@ -7,6 +7,7 @@ import "./Forces.sol";
 import "./Wonders.sol";
 import "./CountryMinter.sol";
 import "./Infrastructure.sol";
+import "./Resources.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
@@ -743,6 +744,7 @@ contract ImprovementsContract2 is Ownable {
     address public forces;
     address public wonders1;
     address public countryMinter;
+    address public resources;
     uint256 public foreignMinistryCost = 120000 * (10 ** 18);
     uint256 public forwardOperatingBaseCost = 125000 * (10 ** 18);
     uint256 public guerillaCampCost = 20000 * (10 ** 18);
@@ -755,6 +757,7 @@ contract ImprovementsContract2 is Ownable {
     WondersContract1 won1;
     CountryMinter mint;
     TreasuryContract tres;
+    ResourcesContract res;
 
     struct Improvements2 {
         //Foreign Ministry
@@ -821,7 +824,8 @@ contract ImprovementsContract2 is Ownable {
         address _forces,
         address _wonders1,
         address _countryMinter,
-        address _improvements1
+        address _improvements1,
+        address _resources
     ) public onlyOwner {
         treasury = _treasury;
         tres = TreasuryContract(_treasury);
@@ -831,6 +835,8 @@ contract ImprovementsContract2 is Ownable {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
         improvements1 = _improvements1;
+        resources = _resources;
+        res = ResourcesContract(_resources);
     }
 
     modifier onlyCountryMinter() {
@@ -1204,6 +1210,11 @@ contract ImprovementsContract2 is Ownable {
                 "Cannot delete a drydock if it supports a harbor"
             );
             //need a requirement that it cannot be deleted if it supports a trade agreement
+            uint256[] memory partners = res.getTradingPartners(countryId);
+            require(
+                partners.length <= 4,
+                "Cannot delete, harbor supports a trade"
+            );
             idToImprovements2[countryId].harborCount -= amount;
             uint256 existingImprovementTotal = ImprovementsContract1(
                 improvements1
@@ -1220,6 +1231,7 @@ contract ImprovementsContract2 is Ownable {
             uint256 existingImprovementTotal = ImprovementsContract1(
                 improvements1
             ).getImprovementCount(countryId);
+
             uint256 newImprovementTotal = existingImprovementTotal -= amount;
             ImprovementsContract1(improvements1).updateImprovementCount(
                 countryId,
@@ -1240,7 +1252,7 @@ contract ImprovementsContract2 is Ownable {
             }
             require(
                 spyCount <= (baseSpyCount + (newIntelAgencyCount * 100)),
-                "You have too many spies, each intel agency supports 100 spies"
+                "You have too many spies to delete, each intel agency supports 100 spies"
             );
             idToImprovements2[countryId].intelligenceAgencyCount -= amount;
             uint256 existingImprovementTotal = ImprovementsContract1(
@@ -1378,6 +1390,7 @@ contract ImprovementsContract4 is Ownable {
     address public improvements2;
     address public forces;
     address public countryMinter;
+    address public wonders4;
     uint256 public missileDefenseCost = 90000 * (10 ** 18);
     uint256 public munitionsFactoryCost = 200000 * (10 ** 18);
     uint256 public navalAcademyCost = 300000 * (10 ** 18);
@@ -1387,6 +1400,7 @@ contract ImprovementsContract4 is Ownable {
     ImprovementsContract2 imp2;
     CountryMinter mint;
     TreasuryContract tres;
+    WondersContract4 won4;
 
     struct Improvements4 {
         //Missile Defense
@@ -1428,7 +1442,8 @@ contract ImprovementsContract4 is Ownable {
         address _forces,
         address _improvements1,
         address _improvements2,
-        address _countryMinter
+        address _countryMinter,
+        address _wonders4
     ) public onlyOwner {
         treasury = _treasury;
         tres = TreasuryContract(_treasury);
@@ -1438,6 +1453,8 @@ contract ImprovementsContract4 is Ownable {
         imp2 = ImprovementsContract2(_improvements2);
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
+        wonders4 = _wonders4;
+        won4 = WondersContract4(_wonders4);
     }
 
     modifier onlyCountryMinter() {
@@ -1655,6 +1672,14 @@ contract ImprovementsContract4 is Ownable {
                 .missileDefenseCount;
             require((existingCount - amount) >= 0, "Cannot delete that many");
             //cannot delete below 3 if strategic defense init
+            bool strategicDefenseInitiative = won4
+                .getStrategicDefenseInitiative(countryId);
+            if (strategicDefenseInitiative) {
+                require(
+                    (existingCount - amount) >= 3,
+                    "Cannot delete if Strategic Defense Initiative owned"
+                );
+            }
             idToImprovements4[countryId].missileDefenseCount -= amount;
             uint256 existingImprovementTotal = ImprovementsContract1(
                 improvements1

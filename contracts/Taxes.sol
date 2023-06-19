@@ -477,6 +477,11 @@ contract TaxesContract is Ownable {
         if (stadiums > 0) {
             pointsFromImprovements += (3 * stadiums);
         }
+        uint256 taxRate = inf.getTaxRate(id);
+        uint256 intelAgencies = imp2.getIntelAgencyCount(id);
+        if (taxRate >= 23) {
+            pointsFromImprovements += intelAgencies;
+        }
         return pointsFromImprovements;
     }
 

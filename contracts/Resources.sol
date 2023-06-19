@@ -66,7 +66,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         bool gems;
         //Gems
         //DONE //Increases citizen's daily income +$1.50
-        //DONE //and increases population happiness +2.5.
+        //DONE //and increases population happiness +3.
         bool gold;
         //Gold
         //DONE //Increases citizen's daily income +$3.00
@@ -82,7 +82,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         //DONE //Lowers cruise missile and nuclear weapon purchase cost and upkeep cost -20%,
         //DONE //lowers aircraft upkeep cost -25%,
         //lowers tank purchase and upkeep costs -8%,
-        //DONE //lowers soldier upkeep cost -$0.50,
+        //DONE //lowers soldier upkeep cost -15%,
         //DONE //reduces environment penalties for owning nuclear weapons by 50%,
         //DONE //and lowers all navy vessel upkeep cost -20%.
         bool lumber;
@@ -98,7 +98,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         bool oil;
         //Oil
         //DONE //Lowers soldier purchase cost -$3.00,
-        //DONE //increases population happiness +1.5,
+        //DONE //increases population happiness +2,
         //DONE //increases soldier efficiency +10%,
         //DONE //lowers tank upkeep cost -5%,
         //DONE //lowers aircraft purchase cost -4%,
@@ -108,7 +108,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         //Pigs
         //DONE //Lowers soldier upkeep cost -$0.50,
         //DONE //increases soldier efficiency +15%,
-        //DONE //and increases number of citizens +3.5%.
+        //DONE //and increases number of citizens +4%.
         bool rubber;
         //Rubber
         //DONE //Increases purchased land area of a nation by 20%,
@@ -131,8 +131,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         bool uranium;
         //Uranium
         //DONE //Reduces infrastructure upkeep cost -3%.
-        //DONE //Allow nations to develop nuclear weapons only if that nation's government preference
-        //supports nuclear weapons.
+        //DONE //Allow nations to develop nuclear weapons
         //If a nations government preference favors nuclear technology for the use of nuclear
         //power plants but does not support nuclear weapons then the nation will receive +$3.00
         //per citizen and +$0.15 for every level of tech purchased up to level 30 but loses -1
@@ -143,7 +142,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         bool water;
         //Water
         //DONE //Increases number of citizens per mile before population unhappiness by 50,
-        //DONE //increases population happiness +2.5,
+        //DONE //increases population happiness +3,
         //DONE //and improves a nation's environment by 1.
         bool wheat;
         //Wheat

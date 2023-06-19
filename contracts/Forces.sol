@@ -575,6 +575,10 @@ contract ForcesContract is Ownable {
         if (factoryCount > 0) {
             costModifier -= (factoryCount * 5);
         }
+        bool lead = res.viewLead(id);
+        if (lead) {
+            costModifier -= 8;
+        }
         uint256 cost = ((purchasePrice * costModifier) / 100);
         return cost;
     }

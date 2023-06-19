@@ -581,6 +581,12 @@ contract InfrastructureContract is Ownable {
     ) public onlyCruiseMissileContract {
         uint256 infrastructureAmount = idToInfrastructure[countryId]
             .infrastructureCount;
+        uint256 damagePercentage = 100;
+        uint256 bunkerCount = imp1.getBunkerCount(countryId);
+        if (bunkerCount > 0) {
+            damagePercentage -= (bunkerCount * 3);
+        }
+        amountToDecrease = ((amountToDecrease * damagePercentage) / 100);
         if (amountToDecrease >= infrastructureAmount) {
             idToInfrastructure[countryId].infrastructureCount = 0;
         } else {
