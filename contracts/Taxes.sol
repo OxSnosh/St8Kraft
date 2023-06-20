@@ -12,6 +12,7 @@ import "./Military.sol";
 import "./Crime.sol";
 import "./CountryMinter.sol";
 import "./KeeperFile.sol";
+import "./Environment.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
@@ -37,6 +38,7 @@ contract TaxesContract is Ownable {
     address public additionalTaxes;
     address public bonusResources;
     address public keeper;
+    address public environment;
 
     InfrastructureContract inf;
     TreasuryContract tsy;
@@ -56,6 +58,7 @@ contract TaxesContract is Ownable {
     CountryMinter mint;
     BonusResourcesContract bonus;
     KeeperContract keep;
+    EnvironmentContract env;
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -68,7 +71,8 @@ contract TaxesContract is Ownable {
         address _improvements3,
         address _additionalTaxes,
         address _bonusResources,
-        address _keeper
+        address _keeper,
+        address _environment
     ) public onlyOwner {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
@@ -88,6 +92,8 @@ contract TaxesContract is Ownable {
         bonus = BonusResourcesContract(_bonusResources);
         keeper = _keeper;
         keep = KeeperContract(_keeper);
+        environment = _environment;
+        env = EnvironmentContract(_environment);
     }
 
     ///@dev this function is only callable by the contract owner
@@ -330,13 +336,15 @@ contract TaxesContract is Ownable {
         );
         uint256 pointsFromIntelAgencies = getPointsFromIntelAgencies(id);
         uint256 pointsFromPeaceMode = addTax.getPointsFromPeaceMode(id);
-        uint256 happinessPointsToSubtract = (50 -
+        uint256 environmentPoints = env.getEnvironmentScore(id);
+        uint256 happinessPointsToSubtract = (60 -
             taxRatePoints -
             pointsFromCrime -
             pointsFromImprovements -
             pointsFromStability -
             pointsFromIntelAgencies -
-            pointsFromPeaceMode );
+            pointsFromPeaceMode -
+            environmentPoints );
         return happinessPointsToSubtract;
     }
 

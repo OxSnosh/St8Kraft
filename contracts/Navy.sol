@@ -647,10 +647,10 @@ contract NavyContract is Ownable {
         uint256 landingShipCount = idToNavy[defenderId].landingShipCount;
         uint256 cruiserCount = idToNavy[defenderId].cruiserCount;
         uint256 frigateCount = navy2.getFrigateCount(defenderId);
-        uint256 percentage = 25;
+        uint256 percentage = 40;
         bool falloutShelter = won1.getFalloutShelterSystem(defenderId);
         if (falloutShelter) {
-            percentage = 12;
+            percentage = 20;
         }
         idToNavy[defenderId].corvetteCount -= ((corvetteCount * percentage) /
             100);

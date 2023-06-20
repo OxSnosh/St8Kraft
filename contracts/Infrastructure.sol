@@ -762,6 +762,10 @@ contract InfrastructureContract is Ownable {
     function getTotalPopulationCount(uint256 id) public view returns (uint256) {
         uint256 infra = getInfrastructureCount(id);
         uint256 populationBaseCount = (infra * 8);
+        bool agricultureDevelopment = won1.getAgriculturalDevelopmentProgram(id);
+        if(agricultureDevelopment) {
+            populationBaseCount = (infra * 9);
+        }
         uint256 populationModifier = 100;
         bool cattle = res.viewCattle(id);
         if (cattle) {

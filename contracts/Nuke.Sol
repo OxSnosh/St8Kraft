@@ -198,6 +198,10 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         } else {
             require(attackType <= 4, "invalid attack type");
         }
+        uint256 tech = inf.getTechnologyCount(attackerId);
+        if (attackType == 2 || attackType == 3 || attackType == 4) {
+            require (tech >= 5000, "emp attacks require a nation to have 5,000 tech");
+        }
         NukeAttack memory newAttack = NukeAttack(
             warId,
             attackerId,

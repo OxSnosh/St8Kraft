@@ -450,6 +450,12 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         fighterLoss.decrementLosses(attackerFighterCasualties, attackerId);
         bomber.decrementBomberLosses(attackerBomberCasualties, attackerId);
         fighterLoss.decrementLosses(defenderFighterCasualties, defenderId);
+        bool antiAir = won1.getAntiAirDefenseNewtwork(defenderId);
+        if(antiAir) {
+            infrastructureDamage = ((infrastructureDamage * 60) / 100);
+            tankDamage = ((tankDamage * 60) / 100);
+            cruiseMissileDamage = ((cruiseMissileDamage * 60) / 100);
+        }
         inf.decreaseInfrastructureCountFromAirBattleContract(
             defenderId,
             infrastructureDamage

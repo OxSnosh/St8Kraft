@@ -1790,6 +1790,8 @@ contract ImprovementsContract3 is Ownable {
     address public navy;
     address public additionalNavy;
     address public countryMinter;
+    address public bonusResources;
+    address public wonder4;
     uint256 public officeOfPropagandaCost = 200000 * (10 ** 18);
     uint256 public policeHeadquartersCost = 75000 * (10 ** 18);
     uint256 public prisonCost = 200000 * (10 ** 18);
@@ -1804,6 +1806,8 @@ contract ImprovementsContract3 is Ownable {
 
     CountryMinter mint;
     TreasuryContract tres;
+    BonusResourcesContract bonus;
+    WondersContract4 won4;
 
     struct Improvements3 {
         //Office of Propoganda
@@ -1884,7 +1888,9 @@ contract ImprovementsContract3 is Ownable {
         address _additionalNavy,
         address _improvements1,
         address _improvements2,
-        address _countryMinter
+        address _countryMinter,
+        address _bonusResources,
+        address _wonder4
     ) public onlyOwner {
         treasury = _treasury;
         tres = TreasuryContract(_treasury);
@@ -1893,6 +1899,10 @@ contract ImprovementsContract3 is Ownable {
         improvements2 = _improvements2;
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
+        bonusResources = _bonusResources;
+        bonus = BonusResourcesContract(_bonusResources);
+        wonder4 = _wonder4;
+        won4 = WondersContract4(_wonder4);
     }
 
     modifier onlyCountryMinter() {
@@ -1903,29 +1913,29 @@ contract ImprovementsContract3 is Ownable {
         _;
     }
 
-    ///@dev this function is only callable by the contract owner
-    function updateTreasuryAddress(address _treasury) public onlyOwner {
-        treasury = _treasury;
-    }
+    // ///@dev this function is only callable by the contract owner
+    // function updateTreasuryAddress(address _treasury) public onlyOwner {
+    //     treasury = _treasury;
+    // }
 
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementContract1Address(
-        address _improvements1
-    ) public onlyOwner {
-        improvements1 = _improvements1;
-    }
+    // ///@dev this function is only callable by the contract owner
+    // function updateImprovementContract1Address(
+    //     address _improvements1
+    // ) public onlyOwner {
+    //     improvements1 = _improvements1;
+    // }
 
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementContract2Address(
-        address _improvements2
-    ) public onlyOwner {
-        improvements2 = _improvements2;
-    }
+    // ///@dev this function is only callable by the contract owner
+    // function updateImprovementContract2Address(
+    //     address _improvements2
+    // ) public onlyOwner {
+    //     improvements2 = _improvements2;
+    // }
 
-    ///@dev this function is only callable by the contract owner
-    function updateNavyContractAddress(address _navy) public onlyOwner {
-        navy = _navy;
-    }
+    // ///@dev this function is only callable by the contract owner
+    // function updateNavyContractAddress(address _navy) public onlyOwner {
+    //     navy = _navy;
+    // }
 
     ///@dev this function is only callable by the countryMinter contract
     ///@dev this function will initialize the struct to store the info about the minted nations improvements
@@ -2155,7 +2165,11 @@ contract ImprovementsContract3 is Ownable {
                 (existingCount + amount) <= bunkerAmount,
                 "Must own a bunker for each radiation containment chamber"
             );
-            //require maintaining radiation cleanup bonus resource
+            bool radiationCleanup = bonus.viewRadiationCleanup(countryId);
+            require(
+                radiationCleanup,
+                "nation must possess radiation cleanup bonus resource to purchase"
+            );
             idToImprovements3[countryId]
                 .radiationContainmentChamberCount += amount;
             uint256 existingImprovementTotal = ImprovementsContract1(
@@ -2391,7 +2405,15 @@ contract ImprovementsContract3 is Ownable {
         } else if (improvementId == 7) {
             uint256 existingCount = idToImprovements3[countryId].satelliteCount;
             require((existingCount - amount) >= 0, "Cannot delete that many");
-            //cannot delete below 3 if strategic defense init
+            bool strategicDefense = won4.getStrategicDefenseInitiative(
+                countryId
+            );
+            if (strategicDefense) {
+                require(
+                    (existingCount - amount) >= 3,
+                    "must maintain 3 satellites with strategic defense initiative"
+                );
+            }
             idToImprovements3[countryId].satelliteCount -= amount;
             uint256 existingImprovementTotal = ImprovementsContract1(
                 improvements1
