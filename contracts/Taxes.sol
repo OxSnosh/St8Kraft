@@ -753,7 +753,7 @@ contract TaxesContract is Ownable {
     function getPointsFromMilitary(uint256 id) public view returns (uint256) {
         (uint256 ratio, , ) = soldierToPopulationRatio(id);
         uint256 pointsFromMilitaryToSubtract;
-        if (ratio > 80) {
+        if (ratio > 70) {
             //unsure about this number
             pointsFromMilitaryToSubtract = 10;
         }

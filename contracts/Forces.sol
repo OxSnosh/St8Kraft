@@ -213,7 +213,7 @@ contract ForcesContract is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         uint256 populationCount = inf.getTotalPopulationCount(0);
-        uint256 maxSoldierCount = ((populationCount * 70) / 100);
+        uint256 maxSoldierCount = ((populationCount * 80) / 100);
         uint256 currentSoldierCount = idToForces[id].numberOfSoldiers;
         require(
             (currentSoldierCount + amount) <= maxSoldierCount,

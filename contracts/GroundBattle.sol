@@ -411,7 +411,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             attackerId
         );
         uint256 attackingEfficiencyModifier = force
-            .getDefendingSoldierEfficiencyModifier(attackerId);
+            .getDeployedSoldierEfficiencyModifier(attackerId);
         uint256 attackingSoldierEfficiency = ((attackingSoldiers *
             attackingEfficiencyModifier) / 100);
         return attackingSoldierEfficiency;

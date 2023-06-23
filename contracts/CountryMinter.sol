@@ -2,6 +2,7 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./IWarBucks.sol";
 import "./CountryParameters.sol";
@@ -22,7 +23,10 @@ import "./Senate.sol";
 ///@author OxSnosh
 ///@notice this is the contract that will allow the user to mint a nation!
 contract CountryMinter is ERC721, Ownable {
-    uint256 public countryId = 0;
+    using Counters for Counters.Counter;
+    Counters.Counter public _countryId;
+
+    // uint256 public countryId = 0;
     address public countryParameters;
     address public infrastructure;
     address public resources;
@@ -60,7 +64,7 @@ contract CountryMinter is ERC721, Ownable {
     );
 
     constructor (
-    ) ERC721("MetaNations", "MNFT") {
+    ) ERC721 ("MetaNations NFT", "MNFT") {
     }
 
     ///@dev this function is only callable by the contract owner
@@ -144,10 +148,12 @@ contract CountryMinter is ERC721, Ownable {
         string memory capitalCity,
         string memory nationSlogan
     ) public {
+        uint256 countryId = _countryId.current();
         require(
             ownerCountryCount[msg.sender] == 0,
             "Wallet already contains a country"
         );
+        _mint(msg.sender, countryId);
         AidContract(aid).initiateAid(countryId, msg.sender);
         BombersContract(bombers).generateBombers(countryId);
         CountryParametersContract(countryParameters).generateCountryParameters(
@@ -178,7 +184,7 @@ contract CountryMinter is ERC721, Ownable {
         WondersContract4(wonders4).generateWonders4(countryId);
         idToOwner[countryId] = msg.sender;
         ownerCountryCount[msg.sender]++;
-        countryId++;
+        _countryId.increment();
         emit nationCreated(msg.sender, nationName, ruler);
     }
 
@@ -197,7 +203,12 @@ contract CountryMinter is ERC721, Ownable {
     ///@dev this function will return the current country Id that gets incremented every time a county is minted
     ///@return uint256 will be number of countries minted
     function getCountryCount() public view returns (uint256) {
-        uint256 countryCount = countryId;
+        uint256 countryCount = _countryId.current();
         return countryCount;
+    }
+
+    function isApprovedOrOwner(uint256 tokenId, address caller) public view returns (bool) {
+        bool owner = _isApprovedOrOwner(caller, tokenId);
+        return owner;
     }
 }
