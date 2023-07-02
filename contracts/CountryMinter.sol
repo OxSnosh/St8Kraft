@@ -64,7 +64,7 @@ contract CountryMinter is ERC721, Ownable {
     );
 
     constructor (
-    ) ERC721 ("MetaNations NFT", "MNFT") {
+    ) ERC721 ("MetaNations NFTs", "MNFT") {
     }
 
     ///@dev this function is only callable by the contract owner
@@ -149,10 +149,6 @@ contract CountryMinter is ERC721, Ownable {
         string memory nationSlogan
     ) public {
         uint256 countryId = _countryId.current();
-        require(
-            ownerCountryCount[msg.sender] == 0,
-            "Wallet already contains a country"
-        );
         _mint(msg.sender, countryId);
         AidContract(aid).initiateAid(countryId, msg.sender);
         BombersContract(bombers).generateBombers(countryId);
@@ -207,8 +203,8 @@ contract CountryMinter is ERC721, Ownable {
         return countryCount;
     }
 
-    function isApprovedOrOwner(uint256 tokenId, address caller) public view returns (bool) {
-        bool owner = _isApprovedOrOwner(caller, tokenId);
+    function isOwner(uint256 nationId, address caller) public view returns (bool) {
+        bool owner = _isApprovedOrOwner(caller, nationId);
         return owner;
     }
 }

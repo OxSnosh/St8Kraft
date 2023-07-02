@@ -10,19 +10,66 @@ import "./Navy.sol";
 import "./CountryParameters.sol";
 import "./Military.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/KeeperCompatibleInterface.sol";
 
 ///@title KeeperContract
 ///@author OxSnosh
-///@dev this contract will allow the chainlink keeper to maintain the game clock that resets everal parameters daily
-contract KeeperContract is Ownable {
+///@dev this contract will allow the chainlink keeper to maintain the game clock that increments daily
+contract KeeperContract is Ownable, KeeperCompatibleInterface {
     uint256 public gameDay;
+    uint public interval;
+    uint public lastTimeStamp;
+    address public keeperRegistry;
 
-    function incrementGameDay() public {
+    constructor(uint updateInterval, address _keeperRegistry) {
+        interval = updateInterval;
+        lastTimeStamp = block.timestamp;
+        keeperRegistry = _keeperRegistry;
+        gameDay = 0;
+    }
+
+    function checkUpkeep(
+        bytes calldata /* checkData */
+    )
+        external
+        view
+        override
+        returns (bool upkeepNeeded, bytes memory /* performData */)
+    {
+        upkeepNeeded = (block.timestamp - lastTimeStamp) > interval;
+        return (upkeepNeeded, "");
+    }
+
+    function performUpkeep(bytes calldata /* performData */) external override onlyKeeper {
+        if ((block.timestamp - lastTimeStamp) > interval) {
+            lastTimeStamp = lastTimeStamp + interval;
+            gameDay++;
+        }
+    }
+
+    function incrementGameDay() public onlyOwner {
         gameDay++;
+        lastTimeStamp = block.timestamp;
+    }
+
+    function updateKeeperRegistry(address _keeperRegistry) public onlyOwner {
+        keeperRegistry = _keeperRegistry;
+    }
+
+    function ipdateInterval(uint _interval) public onlyOwner {
+        interval = _interval;
     }
 
     function getGameDay() public view returns (uint256) {
         return gameDay;
+    }
+
+    modifier onlyKeeper() {
+        require(
+            msg.sender == keeperRegistry,
+            "function only callable by keeper"
+        );
+        _;
     }
 
     address nukes;

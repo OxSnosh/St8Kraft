@@ -34,6 +34,11 @@ contract WarBucks is ERC20, Ownable {
     }
 
     /// @dev This function can only be called from the treasury contract
+    /// @dev This function enables a nation owner to withdraw in game balance from the treasury contract and mint a corresponding amount of WarBucks tokens into a nations wallet 
+    /// @dev WarBucks has 18 decimals as does the in game balance
+    
+    /// @param account this is the address of the nation owner and the wallet where the tokens are being minted
+    /// @param amount is the amount of tokens being burned
     function mintFromTreasury(
         address account,
         uint256 amount
@@ -42,10 +47,23 @@ contract WarBucks is ERC20, Ownable {
     }
 
     /// @dev This function can only be called from the treasury contract
+    /// @dev This function enables a nation owner to deposit in game balance into a nation and burn a corresponding amount of WarBucks tokens into a nations wallet
+    /// @dev WarBucks has 18 decimals as does the in game balance
+    /// @notice This function will burn tokens when they are deposited into a nation. For every token burned, a nations in game balance will increase +1
+    /// @param account this is the address of the nation owner and the wallet where the tokens are being burned
+    /// @param amount is the amount of tokens being burned
     function burnFromTreasury(
         address account,
         uint256 amount
     ) external onlyTreasury {
+        _burn(account, amount);
+    }
+
+    function mint(address account, uint256 amount) public onlyOwner {
+        _mint(account, amount);
+    }
+
+    function burn(address account, uint256 amount) public onlyOwner {
         _burn(account, amount);
     }
 }

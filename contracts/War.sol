@@ -185,7 +185,7 @@ contract WarContract is Ownable {
     ///@notice a nation can only have a maximum of 4 offensive wars (5 with a foreign army base)
     function declareWar(uint256 offenseId, uint256 defenseId) public {
         // bool isOwner = mint.checkOwnership(offenseId, msg.sender);
-        bool isOwner = mint.isApprovedOrOwner(offenseId, msg.sender);
+        bool isOwner = mint.isOwner(offenseId, msg.sender);
         require(isOwner, "!nation owner");
         bool check = warCheck(offenseId, defenseId);
         require(check, "war not possible");
