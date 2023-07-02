@@ -5,6 +5,7 @@ import "./CountryMinter.sol";
 import "./Senate.sol";
 import "./KeeperFile.sol";
 import "./Wonders.sol";
+import "./Treasury.sol";    
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -21,6 +22,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     address public nuke;
     address public groundBattle;
     address public wonders1;
+    address public treasury;
 
     //chainlink variables
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
@@ -34,6 +36,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     SenateContract senate;
     KeeperContract keep;
     WondersContract1 won1;
+    TreasuryContract tres;
 
     event randomNumbersRequested(uint256 indexed requestId);
     event randomNumbersFulfilled(
@@ -43,7 +46,6 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
 
     struct CountryParameters {
         uint256 id;
-        address rulerAddress;
         string rulerName;
         string nationName;
         string capitalCity;
@@ -100,7 +102,8 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         address _keeper,
         address _nuke,
         address _groundBattle,
-        address _wonders1
+        address _wonders1,
+        address _treasury
     ) public onlyOwner {
         spyAddress = _spy;
         countryMinter = _countryMinter;
@@ -113,6 +116,8 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         groundBattle = _groundBattle;
         wonders1 = _wonders1;
         won1 = WondersContract1(_wonders1);
+        treasury = _treasury;
+        tres = TreasuryContract(_treasury);
     }
 
     modifier onlySpyContract() {
@@ -142,14 +147,12 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     ///@dev this is a public function but only callable from the counry minter contract
     ///@notice this function will get called only when a nation is minted
     ///@param id this will be the nations ID that is passed in from the country minter contact
-    ///@param nationOwner this will be the address of the nation owner that gets passed in from the country minter contract
     ///@param rulerName name passed in from country minter contract when a nation is minted
     ///@param nationName passed in from the country minter contract when a nation is minted
     ///@param capitalCity passed in from the country minter contract when a nation is minted
     ///@param nationSlogan passed in from the country minter contract when a nation is minted
     function generateCountryParameters(
         uint256 id,
-        address nationOwner,
         string memory rulerName,
         string memory nationName,
         string memory capitalCity,
@@ -157,7 +160,6 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     ) public onlyCountryMinter {
         CountryParameters memory newCountryParameters = CountryParameters(
             id,
-            nationOwner,
             rulerName,
             nationName,
             capitalCity,
@@ -206,7 +208,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         s_requestIndexToRandomWords[requestNumber] = randomWords;
         s_randomWords = s_requestIndexToRandomWords[requestNumber];
         uint256 religionPreference = ((randomWords[0] % 14) + 1);
-        uint256 governmentPreference = ((randomWords[1] % 10) + 1);
+        uint256 governmentPreference = ((randomWords[1] % 9) + 1);
         emit randomNumbersFulfilled(religionPreference, governmentPreference);
         idToReligionPreference[requestNumber] = religionPreference;
         idToGovernmentPreference[requestNumber] = governmentPreference;
@@ -220,6 +222,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     function setRulerName(string memory newRulerName, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
+        tres.spendBalance(id, 20000000 * (10**18));
         idToCountryParameters[id].rulerName = newRulerName;
     }
 
@@ -231,6 +234,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     function setNationName(string memory newNationName, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
+        tres.spendBalance(id, 20000000 * (10**18));
         idToCountryParameters[id].nationName = newNationName;
     }
 

@@ -302,4 +302,8 @@ contract SenateContract is ChainlinkClient, Ownable {
     function isSenator(uint256 id) public view returns (bool) {
         return idToVoter[id].senator;
     }
+
+    function getCurrentEpoch() public view returns (uint256) {
+        return epoch;
+    }
 }

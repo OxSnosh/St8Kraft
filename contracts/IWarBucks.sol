@@ -7,4 +7,6 @@ interface IWarBucks is IERC20 {
     function mintFromTreasury(address account, uint256 amount) external;
 
     function burnFromTreasury(address account, uint256 amount) external;
+
+    function burnFromMint(address account, uint256 amount) external;
 }

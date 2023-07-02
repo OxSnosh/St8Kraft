@@ -53,6 +53,7 @@ contract CountryMinter is ERC721, Ownable {
     address public bombers;
     address public missiles;
     address public senate;
+    address public warbucks;
 
     mapping(uint256 => address) public idToOwner;
     mapping(address => uint256) public ownerCountryCount;
@@ -76,7 +77,8 @@ contract CountryMinter is ERC721, Ownable {
         address _resources,
         address _aid,
         address _missiles,
-        address _senate
+        address _senate,
+        address _warbucks
     ) public onlyOwner {
         countryParameters = _countryParameters;
         treasury = _treasury;
@@ -85,6 +87,7 @@ contract CountryMinter is ERC721, Ownable {
         aid = _aid;
         missiles = _missiles;
         senate = _senate;
+        warbucks = _warbucks;
     }
 
     ///@dev this function is only callable by the contract owner
@@ -149,12 +152,13 @@ contract CountryMinter is ERC721, Ownable {
         string memory nationSlogan
     ) public {
         uint256 countryId = _countryId.current();
+        uint256 seedMoney = TreasuryContract(treasury).getSeedMoney();
+        IWarBucks(warbucks).burnFromMint(msg.sender, seedMoney);
         _mint(msg.sender, countryId);
         AidContract(aid).initiateAid(countryId, msg.sender);
         BombersContract(bombers).generateBombers(countryId);
         CountryParametersContract(countryParameters).generateCountryParameters(
             countryId,
-            msg.sender,
             ruler,
             nationName,
             capitalCity,
@@ -184,17 +188,17 @@ contract CountryMinter is ERC721, Ownable {
         emit nationCreated(msg.sender, nationName, ruler);
     }
 
-    ///@dev this is public view function that will check if the caller of the function is the nation owner
-    ///@dev this function is used throught the contracts for the game
-    ///@param id is the nation id
-    ///@param caller is the caller of the function that gets passed into this function from another contract throught the game
-    ///@return bool will be true if the caller address passed into the caller parameter is the owner of the nation of parameter id
-    function checkOwnership(uint256 id, address caller) public view returns (bool) {
-        if(idToOwner[id] == caller) {
-            return true;
-        }
-        return false;
-    }
+    // ///@dev this is public view function that will check if the caller of the function is the nation owner
+    // ///@dev this function is used throught the contracts for the game
+    // ///@param id is the nation id
+    // ///@param caller is the caller of the function that gets passed into this function from another contract throught the game
+    // ///@return bool will be true if the caller address passed into the caller parameter is the owner of the nation of parameter id
+    // function checkOwnership(uint256 id, address caller) public view returns (bool) {
+    //     if(idToOwner[id] == caller) {
+    //         return true;
+    //     }
+    //     return false;
+    // }
 
     ///@dev this function will return the current country Id that gets incremented every time a county is minted
     ///@return uint256 will be number of countries minted
@@ -203,7 +207,7 @@ contract CountryMinter is ERC721, Ownable {
         return countryCount;
     }
 
-    function isOwner(uint256 nationId, address caller) public view returns (bool) {
+    function checkOwnership(uint256 nationId, address caller) public view returns (bool) {
         bool owner = _isApprovedOrOwner(caller, nationId);
         return owner;
     }

@@ -11,6 +11,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 /// @dev The deployer of the contract will be the owner
 contract WarBucks is ERC20, Ownable {
     address treasury;
+    address countryMinter;
 
     /// @param initialSupply is the inital supply of WarBucks currency
     /// @dev The initial supply is minted to the deployer of the contract
@@ -27,16 +28,25 @@ contract WarBucks is ERC20, Ownable {
         _;
     }
 
+    modifier onlyCountryMinter() {
+        require(
+            msg.sender == countryMinter,
+            "function only callable from countryMinter contract"
+        );
+        _;
+    }
+
     /// @dev This function is called by the owner after deployment in order to update the treasury contract address for the onlyTreasury modifer
     /// @param _treasury is the address of the treasury contract
-    function settings(address _treasury) public onlyOwner {
+    /// @param _countryMinter is the address of the countryMinter contract
+    function settings(address _treasury, address _countryMinter) public onlyOwner {
         treasury = _treasury;
+        countryMinter = _countryMinter;
     }
 
     /// @dev This function can only be called from the treasury contract
     /// @dev This function enables a nation owner to withdraw in game balance from the treasury contract and mint a corresponding amount of WarBucks tokens into a nations wallet 
     /// @dev WarBucks has 18 decimals as does the in game balance
-    
     /// @param account this is the address of the nation owner and the wallet where the tokens are being minted
     /// @param amount is the amount of tokens being burned
     function mintFromTreasury(
@@ -56,6 +66,13 @@ contract WarBucks is ERC20, Ownable {
         address account,
         uint256 amount
     ) external onlyTreasury {
+        _burn(account, amount);
+    }
+
+    function burnFromMint(
+        address account,
+        uint256 amount
+    ) external onlyCountryMinter {
         _burn(account, amount);
     }
 
