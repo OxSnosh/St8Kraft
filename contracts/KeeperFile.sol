@@ -21,10 +21,9 @@ contract KeeperContract is Ownable, KeeperCompatibleInterface {
     uint public lastTimeStamp;
     address public keeperRegistry;
 
-    constructor(uint updateInterval, address _keeperRegistry) {
+    constructor(uint updateInterval) {
         interval = updateInterval;
         lastTimeStamp = block.timestamp;
-        keeperRegistry = _keeperRegistry;
         gameDay = 0;
     }
 
@@ -40,7 +39,7 @@ contract KeeperContract is Ownable, KeeperCompatibleInterface {
         return (upkeepNeeded, "");
     }
 
-    function performUpkeep(bytes calldata /* performData */) external override onlyKeeper {
+    function performUpkeep(bytes calldata /* performData */) external override {
         if ((block.timestamp - lastTimeStamp) > interval) {
             lastTimeStamp = lastTimeStamp + interval;
             gameDay++;
@@ -62,14 +61,6 @@ contract KeeperContract is Ownable, KeeperCompatibleInterface {
 
     function getGameDay() public view returns (uint256) {
         return gameDay;
-    }
-
-    modifier onlyKeeper() {
-        require(
-            msg.sender == keeperRegistry,
-            "function only callable by keeper"
-        );
-        _;
     }
 
     address nukes;

@@ -8,22 +8,26 @@ import "./KeeperFile.sol";
 import "./Resources.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/KeeperCompatibleInterface.sol";
 
 ///@title SenateContract
 ///@author OxSnosh
 ///@notice this contract will allow nation owners to vote for team senators
 ///@notice team senators will be able to sanction nations from trading with trading partners on the same team
 ///@dev this contract inherits from the openzeppelin ownable contract
-contract SenateContract is ChainlinkClient, Ownable {
+contract SenateContract is ChainlinkClient, KeeperCompatibleInterface, Ownable {
     using Chainlink for Chainlink.Request;
 
     uint256 public epoch;
+    uint256 public interval;
     uint256 public dayOfLastElection;
+    uint256 maximumSanctions = 25;
     address public countryMinter;
     address public parameters;
     address public wonders3;
     address public keeper;
     address public resources;
+    
 
     WondersContract3 won3;
     CountryMinter mint;
@@ -52,7 +56,15 @@ contract SenateContract is ChainlinkClient, Ownable {
     mapping(uint256 => mapping(uint256 => uint256[])) epochToTeamToSenatorVotes;
     mapping(uint256 => mapping(uint256 => uint256[])) epochToTeamToWinners;
 
-    // mapping(uint256 => mapping(uint256 => uint256)) election;
+    ///@param _interval is in days
+    constructor(uint _interval, address) {
+        interval = _interval;
+    }
+
+    ///@param _interval is in days
+    function updateInterval(uint _interval) public onlyOwner {
+        interval = _interval;
+    }
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -164,42 +176,83 @@ contract SenateContract is ChainlinkClient, Ownable {
         emit Vote(idVoter, voterTeam, idOfSenateVote, msg.sender);
     }
 
+    function checkUpkeep(
+        bytes calldata /* checkData */
+    )
+        external
+        view
+        returns (bool upkeepNeeded, bytes memory /* performData */)
+    {
+        uint256 gameDay = keep.getGameDay();
+        upkeepNeeded = (gameDay - dayOfLastElection) > interval;
+        return (upkeepNeeded, "");
+    }
+
+    function performUpkeep(bytes calldata /* performData */) external override {
+        uint256 gameDay = keep.getGameDay();
+        if ((gameDay - dayOfLastElection) > interval) {
+            dayOfLastElection = gameDay;
+            for (uint256 i = 0; i <= 15; i++) {
+                runElections(jobId, oracleAddress, fee, i);
+            }
+            epoch++;
+            dayOfLastElection = gameDay;
+        }
+    }
+
+    bytes32 jobId;
+    address oracleAddress;
+    uint256 fee;
+    uint256 orderId;
+
+    function updateExecuteAttackJobId(bytes32 _jobId) public onlyOwner {
+        jobId = _jobId;
+    }
+
+    function updateOracleAddress(address _oracleAddress) public onlyOwner {
+        oracleAddress = _oracleAddress;
+    }
+
+    function updateFee(uint256 _fee) public onlyOwner {
+        fee = _fee;
+    }
+
     ///@dev this is a public function that will be called from an off chain source
     ///@notice this function will make the nations who won the team 7 election senators
     ///@param _jobId is the job id for the chainlink oracle to run
     ///@param _oracleAddress is the address of the chainlink oracle
-    ///@param _orderId is the order id of the chainlink oracle request
     ///@param _fee is the fee paid to the chainlink oracle
-    function inaugurateTeam7Senators(
+    function runElections(
         bytes32 _jobId,
         address _oracleAddress,
-        uint256 _orderId,
         uint256 _fee,
-        uint256 teamNumber,
-        uint256 _epoch
-    ) public {
+         uint256 team
+    ) internal returns (bytes32 _requestId) {
         Chainlink.Request memory req = buildChainlinkRequest(
             _jobId,
             address(this),
             this.completeElection.selector
         );
-        uint256[] memory teamVotes = epochToTeamToSenatorVotes[_epoch][
-            teamNumber
+        uint256[] memory teamVotes = epochToTeamToSenatorVotes[epoch][
+            team
         ];
-        req.addUint("orderId", _orderId);
-        req.addUint("teamNumber", teamNumber);
+        req.addUint("orderId", orderId);
+        req.addUint("teamNumber", team);
         req.addBytes("teamVotes", abi.encodePacked(teamVotes));
-        req.addUint("epoch", _epoch);
-        sendChainlinkRequestTo(_oracleAddress, req, _fee);
+        req.addUint("epoch", epoch);
+        orderId++;
+        bytes32 requestId = sendChainlinkRequestTo(_oracleAddress, req, _fee);
+        return requestId;
     }
 
+    ///@dev 
     function completeElection(
-        // bytes32 _requestId,
+        bytes32 _requestId,
         // uint256 _orderId,
         uint256[] memory winners,
         uint256 team,
         uint256 _epoch
-    ) public {
+    ) public recordChainlinkFulfillment(_requestId) {
         if(epoch > 0) {
             uint256[] memory currentSenators = epochToTeamToWinners[_epoch-1][team];
             for (uint i = 0; i < currentSenators.length; i++) {
@@ -212,6 +265,12 @@ contract SenateContract is ChainlinkClient, Ownable {
         epochToTeamToWinners[_epoch][team] = winners;
     }
 
+    ///@dev this is a public function that can only be called by the contract owner 
+    ///@param _maximumSanctions is the maximum number of sanctions a team can have at one time
+    function updaateMaximumSanctions(uint256 _maximumSanctions) public onlyOwner {
+        maximumSanctions = _maximumSanctions;
+    }
+
     ///@dev this is a public function callable by a senator
     ///@notice this function will only work if the senator and the nation being sanctioned are on the same team
     ///@param idSenator is the id of the senator calling the function that will cast the vote to sanction
@@ -220,6 +279,8 @@ contract SenateContract is ChainlinkClient, Ownable {
         uint256 idSenator,
         uint256 idSanctioned
     ) public {
+        bool owner = mint.checkOwnership(idSenator, msg.sender);
+        require(owner, "!nation owner");
         require(idToVoter[idSenator].senator == true, "!senator");
         require(
             idToVoter[idSanctioned].senator == false,
@@ -231,25 +292,30 @@ contract SenateContract is ChainlinkClient, Ownable {
             senatorTeam == sanctionedTeam,
             "you can only sanction a fellow team member"
         );
+        uint256[] memory currentTeamSanctions = teamToCurrentSanctions[
+            sanctionedTeam
+        ];
+        require (
+            currentTeamSanctions.length < maximumSanctions,
+            "this team has reached the limit for sanctions"
+        );
         uint256 gameDay = keep.getGameDay();
         Voter storage sanctioned = idToVoter[idSanctioned];
+        require(
+            sanctioned.sanctionsByTeam[sanctionedTeam] == false,
+            "this nation is already sanctioned"
+        );
         sanctioned.sanctionsByTeam[sanctionedTeam] = true;
         sanctioned.dayOfSanctionByTeam[sanctionedTeam] = gameDay;
         res.removeTradingPartnersFromSanction(idSanctioned, sanctionedTeam);
-        // uint256[] storage sanctionVoteArray = getSanctionVotes(idSanctioned);
-        // for (uint256 i = 0; i < sanctionVoteArray.length; i++) {
-        //     require(
-        //         sanctionVoteArray[i] != idSenator,
-        //         "you already voted to sanction this nation"
-        //     );
-        // }
-        // sanctionVoteArray.push(idSenator);
-        // setSanctionArray(sanctionVoteArray, idSanctioned);
-        // if (idToVoter[idSanctioned].votesToSanction >= 3) {
-        //     idToVoter[idSanctioned].sanctioned = true;
-        // }
     }
 
+    ///@dev this is a public function callable by a senator
+    ///@notice this function will only work if the senator and the nation being sanctioned are on the same team
+    ///@notice sanctions can only be lifted after 10 days
+    ///@notice lifting a sanction only requires one vote from a senator
+    ///@param idSenator is the id of the senator calling the function that will cast the vote to lift the sanction
+    ///@param idSanctioned is the nation id of the nation who the senator is voting to lift the sanction on
     function liftSanctionVote(uint256 idSenator, uint256 idSanctioned) public {
         require(idToVoter[idSenator].senator == true, "!senator");
         uint256 senatorTeam = idToVoter[idSenator].team;
@@ -265,35 +331,23 @@ contract SenateContract is ChainlinkClient, Ownable {
             (dayOfTeamSanction + 10) < gameDay,
             "you must wait 10 days before lifting a sanction"
         );
+        require (
+            sanctioned.sanctionsByTeam[sanctionedTeam] == true,
+            "this nation is not sanctioned"
+        );
         sanctioned.sanctionsByTeam[senatorTeam] = false;
+        uint256[] storage currentTeamSanctions = teamToCurrentSanctions[
+            sanctionedTeam
+        ];
+        for (uint256 i = 0; i < currentTeamSanctions.length; i++) {
+            if (currentTeamSanctions[i] == idSanctioned) {
+                currentTeamSanctions[i] = currentTeamSanctions[
+                    currentTeamSanctions.length - 1
+                ];
+                currentTeamSanctions.pop();
+            }
+        }
     }
-
-    // function getSanctionVotes(
-    //     uint256 id
-    // ) internal view returns (uint256[] storage) {
-    //     uint256[] storage sanctionVoteArray = idToSanctionVotes[id];
-    //     return sanctionVoteArray;
-    // }
-
-    // function setSanctionArray(
-    //     uint256[] memory sanctionArray,
-    //     uint256 idSanctioned
-    // ) internal {
-    //     idToSanctionVotes[idSanctioned] = sanctionArray;
-    // }
-
-    // function checkIfSenatorVoted(
-    //     uint256 senatorId,
-    //     uint256 idSanctioned
-    // ) internal view returns (bool, uint256) {
-    //     uint256[] memory sanctionVoteCheck = getSanctionVotes(idSanctioned);
-    //     for (uint256 i = 0; i < sanctionVoteCheck.length; i++) {
-    //         if (sanctionVotes[i] == senatorId) {
-    //             return (true, i);
-    //         }
-    //     }
-    //     return (false, 0);
-    // }
 
     ///@dev this is a public view function that will return if a nation is a senator
     ///@notice this function will return if a nation is a senator
@@ -303,6 +357,7 @@ contract SenateContract is ChainlinkClient, Ownable {
         return idToVoter[id].senator;
     }
 
+    ///@notice this function will return the current election epoch
     function getCurrentEpoch() public view returns (uint256) {
         return epoch;
     }
