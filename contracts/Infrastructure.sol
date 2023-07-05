@@ -319,6 +319,16 @@ contract InfrastructureContract is Ownable {
         idToInfrastructure[id].landArea -= amount;
     }
 
+    ///@dev this is a public view function that will return the amount of land a nation has
+    ///@notice this function will return the amount of land a nation has
+    ///@param countryId this is the nation ID of the country being queried
+    ///@return count is the amount of land area for a given country
+    function getLandCount(
+        uint256 countryId
+    ) public view returns (uint256 count) {
+        return idToInfrastructure[countryId].landArea;
+    }
+
     ///@dev this is a public view function that will return a nations area of influence from a given land area
     ///@notice this function will return a given nations area of influence as a multiple of their land area
     ///@notice coal will increase area of influence 15%
@@ -372,7 +382,7 @@ contract InfrastructureContract is Ownable {
         bool owner = mint.checkOwnership(id, msg.sender);
         require(owner, "!nation owner");
         uint256 currentLand = idToInfrastructure[id].landArea;
-        require(amount < currentLand, "cannot sell all land");
+        require(amount < (currentLand - 20), "cannot sell land below 20 miles");
         idToInfrastructure[id].landArea -= amount;
         uint256 costPerMile = 100;
         bool rubber = res.viewRubber(id);
@@ -383,44 +393,12 @@ contract InfrastructureContract is Ownable {
         TreasuryContract(treasury).returnBalance(id, totalCost);
     }
 
-    modifier onlyAidContract() {
-        require(msg.sender == aid);
-        _;
-    }
-
-    ///@dev this is a public function only callable from the aid contract
-    ///@dev this function will send the technology when an aid proposal is accepted
-    ///@notice this function will send the technology when an aid proposal is accepted
-    ///@param idSender is the nation id of the sender of the technology aid
-    ///@param idReciever is the nation id of the recipient of technology aid
-    ///@param amount is the amount of technology being sent
-    function sendTech(
-        uint256 idSender,
-        uint256 idReciever,
-        uint256 amount
-    ) public onlyAidContract {
-        uint256 balanceOfSender = idToInfrastructure[idSender].technologyCount;
-        require(balanceOfSender >= amount, "sender does not have enought tech");
-        idToInfrastructure[idSender].technologyCount -= amount;
-        idToInfrastructure[idReciever].technologyCount += amount;
-    }
-
-    ///@dev this is a public view function that will return the amount of land a nation has
-    ///@notice this function will return the amount of land a nation has
-    ///@param countryId this is the nation ID of the country being queried
-    ///@return count is the amount of land area for a given country
-    function getLandCount(
-        uint256 countryId
-    ) public view returns (uint256 count) {
-        return idToInfrastructure[countryId].landArea;
-    }
-
     ///@dev this is a public function that is only callable from the spy contract
     ///@dev this function will decrease land area after a successful spy attack
     ///@notice this function will deacrease land area after a succesfuls spy attack
     ///@param countryId is the country if of the nation losing land in the attack
     ///@param amount is the amount of land being lost in the attack
-    function decreaseLandCount(
+    function decreaseLandCountFromSpyContract(
         uint256 countryId,
         uint256 amount
     ) public onlySpyContract {
@@ -456,18 +434,6 @@ contract InfrastructureContract is Ownable {
         }
     }
 
-    // ///@dev this is a public function only callable from the spy contract
-    // ///@dev this function will increase a attacking nations land after a successful spy attack
-    // ///@notice this function will increase an attacking nations land after a successful spy attack
-    // ///@param countryId is the nation ID of the nation gaining technology
-    // ///@param amount is the amount of land area being gained
-    // function increaseLandCountFromSpyContract(
-    //     uint256 countryId,
-    //     uint256 amount
-    // ) public onlySpyContract {
-    //     idToInfrastructure[countryId].landArea += amount;
-    // }
-
     ///@dev this is a public view function that will retrun the amount of technology a nation has
     ///@notice this function will return the amount of technology a nation has
     ///@param countryId this is the nation ID of the nation being queried
@@ -478,6 +444,28 @@ contract InfrastructureContract is Ownable {
         uint256 technologyAmount = idToInfrastructure[countryId]
             .technologyCount;
         return technologyAmount;
+    }
+
+    modifier onlyAidContract() {
+        require(msg.sender == aid);
+        _;
+    }
+
+    ///@dev this is a public function only callable from the aid contract
+    ///@dev this function will send the technology when an aid proposal is accepted
+    ///@notice this function will send the technology when an aid proposal is accepted
+    ///@param idSender is the nation id of the sender of the technology aid
+    ///@param idReciever is the nation id of the recipient of technology aid
+    ///@param amount is the amount of technology being sent
+    function sendTech(
+        uint256 idSender,
+        uint256 idReciever,
+        uint256 amount
+    ) public onlyAidContract {
+        uint256 balanceOfSender = idToInfrastructure[idSender].technologyCount;
+        require(balanceOfSender >= amount, "sender does not have enought tech");
+        idToInfrastructure[idSender].technologyCount -= amount;
+        idToInfrastructure[idReciever].technologyCount += amount;
     }
 
     ///@dev this is a public function only callable from the spy contract
@@ -533,18 +521,6 @@ contract InfrastructureContract is Ownable {
                 .technologyCount -= techAmountToDecrease;
         }
     }
-
-    // ///@dev this is a public function that is only callable from the spy contract
-    // ///@dev this function will increase an attacking nations tech after a succesful spy attack
-    // ///@notice this function will increase a nations technology from a succesful spy attack
-    // ///@param countryId is the nation ID of the attacking nation gaining tech from the attack
-    // ///@param amount is the amount of tech being gained
-    // function increaseTechCountFromSpyContract(
-    //     uint256 countryId,
-    //     uint256 amount
-    // ) public onlySpyContract {
-    //     idToInfrastructure[countryId].technologyCount += amount;
-    // }
 
     ///@dev this is a public view function that will return the amount of infrastructure for a nation
     ///@notice this function will return a nations infrastructure count
@@ -645,7 +621,7 @@ contract InfrastructureContract is Ownable {
 
     ///@dev this is a public function only callable from the air battle contract
     ///@dev this function will decrease a nations infrastructure lost in a bombing attack
-    ///@notice this function will decrease a nations infrastructure lost in a bombing attack
+    ///@notice this function will decrease a nations infrastructure lost in a bombing attack (max 20 levels)
     ///@param countryId is the nation id of the country losing infrastructure
     ///@param amountToDecrease is the amount of infrastructure being lost
     function decreaseInfrastructureCountFromAirBattleContract(
@@ -671,87 +647,40 @@ contract InfrastructureContract is Ownable {
         }
     }
 
-    // ///@dev this is a public function only callable from the spy contract
-    // ///@dev this function will decrease increase the amount of infrastructure for an attacker in a succesful spy attack
-    // ///@notice this function will decrease increase the amount of infrastructure for an attacker in a succesful spy attack
-    // ///@param countryId is the nation ID for the nation gaining infrastructure in the attack
-    // ///@param amount is the amount of infrastructre being gained
-    // function increaseInfrastructureCountFromSpyContract(
-    //     uint256 countryId,
-    //     uint256 amount
-    // ) public onlySpyContract {
-    //     idToInfrastructure[countryId].infrastructureCount += amount;
-    // }
-
-    ///@dev this is a public view function that will return a nations tax rate at which they tax their citizens
-    ///@notice this function will return the tax rate which a nation taxes their citizens at
-    ///@param id is the nation ID of the nation being queried
-    ///@param taxPercentage is the tax rate for a given nation
-    function getTaxRate(
-        uint256 id
-    ) public view returns (uint256 taxPercentage) {
-        uint256 taxRate = idToInfrastructure[id].taxRate;
-        return taxRate;
-    }
-
-    ///@dev this is a public function only vallable by a nation owner
-    ///@dev this function will allow a nation owner to set their nations tax rate
-    ///@notice this function will allow a nation owner to set their nations tax rate
-    ///@notice a tax rate can be between 15% and 28%
-    ///@notice a tax rate can be 30% with a social security wonder
-    ///@param id is the nation id of the nation changing its tax rate
-    ///@param newTaxRate is the new tax rate for a nation
-    function setTaxRate(uint256 id, uint256 newTaxRate) public {
-        bool owner = mint.checkOwnership(id, msg.sender);
-        require(owner, "!nation owner");
-        require(
-            idToInfrastructure[id].collectionNeededToChangeRate == false,
-            "need to collect taxes before changing tax rate"
-        );
-        uint256 maximumTaxRate = 28;
-        bool socialSecurity = won4.getSocialSecuritySystem(id);
-        if (socialSecurity) {
-            maximumTaxRate = 30;
+    ///@dev this is a public function only callable from the ground battle contract
+    ///@notice this function will transfer land and infrastructure lost during a ground battle
+    ///@param landMiles is the amount of land being won
+    ///@param infrastructureLevels is the amount of infrastructure being won
+    ///@param attackerId is the ID of the attack nation
+    ///@param defenderId is the ID of the defending nation
+    function transferLandAndInfrastructure(
+        uint256 landMiles,
+        uint256 infrastructureLevels,
+        uint256 attackerId,
+        uint256 defenderId
+    ) public onlyGroundBattle {
+        uint256 defenderLand = idToInfrastructure[defenderId].landArea;
+        uint256 defenderInfrastructure = idToInfrastructure[defenderId]
+            .infrastructureCount;
+        if (defenderLand <= landMiles) {
+            idToInfrastructure[attackerId].landArea += defenderLand;
+            landMiles = defenderLand;
+            idToInfrastructure[defenderId].landArea = 0;
+        } else {
+            idToInfrastructure[attackerId].landArea += landMiles;
+            idToInfrastructure[defenderId].landArea -= landMiles;
         }
-        require(newTaxRate <= maximumTaxRate, "cannot tax above maximum rate");
-        require(newTaxRate >= 15, "cannot tax below 15%");
-        idToInfrastructure[id].taxRate = newTaxRate;
-    }
-
-    ///@dev this is a public function only callable from the spy contract
-    ///@dev this function will reset a nations tax rate after a succesful spy attack
-    ///@notice this function will reset a nations tax rate after a succesful spy attack
-    ///@param id this is the nation ID for the nation being attacked and getting its tax rate changed
-    ///@param newTaxRate is the new tax rate for the nation
-    function setTaxRateFromSpyContract(
-        uint256 id,
-        uint256 newTaxRate
-    ) public onlySpyContract {
-        idToInfrastructure[id].taxRate = newTaxRate;
-        idToInfrastructure[id].collectionNeededToChangeRate = true;
-    }
-
-    ///@dev this is a public function only callable from the taxes contract
-    ///@dev this function will toggle the collection needed to change tax rate to true
-    ///@notice this function will toggle the collection needed to change tax rate to true
-    ///@notice when a nation is blockaded it will need to either break the blockade or collect taxes at a reduced rate to be able to change tax rate
-    ///@param id is the nation ID of the nation toggleing the collection needed parameter
-    function toggleCollectionNeededToChangeRate(
-        uint256 id
-    ) public onlyTaxesContract {
-        idToInfrastructure[id].collectionNeededToChangeRate = false;
-    }
-
-    ///@dev this is a public view function that will return true if a nation needs to collect taxes in order to change its tax rate
-    ///@notice this function will retrun true if a nation needs to collect taxes in order to change its tax rate
-    ///@param id is the nation ID of the nation being queried
-    ///@return bool is the boolean value whether a nation needs to collect taxes in order to change its tax rate
-    function checkIfCollectionNeededToChangeRate(
-        uint256 id
-    ) public view returns (bool) {
-        bool collectionNeeded = idToInfrastructure[id]
-            .collectionNeededToChangeRate;
-        return collectionNeeded;
+        if (defenderInfrastructure <= infrastructureLevels) {
+            idToInfrastructure[attackerId]
+                .infrastructureCount += defenderInfrastructure;
+            infrastructureLevels = defenderInfrastructure;
+            idToInfrastructure[defenderId].infrastructureCount = 0;
+        } else {
+            idToInfrastructure[attackerId]
+                .infrastructureCount += infrastructureLevels;
+            idToInfrastructure[defenderId]
+                .infrastructureCount -= infrastructureLevels;
+        }
     }
 
     ///@dev this is public view function that will return a nations total population count
@@ -847,46 +776,90 @@ contract InfrastructureContract is Ownable {
     ///@return uint256 this is the given nations total taxable population
     function getTaxablePopulationCount(
         uint256 id
-    ) public view returns (uint256) {
+    ) public view returns (uint256, uint256) {
         uint256 totalPop = getTotalPopulationCount(id);
         uint256 criminals = crim.getCriminalCount(id);
         uint256 soldiers = forc.getSoldierCount(id);
-        return (totalPop - (criminals + soldiers));
+        uint256 citizens;
+        uint256 citizenDefecit;
+        if(totalPop <= (criminals + soldiers)) {
+            citizens = 0;
+            citizenDefecit = (criminals + soldiers) - totalPop;
+        } else {
+            citizens = totalPop - (criminals + soldiers);
+            citizenDefecit = 0;
+        }
+        return (citizens, citizenDefecit);
     }
 
-    ///@dev this is a public function only callable from the ground battle contract
-    ///@notice this function will transfer land and infrastructure lost during a ground battle
-    ///@param landMiles is the amount of land being won
-    ///@param infrastructureLevels is the amount of infrastructure being won
-    ///@param attackerId is the ID of the attack nation
-    ///@param defenderId is the ID of the defending nation
-    function transferLandAndInfrastructure(
-        uint256 landMiles,
-        uint256 infrastructureLevels,
-        uint256 attackerId,
-        uint256 defenderId
-    ) public onlyGroundBattle {
-        uint256 defenderLand = idToInfrastructure[defenderId].landArea;
-        uint256 defenderInfrastructure = idToInfrastructure[defenderId]
-            .infrastructureCount;
-        if (defenderLand <= landMiles) {
-            idToInfrastructure[attackerId].landArea += defenderLand;
-            landMiles = defenderLand;
-            idToInfrastructure[defenderId].landArea = 0;
-        } else {
-            idToInfrastructure[attackerId].landArea += landMiles;
-            idToInfrastructure[defenderId].landArea -= landMiles;
+    ///@dev this is a public view function that will return a nations tax rate at which they tax their citizens
+    ///@notice this function will return the tax rate which a nation taxes their citizens at
+    ///@param id is the nation ID of the nation being queried
+    ///@return taxPercentage is the tax rate for a given nation
+    function getTaxRate(
+        uint256 id
+    ) public view returns (uint256 taxPercentage) {
+        uint256 taxRate = idToInfrastructure[id].taxRate;
+        return taxRate;
+    }
+
+    ///@dev this is a public function only vallable by a nation owner
+    ///@dev this function will allow a nation owner to set their nations tax rate
+    ///@notice this function will allow a nation owner to set their nations tax rate
+    ///@notice a tax rate can be between 15% and 28%
+    ///@notice a tax rate can be 30% with a social security wonder
+    ///@param id is the nation id of the nation changing its tax rate
+    ///@param newTaxRate is the new tax rate for a nation
+    function setTaxRate(uint256 id, uint256 newTaxRate) public {
+        bool owner = mint.checkOwnership(id, msg.sender);
+        require(owner, "!nation owner");
+        require(
+            idToInfrastructure[id].collectionNeededToChangeRate == false,
+            "need to collect taxes before changing tax rate"
+        );
+        uint256 maximumTaxRate = 28;
+        bool socialSecurity = won4.getSocialSecuritySystem(id);
+        if (socialSecurity) {
+            maximumTaxRate = 30;
         }
-        if (defenderInfrastructure <= infrastructureLevels) {
-            idToInfrastructure[attackerId]
-                .infrastructureCount += defenderInfrastructure;
-            infrastructureLevels = defenderInfrastructure;
-            idToInfrastructure[defenderId].infrastructureCount = 0;
-        } else {
-            idToInfrastructure[attackerId]
-                .infrastructureCount += infrastructureLevels;
-            idToInfrastructure[defenderId]
-                .infrastructureCount -= infrastructureLevels;
-        }
+        require(newTaxRate <= maximumTaxRate, "cannot tax above maximum rate");
+        require(newTaxRate >= 15, "cannot tax below 15%");
+        idToInfrastructure[id].taxRate = newTaxRate;
+    }
+
+    ///@dev this is a public function only callable from the spy contract
+    ///@dev this function will reset a nations tax rate after a succesful spy attack
+    ///@notice this function will reset a nations tax rate after a succesful spy attack
+    ///@param id this is the nation ID for the nation being attacked and getting its tax rate changed
+    ///@param newTaxRate is the new tax rate for the nation
+    function setTaxRateFromSpyContract(
+        uint256 id,
+        uint256 newTaxRate
+    ) public onlySpyContract {
+        idToInfrastructure[id].taxRate = newTaxRate;
+        idToInfrastructure[id].collectionNeededToChangeRate = true;
+    }
+
+    ///@dev this is a public function only callable from the taxes contract
+    ///@dev this function will toggle the collection needed to change tax rate to true
+    ///@notice this function will toggle the collection needed to change tax rate to true
+    ///@notice when a nation is blockaded it will need to either break the blockade or collect taxes at a reduced rate to be able to change tax rate
+    ///@param id is the nation ID of the nation toggleing the collection needed parameter
+    function toggleCollectionNeededToChangeRate(
+        uint256 id
+    ) public onlyTaxesContract {
+        idToInfrastructure[id].collectionNeededToChangeRate = false;
+    }
+
+    ///@dev this is a public view function that will return true if a nation needs to collect taxes in order to change its tax rate
+    ///@notice this function will retrun true if a nation needs to collect taxes in order to change its tax rate
+    ///@param id is the nation ID of the nation being queried
+    ///@return bool is the boolean value whether a nation needs to collect taxes in order to change its tax rate
+    function checkIfCollectionNeededToChangeRate(
+        uint256 id
+    ) public view returns (bool) {
+        bool collectionNeeded = idToInfrastructure[id]
+            .collectionNeededToChangeRate;
+        return collectionNeeded;
     }
 }

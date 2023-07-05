@@ -155,7 +155,6 @@ contract CountryMinter is ERC721, Ownable {
         uint256 seedMoney = TreasuryContract(treasury).getSeedMoney();
         IWarBucks(warbucks).burnFromMint(msg.sender, seedMoney);
         _mint(msg.sender, countryId);
-        AidContract(aid).initiateAid(countryId, msg.sender);
         BombersContract(bombers).generateBombers(countryId);
         CountryParametersContract(countryParameters).generateCountryParameters(
             countryId,
@@ -184,21 +183,9 @@ contract CountryMinter is ERC721, Ownable {
         WondersContract4(wonders4).generateWonders4(countryId);
         idToOwner[countryId] = msg.sender;
         ownerCountryCount[msg.sender]++;
-        _countryId.increment();
         emit nationCreated(msg.sender, nationName, ruler);
+        _countryId.increment();
     }
-
-    // ///@dev this is public view function that will check if the caller of the function is the nation owner
-    // ///@dev this function is used throught the contracts for the game
-    // ///@param id is the nation id
-    // ///@param caller is the caller of the function that gets passed into this function from another contract throught the game
-    // ///@return bool will be true if the caller address passed into the caller parameter is the owner of the nation of parameter id
-    // function checkOwnership(uint256 id, address caller) public view returns (bool) {
-    //     if(idToOwner[id] == caller) {
-    //         return true;
-    //     }
-    //     return false;
-    // }
 
     ///@dev this function will return the current country Id that gets incremented every time a county is minted
     ///@return uint256 will be number of countries minted
@@ -210,5 +197,9 @@ contract CountryMinter is ERC721, Ownable {
     function checkOwnership(uint256 nationId, address caller) public view returns (bool) {
         bool owner = _isApprovedOrOwner(caller, nationId);
         return owner;
+    }
+
+    function ownerOf(uint256 nationId) override public view returns (address) {
+        return ownerOf(nationId);
     }
 }

@@ -536,7 +536,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         ];
         uint256 randomNumberToDecreaseFromDefender = ((randomNumbers[1] % 10) +
             5);
-        inf.decreaseLandCount(defenderId, randomNumberToDecreaseFromDefender);
+        inf.decreaseLandCountFromSpyContract(defenderId, randomNumberToDecreaseFromDefender);
     }
 
     function changeDesiredGovernment(

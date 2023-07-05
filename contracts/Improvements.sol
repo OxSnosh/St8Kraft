@@ -334,10 +334,10 @@ contract ImprovementsContract1 is Ownable {
         uint256 amount
     ) public view returns (bool) {
         bool possible = false;
-        uint256 totalPopulation = inf.getTotalPopulationCount(id);
+        (uint256 citizens, ) = inf.getTaxablePopulationCount(id);
         uint256 improvementCount = idToImprovements1[id].improvementCount;
         require(
-            ((totalPopulation / 1000) >= (improvementCount + amount)),
+            ((citizens / 1000) >= (improvementCount + amount)),
             "population too low to purchase improvement"
         );
         possible = true;
@@ -1912,30 +1912,6 @@ contract ImprovementsContract3 is Ownable {
         );
         _;
     }
-
-    // ///@dev this function is only callable by the contract owner
-    // function updateTreasuryAddress(address _treasury) public onlyOwner {
-    //     treasury = _treasury;
-    // }
-
-    // ///@dev this function is only callable by the contract owner
-    // function updateImprovementContract1Address(
-    //     address _improvements1
-    // ) public onlyOwner {
-    //     improvements1 = _improvements1;
-    // }
-
-    // ///@dev this function is only callable by the contract owner
-    // function updateImprovementContract2Address(
-    //     address _improvements2
-    // ) public onlyOwner {
-    //     improvements2 = _improvements2;
-    // }
-
-    // ///@dev this function is only callable by the contract owner
-    // function updateNavyContractAddress(address _navy) public onlyOwner {
-    //     navy = _navy;
-    // }
 
     ///@dev this function is only callable by the countryMinter contract
     ///@dev this function will initialize the struct to store the info about the minted nations improvements

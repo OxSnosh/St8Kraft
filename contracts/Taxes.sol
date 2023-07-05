@@ -233,7 +233,7 @@ contract TaxesContract is Ownable {
         uint256 daysSinceLastTaxCollection = tsy.getDaysSinceLastTaxCollection(
             id
         );
-        uint256 citizenCount = inf.getTaxablePopulationCount(0);
+        (uint256 citizenCount, ) = inf.getTaxablePopulationCount(0);
         uint256 taxRate = inf.getTaxRate(id);
         uint256 dailyTaxesCollectiblePerCitizen = ((dailyIncomePerCitizen *
             taxRate) / 100);

@@ -5,6 +5,7 @@ import "./Infrastructure.sol";
 import "./Improvements.sol";
 import "./CountryMinter.sol";
 import "./CountryParameters.sol";
+import "./Senate.sol";
 import "hardhat/console.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
@@ -31,6 +32,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
     CountryMinter mint;
     BonusResourcesContract bonus;
     CountryParametersContract params;
+    SenateContract sen;
 
     //Chainlik Variables
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
@@ -204,6 +206,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         bonusResources = _bonusResources;
         bonus = BonusResourcesContract(_bonusResources);
         senate = _senate;
+        sen = SenateContract(_senate);
     }
 
     ///@dev this is a public function that is only callable from the country minter contract when a nation is minted
@@ -481,6 +484,8 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         bool isPossibleRecipient = isTradePossibleForRecipient(recipientId);
         require(isPossibleRequestor == true, "trade is not possible");
         require(isPossibleRecipient == true, "trade is not possible");
+        bool sanctioned = sen.isSanctioned(requestorId, recipientId);
+        require(sanctioned == false, "trade is sanctioned");
         idToProposedTradingPartners[recipientId].push(requestorId);
         idToProposedTradingPartners[requestorId].push(recipientId);
     }
@@ -602,6 +607,8 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
             storage proposedTradesOfRequestor = idToProposedTradingPartners[
                 requestorId
             ];
+        bool sanctioned = sen.isSanctioned(recipientId, requestorId);
+        require(sanctioned == false, "trade is sanctioned");
         for (uint256 i = 0; i < proposedTradesOfRequestor.length; i++) {
             if (proposedTradesOfRequestor[i] == recipientId) {
                 proposedTradesOfRequestor[i] = proposedTradesOfRequestor[

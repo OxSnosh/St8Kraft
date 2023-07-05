@@ -361,4 +361,31 @@ contract SenateContract is ChainlinkClient, KeeperCompatibleInterface, Ownable {
     function getCurrentEpoch() public view returns (uint256) {
         return epoch;
     }
+
+    function isSanctioned(
+        uint256 idSender,
+        uint256 idReceiver
+    ) public view returns (bool) {
+        uint256 senderTeam = idToVoter[idSender].team;
+        uint256 receiverTeam = idToVoter[idReceiver].team;
+        bool senderSanctionedSenderTeam = idToVoter[idSender].sanctionsByTeam[senderTeam];
+        bool recieverSanctionedRecieverTeam = idToVoter[idReceiver].sanctionsByTeam[receiverTeam];
+        bool senderSanctionedRecieverTeam = idToVoter[idSender].sanctionsByTeam[receiverTeam];
+        bool recieverSanctionedSenderTeam = idToVoter[idReceiver].sanctionsByTeam[senderTeam];
+        bool sanctioned;
+        if (senderTeam == receiverTeam) {
+            if (senderSanctionedSenderTeam == true || recieverSanctionedRecieverTeam == true) {
+                sanctioned = true;
+            } else {
+                sanctioned = false;
+            }
+        } else if (senderTeam != receiverTeam) {
+            if (senderSanctionedRecieverTeam == true || recieverSanctionedSenderTeam == true) {
+                sanctioned = true;
+            } else {
+                sanctioned = false;
+            }
+        }
+        return sanctioned;
+    }
 }
