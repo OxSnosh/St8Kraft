@@ -357,11 +357,6 @@ contract AidContract is Ownable {
         idToProposal[proposalId].cancelled = true;
     }
 
-    modifier onlyKeeper() {
-        require(msg.sender == keeper, "only callable from keeper contract");
-        _;
-    }
-
     ///@dev this is public view function that allows a caller to return the items in a proposal struct
     ///@return uint256 this funtion returns the contects of a proposal struct
     function getProposal(uint256 proposalId) public view returns(

@@ -371,7 +371,7 @@ contract TaxesContract is Ownable {
     }
 
     function checkPopulationDensity(uint256 id) public view returns (uint256) {
-        uint256 landArea = inf.getLandCount(id);
+        uint256 landArea = inf.getAreaOfInfluence(id);
         uint256 population = inf.getTotalPopulationCount(id);
         uint256 populationDensity = (population / landArea);
         return populationDensity;

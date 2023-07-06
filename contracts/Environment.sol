@@ -365,8 +365,8 @@ contract EnvironmentContract is Ownable {
     {
         uint256 techCount = inf.getTechnologyCount(id);
         int256 pointsFromTech;
-        if (techCount <= 6) {
-            pointsFromTech = 10;
+        if (techCount >= 6) {
+            pointsFromTech = -10;
         }
         return pointsFromTech;
     }
@@ -400,9 +400,9 @@ contract EnvironmentContract is Ownable {
         returns (int256)
     {
         int256 pointsFromInfrastructure;
-        uint256 land = inf.getLandCount(id);
+        uint256 area = inf.getAreaOfInfluence(id);
         uint256 infra = inf.getInfrastructureCount(id);
-        if ((infra / 2) >= land) {
+        if ((infra / 2) >= area) {
             pointsFromInfrastructure += 10;
         }
         return pointsFromInfrastructure;
@@ -417,7 +417,7 @@ contract EnvironmentContract is Ownable {
         int256 pointsFromNukes;
         uint256 nukeCount = mis.getNukeCount(id);
         if (nukeCount > 0) {
-            pointsFromNukes = (int256(nukeCount / 10));
+            pointsFromNukes = (int256(nukeCount));
         }
         bool isLead = res.viewLead(id);
         if (isLead) {

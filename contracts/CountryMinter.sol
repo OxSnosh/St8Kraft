@@ -198,8 +198,4 @@ contract CountryMinter is ERC721, Ownable {
         bool owner = _isApprovedOrOwner(caller, nationId);
         return owner;
     }
-
-    function ownerOf(uint256 nationId) override public view returns (address) {
-        return ownerOf(nationId);
-    }
 }
