@@ -129,6 +129,10 @@ contract MilitaryContract is Ownable {
         require (isOwner, "!nation owner");
         uint256 gameDay = keep.getGameDay();
         if (idToMilitary[id].warPeacePreference == true) {
+            require(
+                (gameDay - idToMilitary[id].dayPeaceToggled) >= 7,
+                "Must wait 7 days to switch to peace mode"
+            );
             idToMilitary[id].warPeacePreference = false;
             idToMilitary[id].dayPeaceToggled = gameDay;
         } else {
@@ -159,15 +163,6 @@ contract MilitaryContract is Ownable {
         bool war = idToMilitary[id].warPeacePreference;
         return war;
     }
-
-    // function incrementDaysInPeaceMode() public onlyKeeper {
-    //     uint256 countryCount = mint.getCountryCount();
-    //     for (uint i = 0; i < countryCount-1; i++) {
-    //         if (idToMilitary[i].warPeacePreference == false) {
-    //             idToMilitary[i].daysInPeaceMode += 1;
-    //         }
-    //     }
-    // }
 
     function getDaysInPeaceMode(uint256 id) public view returns (uint256) {
         uint256 daysPeaceToggled = idToMilitary[id].dayPeaceToggled;

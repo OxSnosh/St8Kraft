@@ -691,8 +691,10 @@ contract InfrastructureContract is Ownable {
     function getTotalPopulationCount(uint256 id) public view returns (uint256) {
         uint256 infra = getInfrastructureCount(id);
         uint256 populationBaseCount = (infra * 8);
-        bool agricultureDevelopment = won1.getAgriculturalDevelopmentProgram(id);
-        if(agricultureDevelopment) {
+        bool agricultureDevelopment = won1.getAgriculturalDevelopmentProgram(
+            id
+        );
+        if (agricultureDevelopment) {
             populationBaseCount = (infra * 9);
         }
         uint256 populationModifier = 100;
@@ -778,15 +780,16 @@ contract InfrastructureContract is Ownable {
         uint256 id
     ) public view returns (uint256, uint256) {
         uint256 totalPop = getTotalPopulationCount(id);
-        uint256 criminals = crim.getCriminalCount(id);
+        (uint256 criminals, uint256 rehabilitatedCitizens, ) = crim
+            .getCriminalCount(id);
         uint256 soldiers = forc.getSoldierCount(id);
         uint256 citizens;
         uint256 citizenDefecit;
-        if(totalPop <= (criminals + soldiers)) {
+        if (totalPop <= ((criminals - rehabilitatedCitizens) + soldiers)) {
             citizens = 0;
-            citizenDefecit = (criminals + soldiers) - totalPop;
+            citizenDefecit = ((criminals - rehabilitatedCitizens) + soldiers) - totalPop;
         } else {
-            citizens = totalPop - (criminals + soldiers);
+            citizens = totalPop - ((criminals - rehabilitatedCitizens) + soldiers);
             citizenDefecit = 0;
         }
         return (citizens, citizenDefecit);

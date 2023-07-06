@@ -4,6 +4,7 @@ pragma solidity 0.8.17;
 import "./Infrastructure.sol";
 import "./Improvements.sol";
 import "./CountryParameters.sol";
+import "./Wonders.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 ///@title CrimeContract
@@ -15,21 +16,24 @@ contract CrimeContract is Ownable {
     address public improvements2;
     address public improvements3;
     address public parameters;
+    address public wonders2;
 
     InfrastructureContract inf;
     ImprovementsContract1 imp1;
     ImprovementsContract2 imp2;
     ImprovementsContract3 imp3;
     CountryParametersContract cp;
+    WondersContract2 won2;
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings (
+    function settings(
         address _infrastructure,
         address _improvements1,
         address _improvements2,
         address _improvements3,
-        address _parameters
+        address _parameters,
+        address _wonders2
     ) public onlyOwner {
         infrastructure = _infrastructure;
         inf = InfrastructureContract(_infrastructure);
@@ -41,13 +45,14 @@ contract CrimeContract is Ownable {
         imp3 = ImprovementsContract3(_improvements3);
         parameters = _parameters;
         cp = CountryParametersContract(_parameters);
+        wonders2 = _wonders2;
+        won2 = WondersContract2(_wonders2);
     }
 
     ///@dev this function is only callable by the contract owner
-    function updateInfrastructureContract(address _newAddress)
-        public
-        onlyOwner
-    {
+    function updateInfrastructureContract(
+        address _newAddress
+    ) public onlyOwner {
         infrastructure = _newAddress;
         inf = InfrastructureContract(_newAddress);
     }
@@ -80,34 +85,55 @@ contract CrimeContract is Ownable {
     ///@notice this will calulate the number of criminals in a nations population
     ///@notice criminals will rduce the amount of your tax paying citizens
     ///@notice you will also lose population happiness as your criminal population increases
-    ///@notice jails, labor camps, border walls and prisons will reduce the number of criminals in your nation 
+    ///@notice jails, labor camps, border walls and prisons will reduce the number of criminals in your nation
     ///@param id this is the nation ID for the nation being queried
     ///@return uint256 this function will return the number of criminals in your population
-    function getCriminalCount(uint256 id) public view returns (uint256) {
+    function getCriminalCount(
+        uint256 id
+    ) public view returns (uint256, uint256, uint256) {
         uint256 totalPopulation = inf.getTotalPopulationCount(id);
         uint256 crimeIndex = getCrimeIndex(id);
         uint256 criminalPercentage = (crimeIndex + 1);
         uint256 baseCriminalCount = ((totalPopulation * criminalPercentage) /
             100);
-        uint256 jailCount = imp2.getJailCount(id);
-        uint256 laborCamps = imp2.getLaborCampCount(id);
-        uint256 prisons = imp3.getPrisonCount(id);
-        uint256 criminalsIncarcerated = ((jailCount * 500) +
-            (laborCamps * 200) +
-            (prisons * 5000));
-        if (baseCriminalCount <= criminalsIncarcerated) {
+        uint256 rehabs = imp3.getRehabilitationFacilityCount(id);
+        uint256 rehabilitatedCitizens = (rehabs * 1000);
+        if (baseCriminalCount <= rehabilitatedCitizens) {
+            rehabilitatedCitizens = baseCriminalCount;
             baseCriminalCount = 0;
         } else {
-            baseCriminalCount = baseCriminalCount - criminalsIncarcerated;
+            baseCriminalCount = baseCriminalCount - rehabilitatedCitizens;
+        }
+        (uint256 criminalCount, uint256 incarcerated) = incarcerateCriminals(baseCriminalCount, id);
+        return (criminalCount, rehabilitatedCitizens, incarcerated);
+    }
+
+    function incarcerateCriminals(
+        uint256 baseCriminalCount,
+        uint256 countryId
+    ) public view returns (uint256, uint256) {
+        uint256 jailCount = imp2.getJailCount(countryId);
+        uint256 laborCamps = imp2.getLaborCampCount(countryId);
+        uint256 prisons = imp3.getPrisonCount(countryId);
+        uint256 incarceratedCriminals = 0;
+        uint256 roomForIncarceration = ((jailCount * 500) +
+            (laborCamps * 200) +
+            (prisons * 5000));
+        if (baseCriminalCount <= roomForIncarceration) {
+            incarceratedCriminals = baseCriminalCount;
+            baseCriminalCount = 0;
+        } else {
+            baseCriminalCount = baseCriminalCount - roomForIncarceration;
+            incarceratedCriminals = roomForIncarceration;
         }
         uint256 criminalCountPercentageModifier = 100;
-        uint256 borderWalls = imp1.getBorderWallCount(id);
+        uint256 borderWalls = imp1.getBorderWallCount(countryId);
         if (borderWalls > 0) {
             criminalCountPercentageModifier -= borderWalls;
         }
         uint256 criminalCount = ((baseCriminalCount *
             criminalCountPercentageModifier) / 100);
-        return criminalCount;
+        return (criminalCount, incarceratedCriminals);
     }
 
     ///@dev this function will take your nation's crime prevention score and return a crime index
@@ -145,11 +171,13 @@ contract CrimeContract is Ownable {
     function getCrimePreventionScore(uint256 id) public view returns (uint256) {
         uint256 litPoints = getLiteracyPoints(id);
         uint256 improvementPoints = getImprovementPoints(id);
+        uint256 taxRatePoints = getTaxRateCrimeMultiplier(id);
         uint256 governmentPoints = getPointsFromGovernmentType(id);
         uint256 getPointsFromInfrastructure = getPointsFromInfrastruture(id);
         uint256 populationPoints = getPointsFromPopulation(id);
         uint256 cps = (litPoints +
             improvementPoints +
+            taxRatePoints +
             governmentPoints +
             getPointsFromInfrastructure +
             populationPoints);
@@ -174,6 +202,10 @@ contract CrimeContract is Ownable {
         uint256 schoolPoints = imp3.getSchoolCount(id);
         uint256 universities = imp3.getUniversityCount(id);
         uint256 universityPoints = (universities * 3);
+        bool greatUniversity = won2.getGreatUniversity(id);
+        if (greatUniversity == true) {
+            universityPoints += 10;
+        }
         uint256 literacy = (litBeforeModifiers +
             schoolPoints +
             universityPoints);
@@ -194,12 +226,12 @@ contract CrimeContract is Ownable {
         return litPoints;
     }
 
-    ///@dev this is a publci view function that will calculate the amount of crime prevention score points from a nations improvements and tax rate 
+    ///@dev this is a publci view function that will calculate the amount of crime prevention score points from a nations improvements and tax rate
     ///@notice schools, universities, polive headquarters, casinos and red light districts all affect a nations crime prevention score
     ///@notice a nations tax rate will change the magnitude of these improvements affect on crime prevention score
     ///@notice the higher a tax rate the lower the crime prevention score will be and the more criminals a population will have
     ///@param id this is the nation ID of the nation being queried
-    ///@return uint256 is the number of points added to crime prevention score from imrpovements and tax rate    
+    ///@return uint256 is the number of points added to crime prevention score from imrpovements and tax rate
     function getImprovementPoints(uint256 id) public view returns (uint256) {
         uint256 schools = imp3.getSchoolCount(id);
         uint256 universities = imp3.getUniversityCount(id);
@@ -211,13 +243,12 @@ contract CrimeContract is Ownable {
         uint256 policeHqPoints = (policeHqs * 2);
         uint256 casinoPoints = (casinoCount * 2);
         uint256 redLightDistrictPoints = (redLightDistricts * 2);
-        uint256 taxMultiplier = getTaxRateCrimeMultiplier(id);
-        uint256 improvementPoints = (((8 +
+        uint256 improvementPoints = (8 +
             schoolPoints +
             universityPoints +
             policeHqPoints -
             casinoPoints -
-            redLightDistrictPoints) * taxMultiplier) / 100);
+            redLightDistrictPoints);
         return improvementPoints;
     }
 
@@ -225,24 +256,12 @@ contract CrimeContract is Ownable {
     ///@notice the higher a nations tax rate the lower the multiplier will be and the lower the crime prevention score will be
     ///@param id is the nation ID of the nation being queried
     ///@return uint256 is the munliplier used to adjust the points added to crime prevention score from taxes and improvements
-    function getTaxRateCrimeMultiplier(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
+    function getTaxRateCrimeMultiplier(
+        uint256 id
+    ) public view returns (uint256) {
         uint256 taxRate = inf.getTaxRate(id);
         uint256 taxRateCrimeMultiplier;
-        if (taxRate <= 10) {
-            taxRateCrimeMultiplier = 40;
-        } else if (taxRate == 11) {
-            taxRateCrimeMultiplier = 39;
-        } else if (taxRate == 12) {
-            taxRateCrimeMultiplier = 38;
-        } else if (taxRate == 13) {
-            taxRateCrimeMultiplier = 37;
-        } else if (taxRate == 14) {
-            taxRateCrimeMultiplier = 36;
-        } else if (taxRate == 15) {
+        if (taxRate <= 15) {
             taxRateCrimeMultiplier = 35;
         } else if (taxRate == 16) {
             taxRateCrimeMultiplier = 34;
@@ -283,11 +302,9 @@ contract CrimeContract is Ownable {
     ///@notice different govermnet types will affect a nations crime prevenetion score differently
     ///@param id is the nation ID of the nation being queried
     ///@return uint256 is the points added to crime prevention score from governemtn type
-    function getPointsFromGovernmentType(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
+    function getPointsFromGovernmentType(
+        uint256 id
+    ) public view returns (uint256) {
         uint256 governmentPoints;
         uint256 gov = cp.getGovernmentType(id);
         if (gov == 0) {
@@ -331,11 +348,9 @@ contract CrimeContract is Ownable {
     ///@notice more infrastructure will increase crime prevention score reducing criminals
     ///@param id is the nation ID for the countrtry being queried
     ///@return uint256 is the points added to crime prevention score from infrastructure
-    function getPointsFromInfrastruture(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
+    function getPointsFromInfrastruture(
+        uint256 id
+    ) public view returns (uint256) {
         uint256 infra = inf.getInfrastructureCount(id);
         uint256 infraPoints = (infra / 400);
         return infraPoints;

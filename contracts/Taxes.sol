@@ -19,6 +19,7 @@ import "hardhat/console.sol";
 ///@title TaxesContract
 ///@author OxSnosh
 ///@dev this contract inherits from the open zeppelin ownable contract
+///@notice this contract will allow a nation owner to collect taxes from their citizens
 contract TaxesContract is Ownable {
     address public countryMinter;
     address public infrastructure;
@@ -217,6 +218,8 @@ contract TaxesContract is Ownable {
     function collectTaxes(uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require (isOwner, "!nation owner");
+        bool war = mil.getWarPeacePreference(id);
+        require(war, "must be ready for war to collct taxes");
         (, uint256 taxesCollectible) = getTaxesCollectible(id);
         inf.toggleCollectionNeededToChangeRate(id);
         tsy.increaseBalanceOnTaxCollection(id, taxesCollectible);
@@ -233,7 +236,7 @@ contract TaxesContract is Ownable {
         uint256 daysSinceLastTaxCollection = tsy.getDaysSinceLastTaxCollection(
             id
         );
-        (uint256 citizenCount, ) = inf.getTaxablePopulationCount(0);
+        (uint256 citizenCount,) = inf.getTaxablePopulationCount(0);
         uint256 taxRate = inf.getTaxRate(id);
         uint256 dailyTaxesCollectiblePerCitizen = ((dailyIncomePerCitizen *
             taxRate) / 100);
@@ -281,7 +284,12 @@ contract TaxesContract is Ownable {
     function getHappiness(uint256 id) public view returns (uint256) {
         uint256 happinessAdditions = getHappinessPointsToAdd(id);
         uint256 happinessSubtractions = getHappinessPointsToSubtract(id);
-        uint256 happiness = (happinessAdditions + happinessSubtractions);
+        uint256 happiness = 0;
+        if (happinessSubtractions >= happinessAdditions) {
+            happiness = 0;
+        } else {
+            happiness = (happinessAdditions - happinessSubtractions);
+        }
         return happiness;
     }
 
@@ -335,15 +343,13 @@ contract TaxesContract is Ownable {
             id
         );
         uint256 pointsFromIntelAgencies = getPointsFromIntelAgencies(id);
-        uint256 pointsFromPeaceMode = addTax.getPointsFromPeaceMode(id);
         uint256 environmentPoints = env.getEnvironmentScore(id);
-        uint256 happinessPointsToSubtract = (60 -
-            taxRatePoints -
-            pointsFromCrime -
-            pointsFromImprovements -
-            pointsFromStability -
-            pointsFromIntelAgencies -
-            pointsFromPeaceMode -
+        uint256 happinessPointsToSubtract = (
+            taxRatePoints +
+            pointsFromCrime +
+            pointsFromImprovements +
+            pointsFromStability +
+            pointsFromIntelAgencies +
             environmentPoints );
         return happinessPointsToSubtract;
     }
@@ -683,37 +689,6 @@ contract TaxesContract is Ownable {
         return agePoints;
     }
 
-    // function getPointsFromTrades(uint256 id) public view returns (uint256) {
-    //     uint256[] memory partners = res.getTradingPartners(id);
-    //     uint256 pointsFromTeamTrades = 0;
-    //     uint256 callerNationTeam = params.getTeam(id);
-    //     for (uint256 i = 0; i < partners.length; i++) {
-    //         uint256 partnerId = partners[i];
-    //         uint256 partnerTeam = params.getTeam(partnerId);
-    //         if (callerNationTeam == partnerTeam) {
-    //             pointsFromTeamTrades++;
-    //         }
-    //     }
-    //     return pointsFromTeamTrades;
-    // }
-
-    // function getPointsFromDefcon(uint256 id) public view returns (uint256) {
-    //     uint256 defconLevel = mil.getDefconLevel(id);
-    //     uint256 pointsFromDefcon;
-    //     if (defconLevel == 5) {
-    //         pointsFromDefcon = 4;
-    //     } else if (defconLevel == 4) {
-    //         pointsFromDefcon = 3;
-    //     } else if (defconLevel == 3) {
-    //         pointsFromDefcon = 2;
-    //     } else if (defconLevel == 2) {
-    //         pointsFromDefcon = 1;
-    //     } else {
-    //         pointsFromDefcon = 0;
-    //     }
-    //     return pointsFromDefcon;
-    // }
-
     function getTaxRatePoints(uint256 id) public view returns (uint256) {
         uint256 subtractTaxPoints;
         uint256 taxRate = inf.getTaxRate(id);
@@ -735,13 +710,11 @@ contract TaxesContract is Ownable {
         uint256 intelAgencies = imp2.getIntelAgencyCount(id);
         uint256 subtractPoints;
         uint256 taxRate = inf.getTaxRate(id);
-        if (intelAgencies >= 1 && taxRate <= 20) {
+        if (taxRate <= 20) {
             subtractPoints = 0;
-        } else if (intelAgencies <= 3 && taxRate > 20 && taxRate <= 23) {
-            subtractPoints = intelAgencies;
-        } else if (intelAgencies > 3 && taxRate > 20 && taxRate <= 23) {
-            subtractPoints = 0;    
-        } else if (taxRate > 23) {
+        } else if (intelAgencies >= 1 && taxRate > 20 && taxRate <= 23) {
+            subtractPoints = 1;  
+        } else if (intelAgencies >= 1 && taxRate > 23) {
             subtractPoints = intelAgencies;
         } else {
             subtractPoints = 0;
@@ -754,7 +727,6 @@ contract TaxesContract is Ownable {
         (uint256 ratio, , ) = soldierToPopulationRatio(id);
         uint256 pointsFromMilitaryToSubtract;
         if (ratio > 70) {
-            //unsure about this number
             pointsFromMilitaryToSubtract = 10;
         }
         if (ratio < 20) {
@@ -764,7 +736,6 @@ contract TaxesContract is Ownable {
             pointsFromMilitaryToSubtract = 14;
         }
         return pointsFromMilitaryToSubtract;
-        //need to include recent casualties
     }
 
     function soldierToPopulationRatio(uint256 id)
@@ -790,7 +761,7 @@ contract TaxesContract is Ownable {
     }
 
     function getPointsFromCriminals(uint256 id) public view returns (uint256) {
-        uint256 unincarceratedCriminals = crm.getCriminalCount(id);
+        (uint256 unincarceratedCriminals,, )= crm.getCriminalCount(id);
         uint256 pointsFromCrime;
         if (unincarceratedCriminals < 200) {
             pointsFromCrime = 0;
@@ -807,33 +778,6 @@ contract TaxesContract is Ownable {
         }
         return pointsFromCrime;
     }
-
-    // function getPointsToSubtractFromImprovements(uint256 id)
-    //     public
-    //     view
-    //     returns (uint256)
-    // {
-    //     uint256 pointsToSubtractFromImprovements;
-    //     uint256 laborCamps = imp2.getLaborCampCount(id);
-    //     if (laborCamps > 0) {
-    //         pointsToSubtractFromImprovements += (laborCamps * 1);
-    //     }
-    //     return pointsToSubtractFromImprovements;
-    // }
-
-    // function getUniversityPoints(uint256 id) public view returns (uint256) {
-    //     uint256 universities = imp3.getUniversityCount(id);
-    //     uint256 universityPoints = 0;
-    //     bool scientificDevelopmentCenter = won3.getScientificDevelopmentCenter(id);
-    //     if (universities > 0) {
-    //         if (!scientificDevelopmentCenter) {
-    //             universityPoints = (universities * 8);
-    //         } else if (scientificDevelopmentCenter) {
-    //             universityPoints = (universities * 10);
-    //         }
-    //     }
-    //     return universityPoints;
-    // }
 }
 
 ///@title AdditionalTaxesContract
@@ -841,10 +785,7 @@ contract TaxesContract is Ownable {
 ///@dev tis contract inherits from openzeppelin's ownable contract
 ///@notice this contract will have additional formulas that will allow a nation to collect taxes from its citizens
 contract AdditionalTaxesContract is Ownable {
-    // address public countryMinter;
     address public infrastructure;
-    // address public treasury;
-    // address public improvements1;
     address public improvements2;
     address public improvements3;
     address public parameters;
@@ -853,14 +794,10 @@ contract AdditionalTaxesContract is Ownable {
     address public wonders3;
     address public wonders4;
     address public resources;
-    // address public forces;
     address public military;
-    // address public crime;
     address public bonusResources;
 
     InfrastructureContract inf;
-    // TreasuryContract tsy;
-    // ImprovementsContract1 imp1;
     ImprovementsContract2 imp2;
     ImprovementsContract3 imp3;
     CountryParametersContract params;
@@ -869,9 +806,7 @@ contract AdditionalTaxesContract is Ownable {
     WondersContract3 won3;
     WondersContract4 won4;
     ResourcesContract res;
-    // ForcesContract frc;
     MilitaryContract mil;
-    // CrimeContract crm;
     BonusResourcesContract bonus;
 
     ///@dev this function is only callable by the contract owner
@@ -1017,19 +952,7 @@ contract AdditionalTaxesContract is Ownable {
 
     function getPointsFromDefcon(uint256 id) public view returns (uint256) {
         uint256 defconLevel = mil.getDefconLevel(id);
-        uint256 pointsFromDefcon;
-        if (defconLevel == 5) {
-            pointsFromDefcon = 4;
-        } else if (defconLevel == 4) {
-            pointsFromDefcon = 3;
-        } else if (defconLevel == 3) {
-            pointsFromDefcon = 2;
-        } else if (defconLevel == 2) {
-            pointsFromDefcon = 1;
-        } else {
-            pointsFromDefcon = 0;
-        }
-        return pointsFromDefcon;
+        return (defconLevel - 1);
     }
 
     function getPointsToSubtractFromImprovements(uint256 id)
@@ -1071,17 +994,5 @@ contract AdditionalTaxesContract is Ownable {
             pointsFromGovernmentType = 1;
         }
         return pointsFromGovernmentType;
-    }
-
-    function getPointsFromPeaceMode(uint256 id) public view returns (uint256) {
-        uint256 daysInPeaceMode = mil.getDaysInPeaceMode(id);
-        uint256 pointsFromPeaceMode = 0;
-        if (daysInPeaceMode > 0) {
-            pointsFromPeaceMode = daysInPeaceMode;
-        }
-        if (pointsFromPeaceMode > 10) {
-            pointsFromPeaceMode = 10;
-        }
-        return pointsFromPeaceMode;
     }
 }
