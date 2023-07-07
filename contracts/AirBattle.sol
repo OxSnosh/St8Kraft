@@ -87,14 +87,12 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
 
     mapping(uint256 => uint256[]) airBattleIdToAttackerFighters;
     mapping(uint256 => uint256[]) airBattleIdToAttackerBombers;
-    // mapping(uint256 => uint256) airBattleIdToAttackerFighterStrength;
     mapping(uint256 => uint256) airBattleIdToAttackerFighterSum;
     mapping(uint256 => uint256) airBattleIdToAttackerBomberSum;
     mapping(uint256 => uint256[]) airBattleIdToAttackerFighterLosses;
 
     mapping(uint256 => uint256[]) airBattleIdToDefenderFighters;
     mapping(uint256 => uint256[]) airBattleIdToDefendederFighterArray;
-    // mapping(uint256 => uint256) airBattleIdToDefendingFighterStrength;
     mapping(uint256 => uint256) airBattleIdToDefenderFighterSum;
     mapping(uint256 => uint256[]) airBattleIdToDefenderFighterLosses;
 
@@ -236,8 +234,6 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         newAirBattle.defenderId = defenderId;
         newAirBattle.attackerFighterArray = attackerFighterArray;
         newAirBattle.attackerBomberArray = attackerBomberArray;
-        // airBattleIdToAttackerFighters[airBattleId] = attackerFighterArray;
-        // airBattleIdToAttackerBombers[airBattleId] = attackerBomberArray;
         generateDefenderFighters(defenderId, airBattleId);
         fulfillRequest(airBattleId);
         airBattleId++;
@@ -374,7 +370,6 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         defenderFighterArray[6] = f15EagleCount;
         defenderFighterArray[7] = su30MkiCount;
         defenderFighterArray[8] = f22RaptorCount;
-        // airBattleIdToDefenderFighters[_airBattleId] = defenderFighterArray;
         AirBattle storage newAirBattle = airBattleIdToAirBattle[_airBattleId];
         newAirBattle.defenderFighterArray = defenderFighterArray;
     }

@@ -826,7 +826,7 @@ contract MissilesContract is Ownable {
     struct Missiles {
         uint256 cruiseMissiles;
         uint256 nuclearWeapons;
-        uint256 nukesPurchasedToday;
+        // uint256 nukesPurchasedToday;
     }
 
     mapping(uint256 => mapping(uint256 => uint256))
@@ -883,7 +883,7 @@ contract MissilesContract is Ownable {
     mapping(uint256 => Missiles) public idToMissiles;
 
     function generateMissiles(uint256 id) public {
-        Missiles memory newMissiles = Missiles(0, 0, 0);
+        Missiles memory newMissiles = Missiles(0, 0);
         idToMissiles[id] = newMissiles;
     }
 
@@ -1110,7 +1110,6 @@ contract MissilesContract is Ownable {
             "already purchased nuke today"
         );
         idToNukesPurchasedToday[id][day] += 1;
-        // idToMissiles[id].nukesPurchasedToday += 1;
         idToMissiles[id].nuclearWeapons += 1;
         uint256 cost = getNukeCost(id);
         tsy.spendBalance(id, cost);
@@ -1181,14 +1180,4 @@ contract MissilesContract is Ownable {
         require(nukeCount >= requiredNukeAmount, "no nukes to destroy");
         idToMissiles[id].nuclearWeapons -= 1;
     }
-
-    // ///@dev this is a function that is only callable from the keeper contract
-    // ///@dev this function will reset the number of nukes purchased by each nation for that day back to 0
-    // ///@dev this function will be called daily
-    // function resetNukesPurchasedToday() public onlyKeeper {
-    //     uint256 countryCount = mint.getCountryCount();
-    //     for (uint i = 0; i < countryCount; i++) {
-    //         idToMissiles[i].nukesPurchasedToday = 0;
-    //     }
-    // }
 }

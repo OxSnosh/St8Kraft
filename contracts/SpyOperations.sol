@@ -146,13 +146,28 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         fee = _fee;
     }
 
+    /**@param attackType is the type of attack
+     * 1. destroy cruise missiles
+     * 2. destroy defending tanks
+     * 3. capture land
+     * 4. change governemnt
+     * 5. change religion
+     * 6. chenge threat level
+     * 7. change defcon
+     * 8. destroy spies
+     * 9. capture tech
+     * 10. sabatoge taxes
+     * 11. capture money reserves
+     * 12. capture infrastructure
+     * 13. destroy nukes
+     */
     function trainSpy(
         uint256 encryptedAttackerId,
         uint256 encryptedDefenderId,
         uint256 attackType
     ) public {
         require(attackType >= 1, "invalid attack type");
-        require(attackType <= 15, "invalid attack type");
+        require(attackType <= 13, "invalid attack type");
         attackIdToAttackType[attackId] = attackType;
         Chainlink.Request memory req = buildChainlinkRequest(
             trainSpyJobId,
@@ -187,22 +202,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     ///@notice this function will allow a nation to conduct a spy operation against another nation
     ///@param encryptedAttackerId is the id of the attacking nation
     ///@param defenderId is the id of the defending nation
-    /**@param _attackId is the type of attack
-     * 1. gather intelligence
-     * 2. destroy cruise missiles
-     * 3. destroy defending tanks
-     * 4. capture land
-     * 5. change governemnt
-     * 6. change religion
-     * 7. chenge threat level
-     * 8. change defcon
-     * 9. destroy spies
-     * 10. capture tech
-     * 11. sabatoge taxes
-     * 12. capture money reserves
-     * 13. capture infrastructure
-     * 14. destroy nukes
-     */
+    ///@param _attackId is the id of the attack as it is stored on this contract
     function conductSpyOperation(
         uint256 encryptedAttackerId,
         uint256 defenderId,
@@ -211,11 +211,6 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256 gameDay = keep.getGameDay();
         uint256 trainingDay = attackIdToDayTrained[_attackId];
         require((gameDay - trainingDay) <= 5, "spy training expired");
-        // bool warPreference = mil.getWarPeacePreference(defenderId);
-        // SpyAttack storage newSpyAttack = spyAttackIdToSpyAttack[spyAttackId];
-        // newSpyAttack.encryptedAttackerId = encryptedAttackerId;
-        // newSpyAttack.defenderId = defenderId;
-        // newSpyAttack.attackType = attackType;
         uint256 attackType = attackIdToAttackType[_attackId];
         uint256 infrastructureAmount = inf.getInfrastructureCount(defenderId);
         uint256 techAmount = inf.getTechnologyCount(defenderId);
@@ -312,42 +307,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         req.addBytes("randomNumber", abi.encodePacked(randomWords[0]));
         req.addUint("randomnessRequestId", _randomnessRequestId);
         sendChainlinkRequestTo(oracleAddress, req, fee);
-        // uint256 requestNumber = s_requestIdToRequestIndex[requestId];
-        // s_requestIndexToRandomWords[requestNumber] = randomWords;
-        // s_randomWords = randomWords;
-        // uint256 attackType = spyAttackIdToSpyAttack[requestNumber].attackType;
-        // uint256 attackerId = spyAttackIdToSpyAttack[requestNumber].attackerId;
-        // uint256 attackerSuccessScore = getAttackerSuccessScore(attackerId);
-        // uint256 defenderId = spyAttackIdToSpyAttack[requestNumber].defenderId;
-        // uint256 defenderSuccessScore = getDefenseSuccessScore(defenderId);
-        // uint256 totalSuccessScore = defenderSuccessScore + attackerSuccessScore;
-        // uint256 randomSuccessNumber = (s_randomWords[0] % totalSuccessScore);
-        // if (randomSuccessNumber <= attackerSuccessScore) {
-        //     console.log("Mission Success");
-        //     executeSpyOperation(
-        //         attackerId,
-        //         defenderId,
-        //         attackType,
-        //         requestNumber
-        //     );
-        // } else {
-        //     force.decreaseAttackerSpyCount(attackerId);
-        //     console.log("Mission Failed");
-        // }
     }
-
-    // function attackOdds(
-    //     uint256 attackerId,
-    //     uint256 defenderId
-    // ) public view returns (uint256, uint256) {
-    //     uint256 attackerSuccess = getAttackerSuccessScore(attackerId);
-    //     uint256 defenderSuccess = getDefenseSuccessScore(defenderId);
-    //     uint256 attackerOdds = ((attackerSuccess * 100) /
-    //         (attackerSuccess + defenderSuccess));
-    //     uint256 defenderOdds = ((defenderSuccess * 100) /
-    //         (attackerSuccess + defenderSuccess));
-    //     return (attackerOdds, defenderOdds);
-    // }
 
     function getAttackerSuccessScore(
         uint256 countryId
@@ -434,54 +394,50 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
             );
         } else if (success) {
             if (attackType == 1) {
-                // uint256 cost = (200000 + (defenderStrength * 2));
-                // tsy.spendBalance(attackerId, cost);
-                gatherIntelligence();
-            } else if (attackType == 2) {
                 // uint256 cost = ((100000 + defenderStrength) * (10 ** 18));
                 // tsy.spendBalance(attackerId, cost);
                 destroyCruiseMissiles(defenderId, _randomnessRequestId);
-            } else if (attackType == 3) {
+            } else if (attackType == 2) {
                 // uint256 cost = (100000 + (defenderStrength * 2) * (10 ** 18));
                 // tsy.spendBalance(attackerId, cost);
                 destroyDefendingTanks(defenderId, _randomnessRequestId);
-            } else if (attackType == 4) {
+            } else if (attackType == 3) {
                 // uint256 cost = (100000 + (defenderStrength * 3) * (10 ** 18));
                 // tsy.spendBalance(attackerId, cost);
                 captureLand(defenderId, _randomnessRequestId);
-            } else if (attackType == 5) {
+            } else if (attackType == 4) {
                 // uint256 cost = (100000 + (defenderStrength * 3) * (10 ** 18));
                 // tsy.spendBalance(attackerId, cost);
                 changeDesiredGovernment(defenderId, _randomnessRequestId);
-            } else if (attackType == 6) {
+            } else if (attackType == 5) {
                 // uint256 cost = (100000 + (defenderStrength * 3) * (10 ** 18));
                 // tsy.spendBalance(attackerId, cost);
                 changeDesiredReligion(defenderId, _randomnessRequestId);
-            } else if (attackType == 7) {
+            } else if (attackType == 6) {
                 // uint256 cost = (150000 + (defenderStrength) * (10 ** 18));
                 // tsy.spendBalance(attackerId, cost);
                 changeThreatLevel(defenderId, _randomnessRequestId);
-            } else if (attackType == 8) {
+            } else if (attackType == 7) {
                 // uint256 cost = (150000 + (defenderStrength * 5) * (10 ** 18));
                 // tsy.spendBalance(attackerId, cost);
                 changeDefconLevel(defenderId, _randomnessRequestId);
-            } else if (attackType == 9) {
+            } else if (attackType == 8) {
                 // uint256 cost = (250000 + (defenderStrength * 2) * (10 ** 18));
                 // tsy.spendBalance(attackerId, cost);
                 destroySpies(defenderId, _randomnessRequestId);
-            } else if (attackType == 10) {
+            } else if (attackType == 9) {
                 // uint256 cost = (300000 + (defenderStrength * 2) * (10 ** 18));
                 // tsy.spendBalance(attackerId, cost);
                 captueTechnology(defenderId, _randomnessRequestId);
-            } else if (attackType == 11) {
+            } else if (attackType == 10) {
                 // uint256 cost = (100000 + (defenderStrength * 20) * (10 ** 18));
                 // tsy.spendBalance(attackerId, cost);
                 sabotogeTaxes(defenderId, _randomnessRequestId);
-            } else if (attackType == 12) {
+            } else if (attackType == 11) {
                 // uint256 cost = (300000 + (defenderStrength * 15) * (10 ** 18));
                 // tsy.spendBalance(attackerId, cost);
                 destroyMoneyReserves(defenderId);
-            } else if (attackType == 13) {
+            } else if (attackType == 12) {
                 // uint256 cost = (500000 + (defenderStrength * 5) * (10 ** 18));
                 // tsy.spendBalance(attackerId, cost);
                 captureInfrastructure(defenderId, _randomnessRequestId);
@@ -491,13 +447,6 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
                 destroyNukes(defenderId);
             }
         }
-    }
-
-    function gatherIntelligence() internal // uint256 attackerId,
-    // uint256 defenderId,
-    // uint256 attackId
-    {
-
     }
 
     function destroyCruiseMissiles(
@@ -586,19 +535,19 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256 _randomnessRequestId
     ) internal {
         //new level randomly chosen
-        uint256[] memory randomNumbers = s_randomnessRequestIdToRandomWords[
-            _randomnessRequestId
-        ];
-        uint256 threatLevel = mil.getThreatLevel(defenderId);
-        uint256 newThreatLevel = ((randomNumbers[1] % 5) + 1);
-        if (threatLevel == newThreatLevel) {
-            if (threatLevel == 1) {
-                newThreatLevel += 1;
-            } else {
-                newThreatLevel -= 1;
-            }
-        }
-        mil.setThreatLevelFromSpyContract(defenderId, newThreatLevel);
+        // uint256[] memory randomNumbers = s_randomnessRequestIdToRandomWords[
+        //     _randomnessRequestId
+        // ];
+        // uint256 threatLevel = mil.getThreatLevel(defenderId);
+        // uint256 newThreatLevel = ((randomNumbers[1] % 5) + 1);
+        // if (threatLevel == newThreatLevel) {
+        //     if (threatLevel == 1) {
+        //         newThreatLevel += 1;
+        //     } else {
+        //         newThreatLevel -= 1;
+        //     }
+        // }
+        mil.setThreatLevelFromSpyContract(defenderId, 1);
     }
 
     function changeDefconLevel(
@@ -606,19 +555,16 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256 _randomnessRequestId
     ) internal {
         //new level randomly chosen
-        uint256[] memory randomNumbers = s_randomnessRequestIdToRandomWords[
-            _randomnessRequestId
-        ];
-        uint256 defconLevel = mil.getDefconLevel(defenderId);
-        uint256 newDefconLevel = ((randomNumbers[1] % 5) + 1);
-        if (defconLevel == newDefconLevel) {
-            if (defconLevel == 1) {
-                newDefconLevel += 1;
-            } else {
-                newDefconLevel -= 1;
-            }
-        }
-        mil.setDefconLevelFromSpyContract(defenderId, newDefconLevel);
+        // uint256[] memory randomNumbers = s_randomnessRequestIdToRandomWords[
+        //     _randomnessRequestId
+        // ];
+        // uint256 defconLevel = mil.getDefconLevel(defenderId);
+        // uint256 newDefconLevel = ((randomNumbers[1] % 5) + 1);
+        // if (defconLevel == newDefconLevel) {
+        //         newDefconLevel += 1;
+
+        // }
+        mil.setDefconLevelFromSpyContract(defenderId, 5);
     }
 
     function destroySpies(
