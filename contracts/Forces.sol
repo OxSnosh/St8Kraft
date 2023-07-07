@@ -52,7 +52,6 @@ contract ForcesContract is Ownable {
         uint256 numberOfSoldiers;
         uint256 defendingSoldiers;
         uint256 deployedSoldiers;
-        uint256 soldierCasualties;
         uint256 numberOfTanks;
         uint256 defendingTanks;
         uint256 deployedTanks;
@@ -62,7 +61,7 @@ contract ForcesContract is Ownable {
 
     struct GroundBattleCasualties {
         uint256 soldierCasualties;
-        uint256 tankCasualties; 
+        uint256 tankCasualties;
     }
 
     ///@dev this function is only callable by the contract owner
@@ -126,36 +125,8 @@ contract ForcesContract is Ownable {
     ///@notice this function allows a nation to purchase forces once a country is minted
     ///@param id this is the nation ID of the nation being minted
     function generateForces(uint256 id) public {
-        Forces memory newForces = Forces(
-            20,
-            20,
-            0,
-            0,
-            0,
-            0,
-            0,
-            0,
-            true
-        );
+        Forces memory newForces = Forces(20, 20, 0, 0, 0, 0, 0, true);
         idToForces[id] = newForces;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateInfrastructureContract(address newAddress) public onlyOwner {
-        infrastructure = newAddress;
-        inf = InfrastructureContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateResourcesContract(address newAddress) public onlyOwner {
-        resources = newAddress;
-        res = ResourcesContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementsContract1(address newAddress) public onlyOwner {
-        improvements1 = newAddress;
-        imp1 = ImprovementsContract1(newAddress);
     }
 
     modifier onlyAidContract() {
@@ -197,11 +168,8 @@ contract ForcesContract is Ownable {
         _;
     }
 
-    modifier onlyKeeperContract() {
-        require(
-            msg.sender == keeper,
-            "function is only callable from the keeper contract"
-        );
+    modifier onlyWar() {
+        require(msg.sender == warAddress, "only callable from war contract");
         _;
     }
 
@@ -285,6 +253,29 @@ contract ForcesContract is Ownable {
         return count;
     }
 
+
+    ///@dev this is a public view function that will return the number of soldiers for a nation
+    ///@notice this function will return the number of soldiers a nation has
+    ///@param id this is the nation ID of the nation being queried
+    ///@return soldiers is the nations soldier count
+    function getSoldierCount(
+        uint256 id
+    ) public view returns (uint256 soldiers) {
+        uint256 soldierAmount = idToForces[id].numberOfSoldiers;
+        return soldierAmount;
+    }
+
+    ///@dev this is a public view function that will return a nations deployed soldier count
+    ///@notice this function returns the amount of deployed solders a nation has
+    ///@param id is the nation ID for the nation being queried
+    ///@return soldiers is the number of deployed soldiers for that nation
+    function getDeployedSoldierCount(
+        uint256 id
+    ) public view returns (uint256 soldiers) {
+        uint256 soldierAmount = idToForces[id].deployedSoldiers;
+        return soldierAmount;
+    }
+
     ///@dev this is a public function that will allow a nation woner to deploy soldiers to a war
     ///@notice this function allows a nation owner to deploy soldiers to an active war
     ///@param soldiersToDeploy is the number of soldiers being deployed
@@ -345,9 +336,10 @@ contract ForcesContract is Ownable {
     ///@notice this function lets a nation owner deploy troops from war
     ///@param amountToWithdraw is the amount of soldiers the nation owner is looking to withdraw
     ///@param id is the nation id of the nation withdrawing soldeirs
-    function withdrawSoldiers(uint256 amountToWithdraw, uint256 id) public {
-        bool isOwner = mint.checkOwnership(id, msg.sender);
-        require(isOwner, "!nation owner");
+    function withdrawSoldiers(
+        uint256 amountToWithdraw,
+        uint256 id
+    ) public onlyWar {
         uint256 deployedSoldierCount = idToForces[id].deployedSoldiers;
         require(deployedSoldierCount >= amountToWithdraw);
         idToForces[id].defendingSoldiers += amountToWithdraw;
@@ -368,7 +360,7 @@ contract ForcesContract is Ownable {
                 .defendingSoldiers;
             idToForces[id].defendingSoldiers = 0;
             idToForces[id].numberOfSoldiers -= numberOfDefendingSoldiers;
-            idToForces[id].soldierCasualties += numberOfDefendingSoldiers;
+            idToCasualties[id].soldierCasualties += numberOfDefendingSoldiers;
         } else {
             uint256 numberOfDefendingSoldierCasualties = ((
                 idToForces[id].defendingSoldiers
@@ -377,31 +369,9 @@ contract ForcesContract is Ownable {
                 .defendingSoldiers = numberOfDefendingSoldierCasualties;
             idToForces[id]
                 .numberOfSoldiers -= numberOfDefendingSoldierCasualties;
-            idToForces[id]
+            idToCasualties[id]
                 .soldierCasualties += numberOfDefendingSoldierCasualties;
         }
-    }
-
-    ///@dev this is a public view function that will return the number of soldiers for a nation
-    ///@notice this function will return the number of soldiers a nation has
-    ///@param id this is the nation ID of the nation being queried
-    ///@return soldiers is the nations soldier count
-    function getSoldierCount(
-        uint256 id
-    ) public view returns (uint256 soldiers) {
-        uint256 soldierAmount = idToForces[id].numberOfSoldiers;
-        return soldierAmount;
-    }
-
-    ///@dev this is a public view function that will return a nations deployed soldier count
-    ///@notice this function returns the amount of deployed solders a nation has
-    ///@param id is the nation ID for the nation being queried
-    ///@return soldiers is the number of deployed soldiers for that nation
-    function getDeployedSoldierCount(
-        uint256 id
-    ) public view returns (uint256 soldiers) {
-        uint256 soldierAmount = idToForces[id].deployedSoldiers;
-        return soldierAmount;
     }
 
     ///@dev this is a public view function that will adjust the efficiency of a nations deployed soldiers
@@ -583,9 +553,10 @@ contract ForcesContract is Ownable {
         return cost;
     }
 
-    function withdrawTanks(uint256 amountToWithdraw, uint256 id) public {
-        bool isOwner = mint.checkOwnership(id, msg.sender);
-        require(isOwner, "!nation owner");
+    function withdrawTanks(
+        uint256 amountToWithdraw,
+        uint256 id
+    ) public onlyWar {
         uint256 deployedTankCount = idToForces[id].deployedTanks;
         require(deployedTankCount >= amountToWithdraw);
         idToForces[id].defendingTanks += amountToWithdraw;
@@ -702,13 +673,21 @@ contract ForcesContract is Ownable {
         );
         uint256 purchasePrice = spyCost * amount;
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(balance >= purchasePrice, "insufficient balance to purchase spies");
+        require(
+            balance >= purchasePrice,
+            "insufficient balance to purchase spies"
+        );
         idToForces[id].numberOfSpies += amount;
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
     }
 
     function updateSpyPrice(uint256 newCost) public onlyOwner {
         spyCost = newCost;
+    }
+
+
+    function getSpyPrice() public view returns (uint256) {
+        return spyCost;
     }
 
     ///@dev this is a public view function that will return the maximum amount of spies a given country can own
@@ -758,10 +737,6 @@ contract ForcesContract is Ownable {
     ) public view returns (uint256 count) {
         uint256 spyAmount = idToForces[countryId].numberOfSpies;
         return spyAmount;
-    }
-
-    function getSpyPrice() public view returns (uint256) {
-        return spyCost;
     }
 
     ///@dev this is a public function only callable from the ground battle contract
@@ -817,8 +792,8 @@ contract ForcesContract is Ownable {
 ///@dev this contract will allow a nation to purchase cruise missiles and nukes
 ///@dev this contract inherits from the openzeppelin ownable contract
 contract MissilesContract is Ownable {
-    uint256 public cruiseMissileCost = 20000 * (10**18);
-    uint256 public defaultNukeCost = 500000 * (10**18);
+    uint256 public cruiseMissileCost = 20000 * (10 ** 18);
+    uint256 public defaultNukeCost = 500000 * (10 ** 18);
     uint256 public nukeCost;
     address public countryMinter;
     address public treasury;
@@ -854,7 +829,8 @@ contract MissilesContract is Ownable {
         uint256 nukesPurchasedToday;
     }
 
-    mapping(uint256 => mapping(uint256 => uint256)) public idToNukesPurchasedToday;
+    mapping(uint256 => mapping(uint256 => uint256))
+        public idToNukesPurchasedToday;
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers

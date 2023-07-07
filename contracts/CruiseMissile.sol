@@ -200,7 +200,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         );
         war.incrementCruiseMissileAttack(warId, attackerId);
         attackIdToCruiseMissile[cruiseMissileAttackId] = newAttack;
-        // fulfillRequest(cruiseMissileAttackId);
+        fulfillRequest(cruiseMissileAttackId);
         cruiseMissileAttackId++;
     }
 

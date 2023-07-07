@@ -137,6 +137,7 @@ contract MilitaryContract is Ownable {
             idToMilitary[id].dayPeaceToggled = gameDay;
         } else {
             idToMilitary[id].warPeacePreference = true;
+            idToMilitary[id].dayPeaceToggled = gameDay;
         }
     }
 

@@ -269,7 +269,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             attackType
         );
         generateDefenderForcesStruct(warId, groundBattleId, defenderId);
-        // fulfillRequest(groundBattleId);
+        fulfillRequest(groundBattleId);
         groundBattleId++;
     }
 

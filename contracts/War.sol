@@ -30,7 +30,6 @@ contract WarContract is Ownable {
     address public wonders1;
     address public keeper;
     address public treasury;
-    // uint256[] public activeWars;
 
     NationStrengthContract nsc;
     MilitaryContract mil;
@@ -101,8 +100,6 @@ contract WarContract is Ownable {
     mapping(uint256 => uint256[]) public idToActiveWars;
     mapping(uint256 => uint256[]) public idToOffensiveWars;
     mapping(uint256 => uint256[]) public idToDeactivatedWars;
-        
-    // mapping(uint256 => mapping (uint256 => uint256)) public nationIdToCruiseMissileLaunchesToday;
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -274,30 +271,26 @@ contract WarContract is Ownable {
         return warCheckReturn;
     }
 
-    function offensiveWarLengthForTesting(
+    function offensiveWarLength(
         uint256 offenseId
     ) public view returns (uint256) {
         uint256[] memory offensiveWars = idToOffensiveWars[offenseId];
         return offensiveWars.length;
     }
 
-    function offensiveWarReturnForTesting(
+    function offensiveWarReturn(
         uint256 offenseId
     ) public view returns (uint256[] memory) {
         uint256[] memory offensiveWars = idToOffensiveWars[offenseId];
         return offensiveWars;
     }
 
-    function nationActiveWarsReturnForTesting(
+    function nationActiveWarsReturn(
         uint256 offenseId
     ) public view returns (uint256[] memory) {
         uint256[] memory activeWarsArray = idToActiveWars[offenseId];
         return activeWarsArray;
     }
-
-    // function gameActiveWars() public view returns (uint256[] memory) {
-    //     return activeWars;
-    // }
 
     ///@dev this is an internal function that will be balled by the declare war function and set up several structs that will keep track of each war
     function initializeDeployments(uint256 _warId) internal {
@@ -356,7 +349,6 @@ contract WarContract is Ownable {
         bool defensePeaceCheck = warIdToWar[_warId].defensePeaceOffered;
         if (offensePeaceCheck == true && defensePeaceCheck == true) {
             warIdToWar[_warId].peaceDeclared = true;
-            // warIdToWar[_warId].active = false;
             removeActiveWar(_warId);
         }
     }
@@ -369,7 +361,7 @@ contract WarContract is Ownable {
     ///@return warActive will return a boolean true if the war is still active
     ///@return peaceDeclared will return a boolean true of peace was declared by both sides
     ///@return expired will return a boolean true if the war expired (days left reached 0)
-    function checkWar(
+    function returnWar(
         uint256 _warId
     ) public view returns (bool, bool, bool, bool, bool) {
         bool offensePeaceOffered = warIdToWar[_warId].offensePeaceOffered;
@@ -418,59 +410,7 @@ contract WarContract is Ownable {
                 defenseActiveWars.pop();
             }
         }
-        // for (uint256 i = 0; i < activeWars.length; i++) {
-        //     if (activeWars[i] == _warId) {
-        //         activeWars[i] = activeWars[activeWars.length - 1];
-        //         activeWars.pop();
-        //     }
-        // }
     }
-
-    // modifier onlyKeeper() {
-    //     require(
-    //         msg.sender == keeper,
-    //         "function only callable from keeper file"
-    //     );
-    //     _;
-    // }
-
-    // ///@dev this function is only callable from the keeper contract
-    // ///@dev wars expire after 7 days and will be removed from active wars when 7 days have elapsed
-    // ///@notice wars expire after 7 days and will be removed from active wars when 7 days have elapsed
-    // function expireOldWars() public onlyKeeper {
-    //     uint256 day = keep.getGameDay();
-    //     for (uint256 i = 0; i < activeWars.length; i++) {
-    //         uint256 war = activeWars[i];
-    //         // warIdToWar[war].daysLeft -= 1;
-    //         if (day - warIdToWar[war].dayStarted >= 7) {
-    //             warIdToWar[war].expired = true;
-    //             warIdToWar[war].active = false;
-    //             removeActiveWar(war);
-    //         }
-    //     }
-    // }
-
-    // ///@dev this function is only callable from the keeper contract
-    // ///@notice this function will reset cruise missile launches daily to 0
-    // ///@notice a nation can only launch 2 cruise missiles per day per war
-    // function resetCruiseMissileLaunches() public onlyKeeper {
-    //     for (uint256 i = 0; i < activeWars.length; i++) {
-    //         uint256 war = activeWars[i];
-    //         warIdToWar[war].offenseCruiseMissileLaunchesToday = 0;
-    //         warIdToWar[war].defenseCruiseMissileLaunchesToday = 0;
-    //     }
-    // }
-
-    // ///@dev this function is only callable from the keeper contract
-    // ///@notice this function will reset the active wars daily so that forces can be deployed again
-    // ///@notice a nation can only deploy forces to a war once per day
-    // function resetDeployedToday() public onlyKeeper {
-    //     for (uint256 i = 0; i < activeWars.length; i++) {
-    //         uint256 war = activeWars[i];
-    //         warIdToOffenseDeployed1[war].offenseDeployedToday = false;
-    //         warIdToDefenseDeployed1[war].defenseDeployedToday = false;
-    //     }
-    // }
 
     modifier onlyNavyBattle() {
         require(
@@ -601,110 +541,6 @@ contract WarContract is Ownable {
             "function only callable from air battle"
         );
         _;
-    }
-
-    function decrementLosses(
-        uint256 _warId,
-        uint256[] memory defenderLosses,
-        uint256 defenderId,
-        uint256[] memory attackerLosses,
-        uint256 attackerId
-    ) public onlyAirBattle {
-        // (uint256 offenseWarId, uint256 defenseWarId) = getInvolvedParties(
-        //     _warId
-        // );
-        // if (offenseWarId == attackerId) {
-        //     for (uint256 i; i < attackerLosses.length; i++) {
-        //         if (attackerLosses[i] == 1) {
-        //             warIdToOffenseDeployed1[_warId].yak9Deployed -= 1;
-        //         } else if (attackerLosses[i] == 2) {
-        //             warIdToOffenseDeployed1[_warId].p51MustangDeployed -= 1;
-        //         } else if (attackerLosses[i] == 3) {
-        //             warIdToOffenseDeployed1[_warId].f86SabreDeployed -= 1;
-        //         } else if (attackerLosses[i] == 4) {
-        //             warIdToOffenseDeployed1[_warId].mig15Deployed -= 1;
-        //         } else if (attackerLosses[i] == 5) {
-        //             warIdToOffenseDeployed1[_warId].f100SuperSabreDeployed -= 1;
-        //         } else if (attackerLosses[i] == 6) {
-        //             warIdToOffenseDeployed1[_warId].f35LightningDeployed -= 1;
-        //         } else if (attackerLosses[i] == 7) {
-        //             warIdToOffenseDeployed1[_warId].f15EagleDeployed -= 1;
-        //         } else if (attackerLosses[i] == 8) {
-        //             warIdToOffenseDeployed1[_warId].su30MkiDeployed -= 1;
-        //         } else if (attackerLosses[i] == 9) {
-        //             warIdToOffenseDeployed1[_warId].f22RaptorDeployed -= 1;
-        //         }
-        //     }
-        // }
-        // if (offenseWarId == defenderId) {
-        //     for (uint256 i; i < defenderLosses.length; i++) {
-        //         if (defenderLosses[i] == 1) {
-        //             warIdToOffenseDeployed1[_warId].yak9Deployed -= 1;
-        //         } else if (defenderLosses[i] == 2) {
-        //             warIdToOffenseDeployed1[_warId].p51MustangDeployed -= 1;
-        //         } else if (defenderLosses[i] == 3) {
-        //             warIdToOffenseDeployed1[_warId].f86SabreDeployed -= 1;
-        //         } else if (defenderLosses[i] == 4) {
-        //             warIdToOffenseDeployed1[_warId].mig15Deployed -= 1;
-        //         } else if (defenderLosses[i] == 5) {
-        //             warIdToOffenseDeployed1[_warId].f100SuperSabreDeployed -= 1;
-        //         } else if (defenderLosses[i] == 6) {
-        //             warIdToOffenseDeployed1[_warId].f35LightningDeployed -= 1;
-        //         } else if (defenderLosses[i] == 7) {
-        //             warIdToOffenseDeployed1[_warId].f15EagleDeployed -= 1;
-        //         } else if (defenderLosses[i] == 8) {
-        //             warIdToOffenseDeployed1[_warId].su30MkiDeployed -= 1;
-        //         } else if (defenderLosses[i] == 9) {
-        //             warIdToOffenseDeployed1[_warId].f22RaptorDeployed -= 1;
-        //         }
-        //     }
-        // }
-        // if (defenseWarId == attackerId) {
-        //     for (uint256 i; i < attackerLosses.length; i++) {
-        //         if (attackerLosses[i] == 1) {
-        //             warIdToDefenseDeployed1[_warId].yak9Deployed -= 1;
-        //         } else if (attackerLosses[i] == 2) {
-        //             warIdToDefenseDeployed1[_warId].p51MustangDeployed -= 1;
-        //         } else if (attackerLosses[i] == 3) {
-        //             warIdToDefenseDeployed1[_warId].f86SabreDeployed -= 1;
-        //         } else if (attackerLosses[i] == 4) {
-        //             warIdToDefenseDeployed1[_warId].mig15Deployed -= 1;
-        //         } else if (attackerLosses[i] == 5) {
-        //             warIdToDefenseDeployed1[_warId].f100SuperSabreDeployed -= 1;
-        //         } else if (attackerLosses[i] == 6) {
-        //             warIdToDefenseDeployed1[_warId].f35LightningDeployed -= 1;
-        //         } else if (attackerLosses[i] == 7) {
-        //             warIdToDefenseDeployed1[_warId].f15EagleDeployed -= 1;
-        //         } else if (attackerLosses[i] == 8) {
-        //             warIdToDefenseDeployed1[_warId].su30MkiDeployed -= 1;
-        //         } else if (attackerLosses[i] == 9) {
-        //             warIdToDefenseDeployed1[_warId].f22RaptorDeployed -= 1;
-        //         }
-        //     }
-        // }
-        // if (defenseWarId == defenderId) {
-        //     for (uint256 i; i < defenderLosses.length; i++) {
-        //         if (defenderLosses[i] == 1) {
-        //             warIdToDefenseDeployed1[_warId].yak9Deployed -= 1;
-        //         } else if (defenderLosses[i] == 2) {
-        //             warIdToDefenseDeployed1[_warId].p51MustangDeployed -= 1;
-        //         } else if (defenderLosses[i] == 3) {
-        //             warIdToDefenseDeployed1[_warId].f86SabreDeployed -= 1;
-        //         } else if (defenderLosses[i] == 4) {
-        //             warIdToDefenseDeployed1[_warId].mig15Deployed -= 1;
-        //         } else if (defenderLosses[i] == 5) {
-        //             warIdToDefenseDeployed1[_warId].f100SuperSabreDeployed -= 1;
-        //         } else if (defenderLosses[i] == 6) {
-        //             warIdToDefenseDeployed1[_warId].f35LightningDeployed -= 1;
-        //         } else if (defenderLosses[i] == 7) {
-        //             warIdToDefenseDeployed1[_warId].f15EagleDeployed -= 1;
-        //         } else if (defenderLosses[i] == 8) {
-        //             warIdToDefenseDeployed1[_warId].su30MkiDeployed -= 1;
-        //         } else if (defenderLosses[i] == 9) {
-        //             warIdToDefenseDeployed1[_warId].f22RaptorDeployed -= 1;
-        //         }
-        //     }
-        // }
     }
 
     ///@dev this function is only callable from the air battle contract

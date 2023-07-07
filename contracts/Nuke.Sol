@@ -253,11 +253,9 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
             inflictNukeDamage(requestNumber);
             mis.decreaseNukeCountFromNukeContract(attackerId);
             param.inflictAnarchy(defenderId);
-            // nukesDroppedToday++;
             uint256 gameDay = keep.getGameDay();
             gameDayToNukesLanded[gameDay]++;
         } else {
-            //thwart event
             console.log("Nuke attaq thwarted");
             mis.decreaseNukeCountFromNukeContract(attackerId);
         }
@@ -386,16 +384,4 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         require (msg.sender == keeper, "only callable from keeper");
         _;
     }
-
-    // ///@dev this is a function only callable from the chainlink keeper contract
-    // ///@dev this function will shift the nukes landed daily for the last 6 days (i.e. 2 dayss ago goes to 3 days ago)
-    // function shiftNukesDroppedDays() public onlyKeeper {
-    //     nukesDropped6DaysAgo = nukesDropped5DaysAgo;
-    //     nukesDropped5DaysAgo = nukesDropped4DaysAgo;
-    //     nukesDropped4DaysAgo = nukesDropped3DaysAgo;
-    //     nukesDropped3DaysAgo = nukesDropped2DaysAgo;
-    //     nukesDropped2DaysAgo = nukesDropped1DayAgo;
-    //     nukesDropped1DayAgo = nukesDroppedToday;
-    //     nukesDroppedToday = 0;
-    // }
 }

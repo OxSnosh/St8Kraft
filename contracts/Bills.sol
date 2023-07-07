@@ -372,7 +372,7 @@ contract BillsContract is Ownable {
         if (accomodativeGov) {
             dailyMilitaryUpkeep = ((dailyMilitaryUpkeep * 95) / 100);
         }
-        return dailyMilitaryUpkeep * (10 ** 18);
+        return dailyMilitaryUpkeep;
     }
 
     ///@notice this function calculates daily bills for soldiers
@@ -402,7 +402,7 @@ contract BillsContract is Ownable {
         }
         uint256 adjustedSoldierUpkeep = ((soldierUpkeep *
             soldierUpkeepModifier) / 100);
-        return adjustedSoldierUpkeep;
+        return adjustedSoldierUpkeep * (10**18);
     }
 
     ///@notice this functions calculates daily bills for tanks
@@ -431,7 +431,7 @@ contract BillsContract is Ownable {
             tankUpkeepModifier -= 20;
         }
         uint256 adjustedTankUpkeep = ((tankUpkeep * tankUpkeepModifier) / 100);
-        return adjustedTankUpkeep;
+        return adjustedTankUpkeep * (10**18);
     }
 
     ///@notice this finction calculates daily bills for a ntaions nukes
@@ -451,7 +451,7 @@ contract BillsContract is Ownable {
         if (!uranium) {
             adjustedNukeUpkeep = (adjustedNukeUpkeep * 2);
         }
-        return adjustedNukeUpkeep;
+        return adjustedNukeUpkeep * (10**18);
     }
 
     ///@notice this function claculates daily bills for a nations cruise missiles
@@ -469,7 +469,7 @@ contract BillsContract is Ownable {
         }
         uint256 adjustedMissileUpkeep = ((missileUpkeep *
             missileUpkeepModifier) / 100);
-        return adjustedMissileUpkeep;
+        return adjustedMissileUpkeep * (10**18);
     }
 
     ///@notice this function calculates daily bills for a nations aircraft
@@ -495,7 +495,7 @@ contract BillsContract is Ownable {
         }
         uint256 adjustedAircraftUpkeep = ((aircraftUpkeep *
             aircraftUpkeepModifier) / 100);
-        return adjustedAircraftUpkeep;
+        return adjustedAircraftUpkeep * (10**18);
     }
 
     ///@notice this function calculates daily bills for a nations navy
@@ -519,7 +519,7 @@ contract BillsContract is Ownable {
             battleshipUpkeep +
             cruiserUpkeep;
         uint256 dailyNavyUpkeep = getAdjustedNavyUpkeep(id, baseNavyUpkeep);
-        return dailyNavyUpkeep;
+        return dailyNavyUpkeep * (10**18);
     }
 
     ///@notice this function calculates additional nacy upkeep for a nation
