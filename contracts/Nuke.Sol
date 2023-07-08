@@ -22,13 +22,6 @@ import "hardhat/console.sol";
 ///@notice this contract will allow a nation to launch a nuclear missile at anoter nation
 contract NukeContract is Ownable, VRFConsumerBaseV2 {
     uint256 nukeAttackId;
-    uint256 nukesDroppedToday;
-    uint256 nukesDropped1DayAgo;
-    uint256 nukesDropped2DaysAgo;
-    uint256 nukesDropped3DaysAgo;
-    uint256 nukesDropped4DaysAgo;
-    uint256 nukesDropped5DaysAgo;
-    uint256 nukesDropped6DaysAgo;
     address countryMinter;
     address warAddress;
     address wonders1;
@@ -41,7 +34,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     address missiles;
     address keeper;
     address parameters;
-    uint256 mod = 300;
+    uint256 mod = 50;
 
     //Chainlik Variables
     uint256[] private s_randomWords;
@@ -209,7 +202,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
             attackType
         );
         nukeAttackIdToNukeAttack[nukeAttackId] = newAttack;
-        // fulfillRequest(nukeAttackId);
+        fulfillRequest(nukeAttackId);
         nukeAttackId++;
     }
 
@@ -378,10 +371,5 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     ///@param newModifier is the new modifier for the global radiation level
     function updateGlobalRadiationModifier(uint256 newModifier) public onlyOwner {
         mod = newModifier;
-    }
-
-    modifier onlyKeeper() {
-        require (msg.sender == keeper, "only callable from keeper");
-        _;
     }
 }

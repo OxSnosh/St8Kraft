@@ -285,25 +285,29 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         uint256 defenderId = attackIdToCruiseMissile[attackId].defenderId;
         uint256 attackerId = attackIdToCruiseMissile[attackId].attackerId;
         uint256 tankCount = force.getDefendingTankCount(defenderId);
-        uint256[] memory randomNumbers = s_requestIndexToRandomWords[attackId];
-        uint256 defenderBunkerCount = imp1.getBunkerCount(defenderId);
-        uint256 attackerMunitionsFactory = imp4.getMunitionsFactoryCount(
-            attackerId
-        );
-        uint256 randomTankCount = (10 +
-            (randomNumbers[2] % 5) +
-            attackerMunitionsFactory -
-            defenderBunkerCount);
-        if (tankCount <= randomTankCount) {
-            force.decreaseDefendingTankCountFromCruiseMissileContract(
-                tankCount,
-                defenderId
-            );
+        if (tankCount == 0) {
+            destroyInfrastructure(attackId);
         } else {
-            force.decreaseDefendingTankCountFromCruiseMissileContract(
-                randomTankCount,
-                defenderId
+            uint256[] memory randomNumbers = s_requestIndexToRandomWords[attackId];
+            uint256 defenderBunkerCount = imp1.getBunkerCount(defenderId);
+            uint256 attackerMunitionsFactory = imp4.getMunitionsFactoryCount(
+                attackerId
             );
+            uint256 randomTankCount = (10 +
+                (randomNumbers[2] % 6) +
+                attackerMunitionsFactory -
+                defenderBunkerCount);
+            if (tankCount <= randomTankCount) {
+                force.decreaseDefendingTankCountFromCruiseMissileContract(
+                    tankCount,
+                    defenderId
+                );
+            } else {
+                force.decreaseDefendingTankCountFromCruiseMissileContract(
+                    randomTankCount,
+                    defenderId
+                );
+            }
         }
     }
 
@@ -321,12 +325,12 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
             uint256 attackerMunitionsFactory = imp4.getMunitionsFactoryCount(
                 attackerId
             );
-            uint256 amount = 2;
-            if (defenderBunkerCount == 5) {
-                amount -= 1;
+            uint256 amount = 6;
+            if (defenderBunkerCount >= 1) {
+                amount -= defenderBunkerCount;
             }
-            if (attackerMunitionsFactory == 5) {
-                amount += 2;
+            if (attackerMunitionsFactory >= 1) {
+                amount += attackerMunitionsFactory;
             }
             inf.decreaseTechCountFromCruiseMissileContract(defenderId, amount);
         }
@@ -349,8 +353,8 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
             uint256 attackerMunitionsFactory = imp4.getMunitionsFactoryCount(
                 attackerId
             );
-            uint256 randomInfrastructureCount = 5;
-            uint256 randomModulus = randomNumbers[2] % 5;
+            uint256 randomInfrastructureCount = 6;
+            uint256 randomModulus = randomNumbers[2] % 6;
             randomInfrastructureCount += randomModulus;
             randomInfrastructureCount += attackerMunitionsFactory;
             randomInfrastructureCount -= defenderBunkerCount;

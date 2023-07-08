@@ -394,56 +394,30 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
             );
         } else if (success) {
             if (attackType == 1) {
-                // uint256 cost = ((100000 + defenderStrength) * (10 ** 18));
-                // tsy.spendBalance(attackerId, cost);
                 destroyCruiseMissiles(defenderId, _randomnessRequestId);
             } else if (attackType == 2) {
-                // uint256 cost = (100000 + (defenderStrength * 2) * (10 ** 18));
-                // tsy.spendBalance(attackerId, cost);
                 destroyDefendingTanks(defenderId, _randomnessRequestId);
             } else if (attackType == 3) {
-                // uint256 cost = (100000 + (defenderStrength * 3) * (10 ** 18));
-                // tsy.spendBalance(attackerId, cost);
                 captureLand(defenderId, _randomnessRequestId);
             } else if (attackType == 4) {
-                // uint256 cost = (100000 + (defenderStrength * 3) * (10 ** 18));
-                // tsy.spendBalance(attackerId, cost);
                 changeDesiredGovernment(defenderId, _randomnessRequestId);
             } else if (attackType == 5) {
-                // uint256 cost = (100000 + (defenderStrength * 3) * (10 ** 18));
-                // tsy.spendBalance(attackerId, cost);
                 changeDesiredReligion(defenderId, _randomnessRequestId);
             } else if (attackType == 6) {
-                // uint256 cost = (150000 + (defenderStrength) * (10 ** 18));
-                // tsy.spendBalance(attackerId, cost);
-                changeThreatLevel(defenderId, _randomnessRequestId);
+                changeThreatLevel(defenderId);
             } else if (attackType == 7) {
-                // uint256 cost = (150000 + (defenderStrength * 5) * (10 ** 18));
-                // tsy.spendBalance(attackerId, cost);
-                changeDefconLevel(defenderId, _randomnessRequestId);
+                changeDefconLevel(defenderId);
             } else if (attackType == 8) {
-                // uint256 cost = (250000 + (defenderStrength * 2) * (10 ** 18));
-                // tsy.spendBalance(attackerId, cost);
                 destroySpies(defenderId, _randomnessRequestId);
             } else if (attackType == 9) {
-                // uint256 cost = (300000 + (defenderStrength * 2) * (10 ** 18));
-                // tsy.spendBalance(attackerId, cost);
                 captueTechnology(defenderId, _randomnessRequestId);
             } else if (attackType == 10) {
-                // uint256 cost = (100000 + (defenderStrength * 20) * (10 ** 18));
-                // tsy.spendBalance(attackerId, cost);
                 sabotogeTaxes(defenderId, _randomnessRequestId);
             } else if (attackType == 11) {
-                // uint256 cost = (300000 + (defenderStrength * 15) * (10 ** 18));
-                // tsy.spendBalance(attackerId, cost);
                 destroyMoneyReserves(defenderId);
             } else if (attackType == 12) {
-                // uint256 cost = (500000 + (defenderStrength * 5) * (10 ** 18));
-                // tsy.spendBalance(attackerId, cost);
                 captureInfrastructure(defenderId, _randomnessRequestId);
             } else {
-                // uint256 cost = (500000 + (defenderStrength * 15) * (10 ** 18));
-                // tsy.spendBalance(attackerId, cost);
                 destroyNukes(defenderId);
             }
         }
@@ -531,39 +505,14 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     }
 
     function changeThreatLevel(
-        uint256 defenderId,
-        uint256 _randomnessRequestId
+        uint256 defenderId
     ) internal {
-        //new level randomly chosen
-        // uint256[] memory randomNumbers = s_randomnessRequestIdToRandomWords[
-        //     _randomnessRequestId
-        // ];
-        // uint256 threatLevel = mil.getThreatLevel(defenderId);
-        // uint256 newThreatLevel = ((randomNumbers[1] % 5) + 1);
-        // if (threatLevel == newThreatLevel) {
-        //     if (threatLevel == 1) {
-        //         newThreatLevel += 1;
-        //     } else {
-        //         newThreatLevel -= 1;
-        //     }
-        // }
         mil.setThreatLevelFromSpyContract(defenderId, 1);
     }
 
     function changeDefconLevel(
-        uint256 defenderId,
-        uint256 _randomnessRequestId
+        uint256 defenderId
     ) internal {
-        //new level randomly chosen
-        // uint256[] memory randomNumbers = s_randomnessRequestIdToRandomWords[
-        //     _randomnessRequestId
-        // ];
-        // uint256 defconLevel = mil.getDefconLevel(defenderId);
-        // uint256 newDefconLevel = ((randomNumbers[1] % 5) + 1);
-        // if (defconLevel == newDefconLevel) {
-        //         newDefconLevel += 1;
-
-        // }
         mil.setDefconLevelFromSpyContract(defenderId, 5);
     }
 
