@@ -63,81 +63,81 @@ contract KeeperContract is Ownable, KeeperCompatibleInterface {
         return gameDay;
     }
 
-    address nukes;
-    address aidContract;
-    address warContract;
-    address treasury;
-    address missiles;
-    address navalActions;
-    address parameters;
-    address military;
+    // address nukes;
+    // address aidContract;
+    // address warContract;
+    // address treasury;
+    // address missiles;
+    // address navalActions;
+    // address parameters;
+    // address military;
 
-    NukeContract nuke;
-    AidContract aid;
-    WarContract war;
-    TreasuryContract tres;
-    MissilesContract miss;
-    NavalActionsContract navAct;
-    CountryParametersContract params;
-    MilitaryContract mil;
+    // NukeContract nuke;
+    // AidContract aid;
+    // WarContract war;
+    // TreasuryContract tres;
+    // MissilesContract miss;
+    // NavalActionsContract navAct;
+    // CountryParametersContract params;
+    // MilitaryContract mil;
 
-    ///@dev this function is only callable by the contract owner
-    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings (
-        address _nukes,
-        address _aid,
-        address _war,
-        address _treasury,
-        address _missiles,
-        address _navalActions,
-        address _parameters,
-        address _military
-    ) public onlyOwner {
-        nukes = _nukes;
-        nuke = NukeContract(_nukes);
-        aidContract = _aid;
-        aid = AidContract(_aid);
-        warContract = _war;
-        war = WarContract(_war);
-        treasury = _treasury;
-        tres = TreasuryContract(_treasury);
-        missiles = _missiles;
-        miss = MissilesContract(_missiles);
-        navalActions = _navalActions;
-        navAct = NavalActionsContract(_navalActions);
-        parameters = _parameters;
-        params = CountryParametersContract(_parameters);
-        military = _military;
-        mil = MilitaryContract(_military);
-    }
+    // ///@dev this function is only callable by the contract owner
+    // ///@dev this function will be called immediately after contract deployment in order to set contract pointers
+    // function settings (
+    //     address _nukes,
+    //     address _aid,
+    //     address _war,
+    //     address _treasury,
+    //     address _missiles,
+    //     address _navalActions,
+    //     address _parameters,
+    //     address _military
+    // ) public onlyOwner {
+    //     nukes = _nukes;
+    //     nuke = NukeContract(_nukes);
+    //     aidContract = _aid;
+    //     aid = AidContract(_aid);
+    //     warContract = _war;
+    //     war = WarContract(_war);
+    //     treasury = _treasury;
+    //     tres = TreasuryContract(_treasury);
+    //     missiles = _missiles;
+    //     miss = MissilesContract(_missiles);
+    //     navalActions = _navalActions;
+    //     navAct = NavalActionsContract(_navalActions);
+    //     parameters = _parameters;
+    //     params = CountryParametersContract(_parameters);
+    //     military = _military;
+    //     mil = MilitaryContract(_military);
+    // }
 
-    ///@dev this functon will be called by the chainlink keeper
-    function keeperFunctionToCall() public {
-        // shiftNukeDays();
-        // resetAidProposals();
-        // expireOldWars();
-        // resetCruiseMissileLaunches();
-        // incrementDaysSince();
-        // resetNukesPurchasedToday();
-        resetActionsToday();
-        // incrementDaysSinceForParameters();
-        // resetDeployments();
-        // incrementDaysInPeaceMode();
-    }
+    // ///@dev this functon will be called by the chainlink keeper
+    // function keeperFunctionToCall() public {
+    //     // shiftNukeDays();
+    //     // resetAidProposals();
+    //     // expireOldWars();
+    //     // resetCruiseMissileLaunches();
+    //     // incrementDaysSince();
+    //     // resetNukesPurchasedToday();
+    //     // resetActionsToday();
+    //     // incrementDaysSinceForParameters();
+    //     // resetDeployments();
+    //     // incrementDaysInPeaceMode();
+    // }
 
-    ///@dev this function can be called by the contract owner in the event the keeper fails
-    function keeperFunctionToCallManually() public onlyOwner {
-        // shiftNukeDays();
-        // resetAidProposals();
-        // expireOldWars();
-        // resetCruiseMissileLaunches();
-        // incrementDaysSince();
-        // resetNukesPurchasedToday();
-        resetActionsToday();
-        // incrementDaysSinceForParameters();
-        // resetDeployments();
-        // incrementDaysInPeaceMode();
-    }
+    // ///@dev this function can be called by the contract owner in the event the keeper fails
+    // function keeperFunctionToCallManually() public onlyOwner {
+    //     // shiftNukeDays();
+    //     // resetAidProposals();
+    //     // expireOldWars();
+    //     // resetCruiseMissileLaunches();
+    //     // incrementDaysSince();
+    //     // resetNukesPurchasedToday();
+    //     // resetActionsToday();
+    //     // incrementDaysSinceForParameters();
+    //     // resetDeployments();
+    //     // incrementDaysInPeaceMode();
+    // }
 
     // function shiftNukeDays() internal {
     //     nuke.shiftNukesDroppedDays();
@@ -179,13 +179,13 @@ contract KeeperContract is Ownable, KeeperCompatibleInterface {
     //     miss.resetNukesPurchasedToday();
     // }
 
-    function resetActionsToday() internal {
-        navAct.resetActionsToday();
-    }
+    // function resetActionsToday() internal {
+    //     navAct.resetActionsToday();
+    // }
 
-    function resetActionsTodayByOwner() public onlyOwner {
-        navAct.resetActionsToday();
-    }
+    // function resetActionsTodayByOwner() public onlyOwner {
+    //     navAct.resetActionsToday();
+    // }
 
     // function incrementDaysSinceForParameters() internal {
     //     params.incrementDaysSince();

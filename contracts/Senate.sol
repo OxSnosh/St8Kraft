@@ -57,7 +57,7 @@ contract SenateContract is ChainlinkClient, KeeperCompatibleInterface, Ownable {
     mapping(uint256 => mapping(uint256 => uint256[])) epochToTeamToWinners;
 
     ///@param _interval is in days
-    constructor(uint _interval, address) {
+    constructor(uint _interval) {
         interval = _interval;
     }
 

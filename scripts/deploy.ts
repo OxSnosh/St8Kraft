@@ -62,7 +62,6 @@ import fs from "fs"
 const eaPath = "../MetaNations-external-adapters/Contracts/"
 
 async function main() {
-    
     let chainId = network.config.chainId
     let subscriptionId    
     let vrfCoordinatorV2Mock
@@ -71,7 +70,6 @@ async function main() {
     const FUND_AMOUNT = ethers.utils.parseEther("1")
 
     if (chainId == 31337) {
-        console.log("local network detected")
         const BASE_FEE = "250000000000000000" // 0.25 is this the premium in LINK?
         const GAS_PRICE_LINK = 1e9 // link per gas, is this the gas lane? // 0.000000001 LINK per gas
         // create VRFV2 Subscription
@@ -147,7 +145,6 @@ async function main() {
     let signer1: SignerWithAddress
     let signers: SignerWithAddress[]
     let addrs
-    console.log("imported types");
     
     signers = await ethers.getSigners();
     signer0 = signers[0];
@@ -481,7 +478,7 @@ async function main() {
         // address _infrastructure
 
     const KeeperContract = await ethers.getContractFactory("KeeperContract")
-    keepercontract = await KeeperContract.deploy() as KeeperContract
+    keepercontract = await KeeperContract.deploy(86400) as KeeperContract
     await keepercontract.deployed()
     console.log(`KeeperContract deployed to ${keepercontract.address}`)
         // address _nukes,
@@ -620,7 +617,7 @@ async function main() {
     console.log(`BonusResourcesContract deployed to ${bonusresourcescontract.address}`)
 
     const SenateContract = await ethers.getContractFactory("SenateContract")
-    senatecontract = await SenateContract.deploy() as SenateContract
+    senatecontract = await SenateContract.deploy(20) as SenateContract
     await senatecontract.deployed()
     console.log(`SenateContract deployed to ${senatecontract.address}`)
 
@@ -773,16 +770,19 @@ async function main() {
     console.log("contracts deployed")
 
     await warbucks.settings(
-        treasurycontract.address
+        treasurycontract.address,
+        countryminter.address
     )
-
+    
     await aidcontract.settings(
         countryminter.address, 
         treasurycontract.address, 
         forcescontract.address, 
         infrastructurecontract.address, 
         keepercontract.address, 
-        wonderscontract1.address)
+        wonderscontract1.address,
+        senatecontract.address,
+        countryparameterscontract.address)
 
     await airbattlecontract.settings(
         warcontract.address, 
@@ -844,9 +844,9 @@ async function main() {
         treasurycontract.address,
         infrastructurecontract.address,
         resourcescontract.address,
-        aidcontract.address,
         missilescontract.address,
-        senatecontract.address)
+        senatecontract.address,
+        warbucks.address)
     await countryminter.settings2(
         improvementscontract1.address,
         improvementscontract2.address,
@@ -862,11 +862,7 @@ async function main() {
         navycontract.address,
         navalactionscontract.address,
         fighterscontract.address,
-        fightersmarketplace1.address,
-        fightersmarketplace2.address,
-        bomberscontract.address,
-        bombersmarketplace1.address,
-        bombersmarketplace2.address)
+        bomberscontract.address)
     
     await countryparameterscontract.settings(
         spyoperationscontract.address,
@@ -875,7 +871,8 @@ async function main() {
         keepercontract.address,
         nukecontract.address,
         groundbattlecontract.address,
-        wonderscontract1.address
+        wonderscontract1.address,
+        treasurycontract.address
     )
 
     await crimecontract.settings(
@@ -883,7 +880,8 @@ async function main() {
         improvementscontract1.address,
         improvementscontract2.address,
         improvementscontract3.address,
-        countryparameterscontract.address)
+        countryparameterscontract.address,
+        wonderscontract2.address)
     
     await cruisemissilecontract.settings(
         forcescontract.address,
@@ -1094,16 +1092,16 @@ async function main() {
         bonusresourcescontract.address
     )
 
-    await keepercontract.settings(
-        nukecontract.address,
-        aidcontract.address,
-        warcontract.address,
-        treasurycontract.address,
-        missilescontract.address,
-        navalactionscontract.address,
-        countryparameterscontract.address,
-        militarycontract.address
-    )
+    // await keepercontract.settings(
+    //     nukecontract.address,
+    //     aidcontract.address,
+    //     warcontract.address,
+    //     treasurycontract.address,
+    //     missilescontract.address,
+    //     navalactionscontract.address,
+    //     countryparameterscontract.address,
+    //     militarycontract.address
+    // )
 
     await landmarketcontract.settings(
         resourcescontract.address,
@@ -1442,7 +1440,7 @@ async function main() {
         let nationStrengthArtifact = await artifacts.readArtifact("NationStrengthContract")
         let nationStrengthAbi = nationStrengthArtifact.abi;
 
-        let spyOperationArtifact = await artifacts.readArtifact("SpyOperationContract")
+        let spyOperationArtifact = await artifacts.readArtifact("SpyOperationsContract")
         let spyOperationAbi = spyOperationArtifact.abi
 
         // Read Contract Metadata

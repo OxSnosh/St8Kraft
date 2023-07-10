@@ -1,7 +1,7 @@
 {
   "HARDHAT": {
     "countryminter": {
-      "address": "0xA36B5Fec0E93d24908fAA9966535567E9f888994",
+      "address": "0xbe18A1B61ceaF59aEB6A9bC81AB4FB87D56Ba167",
       "ABI": [
         {
           "inputs": [],
@@ -129,6 +129,19 @@
         },
         {
           "inputs": [],
+          "name": "_countryId",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "_value",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
           "name": "aid",
           "outputs": [
             {
@@ -220,7 +233,7 @@
           "inputs": [
             {
               "internalType": "uint256",
-              "name": "id",
+              "name": "nationId",
               "type": "uint256"
             },
             {
@@ -235,19 +248,6 @@
               "internalType": "bool",
               "name": "",
               "type": "bool"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "countryId",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
             }
           ],
           "stateMutability": "view",
@@ -728,17 +728,17 @@
             },
             {
               "internalType": "address",
-              "name": "_aid",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
               "name": "_missiles",
               "type": "address"
             },
             {
               "internalType": "address",
               "name": "_senate",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_warbucks",
               "type": "address"
             }
           ],
@@ -824,27 +824,7 @@
             },
             {
               "internalType": "address",
-              "name": "_fightersMarket1",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "_fightersMarket2",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
               "name": "_bombers",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "_bombersMarket1",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "_bombersMarket2",
               "type": "address"
             }
           ],
@@ -955,6 +935,19 @@
         },
         {
           "inputs": [],
+          "name": "warbucks",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
           "name": "wonders",
           "outputs": [
             {
@@ -1021,7 +1014,7 @@
       ]
     },
     "forcescontract": {
-      "address": "0xB0f3A4aE1fDC1068f9364c5d7b1E42678B66D941",
+      "address": "0x6732128F9cc0c4344b2d4DC6285BCd516b7E59E6",
       "ABI": [
         {
           "anonymous": false,
@@ -1747,11 +1740,6 @@
             },
             {
               "internalType": "uint256",
-              "name": "soldierCasualties",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
               "name": "numberOfTanks",
               "type": "uint256"
             },
@@ -1865,6 +1853,19 @@
         {
           "inputs": [],
           "name": "owner",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "parameters",
           "outputs": [
             {
               "internalType": "address",
@@ -2002,6 +2003,11 @@
               "internalType": "address",
               "name": "_keeper",
               "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_parameters",
+              "type": "address"
             }
           ],
           "name": "settings2",
@@ -2059,45 +2065,6 @@
             }
           ],
           "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "newAddress",
-              "type": "address"
-            }
-          ],
-          "name": "updateImprovementsContract1",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "newAddress",
-              "type": "address"
-            }
-          ],
-          "name": "updateInfrastructureContract",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "newAddress",
-              "type": "address"
-            }
-          ],
-          "name": "updateResourcesContract",
-          "outputs": [],
-          "stateMutability": "nonpayable",
           "type": "function"
         },
         {
@@ -2178,7 +2145,7 @@
       ]
     },
     "warbucks": {
-      "address": "0xd9d972d687Bc511D833fe2550C456fEC1a857D2C",
+      "address": "0xe044814c9eD1e6442Af956a817c161192cBaE98F",
       "ABI": [
         {
           "inputs": [
@@ -2340,6 +2307,42 @@
               "type": "uint256"
             }
           ],
+          "name": "burn",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "burnFromMint",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
           "name": "burnFromTreasury",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -2419,6 +2422,24 @@
               "type": "uint256"
             }
           ],
+          "name": "mint",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
           "name": "mintFromTreasury",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -2462,6 +2483,11 @@
             {
               "internalType": "address",
               "name": "_treasury",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_countryMinter",
               "type": "address"
             }
           ],
@@ -2565,7 +2591,7 @@
       ]
     },
     "treasurycontract": {
-      "address": "0x4924322ec75E8F8b7851CfAFAC11227873d28D67",
+      "address": "0xdB012DD3E3345e2f8D23c0F3cbCb2D94f430Be8C",
       "ABI": [
         {
           "anonymous": false,
@@ -2633,6 +2659,32 @@
         {
           "inputs": [],
           "name": "bombers",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "bombersMarket1",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "bombersMarket2",
           "outputs": [
             {
               "internalType": "address",
@@ -2752,8 +2804,52 @@
           "type": "function"
         },
         {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "destroyBalance",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
           "inputs": [],
           "name": "fighters",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "fightersMarket1",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "fightersMarket2",
           "outputs": [
             {
               "internalType": "address",
@@ -2830,7 +2926,33 @@
         },
         {
           "inputs": [],
-          "name": "getGameTaxRate",
+          "name": "getMaxDaysOfTaxes",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "getMilf",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "getSeedMoney",
           "outputs": [
             {
               "internalType": "uint256",
@@ -2879,53 +3001,18 @@
           "outputs": [
             {
               "internalType": "uint256",
-              "name": "grossIncomePerCitizenPerDay",
+              "name": "dayOfLastBillPaid",
               "type": "uint256"
             },
             {
               "internalType": "uint256",
-              "name": "individualTaxableIncomePerDay",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "netDailyTaxesCollectable",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "netDailyBillsPayable",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "lockedBalance",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "daysSinceLastBillPaid",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "lastTaxCollection",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "daysSinceLastTaxCollection",
+              "name": "dayOfLastTaxCollection",
               "type": "uint256"
             },
             {
               "internalType": "uint256",
               "name": "balance",
               "type": "uint256"
-            },
-            {
-              "internalType": "bool",
-              "name": "inactive",
-              "type": "bool"
             },
             {
               "internalType": "bool",
@@ -3008,13 +3095,6 @@
         },
         {
           "inputs": [],
-          "name": "incrementDaysSince",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [],
           "name": "infrastructure",
           "outputs": [
             {
@@ -3060,6 +3140,19 @@
               "internalType": "address",
               "name": "",
               "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "maxDaysOfTaxes",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
             }
           ],
           "stateMutability": "view",
@@ -3208,11 +3301,24 @@
           "inputs": [
             {
               "internalType": "uint256",
+              "name": "newMaxDays",
+              "type": "uint256"
+            }
+          ],
+          "name": "setMaxDaysOfTaxes",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
               "name": "newPercentage",
               "type": "uint256"
             }
           ],
-          "name": "setGameTaxRate",
+          "name": "setMilf",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -3364,6 +3470,26 @@
               "internalType": "address",
               "name": "_techMarket",
               "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_fightersMarket1",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_fightersMarket2",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_bombersMarket1",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_bombersMarket2",
+              "type": "address"
             }
           ],
           "name": "settings3",
@@ -3444,29 +3570,6 @@
         {
           "inputs": [
             {
-              "internalType": "uint256",
-              "name": "toId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "fromId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "amount",
-              "type": "uint256"
-            }
-          ],
-          "name": "transferBalance",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
               "internalType": "address",
               "name": "newOwner",
               "type": "address"
@@ -3506,8 +3609,21 @@
           "type": "function"
         },
         {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "newSeedMoney",
+              "type": "uint256"
+            }
+          ],
+          "name": "updateSeedMoney",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
           "inputs": [],
-          "name": "viewTaxRevenues",
+          "name": "viewMilfRevenues",
           "outputs": [
             {
               "internalType": "uint256",
@@ -3557,7 +3673,7 @@
               "type": "uint256"
             }
           ],
-          "name": "withdrawTaxRevenues",
+          "name": "withdrawMilfRevenues",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -3617,7 +3733,7 @@
       ]
     },
     "infrastructurecontract": {
-      "address": "0x72c0B892f1096e3c64d529a6b8d93daA252c2C27",
+      "address": "0x4f42528B7bF8Da96516bECb22c1c6f53a8Ac7312",
       "ABI": [
         {
           "anonymous": false,
@@ -3999,7 +4115,7 @@
       ]
     },
     "technologymarketcontract": {
-      "address": "0x70274a6D27bD9173FC8fe9369FD7dcbE85231F26",
+      "address": "0x532802f2F9E0e3EE9d5Ba70C35E1F43C0498772D",
       "ABI": [
         {
           "anonymous": false,
@@ -4324,7 +4440,7 @@
       ]
     },
     "militarycontract": {
-      "address": "0x9a35F13Ed8DB3FbDBA56bF3202Eb3A7191C43385",
+      "address": "0x74ef2B06A1D2035C33244A4a263FF00B84504865",
       "ABI": [
         {
           "anonymous": false,
@@ -4369,6 +4485,25 @@
           "name": "generateMilitary",
           "outputs": [],
           "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            }
+          ],
+          "name": "getDaysInPeaceMode",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
           "type": "function"
         },
         {
@@ -4452,6 +4587,24 @@
               "internalType": "bool",
               "name": "warPeacePreference",
               "type": "bool"
+            },
+            {
+              "internalType": "uint256",
+              "name": "dayPeaceToggled",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "keeper",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
             }
           ],
           "stateMutability": "view",
@@ -4523,6 +4676,11 @@
             {
               "internalType": "address",
               "name": "_countryMinter",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_keeper",
               "type": "address"
             }
           ],
@@ -4609,7 +4767,7 @@
       ]
     },
     "warcontract": {
-      "address": "0x6d726650755e2D3690E42f8bB0E356D49B782fD9",
+      "address": "0xd977422c9eE9B646f64A4C4389a6C98ad356d8C4",
       "ABI": [
         {
           "anonymous": false,
@@ -4629,25 +4787,6 @@
           ],
           "name": "OwnershipTransferred",
           "type": "event"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "name": "activeWars",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
         },
         {
           "inputs": [
@@ -4759,45 +4898,6 @@
           "type": "function"
         },
         {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "_warId",
-              "type": "uint256"
-            }
-          ],
-          "name": "checkWar",
-          "outputs": [
-            {
-              "internalType": "bool",
-              "name": "",
-              "type": "bool"
-            },
-            {
-              "internalType": "bool",
-              "name": "",
-              "type": "bool"
-            },
-            {
-              "internalType": "bool",
-              "name": "",
-              "type": "bool"
-            },
-            {
-              "internalType": "bool",
-              "name": "",
-              "type": "bool"
-            },
-            {
-              "internalType": "bool",
-              "name": "",
-              "type": "bool"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
           "inputs": [],
           "name": "countryMinter",
           "outputs": [
@@ -4873,46 +4973,6 @@
           "inputs": [
             {
               "internalType": "uint256",
-              "name": "_warId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256[]",
-              "name": "defenderLosses",
-              "type": "uint256[]"
-            },
-            {
-              "internalType": "uint256",
-              "name": "defenderId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256[]",
-              "name": "attackerLosses",
-              "type": "uint256[]"
-            },
-            {
-              "internalType": "uint256",
-              "name": "attackerId",
-              "type": "uint256"
-            }
-          ],
-          "name": "decrementLosses",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "decrementWarDaysLeft",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
               "name": "nationId",
               "type": "uint256"
             },
@@ -4951,13 +5011,24 @@
           "type": "function"
         },
         {
-          "inputs": [],
-          "name": "gameActiveWars",
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "_warId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            }
+          ],
+          "name": "getCruiseMissileLaunchesToday",
           "outputs": [
             {
-              "internalType": "uint256[]",
+              "internalType": "uint256",
               "name": "",
-              "type": "uint256[]"
+              "type": "uint256"
             }
           ],
           "stateMutability": "view",
@@ -4977,6 +5048,11 @@
               "internalType": "uint256",
               "name": "",
               "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
             }
           ],
           "stateMutability": "view",
@@ -5062,6 +5138,30 @@
             }
           ],
           "name": "idToActiveWars",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "name": "idToDeactivatedWars",
           "outputs": [
             {
               "internalType": "uint256",
@@ -5186,7 +5286,7 @@
               "type": "uint256"
             }
           ],
-          "name": "nationActiveWarsReturnForTesting",
+          "name": "nationActiveWarsReturn",
           "outputs": [
             {
               "internalType": "uint256[]",
@@ -5231,7 +5331,7 @@
               "type": "uint256"
             }
           ],
-          "name": "offensiveWarLengthForTesting",
+          "name": "offensiveWarLength",
           "outputs": [
             {
               "internalType": "uint256",
@@ -5250,7 +5350,7 @@
               "type": "uint256"
             }
           ],
-          "name": "offensiveWarReturnForTesting",
+          "name": "offensiveWarReturn",
           "outputs": [
             {
               "internalType": "uint256[]",
@@ -5293,6 +5393,19 @@
           "type": "function"
         },
         {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            }
+          ],
+          "name": "recallTroopsFromDeactivatedWars",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
           "inputs": [],
           "name": "renounceOwnership",
           "outputs": [],
@@ -5300,17 +5413,42 @@
           "type": "function"
         },
         {
-          "inputs": [],
-          "name": "resetCruiseMissileLaunches",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "resetDeployedToday",
-          "outputs": [],
-          "stateMutability": "nonpayable",
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "_warId",
+              "type": "uint256"
+            }
+          ],
+          "name": "returnWar",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            },
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "view",
           "type": "function"
         },
         {
@@ -5381,6 +5519,11 @@
             {
               "internalType": "address",
               "name": "_treasury",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_forces",
               "type": "address"
             }
           ],
@@ -5478,11 +5621,6 @@
           "name": "warIdToDefenseDeployed1",
           "outputs": [
             {
-              "internalType": "bool",
-              "name": "defenseDeployedToday",
-              "type": "bool"
-            },
-            {
               "internalType": "uint256",
               "name": "soldiersDeployed",
               "type": "uint256"
@@ -5570,11 +5708,6 @@
           ],
           "name": "warIdToOffenseDeployed1",
           "outputs": [
-            {
-              "internalType": "bool",
-              "name": "offenseDeployedToday",
-              "type": "bool"
-            },
             {
               "internalType": "uint256",
               "name": "soldiersDeployed",
@@ -5680,7 +5813,7 @@
             },
             {
               "internalType": "uint256",
-              "name": "daysLeft",
+              "name": "dayStarted",
               "type": "uint256"
             },
             {
@@ -5711,16 +5844,6 @@
             {
               "internalType": "uint256",
               "name": "defenseBlockades",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "offenseCruiseMissileLaunchesToday",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "defenseCruiseMissileLaunchesToday",
               "type": "uint256"
             }
           ],

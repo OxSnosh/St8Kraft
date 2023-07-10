@@ -75,7 +75,6 @@ contract CountryMinter is ERC721, Ownable {
         address _treasury,
         address _infrastructure,
         address _resources,
-        address _aid,
         address _missiles,
         address _senate,
         address _warbucks
@@ -84,7 +83,6 @@ contract CountryMinter is ERC721, Ownable {
         treasury = _treasury;
         infrastructure = _infrastructure;
         resources = _resources;
-        aid = _aid;
         missiles = _missiles;
         senate = _senate;
         warbucks = _warbucks;
@@ -120,22 +118,14 @@ contract CountryMinter is ERC721, Ownable {
         address _navy,
         address _navalActions,
         address _fighters,
-        address _fightersMarket1,
-        address _fightersMarket2,
-        address _bombers,
-        address _bombersMarket1,
-        address _bombersMarket2
+        address _bombers
     ) public onlyOwner {
         military = _military;
         forces = _forces;
         navy = _navy;
         navalActions = _navalActions;
         fighters = _fighters;
-        fightersMarket1 = _fightersMarket1;
-        fightersMarket2 = _fightersMarket2;
         bombers = _bombers;
-        bombersMarket1 = _bombersMarket1;
-        bombersMarket2 = _bombersMarket2;
     }
 
     ///@dev this is a public function that allows the caller to mint a nation
