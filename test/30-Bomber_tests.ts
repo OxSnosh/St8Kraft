@@ -422,16 +422,19 @@ describe("Bombers", async function () {
         // console.log("contracts deployed")
 
         await warbucks.settings(
-            treasurycontract.address
+            treasurycontract.address,
+            countryminter.address
         )
-    
+        
         await aidcontract.settings(
             countryminter.address, 
             treasurycontract.address, 
             forcescontract.address, 
             infrastructurecontract.address, 
             keepercontract.address, 
-            wonderscontract1.address)
+            wonderscontract1.address,
+            senatecontract.address,
+            countryparameterscontract.address)
     
         await airbattlecontract.settings(
             warcontract.address, 
@@ -493,9 +496,9 @@ describe("Bombers", async function () {
             treasurycontract.address,
             infrastructurecontract.address,
             resourcescontract.address,
-            aidcontract.address,
             missilescontract.address,
-            senatecontract.address)
+            senatecontract.address,
+            warbucks.address)
         await countryminter.settings2(
             improvementscontract1.address,
             improvementscontract2.address,
@@ -511,11 +514,7 @@ describe("Bombers", async function () {
             navycontract.address,
             navalactionscontract.address,
             fighterscontract.address,
-            fightersmarketplace1.address,
-            fightersmarketplace2.address,
-            bomberscontract.address,
-            bombersmarketplace1.address,
-            bombersmarketplace2.address)
+            bomberscontract.address)
         
         await countryparameterscontract.settings(
             spyoperationscontract.address,
@@ -523,7 +522,9 @@ describe("Bombers", async function () {
             senatecontract.address,
             keepercontract.address,
             nukecontract.address,
-            groundbattlecontract.address
+            groundbattlecontract.address,
+            wonderscontract1.address,
+            treasurycontract.address
         )
     
         await crimecontract.settings(
@@ -531,7 +532,8 @@ describe("Bombers", async function () {
             improvementscontract1.address,
             improvementscontract2.address,
             improvementscontract3.address,
-            countryparameterscontract.address)
+            countryparameterscontract.address,
+            wonderscontract2.address)
         
         await cruisemissilecontract.settings(
             forcescontract.address,
@@ -648,7 +650,8 @@ describe("Bombers", async function () {
             infrastructurecontract.address,
             forcescontract.address,
             treasurycontract.address,
-            countryminter.address)
+            countryminter.address,
+            militarycontract.address)
         await groundbattlecontract.settings2(
             improvementscontract2.address,
             improvementscontract3.address,
@@ -667,27 +670,34 @@ describe("Bombers", async function () {
             countryminter.address,
             wonderscontract1.address,
             infrastructurecontract.address)
-        
+    
         await improvementscontract2.settings(
             treasurycontract.address,
             forcescontract.address,
             wonderscontract1.address,
             countryminter.address,
-            improvementscontract1.address)
+            improvementscontract1.address,
+            resourcescontract.address
+            )
         
         await improvementscontract3.settings(
             treasurycontract.address,
             additionalnavycontract.address,
             improvementscontract1.address,
             improvementscontract2.address,
-            countryminter.address)
+            countryminter.address,
+            bonusresourcescontract.address,
+            wonderscontract4.address
+            )
         
         await improvementscontract4.settings(
             treasurycontract.address,
             forcescontract.address,
             improvementscontract1.address,
             improvementscontract2.address,
-            countryminter.address)
+            countryminter.address,
+            wonderscontract4.address
+            )
         
         await infrastructurecontract.settings1(
             resourcescontract.address,
@@ -734,15 +744,16 @@ describe("Bombers", async function () {
             bonusresourcescontract.address
         )
     
-        await keepercontract.settings(
-            nukecontract.address,
-            aidcontract.address,
-            warcontract.address,
-            treasurycontract.address,
-            missilescontract.address,
-            navalactionscontract.address,
-            countryparameterscontract.address
-        )
+        // await keepercontract.settings(
+        //     nukecontract.address,
+        //     aidcontract.address,
+        //     warcontract.address,
+        //     treasurycontract.address,
+        //     missilescontract.address,
+        //     navalactionscontract.address,
+        //     countryparameterscontract.address,
+        //     militarycontract.address
+        // )
     
         await landmarketcontract.settings(
             resourcescontract.address,
@@ -753,7 +764,8 @@ describe("Bombers", async function () {
     
         await militarycontract.settings(
             spyoperationscontract.address,
-            countryminter.address
+            countryminter.address,
+            keepercontract.address
         )
     
         await nationstrengthcontract.settings(
@@ -868,7 +880,8 @@ describe("Bombers", async function () {
             infrastructurecontract.address,
             improvementscontract2.address,
             countryminter.address,
-            bonusresourcescontract.address
+            bonusresourcescontract.address,
+            senatecontract.address
         )
         await bonusresourcescontract.settings(
             infrastructurecontract.address,
@@ -879,7 +892,9 @@ describe("Bombers", async function () {
         await senatecontract.settings(
             countryminter.address,
             countryparameterscontract.address,
-            wonderscontract3.address
+            wonderscontract3.address,
+            keepercontract.address,
+            resourcescontract.address
         )
     
         await spyoperationscontract.settings(
@@ -894,6 +909,9 @@ describe("Bombers", async function () {
             missilescontract.address,
             countryminter.address
         )
+        await spyoperationscontract.settings2(
+            keepercontract.address
+        )
     
         await taxescontract.settings1(
             countryminter.address,
@@ -903,7 +921,9 @@ describe("Bombers", async function () {
             improvementscontract2.address,
             improvementscontract3.address,
             additionaltaxescontract.address,
-            bonusresourcescontract.address
+            bonusresourcescontract.address,
+            keepercontract.address,
+            environmentcontract.address
         )
         await taxescontract.settings2(
             countryparameterscontract.address,
@@ -996,7 +1016,8 @@ describe("Bombers", async function () {
             keepercontract.address
         )
         await warcontract.settings2(
-            treasurycontract.address
+            treasurycontract.address,
+            forcescontract.address
         )
     
         await wonderscontract1.settings(
@@ -1081,13 +1102,13 @@ describe("Bombers", async function () {
             var aircraftCount : any = await fighterscontract.getAircraftCount(0);
             // console.log(aircraftCount.toNumber())
             expect(aircraftCount).to.equal(2)
-            var yak9Count = await bomberscontract.getDefendingAh1CobraCount(0)
+            var yak9Count = await bomberscontract.getAh1CobraCount(0)
             // console.log(yak9Count.toNumber())
             expect(yak9Count).to.equal(2)
             await expect(bomberscontract.connect(signer1).scrapAh1Cobra(2, 1)).to.be.revertedWith("!nation ruler")
             await expect(bomberscontract.connect(signer1).scrapAh1Cobra(3, 0)).to.be.revertedWith("cannot delete that many")
             await bomberscontract.connect(signer1).scrapAh1Cobra(2, 0)
-            var yak9Count = await bomberscontract.getDefendingAh1CobraCount(0)
+            var yak9Count = await bomberscontract.getAh1CobraCount(0)
             // console.log(yak9Count.toNumber())
             expect(yak9Count).to.equal(0)
         })
@@ -1154,13 +1175,13 @@ describe("Bombers", async function () {
             var aircraftCount : any = await fighterscontract.getAircraftCount(0);
             // console.log(aircraftCount.toNumber())
             expect(aircraftCount).to.equal(2)
-            var yak9Count = await bomberscontract.getDefendingAh64ApacheCount(0)
+            var yak9Count = await bomberscontract.getAh64ApacheCount(0)
             // console.log(yak9Count.toNumber())
             expect(yak9Count).to.equal(2)
             await expect(bomberscontract.connect(signer1).scrapAh64Apache(2, 1)).to.be.revertedWith("!nation ruler")
             await expect(bomberscontract.connect(signer1).scrapAh64Apache(3, 0)).to.be.revertedWith("cannot delete that many")
             await bomberscontract.connect(signer1).scrapAh64Apache(2, 0)
-            var yak9Count = await bomberscontract.getDefendingAh64ApacheCount(0)
+            var yak9Count = await bomberscontract.getAh64ApacheCount(0)
             // console.log(yak9Count.toNumber())
             expect(yak9Count).to.equal(0)
         })
@@ -1227,13 +1248,13 @@ describe("Bombers", async function () {
             var aircraftCount : any = await fighterscontract.getAircraftCount(0);
             // console.log(aircraftCount.toNumber())
             expect(aircraftCount).to.equal(2)
-            var yak9Count = await bomberscontract.getDefendingBristolBlenheimCount(0)
+            var yak9Count = await bomberscontract.getBristolBlenheimCount(0)
             // console.log(yak9Count.toNumber())
             expect(yak9Count).to.equal(2)
             await expect(bomberscontract.connect(signer1).scrapBristolBlenheim(2, 1)).to.be.revertedWith("!nation ruler")
             await expect(bomberscontract.connect(signer1).scrapBristolBlenheim(3, 0)).to.be.revertedWith("cannot delete that many")
             await bomberscontract.connect(signer1).scrapBristolBlenheim(2, 0)
-            var yak9Count = await bomberscontract.getDefendingBristolBlenheimCount(0)
+            var yak9Count = await bomberscontract.getBristolBlenheimCount(0)
             // console.log(yak9Count.toNumber())
             expect(yak9Count).to.equal(0)
         })
@@ -1300,13 +1321,13 @@ describe("Bombers", async function () {
             var aircraftCount : any = await fighterscontract.getAircraftCount(0);
             // console.log(aircraftCount.toNumber())
             expect(aircraftCount).to.equal(2)
-            var yak9Count = await bomberscontract.getDefendingB52MitchellCount(0)
+            var yak9Count = await bomberscontract.getB52MitchellCount(0)
             // console.log(yak9Count.toNumber())
             expect(yak9Count).to.equal(2)
             await expect(bomberscontract.connect(signer1).scrapB52Mitchell(2, 1)).to.be.revertedWith("!nation ruler")
             await expect(bomberscontract.connect(signer1).scrapB52Mitchell(3, 0)).to.be.revertedWith("cannot delete that many")
             await bomberscontract.connect(signer1).scrapB52Mitchell(2, 0)
-            var yak9Count = await bomberscontract.getDefendingB52MitchellCount(0)
+            var yak9Count = await bomberscontract.getB52MitchellCount(0)
             // console.log(yak9Count.toNumber())
             expect(yak9Count).to.equal(0)
         })
@@ -1373,13 +1394,13 @@ describe("Bombers", async function () {
             var aircraftCount : any = await fighterscontract.getAircraftCount(0);
             // console.log(aircraftCount.toNumber())
             expect(aircraftCount).to.equal(2)
-            var yak9Count = await bomberscontract.getDefendingB17gFlyingFortressCount(0)
+            var yak9Count = await bomberscontract.getB17gFlyingFortressCount(0)
             // console.log(yak9Count.toNumber())
             expect(yak9Count).to.equal(2)
             await expect(bomberscontract.connect(signer1).scrapB17gFlyingFortress(2, 1)).to.be.revertedWith("!nation ruler")
             await expect(bomberscontract.connect(signer1).scrapB17gFlyingFortress(3, 0)).to.be.revertedWith("cannot delete that many")
             await bomberscontract.connect(signer1).scrapB17gFlyingFortress(2, 0)
-            var yak9Count = await bomberscontract.getDefendingB17gFlyingFortressCount(0)
+            var yak9Count = await bomberscontract.getB17gFlyingFortressCount(0)
             // console.log(yak9Count.toNumber())
             expect(yak9Count).to.equal(0)
         })
@@ -1446,13 +1467,13 @@ describe("Bombers", async function () {
             var aircraftCount : any = await fighterscontract.getAircraftCount(0);
             // console.log(aircraftCount.toNumber())
             expect(aircraftCount).to.equal(2)
-            var yak9Count = await bomberscontract.getDefendingB52StratofortressCount(0)
+            var yak9Count = await bomberscontract.getB52StratofortressCount(0)
             // console.log(yak9Count.toNumber())
             expect(yak9Count).to.equal(2)
             await expect(bomberscontract.connect(signer1).scrapB52Stratofortress(2, 1)).to.be.revertedWith("!nation ruler")
             await expect(bomberscontract.connect(signer1).scrapB52Stratofortress(3, 0)).to.be.revertedWith("cannot delete that many")
             await bomberscontract.connect(signer1).scrapB52Stratofortress(2, 0)
-            var yak9Count = await bomberscontract.getDefendingB52StratofortressCount(0)
+            var yak9Count = await bomberscontract.getB52StratofortressCount(0)
             // console.log(yak9Count.toNumber())
             expect(yak9Count).to.equal(0)
         })
@@ -1519,13 +1540,13 @@ describe("Bombers", async function () {
             var aircraftCount : any = await fighterscontract.getAircraftCount(0);
             // console.log(aircraftCount.toNumber())
             expect(aircraftCount).to.equal(2)
-            var yak9Count = await bomberscontract.getDefendingB2SpiritCount(0)
+            var yak9Count = await bomberscontract.getB2SpiritCount(0)
             // console.log(yak9Count.toNumber())
             expect(yak9Count).to.equal(2)
             await expect(bomberscontract.connect(signer1).scrapB2Spirit(2, 1)).to.be.revertedWith("!nation ruler")
             await expect(bomberscontract.connect(signer1).scrapB2Spirit(3, 0)).to.be.revertedWith("cannot delete that many")
             await bomberscontract.connect(signer1).scrapB2Spirit(2, 0)
-            var yak9Count = await bomberscontract.getDefendingB2SpiritCount(0)
+            var yak9Count = await bomberscontract.getB2SpiritCount(0)
             // console.log(yak9Count.toNumber())
             expect(yak9Count).to.equal(0)
         })
@@ -1592,13 +1613,13 @@ describe("Bombers", async function () {
             var aircraftCount : any = await fighterscontract.getAircraftCount(0);
             // console.log(aircraftCount.toNumber())
             expect(aircraftCount).to.equal(2)
-            var yak9Count = await bomberscontract.getDefendingB1bLancerCount(0)
+            var yak9Count = await bomberscontract.getB1bLancerCount(0)
             // console.log(yak9Count.toNumber())
             expect(yak9Count).to.equal(2)
             await expect(bomberscontract.connect(signer1).scrapB1bLancer(2, 1)).to.be.revertedWith("!nation ruler")
             await expect(bomberscontract.connect(signer1).scrapB1bLancer(3, 0)).to.be.revertedWith("cannot delete that many")
             await bomberscontract.connect(signer1).scrapB1bLancer(2, 0)
-            var yak9Count = await bomberscontract.getDefendingB1bLancerCount(0)
+            var yak9Count = await bomberscontract.getB1bLancerCount(0)
             // console.log(yak9Count.toNumber())
             expect(yak9Count).to.equal(0)
         })
@@ -1665,13 +1686,13 @@ describe("Bombers", async function () {
             var aircraftCount : any = await fighterscontract.getAircraftCount(0);
             // console.log(aircraftCount.toNumber())
             expect(aircraftCount).to.equal(2)
-            var yak9Count = await bomberscontract.getDefendingTupolevTu160Count(0)
+            var yak9Count = await bomberscontract.getTupolevTu160Count(0)
             // console.log(yak9Count.toNumber())
             expect(yak9Count).to.equal(2)
             await expect(bomberscontract.connect(signer1).scrapTupolevTu160(2, 1)).to.be.revertedWith("!nation ruler")
             await expect(bomberscontract.connect(signer1).scrapTupolevTu160(3, 0)).to.be.revertedWith("cannot delete that many")
             await bomberscontract.connect(signer1).scrapTupolevTu160(2, 0)
-            var yak9Count = await bomberscontract.getDefendingTupolevTu160Count(0)
+            var yak9Count = await bomberscontract.getTupolevTu160Count(0)
             // console.log(yak9Count.toNumber())
             expect(yak9Count).to.equal(0)
         })

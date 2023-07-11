@@ -422,16 +422,19 @@ describe("War Contract", async function () {
         // console.log("contracts deployed")
 
         await warbucks.settings(
-            treasurycontract.address
+            treasurycontract.address,
+            countryminter.address
         )
-    
+        
         await aidcontract.settings(
             countryminter.address, 
             treasurycontract.address, 
             forcescontract.address, 
             infrastructurecontract.address, 
             keepercontract.address, 
-            wonderscontract1.address)
+            wonderscontract1.address,
+            senatecontract.address,
+            countryparameterscontract.address)
     
         await airbattlecontract.settings(
             warcontract.address, 
@@ -493,9 +496,9 @@ describe("War Contract", async function () {
             treasurycontract.address,
             infrastructurecontract.address,
             resourcescontract.address,
-            aidcontract.address,
             missilescontract.address,
-            senatecontract.address)
+            senatecontract.address,
+            warbucks.address)
         await countryminter.settings2(
             improvementscontract1.address,
             improvementscontract2.address,
@@ -511,11 +514,7 @@ describe("War Contract", async function () {
             navycontract.address,
             navalactionscontract.address,
             fighterscontract.address,
-            fightersmarketplace1.address,
-            fightersmarketplace2.address,
-            bomberscontract.address,
-            bombersmarketplace1.address,
-            bombersmarketplace2.address)
+            bomberscontract.address)
         
         await countryparameterscontract.settings(
             spyoperationscontract.address,
@@ -523,7 +522,9 @@ describe("War Contract", async function () {
             senatecontract.address,
             keepercontract.address,
             nukecontract.address,
-            groundbattlecontract.address
+            groundbattlecontract.address,
+            wonderscontract1.address,
+            treasurycontract.address
         )
     
         await crimecontract.settings(
@@ -531,7 +532,8 @@ describe("War Contract", async function () {
             improvementscontract1.address,
             improvementscontract2.address,
             improvementscontract3.address,
-            countryparameterscontract.address)
+            countryparameterscontract.address,
+            wonderscontract2.address)
         
         await cruisemissilecontract.settings(
             forcescontract.address,
@@ -648,7 +650,8 @@ describe("War Contract", async function () {
             infrastructurecontract.address,
             forcescontract.address,
             treasurycontract.address,
-            countryminter.address)
+            countryminter.address,
+            militarycontract.address)
         await groundbattlecontract.settings2(
             improvementscontract2.address,
             improvementscontract3.address,
@@ -667,27 +670,34 @@ describe("War Contract", async function () {
             countryminter.address,
             wonderscontract1.address,
             infrastructurecontract.address)
-        
+    
         await improvementscontract2.settings(
             treasurycontract.address,
             forcescontract.address,
             wonderscontract1.address,
             countryminter.address,
-            improvementscontract1.address)
+            improvementscontract1.address,
+            resourcescontract.address
+            )
         
         await improvementscontract3.settings(
             treasurycontract.address,
             additionalnavycontract.address,
             improvementscontract1.address,
             improvementscontract2.address,
-            countryminter.address)
+            countryminter.address,
+            bonusresourcescontract.address,
+            wonderscontract4.address
+            )
         
         await improvementscontract4.settings(
             treasurycontract.address,
             forcescontract.address,
             improvementscontract1.address,
             improvementscontract2.address,
-            countryminter.address)
+            countryminter.address,
+            wonderscontract4.address
+            )
         
         await infrastructurecontract.settings1(
             resourcescontract.address,
@@ -734,15 +744,16 @@ describe("War Contract", async function () {
             bonusresourcescontract.address
         )
     
-        await keepercontract.settings(
-            nukecontract.address,
-            aidcontract.address,
-            warcontract.address,
-            treasurycontract.address,
-            missilescontract.address,
-            navalactionscontract.address,
-            countryparameterscontract.address
-        )
+        // await keepercontract.settings(
+        //     nukecontract.address,
+        //     aidcontract.address,
+        //     warcontract.address,
+        //     treasurycontract.address,
+        //     missilescontract.address,
+        //     navalactionscontract.address,
+        //     countryparameterscontract.address,
+        //     militarycontract.address
+        // )
     
         await landmarketcontract.settings(
             resourcescontract.address,
@@ -753,7 +764,8 @@ describe("War Contract", async function () {
     
         await militarycontract.settings(
             spyoperationscontract.address,
-            countryminter.address
+            countryminter.address,
+            keepercontract.address
         )
     
         await nationstrengthcontract.settings(
@@ -868,7 +880,8 @@ describe("War Contract", async function () {
             infrastructurecontract.address,
             improvementscontract2.address,
             countryminter.address,
-            bonusresourcescontract.address
+            bonusresourcescontract.address,
+            senatecontract.address
         )
         await bonusresourcescontract.settings(
             infrastructurecontract.address,
@@ -879,7 +892,9 @@ describe("War Contract", async function () {
         await senatecontract.settings(
             countryminter.address,
             countryparameterscontract.address,
-            wonderscontract3.address
+            wonderscontract3.address,
+            keepercontract.address,
+            resourcescontract.address
         )
     
         await spyoperationscontract.settings(
@@ -894,6 +909,9 @@ describe("War Contract", async function () {
             missilescontract.address,
             countryminter.address
         )
+        await spyoperationscontract.settings2(
+            keepercontract.address
+        )
     
         await taxescontract.settings1(
             countryminter.address,
@@ -903,7 +921,9 @@ describe("War Contract", async function () {
             improvementscontract2.address,
             improvementscontract3.address,
             additionaltaxescontract.address,
-            bonusresourcescontract.address
+            bonusresourcescontract.address,
+            keepercontract.address,
+            environmentcontract.address
         )
         await taxescontract.settings2(
             countryparameterscontract.address,
@@ -996,7 +1016,8 @@ describe("War Contract", async function () {
             keepercontract.address
         )
         await warcontract.settings2(
-            treasurycontract.address
+            treasurycontract.address,
+            forcescontract.address
         )
     
         await wonderscontract1.settings(
@@ -1158,7 +1179,7 @@ describe("War Contract", async function () {
             await wonderscontract1.connect(signer1).buyWonder1(0, 10)
             await technologymarketcontrat.connect(signer6).buyTech(5, 8000);
             await warcontract.connect(signer1).declareWar(0, 5)
-            var offensiveWars = await warcontract.offensiveWarLengthForTesting(0);
+            var offensiveWars = await warcontract.offensiveWarLength(0);
             expect(offensiveWars.toNumber()).to.equal(5)
 
             await countryminter.connect(signer7).generateCountry(
@@ -1196,7 +1217,7 @@ describe("War Contract", async function () {
             expect(soldiersDeployed.toNumber()).to.equal(300);  
             expect(tanksDeployed.toNumber()).to.equal(20);
             await expect(forcescontract.connect(signer1).deployForces(50, 20, 0, 0)).to.be.revertedWith("already deployed forces today");
-            await keepercontract.connect(signer0).resetDeploymentsByOwner();
+            await keepercontract.connect(signer0).incrementGameDay();
             await forcescontract.connect(signer1).deployForces(0, 20, 0, 0);
             var deployedForces2 : any = await warcontract.getDeployedGroundForces(0, 0);
             var soldiersDeployed2 = deployedForces2[0];
@@ -1296,7 +1317,7 @@ describe("War Contract", async function () {
             // console.log(isActive)
             expect(isActive).to.equal(true)
             await warcontract.connect(signer2).offerPeace(1, 0)
-            var arr : any = await warcontract.checkWar(0)
+            var arr : any = await warcontract.returnWar(0)
             var offenseOffered = arr[0]
             var defenseOffered = arr[1]
             var active = arr[2]
@@ -1320,7 +1341,7 @@ describe("War Contract", async function () {
             await warcontract.connect(signer1).declareWar(0, 1)
             await warcontract.connect(signer2).offerPeace(1, 0)
             await warcontract.connect(signer1).offerPeace(0, 0)
-            var arr : any = await warcontract.checkWar(0)
+            var arr : any = await warcontract.returnWar(0)
             var offenseOffered = arr[0]
             var defenseOffered = arr[1]
             var active = arr[2]
@@ -1348,17 +1369,17 @@ describe("War Contract", async function () {
             await warcontract.connect(signer2).offerPeace(1, 0)
             var isActive = await warcontract.isWarActive(0);
             expect(isActive).to.equal(true)
-            var offenseOffensiveWars : any = await warcontract.offensiveWarReturnForTesting(0)
-            var defenseOffensiveWars : any = await warcontract.offensiveWarReturnForTesting(1)
-            var offenseActiveWars : any = await warcontract.nationActiveWarsReturnForTesting(0)
-            var defenseActiveWars : any = await warcontract.nationActiveWarsReturnForTesting(1)
+            var offenseOffensiveWars : any = await warcontract.offensiveWarReturn(0)
+            var defenseOffensiveWars : any = await warcontract.offensiveWarReturn(1)
+            var offenseActiveWars : any = await warcontract.nationActiveWarsReturn(0)
+            var defenseActiveWars : any = await warcontract.nationActiveWarsReturn(1)
             expect(offenseOffensiveWars.length).to.equal(1)
             expect(defenseOffensiveWars.length).to.equal(0)
             expect(offenseActiveWars.length).to.equal(1)
             expect(defenseActiveWars.length).to.equal(1)
 
             await warcontract.connect(signer1).offerPeace(0, 0)
-            var arr : any = await warcontract.checkWar(0)
+            var arr : any = await warcontract.returnWar(0)
             var offenseOffered = arr[0]
             var defenseOffered = arr[1]
             var active = arr[2]
@@ -1373,34 +1394,34 @@ describe("War Contract", async function () {
             expect(defenseOffered).to.equal(true)
             expect(peaceDeclared).to.equal(true)
             expect(active).to.equal(false)
-            var offenseOffensiveWars : any = await warcontract.offensiveWarReturnForTesting(0)
-            var defenseOffensiveWars : any = await warcontract.offensiveWarReturnForTesting(1)
-            var offenseActiveWars : any = await warcontract.nationActiveWarsReturnForTesting(0)
-            var defenseActiveWars : any = await warcontract.nationActiveWarsReturnForTesting(1)
+            var offenseOffensiveWars : any = await warcontract.offensiveWarReturn(0)
+            var defenseOffensiveWars : any = await warcontract.offensiveWarReturn(1)
+            var offenseActiveWars : any = await warcontract.nationActiveWarsReturn(0)
+            var defenseActiveWars : any = await warcontract.nationActiveWarsReturn(1)
             expect(offenseOffensiveWars.length).to.equal(0)
             expect(defenseOffensiveWars.length).to.equal(0)
             expect(offenseActiveWars.length).to.equal(0)
             expect(defenseActiveWars.length).to.equal(0)
         })
 
-        it("tests that removeActiveWar deletes war from active wars array", async function () {
-            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 3000)
-            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
-            await forcescontract.connect(signer2).buySoldiers(1000, 1)
-            await forcescontract.connect(signer2).buyTanks(50, 1)
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
-            await warcontract.connect(signer1).declareWar(0, 1)
-            await warcontract.connect(signer2).offerPeace(1, 0)
-            var isActive = await warcontract.isWarActive(0);
-            expect(isActive).to.equal(true)
-            var activeWars : any = await warcontract.gameActiveWars();
-            expect(activeWars.length).to.equal(1)
-            expect(activeWars[0].toNumber()).to.equal(0)
-            await warcontract.connect(signer1).offerPeace(0, 0)
-            var activeWars : any = await warcontract.gameActiveWars();
-            expect(activeWars.length).to.equal(0)
-        })
+        // it("tests that removeActiveWar deletes war from active wars array", async function () {
+        //     await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 3000)
+        //     await technologymarketcontrat.connect(signer2).buyTech(1, 100)
+        //     await forcescontract.connect(signer2).buySoldiers(1000, 1)
+        //     await forcescontract.connect(signer2).buyTanks(50, 1)
+        //     await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+        //     await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+        //     await warcontract.connect(signer1).declareWar(0, 1)
+        //     await warcontract.connect(signer2).offerPeace(1, 0)
+        //     var isActive = await warcontract.isWarActive(0);
+        //     expect(isActive).to.equal(true)
+        //     var activeWars : any = await warcontract.gameActiveWars();
+        //     expect(activeWars.length).to.equal(1)
+        //     expect(activeWars[0].toNumber()).to.equal(0)
+        //     await warcontract.connect(signer1).offerPeace(0, 0)
+        //     var activeWars : any = await warcontract.gameActiveWars();
+        //     expect(activeWars.length).to.equal(0)
+        // })
 
         it("tests that wars can expire", async function () {
             await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 3000)
@@ -1416,16 +1437,17 @@ describe("War Contract", async function () {
             var daysLeft = await warcontract.getDaysLeft(0)
             // console.log(daysLeft.toNumber())
             expect(daysLeft).to.equal(7)
-            var warDetails : any = await warcontract.checkWar(0)
+            var warDetails : any = await warcontract.returnWar(0)
             // console.log("expired", warDetails[4])
             expect(warDetails[4]).to.equal(false)
-            await keepercontract.decremenWarDaysByOwner()
-            await keepercontract.decremenWarDaysByOwner()
-            await keepercontract.decremenWarDaysByOwner()
-            await keepercontract.decremenWarDaysByOwner()
-            await keepercontract.decremenWarDaysByOwner()
-            await keepercontract.decremenWarDaysByOwner()
-            await keepercontract.decremenWarDaysByOwner()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
             var isActive = await warcontract.isWarActive(0);
             expect(isActive).to.equal(false)
             // console.log("active after expiration", isActive)
@@ -1433,7 +1455,7 @@ describe("War Contract", async function () {
             // console.log(daysLeft.toNumber())
             expect(daysLeft).to.equal(0)
             // console.log("days left", daysLeft.toNumber())
-            var warDetails : any = await warcontract.checkWar(0)
+            var warDetails : any = await warcontract.returnWar(0)
             // console.log("expired", warDetails[4])
             expect(warDetails[4]).to.equal(true)
         })

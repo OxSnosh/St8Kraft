@@ -422,16 +422,19 @@ describe("Crime Contract", async function () {
         // console.log("contracts deployed")
 
         await warbucks.settings(
-            treasurycontract.address
+            treasurycontract.address,
+            countryminter.address
         )
-    
+        
         await aidcontract.settings(
             countryminter.address, 
             treasurycontract.address, 
             forcescontract.address, 
             infrastructurecontract.address, 
             keepercontract.address, 
-            wonderscontract1.address)
+            wonderscontract1.address,
+            senatecontract.address,
+            countryparameterscontract.address)
     
         await airbattlecontract.settings(
             warcontract.address, 
@@ -493,9 +496,9 @@ describe("Crime Contract", async function () {
             treasurycontract.address,
             infrastructurecontract.address,
             resourcescontract.address,
-            aidcontract.address,
             missilescontract.address,
-            senatecontract.address)
+            senatecontract.address,
+            warbucks.address)
         await countryminter.settings2(
             improvementscontract1.address,
             improvementscontract2.address,
@@ -511,11 +514,7 @@ describe("Crime Contract", async function () {
             navycontract.address,
             navalactionscontract.address,
             fighterscontract.address,
-            fightersmarketplace1.address,
-            fightersmarketplace2.address,
-            bomberscontract.address,
-            bombersmarketplace1.address,
-            bombersmarketplace2.address)
+            bomberscontract.address)
         
         await countryparameterscontract.settings(
             spyoperationscontract.address,
@@ -523,7 +522,9 @@ describe("Crime Contract", async function () {
             senatecontract.address,
             keepercontract.address,
             nukecontract.address,
-            groundbattlecontract.address
+            groundbattlecontract.address,
+            wonderscontract1.address,
+            treasurycontract.address
         )
     
         await crimecontract.settings(
@@ -531,7 +532,8 @@ describe("Crime Contract", async function () {
             improvementscontract1.address,
             improvementscontract2.address,
             improvementscontract3.address,
-            countryparameterscontract.address)
+            countryparameterscontract.address,
+            wonderscontract2.address)
         
         await cruisemissilecontract.settings(
             forcescontract.address,
@@ -648,7 +650,8 @@ describe("Crime Contract", async function () {
             infrastructurecontract.address,
             forcescontract.address,
             treasurycontract.address,
-            countryminter.address)
+            countryminter.address,
+            militarycontract.address)
         await groundbattlecontract.settings2(
             improvementscontract2.address,
             improvementscontract3.address,
@@ -667,27 +670,34 @@ describe("Crime Contract", async function () {
             countryminter.address,
             wonderscontract1.address,
             infrastructurecontract.address)
-        
+    
         await improvementscontract2.settings(
             treasurycontract.address,
             forcescontract.address,
             wonderscontract1.address,
             countryminter.address,
-            improvementscontract1.address)
+            improvementscontract1.address,
+            resourcescontract.address
+            )
         
         await improvementscontract3.settings(
             treasurycontract.address,
             additionalnavycontract.address,
             improvementscontract1.address,
             improvementscontract2.address,
-            countryminter.address)
+            countryminter.address,
+            bonusresourcescontract.address,
+            wonderscontract4.address
+            )
         
         await improvementscontract4.settings(
             treasurycontract.address,
             forcescontract.address,
             improvementscontract1.address,
             improvementscontract2.address,
-            countryminter.address)
+            countryminter.address,
+            wonderscontract4.address
+            )
         
         await infrastructurecontract.settings1(
             resourcescontract.address,
@@ -734,15 +744,16 @@ describe("Crime Contract", async function () {
             bonusresourcescontract.address
         )
     
-        await keepercontract.settings(
-            nukecontract.address,
-            aidcontract.address,
-            warcontract.address,
-            treasurycontract.address,
-            missilescontract.address,
-            navalactionscontract.address,
-            countryparameterscontract.address
-        )
+        // await keepercontract.settings(
+        //     nukecontract.address,
+        //     aidcontract.address,
+        //     warcontract.address,
+        //     treasurycontract.address,
+        //     missilescontract.address,
+        //     navalactionscontract.address,
+        //     countryparameterscontract.address,
+        //     militarycontract.address
+        // )
     
         await landmarketcontract.settings(
             resourcescontract.address,
@@ -753,7 +764,8 @@ describe("Crime Contract", async function () {
     
         await militarycontract.settings(
             spyoperationscontract.address,
-            countryminter.address
+            countryminter.address,
+            keepercontract.address
         )
     
         await nationstrengthcontract.settings(
@@ -868,7 +880,8 @@ describe("Crime Contract", async function () {
             infrastructurecontract.address,
             improvementscontract2.address,
             countryminter.address,
-            bonusresourcescontract.address
+            bonusresourcescontract.address,
+            senatecontract.address
         )
         await bonusresourcescontract.settings(
             infrastructurecontract.address,
@@ -879,7 +892,9 @@ describe("Crime Contract", async function () {
         await senatecontract.settings(
             countryminter.address,
             countryparameterscontract.address,
-            wonderscontract3.address
+            wonderscontract3.address,
+            keepercontract.address,
+            resourcescontract.address
         )
     
         await spyoperationscontract.settings(
@@ -894,6 +909,9 @@ describe("Crime Contract", async function () {
             missilescontract.address,
             countryminter.address
         )
+        await spyoperationscontract.settings2(
+            keepercontract.address
+        )
     
         await taxescontract.settings1(
             countryminter.address,
@@ -903,7 +921,9 @@ describe("Crime Contract", async function () {
             improvementscontract2.address,
             improvementscontract3.address,
             additionaltaxescontract.address,
-            bonusresourcescontract.address
+            bonusresourcescontract.address,
+            keepercontract.address,
+            environmentcontract.address
         )
         await taxescontract.settings2(
             countryparameterscontract.address,
@@ -996,7 +1016,8 @@ describe("Crime Contract", async function () {
             keepercontract.address
         )
         await warcontract.settings2(
-            treasurycontract.address
+            treasurycontract.address,
+            forcescontract.address
         )
     
         await wonderscontract1.settings(
@@ -1062,7 +1083,7 @@ describe("Crime Contract", async function () {
             expect(populationCount.toNumber()).to.equal(160);
             const initialCriminalCount = await crimecontract.getCriminalCount(0);
             // console.log("inital criminal count", initialCriminalCount.toNumber());
-            expect(initialCriminalCount.toNumber()).to.equal(3);
+            expect(initialCriminalCount[0].toNumber()).to.equal(3);
         })
 
         it("crime1 tests that population and infrastructure affects cps", async function () {
@@ -1081,7 +1102,7 @@ describe("Crime Contract", async function () {
             expect(infPoints1.toNumber()).to.equal(0);
             expect(cps1.toNumber()).to.equal(441);
             expect(crimeIndex1.toNumber()).to.equal(1);
-            expect(criminalCount1.toNumber()).to.equal(35);
+            expect(criminalCount1[0].toNumber()).to.equal(35);
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 30000); 
             var popPoints3 = await crimecontract.getPointsFromPopulation(0);
             var infPoints3 = await crimecontract.getPointsFromInfrastruture(0);
@@ -1097,7 +1118,7 @@ describe("Crime Contract", async function () {
             expect(infPoints3.toNumber()).to.equal(75);
             expect(cps3.toNumber()).to.equal(173);
             expect(crimeIndex3.toNumber()).to.equal(6);
-            expect(criminalCount3.toNumber()).to.equal(16923);
+            expect(criminalCount3[0].toNumber()).to.equal(16923);
         })
 
         it("crime1 tests that government affects criminal count", async function () {
@@ -1114,11 +1135,11 @@ describe("Crime Contract", async function () {
             // console.log("gov points 1", govPoints1.toNumber());
             expect(cps1.toNumber()).to.equal(160);
             expect(crimeIndex1.toNumber()).to.equal(6);
-            expect(criminalCount1.toNumber()).to.equal(14011);
+            expect(criminalCount1[0].toNumber()).to.equal(14011);
             expect(govPoints1.toNumber()).to.equal(50);
-            await keepercontract.incrementDaysSinceForParametersByOwner();
-            await keepercontract.incrementDaysSinceForParametersByOwner();
-            await keepercontract.incrementDaysSinceForParametersByOwner();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
             await countryparameterscontract.connect(signer1).setGovernment(0, 4);
             var cps3 = await crimecontract.getCrimePreventionScore(0);
             var crimeIndex3 = await crimecontract.getCrimeIndex(0);
@@ -1127,7 +1148,7 @@ describe("Crime Contract", async function () {
             // console.log("gov points 2", govPoints2.toNumber());
             expect(cps3.toNumber()).to.equal(285);
             expect(crimeIndex3.toNumber()).to.equal(4);
-            expect(criminalCount3.toNumber()).to.equal(10008);
+            expect(criminalCount3[0].toNumber()).to.equal(10008);
             expect(govPoints2.toNumber()).to.equal(175);
         })
 
@@ -1139,7 +1160,7 @@ describe("Crime Contract", async function () {
             // console.log("initial literacy percentage", initialLiteracyPercentage.toNumber());
             var criminalCount1 = await crimecontract.getCriminalCount(0);
             // console.log("criminal count 1", criminalCount1.toNumber());
-            expect(criminalCount1.toNumber()).to.equal(14011);
+            expect(criminalCount1[0].toNumber()).to.equal(14011);
             expect(initialLiteracyPercentage.toNumber()).to.equal(20);
             expect(initialLiteracyPoints.toNumber()).to.equal(16);
             await technologymarketcontrat.connect(signer1).buyTech(0, 200);
@@ -1149,7 +1170,7 @@ describe("Crime Contract", async function () {
             expect(updatedLiteracyPoints.toNumber()).to.equal(56);
             var criminalCount3 = await crimecontract.getCriminalCount(0);
             // console.log("criminal count 3", criminalCount3.toNumber());
-            expect(criminalCount3.toNumber()).to.equal(12009);
+            expect(criminalCount3[0].toNumber()).to.equal(12009);
             await billscontract.connect(signer1).payBills(0)
             await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 8);
             await improvementscontract3.connect(signer1).buyImprovement3(2, 0, 11);
@@ -1182,25 +1203,25 @@ describe("Crime Contract", async function () {
         it("crime1 tests that criminals get incarcerated", async function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 25000);          
             var criminalCount1 = await crimecontract.getCriminalCount(0);
-            expect(criminalCount1.toNumber()).to.equal(14011);
+            expect(criminalCount1[0].toNumber()).to.equal(14011);
             
             await billscontract.connect(signer1).payBills(0)
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 7);
             var criminalCount2 = await crimecontract.getCriminalCount(0);
-            expect(criminalCount2.toNumber()).to.equal(13511);
+            expect(criminalCount2[0].toNumber()).to.equal(13511);
             
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 8);
             var criminalCount3 = await crimecontract.getCriminalCount(0);
-            expect(criminalCount3.toNumber()).to.equal(13311);
+            expect(criminalCount3[0].toNumber()).to.equal(13311);
             
             await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 3);
             var criminalCount4 = await crimecontract.getCriminalCount(0);
-            expect(criminalCount4.toNumber()).to.equal(8311);
+            expect(criminalCount4[0].toNumber()).to.equal(8311);
 
             await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
             var criminalCount5 = await crimecontract.getCriminalCount(0);
             // console.log("criminal", criminalCount5.toNumber());
-            expect(criminalCount5.toNumber()).to.equal(7949);  
+            expect(criminalCount5[0].toNumber()).to.equal(7949);  
         })    
     })
 });

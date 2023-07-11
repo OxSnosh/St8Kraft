@@ -2,12 +2,13 @@ import { expect } from "chai"
 import { ethers } from "hardhat"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address"
 import { INITIAL_SUPPLY } from "../helper-hardhat-config"
-import { TreasuryContract, WarBucks } from "../typechain-types"
+import { TreasuryContract, WarBucks, CountryMinter } from "../typechain-types"
 
 describe("WarBucks", function () {
   
   let warbucks: WarBucks
   let treasurycontract: TreasuryContract
+  let countryMinter: CountryMinter
 
   let signer0: SignerWithAddress
   let signer1: SignerWithAddress
@@ -31,9 +32,14 @@ describe("WarBucks", function () {
       treasurycontract = await TreasuryContract.deploy() as TreasuryContract
       await treasurycontract.deployed()
       // console.log(`TreasuryContract deployed to ${treasurycontract.address}`)
-      
+
+      const CountryMinter = await ethers.getContractFactory("CountryMinter");
+      countryMinter = await CountryMinter.deploy() as CountryMinter;
+      await countryMinter.deployed(); 
+
       warbucks.settings(
-        treasurycontract.address
+        treasurycontract.address,
+        countryMinter.address
       )
   });
 

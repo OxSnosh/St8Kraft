@@ -422,16 +422,19 @@ describe("Cruise Missile Attack", async function () {
         // console.log("contracts deployed")
 
         await warbucks.settings(
-            treasurycontract.address
+            treasurycontract.address,
+            countryminter.address
         )
-    
+        
         await aidcontract.settings(
             countryminter.address, 
             treasurycontract.address, 
             forcescontract.address, 
             infrastructurecontract.address, 
             keepercontract.address, 
-            wonderscontract1.address)
+            wonderscontract1.address,
+            senatecontract.address,
+            countryparameterscontract.address)
     
         await airbattlecontract.settings(
             warcontract.address, 
@@ -493,9 +496,9 @@ describe("Cruise Missile Attack", async function () {
             treasurycontract.address,
             infrastructurecontract.address,
             resourcescontract.address,
-            aidcontract.address,
             missilescontract.address,
-            senatecontract.address)
+            senatecontract.address,
+            warbucks.address)
         await countryminter.settings2(
             improvementscontract1.address,
             improvementscontract2.address,
@@ -511,11 +514,7 @@ describe("Cruise Missile Attack", async function () {
             navycontract.address,
             navalactionscontract.address,
             fighterscontract.address,
-            fightersmarketplace1.address,
-            fightersmarketplace2.address,
-            bomberscontract.address,
-            bombersmarketplace1.address,
-            bombersmarketplace2.address)
+            bomberscontract.address)
         
         await countryparameterscontract.settings(
             spyoperationscontract.address,
@@ -523,7 +522,9 @@ describe("Cruise Missile Attack", async function () {
             senatecontract.address,
             keepercontract.address,
             nukecontract.address,
-            groundbattlecontract.address
+            groundbattlecontract.address,
+            wonderscontract1.address,
+            treasurycontract.address
         )
     
         await crimecontract.settings(
@@ -531,7 +532,8 @@ describe("Cruise Missile Attack", async function () {
             improvementscontract1.address,
             improvementscontract2.address,
             improvementscontract3.address,
-            countryparameterscontract.address)
+            countryparameterscontract.address,
+            wonderscontract2.address)
         
         await cruisemissilecontract.settings(
             forcescontract.address,
@@ -648,7 +650,8 @@ describe("Cruise Missile Attack", async function () {
             infrastructurecontract.address,
             forcescontract.address,
             treasurycontract.address,
-            countryminter.address)
+            countryminter.address,
+            militarycontract.address)
         await groundbattlecontract.settings2(
             improvementscontract2.address,
             improvementscontract3.address,
@@ -667,27 +670,34 @@ describe("Cruise Missile Attack", async function () {
             countryminter.address,
             wonderscontract1.address,
             infrastructurecontract.address)
-        
+    
         await improvementscontract2.settings(
             treasurycontract.address,
             forcescontract.address,
             wonderscontract1.address,
             countryminter.address,
-            improvementscontract1.address)
+            improvementscontract1.address,
+            resourcescontract.address
+            )
         
         await improvementscontract3.settings(
             treasurycontract.address,
             additionalnavycontract.address,
             improvementscontract1.address,
             improvementscontract2.address,
-            countryminter.address)
+            countryminter.address,
+            bonusresourcescontract.address,
+            wonderscontract4.address
+            )
         
         await improvementscontract4.settings(
             treasurycontract.address,
             forcescontract.address,
             improvementscontract1.address,
             improvementscontract2.address,
-            countryminter.address)
+            countryminter.address,
+            wonderscontract4.address
+            )
         
         await infrastructurecontract.settings1(
             resourcescontract.address,
@@ -734,15 +744,16 @@ describe("Cruise Missile Attack", async function () {
             bonusresourcescontract.address
         )
     
-        await keepercontract.settings(
-            nukecontract.address,
-            aidcontract.address,
-            warcontract.address,
-            treasurycontract.address,
-            missilescontract.address,
-            navalactionscontract.address,
-            countryparameterscontract.address
-        )
+        // await keepercontract.settings(
+        //     nukecontract.address,
+        //     aidcontract.address,
+        //     warcontract.address,
+        //     treasurycontract.address,
+        //     missilescontract.address,
+        //     navalactionscontract.address,
+        //     countryparameterscontract.address,
+        //     militarycontract.address
+        // )
     
         await landmarketcontract.settings(
             resourcescontract.address,
@@ -753,7 +764,8 @@ describe("Cruise Missile Attack", async function () {
     
         await militarycontract.settings(
             spyoperationscontract.address,
-            countryminter.address
+            countryminter.address,
+            keepercontract.address
         )
     
         await nationstrengthcontract.settings(
@@ -868,7 +880,8 @@ describe("Cruise Missile Attack", async function () {
             infrastructurecontract.address,
             improvementscontract2.address,
             countryminter.address,
-            bonusresourcescontract.address
+            bonusresourcescontract.address,
+            senatecontract.address
         )
         await bonusresourcescontract.settings(
             infrastructurecontract.address,
@@ -879,7 +892,9 @@ describe("Cruise Missile Attack", async function () {
         await senatecontract.settings(
             countryminter.address,
             countryparameterscontract.address,
-            wonderscontract3.address
+            wonderscontract3.address,
+            keepercontract.address,
+            resourcescontract.address
         )
     
         await spyoperationscontract.settings(
@@ -894,6 +909,9 @@ describe("Cruise Missile Attack", async function () {
             missilescontract.address,
             countryminter.address
         )
+        await spyoperationscontract.settings2(
+            keepercontract.address
+        )
     
         await taxescontract.settings1(
             countryminter.address,
@@ -903,7 +921,9 @@ describe("Cruise Missile Attack", async function () {
             improvementscontract2.address,
             improvementscontract3.address,
             additionaltaxescontract.address,
-            bonusresourcescontract.address
+            bonusresourcescontract.address,
+            keepercontract.address,
+            environmentcontract.address
         )
         await taxescontract.settings2(
             countryparameterscontract.address,
@@ -996,7 +1016,8 @@ describe("Cruise Missile Attack", async function () {
             keepercontract.address
         )
         await warcontract.settings2(
-            treasurycontract.address
+            treasurycontract.address,
+            forcescontract.address
         )
     
         await wonderscontract1.settings(
@@ -1160,7 +1181,7 @@ describe("Cruise Missile Attack", async function () {
             let txReceipt2 = await tx2.wait(1);
             let requestId2 : any = txReceipt2?.events?.[1].args?.requestId;
             await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, cruisemissilecontract.address);
-            await keepercontract.resetCruiseMissileLaunchesByOwner()
+            await keepercontract.incrementGameDay()
             await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
             const tx3 = await cruisemissilecontract.fulfillRequest(2);
             let txReceipt3 = await tx3.wait(1);
@@ -1171,7 +1192,7 @@ describe("Cruise Missile Attack", async function () {
             let txReceipt4 = await tx4.wait(1);
             let requestId4 : any = txReceipt4?.events?.[1].args?.requestId;
             await vrfCoordinatorV2Mock.fulfillRandomWords(requestId4, cruisemissilecontract.address);
-            await keepercontract.resetCruiseMissileLaunchesByOwner()
+            await keepercontract.incrementGameDay()
             await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
             const tx5 = await cruisemissilecontract.fulfillRequest(4);
             let txReceipt5 = await tx5.wait(1);
@@ -1182,7 +1203,7 @@ describe("Cruise Missile Attack", async function () {
             let txReceipt6 = await tx6.wait(1);
             let requestId6 : any = txReceipt6?.events?.[1].args?.requestId;
             await vrfCoordinatorV2Mock.fulfillRandomWords(requestId6, cruisemissilecontract.address);
-            await keepercontract.resetCruiseMissileLaunchesByOwner()
+            await keepercontract.incrementGameDay()
             await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
             const tx7 = await cruisemissilecontract.fulfillRequest(6);
             let txReceipt7 = await tx7.wait(1);

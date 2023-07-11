@@ -1,4 +1,4 @@
-import { expect } from "chai"
+import { expect, assert } from "chai"
 import { network, ethers } from "hardhat"
 import { INITIAL_SUPPLY } from "../helper-hardhat-config"
 import { 
@@ -298,7 +298,7 @@ describe("CountryMinter", function () {
         // console.log(`InfrastructureMarketplace deployed to ${infrastructuremarketplace.address}`)
     
         const KeeperContract = await ethers.getContractFactory("KeeperContract")
-        keepercontract = await KeeperContract.deploy() as KeeperContract
+        keepercontract = await KeeperContract.deploy(86400) as KeeperContract
         await keepercontract.deployed()
         // console.log(`KeeperContract deployed to ${keepercontract.address}`)
         
@@ -367,7 +367,7 @@ describe("CountryMinter", function () {
         await bonusresourcescontract.deployed()
     
         const SenateContract = await ethers.getContractFactory("SenateContract")
-        senatecontract = await SenateContract.deploy() as SenateContract
+        senatecontract = await SenateContract.deploy(20) as SenateContract
         await senatecontract.deployed()
         // console.log(`SenateContract deployed to ${senatecontract.address}`)
         
@@ -424,16 +424,19 @@ describe("CountryMinter", function () {
         // console.log("contracts deployed")
 
         await warbucks.settings(
-            treasurycontract.address
+            treasurycontract.address,
+            countryminter.address
         )
-    
+        
         await aidcontract.settings(
             countryminter.address, 
             treasurycontract.address, 
             forcescontract.address, 
             infrastructurecontract.address, 
             keepercontract.address, 
-            wonderscontract1.address)
+            wonderscontract1.address,
+            senatecontract.address,
+            countryparameterscontract.address)
     
         await airbattlecontract.settings(
             warcontract.address, 
@@ -495,9 +498,9 @@ describe("CountryMinter", function () {
             treasurycontract.address,
             infrastructurecontract.address,
             resourcescontract.address,
-            aidcontract.address,
             missilescontract.address,
-            senatecontract.address)
+            senatecontract.address,
+            warbucks.address)
         await countryminter.settings2(
             improvementscontract1.address,
             improvementscontract2.address,
@@ -513,11 +516,7 @@ describe("CountryMinter", function () {
             navycontract.address,
             navalactionscontract.address,
             fighterscontract.address,
-            fightersmarketplace1.address,
-            fightersmarketplace2.address,
-            bomberscontract.address,
-            bombersmarketplace1.address,
-            bombersmarketplace2.address)
+            bomberscontract.address)
         
         await countryparameterscontract.settings(
             spyoperationscontract.address,
@@ -525,7 +524,9 @@ describe("CountryMinter", function () {
             senatecontract.address,
             keepercontract.address,
             nukecontract.address,
-            groundbattlecontract.address
+            groundbattlecontract.address,
+            wonderscontract1.address,
+            treasurycontract.address
         )
     
         await crimecontract.settings(
@@ -533,7 +534,8 @@ describe("CountryMinter", function () {
             improvementscontract1.address,
             improvementscontract2.address,
             improvementscontract3.address,
-            countryparameterscontract.address)
+            countryparameterscontract.address,
+            wonderscontract2.address)
         
         await cruisemissilecontract.settings(
             forcescontract.address,
@@ -650,7 +652,8 @@ describe("CountryMinter", function () {
             infrastructurecontract.address,
             forcescontract.address,
             treasurycontract.address,
-            countryminter.address)
+            countryminter.address,
+            militarycontract.address)
         await groundbattlecontract.settings2(
             improvementscontract2.address,
             improvementscontract3.address,
@@ -669,27 +672,34 @@ describe("CountryMinter", function () {
             countryminter.address,
             wonderscontract1.address,
             infrastructurecontract.address)
-        
+    
         await improvementscontract2.settings(
             treasurycontract.address,
             forcescontract.address,
             wonderscontract1.address,
             countryminter.address,
-            improvementscontract1.address)
+            improvementscontract1.address,
+            resourcescontract.address
+            )
         
         await improvementscontract3.settings(
             treasurycontract.address,
             additionalnavycontract.address,
             improvementscontract1.address,
             improvementscontract2.address,
-            countryminter.address)
+            countryminter.address,
+            bonusresourcescontract.address,
+            wonderscontract4.address
+            )
         
         await improvementscontract4.settings(
             treasurycontract.address,
             forcescontract.address,
             improvementscontract1.address,
             improvementscontract2.address,
-            countryminter.address)
+            countryminter.address,
+            wonderscontract4.address
+            )
         
         await infrastructurecontract.settings1(
             resourcescontract.address,
@@ -736,15 +746,16 @@ describe("CountryMinter", function () {
             bonusresourcescontract.address
         )
     
-        await keepercontract.settings(
-            nukecontract.address,
-            aidcontract.address,
-            warcontract.address,
-            treasurycontract.address,
-            missilescontract.address,
-            navalactionscontract.address,
-            countryparameterscontract.address
-        )
+        // await keepercontract.settings(
+        //     nukecontract.address,
+        //     aidcontract.address,
+        //     warcontract.address,
+        //     treasurycontract.address,
+        //     missilescontract.address,
+        //     navalactionscontract.address,
+        //     countryparameterscontract.address,
+        //     militarycontract.address
+        // )
     
         await landmarketcontract.settings(
             resourcescontract.address,
@@ -755,7 +766,8 @@ describe("CountryMinter", function () {
     
         await militarycontract.settings(
             spyoperationscontract.address,
-            countryminter.address
+            countryminter.address,
+            keepercontract.address
         )
     
         await nationstrengthcontract.settings(
@@ -870,7 +882,8 @@ describe("CountryMinter", function () {
             infrastructurecontract.address,
             improvementscontract2.address,
             countryminter.address,
-            bonusresourcescontract.address
+            bonusresourcescontract.address,
+            senatecontract.address
         )
         await bonusresourcescontract.settings(
             infrastructurecontract.address,
@@ -881,7 +894,9 @@ describe("CountryMinter", function () {
         await senatecontract.settings(
             countryminter.address,
             countryparameterscontract.address,
-            wonderscontract3.address
+            wonderscontract3.address,
+            keepercontract.address,
+            resourcescontract.address
         )
     
         await spyoperationscontract.settings(
@@ -896,6 +911,9 @@ describe("CountryMinter", function () {
             missilescontract.address,
             countryminter.address
         )
+        await spyoperationscontract.settings2(
+            keepercontract.address
+        )
     
         await taxescontract.settings1(
             countryminter.address,
@@ -905,7 +923,9 @@ describe("CountryMinter", function () {
             improvementscontract2.address,
             improvementscontract3.address,
             additionaltaxescontract.address,
-            bonusresourcescontract.address
+            bonusresourcescontract.address,
+            keepercontract.address,
+            environmentcontract.address
         )
         await taxescontract.settings2(
             countryparameterscontract.address,
@@ -998,7 +1018,8 @@ describe("CountryMinter", function () {
             keepercontract.address
         )
         await warcontract.settings2(
-            treasurycontract.address
+            treasurycontract.address,
+            forcescontract.address
         )
     
         await wonderscontract1.settings(
@@ -1045,6 +1066,7 @@ describe("CountryMinter", function () {
 
     describe("Minting a Country", function () {
         it("Tests that the nation parameters set correctly", async function () {
+            await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
             await countryminter.connect(signer1).generateCountry(
                     "TestRuler",
                     "TestNationName",
@@ -1059,6 +1081,8 @@ describe("CountryMinter", function () {
         });
 
         it("Tests that the countryId increments correctly", async function () {
+            await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
+            await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
             await countryminter.connect(signer1).generateCountry(
                 "TestRuler",
                 "TestNationName",
@@ -1077,19 +1101,23 @@ describe("CountryMinter", function () {
             expect(countryId2).to.equal(2);
         });  
 
-        it("Tests that country mint will be reverted if the wallet already contains a country", async function () {
+        it("Tests that a wallet can mint 2 nations in the same wallet", async function () {
+            await warbucks.connect(signer0).transfer(signer1.address, BigInt(4100000000000000000000000))
             await countryminter.connect(signer1).generateCountry(
                 "TestRuler",
                 "TestNationName",
                 "TestCapitalCity",
                 "TestNationSlogan"
             )
-            await expect(countryminter.connect(signer1).generateCountry(
-                "TestRuler",
-                "TestNationName",
-                "TestCapitalCity",
-                "TestNationSlogan"
-            )).to.be.revertedWith("Wallet already contains a country");
+            
+            await countryminter.connect(signer1).generateCountry(
+                "TestRuler2",
+                "TestNationName2",
+                "TestCapitalCity2",
+                "TestNationSlogan2"
+            )
+            const country2Name = await countryparameterscontract.getNationName(1);
+            expect(country2Name).to.equal("TestNationName2");
         })
     });
 });

@@ -423,16 +423,19 @@ describe("Treasury", async function () {
         // console.log("contracts deployed")
 
         await warbucks.settings(
-            treasurycontract.address
+            treasurycontract.address,
+            countryminter.address
         )
-    
+        
         await aidcontract.settings(
             countryminter.address, 
             treasurycontract.address, 
             forcescontract.address, 
             infrastructurecontract.address, 
             keepercontract.address, 
-            wonderscontract1.address)
+            wonderscontract1.address,
+            senatecontract.address,
+            countryparameterscontract.address)
     
         await airbattlecontract.settings(
             warcontract.address, 
@@ -494,9 +497,9 @@ describe("Treasury", async function () {
             treasurycontract.address,
             infrastructurecontract.address,
             resourcescontract.address,
-            aidcontract.address,
             missilescontract.address,
-            senatecontract.address)
+            senatecontract.address,
+            warbucks.address)
         await countryminter.settings2(
             improvementscontract1.address,
             improvementscontract2.address,
@@ -512,11 +515,7 @@ describe("Treasury", async function () {
             navycontract.address,
             navalactionscontract.address,
             fighterscontract.address,
-            fightersmarketplace1.address,
-            fightersmarketplace2.address,
-            bomberscontract.address,
-            bombersmarketplace1.address,
-            bombersmarketplace2.address)
+            bomberscontract.address)
         
         await countryparameterscontract.settings(
             spyoperationscontract.address,
@@ -524,7 +523,9 @@ describe("Treasury", async function () {
             senatecontract.address,
             keepercontract.address,
             nukecontract.address,
-            groundbattlecontract.address
+            groundbattlecontract.address,
+            wonderscontract1.address,
+            treasurycontract.address
         )
     
         await crimecontract.settings(
@@ -532,7 +533,8 @@ describe("Treasury", async function () {
             improvementscontract1.address,
             improvementscontract2.address,
             improvementscontract3.address,
-            countryparameterscontract.address)
+            countryparameterscontract.address,
+            wonderscontract2.address)
         
         await cruisemissilecontract.settings(
             forcescontract.address,
@@ -649,7 +651,8 @@ describe("Treasury", async function () {
             infrastructurecontract.address,
             forcescontract.address,
             treasurycontract.address,
-            countryminter.address)
+            countryminter.address,
+            militarycontract.address)
         await groundbattlecontract.settings2(
             improvementscontract2.address,
             improvementscontract3.address,
@@ -668,27 +671,34 @@ describe("Treasury", async function () {
             countryminter.address,
             wonderscontract1.address,
             infrastructurecontract.address)
-        
+    
         await improvementscontract2.settings(
             treasurycontract.address,
             forcescontract.address,
             wonderscontract1.address,
             countryminter.address,
-            improvementscontract1.address)
+            improvementscontract1.address,
+            resourcescontract.address
+            )
         
         await improvementscontract3.settings(
             treasurycontract.address,
             additionalnavycontract.address,
             improvementscontract1.address,
             improvementscontract2.address,
-            countryminter.address)
+            countryminter.address,
+            bonusresourcescontract.address,
+            wonderscontract4.address
+            )
         
         await improvementscontract4.settings(
             treasurycontract.address,
             forcescontract.address,
             improvementscontract1.address,
             improvementscontract2.address,
-            countryminter.address)
+            countryminter.address,
+            wonderscontract4.address
+            )
         
         await infrastructurecontract.settings1(
             resourcescontract.address,
@@ -735,15 +745,16 @@ describe("Treasury", async function () {
             bonusresourcescontract.address
         )
     
-        await keepercontract.settings(
-            nukecontract.address,
-            aidcontract.address,
-            warcontract.address,
-            treasurycontract.address,
-            missilescontract.address,
-            navalactionscontract.address,
-            countryparameterscontract.address
-        )
+        // await keepercontract.settings(
+        //     nukecontract.address,
+        //     aidcontract.address,
+        //     warcontract.address,
+        //     treasurycontract.address,
+        //     missilescontract.address,
+        //     navalactionscontract.address,
+        //     countryparameterscontract.address,
+        //     militarycontract.address
+        // )
     
         await landmarketcontract.settings(
             resourcescontract.address,
@@ -754,7 +765,8 @@ describe("Treasury", async function () {
     
         await militarycontract.settings(
             spyoperationscontract.address,
-            countryminter.address
+            countryminter.address,
+            keepercontract.address
         )
     
         await nationstrengthcontract.settings(
@@ -869,7 +881,8 @@ describe("Treasury", async function () {
             infrastructurecontract.address,
             improvementscontract2.address,
             countryminter.address,
-            bonusresourcescontract.address
+            bonusresourcescontract.address,
+            senatecontract.address
         )
         await bonusresourcescontract.settings(
             infrastructurecontract.address,
@@ -880,7 +893,9 @@ describe("Treasury", async function () {
         await senatecontract.settings(
             countryminter.address,
             countryparameterscontract.address,
-            wonderscontract3.address
+            wonderscontract3.address,
+            keepercontract.address,
+            resourcescontract.address
         )
     
         await spyoperationscontract.settings(
@@ -895,6 +910,9 @@ describe("Treasury", async function () {
             missilescontract.address,
             countryminter.address
         )
+        await spyoperationscontract.settings2(
+            keepercontract.address
+        )
     
         await taxescontract.settings1(
             countryminter.address,
@@ -904,7 +922,9 @@ describe("Treasury", async function () {
             improvementscontract2.address,
             improvementscontract3.address,
             additionaltaxescontract.address,
-            bonusresourcescontract.address
+            bonusresourcescontract.address,
+            keepercontract.address,
+            environmentcontract.address
         )
         await taxescontract.settings2(
             countryparameterscontract.address,
@@ -997,7 +1017,8 @@ describe("Treasury", async function () {
             keepercontract.address
         )
         await warcontract.settings2(
-            treasurycontract.address
+            treasurycontract.address,
+            forcescontract.address
         )
     
         await wonderscontract1.settings(
@@ -1138,14 +1159,14 @@ describe("Treasury", async function () {
 
     describe("Game Tax Rate Functionality", function () {
         it("Tests that the setGameTaxRate() function works correctly", async function () {
-            let gameTaxRate1 = await treasurycontract.getGameTaxRate();
+            let gameTaxRate1 = await treasurycontract.getMilf();
             // console.log("Tax Rate Initial", gameTaxRate1.toNumber());
             expect(gameTaxRate1.toNumber()).to.equal(0);
-            await treasurycontract.setGameTaxRate(50);
-            let gameTaxRate2 = await treasurycontract.getGameTaxRate();
+            await treasurycontract.setMilf(50);
+            let gameTaxRate2 = await treasurycontract.getMilf();
             expect(gameTaxRate2.toNumber()).to.equal(50);
             // console.log("Tax Rate Updated", gameTaxRate2.toNumber());
-            let initialTaxRevenue = await treasurycontract.viewTaxRevenues();
+            let initialTaxRevenue = await treasurycontract.getMilf();
             // console.log("Initial Balance", initialTaxRevenue.toNumber());
             expect(initialTaxRevenue.toNumber()).to.equal(0);
             await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
@@ -1153,21 +1174,21 @@ describe("Treasury", async function () {
             var cost : any = await infrastructuremarketplace.connect(signer1).getInfrastructureCost(0, 100);
             // console.log(BigInt(cost), "cost");
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 100);
-            let afterTaxRevenue : any = await treasurycontract.viewTaxRevenues();
+            let afterTaxRevenue : any = await treasurycontract.viewMilfRevenues();
             // console.log("After Transaction Tax Balance", afterTaxRevenue.toNumber());
             expect(BigInt(afterTaxRevenue).toString()).to.equal("37000000000000000000000");
         })
 
         it("Tests that the owner can withdraw game taxes from the treasury contract", async function () {
-            await treasurycontract.setGameTaxRate(50);
+            await treasurycontract.setMilf(50);
             let ownerInitialWarBucksBalance : any = await warbucks.balanceOf(signer0.address);
             // console.log("First Balance", BigInt(ownerInitialWarBucksBalance));
             await warbucks.connect(signer0).approve(warbucks.address, BigInt(ownerInitialWarBucksBalance));
             await warbucks.connect(signer0).transfer(signer1.address, BigInt(ownerInitialWarBucksBalance));
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 100);
-            let taxRevenue = await treasurycontract.viewTaxRevenues();
-            await treasurycontract.connect(signer0).withdrawTaxRevenues(1000000);
-            let taxRevenueAfterWithdrawal = await treasurycontract.viewTaxRevenues();
+            let taxRevenue = await treasurycontract.viewMilfRevenues();
+            await treasurycontract.connect(signer0).withdrawMilfRevenues(1000000);
+            let taxRevenueAfterWithdrawal = await treasurycontract.viewMilfRevenues();
             // console.log(taxRevenueAfterWithdrawal.toNumber());
             // expect(taxRevenueAfterWithdrawal.toNumber()).to.equal(0);
             let ownerWarBucksBalance : any = await warbucks.balanceOf(signer0.address);

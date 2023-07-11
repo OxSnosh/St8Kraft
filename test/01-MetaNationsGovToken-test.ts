@@ -3,10 +3,14 @@ import { ethers } from "hardhat"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address"
 import { INITIAL_SUPPLY } from "../helper-hardhat-config"
 import { MetaNationsGovToken } from "../typechain-types"
+import { TreasuryContract } from '../typechain-types/contracts/Treasury.sol/TreasuryContract';
+import { CountryMinter } from '../typechain-types/contracts/CountryMinter';
 
 describe("MetaNationsGovToken", function () {
 
   let metanationsgovtoken: MetaNationsGovToken
+  let treasuryContract: TreasuryContract
+  let countryMinter: CountryMinter
 
   let signer0: SignerWithAddress
   let signer1: SignerWithAddress
@@ -26,6 +30,7 @@ describe("MetaNationsGovToken", function () {
       metanationsgovtoken = await MetaNatonsGovToken.deploy(INITIAL_SUPPLY) as MetaNationsGovToken
       await metanationsgovtoken.deployed()
       // console.log(`MetaNationsGovToken deployed to ${metanationsgovtoken.address}`)
+
 
   });
 
