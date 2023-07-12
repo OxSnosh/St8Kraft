@@ -141,7 +141,7 @@ describe("Taxes Contract", async function () {
         let subscriptionId: any
         let vrfCoordinatorV2Address: any
     
-        if (chainId == 31337) {
+        if (chainId == 31337 || chainId == 1337) {
             // console.log("local network detected")
             const FUND_AMOUNT = ethers.utils.parseEther("10")
             const BASE_FEE = "250000000000000000" // 0.25 is this the premium in LINK?
@@ -297,7 +297,7 @@ describe("Taxes Contract", async function () {
         // console.log(`InfrastructureMarketplace deployed to ${infrastructuremarketplace.address}`)
     
         const KeeperContract = await ethers.getContractFactory("KeeperContract")
-        keepercontract = await KeeperContract.deploy() as KeeperContract
+        keepercontract = await KeeperContract.deploy(86400) as KeeperContract
         await keepercontract.deployed()
         // console.log(`KeeperContract deployed to ${keepercontract.address}`)
         
@@ -366,7 +366,7 @@ describe("Taxes Contract", async function () {
         await bonusresourcescontract.deployed()
     
         const SenateContract = await ethers.getContractFactory("SenateContract")
-        senatecontract = await SenateContract.deploy() as SenateContract
+        senatecontract = await SenateContract.deploy(20) as SenateContract
         await senatecontract.deployed()
         // console.log(`SenateContract deployed to ${senatecontract.address}`)
         
@@ -1060,6 +1060,7 @@ describe("Taxes Contract", async function () {
             countryminter.address
         )
 
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer1).generateCountry(
             "TestRuler",
             "TestNationName",
@@ -1070,24 +1071,28 @@ describe("Taxes Contract", async function () {
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000*(10**18)));
         await treasurycontract.connect(signer1).addFunds(BigInt(20000000000*(10**18)), 0);
 
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer2).generateCountry(
             "TestRuler2",
             "TestNationName2",
             "TestCapitalCity2",
             "TestNationSlogan2"
         )
+        await warbucks.connect(signer0).transfer(signer3.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer3).generateCountry(
             "TestRuler3",
             "TestNationName3",
             "TestCapitalCity3",
             "TestNationSlogan3"
         )
+        await warbucks.connect(signer0).transfer(signer4.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer4).generateCountry(
             "TestRuler4",
             "TestNationName4",
             "TestCapitalCity4",
             "TestNationSlogan4"
         )
+        await warbucks.connect(signer0).transfer(signer5.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer5).generateCountry(
             "TestRuler5",
             "TestNationName5",

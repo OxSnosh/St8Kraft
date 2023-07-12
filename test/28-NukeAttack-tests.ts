@@ -140,7 +140,7 @@ describe("Nuke Attack", async function () {
         let subscriptionId: any
         let vrfCoordinatorV2Address: any
     
-        if (chainId == 31337) {
+        if (chainId == 31337 || chainId == 1337) {
             // console.log("local network detected")
             const FUND_AMOUNT = ethers.utils.parseEther("10")
             const BASE_FEE = "250000000000000000" // 0.25 is this the premium in LINK?
@@ -296,7 +296,7 @@ describe("Nuke Attack", async function () {
         // console.log(`InfrastructureMarketplace deployed to ${infrastructuremarketplace.address}`)
     
         const KeeperContract = await ethers.getContractFactory("KeeperContract")
-        keepercontract = await KeeperContract.deploy() as KeeperContract
+        keepercontract = await KeeperContract.deploy(86400) as KeeperContract
         await keepercontract.deployed()
         // console.log(`KeeperContract deployed to ${keepercontract.address}`)
         
@@ -365,7 +365,7 @@ describe("Nuke Attack", async function () {
         await bonusresourcescontract.deployed()
     
         const SenateContract = await ethers.getContractFactory("SenateContract")
-        senatecontract = await SenateContract.deploy() as SenateContract
+        senatecontract = await SenateContract.deploy(20) as SenateContract
         await senatecontract.deployed()
         // console.log(`SenateContract deployed to ${senatecontract.address}`)
         
@@ -1064,6 +1064,7 @@ describe("Nuke Attack", async function () {
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, nukecontract.address);
         }
 
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer1).generateCountry(
             "TestRuler",
             "TestNationName",
@@ -1080,6 +1081,7 @@ describe("Nuke Attack", async function () {
         // await forcescontract.connect(signer1).buySpies(30, 0)
         await billscontract.connect(signer1).payBills(0)
 
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer2).generateCountry(
             "TestRuler2",
             "TestNationName2",
@@ -1114,6 +1116,7 @@ describe("Nuke Attack", async function () {
         await keepercontract.connect(signer0).incrementGameDay()
         await missilescontract.connect(signer1).buyNukes(0)
 
+        await warbucks.connect(signer0).transfer(signer3.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer3).generateCountry(
             "TestRuler3",
             "TestNationName3",

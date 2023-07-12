@@ -142,7 +142,7 @@ describe("CountryMinter", function () {
         let subscriptionId: any
         let vrfCoordinatorV2Address: any
     
-        if (chainId == 31337) {
+        if (chainId == 31337 || chainId == 1337) {
             // console.log("local network detected")
             const FUND_AMOUNT = ethers.utils.parseEther("10")
             const BASE_FEE = "250000000000000000" // 0.25 is this the premium in LINK?

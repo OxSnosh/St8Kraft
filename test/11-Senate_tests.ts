@@ -151,7 +151,7 @@ describe("Senate Contract", async function () {
         let subscriptionId: any
         let vrfCoordinatorV2Address: any
     
-        if (chainId == 31337) {
+        if (chainId == 31337 || chainId == 1337) {
             // console.log("local network detected")
             const FUND_AMOUNT = ethers.utils.parseEther("10")
             const BASE_FEE = "250000000000000000" // 0.25 is this the premium in LINK?
@@ -307,7 +307,7 @@ describe("Senate Contract", async function () {
         // console.log(`InfrastructureMarketplace deployed to ${infrastructuremarketplace.address}`)
     
         const KeeperContract = await ethers.getContractFactory("KeeperContract")
-        keepercontract = await KeeperContract.deploy() as KeeperContract
+        keepercontract = await KeeperContract.deploy(86400) as KeeperContract
         await keepercontract.deployed()
         // console.log(`KeeperContract deployed to ${keepercontract.address}`)
         
@@ -376,7 +376,7 @@ describe("Senate Contract", async function () {
         await bonusresourcescontract.deployed()
     
         const SenateContract = await ethers.getContractFactory("SenateContract")
-        senatecontract = await SenateContract.deploy() as SenateContract
+        senatecontract = await SenateContract.deploy(20) as SenateContract
         await senatecontract.deployed()
         // console.log(`SenateContract deployed to ${senatecontract.address}`)
         
@@ -1070,6 +1070,7 @@ describe("Senate Contract", async function () {
             countryminter.address
         )
 
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer1).generateCountry(
             "TestRuler",
             "TestNationName",
@@ -1077,77 +1078,77 @@ describe("Senate Contract", async function () {
             "TestNationSlogan"
         )
         
-
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer2).generateCountry(
             "NextRuler",
             "NextNationName",
             "NextCapitalCity",
             "NextNationSlogan"
         )
-
+        await warbucks.connect(signer0).transfer(signer3.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer3).generateCountry(
             "NextRuler3",
             "NextNationName3",
             "NextCapitalCity3",
             "NextNationSlogan3"
         )
-
+        await warbucks.connect(signer0).transfer(signer4.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer4).generateCountry(
             "NextRuler4",
             "NextNationName4",
             "NextCapitalCity4",
             "NextNationSlogan4"
         )
-
+        await warbucks.connect(signer0).transfer(signer5.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer5).generateCountry(
             "NextRuler5",
             "NextNationName5",
             "NextCapitalCity5",
             "NextNationSlogan5"
         )
-
+        await warbucks.connect(signer0).transfer(signer6.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer6).generateCountry(
             "NextRuler6",
             "NextNationName6",
             "NextCapitalCity6",
             "NextNationSlogan6"
         )
-
+        await warbucks.connect(signer0).transfer(signer7.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer7).generateCountry(
             "NextRuler7",
             "NextNationName7",
             "NextCapitalCity7",
             "NextNationSlogan7"
         )
-
+        await warbucks.connect(signer0).transfer(signer8.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer8).generateCountry(
             "NextRuler8",
             "NextNationName8",
             "NextCapitalCity8",
             "NextNationSlogan8"
         )
-
+        await warbucks.connect(signer0).transfer(signer9.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer9).generateCountry(
             "NextRuler9",
             "NextNationName9",
             "NextCapitalCity9",
             "NextNationSlogan9"
         )
-
+        await warbucks.connect(signer0).transfer(signer10.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer10).generateCountry(
             "NextRuler10",
             "NextNationName10",
             "NextCapitalCity10",
             "NextNationSlogan10"
         )
-
+        await warbucks.connect(signer0).transfer(signer11.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer11).generateCountry(
             "NextRuler11",
             "NextNationName11",
             "NextCapitalCity11",
             "NextNationSlogan11"
         )
-
+        await warbucks.connect(signer0).transfer(signer12.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer12).generateCountry(
             "NextRuler12",
             "NextNationName12",

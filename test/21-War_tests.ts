@@ -140,7 +140,7 @@ describe("War Contract", async function () {
         let subscriptionId: any
         let vrfCoordinatorV2Address: any
     
-        if (chainId == 31337) {
+        if (chainId == 31337 || chainId == 1337) {
             // console.log("local network detected")
             const FUND_AMOUNT = ethers.utils.parseEther("10")
             const BASE_FEE = "250000000000000000" // 0.25 is this the premium in LINK?
@@ -296,7 +296,7 @@ describe("War Contract", async function () {
         // console.log(`InfrastructureMarketplace deployed to ${infrastructuremarketplace.address}`)
     
         const KeeperContract = await ethers.getContractFactory("KeeperContract")
-        keepercontract = await KeeperContract.deploy() as KeeperContract
+        keepercontract = await KeeperContract.deploy(86400) as KeeperContract
         await keepercontract.deployed()
         // console.log(`KeeperContract deployed to ${keepercontract.address}`)
         
@@ -365,7 +365,7 @@ describe("War Contract", async function () {
         await bonusresourcescontract.deployed()
     
         const SenateContract = await ethers.getContractFactory("SenateContract")
-        senatecontract = await SenateContract.deploy() as SenateContract
+        senatecontract = await SenateContract.deploy(20) as SenateContract
         await senatecontract.deployed()
         // console.log(`SenateContract deployed to ${senatecontract.address}`)
         
@@ -1059,6 +1059,7 @@ describe("War Contract", async function () {
             countryminter.address
         )
 
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer1).generateCountry(
             "TestRuler",
             "TestNationName",
@@ -1073,6 +1074,7 @@ describe("War Contract", async function () {
         await forcescontract.connect(signer1).buySoldiers(500, 0)
         await forcescontract.connect(signer1).buyTanks(50, 0)
 
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer2).generateCountry(
             "TestRuler2",
             "TestNationName2",
@@ -1112,6 +1114,7 @@ describe("War Contract", async function () {
             await militarycontract.connect(signer2).toggleWarPeacePreference(1)
             await warcontract.connect(signer1).declareWar(0, 1)
 
+            await warbucks.connect(signer0).transfer(signer3.address, BigInt(2100000000000000000000000))
             await countryminter.connect(signer3).generateCountry(
                 "TestRuler3",
                 "TestNationName3",
@@ -1128,6 +1131,7 @@ describe("War Contract", async function () {
             await militarycontract.connect(signer3).toggleWarPeacePreference(2)
             await warcontract.connect(signer1).declareWar(0, 2)
 
+            await warbucks.connect(signer0).transfer(signer4.address, BigInt(2100000000000000000000000))
             await countryminter.connect(signer4).generateCountry(
                 "TestRuler4",
                 "TestNationName4",
@@ -1144,6 +1148,7 @@ describe("War Contract", async function () {
             await militarycontract.connect(signer4).toggleWarPeacePreference(3)
             await warcontract.connect(signer1).declareWar(0, 3)
 
+            await warbucks.connect(signer0).transfer(signer5.address, BigInt(2100000000000000000000000))
             await countryminter.connect(signer5).generateCountry(
                 "TestRuler5",
                 "TestNationName5",
@@ -1160,6 +1165,7 @@ describe("War Contract", async function () {
             await militarycontract.connect(signer5).toggleWarPeacePreference(4)
             await warcontract.connect(signer1).declareWar(0, 4)
 
+            await warbucks.connect(signer0).transfer(signer6.address, BigInt(2100000000000000000000000))
             await countryminter.connect(signer6).generateCountry(
                 "TestRuler6",
                 "TestNationName6",
@@ -1182,6 +1188,7 @@ describe("War Contract", async function () {
             var offensiveWars = await warcontract.offensiveWarLength(0);
             expect(offensiveWars.toNumber()).to.equal(5)
 
+            await warbucks.connect(signer0).transfer(signer7.address, BigInt(2100000000000000000000000))
             await countryminter.connect(signer7).generateCountry(
                 "TestRuler7",
                 "TestNationName7",
