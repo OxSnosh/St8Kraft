@@ -9,6 +9,7 @@ import "./Treasury.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
 
 ///@title CountryParametersContract
 ///@author OxSnosh
@@ -171,10 +172,10 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
             "No Alliance Yet",
             0,
             0,
-            3,
             0,
-            3,
-            6
+            0,
+            0,
+            0
         );
         idToCountryParameters[id] = newCountryParameters;
         idToCountrySettings[id] = newCountrySettings;

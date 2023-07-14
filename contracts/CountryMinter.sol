@@ -2,7 +2,6 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./IWarBucks.sol";
 import "./CountryParameters.sol";
@@ -18,13 +17,13 @@ import "./Fighters.sol";
 import "./Bombers.sol";
 import "./Aid.sol";
 import "./Senate.sol";
+import "hardhat/console.sol";
 
 ///@title CountryMinter
 ///@author OxSnosh
 ///@notice this is the contract that will allow the user to mint a nation!
 contract CountryMinter is ERC721, Ownable {
-    using Counters for Counters.Counter;
-    Counters.Counter public _countryId;
+    uint256 public countryId;
 
     // uint256 public countryId = 0;
     address public countryParameters;
@@ -141,10 +140,9 @@ contract CountryMinter is ERC721, Ownable {
         string memory capitalCity,
         string memory nationSlogan
     ) public {
-        uint256 countryId = _countryId.current();
         uint256 seedMoney = TreasuryContract(treasury).getSeedMoney();
         IWarBucks(warbucks).burnFromMint(msg.sender, seedMoney);
-        _mint(msg.sender, countryId);
+        _safeMint(msg.sender, countryId);
         BombersContract(bombers).generateBombers(countryId);
         CountryParametersContract(countryParameters).generateCountryParameters(
             countryId,
@@ -171,21 +169,24 @@ contract CountryMinter is ERC721, Ownable {
         WondersContract2(wonders2).generateWonders2(countryId);
         WondersContract3(wonders3).generateWonders3(countryId);
         WondersContract4(wonders4).generateWonders4(countryId);
-        idToOwner[countryId] = msg.sender;
-        ownerCountryCount[msg.sender]++;
+        // idToOwner[countryId] = msg.sender;
+        // ownerCountryCount[msg.sender]++;
         emit nationCreated(msg.sender, nationName, ruler);
-        _countryId.increment();
+        countryId++;
     }
 
     ///@dev this function will return the current country Id that gets incremented every time a county is minted
     ///@return uint256 will be number of countries minted
     function getCountryCount() public view returns (uint256) {
-        uint256 countryCount = _countryId.current();
-        return countryCount;
+        return countryId;
     }
 
     function checkOwnership(uint256 nationId, address caller) public view returns (bool) {
-        bool owner = _isApprovedOrOwner(caller, nationId);
-        return owner;
+        address owner = ownerOf(nationId);
+        if (owner == caller) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -59,11 +59,11 @@ const config = {
       // forking: {
       //   url: MAINNET_RPC_URL
       // }
-      chainId: 1337 || 31337,
+      chainId: 31337,
       allowUnlimitedContractSize: true,
     },
     localhost: {
-      chainId: 1337 || 31337,
+      chainId: 31337,
     },
     kovan: {
       url: KOVAN_RPC_URL,

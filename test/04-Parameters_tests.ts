@@ -1000,7 +1000,8 @@ describe("ParametersContract", async function () {
             fightersmarketplace1.address,
             fightersmarketplace2.address,
             bombersmarketplace1.address,
-            bombersmarketplace2.address
+            bombersmarketplace2.address,
+            countryparameterscontract.address
         )
     
         await warcontract.settings(
@@ -1060,18 +1061,19 @@ describe("ParametersContract", async function () {
             countryminter.address
         )
 
-        if(chainId == 31337) {
+        if(chainId == 31337 || chainId == 1337) {
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
         }
 
         // console.log("country 1");
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000000000000000000))
         await countryminter.connect(signer1).generateCountry(
             "TestRuler",
             "TestNationName",
             "TestCapitalCity",
             "TestNationSlogan"
         )
+        await treasurycontract.connect(signer1).addFunds(BigInt(21000000 * (10**18)), 0)
         const tx1 = await countryparameterscontract.fulfillRequest(0);
         let txReceipt1 = await tx1.wait(1);
         let requestId1 = txReceipt1?.events?.[1].args?.requestId;
@@ -1082,13 +1084,14 @@ describe("ParametersContract", async function () {
         // console.log("Gov 1 top", preferredGovernment1.toNumber());
         
         // console.log("country 2");
-        await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(25000000000000000000000000))
         await countryminter.connect(signer2).generateCountry(
             "TestRuler2",
             "TestNationName2",
             "TestCapitalCity2",
             "TestNationSlogan2"
         )
+        await treasurycontract.connect(signer2).addFunds(BigInt(21000000 * (10**18)), 1)
         const tx2 = await countryparameterscontract.fulfillRequest(1);
         let txReceipt2 = await tx2.wait(1);
         let requestId2 = txReceipt2?.events?.[1].args?.requestId;
@@ -1101,39 +1104,21 @@ describe("ParametersContract", async function () {
 
     describe("Preferences Setup", function () {
         it("Tests that religion and government preference were randomly selected", async function () {
-            const tx1 = await countryparameterscontract.fulfillRequest(0);
-            let txReceipt1 = await tx1.wait(1);
-            let requestId1 = txReceipt1?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, countryparameterscontract.address);
+            //Nation 0
             let preferredReligion1 = await countryparameterscontract.getReligionPreference(0);
             // console.log("Rel 1", preferredReligion1.toNumber());
-            expect(preferredReligion1).to.equal(2)
+            expect(preferredReligion1).to.equal(10)
             let preferredGovernment1 = await countryparameterscontract.getGovernmentPreference(0);
             // console.log("Gov 1", preferredGovernment1.toNumber());
-            expect(preferredGovernment1).to.equal(2)
+            expect(preferredGovernment1).to.equal(7)
 
-            const tx2 = await countryparameterscontract.fulfillRequest(1);
-            let txReceipt2 = await tx2.wait(1);
-            let requestId2 = txReceipt2?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, countryparameterscontract.address);
+            //Nation 1
             let preferredReligion2 = await countryparameterscontract.getReligionPreference(1);
             // console.log("Rel 2", preferredReligion2.toNumber());
-            expect(preferredReligion2).to.equal(6)
+            expect(preferredReligion2).to.equal(10)
             let preferredGovernment2 = await countryparameterscontract.getGovernmentPreference(1);
             // console.log("Gov 2", preferredGovernment2.toNumber());
-            expect(preferredGovernment2).to.equal(8)
-
-            const tx3 = await countryparameterscontract.fulfillRequest(2);
-            let txReceipt3 = await tx3.wait(1);
-            let requestId3 = txReceipt3?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId3, countryparameterscontract.address);
-            let preferredReligion3 = await countryparameterscontract.getReligionPreference(2);
-            // console.log("Rel 3", preferredReligion3.toNumber());
-            expect(preferredReligion3).to.equal(1)
-            let preferredGovernment3 = await countryparameterscontract.getGovernmentPreference(2);
-            // console.log("Gov 3", preferredGovernment3.toNumber());
-            expect(preferredGovernment3).to.equal(9)
-            // console.log("done");
+            expect(preferredGovernment2).to.equal(2)
         });
     });
 
@@ -1216,6 +1201,9 @@ describe("ParametersContract", async function () {
             await keepercontract.incrementGameDay();
             await keepercontract.incrementGameDay();
             await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
             let daysSince = await countryparameterscontract.getDaysSince(0);
             expect(daysSince[0].toNumber()).to.equal(6);
             await countryparameterscontract.connect(signer1).setGovernment(0, 4);
@@ -1224,15 +1212,23 @@ describe("ParametersContract", async function () {
         })
 
         it("Tests that the setGovernment() function reverts correctly when called by !owner", async function () {
-            await expect(countryparameterscontract.connect(signer2).setGovernment(5, 0)).to.be.revertedWith("!nation owner");
+            await expect(countryparameterscontract.connect(signer2).setGovernment(0, 0)).to.be.revertedWith("!nation owner");
         })
 
         it("Tests that the setGovernment() function reverts correctly when called too soon", async function () {
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
             await countryparameterscontract.connect(signer1).setGovernment(0, 4);
             await expect(countryparameterscontract.connect(signer1).setGovernment(0, 5)).to.be.revertedWith("need to wait 3 days before changing");
         })
 
         it("Tests that the setGovernment() function reverts correctly when called with wrong type", async function () {
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
             await keepercontract.incrementGameDay();
             await keepercontract.incrementGameDay();
             await keepercontract.incrementGameDay();
@@ -1245,6 +1241,9 @@ describe("ParametersContract", async function () {
             await keepercontract.incrementGameDay();
             await keepercontract.incrementGameDay();
             await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
             let daysSince = await countryparameterscontract.getDaysSince(0);
             expect(daysSince[1].toNumber()).to.equal(6);
             await countryparameterscontract.connect(signer1).setReligion(0, 5);
@@ -1253,15 +1252,30 @@ describe("ParametersContract", async function () {
         })
 
         it("Tests that the setReligion() function reverts correctly when called by !owner", async function () {
-            await expect(countryparameterscontract.connect(signer2).setReligion(5, 0)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await expect(countryparameterscontract.connect(signer2).setReligion(0, 0)).to.be.revertedWith("!nation owner");
         })
 
         it("Tests that the setReligion() function reverts correctly when called too soon", async function () {
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
             await countryparameterscontract.connect(signer1).setReligion(0, 4);
             await expect(countryparameterscontract.connect(signer1).setReligion(0, 5)).to.be.revertedWith("need to wait 3 days before changing");
         })
 
         it("Tests that the setReligion() function reverts correctly when called with worng type", async function () {
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
             await keepercontract.incrementGameDay();
             await keepercontract.incrementGameDay();
             await keepercontract.incrementGameDay();

@@ -999,7 +999,8 @@ describe("Nuke Attack", async function () {
             fightersmarketplace1.address,
             fightersmarketplace2.address,
             bombersmarketplace1.address,
-            bombersmarketplace2.address
+            bombersmarketplace2.address,
+            countryparameterscontract.address
         )
     
         await warcontract.settings(

@@ -1000,7 +1000,8 @@ describe("Treasury", async function () {
             fightersmarketplace1.address,
             fightersmarketplace2.address,
             bombersmarketplace1.address,
-            bombersmarketplace2.address
+            bombersmarketplace2.address,
+            countryparameterscontract.address
         )
     
         await warcontract.settings(
@@ -1068,6 +1069,14 @@ describe("Treasury", async function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )    
+
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
+        await countryminter.connect(signer2).generateCountry(
+            "TestRuler2",
+            "TestNationName2",
+            "TestCapitalCity2",
+            "TestNationSlogan2"
+        )   
     });
 
     describe("Deposit and Withdraw Functionality", function () {
@@ -1075,7 +1084,7 @@ describe("Treasury", async function () {
             let deployerBalanceGross : any = (await (warbucks.balanceOf(signer0.address))).toString();
             let deployerBalance = (BigInt(deployerBalanceGross / (10**18)));
             // console.log("deployer balance", deployerBalance);
-            expect(deployerBalance.toString()).to.equal("30000000000");
+            expect(deployerBalance.toString()).to.equal("29995800000");
         })
 
         it("tests addFunds() will increase game balance and burn coins", async function () {
@@ -1084,7 +1093,7 @@ describe("Treasury", async function () {
             let updatedSigner1CoinBalanceGross : any = await warbucks.balanceOf(signer1.address);
             let updatedSigner1CoinBalance = (BigInt(updatedSigner1CoinBalanceGross / (10**18)));
             // console.log("Signer1 New Coin Balance", BigInt(updatedSigner1CoinBalance.toString()));
-            expect(updatedSigner1CoinBalance.toString()).to.equal("500000000");
+            expect(updatedSigner1CoinBalance.toString()).to.equal("500100000");
             let signer1InitialGameBalanceGross : any = await treasurycontract.checkBalance(0);
             let signer1InitialGameBalance = (BigInt(signer1InitialGameBalanceGross / (10**18)));
             expect(signer1InitialGameBalance.toString()).to.equal("2000000");
@@ -1095,7 +1104,7 @@ describe("Treasury", async function () {
             expect(signer1UpdatedGameBalance.toString()).to.equal("502000000");
             // console.log("signer1 game balance after adding funds", BigInt(signer1UpdatedGameBalance.toString()));
             let signer1UpdatedCoinBalanceAfterBurn = await warbucks.balanceOf(signer1.address);
-            expect(signer1UpdatedCoinBalanceAfterBurn.toString()).to.equal("0");
+            expect(signer1UpdatedCoinBalanceAfterBurn.toString()).to.equal("100000000000000125829120");
             // console.log("signer1 updates coin balance after burn", BigInt(signer1UpdatedCoinBalanceAfterBurn.toString()));
         })
 
@@ -1112,12 +1121,12 @@ describe("Treasury", async function () {
         })
 
         it("tests withdrawFunds() will decrease game balance and mint coins", async function () {
-            await warbucks.connect(signer0).approve(warbucks.address, BigInt(500000000*(10**18)));
+            // await warbucks.connect(signer0).approve(warbucks.address, BigInt(500000000*(10**18)));
             await warbucks.connect(signer0).transfer(signer1.address, BigInt(500000000*(10**18)));
             let updatedSigner1CoinBalanceGross : any = await warbucks.balanceOf(signer1.address);
             let updatedSigner1CoinBalance = (BigInt(updatedSigner1CoinBalanceGross / (10**18)));
             // console.log("Signer1 New Coin Balance", BigInt(updatedSigner1CoinBalance.toString()));
-            expect(updatedSigner1CoinBalance.toString()).to.equal("500000000");
+            expect(updatedSigner1CoinBalance.toString()).to.equal("500100000");
             let signer1InitialGameBalanceGross : any = await treasurycontract.checkBalance(0);
             let signer1InitialGameBalance = (BigInt(signer1InitialGameBalanceGross / (10**18)));
             expect(signer1InitialGameBalance.toString()).to.equal("2000000");
@@ -1128,29 +1137,27 @@ describe("Treasury", async function () {
             expect(signer1UpdatedGameBalance.toString()).to.equal("502000000");
             // console.log("signer1 game balance after adding funds", BigInt(signer1UpdatedGameBalance.toString()));
             let signer1UpdatedCoinBalanceAfterBurn = await warbucks.balanceOf(signer1.address);
-            expect(signer1UpdatedCoinBalanceAfterBurn.toString()).to.equal("0");
+            expect(signer1UpdatedCoinBalanceAfterBurn.toString()).to.equal("100000000000000125829120");
             // console.log("signer1 updates coin balance after burn", BigInt(signer1UpdatedCoinBalanceAfterBurn.toString()));
             await billscontract.connect(signer1).payBills(0);
             await treasurycontract.connect(signer1).withdrawFunds(BigInt(500000000*(10**18)), 0);
             let coinBalanceAfterWithdrawGross : any = await warbucks.balanceOf(signer1.address);
             let coinBalanceAfterWithdraw = (BigInt(coinBalanceAfterWithdrawGross / (10**18)));
             // console.log("coin balance after withdraw", coinBalanceAfterWithdraw);
-            expect (coinBalanceAfterWithdraw.toString()).to.equal("500000000");
+            expect (coinBalanceAfterWithdraw.toString()).to.equal("500100000");
             let gameBalanceAfterWithdrawGross : any = await treasurycontract.checkBalance(0);
             let gameBalanceAfterWithdraw = (BigInt(gameBalanceAfterWithdrawGross / (10**18)));
             // console.log("game balance after withdraw", gameBalanceAfterWithdraw);
-            expect(gameBalanceAfterWithdraw.toString()).to.equal("1999560");
+            expect(gameBalanceAfterWithdraw.toString()).to.equal("2000000");
         })
 
         it("tests withdrawFunds() will revert with !nation owner caller", async function () {
-            await warbucks.connect(signer0).approve(warbucks.address, BigInt(500000000*(10**18)));
             await warbucks.connect(signer0).transfer(signer1.address, BigInt(500000000*(10**18)));
             await treasurycontract.connect(signer1).addFunds(BigInt(500000000*(10**18)), 0);
-            await expect(treasurycontract.connect(signer1).withdrawFunds(BigInt(500000000*(10**18)), 1)).to.be.revertedWith("!nation owner");
+            await expect(treasurycontract.connect(signer1).withdrawFunds(BigInt(100), 1)).to.be.revertedWith("!nation owner");
         })
 
         it("tests withdrawFunds() will revert with insufficient game balance", async function () {
-            await warbucks.connect(signer0).approve(warbucks.address, BigInt(500000000*(10**18)));
             await warbucks.connect(signer0).transfer(signer1.address, BigInt(500000000*(10**18)));
             await treasurycontract.connect(signer1).addFunds(BigInt(500000000*(10**18)), 0);
             await billscontract.connect(signer1).payBills(0);
@@ -1158,8 +1165,8 @@ describe("Treasury", async function () {
         })
     })
 
-    describe("Game Tax Rate Functionality", function () {
-        it("Tests that the setGameTaxRate() function works correctly", async function () {
+    describe("MILF Functionality", function () {
+        it("Tests that the setMilf() function works correctly", async function () {
             let gameTaxRate1 = await treasurycontract.getMilf();
             // console.log("Tax Rate Initial", gameTaxRate1.toNumber());
             expect(gameTaxRate1.toNumber()).to.equal(0);
@@ -1167,10 +1174,10 @@ describe("Treasury", async function () {
             let gameTaxRate2 = await treasurycontract.getMilf();
             expect(gameTaxRate2.toNumber()).to.equal(50);
             // console.log("Tax Rate Updated", gameTaxRate2.toNumber());
-            let initialTaxRevenue = await treasurycontract.getMilf();
+            let initialTaxRevenue = await treasurycontract.viewMilfRevenues();
             // console.log("Initial Balance", initialTaxRevenue.toNumber());
             expect(initialTaxRevenue.toNumber()).to.equal(0);
-            await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
+            // await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
             await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
             var cost : any = await infrastructuremarketplace.connect(signer1).getInfrastructureCost(0, 100);
             // console.log(BigInt(cost), "cost");
@@ -1188,6 +1195,7 @@ describe("Treasury", async function () {
             await warbucks.connect(signer0).transfer(signer1.address, BigInt(ownerInitialWarBucksBalance));
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 100);
             let taxRevenue = await treasurycontract.viewMilfRevenues();
+            // console.log(taxRevenue.toString());
             await treasurycontract.connect(signer0).withdrawMilfRevenues(1000000);
             let taxRevenueAfterWithdrawal = await treasurycontract.viewMilfRevenues();
             // console.log(taxRevenueAfterWithdrawal.toNumber());

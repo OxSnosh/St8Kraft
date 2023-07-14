@@ -52,6 +52,7 @@ contract TreasuryContract is Ownable {
     address public techMarket;
     address public infrastructureMarket;
     address public keeper;
+    address public parameters;
     uint256 public daysToInactive = 30;
     uint256 public maxDaysOfTaxes = 20;
     uint256 private milf = 0;
@@ -136,7 +137,8 @@ contract TreasuryContract is Ownable {
         address _fightersMarket1,
         address _fightersMarket2,
         address _bombersMarket1,
-        address _bombersMarket2
+        address _bombersMarket2,
+        address _parameters
     ) public onlyOwner {
         navy2 = _navy2;
         missiles = _missiles;
@@ -147,6 +149,7 @@ contract TreasuryContract is Ownable {
         fightersMarket2 = _fightersMarket2;
         bombersMarket1 = _bombersMarket1;
         bombersMarket2 = _bombersMarket2;
+        parameters = _parameters;
     }
 
     modifier onlyCountryMinter() {
@@ -187,6 +190,8 @@ contract TreasuryContract is Ownable {
     ///@param amount is the amount of funds being withdrawn
     ///@param id is the nation id of the nation withdrawing funds
     function withdrawFunds(uint256 amount, uint256 id) public {
+        uint256 gameBalance = idToTreasury[id].balance;
+        require(gameBalance >= amount, "insufficient game balance");
         idToTreasury[id].balance -= amount;
         totalGameBalance -= amount;
         bool isOwner = mint.checkOwnership(id, msg.sender);
@@ -197,8 +202,6 @@ contract TreasuryContract is Ownable {
             daysOfBillsPaid == gameDay,
             "pay bills before withdrawing funds"
         );
-        uint256 gameBalance = idToTreasury[id].balance;
-        require(gameBalance >= amount, "insufficient game balance");
         bool demonitized = idToTreasury[id].demonitized;
         require(demonitized == false, "ERROR");
         IWarBucks(warBucksAddress).mintFromTreasury(msg.sender, amount);
@@ -210,17 +213,17 @@ contract TreasuryContract is Ownable {
     ///@param amount is the amount of funds being added
     ///@param id is the nation id of the nation withdrawing funds
     function addFunds(uint256 amount, uint256 id) public {
+        uint256 coinBalance = IWarBucks(warBucksAddress).balanceOf(msg.sender);
+        require(
+            coinBalance >= amount,
+            "deposit amount exceeds balance in wallet"
+        );
         idToTreasury[id].balance += amount;
         totalGameBalance += amount;
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         bool demonitized = idToTreasury[id].demonitized;
         require(demonitized == false, "ERROR");
-        uint256 coinBalance = IWarBucks(warBucksAddress).balanceOf(msg.sender);
-        require(
-            coinBalance >= amount,
-            "deposit amount exceeds balance in wallet"
-        );
         IWarBucks(warBucksAddress).burnFromTreasury(msg.sender, amount);
     }
 
@@ -351,7 +354,8 @@ contract TreasuryContract is Ownable {
                 msg.sender == infrastructureMarket ||
                 msg.sender == techMarket ||
                 msg.sender == landMarket ||
-                msg.sender == spyOperations,
+                msg.sender == spyOperations ||
+                msg.sender == parameters,
             "cannot call spendBalance()"
         );
         _;
@@ -366,10 +370,10 @@ contract TreasuryContract is Ownable {
         uint256 id,
         uint256 cost
     ) external approvedBalanceSpender {
-        idToTreasury[id].balance -= cost;
-        totalGameBalance -= cost;
         uint256 balance = idToTreasury[id].balance;
         require(balance >= cost, "insufficient balance");
+        idToTreasury[id].balance -= cost;
+        totalGameBalance -= cost;
         bool demonitized = idToTreasury[id].demonitized;
         require(demonitized == false, "ERROR");
         bool inactive = checkInactive(id);
