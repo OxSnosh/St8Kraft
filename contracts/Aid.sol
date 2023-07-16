@@ -151,7 +151,7 @@ contract AidContract is Ownable {
             maximums = [uint256(100), uint256(6000000 * (10**18)), uint256(4000)];
         }
         if (federalAidEligable) {
-            maximums = [uint256(100), uint256(6000000 * (10**18)), uint256(4000)];
+            maximums = [uint256(150), uint256(9000000 * (10**18)), uint256(6000)];
         }
         require(techAid <= maximums[0], "max tech exceeded");
         require(balanceAid <= maximums[1], "max balance excedded");
@@ -204,7 +204,13 @@ contract AidContract is Ownable {
     function getAidProposalsLast10Days(uint256 id) public view returns (uint256) {
         uint256 day = keep.getGameDay();
         uint256 proposalsLast10Days = 0;
-        for (uint256 i = 0; i < 10; i++) {
+        uint256 daysToCheck;   
+        if(day >= 10) {
+            daysToCheck = 10;
+        } else {
+            daysToCheck = day;
+        }
+        for (uint256 i = 0; i <= daysToCheck; i++) {
             uint256 dayToCheck = day - i;
             proposalsLast10Days += idToAidProposalsLast10Days[id][dayToCheck].length;
             uint256[] memory proposalsForThatDay = idToAidProposalsLast10Days[id][dayToCheck];

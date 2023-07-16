@@ -56,6 +56,7 @@ import {
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
+import { BigNumber } from "ethers";
 
 describe("ResourcesContract", async function () {
 
@@ -1066,13 +1067,13 @@ describe("ResourcesContract", async function () {
 
         // console.log("country 1");
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
-        const tx1 = await countryminter.connect(signer1).generateCountry(
+        await countryminter.connect(signer1).generateCountry(
             "TestRuler",
             "TestNationName",
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        // const tx1 = await resourcescontract.fulfillRequest(0);
+        const tx1 = await resourcescontract.fulfillRequest(0);
         let txReceipt1 = await tx1.wait(1);
         let requestId1 = txReceipt1?.events?.[1].args?.requestId;
         // console.log("requestId", (txReceipt1.events?.[1].args?.requestId).toNumber());
@@ -1082,13 +1083,13 @@ describe("ResourcesContract", async function () {
         
         // console.log("country 2");
         await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
-        const tx2 = await countryminter.connect(signer2).generateCountry(
+        await countryminter.connect(signer2).generateCountry(
             "TestRuler2",
             "TestNationName2",
             "TestCapitalCity2",
             "TestNationSlogan2"
         )
-        // const tx2 = await resourcescontract.fulfillRequest(1);
+        const tx2 = await resourcescontract.fulfillRequest(1);
         let txReceipt2 = await tx2.wait(1);
         let requestId2 = txReceipt2?.events?.[1].args?.requestId;
         // console.log("requestId", (txReceipt2.events?.[1].args?.requestId).toNumber());
@@ -1096,15 +1097,15 @@ describe("ResourcesContract", async function () {
         let resources2 = await resourcescontract.getPlayerResources(1);
         // console.log("resources2", resources2[0].toNumber(), resources2[1].toNumber());
 
-        // console.log("country 2");
+        // console.log("country 3");
         await warbucks.connect(signer0).transfer(signer3.address, BigInt(2100000000000000000000000))
-        const tx3 = await countryminter.connect(signer3).generateCountry(
+        await countryminter.connect(signer3).generateCountry(
             "TestRuler3",
             "TestNationName3",
             "TestCapitalCity3",
             "TestNationSlogan3"
         )
-        // const tx3 = await resourcescontract.fulfillRequest(2);
+        const tx3 = await resourcescontract.fulfillRequest(2);
         let txReceipt3 = await tx3.wait(1);
         let requestId3 = txReceipt3?.events?.[1].args?.requestId;
         // console.log("requestId3", (txReceipt3.events?.[1].args?.requestId).toNumber());

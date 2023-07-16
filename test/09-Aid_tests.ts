@@ -1108,6 +1108,15 @@ describe("Aid Contract", async function () {
         it("aid1 tests proposeAid() function reverts correctly with slot not available", async function () {
             await expect(aidcontract.connect(signer1).proposeAid(1, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("!nation ruler");
             await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
             await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("aid slot not available");
         })
 
@@ -1115,14 +1124,15 @@ describe("Aid Contract", async function () {
             // var payment : any = await billscontract.getBillsPayable(0)
             // console.log(BigInt(payment))
             await billscontract.connect(signer1).payBills(0)
-            await treasurycontract.connect(signer1).withdrawFunds(BigInt(70999999*(10**18)), 0);
+            await technologymarketcontrat.connect(signer1).destroyTech(0, 10000);
+            await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("not enough tech for this proposal"); 
+            await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
+            await treasurycontract.connect(signer1).withdrawFunds(BigInt(92600000000000004764669344), 0), 
             await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("not enough funds for this porposal");
             await treasurycontract.connect(signer1).addFunds(BigInt(60888888*(10**18)), 0);
             await forcescontract.connect(signer1).decomissionSoldiers(5000, 0);
             await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("not enough soldiers for this porposal");
             await forcescontract.connect(signer1).buySoldiers(5000, 0);
-            await technologymarketcontrat.connect(signer1).destroyTech(0, 10000);
-            await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("not enough tech for this proposal");            
         })
 
         it("aid1 tests proposeAid() function reverts when max amount exceeded (no frderal aid)", async function () {
@@ -1146,9 +1156,17 @@ describe("Aid Contract", async function () {
 
         it("aid1 tests acceptProposal() function reverts when proposal expires", async function () {
             await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
-            let interval = await aidcontract.getProposalExpiration();
-            await network.provider.send("evm_increaseTime", [interval.toNumber() + 1]);
-            await network.provider.request({ method: "evm_mine", params: [] });
+            // let interval = await aidcontract.getProposalExpiration();
+            // await network.provider.send("evm_increaseTime", [interval.toNumber() + 1]);
+            // await network.provider.request({ method: "evm_mine", params: [] });
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
             await expect(aidcontract.connect(signer2).acceptProposal(0)).to.be.revertedWith("proposal expired");
         })
 
@@ -1169,16 +1187,37 @@ describe("Aid Contract", async function () {
         it("aid1 tests acceptProposal() function reverts when proposal is deficient", async function () {
             await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
             await billscontract.connect(signer1).payBills(0)
-            await treasurycontract.connect(signer1).withdrawFunds(BigInt(70999999*(10**18)), 0);
+            // var balance = await treasurycontract.checkBalance(0);
+            // console.log(balance.toString())
+            await treasurycontract.connect(signer1).withdrawFunds(BigInt(92600000000000004764669344), 0), 
             await expect(aidcontract.connect(signer2).acceptProposal(0)).to.be.revertedWith("not enough funds for this porposal");
         })
 
-        it("aid1 tests resetAidProposals()", async function () {
+        it("aid1 tests more proposals become available after time", async function () {
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
             await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
             await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("aid slot not available");
             await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
             await aidcontract.connect(signer1).proposeAid(0, 1, 50, BigInt(6000000*(10**18)), 4000);
-            let array = await aidcontract.getProposal(1);
+            let array = await aidcontract.getProposal(10);
             expect(array[4]).to.equal(50);
         })
 

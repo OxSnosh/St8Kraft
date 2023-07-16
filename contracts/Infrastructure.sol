@@ -780,18 +780,28 @@ contract InfrastructureContract is Ownable {
         uint256 id
     ) public view returns (uint256, uint256) {
         uint256 totalPop = getTotalPopulationCount(id);
-        (uint256 criminals, uint256 rehabilitatedCitizens, ) = crim
+        // console.log("totalPop", totalPop);
+        (uint256 criminals, , ) = crim
             .getCriminalCount(id);
+        // console.log("criminals", criminals);
+        // console.log("rehabilitatedCitizens", rehabilitatedCitizens);
         uint256 soldiers = forc.getSoldierCount(id);
+        // console.log("soldiers", soldiers);
         uint256 citizens;
         uint256 citizenDefecit;
-        if (totalPop <= ((criminals - rehabilitatedCitizens) + soldiers)) {
+        // console.log("overflow 1");
+        if ((totalPop) <= (criminals + soldiers)) {
+            // console.log("overflow 2");
             citizens = 0;
-            citizenDefecit = ((criminals - rehabilitatedCitizens) + soldiers) - totalPop;
+            citizenDefecit = ((criminals + soldiers) - (totalPop));
         } else {
-            citizens = totalPop - ((criminals - rehabilitatedCitizens) + soldiers);
+            // console.log("overflow 3");
+            citizens = ((totalPop) - (criminals + soldiers));
             citizenDefecit = 0;
         }
+        // console.log("citizens", citizens);
+        // console.log("citizenDefecit", citizenDefecit);
+        // console.log("BREAK");
         return (citizens, citizenDefecit);
     }
 

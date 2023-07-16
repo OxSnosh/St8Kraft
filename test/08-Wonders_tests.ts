@@ -1073,6 +1073,14 @@ describe("Wonders", async function () {
         // await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 10000);
         // await landmarketcontract.connect(signer1).buyLand(0, 10000);
         // await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
+
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
+        await countryminter.connect(signer2).generateCountry(
+            "TestRuler",
+            "TestNationName",
+            "TestCapitalCity",
+            "TestNationSlogan"
+        )
     });
 
     describe("Wonders Contract 1", function () {

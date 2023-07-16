@@ -1074,16 +1074,16 @@ describe("Crime Contract", async function () {
     describe("Crime Contract", function () {
         it("crime1 tests that nation crime is inialized correctly", async function () {
             const cpsInitial = await crimecontract.getCrimePreventionScore(0);
-            // console.log("initial CSP", cpsInitial.toNumber());
+            console.log("initial CSP", cpsInitial.toNumber());
             expect(cpsInitial.toNumber()).to.equal(448);
             const initialCrimeIndex = await crimecontract.getCrimeIndex(0);
-            // console.log("initial crime index", initialCrimeIndex.toNumber());
+            console.log("initial crime index", initialCrimeIndex.toNumber());
             expect(initialCrimeIndex.toNumber()).to.equal(1);
             const populationCount = await infrastructurecontract.getTotalPopulationCount(0);
-            // console.log("initial population count", populationCount.toNumber());
+            console.log("initial population count", populationCount.toNumber());
             expect(populationCount.toNumber()).to.equal(160);
             const initialCriminalCount = await crimecontract.getCriminalCount(0);
-            // console.log("inital criminal count", initialCriminalCount.toNumber());
+            console.log("inital criminal count", initialCriminalCount.toString());
             expect(initialCriminalCount[0].toNumber()).to.equal(3);
         })
 
@@ -1094,27 +1094,27 @@ describe("Crime Contract", async function () {
             var cps1 = await crimecontract.getCrimePreventionScore(0);
             var crimeIndex1 = await crimecontract.getCrimeIndex(0);
             var criminalCount1 = await crimecontract.getCriminalCount(0);
-            // console.log("points from population", popPoints1.toNumber());
-            // console.log("points from infrastructure", infPoints1.toNumber());
-            // console.log("cps 1", cps1.toNumber());
-            // console.log("crime index 1", crimeIndex1.toNumber());
-            // console.log("criminal count 1", criminalCount1.toNumber());
+            console.log("points from population", popPoints1.toNumber());
+            console.log("points from infrastructure", infPoints1.toNumber());
+            console.log("cps 1", cps1.toNumber());
+            console.log("crime index 1", crimeIndex1.toNumber());
+            console.log("criminal count 1", criminalCount1.toString());
             expect(popPoints1.toNumber()).to.equal(343);
             expect(infPoints1.toNumber()).to.equal(0);
             expect(cps1.toNumber()).to.equal(441);
             expect(crimeIndex1.toNumber()).to.equal(1);
-            expect(criminalCount1[0].toNumber()).to.equal(35);
+            expect(criminalCount1[0].toNumber()).to.equal(17);
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 30000); 
             var popPoints3 = await crimecontract.getPointsFromPopulation(0);
             var infPoints3 = await crimecontract.getPointsFromInfrastruture(0);
             var cps3 = await crimecontract.getCrimePreventionScore(0);
             var crimeIndex3 = await crimecontract.getCrimeIndex(0);
             var criminalCount3 = await crimecontract.getCriminalCount(0);
-            // console.log("points from population", popPoints3.toNumber());
-            // console.log("points from infrastructure", infPoints3.toNumber());
-            // console.log("cps 3", cps3.toNumber());
-            // console.log("crime index 3", crimeIndex3.toNumber());
-            // console.log("criminal count 3", criminalCount3.toNumber());
+            console.log("points from population", popPoints3.toNumber());
+            console.log("points from infrastructure", infPoints3.toNumber());
+            console.log("cps 3", cps3.toNumber());
+            console.log("crime index 3", crimeIndex3.toNumber());
+            console.log("criminal count 3", criminalCount3.toString());
             expect(popPoints3.toNumber()).to.equal(0);
             expect(infPoints3.toNumber()).to.equal(75);
             expect(cps3.toNumber()).to.equal(173);

@@ -1061,18 +1061,27 @@ describe("Improvements", async function () {
         )
 
         // console.log("country 1");
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(21000000000000000000000000))
         await countryminter.connect(signer1).generateCountry(
             "TestRuler",
             "TestNationName",
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        let ownerInitialWarBucksBalance : any = await warbucks.balanceOf(signer0.address);
-        await warbucks.connect(signer0).approve(warbucks.address, BigInt(ownerInitialWarBucksBalance));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(ownerInitialWarBucksBalance));
-        await treasurycontract.connect(signer1).addFunds(BigInt(500000000*(10**18)), 0);
+        // let ownerInitialWarBucksBalance : any = await warbucks.balanceOf(signer0.address);
+        // await warbucks.connect(signer0).approve(warbucks.address, BigInt(6000000 000000000 000000000));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(60000000000000000000000000));
+        await treasurycontract.connect(signer1).addFunds(BigInt(50000000*(10**18)), 0);
         await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500);
+
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(21000000000000000000000000))
+        await countryminter.connect(signer2).generateCountry(
+            "TestRuler2",
+            "TestNationName2",
+            "TestCapitalCity2",
+            "TestNationSlogan2"
+        )
+        await treasurycontract.connect(signer2).addFunds(BigInt(5000000*(10**18)), 1);
     });
 
     describe("Improvements Contract 1", function () {
@@ -1092,6 +1101,7 @@ describe("Improvements", async function () {
         it("improvement1 airport purchase errors", async function () {
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 1, 1)).to.be.revertedWith("!nation owner");
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 15)).to.be.revertedWith("Invalid improvement ID");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 1)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 1)).to.be.revertedWith("population too low to purchase improvement");
@@ -1127,6 +1137,7 @@ describe("Improvements", async function () {
         it("improvement1 bank purchase errors", async function () {
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 1, 2)).to.be.revertedWith("!nation owner");
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 15)).to.be.revertedWith("Invalid improvement ID");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 2)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 2)).to.be.revertedWith("population too low to purchase improvement");
@@ -1162,6 +1173,7 @@ describe("Improvements", async function () {
         it("improvement1 barracks purchase errors", async function () {
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 1, 3)).to.be.revertedWith("!nation owner");
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 15)).to.be.revertedWith("Invalid improvement ID");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 3)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 3)).to.be.revertedWith("population too low to purchase improvement");
@@ -1198,6 +1210,7 @@ describe("Improvements", async function () {
         })
 
         it("improvement1 border fortification purchase errors", async function () {
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 4)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 4)).to.be.revertedWith("Must own a border wall for every fortification");
@@ -1241,6 +1254,7 @@ describe("Improvements", async function () {
         it("improvement1 border wall purchase errors", async function () {
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 1, 5)).to.be.revertedWith("!nation owner");
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 15)).to.be.revertedWith("Invalid improvement ID");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 5)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 5)).to.be.revertedWith("population too low to purchase improvement");
@@ -1281,6 +1295,7 @@ describe("Improvements", async function () {
         })
 
         it("improvement1 bunker purchase errors", async function () {
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 6)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 6)).to.be.revertedWith("Must own a barracks for every bunker");
@@ -1326,6 +1341,7 @@ describe("Improvements", async function () {
         it("improvement1 casino purchase errors", async function () {
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 1, 7)).to.be.revertedWith("!nation owner");
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 15)).to.be.revertedWith("Invalid improvement ID");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 7)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 7)).to.be.revertedWith("population too low to purchase improvement");
@@ -1361,6 +1377,7 @@ describe("Improvements", async function () {
         it("improvement1 church purchase errors", async function () {
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 1, 8)).to.be.revertedWith("!nation owner");
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 15)).to.be.revertedWith("Invalid improvement ID");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 8)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 8)).to.be.revertedWith("population too low to purchase improvement");
@@ -1394,6 +1411,7 @@ describe("Improvements", async function () {
         it("improvement1 clinic purchase errors", async function () {
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 1, 9)).to.be.revertedWith("!nation owner");
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 15)).to.be.revertedWith("Invalid improvement ID");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 9)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 9)).to.be.revertedWith("population too low to purchase improvement");
@@ -1430,6 +1448,7 @@ describe("Improvements", async function () {
         it("improvement1 drydock purchase errors", async function () {
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 1, 10)).to.be.revertedWith("!nation owner");
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 15)).to.be.revertedWith("Invalid improvement ID");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 10)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 10)).to.be.revertedWith("population too low to purchase improvement");
@@ -1466,6 +1485,7 @@ describe("Improvements", async function () {
         it("improvement1 factory purchase errors", async function () {
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 1, 11)).to.be.revertedWith("!nation owner");
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 15)).to.be.revertedWith("Invalid improvement ID");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 11)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 11)).to.be.revertedWith("population too low to purchase improvement");
@@ -1501,6 +1521,7 @@ describe("Improvements", async function () {
 
         it("improvement2 foreign ministry purchase errors", async function () {
             await expect(improvementscontract2.connect(signer1).buyImprovement2(1, 1, 1)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract2.connect(signer1).buyImprovement2(6, 0, 1)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract2.connect(signer1).buyImprovement2(6, 0, 1)).to.be.revertedWith("population too low to purchase improvement");
@@ -1536,6 +1557,7 @@ describe("Improvements", async function () {
 
         it("improvement2 forward operating base purchase errors", async function () {
             await expect(improvementscontract2.connect(signer1).buyImprovement2(1, 1, 2)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract2.connect(signer1).buyImprovement2(6, 0, 2)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract2.connect(signer1).buyImprovement2(6, 0, 2)).to.be.revertedWith("population too low to purchase improvement");
@@ -1571,6 +1593,7 @@ describe("Improvements", async function () {
 
         it("improvement2 guerilla camp purchase errors", async function () {
             await expect(improvementscontract2.connect(signer1).buyImprovement2(1, 1, 3)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract2.connect(signer1).buyImprovement2(6, 0, 3)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract2.connect(signer1).buyImprovement2(6, 0, 3)).to.be.revertedWith("population too low to purchase improvement");
@@ -1603,6 +1626,7 @@ describe("Improvements", async function () {
 
         it("improvement2 harbor purchase errors", async function () {
             await expect(improvementscontract2.connect(signer1).buyImprovement2(1, 1, 4)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract2.connect(signer1).buyImprovement2(6, 0, 4)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract2.connect(signer1).buyImprovement2(6, 0, 4)).to.be.revertedWith("population too low to purchase improvement");
@@ -1636,6 +1660,7 @@ describe("Improvements", async function () {
         })
 
         it("improvement2 hospital purchase errors", async function () {
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract2.connect(signer1).buyImprovement2(6, 0, 5)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 9);
@@ -1673,6 +1698,7 @@ describe("Improvements", async function () {
 
         it("improvement2 intel agency purchase errors", async function () {
             await expect(improvementscontract2.connect(signer1).buyImprovement2(1, 1, 6)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract2.connect(signer1).buyImprovement2(6, 0, 6)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract2.connect(signer1).buyImprovement2(6, 0, 6)).to.be.revertedWith("population too low to purchase improvement");
@@ -1708,6 +1734,7 @@ describe("Improvements", async function () {
 
         it("improvement2 jail purchase errors", async function () {
             await expect(improvementscontract2.connect(signer1).buyImprovement2(1, 1, 7)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract2.connect(signer1).buyImprovement2(6, 0, 7)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract2.connect(signer1).buyImprovement2(6, 0, 7)).to.be.revertedWith("population too low to purchase improvement");
@@ -1743,6 +1770,7 @@ describe("Improvements", async function () {
 
         it("improvement2 labor camp purchase errors", async function () {
             await expect(improvementscontract2.connect(signer1).buyImprovement2(1, 1, 8)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract2.connect(signer1).buyImprovement2(6, 0, 8)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract2.connect(signer1).buyImprovement2(6, 0, 8)).to.be.revertedWith("population too low to purchase improvement");
@@ -1780,6 +1808,7 @@ describe("Improvements", async function () {
 
         it("improvement4 missile defense purchase errors", async function () {
             await expect(improvementscontract4.connect(signer1).buyImprovement4(1, 1, 1)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract4.connect(signer1).buyImprovement4(6, 0, 1)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract4.connect(signer1).buyImprovement4(6, 0, 1)).to.be.revertedWith("population too low to purchase improvement");
@@ -1819,6 +1848,7 @@ describe("Improvements", async function () {
 
         it("improvement4 munitions factory purchase errors", async function () {
             await expect(improvementscontract4.connect(signer1).buyImprovement4(1, 1, 2)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract4.connect(signer1).buyImprovement4(6, 0, 2)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract4.connect(signer1).buyImprovement4(6, 0, 2)).to.be.revertedWith("population too low to purchase improvement");
@@ -1855,6 +1885,7 @@ describe("Improvements", async function () {
         })
 
         it("improvement4 naval academy purchase errors", async function () {
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract4.connect(signer1).buyImprovement4(6, 0, 3)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4);
@@ -1893,6 +1924,7 @@ describe("Improvements", async function () {
         })
 
         it("improvement4 naval construction yard purchase errors", async function () {
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract4.connect(signer1).buyImprovement4(6, 0, 4)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4);
@@ -1933,6 +1965,7 @@ describe("Improvements", async function () {
         })
 
         it("improvement3 office of propaganda purchase errors", async function () {
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 1)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 2);
@@ -1970,6 +2003,7 @@ describe("Improvements", async function () {
 
         it("improvement3 police headquarters purchase errors", async function () {
             await expect(improvementscontract3.connect(signer1).buyImprovement3(1, 1, 2)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 2)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 2)).to.be.revertedWith("population too low to purchase improvement");
@@ -2005,6 +2039,7 @@ describe("Improvements", async function () {
 
         it("improvement3 prison purchase errors", async function () {
             await expect(improvementscontract3.connect(signer1).buyImprovement3(1, 1, 3)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 3)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 3)).to.be.revertedWith("population too low to purchase improvement");
@@ -2032,7 +2067,62 @@ describe("Improvements", async function () {
             await expect(improvementscontract3.connect(signer1).buyImprovement3(1, 0, 4)).to.be.revertedWith("Must own a bunker for each radiation containment chamber")            
             await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 3);
             await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 6);
+            await warbucks.connect(signer0).transfer(signer3.address, BigInt(21000000000000000000000000))
+            await countryminter.connect(signer3).generateCountry(
+                "TestRuler3",
+                "TestNationName3",
+                "TestCapitalCity3",
+                "TestNationSlogan3"
+            )
+            await warbucks.connect(signer0).transfer(signer4.address, BigInt(21000000000000000000000000))
+            await countryminter.connect(signer4).generateCountry(
+                "TestRuler4",
+                "TestNationName4",
+                "TestCapitalCity4",
+                "TestNationSlogan4"
+            )
+            // console.log("here? 3.5")
+            await treasurycontract.connect(signer3).addFunds(BigInt(5000000*(10**18)), 2);
+            await treasurycontract.connect(signer4).addFunds(BigInt(5000000*(10**18)), 3);
+            // console.log("here? 4")
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 0, 7)
+            await resourcescontract.connect(signer0).mockResourcesForTesting(1, 8, 10)
+            await resourcescontract.connect(signer0).mockResourcesForTesting(2, 6, 11)
+            await resourcescontract.connect(signer0).mockResourcesForTesting(3, 2, 9)
+            // console.log("here? 5")
+            await resourcescontract.connect(signer1).proposeTrade(0, 1)
+            await resourcescontract.connect(signer1).proposeTrade(0, 2)
+            await resourcescontract.connect(signer1).proposeTrade(0, 3)
+            // console.log("here? 6")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 15)            
+            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0)
+            await resourcescontract.connect(signer3).fulfillTradingPartner(2, 0)
+            await resourcescontract.connect(signer4).fulfillTradingPartner(3, 0)
+            // console.log("here? 7")
+            // var aluminium = await resourcescontract.viewAluminium(0)
+            // console.log("aluminium: ", aluminium)
+            // var iron = await resourcescontract.viewIron(0)
+            // console.log("iron: ", iron)
+            // var lead = await resourcescontract.viewLead(0)
+            // console.log("lead: ", lead)
+            // var marble = await resourcescontract.viewMarble(0)
+            // console.log("marble: ", marble)
+            // var gold = await resourcescontract.viewGold(0)
+            // console.log("gold: ", gold)
+            // var oil = await resourcescontract.viewOil(0)
+            // console.log("oil: ", oil)
+            // var coal = await resourcescontract.viewCoal(0)
+            // console.log("coal: ", coal)
+            // var construction = await bonusresourcescontract.viewConstruction(0)
+            // console.log("construction: ", construction)
+            // var microchips = await bonusresourcescontract.viewMicrochips(0)
+            // console.log("microchips: ", microchips)
+            // var steel = await bonusresourcescontract.viewSteel(0)
+            // console.log("steel: ", steel)
+            // var cleanup = await bonusresourcescontract.viewRadiationCleanup(0)
+            // console.log("cleanup: ", cleanup)
             await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 4);
+            // console.log("here?")
             var count = await improvementscontract3.getRadiationContainmentChamberCount(0);
             expect(count.toNumber()).to.equal(1);
             await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 4);
@@ -2044,6 +2134,7 @@ describe("Improvements", async function () {
 
         it("improvement3 radiation containment chamber purchase errors", async function () {
             await expect(improvementscontract3.connect(signer1).buyImprovement3(1, 1, 4)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 4)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 4)).to.be.revertedWith("population too low to purchase improvement");
@@ -2079,6 +2170,7 @@ describe("Improvements", async function () {
 
         it("improvement3 red light district purchase errors", async function () {
             await expect(improvementscontract3.connect(signer1).buyImprovement3(1, 1, 5)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 5)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 5)).to.be.revertedWith("population too low to purchase improvement");
@@ -2114,6 +2206,7 @@ describe("Improvements", async function () {
 
         it("improvement3 rehabilitation facility purchase errors", async function () {
             await expect(improvementscontract3.connect(signer1).buyImprovement3(1, 1, 6)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 6)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 6)).to.be.revertedWith("population too low to purchase improvement");
@@ -2149,6 +2242,7 @@ describe("Improvements", async function () {
 
         it("improvement3 satellite purchase errors", async function () {
             await expect(improvementscontract3.connect(signer1).buyImprovement3(1, 1, 7)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 7)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 7)).to.be.revertedWith("population too low to purchase improvement");
@@ -2184,6 +2278,7 @@ describe("Improvements", async function () {
 
         it("improvement3 school purchase errors", async function () {
             await expect(improvementscontract3.connect(signer1).buyImprovement3(1, 1, 8)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 8)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 8)).to.be.revertedWith("population too low to purchase improvement");
@@ -2219,6 +2314,7 @@ describe("Improvements", async function () {
 
         it("improvement3 shipyard purchase errors", async function () {
             await expect(improvementscontract3.connect(signer1).buyImprovement3(1, 1, 9)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 9)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 9)).to.be.revertedWith("population too low to purchase improvement");
@@ -2254,6 +2350,7 @@ describe("Improvements", async function () {
 
         it("improvement3 stadium purchase errors", async function () {
             await expect(improvementscontract3.connect(signer1).buyImprovement3(1, 1, 10)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 10)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 10)).to.be.revertedWith("population too low to purchase improvement");
@@ -2292,6 +2389,7 @@ describe("Improvements", async function () {
 
         it("improvement3 university purchase errors", async function () {
             await expect(improvementscontract3.connect(signer1).buyImprovement3(1, 1, 11)).to.be.revertedWith("!nation owner");
+            await keepercontract.incrementGameDay();
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 11)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract3.connect(signer1).buyImprovement3(6, 0, 11)).to.be.revertedWith("population too low to purchase improvement");

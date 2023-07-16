@@ -1113,6 +1113,14 @@ describe("Military Contract", async function () {
             await militarycontract.connect(signer1).toggleWarPeacePreference(0);
             var war = await militarycontract.getWarPeacePreference(0);
             expect(war).to.equal(true);
+            await expect(militarycontract.connect(signer1).toggleWarPeacePreference(0)).to.be.revertedWith("Must wait 7 days to switch to peace mode");
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
             await militarycontract.connect(signer1).toggleWarPeacePreference(0);
             var war2 = await militarycontract.getWarPeacePreference(0);
             expect(war2).to.equal(false);
