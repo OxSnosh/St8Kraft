@@ -1106,15 +1106,15 @@ describe("Environment Contract", async function () {
     describe("Environment Contract", function () {
         it("environment1 country initialized correctly", async function () {
             const initialEnvironment = await environmentcontract.getEnvironmentScore(0);
-            expect(initialEnvironment.toNumber()).to.equal(2);
+            expect(initialEnvironment.toNumber()).to.equal(1);
             const initialEnvironmentGross = await environmentcontract.getGrossEnvironmentScore(0);
-            expect(initialEnvironmentGross).to.equal(20);
+            expect(initialEnvironmentGross).to.equal(10);
             const resourcesScore = await environmentcontract.getEnvironmentScoreFromResources(0);
             expect(resourcesScore).to.equal(0);
             const wondersScore = await environmentcontract.getEnvironmentScoreFromImprovementsAndWonders(0);
             expect(wondersScore).to.equal(0);
             const techScore = await environmentcontract.getEnvironmentScoreFromTech(0);
-            expect(techScore).to.equal(10);
+            expect(techScore).to.equal(0);
             const densityScore = await environmentcontract.getEnvironmentScoreFromMilitaryDensity(0);
             expect(densityScore).to.equal(0);
             const infrastructureScore = await environmentcontract.getEnvironmentScoreFromInfrastructure(0);
@@ -1200,6 +1200,11 @@ describe("Environment Contract", async function () {
         })
 
         it("environment1 government affect environment", async function () {
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
             await countryparameterscontract.connect(signer1).setGovernment(0, 7);
             const governmentScore = await environmentcontract.getScoreFromGovernment(0);
             expect(governmentScore).to.equal(-10);
@@ -1208,7 +1213,7 @@ describe("Environment Contract", async function () {
         it("environment1 tech affect on environment", async function () {
             await technologymarketcontrat.connect(signer1).buyTech(0, 20);
             const techScore = await environmentcontract.getEnvironmentScoreFromTech(0);
-            expect(techScore).to.equal(0);
+            expect(techScore).to.equal(-10);
         })
         
         it("environment1 military density affects environment", async function () {

@@ -417,7 +417,7 @@ contract EnvironmentContract is Ownable {
         int256 pointsFromNukes;
         uint256 nukeCount = mis.getNukeCount(id);
         if (nukeCount > 0) {
-            pointsFromNukes = (int256(nukeCount));
+            pointsFromNukes = (int256(nukeCount / 10));
         }
         bool isLead = res.viewLead(id);
         if (isLead) {

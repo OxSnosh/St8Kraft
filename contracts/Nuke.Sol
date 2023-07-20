@@ -349,7 +349,13 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     function calculateNukesLandedLastSevenDays() public view returns (uint256) {
         uint256 sum = 0;
         uint256 gameDay = keep.getGameDay();
-        for (uint256 i = 0; i < 7; i++) {
+        uint256 daysToIterate;
+        if (gameDay < 7) {
+            daysToIterate = gameDay;
+        } else {
+            daysToIterate = 7;
+        }
+        for (uint256 i = 0; i < daysToIterate; i++) {
             sum += gameDayToNukesLanded[gameDay - i];
         }
         return sum;

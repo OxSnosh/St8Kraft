@@ -6,6 +6,7 @@ import "./Improvements.sol";
 import "./CountryParameters.sol";
 import "./Wonders.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
 
 ///@title CrimeContract
 ///@author OxSnosh
@@ -294,7 +295,7 @@ contract CrimeContract is Ownable {
         } else if (taxRate == 30) {
             taxRateCrimeMultiplier = 20;
         }
-        uint256 taxMultiplier = (taxRateCrimeMultiplier * 12);
+        uint256 taxMultiplier = (taxRateCrimeMultiplier);
         return taxMultiplier;
     }
 
