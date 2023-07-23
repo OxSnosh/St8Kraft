@@ -7,6 +7,7 @@ import "./Fighters.sol";
 import "./Bombers.sol";
 import "./Navy.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
 
 ///@title NationStrengthContract
 ///@author OxSnosh
@@ -139,19 +140,26 @@ contract NationStrengthContract is Ownable {
         uint256 defendingTankCount = frc.getDefendingTankCount(id);
         uint256 tankStrength = (((deployedTankCount * 15) +
             (defendingTankCount * 20)) / 100);
+        uint256 additionalStrength = getAdditionalStrengthFromMiliary(id);
+        uint256 strengthFromMilitary = (soldierStrength +
+            tankStrength +
+            additionalStrength);
+        return strengthFromMilitary;
+    }
+
+    function getAdditionalStrengthFromMiliary(uint256 id) public view returns (uint256) {
         uint256 cruiseMissileCount = mis.getCruiseMissileCount(id);
         uint256 cruiseMissileStrength = ((cruiseMissileCount * 10));
         uint256 nukeCount = mis.getNukeCount(id);
-        uint256 nukeStrength = ((nukeCount**2) * 10);
+        uint256 nukeStrengthBase = (nukeCount**2);
+        uint256 nukeStrength = (nukeStrengthBase * 10);
         uint256 aircraftStrength = getStrengthFromAirForce(id);
         uint256 navyStrength = getStrengthFromNavy(id);
-        uint256 strengthFromMilitary = (soldierStrength +
-            tankStrength +
-            cruiseMissileStrength +
+        uint256 additionalStrengthFromMilitary = (cruiseMissileStrength +
             nukeStrength +
             aircraftStrength +
             navyStrength);
-        return strengthFromMilitary;
+        return additionalStrengthFromMilitary;
     }
 
     function getStrengthFromAirForce(uint256 id)

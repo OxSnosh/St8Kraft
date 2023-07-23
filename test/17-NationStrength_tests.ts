@@ -1116,21 +1116,25 @@ describe("Nation Strength Contract", async function () {
             await resourcescontract.mockResourcesForTesting(0, 17, 18);
             await keepercontract.incrementGameDay();
             await missilescontract.connect(signer1).buyNukes(0);
-            var strength = await nationstrengthcontract.getNationStrength(0);
+            const strength1 = await nationstrengthcontract.getNationStrength(0);
+            // console.log(strength1.toNumber(), "strength after 1 nuke");
             await keepercontract.incrementGameDay();
             await missilescontract.connect(signer1).buyNukes(0);
-            var strength = await nationstrengthcontract.getNationStrength(0);
+            const strength2 = await nationstrengthcontract.getNationStrength(0);
+            // console.log(strength.toNumber(), "strength after 2 nukes");
             await keepercontract.incrementGameDay();
             await missilescontract.connect(signer1).buyNukes(0);
-            var strength = await nationstrengthcontract.getNationStrength(0);
+            const strength3 = await nationstrengthcontract.getNationStrength(0);
+            // console.log(strength.toNumber(), "strength after 3 nukes");
             await keepercontract.incrementGameDay();
             await missilescontract.connect(signer1).buyNukes(0);
-            var strength = await nationstrengthcontract.getNationStrength(0);
+            const strength4 = await nationstrengthcontract.getNationStrength(0);
+            // console.log(strength.toNumber(), "strength after 4 nukes");
             await keepercontract.incrementGameDay();
             await missilescontract.connect(signer1).buyNukes(0);
-            var strength = await nationstrengthcontract.getNationStrength(0);
-            expect(strength.toNumber()).to.equal(168500);
+            const strength5 = await nationstrengthcontract.getNationStrength(0);
+            // console.log(strength.toNumber(), "strength after 5 nukes");
+            expect(strength5.toNumber()).to.equal(168500);
         })
-    
     })
 })

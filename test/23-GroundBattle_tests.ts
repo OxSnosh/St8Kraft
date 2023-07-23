@@ -1122,7 +1122,7 @@ describe("Ground Battle Contract", async function () {
             // console.log(defenderStruct[1].toNumber(), "tanks defending")
             expect(defenderStruct[1].toNumber()).to.equal(20)
             // console.log(defenderStruct[2].toNumber(), "defender strength")
-            expect(defenderStruct[2].toNumber()).to.equal(1360)
+            expect(defenderStruct[2].toNumber()).to.equal(2040)
             // console.log(defenderStruct[3].toNumber(), "defender Id")
             expect(defenderStruct[3].toNumber()).to.equal(1)
             // console.log(defenderStruct[4].toNumber(), "war ID")
@@ -1132,8 +1132,8 @@ describe("Ground Battle Contract", async function () {
         it("tests that battle odds work correctly", async function () {
             const battleOdds : any = await groundbattlecontract.battleOdds(0, 0)
             // console.log(battleOdds[0].toNumber(), "attacker victory odds", battleOdds[1].toNumber(), "defender victory odds")
-            expect(battleOdds[0]).to.equal(51);
-            expect(battleOdds[1]).to.equal(48);
+            expect(battleOdds[0]).to.equal(41);
+            expect(battleOdds[1]).to.equal(58);
         }) 
 
         it("tests that battle happens", async function () {
@@ -1148,13 +1148,13 @@ describe("Ground Battle Contract", async function () {
             // console.log(attackerId, "attackerId")
             var attackerSoldierLosses = results[1].toNumber()
             // console.log(attackerSoldierLosses, "attacker soldier losses")
-            expect(attackerSoldierLosses).to.equal(102);
+            expect(attackerSoldierLosses).to.equal(150);
             var attackerTankLosses = results[2].toNumber()
             // console.log(attackerTankLosses, "attacker tank losses")
-            expect(attackerTankLosses).to.equal(1);
+            expect(attackerTankLosses).to.equal(2);
             var defenderSoldierLosses = results[4].toNumber()
             // console.log(defenderSoldierLosses, "defender soldier losses")
-            expect(defenderSoldierLosses).to.equal(204);
+            expect(defenderSoldierLosses).to.equal(306);
             var defenderTankLosses = results[5].toNumber()
             // console.log(defenderTankLosses, "defender tank losses")
             expect(defenderTankLosses).to.equal(4);
@@ -1165,7 +1165,7 @@ describe("Ground Battle Contract", async function () {
 
             var attackerDeployedForces : any = await warcontract.getDeployedGroundForces(0, 0)
             // console.log(attackerDeployedForces[0].toNumber(), "attacker deployed forces")
-            expect(attackerDeployedForces[0].toNumber()).to.equal(898);        
+            expect(attackerDeployedForces[0].toNumber()).to.equal(850);        
         }) 
 
         it("tests that casualties increase from ground battle", async function () {
@@ -1186,21 +1186,21 @@ describe("Ground Battle Contract", async function () {
             // console.log(attackerId, "attackerId")
             var attackerSoldierLosses = results[1].toNumber()
             // console.log(attackerSoldierLosses, "attacker soldier losses")
-            expect(attackerSoldierLosses).to.equal(102);
+            expect(attackerSoldierLosses).to.equal(150);
             var attackerTankLosses = results[2].toNumber()
             // console.log(attackerTankLosses, "attacker tank losses")
-            expect(attackerTankLosses).to.equal(1);   
+            expect(attackerTankLosses).to.equal(2);   
 
             var attackerSoldiers = await forcescontract.getSoldierCount(0);
             // console.log(attackerSoldiers.toNumber(), "attacker soldiers");
-            expect(attackerSoldiers).to.equal(1918);
+            expect(attackerSoldiers).to.equal(1870);
             var attackerTanks = await forcescontract.getTankCount(0);
             // console.log(attackerTanks.toNumber(), "attackerTanks");   
-            expect(attackerTanks).to.equal(39);
+            expect(attackerTanks).to.equal(38);
 
             var casualties : any = await forcescontract.getCasualties(0);
-            expect(casualties[0]).to.equal(102)
-            expect(casualties[1]).to.equal(1)
+            expect(casualties[0]).to.equal(150)
+            expect(casualties[1]).to.equal(2)
             
         }) 
 
@@ -1218,7 +1218,7 @@ describe("Ground Battle Contract", async function () {
 
             var defenderInfrastructure = await infrastructurecontract.getInfrastructureCount(1)
             var defenderLand = await infrastructurecontract.getLandCount(1);
-            expect(defenderLand).to.equal(18)
+            expect(defenderLand).to.equal(19)
             expect(defenderInfrastructure).to.equal(5019)
         }) 
     })

@@ -9,6 +9,7 @@ import "./Military.sol";
 import "./Nuke.sol";
 import "./Wonders.sol";
 import "./CountryMinter.sol";
+import "./KeeperFile.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
@@ -26,6 +27,7 @@ contract NavalActionsContract is Ownable {
     address public countryMinter;
 
     CountryMinter mint;
+    KeeperContract keep;
 
     struct NavalActions {
         bool blockadedToday;
@@ -34,6 +36,7 @@ contract NavalActionsContract is Ownable {
     }
 
     mapping(uint256 => NavalActions) idToNavalActions;
+    mapping(uint256 => mapping(uint256 => uint256)) public idToDayToPurchases;
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -52,6 +55,7 @@ contract NavalActionsContract is Ownable {
         navy = _navy;
         navy2 = _navy2;
         keeper = _keeper;
+        keep = KeeperContract(_keeper);
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
     }
@@ -108,7 +112,8 @@ contract NavalActionsContract is Ownable {
     ///@param id is the nation id of the nation purchasin vessels
     ///@param amount is the amount of navy vessels being purchased
     function increasePurchases(uint256 id, uint256 amount) public onlyNavy {
-        idToNavalActions[id].purchasesToday += amount;
+        uint256 gameDay = keep.getGameDay();
+        idToDayToPurchases[id][gameDay] += amount;
     }
 
     modifier onlyBlockade() {
@@ -133,24 +138,13 @@ contract NavalActionsContract is Ownable {
         _;
     }
 
-    ///@dev this is a public function only callable from the keeper contract
-    ///@dev this function will reset the naval actions dailw when the chainlink keeper calls the function
-    ///@notice this function will reset the naval actions daily when called by a chainlink keeper
-    function resetActionsToday() public onlyKeeper {
-        uint256 countryCount = mint.getCountryCount();
-        for (uint256 i = 0; i <= countryCount; i++) {
-            idToNavalActions[i].purchasesToday = 0;
-            idToNavalActions[i].actionSlotsUsedToday = 0;
-            idToNavalActions[i].blockadedToday = false;
-        }
-    }
-
     ///@dev this is a public view function that will return a nations daily purchases
     ///@notice this function will return the amount of vessels a nation purchases today
     ///@param id is the nation id of the nation being queried
     ///@return uint256 is the number of ships purchased today
     function getPurchasesToday(uint256 id) public view returns (uint256) {
-        uint256 purchasesToday = idToNavalActions[id].purchasesToday;
+        uint256 gameDay = keep.getGameDay();
+        uint256 purchasesToday = idToDayToPurchases[id][gameDay];
         return purchasesToday;
     }
 

@@ -1072,6 +1072,14 @@ describe("Spies in Forces Contract", async function () {
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
         await treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0);
         await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
+        await countryminter.connect(signer2).generateCountry(
+            "TestRuler",
+            "TestNationName",
+            "TestCapitalCity",
+            "TestNationSlogan"
+        )
     });
 
     describe("Buy Spies", function () {

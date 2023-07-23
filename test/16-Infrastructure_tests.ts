@@ -1094,6 +1094,7 @@ describe("Infrastructure Contract", async function () {
 
         it("infrastructure tests setTaxRate() and getTaxRate() function", async function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200);
+            await keepercontract.incrementGameDay();
             var taxes : any = await taxescontract.getTaxesCollectible(0);
             var taxRate = await infrastructurecontract.getTaxRate(0);
             // console.log("taxes collectible = ", BigInt(taxes[1]/(10**18)));
