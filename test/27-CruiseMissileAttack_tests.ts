@@ -1063,6 +1063,8 @@ describe("Cruise Missile Attack", async function () {
         if(chainId == 31337) {
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, cruisemissilecontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, nukecontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
         }
 
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))

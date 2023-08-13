@@ -140,6 +140,7 @@ contract CountryMinter is ERC721, Ownable {
         string memory capitalCity,
         string memory nationSlogan
     ) public {
+        console.log("did we get to the Mint function?");
         uint256 seedMoney = TreasuryContract(treasury).getSeedMoney();
         IWarBucks(warbucks).burnFromMint(msg.sender, seedMoney);
         _safeMint(msg.sender, countryId);

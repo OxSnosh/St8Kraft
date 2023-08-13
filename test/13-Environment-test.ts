@@ -1101,6 +1101,11 @@ describe("Environment Contract", async function () {
             "TestNationSlogan5"
         )
 
+        if(chainId == 31337) {
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
+        }
+
     });
 
     describe("Environment Contract", function () {

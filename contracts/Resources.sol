@@ -242,7 +242,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         );
         idToResources1[id] = newResources1;
         idToResources2[id] = newResources2;
-        // fulfillRequest(id);
+        fulfillRequest(id);
     }
 
     ///@dev this is the function that will call the chainlink vrf contract to return random numbers

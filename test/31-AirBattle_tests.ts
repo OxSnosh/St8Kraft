@@ -1063,6 +1063,8 @@ describe("Air Battle", async function () {
         if(chainId == 31337) {
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, cruisemissilecontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, nukecontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
         }
 
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
@@ -1102,7 +1104,6 @@ describe("Air Battle", async function () {
         await warcontract.connect(signer1).declareWar(0, 1)
         await forcescontract.connect(signer1).deployForces(1000, 30, 0, 0)
         await billscontract.connect(signer2).payBills(1)
-
 
     });
 

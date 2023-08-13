@@ -1063,6 +1063,11 @@ describe("CountryMinter", function () {
         )
   
         // console.log("settings initiated");
+
+        if(chainId == 31337) {
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
+        }
     });
 
     describe("Minting a Country", function () {
@@ -1074,6 +1079,12 @@ describe("CountryMinter", function () {
                     "TestCapitalCity",
                     "TestNationSlogan"
                 );
+            countryparameterscontract.on("randomNumbersRequested", (requestId) => {
+                console.log("randomNumbersRequested", requestId)
+            })
+            vrfCoordinatorV2Mock.on("RandomWordsRequested", (hash : any, requestId : any, preSeed : any, subId : any, minimumConfirms : any, callbackGasLimit : any, numWords : any, sender : any) => {
+                console.log("RandomWordsRequested", hash, requestId, preSeed, subId, minimumConfirms, callbackGasLimit, numWords, sender)
+            })
             const { rulerName, nationName, capitalCity, nationSlogan } = await countryparameterscontract.idToCountryParameters(0);    
             expect(rulerName).to.equal("TestRuler");
             expect(nationName).to.equal("TestNationName");

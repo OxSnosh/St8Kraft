@@ -1061,6 +1061,11 @@ describe("Technology Market Contract", async function () {
             countryminter.address
         )
 
+        if(chainId == 31337) {
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
+        }
+
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer1).generateCountry(
             "TestRuler",

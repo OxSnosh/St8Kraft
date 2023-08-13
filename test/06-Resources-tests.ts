@@ -1063,6 +1063,7 @@ describe("ResourcesContract", async function () {
     
         if(chainId == 31337) {
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
         }
 
         // console.log("country 1");
