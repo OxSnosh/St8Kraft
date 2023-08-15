@@ -1077,22 +1077,6 @@ describe("ParametersContract", async function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        // let requestId1
-        // const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested()
-        // await vrfCoordinatorV2Mock.on(eventFilter1, async (hash : any, requestIdReturn : any, preSeed : any, subId : any, minimumConfirms : any, callbackGasLimit : any, numWords : any, sender : any) => {
-        //     // console.log("RandomWordsRequested", hash, Number(requestIdReturn), Number(preSeed), Number(subId), minimumConfirms, callbackGasLimit, numWords, sender)
-        //     console.log(Number(requestIdReturn), "requestIdReturn")
-        //     requestId1 = Number(requestIdReturn)
-        //     await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, countryparameterscontract.address);
-        //     let preferredReligion1 = await countryparameterscontract.getReligionPreference(0);
-        //     console.log("Rel 1 top", preferredReligion1.toNumber());
-        //     let preferredGovernment1 = await countryparameterscontract.getGovernmentPreference(0);
-        //     console.log("Gov 1 top", preferredGovernment1.toNumber());
-        // })
-        // await treasurycontract.connect(signer1).addFunds(BigInt(21000000 * (10**18)), 0)
-        console.log("here? 3")
-
-        console.log("country2")
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000000000000000000))
         const tx1 = await countryminter.connect(signer1).generateCountry(
             "TestRuler",
@@ -1100,72 +1084,25 @@ describe("ParametersContract", async function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )
-
         const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
         const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
         for (const log of event1Logs) {
             const requestIdReturn = log.args.requestId;
-            console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            // console.log(Number(requestIdReturn), "requestIdReturn for Event");
             if (requestIdReturn == 1) {
                 await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, countryparameterscontract.address);
                 let preferredReligion2 = await countryparameterscontract.getReligionPreference(0);
-                console.log("Rel 1 top", preferredReligion2.toNumber());
+                // console.log("Rel 1 top", preferredReligion2.toNumber());
                 let preferredGovernment2 = await countryparameterscontract.getGovernmentPreference(0);
-                console.log("Gov 1 top", preferredGovernment2.toNumber());
+                // console.log("Gov 1 top", preferredGovernment2.toNumber());
             } else if (requestIdReturn == 3) {
                 await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, countryparameterscontract.address);
                 let preferredReligion2 = await countryparameterscontract.getReligionPreference(1);
-                console.log("Rel 2 top", preferredReligion2.toNumber());
+                // console.log("Rel 2 top", preferredReligion2.toNumber());
                 let preferredGovernment2 = await countryparameterscontract.getGovernmentPreference(1);
-                console.log("Gov 2 top", preferredGovernment2.toNumber());
+                // console.log("Gov 2 top", preferredGovernment2.toNumber());
             }
         }
-
-        console.log("end")
-        // const eventFilter2 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
-        // const event2Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter2);
-        // for (const log of event2Logs) {
-        // const requestIdReturn = log.args.requestId;
-        // console.log(Number(requestIdReturn), "requestIdReturn for Event 2");
-        // }
-
-        // let requestId : any
-        // const eventFilter2 = vrfCoordinatorV2Mock.filters.RandomWordsRequested()
-        // await vrfCoordinatorV2Mock.on(eventFilter2, async (hash : any, requestIdReturn : any, preSeed : any, subId : any, minimumConfirms : any, callbackGasLimit : any, numWords : any, sender : any) => {
-        //     // console.log("RandomWordsRequested", hash, Number(requestIdReturn), Number(preSeed), Number(subId), minimumConfirms, callbackGasLimit, numWords, sender)
-        //     console.log(Number(requestIdReturn), "requestIdReturn")
-        //     requestId = Number(requestIdReturn)
-        //     await vrfCoordinatorV2Mock.fulfillRandomWords(requestId, countryparameterscontract.address);
-        //     let preferredReligion1 = await countryparameterscontract.getReligionPreference(requestId - 1);
-        //     console.log(`Rel ${requestId} top`, preferredReligion1.toNumber());
-        //     let preferredGovernment1 = await countryparameterscontract.getGovernmentPreference(requestId - 1);
-        //     console.log(`Gov ${requestId} top`, preferredGovernment1.toNumber());
-        // })
-        // await treasurycontract.connect(signer1).addFunds(BigInt(21000000 * (10**18)), 0)
-        // console.log("here? 3")
-        
-        // console.log("country 2");
-        // await warbucks.connect(signer0).transfer(signer2.address, BigInt(25000000000000000000000000))
-        // const tx2 = await countryminter.connect(signer2).generateCountry(
-        //     "TestRuler2",
-        //     "TestNationName2",
-        //     "TestCapitalCity2",
-        //     "TestNationSlogan2"
-        // )
-        // // console.log("tx2", tx2)
-        // await treasurycontract.connect(signer2).addFunds(BigInt(21000000 * (10**18)), 1)
-        // // const tx2 = await countryparameterscontract.fulfillRequest(1);
-        // let txReceipt2 = await tx2.wait(1);
-        // // console.log("txReceipt2", txReceipt2);
-        // let requestId2 : any = txReceipt2?.events?.[1].args?[2][0]:0;
-        // // console.log("requestId2", requestId2)
-        // await vrfCoordinatorV2Mock.fulfillRandomWords(1, countryparameterscontract.address);
-        // let preferredReligion2 = await countryparameterscontract.getReligionPreference(1);
-        // // console.log("Rel 2 top", preferredReligion2.toNumber());
-        // let preferredGovernment2 = await countryparameterscontract.getGovernmentPreference(1);
-        // // console.log("Gov 2 top", preferredGovernment2.toNumber());
-
-
     });
 
     describe("Preferences Setup", function () {
@@ -1190,6 +1127,8 @@ describe("ParametersContract", async function () {
 
     describe("Preferences Functions", function () {
         it("Tests that the setRulerName() function works", async function () {
+            await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000000000000000000))
+            await treasurycontract.connect(signer1).addFunds(BigInt(25000000000000000000000000), 0)
             let rulerName = await countryparameterscontract.connect(signer1).getRulerName(0);
             expect(rulerName).to.equal("TestRuler");
             await countryparameterscontract.connect(signer1).setRulerName("newName", 0);
@@ -1202,6 +1141,8 @@ describe("ParametersContract", async function () {
         })
 
         it("Tests that the setNationName() function works", async function () {
+            await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000000000000000000))
+            await treasurycontract.connect(signer1).addFunds(BigInt(25000000000000000000000000), 0)
             let nationName = await countryparameterscontract.connect(signer1).getNationName(0);
             expect(nationName).to.equal("TestNationName");
             await countryparameterscontract.connect(signer1).setNationName("newNationName", 0);

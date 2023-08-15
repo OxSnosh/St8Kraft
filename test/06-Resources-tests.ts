@@ -1066,59 +1066,100 @@ describe("ResourcesContract", async function () {
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
         }
 
-        // console.log("country 1");
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
+        // // console.log("country 1");
+        // await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
+        // await countryminter.connect(signer1).generateCountry(
+        //     "TestRuler",
+        //     "TestNationName",
+        //     "TestCapitalCity",
+        //     "TestNationSlogan"
+        // )
+        // const tx1 = await resourcescontract.fulfillRequest(0);
+        // let txReceipt1 = await tx1.wait(1);
+        // let requestId1 = txReceipt1?.events?.[1].args?.requestId;
+        // // console.log("requestId", (txReceipt1.events?.[1].args?.requestId).toNumber());
+        // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, resourcescontract.address);
+        // let resources1 = await resourcescontract.getPlayerResources(0);
+        // // console.log("resources1", resources1[0].toNumber(), resources1[1].toNumber());
+        
+        // // console.log("country 2");
+        // await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
+        // await countryminter.connect(signer2).generateCountry(
+        //     "TestRuler2",
+        //     "TestNationName2",
+        //     "TestCapitalCity2",
+        //     "TestNationSlogan2"
+        // )
+        // const tx2 = await resourcescontract.fulfillRequest(1);
+        // let txReceipt2 = await tx2.wait(1);
+        // let requestId2 = txReceipt2?.events?.[1].args?.requestId;
+        // // console.log("requestId", (txReceipt2.events?.[1].args?.requestId).toNumber());
+        // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, resourcescontract.address);
+        // let resources2 = await resourcescontract.getPlayerResources(1);
+        // // console.log("resources2", resources2[0].toNumber(), resources2[1].toNumber());
+
+        // // console.log("country 3");
+        // await warbucks.connect(signer0).transfer(signer3.address, BigInt(2100000000000000000000000))
+        // await countryminter.connect(signer3).generateCountry(
+        //     "TestRuler3",
+        //     "TestNationName3",
+        //     "TestCapitalCity3",
+        //     "TestNationSlogan3"
+        // )
+        // const tx3 = await resourcescontract.fulfillRequest(2);
+        // let txReceipt3 = await tx3.wait(1);
+        // let requestId3 = txReceipt3?.events?.[1].args?.requestId;
+        // // console.log("requestId3", (txReceipt3.events?.[1].args?.requestId).toNumber());
+        // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId3, resourcescontract.address);
+        // let resources3 = await resourcescontract.getPlayerResources(2);
+        // // console.log("resources3", resources3[0].toNumber(), resources3[1].toNumber());
+
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000000000000000000))
         await countryminter.connect(signer1).generateCountry(
             "TestRuler",
             "TestNationName",
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        const tx1 = await resourcescontract.fulfillRequest(0);
-        let txReceipt1 = await tx1.wait(1);
-        let requestId1 = txReceipt1?.events?.[1].args?.requestId;
-        // console.log("requestId", (txReceipt1.events?.[1].args?.requestId).toNumber());
-        await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, resourcescontract.address);
-        let resources1 = await resourcescontract.getPlayerResources(0);
-        // console.log("resources1", resources1[0].toNumber(), resources1[1].toNumber());
-        
-        // console.log("country 2");
-        await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
-        await countryminter.connect(signer2).generateCountry(
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000000000000000000))
+        await countryminter.connect(signer1).generateCountry(
             "TestRuler2",
             "TestNationName2",
             "TestCapitalCity2",
             "TestNationSlogan2"
         )
-        const tx2 = await resourcescontract.fulfillRequest(1);
-        let txReceipt2 = await tx2.wait(1);
-        let requestId2 = txReceipt2?.events?.[1].args?.requestId;
-        // console.log("requestId", (txReceipt2.events?.[1].args?.requestId).toNumber());
-        await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, resourcescontract.address);
-        let resources2 = await resourcescontract.getPlayerResources(1);
-        // console.log("resources2", resources2[0].toNumber(), resources2[1].toNumber());
-
-        // console.log("country 3");
-        await warbucks.connect(signer0).transfer(signer3.address, BigInt(2100000000000000000000000))
-        await countryminter.connect(signer3).generateCountry(
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000000000000000000))
+        await countryminter.connect(signer1).generateCountry(
             "TestRuler3",
             "TestNationName3",
             "TestCapitalCity3",
             "TestNationSlogan3"
         )
-        const tx3 = await resourcescontract.fulfillRequest(2);
-        let txReceipt3 = await tx3.wait(1);
-        let requestId3 = txReceipt3?.events?.[1].args?.requestId;
-        // console.log("requestId3", (txReceipt3.events?.[1].args?.requestId).toNumber());
-        await vrfCoordinatorV2Mock.fulfillRandomWords(requestId3, resourcescontract.address);
-        let resources3 = await resourcescontract.getPlayerResources(2);
-        // console.log("resources3", resources3[0].toNumber(), resources3[1].toNumber());
+        const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+        const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+        for (const log of event1Logs) {
+            const requestIdReturn = log.args.requestId;
+            // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            if (requestIdReturn == 2) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources1 = await resourcescontract.getPlayerResources(0);
+                // console.log("resources 1", resources1[0].toNumber(), resources1[1].toNumber());
+            } else if (requestIdReturn == 4) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources2 = await resourcescontract.getPlayerResources(1);
+                // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
+            } else if (requestIdReturn == 6) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources3 = await resourcescontract.getPlayerResources(2);
+                // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+            }
+        }
     });
 
     describe("Resources Setup", function () {
         it("Tests that two resources were randomly selected and set to true", async function () {
-            var wheat1 = await resourcescontract.viewWheat(0);
-            expect(wheat1).to.equal(true);
+            var iron1 = await resourcescontract.viewIron(0);
+            expect(iron1).to.equal(true);
             var oil1 = await resourcescontract.viewOil(0);
             expect(oil1).to.equal(false);
             var fish1 = await resourcescontract.viewFish(0);
@@ -1128,35 +1169,35 @@ describe("ResourcesContract", async function () {
 
             var iron2 = await resourcescontract.viewIron(1);
             expect(iron2).to.equal(true);
-            var water2 = await resourcescontract.viewWater(1);
-            expect(water2).to.equal(false);
+            var gems2 = await resourcescontract.viewGems(1);
+            expect(gems2).to.equal(true);
             var coal2 = await resourcescontract.viewCoal(1);
             expect(coal2).to.equal(false);
             var cattle2 = await resourcescontract.viewCattle(1);
-            expect(cattle2).to.equal(true);
+            expect(cattle2).to.equal(false);
         });
     });
 
     describe("Accept Trading Partner", function () {
         it("Test that partners recieve each others resources", async function () {
             await resourcescontract.connect(signer1).proposeTrade(0, 1);
-            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
             var wheat1 = await resourcescontract.viewWheat(0);
-            expect(wheat1).to.equal(true);
+            expect(wheat1).to.equal(false);
             var cattle1 = await resourcescontract.viewCattle(0);
             expect(cattle1).to.equal(true)
             var iron1 = await resourcescontract.viewIron(0);
             expect(iron1).to.equal(true);
-            var water1 = await resourcescontract.viewWater(0);
-            expect(water1).to.equal(false);
+            var water1 = await resourcescontract.viewGems(0);
+            expect(water1).to.equal(true);
             var wheat2 = await resourcescontract.viewWheat(1);
-            expect(wheat2).to.equal(true);
+            expect(wheat2).to.equal(false);
             var cattle2 = await resourcescontract.viewCattle(1);
             expect(cattle2).to.equal(true)
             var iron2 = await resourcescontract.viewIron(1);
             expect(iron2).to.equal(true);
-            var water2 = await resourcescontract.viewWater(1);
-            expect(water2).to.equal(false);
+            var water2 = await resourcescontract.viewGems(1);
+            expect(water2).to.equal(true);
         })
     })
 
@@ -1180,7 +1221,7 @@ describe("ResourcesContract", async function () {
             var partners1 = await resourcescontract.getProposedTradingPartners(1)
             expect(partners.length).to.equal(1)
             expect(partners1.length).to.equal(1)
-            await resourcescontract.connect(signer2).cancelProposedTrade(1, 0)
+            await resourcescontract.connect(signer1).cancelProposedTrade(1, 0)
             var partners = await resourcescontract.getProposedTradingPartners(0)
             var partners1 = await resourcescontract.getProposedTradingPartners(1)
             expect(partners.length).to.equal(0)
@@ -1191,7 +1232,7 @@ describe("ResourcesContract", async function () {
     describe("Remove Trading Partners", async function () {
         it("Nation one in a trade can remove the trade", async function () {
             await resourcescontract.connect(signer1).proposeTrade(0, 1);
-            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
             var nation1TradingPartnersFirst = await resourcescontract.getTradingPartners(0);
             expect(nation1TradingPartnersFirst.length).to.equal(1);
             await resourcescontract.connect(signer1).removeTradingPartner(0, 1);
@@ -1201,10 +1242,10 @@ describe("ResourcesContract", async function () {
 
         it("Nation two in a trade can remove the trade", async function () {
             await resourcescontract.connect(signer1).proposeTrade(0, 1);
-            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
             var nation1TradingPartnersFirst = await resourcescontract.getTradingPartners(1);
             expect(nation1TradingPartnersFirst.length).to.equal(1);
-            await resourcescontract.connect(signer2).removeTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).removeTradingPartner(1, 0);
             var nation1TradingPartners = await resourcescontract.getTradingPartners(1);
             expect(nation1TradingPartners.length).to.equal(0);
         })

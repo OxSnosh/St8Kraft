@@ -268,6 +268,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         generateDefenderForcesStruct(warId, groundBattleId, defenderId);
         fulfillRequest(groundBattleId);
         groundBattleId++;
+        console.log("GROUND BATTLE ID: ", groundBattleId);
     }
 
     function generateAttackerForcesStruct(
@@ -484,6 +485,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             NUM_WORDS
         );
         s_requestIdToRequestIndex[requestId] = battleId;
+        console.log("REQUEST ID: ", requestId);
         emit randomNumbersRequested(requestId);
     }
 
@@ -510,6 +512,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             .countryId;
         uint256 warId = groundBattleIdToAttackerForces[requestNumber].warId;
         if (randomNumberForOutcomeSelection <= attackerStrength) {
+            console.log("ATTACKER VICTORY");
             (
                 attackerSoldierLosses,
                 attackerTankLosses,
@@ -517,8 +520,11 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
                 defenderTankLosses
             ) = attackVictory(requestNumber);
             collectSpoils(requestNumber, attackerId);
+            console.log("SPOILS COLLECTED");
             groundBattleIdToAtackerVictory[requestNumber] = true;
+            console.log("VICTORY SET TO", groundBattleIdToAtackerVictory[requestNumber]);
         } else if (randomNumberForOutcomeSelection > attackerStrength) {
+            console.log("DEFENDER VICTORY");
             (
                 attackerSoldierLosses,
                 attackerTankLosses,
@@ -553,6 +559,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             defenderTankLosses,
             defenderId
         );
+        console.log("HERE?");
         completeBattleSequence(requestNumber, warId);
     }
 
@@ -584,6 +591,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         if (anarchyCheckAttacker) {
             param.inflictAnarchy(attackerId);
         }
+        console.log("BATTLE COMPLETE");
     }
 
     function returnBattleResults(
@@ -808,8 +816,11 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         if (multiple > 5) {
             multiple = 5;
         }
+        console.log("MULTIPLE", multiple);
         randomLandMiles = (randomLandMiles * multiple);
         randomInfrastructure = (randomInfrastructure * multiple);
+        console.log("LAND MILES", randomLandMiles);
+        console.log("INFRASTRUCTURE", randomInfrastructure);
         inf.transferLandAndInfrastructure(
             randomLandMiles,
             randomInfrastructure,

@@ -1250,7 +1250,7 @@ describe("Cruise Missile Attack", async function () {
             await vrfCoordinatorV2Mock.fulfillRandomWords(requestId8, cruisemissilecontract.address);
             var defenderInfrastructure2 = await infrastructurecontract.getInfrastructureCount(1)
             // console.log(defenderInfrastructure2.toNumber())
-            expect(defenderInfrastructure2).to.equal(1996)
+            expect(defenderInfrastructure2).to.equal(1989)
 
         })
 

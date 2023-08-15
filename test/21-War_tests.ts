@@ -1335,12 +1335,10 @@ describe("War Contract", async function () {
             var defenseOffered = arr[1]
             var active = arr[2]
             var peaceDeclared = arr[3]
-            var expired = arr[4]
             // console.log(defenseOffered, "defense peace offered")
             // console.log(offenseOffered, "offense peace offered")
             // console.log(active, "is war active")
             // console.log(peaceDeclared, "is peace declared")
-            // console.log(expired, "is war expired")
             expect(defenseOffered).to.equal(true)
         })
 
@@ -1359,12 +1357,10 @@ describe("War Contract", async function () {
             var defenseOffered = arr[1]
             var active = arr[2]
             var peaceDeclared = arr[3]
-            var expired = arr[4]
             // console.log(defenseOffered, "defense peace offered")
             // console.log(offenseOffered, "offense peace offered")
             // console.log(active, "is war active")
             // console.log(peaceDeclared, "is peace declared")
-            // console.log(expired, "is war expired")
             expect(offenseOffered).to.equal(true)
             expect(defenseOffered).to.equal(true)
             expect(peaceDeclared).to.equal(true)
@@ -1390,19 +1386,16 @@ describe("War Contract", async function () {
             expect(defenseOffensiveWars.length).to.equal(0)
             expect(offenseActiveWars.length).to.equal(1)
             expect(defenseActiveWars.length).to.equal(1)
-
             await warcontract.connect(signer1).offerPeace(0, 0)
             var arr : any = await warcontract.returnWar(0)
             var offenseOffered = arr[0]
             var defenseOffered = arr[1]
             var active = arr[2]
             var peaceDeclared = arr[3]
-            var expired = arr[4]
             // console.log(defenseOffered, "defense peace offered")
             // console.log(offenseOffered, "offense peace offered")
             // console.log(active, "is war active")
             // console.log(peaceDeclared, "is peace declared")
-            // console.log(expired, "is war expired")
             expect(offenseOffered).to.equal(true)
             expect(defenseOffered).to.equal(true)
             expect(peaceDeclared).to.equal(true)
@@ -1448,11 +1441,8 @@ describe("War Contract", async function () {
             var isActive = await warcontract.isWarActive(0);
             expect(isActive).to.equal(true)
             var daysLeft = await warcontract.getDaysLeft(0)
-            // console.log(daysLeft.toNumber())
-            expect(daysLeft).to.equal(7)
-            var warDetails : any = await warcontract.returnWar(0)
-            // console.log("expired", warDetails[4])
-            expect(warDetails[4]).to.equal(false)
+            expect(daysLeft[0].toNumber()).to.equal(7)
+            // console.log(daysLeft[0].toNumber(), "days Left", "War expired", daysLeft[1])
             await keepercontract.incrementGameDay()
             await keepercontract.incrementGameDay()
             await keepercontract.incrementGameDay()
@@ -1461,18 +1451,14 @@ describe("War Contract", async function () {
             await keepercontract.incrementGameDay()
             await keepercontract.incrementGameDay()
             await keepercontract.incrementGameDay()
+            var daysLeft = await warcontract.getDaysLeft(0)
+            // console.log(daysLeft[0].toNumber(), "days Left", "War exprired", daysLeft[1])
+            expect(daysLeft[0].toNumber()).to.equal(0)
+            expect(daysLeft[1]).to.equal(true)
             var isActive = await warcontract.isWarActive(0);
             expect(isActive).to.equal(false)
-            // console.log("active after expiration", isActive)
-            var daysLeft = await warcontract.getDaysLeft(0)
-            // console.log(daysLeft.toNumber())
-            expect(daysLeft).to.equal(0)
-            // console.log("days left", daysLeft.toNumber())
-            var warDetails : any = await warcontract.returnWar(0)
-            // console.log("expired", warDetails[4])
-            expect(warDetails[4]).to.equal(true)
+            // console.log("isActive", isActive)
         })
-
 
     })
 })

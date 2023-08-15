@@ -662,6 +662,10 @@ contract InfrastructureContract is Ownable {
         uint256 defenderLand = idToInfrastructure[defenderId].landArea;
         uint256 defenderInfrastructure = idToInfrastructure[defenderId]
             .infrastructureCount;
+        console.log("defender land", defenderLand);
+        console.log("defender infrastructure", defenderInfrastructure);
+        console.log("land miles", landMiles);
+        console.log("infrastructure levels", infrastructureLevels);
         if (defenderLand <= landMiles) {
             idToInfrastructure[attackerId].landArea += defenderLand;
             landMiles = defenderLand;
@@ -669,6 +673,7 @@ contract InfrastructureContract is Ownable {
         } else {
             idToInfrastructure[attackerId].landArea += landMiles;
             idToInfrastructure[defenderId].landArea -= landMiles;
+            console.log("this land exchange happened");
         }
         if (defenderInfrastructure <= infrastructureLevels) {
             idToInfrastructure[attackerId]
@@ -680,6 +685,7 @@ contract InfrastructureContract is Ownable {
                 .infrastructureCount += infrastructureLevels;
             idToInfrastructure[defenderId]
                 .infrastructureCount -= infrastructureLevels;
+            console.log("this infrastructure exchange happened");
         }
     }
 

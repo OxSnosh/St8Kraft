@@ -1076,7 +1076,7 @@ describe("Improvements", async function () {
         // let ownerInitialWarBucksBalance : any = await warbucks.balanceOf(signer0.address);
         // await warbucks.connect(signer0).approve(warbucks.address, BigInt(6000000 000000000 000000000));
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(60000000000000000000000000));
-        await treasurycontract.connect(signer1).addFunds(BigInt(50000000*(10**18)), 0);
+        await treasurycontract.connect(signer1).addFunds(BigInt(55000000*(10**18)), 0);
         await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500);
 
         await warbucks.connect(signer0).transfer(signer2.address, BigInt(21000000000000000000000000))
@@ -1308,7 +1308,7 @@ describe("Improvements", async function () {
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 1, 6)).to.be.revertedWith("!nation owner");
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 15)).to.be.revertedWith("Invalid improvement ID");
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 6)).to.be.revertedWith("population too low to purchase improvement");
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             await expect(improvementscontract1.connect(signer1).buyImprovement1(6, 0, 6)).to.be.revertedWith("Cannot own more than 5");
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 2);
             await expect(improvementscontract1.connect(signer1).buyImprovement1(1, 0, 6)).to.be.revertedWith("Cannot own if forward operating base is owned");

@@ -45,7 +45,6 @@ contract WarContract is Ownable {
         bool active;
         uint256 dayStarted;
         bool peaceDeclared;
-        bool expired;
         bool offensePeaceOffered;
         bool defensePeaceOffered;
         uint256 offenseBlockades;
@@ -192,7 +191,6 @@ contract WarContract is Ownable {
             war.active = true;
             war.dayStarted = day;
             war.peaceDeclared = false;
-            war.expired = false;
             war.offensePeaceOffered = false;
             war.defensePeaceOffered = false;
         OffenseLosses memory newOffenseLosses = OffenseLosses(
@@ -349,6 +347,7 @@ contract WarContract is Ownable {
         bool defensePeaceCheck = warIdToWar[_warId].defensePeaceOffered;
         if (offensePeaceCheck == true && defensePeaceCheck == true) {
             warIdToWar[_warId].peaceDeclared = true;
+            warIdToWar[_warId].active = false;
             removeActiveWar(_warId);
         }
     }
@@ -360,21 +359,18 @@ contract WarContract is Ownable {
     ///@return defensePeaceOffered is a boolean value that will be true if the defense nation offered peace
     ///@return warActive will return a boolean true if the war is still active
     ///@return peaceDeclared will return a boolean true of peace was declared by both sides
-    ///@return expired will return a boolean true if the war expired (days left reached 0)
     function returnWar(
         uint256 _warId
-    ) public view returns (bool, bool, bool, bool, bool) {
+    ) public view returns (bool, bool, bool, bool) {
         bool offensePeaceOffered = warIdToWar[_warId].offensePeaceOffered;
         bool defensePeaceOffered = warIdToWar[_warId].defensePeaceOffered;
         bool warActive = warIdToWar[_warId].active;
         bool peaceDeclared = warIdToWar[_warId].peaceDeclared;
-        bool expired = warIdToWar[_warId].expired;
         return (
             offensePeaceOffered,
             defensePeaceOffered,
             warActive,
-            peaceDeclared,
-            expired
+            peaceDeclared
         );
     }
 
@@ -410,6 +406,7 @@ contract WarContract is Ownable {
                 defenseActiveWars.pop();
             }
         }
+        warIdToWar[_warId].active = false;
     }
 
     modifier onlyNavyBattle() {
@@ -527,7 +524,13 @@ contract WarContract is Ownable {
     ///@dev wars expire after 7 days when days left == 0
     function getDaysLeft(uint256 _warId) public view returns (uint256, bool) {
         uint256 day = keep.getGameDay();
-        uint256 daysLeft = (7 - (day - warIdToWar[_warId].dayStarted));
+        uint256 warDaysElapsed;
+        if (day >= warIdToWar[_warId].dayStarted + 7) {
+            warDaysElapsed = 7;
+        } else {
+            warDaysElapsed = day - warIdToWar[_warId].dayStarted;
+        }
+        uint256 daysLeft = (7 - warDaysElapsed);
         bool expired = false;
         if (daysLeft == 0) {
             expired = true;

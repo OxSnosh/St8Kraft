@@ -159,7 +159,6 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         string memory capitalCity,
         string memory nationSlogan
     ) public onlyCountryMinter {
-        console.log("Did we get to the PARAMETERS?");
         CountryParameters memory newCountryParameters = CountryParameters(
             id,
             rulerName,
@@ -196,7 +195,6 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
             NUM_WORDS
         );
         s_requestIdToRequestIndex[requestId] = id;
-        console.log("requestId from parameters:", requestId);
         emit randomNumbersRequested(requestId);
     }
 

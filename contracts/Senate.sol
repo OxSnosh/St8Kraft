@@ -152,15 +152,17 @@ contract SenateContract is ChainlinkClient, KeeperCompatibleInterface, Ownable {
         require(idVoter != idOfSenateVote, "cannot vote for yourself");
         uint256 dayLastVoted = idToVoter[idVoter].lastVoteCast;
         require(
-            dayLastVoted < dayOfLastElection,
+            dayLastVoted <= dayOfLastElection,
             "you already voted this epoch"
         );
         uint256 dayTeamJoined = idToVoter[idVoter].dayTeamJoined;
         uint256 gameDay = keep.getGameDay();
-        require(
-            (dayTeamJoined + 30) < gameDay,
-            "you must be on a team for 30 days before voting for a senator"
-        );
+        if (gameDay >= 30) {
+            require(
+                (dayTeamJoined + 30) < gameDay,
+                "you must be on a team for 30 days before voting for a senator"
+            );
+        }
         uint256 voterTeam = idToVoter[idVoter].team;
         uint256 teamOfVote = idToVoter[idOfSenateVote].team;
         require(
