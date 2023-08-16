@@ -63,7 +63,7 @@ const config = {
       allowUnlimitedContractSize: true,
     },
     localhost: {
-      chainId: 31337,
+      chainId: 1337,
     },
     kovan: {
       url: KOVAN_RPC_URL,

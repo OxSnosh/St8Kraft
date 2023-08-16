@@ -1060,7 +1060,7 @@ describe("Nuke Attack", async function () {
             countryminter.address
         )
         
-        if(chainId == 31337) {
+        if(chainId == 31337 || chainId == 1337) {
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, cruisemissilecontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, nukecontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);

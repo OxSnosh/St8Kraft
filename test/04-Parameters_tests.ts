@@ -1064,7 +1064,7 @@ describe("ParametersContract", async function () {
             countryminter.address
         )
 
-        if(chainId == 31337) {
+        if(chainId == 31337 || chainId == 1337) {
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
         }
