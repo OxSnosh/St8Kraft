@@ -63,7 +63,12 @@ const config = {
       allowUnlimitedContractSize: true,
     },
     localhost: {
+      chainId: 31337,
+    },
+    // yarn hardhat coverage --network coverage (no node running on localhost:8545)
+    coverage: { // for running solidity coverage tests
       chainId: 1337,
+      url: "http://127.0.0.1:8545/"
     },
     kovan: {
       url: KOVAN_RPC_URL,
@@ -109,19 +114,18 @@ const config = {
   },
   gasReporter: {
     enabled: true,
-    currency: "USD",
+    currency: "FTM",
     outputFile: "gas-report.txt",
     noColors: true,
-    // coinmarketcap: process.env.COINMARKETCAP_API_KEY,
+    coinmarketcap: process.env.COINMARKETCAP_API_KEY,
   },
-  // contractSizer: {
-  //   runOnCompile: true,
-  //   only: ["Raffle"],
-  // },
+  contractSizer: {
+    runOnCompile: false,
+  },
   namedAccounts: {
     deployer: {
-      default: 0, // here this will by default take the first account as deployer
-      1: 0, // similarly on mainnet it will take the first account as deployer. Note though that depending on how hardhat network are configured, the account 0 on one network can be different than on another
+      default: 0,
+      1: 0,
     },
     user1: {
       default: 1,

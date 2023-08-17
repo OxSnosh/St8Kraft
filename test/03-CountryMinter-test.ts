@@ -141,8 +141,6 @@ describe("CountryMinter", function () {
         chainId = network.config.chainId
         let subscriptionId: any
         let vrfCoordinatorV2Address: any
-
-        console.log("HELLO #1")
     
         if (chainId == 31337 || chainId == 1337) {
             // console.log("local network detected")
@@ -163,8 +161,6 @@ describe("CountryMinter", function () {
             vrfCoordinatorV2Address = networkConfig[chainId]["vrfCoordinatorV2"]
             subscriptionId = networkConfig[chainId]["subscriptionId"]
         }
-
-        console.log("HELLO #2")
     
         var gasLane = networkConfig[31337]["gasLane"]
         var callbackGasLimit =  networkConfig[31337]["callbackGasLimit"]
@@ -1068,19 +1064,15 @@ describe("CountryMinter", function () {
   
         // console.log("settings initiated");
 
-        console.log("HELLO #3")
-
         if(chainId == 31337 || chainId == 1337) {
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
         }
 
-        console.log("HELLO #4")
     });
 
     describe("Minting a Country", function () {
         it("Tests that the nation parameters set correctly", async function () {
-            console.log("HELLO #5")
             await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
             await countryminter.connect(signer1).generateCountry(
                     "TestRuler",
@@ -1096,7 +1088,6 @@ describe("CountryMinter", function () {
         });
 
         it("Tests that the countryId increments correctly", async function () {
-            console.log("HELLO 6")
             await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
             await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
             await countryminter.connect(signer1).generateCountry(
@@ -1118,7 +1109,6 @@ describe("CountryMinter", function () {
         });  
 
         it("Tests that a wallet can mint 2 nations in the same wallet", async function () {
-            console.log("HELLO #7")
             await warbucks.connect(signer0).transfer(signer1.address, BigInt(4100000000000000000000000))
             await countryminter.connect(signer1).generateCountry(
                 "TestRuler",

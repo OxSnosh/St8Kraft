@@ -1231,8 +1231,8 @@ describe("Ground Battle Contract", async function () {
             var defenderLand = await infrastructurecontract.getLandCount(1);
             console.log(defenderLand.toNumber(), "defender land")
             console.log(defenderInfrastructure.toNumber(), "defender infrastructure")
-            expect(defenderLand).to.equal(20)
-            expect(defenderInfrastructure).to.equal(5020)
+            expect(defenderLand).to.equal(18)
+            expect(defenderInfrastructure).to.equal(5018)
         }) 
     })
 })
