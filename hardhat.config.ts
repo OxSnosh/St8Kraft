@@ -120,7 +120,7 @@ const config = {
     coinmarketcap: process.env.COINMARKETCAP_API_KEY,
   },
   contractSizer: {
-    runOnCompile: false,
+    runOnCompile: true,
   },
   namedAccounts: {
     deployer: {

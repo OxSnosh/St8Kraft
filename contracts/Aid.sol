@@ -33,7 +33,7 @@ contract AidContract is Ownable {
 
     /// @dev this function is callable by the owner only
     /// @dev this function will be called after deployment to initiate contract pointers within this contract
-    function settings (
+    function settings(
         address _countryMinter,
         address _treasury,
         address _forces,
@@ -70,8 +70,35 @@ contract AidContract is Ownable {
         bool cancelled;
     }
 
+    event AidProposed(
+        uint256 indexed proposalId,
+        uint256 indexed idSender,
+        uint256 indexed idRecipient,
+        uint256 dayProposed,
+        uint256 techAid,
+        uint256 balanceAid,
+        uint256 soldierAid
+    );
+
+    event AidAccepted(
+        uint256 indexed proposalId,
+        uint256 indexed idSender,
+        uint256 indexed idRecipient,
+        uint256 techAid,
+        uint256 balanceAid,
+        uint256 soldierAid
+    );
+
+    event ProposalCancelled(
+        uint256 indexed proposalId,
+        uint256 indexed idSender,
+        uint256 indexed idRecipient,
+        uint256 nationCancelling
+    );
+
     mapping(uint256 => Proposal) public idToProposal;
-    mapping(uint256 => mapping(uint256 => uint256[])) public idToAidProposalsLast10Days;
+    mapping(uint256 => mapping(uint256 => uint256[]))
+        public idToAidProposalsLast10Days;
 
     /// @dev this function is only callable from the owner
     function updateCountryMinterAddress(address _newAddress) public onlyOwner {
@@ -101,7 +128,9 @@ contract AidContract is Ownable {
     }
 
     /// @dev this function is only callable from the owner
-    function updateWonderContract1Address(address _newAddress) public onlyOwner {
+    function updateWonderContract1Address(
+        address _newAddress
+    ) public onlyOwner {
         wonder1 = _newAddress;
         won1 = WondersContract1(_newAddress);
     }
@@ -138,8 +167,13 @@ contract AidContract is Ownable {
         uint256 day = keep.getGameDay();
         idToAidProposalsLast10Days[idSender][day].push(aidProposalId);
         idToAidProposalsLast10Days[idRecipient][day].push(aidProposalId);
-        bool aidAvailable = checkAvailability(idSender, techAid, balanceAid, soldiersAid);
-        require (aidAvailable, "aid not available");
+        bool aidAvailable = checkAvailability(
+            idSender,
+            techAid,
+            balanceAid,
+            soldiersAid
+        );
+        require(aidAvailable, "aid not available");
         bool sanctioned = sen.isSanctioned(idSender, idRecipient);
         require(!sanctioned, "trade not possible");
         bool federalAidEligable = getFederalAidEligability(
@@ -148,14 +182,43 @@ contract AidContract is Ownable {
         );
         uint256[3] memory maximums;
         if (!federalAidEligable) {
-            maximums = [uint256(100), uint256(6000000 * (10**18)), uint256(4000)];
+            maximums = [
+                uint256(100),
+                uint256(6000000 * (10 ** 18)),
+                uint256(4000)
+            ];
         }
         if (federalAidEligable) {
-            maximums = [uint256(150), uint256(9000000 * (10**18)), uint256(6000)];
+            maximums = [
+                uint256(150),
+                uint256(9000000 * (10 ** 18)),
+                uint256(6000)
+            ];
         }
         require(techAid <= maximums[0], "max tech exceeded");
         require(balanceAid <= maximums[1], "max balance excedded");
         require(soldiersAid <= maximums[2], "max soldier aid is excedded");
+        completeProposal(
+            aidProposalId,
+            day,
+            idSender,
+            idRecipient,
+            techAid,
+            balanceAid,
+            soldiersAid
+        );
+        aidProposalId++;
+    }
+
+    function completeProposal(
+        uint256 proposalId,
+        uint256 day,
+        uint256 idSender,
+        uint256 idRecipient,
+        uint256 techAid,
+        uint256 balanceAid,
+        uint256 soldiersAid
+    ) internal {
         Proposal memory newProposal = Proposal(
             aidProposalId,
             day,
@@ -168,7 +231,15 @@ contract AidContract is Ownable {
             false
         );
         idToProposal[aidProposalId] = newProposal;
-        aidProposalId++;
+        emit AidProposed(
+            proposalId,
+            idSender,
+            idRecipient,
+            day,
+            techAid,
+            balanceAid,
+            soldiersAid
+        );
     }
 
     ///@dev this function is public but called by the proposeAid() function to check the availabiliy of proposing aid
@@ -200,20 +271,24 @@ contract AidContract is Ownable {
         return (maxAidSlotsPer10Days);
     }
 
-
-    function getAidProposalsLast10Days(uint256 id) public view returns (uint256) {
+    function getAidProposalsLast10Days(
+        uint256 id
+    ) public view returns (uint256) {
         uint256 day = keep.getGameDay();
         uint256 proposalsLast10Days = 0;
-        uint256 daysToCheck;   
-        if(day >= 10) {
+        uint256 daysToCheck;
+        if (day >= 10) {
             daysToCheck = 10;
         } else {
             daysToCheck = day;
         }
         for (uint256 i = 0; i <= daysToCheck; i++) {
             uint256 dayToCheck = day - i;
-            proposalsLast10Days += idToAidProposalsLast10Days[id][dayToCheck].length;
-            uint256[] memory proposalsForThatDay = idToAidProposalsLast10Days[id][dayToCheck];
+            proposalsLast10Days += idToAidProposalsLast10Days[id][dayToCheck]
+                .length;
+            uint256[] memory proposalsForThatDay = idToAidProposalsLast10Days[
+                id
+            ][dayToCheck];
             for (uint256 j = 0; j < proposalsForThatDay.length; j++) {
                 uint256 proposalId = proposalsForThatDay[j];
                 bool cancelled = idToProposal[proposalId].cancelled;
@@ -257,17 +332,15 @@ contract AidContract is Ownable {
         return true;
     }
 
-
     ///@dev this function is a public view function that is called by the proposeAid() function
     ///@notice if both nations have a federal aid commission then max aid amounts increase 50%
     ///@param idSender is the nation ID of the sender of the aid proposal
     ///@param idRecipient id the nation ID of the recipient of the aid proposal
     ///@return bool true if both sender and reciever have a federal aid commission
-    function getFederalAidEligability(uint256 idSender, uint256 idRecipient)
-        public
-        view
-        returns (bool)
-    {
+    function getFederalAidEligability(
+        uint256 idSender,
+        uint256 idRecipient
+    ) public view returns (bool) {
         bool senderEligable = won1.getFederalAidComission(idSender);
         bool recipientEligable = won1.getFederalAidComission(idRecipient);
         if (senderEligable && recipientEligable) {
@@ -340,6 +413,14 @@ contract AidContract is Ownable {
         );
         ForcesContract(forces).sendSoldiers(idSender, idRecipient, soldiers);
         idToProposal[proposalId].accepted = true;
+        emit AidAccepted(
+            proposalId,
+            idSender,
+            idRecipient,
+            tech,
+            balance,
+            soldiers
+        );
     }
 
     ///@dev this function is a public function that allows the aid proposal to be cancelled by the sender of the proposal
@@ -361,19 +442,29 @@ contract AidContract is Ownable {
         bool expired = proposalExpired(proposalId);
         require(expired == false, "trade already expired");
         idToProposal[proposalId].cancelled = true;
+        uint256 nationCancelling;
+        if (addressSender == msg.sender) {
+            nationCancelling = idSender;
+        } else if (addressRecipient == msg.sender) {
+            nationCancelling = idRecipient;
+        }
+        emit ProposalCancelled(
+            proposalId,
+            idSender,
+            idRecipient,
+            nationCancelling
+        );
     }
 
     ///@dev this is public view function that allows a caller to return the items in a proposal struct
     ///@return uint256 this funtion returns the contects of a proposal struct
-    function getProposal(uint256 proposalId) public view returns(
-        uint256,
-        uint256,
-        uint256,
-        uint256,
-        uint256,
-        uint256,
-        uint256
-    ) {
+    function getProposal(
+        uint256 proposalId
+    )
+        public
+        view
+        returns (uint256, uint256, uint256, uint256, uint256, uint256, uint256)
+    {
         return (
             idToProposal[proposalId].proposalId,
             idToProposal[proposalId].dayProposed,
@@ -387,10 +478,9 @@ contract AidContract is Ownable {
 
     ///@dev this function is a public view function that allows the caller to see if an aid proposal is cancelled or accepted already
     ///@return bool true if the proposal has cancelled or accepted
-    function checkCancelledOrAccepted(uint256 proposalId) public view returns(
-        bool,
-        bool
-    ) {
+    function checkCancelledOrAccepted(
+        uint256 proposalId
+    ) public view returns (bool, bool) {
         return (
             idToProposal[proposalId].accepted,
             idToProposal[proposalId].cancelled

@@ -64,6 +64,11 @@ contract ForcesContract is Ownable {
         uint256 tankCasualties;
     }
 
+    event TankDamageFromAirAssautl(
+        uint256 indexed id,
+        uint256 indexed amount
+    );
+
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
@@ -620,10 +625,12 @@ contract ForcesContract is Ownable {
         if (amountToDecrease >= defendingTanks) {
             idToForces[id].numberOfTanks -= defendingTanks;
             idToForces[id].defendingTanks = 0;
+            amountToDecrease = defendingTanks;
         } else {
             idToForces[id].numberOfTanks -= amountToDecrease;
             idToForces[id].defendingTanks -= amountToDecrease;
         }
+        emit TankDamageFromAirAssautl(id, amountToDecrease);
     }
 
     ///@dev this is a public view function that will return the number of tanks a nation has
@@ -826,11 +833,15 @@ contract MissilesContract is Ownable {
     struct Missiles {
         uint256 cruiseMissiles;
         uint256 nuclearWeapons;
-        // uint256 nukesPurchasedToday;
     }
 
     mapping(uint256 => mapping(uint256 => uint256))
         public idToNukesPurchasedToday;
+
+    event CruiseMissilesDestroyedByAirAssault(
+        uint256 indexed id,
+        uint256 amountDestroyed
+    );
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -1072,9 +1083,11 @@ contract MissilesContract is Ownable {
         uint256 cruiseMissiles = idToMissiles[id].cruiseMissiles;
         if (amountToDecrease >= cruiseMissiles) {
             idToMissiles[id].cruiseMissiles = 0;
+            amountToDecrease = cruiseMissiles;
         } else {
             idToMissiles[id].cruiseMissiles -= amountToDecrease;
         }
+        emit CruiseMissilesDestroyedByAirAssault(id, amountToDecrease);
     }
 
     ///@dev this is a public function that will allow a nation owner to purchase nukes

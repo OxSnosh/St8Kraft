@@ -13,7 +13,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
-import "hardhat/console.sol";
 
 ///@title AirBattleContract
 ///@author OxSnosh
@@ -82,6 +81,26 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256[] defenderFighterCasualties;
         uint256[] damage;
     }
+
+    event AirAssaultLaunched(
+        uint256 battleId,
+        uint256 attackerId,
+        uint256 defenderId,
+        uint256[] attackerFighterArray,
+        uint256[] attackerBomberArray,
+        uint256[] defenderFighterArray,
+        uint256 warId
+    );
+
+    event AirAssaultCasualties(
+        uint256 battleId,
+        uint256 attackerId,
+        uint256 defenderId,
+        uint256[] attackerFighterCasualties,
+        uint256[] attackerBomberCasualties,
+        uint256[] defenderFighterCasualties,
+        uint256 warId
+    );
 
     mapping(uint256 => AirBattle) airBattleIdToAirBattle;
 
@@ -228,15 +247,42 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         );
         require(fighterCheck, "!fighter check");
         require(bomberCheck, "!bomber check");
-        AirBattle storage newAirBattle = airBattleIdToAirBattle[airBattleId];
+        completeAirBattleLaunch(
+            warId,
+            attackerId,
+            defenderId,
+            attackerFighterArray,
+            attackerBomberArray,
+            airBattleId
+        );
+        airBattleId++;
+    }
+
+    function completeAirBattleLaunch(
+        uint256 warId,
+        uint256 attackerId,
+        uint256 defenderId,
+        uint256[] memory attackerFighterArray,
+        uint256[] memory attackerBomberArray,
+        uint256 _airBattleId
+    ) internal {
+        AirBattle storage newAirBattle = airBattleIdToAirBattle[_airBattleId];
         newAirBattle.warId = warId;
         newAirBattle.attackerId = attackerId;
         newAirBattle.defenderId = defenderId;
         newAirBattle.attackerFighterArray = attackerFighterArray;
         newAirBattle.attackerBomberArray = attackerBomberArray;
-        generateDefenderFighters(defenderId, airBattleId);
-        fulfillRequest(airBattleId);
-        airBattleId++;
+        generateDefenderFighters(defenderId, _airBattleId);
+        emit AirAssaultLaunched(
+            airBattleId,
+            attackerId,
+            defenderId,
+            attackerFighterArray,
+            attackerBomberArray,
+            newAirBattle.defenderFighterArray,
+            warId
+        );
+        fulfillRequest(_airBattleId);
     }
 
     //make a function that will verify that the attacker has the planes included in the arrays
@@ -244,32 +290,43 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256 attackerId,
         uint256[] memory attackerFighterArray
     ) internal view returns (bool) {
-        uint256 yak9Count = fighter.getYak9Count(attackerId);
-        uint256 p51MustangCount = fighter.getP51MustangCount(attackerId);
-        uint256 f86SabreCount = fighter.getF86SabreCount(attackerId);
-        uint256 mig15Count = fighter.getMig15Count(attackerId);
-        uint256 f100SuperSabreCount = fighter.getF100SuperSabreCount(
-            attackerId
-        );
-        uint256 f35LightningCount = fighter.getF35LightningCount(attackerId);
-        uint256 f15EagleCount = fighter.getF15EagleCount(attackerId);
-        uint256 su30MkiCount = fighter.getSu30MkiCount(attackerId);
-        uint256 f22RaptorCount = fighter.getF22RaptorCount(attackerId);
-        require(yak9Count >= attackerFighterArray[0], "not enough yak9s");
-        require(p51MustangCount >= attackerFighterArray[1], "not enough p51s");
-        require(f86SabreCount >= attackerFighterArray[2], "not enough f86s");
-        require(mig15Count >= attackerFighterArray[3], "not enough mig15s");
         require(
-            f100SuperSabreCount >= attackerFighterArray[4],
+            fighter.getYak9Count(attackerId) >= attackerFighterArray[0],
+            "not enough yak9s"
+        );
+        require(
+            fighter.getP51MustangCount(attackerId) >= attackerFighterArray[1],
+            "not enough p51s"
+        );
+        require(
+            fighter.getF86SabreCount(attackerId) >= attackerFighterArray[2],
+            "not enough f86s"
+        );
+        require(
+            fighter.getMig15Count(attackerId) >= attackerFighterArray[3],
+            "not enough mig15s"
+        );
+        require(
+            fighter.getF100SuperSabreCount(attackerId) >=
+                attackerFighterArray[4],
             "not enough f100s"
         );
         require(
-            f35LightningCount >= attackerFighterArray[5],
+            fighter.getF35LightningCount(attackerId) >= attackerFighterArray[5],
             "not enough f35s"
         );
-        require(f15EagleCount >= attackerFighterArray[6], "not enough f15s");
-        require(su30MkiCount >= attackerFighterArray[7], "not enough su30s");
-        require(f22RaptorCount >= attackerFighterArray[8], "not enough f22s");
+        require(
+            fighter.getF15EagleCount(attackerId) >= attackerFighterArray[6],
+            "not enough f15s"
+        );
+        require(
+            fighter.getSu30MkiCount(attackerId) >= attackerFighterArray[7],
+            "not enough su30s"
+        );
+        require(
+            fighter.getF22RaptorCount(attackerId) >= attackerFighterArray[8],
+            "not enough f22s"
+        );
         return true;
     }
 
@@ -297,49 +354,39 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256 attackerId,
         uint256[] memory attackerBomberArray
     ) internal view returns (bool) {
-        uint256 ah1CobraCount = bomber.getAh1CobraCount(attackerId);
-        uint256 ah64ApacheCount = bomber.getAh64ApacheCount(attackerId);
-        uint256 bristolBlenheimCount = bomber.getBristolBlenheimCount(
-            attackerId
-        );
-        uint256 b52MitchellCount = bomber.getB52MitchellCount(attackerId);
-        uint256 b17gFlyingFortressCount = bomber.getB17gFlyingFortressCount(
-            attackerId
-        );
-        uint256 b52StratoFortressCount = bomber.getB52StratofortressCount(
-            attackerId
-        );
-        uint256 b2SpiritCount = bomber.getB2SpiritCount(attackerId);
-        uint256 b1bLancerCount = bomber.getB1bLancerCount(attackerId);
-        uint256 tupolevTu160Count = bomber.getTupolevTu160Count(attackerId);
-        require(ah1CobraCount >= attackerBomberArray[0], "not enough ah1s");
-        require(ah64ApacheCount >= attackerBomberArray[1], "not enough ah64s");
         require(
-            bristolBlenheimCount >= attackerBomberArray[2],
+            bomber.getAh64ApacheCount(attackerId) >= attackerBomberArray[1],
+            "not enough ah64s"
+        );
+        require(
+            bomber.getBristolBlenheimCount(attackerId) >=
+                attackerBomberArray[2],
             "not enough bristols"
         );
         require(
-            b52MitchellCount >= attackerBomberArray[3],
+            bomber.getB52MitchellCount(attackerId) >= attackerBomberArray[3],
             "not enough b52 Mitchells"
         );
         require(
-            b17gFlyingFortressCount >= attackerBomberArray[4],
+            bomber.getB17gFlyingFortressCount(attackerId) >=
+                attackerBomberArray[4],
             "not enough b17s"
         );
         require(
-            b52StratoFortressCount >= attackerBomberArray[5],
+            bomber.getB52StratofortressCount(attackerId) >=
+                attackerBomberArray[5],
             "not enough b52 Strato's"
         );
         require(
-            b2SpiritCount >= attackerBomberArray[6],
+            bomber.getB2SpiritCount(attackerId) >= attackerBomberArray[6],
             "not enough b2 Spirits"
         );
         require(
-            b1bLancerCount >= attackerBomberArray[7],
+            bomber.getB1bLancerCount(attackerId) >= attackerBomberArray[7],
             "not enough b1b Lancers"
         );
         require(
-            tupolevTu160Count >= attackerBomberArray[8],
+            bomber.getTupolevTu160Count(attackerId) >= attackerBomberArray[8],
             "not enough tupolev's"
         );
         return true;
@@ -349,27 +396,16 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256 defenderId,
         uint256 _airBattleId
     ) internal {
-        uint256 yak9Count = fighter.getYak9Count(defenderId);
-        uint256 p51MustangCount = fighter.getP51MustangCount(defenderId);
-        uint256 f86SabreCount = fighter.getF86SabreCount(defenderId);
-        uint256 mig15Count = fighter.getMig15Count(defenderId);
-        uint256 f100SuperSabreCount = fighter.getF100SuperSabreCount(
-            defenderId
-        );
-        uint256 f35LightningCount = fighter.getF35LightningCount(defenderId);
-        uint256 f15EagleCount = fighter.getF15EagleCount(defenderId);
-        uint256 su30MkiCount = fighter.getSu30MkiCount(defenderId);
-        uint256 f22RaptorCount = fighter.getF22RaptorCount(defenderId);
         uint256[] memory defenderFighterArray = new uint256[](9);
-        defenderFighterArray[0] = yak9Count;
-        defenderFighterArray[1] = p51MustangCount;
-        defenderFighterArray[2] = f86SabreCount;
-        defenderFighterArray[3] = mig15Count;
-        defenderFighterArray[4] = f100SuperSabreCount;
-        defenderFighterArray[5] = f35LightningCount;
-        defenderFighterArray[6] = f15EagleCount;
-        defenderFighterArray[7] = su30MkiCount;
-        defenderFighterArray[8] = f22RaptorCount;
+        defenderFighterArray[0] = fighter.getYak9Count(defenderId);
+        defenderFighterArray[1] = fighter.getP51MustangCount(defenderId);
+        defenderFighterArray[2] = fighter.getF86SabreCount(defenderId);
+        defenderFighterArray[3] = fighter.getMig15Count(defenderId);
+        defenderFighterArray[4] = fighter.getF100SuperSabreCount(defenderId);
+        defenderFighterArray[5] = fighter.getF35LightningCount(defenderId);
+        defenderFighterArray[6] = fighter.getF15EagleCount(defenderId);
+        defenderFighterArray[7] = fighter.getSu30MkiCount(defenderId);
+        defenderFighterArray[8] = fighter.getF22RaptorCount(defenderId);
         AirBattle storage newAirBattle = airBattleIdToAirBattle[_airBattleId];
         newAirBattle.defenderFighterArray = defenderFighterArray;
     }
@@ -440,13 +476,14 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256 defenderId,
         uint256 infrastructureDamage,
         uint256 tankDamage,
-        uint256 cruiseMissileDamage
+        uint256 cruiseMissileDamage,
+        uint256 battleId
     ) public {
         fighterLoss.decrementLosses(attackerFighterCasualties, attackerId);
         bomber.decrementBomberLosses(attackerBomberCasualties, attackerId);
         fighterLoss.decrementLosses(defenderFighterCasualties, defenderId);
         bool antiAir = won1.getAntiAirDefenseNewtwork(defenderId);
-        if(antiAir) {
+        if (antiAir) {
             infrastructureDamage = ((infrastructureDamage * 60) / 100);
             tankDamage = ((tankDamage * 60) / 100);
             cruiseMissileDamage = ((cruiseMissileDamage * 60) / 100);
@@ -473,5 +510,14 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         newAirBattle.attackerBomberCasualties = attackerBomberCasualties;
         newAirBattle.defenderFighterCasualties = defenderFighterCasualties;
         newAirBattle.damage = damage;
+        emit AirAssaultCasualties(
+            battleId,
+            newAirBattle.attackerId,
+            newAirBattle.defenderId,
+            attackerFighterCasualties,
+            attackerBomberCasualties,
+            defenderFighterCasualties,
+            newAirBattle.warId
+        );
     }
 }

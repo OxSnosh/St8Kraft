@@ -66,6 +66,11 @@ contract InfrastructureContract is Ownable {
         bool collectionNeededToChangeRate;
     }
 
+    event InfrastructureDamageFromAirAssault(
+        uint256 indexed countryId,
+        uint256 indexed amount
+    );
+
     mapping(uint256 => Infrastructure) public idToInfrastructure;
     mapping(uint256 => address) public idToOwnerInfrastructure;
 
@@ -642,9 +647,11 @@ contract InfrastructureContract is Ownable {
         }
         if (damage >= infrastructureAmount) {
             idToInfrastructure[countryId].infrastructureCount = 0;
+            damage = infrastructureAmount;
         } else {
             idToInfrastructure[countryId].infrastructureCount -= damage;
         }
+        emit InfrastructureDamageFromAirAssault(countryId, damage);
     }
 
     ///@dev this is a public function only callable from the ground battle contract
