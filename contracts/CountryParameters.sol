@@ -39,12 +39,6 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     WondersContract1 won1;
     TreasuryContract tres;
 
-    event randomNumbersRequested(uint256 indexed requestId);
-    event randomNumbersFulfilled(
-        uint256 indexed preferredReligion,
-        uint256 indexed preferredGovernment
-    );
-
     struct CountryParameters {
         uint256 id;
         string rulerName;
@@ -63,6 +57,45 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         uint256 dayReligionChanged;
         uint256 dayOfAnarchy;
     }
+
+    event RulerNameChanged(
+        uint256 indexed countryId,
+        string indexed newRulerName
+    );
+
+    event NationNameChanged(
+        uint256 indexed countryId,
+        string indexed newNationName
+    );
+
+    event CapitalCityChanged(
+        uint256 indexed countryId,
+        string indexed newCapitalCity
+    );
+
+    event NationSloganChanged(
+        uint256 indexed countryId,
+        string indexed newNationSlogan
+    );
+
+    event AllianceChanged(
+        uint256 indexed countryId,
+        string indexed newAlliance
+    );
+
+    event TeamChanged(uint256 indexed countryId, uint256 indexed newTeam);
+
+    event GovernmentChanged(
+        uint256 indexed countryId,
+        uint256 indexed newGovernment
+    );
+
+    event ReligionChanged(
+        uint256 indexed countryId,
+        uint256 indexed newReligion
+    );
+
+    event AnarchyInflicted(uint256 indexed countryId);
 
     mapping(uint256 => CountryParameters) public idToCountryParameters;
     mapping(uint256 => CountrySettings) public idToCountrySettings;
@@ -182,11 +215,9 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         fulfillRequest(id);
     }
 
-    ///change to internal before deployment
-
     ///@dev this is an internal function that will initalize the call for randomness from the chainlink VRF contract
     ///@param id is the nation ID of the nation being minted
-    function fulfillRequest(uint256 id) public {
+    function fulfillRequest(uint256 id) internal {
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
@@ -195,7 +226,6 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
             NUM_WORDS
         );
         s_requestIdToRequestIndex[requestId] = id;
-        emit randomNumbersRequested(requestId);
     }
 
     ///@dev this is the function that gets called by the chainlink VRF contract
@@ -210,7 +240,6 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         s_randomWords = s_requestIndexToRandomWords[requestNumber];
         uint256 religionPreference = ((randomWords[0] % 14) + 1);
         uint256 governmentPreference = ((randomWords[1] % 9) + 1);
-        emit randomNumbersFulfilled(religionPreference, governmentPreference);
         idToReligionPreference[requestNumber] = religionPreference;
         idToGovernmentPreference[requestNumber] = governmentPreference;
     }
@@ -225,6 +254,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         require(isOwner, "!nation owner");
         tres.spendBalance(id, 20000000 * (10**18));
         idToCountryParameters[id].rulerName = newRulerName;
+        emit RulerNameChanged(id, newRulerName);
     }
 
     ///@dev this is public function that will allow a nation ruler to reset a nations name
@@ -237,6 +267,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         require(isOwner, "!nation owner");
         tres.spendBalance(id, 20000000 * (10**18));
         idToCountryParameters[id].nationName = newNationName;
+        emit NationNameChanged(id, newNationName);
     }
 
     ///@dev this is public function that will allow a nation ruler to reset a nations capital city name
@@ -248,6 +279,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         idToCountryParameters[id].capitalCity = newCapitalCity;
+        emit CapitalCityChanged(id, newCapitalCity);
     }
 
     ///@dev this is public function that will allow a nation ruler to reset a nations slogan
@@ -259,6 +291,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         idToCountryParameters[id].nationSlogan = newNationSlogan;
+        emit NationSloganChanged(id, newNationSlogan);
     }
 
     ///@dev this is public function that will allow a nation ruler to set an alliance
@@ -271,6 +304,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         idToCountrySettings[id].alliance = newAlliance;
+        emit AllianceChanged(id, newAlliance);
     }
 
     ///@dev this is public function that will allow a nation ruler to set a team membership for the nation
@@ -287,6 +321,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         require(isSenator == false, "cannot chenge teams as a senator");
         senate.updateTeam(id, newTeam);
         idToCountrySettings[id].nationTeam = newTeam;
+        emit TeamChanged(id, newTeam);
     }
 
     ///@dev this is public function that will allow a nation ruler to chenge their government type
@@ -334,6 +369,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         require(newType > 0, "invalid type");
         idToCountrySettings[id].governmentType = newType;
         idToCountrySettings[id].dayGovernmentChanged = gameDay;
+        emit GovernmentChanged(id, newType);
     }
 
     ///@dev this is a public function but it is only callable from the spy contract
@@ -366,6 +402,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         require(newType <= 14, "invalid type");
         idToCountrySettings[id].nationalReligion = newType;
         idToCountrySettings[id].dayReligionChanged = gameDay;
+        emit ReligionChanged(id, newType);
     }
 
     ///@dev this is a public function but it is only callable from the spy contract
@@ -383,21 +420,8 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         uint256 gameDay = keep.getGameDay();
         idToCountrySettings[id].governmentType = 0;
         idToCountrySettings[id].dayOfAnarchy = gameDay;
+        emit AnarchyInflicted(id);
     }
-
-    // //needs to be called by a keeper
-    // ///@dev this is an esterna function that is only callable from the keeper contract
-    // ///@dev this function will increment the days since a religion and goverment change
-    // ///@notice ruler must wait 3 days to change religion and government
-    // function incrementDaysSince() external onlyKeeperContract {
-    //     uint256 countryCount = mint.getCountryCount();
-    //     uint256 i;
-    //     for (i = 0; i < countryCount; i++) {
-    //         idToCountrySettings[i].daysSinceGovernmentChenge++;
-    //         idToCountrySettings[i].daysSinceReligionChange++;
-    //         idToCountrySettings[i].anarchyClock++;
-    //     }
-    // }
 
     ///@dev this is a view funtion that will return the ruler name for a country
     ///@param countryId this is the ID for the nation being queried

@@ -25,7 +25,6 @@ import "hardhat/console.sol";
 contract CountryMinter is ERC721, Ownable {
     uint256 public countryId;
 
-    // uint256 public countryId = 0;
     address public countryParameters;
     address public infrastructure;
     address public resources;
@@ -57,10 +56,11 @@ contract CountryMinter is ERC721, Ownable {
     mapping(uint256 => address) public idToOwner;
     mapping(address => uint256) public ownerCountryCount;
 
-    event nationCreated(
-        address indexed countryOwner,
+    event NationCreated(
         string indexed nationName,
-        string indexed ruler
+        string indexed ruler,
+        uint256 indexed countryId,
+        address owner
     );
 
     constructor (
@@ -169,9 +169,7 @@ contract CountryMinter is ERC721, Ownable {
         WondersContract2(wonders2).generateWonders2(countryId);
         WondersContract3(wonders3).generateWonders3(countryId);
         WondersContract4(wonders4).generateWonders4(countryId);
-        // idToOwner[countryId] = msg.sender;
-        // ownerCountryCount[msg.sender]++;
-        emit nationCreated(msg.sender, nationName, ruler);
+        emit NationCreated(nationName, ruler, countryId, msg.sender);
         countryId++;
     }
 
@@ -182,11 +180,7 @@ contract CountryMinter is ERC721, Ownable {
     }
 
     function checkOwnership(uint256 nationId, address caller) public view returns (bool) {
-        // console.log("ownerOf(nationId): ", ownerOf(nationId));
-        // console.log("caller: ", caller);
-        // console.log("nationId", nationId);        
         address owner = ownerOf(nationId);
-        // console.log("owner: ", owner);
         if (owner == caller) {
             return true;
         } else {

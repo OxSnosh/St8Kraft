@@ -34,6 +34,26 @@ contract BombersContract is Ownable {
         uint256 tupolevTu160Count;
     }
 
+    event Ah1CobraPurchased(uint256 id, uint256 amount);
+    event Ah64ApachePurchased(uint256 id, uint256 amount);
+    event BristolBlenheimPurchased(uint256 id, uint256 amount);
+    event B52MitchellPurchased(uint256 id, uint256 amount);
+    event B17gFlyingFortressPurchased(uint256 id, uint256 amount);
+    event B52StratofortressPurchased(uint256 id, uint256 amount);
+    event B2SpiritPurchased(uint256 id, uint256 amount);
+    event B1bLancerPurchased(uint256 id, uint256 amount);
+    event TupolevTu160Purchased(uint256 id, uint256 amount);
+
+    event Ah1CobraDecommissioned(uint256 id, uint256 amount);
+    event Ah64ApacheDecommissioned(uint256 id, uint256 amount);
+    event BristolBlenheimDecommissioned(uint256 id, uint256 amount);
+    event B52MitchellDecommissioned(uint256 id, uint256 amount);
+    event B17gFlyingFortressDecommissioned(uint256 id, uint256 amount);
+    event B52StratofortressDecommissioned(uint256 id, uint256 amount);
+    event B2SpiritDecommissioned(uint256 id, uint256 amount);
+    event B1bLancerDecommissioned(uint256 id, uint256 amount);
+    event TupolevTu160Decommissioned(uint256 id, uint256 amount);
+
     mapping(uint256 => Bombers) public idToBombers;
 
     ///@dev this function is only callable from the contact owner
@@ -156,6 +176,7 @@ contract BombersContract is Ownable {
         uint256 amount
     ) public onlyMarket {
         idToBombers[id].ah1CobraCount += amount;
+        emit Ah1CobraPurchased(id, amount);
     }
 
     ///@dev this function is only callable from the war contract
@@ -180,6 +201,7 @@ contract BombersContract is Ownable {
         uint256 currentAmount = idToBombers[id].ah1CobraCount;
         require(currentAmount >= amount, "cannot delete that many");
         idToBombers[id].ah1CobraCount -= amount;
+        emit Ah1CobraDecommissioned(id, amount);
     }
 
     ///@notice this function will return the amount of defending A64Apaches a nation owns
@@ -199,6 +221,7 @@ contract BombersContract is Ownable {
         uint256 amount
     ) public onlyMarket {
         idToBombers[id].ah64ApacheCount += amount;
+        emit Ah64ApachePurchased(id, amount);
     }
 
     ///@dev this function is only callable from the war contract
@@ -226,6 +249,7 @@ contract BombersContract is Ownable {
         uint256 currentAmount = idToBombers[id].ah64ApacheCount;
         require(currentAmount >= amount, "cannot delete that many");
         idToBombers[id].ah64ApacheCount -= amount;
+        emit Ah64ApacheDecommissioned(id, amount);
     }
 
     ///@notice this function will return the amount of defending Bristol Blenheim's a nation owns
@@ -245,6 +269,7 @@ contract BombersContract is Ownable {
         uint256 amount
     ) public onlyMarket {
         idToBombers[id].bristolBlenheimCount += amount;
+        emit BristolBlenheimPurchased(id, amount);
     }
 
     ///@dev this function is only callable from the war contract
@@ -272,6 +297,7 @@ contract BombersContract is Ownable {
         uint256 currentAmount = idToBombers[id].bristolBlenheimCount;
         require(currentAmount >= amount, "cannot delete that many");
         idToBombers[id].bristolBlenheimCount -= amount;
+        emit BristolBlenheimDecommissioned(id, amount);
     }
 
     ///@notice this function will return the amount of defending b52 Mitchell's a nation owns
@@ -291,6 +317,7 @@ contract BombersContract is Ownable {
         uint256 amount
     ) public onlyMarket {
         idToBombers[id].b52MitchellCount += amount;
+        emit B52MitchellPurchased(id, amount);
     }
 
     ///@dev this function is only callable from the war contract
@@ -318,6 +345,7 @@ contract BombersContract is Ownable {
         uint256 currentAmount = idToBombers[id].b52MitchellCount;
         require(currentAmount >= amount, "cannot delete that many");
         idToBombers[id].b52MitchellCount -= amount;
+        emit B52MitchellDecommissioned(id, amount);
     }
 
     ///@notice this function will return the amount of defending B17's a nation owns
@@ -339,6 +367,7 @@ contract BombersContract is Ownable {
         uint256 amount
     ) public onlyMarket {
         idToBombers[id].b17gFlyingFortressCount += amount;
+        emit B17gFlyingFortressPurchased(id, amount);
     }
 
     ///@dev this function is only callable from the war contract
@@ -366,6 +395,7 @@ contract BombersContract is Ownable {
         uint256 currentAmount = idToBombers[id].b17gFlyingFortressCount;
         require(currentAmount >= amount, "cannot delete that many");
         idToBombers[id].b17gFlyingFortressCount -= amount;
+        emit B17gFlyingFortressDecommissioned(id, amount);
     }
 
     ///@notice this function will return the amount of defending b52Stratofortresses a nation owns
@@ -387,6 +417,7 @@ contract BombersContract is Ownable {
         uint256 amount
     ) public onlyMarket {
         idToBombers[id].b52StratofortressCount += amount;
+        emit B52StratofortressPurchased(id, amount);
     }
 
     ///@dev this function is only callable from the war contract
@@ -414,6 +445,7 @@ contract BombersContract is Ownable {
         uint256 currentAmount = idToBombers[id].b52StratofortressCount;
         require(currentAmount >= amount, "cannot delete that many");
         idToBombers[id].b52StratofortressCount -= amount;
+        emit B52StratofortressDecommissioned(id, amount);
     }
 
     ///@notice this function will return the amount of defending B2Spirits's a nation owns
@@ -433,6 +465,7 @@ contract BombersContract is Ownable {
         uint256 amount
     ) public onlyMarket {
         idToBombers[id].b2SpiritCount += amount;
+        emit B2SpiritPurchased(id, amount);
     }
 
     ///@dev this function is only callable from the war contract
@@ -457,7 +490,7 @@ contract BombersContract is Ownable {
         uint256 currentAmount = idToBombers[id].b2SpiritCount;
         require(currentAmount >= amount, "cannot delete that many");
         idToBombers[id].b2SpiritCount -= amount;
-
+        emit B2SpiritDecommissioned(id, amount);
     }
 
     ///@notice this function will return the amount of defending B1bLancer's a nation owns
@@ -477,6 +510,7 @@ contract BombersContract is Ownable {
         uint256 amount
     ) public onlyMarket {
         idToBombers[id].b1bLancerCount += amount;
+        emit B1bLancerPurchased(id, amount);
     }
 
     ///@dev this function is only callable from the war contract
@@ -501,6 +535,7 @@ contract BombersContract is Ownable {
         uint256 currentAmount = idToBombers[id].b1bLancerCount;
         require(currentAmount >= amount, "cannot delete that many");
         idToBombers[id].b1bLancerCount -= amount;
+        emit B1bLancerDecommissioned(id, amount);
     }
 
     ///@notice this function will return the amount of defending Tu160's a nation owns
@@ -520,6 +555,7 @@ contract BombersContract is Ownable {
         uint256 amount
     ) public onlyMarket {
         idToBombers[id].tupolevTu160Count += amount;
+        emit TupolevTu160Purchased(id, amount);
     }
 
     ///@dev this function is only callable from the war contract
@@ -547,6 +583,7 @@ contract BombersContract is Ownable {
         uint256 currentAmount = idToBombers[id].tupolevTu160Count;
         require(currentAmount >= amount, "cannot delete that many");
         idToBombers[id].tupolevTu160Count -= amount;
+        emit TupolevTu160Decommissioned(id, amount);
     }
 
     function getBomberCount(uint256 id) public view returns (uint256) {

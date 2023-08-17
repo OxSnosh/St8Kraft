@@ -57,6 +57,11 @@ contract BillsContract is Ownable {
 
     mapping(uint256 => address) public idToOwnerBills;
 
+    event BillsPaid(
+        uint256 indexed id,
+        uint256 indexed billsPaid
+    );
+
     ///@dev this function is only callable from the contact owner
     ///@dev this function will be called right after contract deployment to set contract pointers
     function settings(
@@ -214,6 +219,8 @@ contract BillsContract is Ownable {
             "balance not high enough to pay bills"
         );
         tsy.decreaseBalanceOnBillsPaid(id, billsPayable);
+        emit BillsPaid(id, billsPayable);
+
     }
 
     ///@notice this is a public view function that will determine a nations bill payment
