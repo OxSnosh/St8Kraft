@@ -59,7 +59,21 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
-    event randomNumbersRequested(uint256 indexed requestId);
+    event CruiseMissileLaunched(
+        uint256 indexed attackId,
+        uint256 indexed attackerId,
+        uint256 indexed defenderId,
+        uint256 warId
+    );
+
+    event CruiseMissileAttackResults(
+        uint256 indexed attackId,
+        uint256 indexed attackerId,
+        uint256 indexed defenderId,
+        bool landed,
+        uint256 warId,
+        uint256 damageTypeNumber
+    );
 
     ///@dev this is the constructor that inherits chainlink variables to use chainlink VRF
     constructor(
@@ -200,6 +214,12 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         );
         war.incrementCruiseMissileAttack(warId, attackerId);
         attackIdToCruiseMissile[cruiseMissileAttackId] = newAttack;
+        emit CruiseMissileLaunched(
+            cruiseMissileAttackId,
+            attackerId,
+            defenderId,
+            warId
+        );
         fulfillRequest(cruiseMissileAttackId);
         cruiseMissileAttackId++;
     }
@@ -215,7 +235,6 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
             NUM_WORDS
         );
         s_requestIdToRequestIndex[requestId] = id;
-        emit randomNumbersRequested(requestId);
     }
 
     ///@dev this is the fnction that the ChainlinkVRF contract will call when it responds
@@ -242,6 +261,14 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         uint256 successNumber = (randomNumbers[0] % 100);
         uint256 damageTypeNumber = (randomNumbers[1] % 3);
         if (successNumber < successOdds) {
+            emit CruiseMissileAttackResults(
+                requestNumber,
+                attackerId,
+                defenderId,
+                true,
+                attackIdToCruiseMissile[requestNumber].warId,
+                damageTypeNumber
+            );
             if (damageTypeNumber == 0) {
                 destroyTanks(requestNumber);
             } else if (damageTypeNumber == 1) {
@@ -250,7 +277,14 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
                 destroyInfrastructure(requestNumber);
             }
         } else {
-            /* emit thwarted event */
+            emit CruiseMissileAttackResults(
+                requestNumber,
+                attackerId,
+                defenderId,
+                false,
+                attackIdToCruiseMissile[requestNumber].warId,
+                0
+            );
         }
     }
 

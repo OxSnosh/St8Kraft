@@ -71,6 +71,16 @@ contract InfrastructureContract is Ownable {
         uint256 indexed amount
     );
 
+    event TechDestroyedFromCruiseMissile(
+        uint256 indexed countryId,
+        uint256 indexed amount  
+    );
+
+    event InfrastructureDestroyedFromCruiseMissile(
+        uint256 indexed countryId,
+        uint256 indexed amount
+    );
+
     mapping(uint256 => Infrastructure) public idToInfrastructure;
     mapping(uint256 => address) public idToOwnerInfrastructure;
 
@@ -495,6 +505,7 @@ contract InfrastructureContract is Ownable {
         uint256 amount
     ) public onlyCruiseMissileContract {
         idToInfrastructure[countryId].technologyCount -= amount;
+        emit TechDestroyedFromCruiseMissile(countryId, amount);
     }
 
     ///@dev this is a public function only callable from the nuke contract
@@ -570,10 +581,12 @@ contract InfrastructureContract is Ownable {
         amountToDecrease = ((amountToDecrease * damagePercentage) / 100);
         if (amountToDecrease >= infrastructureAmount) {
             idToInfrastructure[countryId].infrastructureCount = 0;
+            amountToDecrease = infrastructureAmount;
         } else {
             idToInfrastructure[countryId]
                 .infrastructureCount -= amountToDecrease;
         }
+        emit TechDestroyedFromCruiseMissile(countryId, amountToDecrease);
     }
 
     ///@dev this is a public function only callable from the nuke contract
@@ -793,28 +806,18 @@ contract InfrastructureContract is Ownable {
         uint256 id
     ) public view returns (uint256, uint256) {
         uint256 totalPop = getTotalPopulationCount(id);
-        // console.log("totalPop", totalPop);
         (uint256 criminals, , ) = crim
             .getCriminalCount(id);
-        // console.log("criminals", criminals);
-        // console.log("rehabilitatedCitizens", rehabilitatedCitizens);
         uint256 soldiers = forc.getSoldierCount(id);
-        // console.log("soldiers", soldiers);
         uint256 citizens;
         uint256 citizenDefecit;
-        // console.log("overflow 1");
         if ((totalPop) <= (criminals + soldiers)) {
-            // console.log("overflow 2");
             citizens = 0;
             citizenDefecit = ((criminals + soldiers) - (totalPop));
         } else {
-            // console.log("overflow 3");
             citizens = ((totalPop) - (criminals + soldiers));
             citizenDefecit = 0;
         }
-        // console.log("citizens", citizens);
-        // console.log("citizenDefecit", citizenDefecit);
-        // console.log("BREAK");
         return (citizens, citizenDefecit);
     }
 

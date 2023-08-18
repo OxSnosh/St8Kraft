@@ -69,6 +69,11 @@ contract ForcesContract is Ownable {
         uint256 indexed amount
     );
 
+    event TankDamageFromCruiseMissile(
+        uint256 indexed id,
+        uint256 indexed amount
+    );
+
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
@@ -590,6 +595,7 @@ contract ForcesContract is Ownable {
     ) public onlyCruiseMissileContract {
         idToForces[id].defendingTanks -= amount;
         idToForces[id].numberOfTanks -= amount;
+        emit TankDamageFromCruiseMissile(id, amount);
     }
 
     ///@dev this is a public function that can only be called from the nuke contract
