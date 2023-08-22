@@ -64,10 +64,26 @@ contract ForcesContract is Ownable {
         uint256 tankCasualties;
     }
 
-    event TankDamageFromAirAssautl(
+    event SoldiersPurchased(uint256 indexed id, uint256 indexed amount);
+
+    event SoldiersDecommissioned(uint256 indexed id, uint256 indexed amount);
+
+    event TanksPurchased(uint256 indexed id, uint256 indexed amount);
+
+    event TanksDecommissioned(uint256 indexed id, uint256 indexed amount);
+
+    event SpiesPurchased(uint256 indexed id, uint256 indexed amount);
+
+    event SpiesDecommissioned(uint256 indexed id, uint256 indexed amount);
+
+    event ForcesDeployed(
         uint256 indexed id,
-        uint256 indexed amount
+        uint256 indexed soldiers,
+        uint256 indexed tanks,
+        uint256 warId
     );
+
+    event TankDamageFromAirAssault(uint256 indexed id, uint256 indexed amount);
 
     event TankDamageFromCruiseMissile(
         uint256 indexed id,
@@ -207,6 +223,7 @@ contract ForcesContract is Ownable {
         idToForces[id].numberOfSoldiers += amount;
         idToForces[id].defendingSoldiers += amount;
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+        emit SoldiersPurchased(id, amount);
     }
 
     ///@dev this is a public view function that will retrun the cost of soldiers for a nation
@@ -262,7 +279,6 @@ contract ForcesContract is Ownable {
         uint256 count = idToForces[id].defendingSoldiers;
         return count;
     }
-
 
     ///@dev this is a public view function that will return the number of soldiers for a nation
     ///@notice this function will return the number of soldiers a nation has
@@ -325,6 +341,7 @@ contract ForcesContract is Ownable {
         idToForces[id].defendingTanks -= tanksToDeploy;
         idToForces[id].deployedTanks += tanksToDeploy;
         war.deployForcesToWar(id, warId, soldiersToDeploy, tanksToDeploy);
+        emit ForcesDeployed(id, soldiersToDeploy, tanksToDeploy, warId);
     }
 
     ///@dev this is a public view function that will return the maximum percentage of a population that is deployable
@@ -498,6 +515,7 @@ contract ForcesContract is Ownable {
         );
         idToForces[id].defendingSoldiers -= amount;
         idToForces[id].numberOfSoldiers -= amount;
+        emit SoldiersDecommissioned(id, amount);
     }
 
     ///@dev this is a public function that allows a nation owner to buy tanks
@@ -522,6 +540,24 @@ contract ForcesContract is Ownable {
         idToForces[id].numberOfTanks += amount;
         idToForces[id].defendingTanks += amount;
         TreasuryContract(treasuryAddress).spendBalance(id, cost);
+        emit TanksPurchased(id, amount);
+    }
+
+        ///@dev this is a public function that allows a nation owner to decommission soldiers
+    ///@notice this function allows a nation owner to decomission soldiers
+    ///@param amount is the amount of soldiers being decomissioned
+    ///@param id is the nation ID of the nation
+    function decomissionTanks(uint256 amount, uint256 id) public {
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
+        uint256 defendingTankCount = getDefendingTankCount(id);
+        require(
+            (defendingTankCount - amount) >= 0,
+            "not enough defending tanks"
+        );
+        idToForces[id].defendingTanks -= amount;
+        idToForces[id].numberOfTanks -= amount;
+        emit TanksDecommissioned(id, amount);
     }
 
     ///@dev this is a public view function that will return the maximum amount of tanks a nation can own
@@ -636,7 +672,7 @@ contract ForcesContract is Ownable {
             idToForces[id].numberOfTanks -= amountToDecrease;
             idToForces[id].defendingTanks -= amountToDecrease;
         }
-        emit TankDamageFromAirAssautl(id, amountToDecrease);
+        emit TankDamageFromAirAssault(id, amountToDecrease);
     }
 
     ///@dev this is a public view function that will return the number of tanks a nation has
@@ -692,12 +728,12 @@ contract ForcesContract is Ownable {
         );
         idToForces[id].numberOfSpies += amount;
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+        emit SpiesPurchased(id, amount);
     }
 
     function updateSpyPrice(uint256 newCost) public onlyOwner {
         spyCost = newCost;
     }
-
 
     function getSpyPrice() public view returns (uint256) {
         return spyCost;
@@ -721,6 +757,15 @@ contract ForcesContract is Ownable {
             maxSpyCount += 250;
         }
         return maxSpyCount;
+    }
+
+    function decommissionSpies(uint256 amount, uint256 id) public {
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
+        uint256 spyCount = idToForces[id].numberOfSpies;
+        require((spyCount - amount) >= 0, "not enough spies to decommission that many");
+        idToForces[id].numberOfSpies -= amount;
+        emit SpiesDecommissioned(id, amount);
     }
 
     ///@dev this is a public function only callable from the Spy Contract

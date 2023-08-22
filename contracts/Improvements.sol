@@ -117,6 +117,18 @@ contract ImprovementsContract1 is Ownable {
 
     mapping(uint256 => Improvements1) public idToImprovements1;
 
+    event Improvement1Purchased(
+        uint256 indexed countryId,
+        uint256 indexed improvementId,
+        uint256 indexed amount
+    );
+
+    event Improvement1Deleted(
+        uint256 indexed countryId,
+        uint256 indexed improvementId,
+        uint256 indexed amount
+    );
+
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
@@ -517,6 +529,7 @@ contract ImprovementsContract1 is Ownable {
             idToImprovements1[countryId].improvementCount += amount;
             TreasuryContract(treasury).spendBalance(countryId, purchasePrice);
         }
+        emit Improvement1Purchased(countryId, improvementId, amount);
     }
 
     ///@dev this is a public function that allows a nation owner to delete improvements
@@ -616,6 +629,7 @@ contract ImprovementsContract1 is Ownable {
             idToImprovements1[countryId].factoryCount -= amount;
             idToImprovements1[countryId].improvementCount -= amount;
         }
+        emit Improvement1Deleted(countryId, improvementId, amount);
     }
 
     ///@dev this is a public view function that will return the number of airports for a given nation
@@ -816,6 +830,18 @@ contract ImprovementsContract2 is Ownable {
     }
 
     mapping(uint256 => Improvements2) public idToImprovements2;
+
+    event Improvement2Purchased(
+        uint256 indexed countryId,
+        uint256 indexed improvementId,
+        uint256 indexed amount
+    );
+
+    event Improvement2Deleted(
+        uint256 indexed countryId,
+        uint256 indexed improvementId,
+        uint256 indexed amount
+    );
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -1135,6 +1161,7 @@ contract ImprovementsContract2 is Ownable {
             );
             TreasuryContract(treasury).spendBalance(countryId, purchasePrice);
         }
+        emit Improvement2Purchased(countryId, improvementId, amount);
     }
 
     ///@dev this is a public function that allows a nation owner to delete improvements
@@ -1288,6 +1315,7 @@ contract ImprovementsContract2 is Ownable {
                 newImprovementTotal
             );
         }
+        emit Improvement2Deleted(countryId, improvementId, amount);
     }
 
     ///@dev this is a public view function that will return the number of foreign ministries for a given nation
@@ -1481,6 +1509,18 @@ contract ImprovementsContract3 is Ownable {
     }
 
     mapping(uint256 => Improvements3) public idToImprovements3;
+
+    event Improvement3Purchased(
+        uint256 indexed countryId,
+        uint256 indexed improvementId,
+        uint256 indexed amount
+    );
+
+    event Improvement3Deleted(
+        uint256 indexed countryId,
+        uint256 indexed improvementId,
+        uint256 indexed amount
+    );
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -1872,6 +1912,7 @@ contract ImprovementsContract3 is Ownable {
             );
             TreasuryContract(treasury).spendBalance(countryId, purchasePrice);
         }
+        emit Improvement3Purchased(countryId, improvementId, amount);
     }
 
     ///@dev this is a public function that allows a nation owner to delete improvements
@@ -2063,6 +2104,7 @@ contract ImprovementsContract3 is Ownable {
                 newImprovementTotal
             );
         }
+        emit Improvement3Deleted(countryId, improvementId, amount);
     }
 
     ///@dev this is a public view function that will return the number of offices of propaganda for a given nation
@@ -2239,6 +2281,18 @@ contract ImprovementsContract4 is Ownable {
     }
 
     mapping(uint256 => Improvements4) public idToImprovements4;
+
+    event Improvement4Purchased(
+        uint256 indexed countryId,
+        uint256 indexed improvementId,
+        uint256 indexed amount
+    );
+
+    event Improvement4Deleted(
+        uint256 indexed countryId,
+        uint256 indexed improvementId,
+        uint256 indexed amount
+    );
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -2450,6 +2504,7 @@ contract ImprovementsContract4 is Ownable {
             );
             TreasuryContract(treasury).spendBalance(countryId, purchasePrice);
         }
+        emit Improvement4Purchased(countryId, improvementId, amount);
     }
 
     ///@dev this is a public function that allows a nation owner to delete improvements
@@ -2534,6 +2589,7 @@ contract ImprovementsContract4 is Ownable {
                 newImprovementTotal
             );
         }
+        emit Improvement4Deleted(countryId, improvementId, amount);
     }
 
     ///@dev this is a public view function that will return the number of missile defenses for a given nation

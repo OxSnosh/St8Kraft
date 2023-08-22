@@ -61,6 +61,8 @@ contract TaxesContract is Ownable {
     KeeperContract keep;
     EnvironmentContract env;
 
+    event TaxesCollected(uint256 indexed id, uint256 indexed amount);
+
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings1 (
@@ -224,6 +226,7 @@ contract TaxesContract is Ownable {
         inf.toggleCollectionNeededToChangeRate(id);
         tsy.increaseBalanceOnTaxCollection(id, taxesCollectible);
         //need to reduce taxes collectible by a percentage for each blockade against
+        emit TaxesCollected(id, taxesCollectible);
     }
 
     ///@dev this is a public view function that will return a nations taxes that are collectible

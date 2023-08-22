@@ -26,6 +26,15 @@ contract MilitaryContract is Ownable {
         uint256 dayPeaceToggled;
     }
 
+    event DefconLevelUpdated(uint256 indexed id, uint256 indexed newLevel);
+
+    event ThreatLevelUpdated(uint256 indexed id, uint256 indexed newLevel);
+
+    event WarPeacePreferenceToggled(
+        uint256 indexed id,
+        bool indexed warPeacePreference
+    );
+
     mapping(uint256 => Military) public idToMilitary;
 
     modifier onlySpyContract() {
@@ -78,6 +87,7 @@ contract MilitaryContract is Ownable {
             "New DEFCON level is not an integer between 1 and 5"
         );
         idToMilitary[id].defconLevel = newDefcon;
+        emit DefconLevelUpdated(id, newDefcon);
     }
 
     ///@dev this function will only be callable from the Spy contract
@@ -106,6 +116,7 @@ contract MilitaryContract is Ownable {
             "Not a valid threat level"
         );
         idToMilitary[id].threatLevel = newThreatLevel;
+        emit ThreatLevelUpdated(id, newThreatLevel);
     }
 
     ///@dev this function will only be callable from the Spy contract
@@ -139,6 +150,7 @@ contract MilitaryContract is Ownable {
             idToMilitary[id].warPeacePreference = true;
             idToMilitary[id].dayPeaceToggled = gameDay;
         }
+        emit WarPeacePreferenceToggled(id, idToMilitary[id].warPeacePreference);
     }
 
     ///@dev this is a public view function that will return a nations defcon level

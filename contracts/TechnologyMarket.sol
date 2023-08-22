@@ -34,9 +34,17 @@ contract TechnologyMarketContract is Ownable {
     InfrastructureContract inf;
     BonusResourcesContract bonus;
 
+    event TechPurchased(
+        uint256 indexed id,
+        uint256 indexed amount,
+        uint256 indexed cost
+    );
+
+    event TechDestroyed(uint256 indexed id, uint256 indexed amount);
+
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings (
+    function settings(
         address _resources,
         address _improvements3,
         address _infrastructure,
@@ -77,6 +85,7 @@ contract TechnologyMarketContract is Ownable {
         uint256 cost = getTechCost(id, amount);
         inf.increaseTechnologyFromMarket(id, amount);
         tsy.spendBalance(id, cost);
+        emit TechPurchased(id, amount, cost);
     }
 
     ///@dev this is a public view function taht will return the cost of a technology purchase
@@ -84,7 +93,10 @@ contract TechnologyMarketContract is Ownable {
     ///@param id is the nation id of the nation buying technology
     ///@param amount is the amount of technology being purchased
     ///@return uint256 is the cost of a technology purchase
-    function getTechCost(uint256 id, uint256 amount) public view returns (uint256) {
+    function getTechCost(
+        uint256 id,
+        uint256 amount
+    ) public view returns (uint256) {
         uint256 costPerLevel = getTechCostPerLevel(id);
         uint256 cost = (costPerLevel * amount);
         return cost;
@@ -94,13 +106,9 @@ contract TechnologyMarketContract is Ownable {
     ///@notice this function willreturn the cost a nation has to pay for technology per level
     ///@param id is the nation id of the nation being queried
     ///@return uint256 is the cost a nation has to pey for technology per level
-    function getTechCostPerLevel(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
+    function getTechCostPerLevel(uint256 id) public view returns (uint256) {
         uint256 currentTechAmount = inf.getTechnologyCount(id);
-        uint256 baseCostPerLevel; 
+        uint256 baseCostPerLevel;
         if (currentTechAmount < 5) {
             baseCostPerLevel = 100 * (10 ** 18);
         } else if (currentTechAmount < 8) {
@@ -203,5 +211,6 @@ contract TechnologyMarketContract is Ownable {
         uint256 currentTech = inf.getTechnologyCount(id);
         require((currentTech - amount) >= 0, "not enough tech");
         inf.decreaseTechnologyFromMarket(id, amount);
+        emit TechDestroyed(id, amount);
     }
 }

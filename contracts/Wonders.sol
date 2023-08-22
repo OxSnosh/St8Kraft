@@ -108,6 +108,16 @@ contract WondersContract1 is Ownable {
 
     mapping(uint256 => Wonders1) public idToWonders1;
 
+    event Wonder1Purchased(
+        uint256 indexed id,
+        uint256 indexed wonderId
+    );
+
+    event Wonder1Deleted(
+        uint256 indexed id,
+        uint256 indexed wonderId
+    );
+
     modifier approvedAddress() {
         require(
             msg.sender == wondersContract2Address ||
@@ -475,6 +485,7 @@ contract WondersContract1 is Ownable {
                 foreignNavalBaseCost
             );
         }
+        emit Wonder1Purchased(countryId, wonderId);
     }
 
     ///@dev this function will allow a nation owner to delete a wonder
@@ -556,6 +567,7 @@ contract WondersContract1 is Ownable {
             idToWonders1[countryId].foreignNavalBase = false;
             idToWonders1[countryId].wonderCount -= 1;
         }
+        emit Wonder1Deleted(countryId, wonderId);
     }
 
     ///@dev this is a public view function that will return true if a nation has the agriculture development program wonder
@@ -759,6 +771,9 @@ contract WondersContract2 is Ownable {
     }
 
     mapping(uint256 => Wonders2) public idToWonders2;
+
+    event Wonder2Purchased(uint256 indexed countryId, uint256 indexed wonderId);
+    event Wonder2Deleted(uint256 indexed countryId, uint256 indexed wonderId);
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -1053,8 +1068,8 @@ contract WondersContract2 is Ownable {
                 countryId,
                 miningIndustryConsortiumCost
             );
-            //reset trades
         }
+        emit Wonder2Purchased(countryId, wonderId);
     }
 
     ///@dev this function will allow a nation owner to delete a wonder
@@ -1135,6 +1150,7 @@ contract WondersContract2 is Ownable {
             // WondersContract1(wonderContract1Address).subtractWonderCount(
             //     countryId
             // );
+            revert("Unable to delete Manhattan Project");
         } else {
             bool existingWonder = idToWonders2[countryId]
                 .miningIndustryConsortium;
@@ -1144,6 +1160,7 @@ contract WondersContract2 is Ownable {
                 countryId
             );
         }
+        emit Wonder2Deleted(countryId, wonderId);
     }
 
     ///@dev this is a public view function that will return true if a nation has the great monument wonder
@@ -1340,6 +1357,9 @@ contract WondersContract3 is Ownable {
     }
 
     mapping(uint256 => Wonders3) public idToWonders3;
+
+    event Wonder3Purchased(uint256 indexed countryId, uint256 indexed wonderId);
+    event Wonder3Deleted(uint256 indexed countryId, uint256 indexed wonderId);
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -1650,6 +1670,7 @@ contract WondersContract3 is Ownable {
                 scientificDevelopmentCenterCost
             );
         }
+        emit Wonder3Purchased(countryId, wonderId);
     }
 
     ///@dev this function will allow a nation owner to delete a wonder
@@ -1737,6 +1758,7 @@ contract WondersContract3 is Ownable {
                 countryId
             );
         }
+        emit Wonder3Deleted(countryId, wonderId);
     }
 
     ///@dev this is a public view function that will return true if a nation has the movie industry wonder
@@ -1920,6 +1942,9 @@ contract WondersContract4 is Ownable {
     }
 
     mapping(uint256 => Wonders4) public idToWonders4;
+
+    event Wonder4Purchased(uint256 indexed countryId, uint256 indexed wonderId);
+    event Wonder4Deleted(uint256 indexed countryId, uint256 indexed wonderId);
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -2214,6 +2239,7 @@ contract WondersContract4 is Ownable {
                 weaponsResearchCenterCost
             );
         }
+        emit Wonder4Purchased(countryId, wonderId);
     }
 
     function deleteWonder4(uint256 countryId, uint256 wonderId) public {
@@ -2272,6 +2298,7 @@ contract WondersContract4 is Ownable {
                 countryId
             );
         }
+        emit Wonder4Deleted(countryId, wonderId);
     }
 
     ///@dev this is a public view function that will return true if a nation has the social security system wonder

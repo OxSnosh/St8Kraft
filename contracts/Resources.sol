@@ -163,11 +163,10 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
-    event randomNumbersRequested(uint256 indexed requestId);
-    event randomNumbersFulfilled(
-        uint256 indexed randomResource1,
-        uint256 indexed randomResource2
-    );
+    event TradeProposed(uint256 indexed requestorId, uint256 indexed recipientId);
+    event TradeAccepted(uint256 indexed requestorId, uint256 indexed recipientId);
+    event TradeCancelled(uint256 indexed requestorId, uint256 indexed recipientId);
+    event TradeProposalCancelled(uint256 indexed requestorId, uint256 indexed recipientId);
 
     modifier onlyCountryMinter() {
         require(
@@ -256,7 +255,6 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
             NUM_WORDS
         );
         s_requestIdToRequestIndex[requestId] = id;
-        emit randomNumbersRequested(requestId);
     }
 
     ///@dev this is the function that the chainlink vrf contract will call when it answers
@@ -272,7 +270,6 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         s_randomWords = s_requestIndexToRandomWords[requestNumber];
         uint256 randomResource1 = (s_randomWords[0] % 20);
         uint256 randomResource2 = (s_randomWords[1] % 20);
-        emit randomNumbersFulfilled(randomResource1, randomResource2);
         if (randomResource1 == randomResource2 && randomResource2 == 20) {
             randomResource2 = 0;
         }
@@ -488,6 +485,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         require(sanctioned == false, "trade is sanctioned");
         idToProposedTradingPartners[recipientId].push(requestorId);
         idToProposedTradingPartners[requestorId].push(recipientId);
+        emit TradeProposed(requestorId, recipientId);
     }
 
     ///@dev this is a public function but is only callable from the nation owner
@@ -514,6 +512,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
                 revert("No proposed trade with this partner");
             }
         }
+        emit TradeProposalCancelled(nationId, partnerId);
     }
 
     ///@dev this is a public view function that will return a nations proposed trading partners
@@ -639,6 +638,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         requestorTradeAgreements.push(recipientId);
         setResources(recipientId);
         setResources(requestorId);
+        emit TradeAccepted(requestorId, recipientId);
     }
 
     ///@dev this is a public function callable by either member of an active trade that will remove the active trade
@@ -668,6 +668,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         }
         setResources(nationId);
         setResources(partnerId);
+        emit TradeCancelled(nationId, partnerId);
     }
 
     ///@dev this is a public view function that will take two trading partners in the parameters and return a boolean value

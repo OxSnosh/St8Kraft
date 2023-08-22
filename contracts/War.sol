@@ -100,6 +100,23 @@ contract WarContract is Ownable {
     mapping(uint256 => uint256[]) public idToOffensiveWars;
     mapping(uint256 => uint256[]) public idToDeactivatedWars;
 
+    event WarDeclared(
+        uint256 indexed warId,
+        uint256 indexed offenseId,
+        uint256 indexed defenseId
+    );
+
+    event PeaceOffered(
+        uint256 indexed warId,
+        uint256 indexed offeredBy
+    );
+
+    event PeaceDeclared(
+        uint256 indexed warId,
+        uint256 indexed offenseId,
+        uint256 indexed defenseId
+    );
+
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
@@ -235,6 +252,7 @@ contract WarContract is Ownable {
         uint256[] storage defenseActiveWars = idToActiveWars[defenseId];
         defenseActiveWars.push(warId);
         initializeDeployments(warId);
+        emit WarDeclared(warId, offenseId, defenseId);
         warId++;
     }
 
@@ -343,11 +361,13 @@ contract WarContract is Ownable {
         if (offerId == defenseNation) {
             warIdToWar[_warId].defensePeaceOffered = true;
         }
+        emit PeaceOffered(_warId, offerId);
         bool offensePeaceCheck = warIdToWar[_warId].offensePeaceOffered;
         bool defensePeaceCheck = warIdToWar[_warId].defensePeaceOffered;
         if (offensePeaceCheck == true && defensePeaceCheck == true) {
             warIdToWar[_warId].peaceDeclared = true;
             warIdToWar[_warId].active = false;
+            emit PeaceDeclared(_warId, offenseNation, defenseNation);
             removeActiveWar(_warId);
         }
     }

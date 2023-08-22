@@ -22,6 +22,10 @@ contract LandMarketContract is Ownable {
     InfrastructureContract inf;
     TreasuryContract tsy;
 
+    event LandPurchased(uint256 indexed id, uint256 indexed amount, uint256 indexed cost);
+
+    event LandDestroyed(uint256 indexed id, uint256 indexed amount);
+
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
@@ -51,6 +55,7 @@ contract LandMarketContract is Ownable {
         uint256 cost = getLandCost(id, amount);
         inf.increaseLandCountFromMarket(id, amount);
         tsy.spendBalance(id, cost);
+        emit LandPurchased(id, amount, cost);
     }
 
     ///@dev this is a public view function that will return the cost of a land purchase
@@ -142,5 +147,6 @@ contract LandMarketContract is Ownable {
         uint256 currentLandAmount = inf.getLandCount(id);
         require((currentLandAmount - amount) >= 0, "not enough land");
         inf.decreaseLandCountFromMarket(id, amount);
+        emit LandDestroyed(id, amount);
     }
 }

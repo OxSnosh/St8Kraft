@@ -34,6 +34,17 @@ contract InfrastructureMarketContract is Ownable {
     TreasuryContract tsy;
     BonusResourcesContract bonus;
 
+    event InfrastructurePurchased(
+        uint256 indexed countryId,
+        uint256 indexed amount,
+        uint256 indexed cost
+    );
+
+    event InfrastructureDestroyed(
+        uint256 indexed countryId,
+        uint256 indexed amount
+    );
+
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
@@ -78,6 +89,7 @@ contract InfrastructureMarketContract is Ownable {
         uint256 cost = getInfrastructureCost(id, buyAmount);
         inf.increaseInfrastructureFromMarket(id, buyAmount);
         tsy.spendBalance(id, cost);
+        emit InfrastructurePurchased(id, buyAmount, cost);
     }
 
     ///@dev this is a public view function that will return the cost of an infrastructure purchase
@@ -283,5 +295,6 @@ contract InfrastructureMarketContract is Ownable {
             "not enough infrastructure"
         );
         inf.decreaseInfrastructureFromMarket(id, amount);
+        emit InfrastructureDestroyed(id, amount);
     }
 }

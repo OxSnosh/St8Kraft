@@ -34,25 +34,31 @@ contract BombersContract is Ownable {
         uint256 tupolevTu160Count;
     }
 
-    event Ah1CobraPurchased(uint256 id, uint256 amount);
-    event Ah64ApachePurchased(uint256 id, uint256 amount);
-    event BristolBlenheimPurchased(uint256 id, uint256 amount);
-    event B52MitchellPurchased(uint256 id, uint256 amount);
-    event B17gFlyingFortressPurchased(uint256 id, uint256 amount);
-    event B52StratofortressPurchased(uint256 id, uint256 amount);
-    event B2SpiritPurchased(uint256 id, uint256 amount);
-    event B1bLancerPurchased(uint256 id, uint256 amount);
-    event TupolevTu160Purchased(uint256 id, uint256 amount);
+    event Ah1CobraPurchased(uint256 indexed id, uint256 indexed amount);
+    event Ah64ApachePurchased(uint256 indexed id, uint256 indexed amount);
+    event BristolBlenheimPurchased(uint256 indexed id, uint256 indexed amount);
+    event B52MitchellPurchased(uint256 indexed id, uint256 indexed amount);
+    event B17gFlyingFortressPurchased(
+        uint256 indexed id,
+        uint256 indexed amount
+    );
+    event B52StratofortressPurchased(
+        uint256 indexed id,
+        uint256 indexed amount
+    );
+    event B2SpiritPurchased(uint256 indexed id, uint256 indexed amount);
+    event B1bLancerPurchased(uint256 indexed id, uint256 indexed amount);
+    event TupolevTu160Purchased(uint256 indexed id, uint256 indexed amount);
 
-    event Ah1CobraDecommissioned(uint256 id, uint256 amount);
-    event Ah64ApacheDecommissioned(uint256 id, uint256 amount);
-    event BristolBlenheimDecommissioned(uint256 id, uint256 amount);
-    event B52MitchellDecommissioned(uint256 id, uint256 amount);
-    event B17gFlyingFortressDecommissioned(uint256 id, uint256 amount);
-    event B52StratofortressDecommissioned(uint256 id, uint256 amount);
-    event B2SpiritDecommissioned(uint256 id, uint256 amount);
-    event B1bLancerDecommissioned(uint256 id, uint256 amount);
-    event TupolevTu160Decommissioned(uint256 id, uint256 amount);
+    event Ah1CobraDecommissioned(uint256 indexed id, uint256 indexed amount);
+    event Ah64ApacheDecommissioned(uint256 indexed id, uint256 indexed amount);
+    event BristolBlenheimDecommissioned(uint256 indexed id, uint256 indexed amount);
+    event B52MitchellDecommissioned(uint256 indexed id, uint256 indexed amount);
+    event B17gFlyingFortressDecommissioned(uint256 indexed id, uint256 indexed amount);
+    event B52StratofortressDecommissioned(uint256 indexed id, uint256 indexed amount);
+    event B2SpiritDecommissioned(uint256 indexed id, uint256 indexed amount);
+    event B1bLancerDecommissioned(uint256 indexed id, uint256 indexed amount);
+    event TupolevTu160Decommissioned(uint256 indexed id, uint256 indexed amount);
 
     mapping(uint256 => Bombers) public idToBombers;
 
@@ -228,10 +234,7 @@ contract BombersContract is Ownable {
     ///@notice this function will decrease the amount of aircraft lost in a battle
     ///@param id is the nation ID of the nation
     ///@param amount is the amount of aircraft being destroyed
-    function decreaseAh64ApacheCount(
-        uint256 amount,
-        uint256 id
-    ) internal {
+    function decreaseAh64ApacheCount(uint256 amount, uint256 id) internal {
         uint256 currentAmount = idToBombers[id].ah64ApacheCount;
         if (currentAmount >= amount) {
             idToBombers[id].ah64ApacheCount -= amount;
@@ -276,10 +279,7 @@ contract BombersContract is Ownable {
     ///@notice this function will decrease the amount of aircraft lost in a battle
     ///@param id is the nation ID of the nation
     ///@param amount is the amount of aircraft being destroyed
-    function decreaseBristolBlenheimCount(
-        uint256 amount,
-        uint256 id
-    ) internal {
+    function decreaseBristolBlenheimCount(uint256 amount, uint256 id) internal {
         uint256 currentAmount = idToBombers[id].bristolBlenheimCount;
         if (currentAmount >= amount) {
             idToBombers[id].bristolBlenheimCount -= amount;
@@ -324,10 +324,7 @@ contract BombersContract is Ownable {
     ///@notice this function will decrease the amount of aircraft lost in a battle
     ///@param id is the nation ID of the nation
     ///@param amount is the amount of aircraft being destroyed
-    function decreaseB52MitchellCount(
-        uint256 amount,
-        uint256 id
-    ) internal {
+    function decreaseB52MitchellCount(uint256 amount, uint256 id) internal {
         uint256 currentAmount = idToBombers[id].b52MitchellCount;
         if (currentAmount >= amount) {
             idToBombers[id].b52MitchellCount -= amount;
@@ -562,10 +559,7 @@ contract BombersContract is Ownable {
     ///@notice this function will decrease the amount of aircraft lost in a battle
     ///@param id is the nation ID of the nation
     ///@param amount is the amount of aircraft being destroyed
-    function decreaseTupolevTu160Count(
-        uint256 amount,
-        uint256 id
-    ) internal {
+    function decreaseTupolevTu160Count(uint256 amount, uint256 id) internal {
         uint256 currentAmount = idToBombers[id].tupolevTu160Count;
         if (currentAmount >= amount) {
             idToBombers[id].tupolevTu160Count -= amount;
@@ -587,16 +581,15 @@ contract BombersContract is Ownable {
     }
 
     function getBomberCount(uint256 id) public view returns (uint256) {
-        uint256 count =
-            idToBombers[id].ah1CobraCount +
-                idToBombers[id].ah64ApacheCount +
-                idToBombers[id].bristolBlenheimCount +
-                idToBombers[id].b52MitchellCount +
-                idToBombers[id].b17gFlyingFortressCount +
-                idToBombers[id].b52StratofortressCount +
-                idToBombers[id].b2SpiritCount +
-                idToBombers[id].b1bLancerCount +
-                idToBombers[id].tupolevTu160Count;
+        uint256 count = idToBombers[id].ah1CobraCount +
+            idToBombers[id].ah64ApacheCount +
+            idToBombers[id].bristolBlenheimCount +
+            idToBombers[id].b52MitchellCount +
+            idToBombers[id].b17gFlyingFortressCount +
+            idToBombers[id].b52StratofortressCount +
+            idToBombers[id].b2SpiritCount +
+            idToBombers[id].b1bLancerCount +
+            idToBombers[id].tupolevTu160Count;
         return count;
     }
 

@@ -184,7 +184,7 @@ contract TreasuryContract is Ownable {
         return idToTreasury[id].balance;
     }
 
-        ///@dev this function is only callable from a nation owner
+    ///@dev this function is only callable from a nation owner
     ///@dev this function allows a nation owner to withdraw funds from their nation
     ///@notice this function allows a nation owner to withdraw funds from their nation
     ///@param amount is the amount of funds being withdrawn

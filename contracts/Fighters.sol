@@ -48,6 +48,26 @@ contract FightersContract is Ownable {
         uint256 f22RaptorCount;
     }
 
+    event Yak9Purchased(uint256 indexed id, uint256 indexed amount);
+    event P51MustangPurchased(uint256 indexed id, uint256 indexed amount);
+    event F86SabrePurchased(uint256 indexed id, uint256 indexed amount);
+    event Mig15Purchased(uint256 indexed id, uint256 indexed amount);
+    event F100SuperSabrePurchased(uint256 indexed id, uint256 indexed amount);
+    event F35LightningPurchased(uint256 indexed id, uint256 indexed amount);
+    event F15EaglePurchased(uint256 indexed id, uint256 indexed amount);
+    event Su30MkiPurchased(uint256 indexed id, uint256 indexed amount);
+    event F22RaptorPurchased(uint256 indexed id, uint256 indexed amount);
+
+    event Yak9Scrapped(uint256 indexed id, uint256 indexed amount);
+    event P51MustangScrapped(uint256 indexed id, uint256 indexed amount);
+    event F86SabreScrapped(uint256 indexed id, uint256 indexed amount);
+    event Mig15Scrapped(uint256 indexed id, uint256 indexed amount);
+    event F100SuperSabreScrapped(uint256 indexed id, uint256 indexed amount);
+    event F35LightningScrapped(uint256 indexed id, uint256 indexed amount);
+    event F15EagleScrapped(uint256 indexed id, uint256 indexed amount);
+    event Su30MkiScrapped(uint256 indexed id, uint256 indexed amount);
+    event F22RaptorScrapped(uint256 indexed id, uint256 indexed amount);
+
     mapping(uint256 => Fighters) public idToFighters;
 
     ///@dev this function is only callable by the contract owner
@@ -144,6 +164,7 @@ contract FightersContract is Ownable {
     ///@param amount is the amount of aircraft being purchased
     function increaseYak9Count(uint256 id, uint256 amount) public onlyMarket {
         idToFighters[id].yak9Count += amount;
+        emit Yak9Purchased(id, amount);
     }
 
     ///@dev this function is only callable from the losses contract
@@ -171,6 +192,7 @@ contract FightersContract is Ownable {
         uint256 currentAmount = idToFighters[id].yak9Count;
         require(currentAmount >= amount, "cannot delete that many");
         idToFighters[id].yak9Count -= amount;
+        emit Yak9Scrapped(id, amount);
     }
 
     ///@notice this function will return the amount of defending P51 Mustangs's of a nation
@@ -190,6 +212,7 @@ contract FightersContract is Ownable {
         uint256 amount
     ) public onlyMarket {
         idToFighters[id].p51MustangCount += amount;
+        emit P51MustangPurchased(id, amount);
     }
 
     ///@dev this function is only callable from the losses contract
@@ -217,6 +240,7 @@ contract FightersContract is Ownable {
         uint256 currentAmount = idToFighters[id].p51MustangCount;
         require(currentAmount >= amount, "cannot delete that many");
         idToFighters[id].p51MustangCount -= amount;
+        emit P51MustangScrapped(id, amount);
     }
 
     ///@notice this function will return the amount of defending F86 Sabre's of a nation
@@ -236,6 +260,7 @@ contract FightersContract is Ownable {
         uint256 amount
     ) public onlyMarket {
         idToFighters[id].f86SabreCount += amount;
+        emit F86SabrePurchased(id, amount);
     }
 
     ///@dev this function is only callable from the losses contract
@@ -263,6 +288,7 @@ contract FightersContract is Ownable {
         uint256 currentAmount = idToFighters[id].f86SabreCount;
         require(currentAmount >= amount, "cannot delete that many");
         idToFighters[id].f86SabreCount -= amount;
+        emit F86SabreScrapped(id, amount);
     }
 
     ///@notice this function will return the amount of defending Mig15's of a nation
@@ -279,6 +305,7 @@ contract FightersContract is Ownable {
     ///@param amount is the amount of aircraft being purchased
     function increaseMig15Count(uint256 id, uint256 amount) public onlyMarket {
         idToFighters[id].mig15Count += amount;
+        emit Mig15Purchased(id, amount);
     }
 
     ///@dev this function is only callable from the losses contract
@@ -306,6 +333,7 @@ contract FightersContract is Ownable {
         uint256 currentAmount = idToFighters[id].mig15Count;
         require(currentAmount >= amount, "cannot delete that many");
         idToFighters[id].mig15Count -= amount;
+        emit Mig15Scrapped(id, amount);
     }
 
     ///@notice this function will return the amount of defending F100 Super Sabre's of a nation
@@ -325,6 +353,7 @@ contract FightersContract is Ownable {
         uint256 amount
     ) public onlyMarket {
         idToFighters[id].f100SuperSabreCount += amount;
+        emit F100SuperSabrePurchased(id, amount);
     }
 
     ///@dev this function is only callable from the losses contract
@@ -352,6 +381,7 @@ contract FightersContract is Ownable {
         uint256 currentAmount = idToFighters[id].f100SuperSabreCount;
         require(currentAmount >= amount, "cannot delete that many");
         idToFighters[id].f100SuperSabreCount -= amount;
+        emit F100SuperSabreScrapped(id, amount);
     }
 
     ///@notice this function will return the amount of defending F35 Lightning's of a nation
@@ -371,6 +401,7 @@ contract FightersContract is Ownable {
         uint256 amount
     ) public onlyMarket {
         idToFighters[id].f35LightningCount += amount;
+        emit F35LightningPurchased(id, amount);
     }
 
     ///@dev this function is only callable from the losses contract
@@ -398,6 +429,7 @@ contract FightersContract is Ownable {
         uint256 currentAmount = idToFighters[id].f35LightningCount;
         require(currentAmount >= amount, "cannot delete that many");
         idToFighters[id].f35LightningCount -= amount;
+        emit F35LightningScrapped(id, amount);
     }
 
     ///@notice this function will return the amount of defending F15 Eagle's of a nation
@@ -417,6 +449,7 @@ contract FightersContract is Ownable {
         uint256 amount
     ) public onlyMarket {
         idToFighters[id].f15EagleCount += amount;
+        emit F15EaglePurchased(id, amount);
     }
 
     ///@dev this function is only callable from the losses contract
@@ -444,6 +477,7 @@ contract FightersContract is Ownable {
         uint256 currentAmount = idToFighters[id].f15EagleCount;
         require(currentAmount >= amount, "cannot delete that many");
         idToFighters[id].f15EagleCount -= amount;
+        emit F15EagleScrapped(id, amount);
     }
 
     ///@notice this function will return the amount of defending Su30 Mki's of a nation
@@ -463,6 +497,7 @@ contract FightersContract is Ownable {
         uint256 amount
     ) public onlyMarket {
         idToFighters[id].su30MkiCount += amount;
+        emit Su30MkiPurchased(id, amount);
     }
 
     ///@dev this function is only callable from the losses contract
@@ -490,6 +525,7 @@ contract FightersContract is Ownable {
         uint256 currentAmount = idToFighters[id].su30MkiCount;
         require(currentAmount >= amount, "cannot delete that many");
         idToFighters[id].su30MkiCount -= amount;
+        emit Su30MkiScrapped(id, amount);
     }
 
     ///@notice this function will return the amount of defending F22 Raptor's of a nation
@@ -509,6 +545,7 @@ contract FightersContract is Ownable {
         uint256 amount
     ) public onlyMarket {
         idToFighters[id].f22RaptorCount += amount;
+        emit F22RaptorPurchased(id, amount);
     }
 
     ///@dev this function is only callable from the losses contract
@@ -536,6 +573,7 @@ contract FightersContract is Ownable {
         uint256 currentAmount = idToFighters[id].f22RaptorCount;
         require(currentAmount >= amount, "cannot delete that many");
         idToFighters[id].f22RaptorCount -= amount;
+        emit F22RaptorScrapped(id, amount);
     }
 
     function getFighterCount(uint256 id) public view returns (uint256) {
