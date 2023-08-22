@@ -70,7 +70,29 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
     mapping(uint256 => uint256) public gameDayToNukesLanded;
 
-    event randomNumbersRequested(uint256 indexed requestId);
+    event NukeLaunched(
+        uint256 indexed id,
+        uint256 indexed attackerId,
+        uint256 indexed defenderId,
+        uint256 warId,
+        uint256 attackType
+    );
+
+    event NukeLanded(
+        uint256 indexed id,
+        uint256 indexed attackerId,
+        uint256 indexed defenderId,
+        uint256 thwartOdds,
+        uint256 randomNukeSuccessNumber
+    );
+
+    event NukeThwarted(
+        uint256 indexed id,
+        uint256 indexed attackerId,
+        uint256 indexed defenderId,
+        uint256 thwartOdds,
+        uint256 randomNukeSuccessNumber
+    );
 
     ///@dev this function contains the variable necessary for chainlink randomness
     constructor(
@@ -87,7 +109,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings (
+    function settings(
         address _countryMinter,
         address _warAddress,
         address _wonders1,
@@ -98,7 +120,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         address _forces,
         address _navy,
         address _missiles,
-        address _keeper 
+        address _keeper
     ) public onlyOwner {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
@@ -124,9 +146,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         keep = KeeperContract(_keeper);
     }
 
-    function settings2(
-        address _parameters
-    ) public onlyOwner {
+    function settings2(address _parameters) public onlyOwner {
         parameters = _parameters;
         param = CountryParametersContract(_parameters);
     }
@@ -181,7 +201,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         (uint256 daysLeft, ) = war.getDaysLeft(warId);
         require(daysLeft < 6, "not at war long enough to launch a nuke");
         uint256 count = mis.getNukeCount(attackerId);
-        require (count >= 1, "need to own a nuke");
+        require(count >= 1, "need to own a nuke");
         bool emp = won1.getEmpWeaponization(attackerId);
         if (!emp) {
             require(
@@ -193,8 +213,20 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         }
         uint256 tech = inf.getTechnologyCount(attackerId);
         if (attackType == 2 || attackType == 3 || attackType == 4) {
-            require (tech >= 5000, "emp attacks require a nation to have 5,000 tech");
+            require(
+                tech >= 5000,
+                "emp attacks require a nation to have 5,000 tech"
+            );
         }
+        completeNukeLaunch(warId, attackerId, defenderId, attackType);
+    }
+
+    function completeNukeLaunch(
+        uint256 warId,
+        uint256 attackerId,
+        uint256 defenderId,
+        uint256 attackType
+    ) internal {
         NukeAttack memory newAttack = NukeAttack(
             warId,
             attackerId,
@@ -203,6 +235,13 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         );
         nukeAttackIdToNukeAttack[nukeAttackId] = newAttack;
         fulfillRequest(nukeAttackId);
+        emit NukeLaunched(
+            nukeAttackId,
+            attackerId,
+            defenderId,
+            warId,
+            attackType
+        );
         nukeAttackId++;
     }
 
@@ -217,7 +256,6 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
             NUM_WORDS
         );
         s_requestIdToRequestIndex[requestId] = id;
-        emit randomNumbersRequested(requestId);
     }
 
     ///@dev this function will be called by the chainlink VRF contract in response to a randomness request
@@ -228,10 +266,10 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     ///@notice if a defender has a missile defense, the odds of a sucessful strike go down 5% per missile defense
     ///@param requestId will be the request id passed in from the fulfillRequest() function
     ///@param randomWords is the randomly generate number for the calculation of a successful nuke strike
-    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords)
-        internal
-        override
-    {
+    function fulfillRandomWords(
+        uint256 requestId,
+        uint256[] memory randomWords
+    ) internal override {
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
         s_requestIndexToRandomWords[requestNumber] = randomWords;
         s_randomWords = randomWords;
@@ -248,9 +286,23 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
             param.inflictAnarchy(defenderId);
             uint256 gameDay = keep.getGameDay();
             gameDayToNukesLanded[gameDay]++;
+            emit NukeLanded(
+                requestNumber,
+                attackerId,
+                defenderId,
+                thwartOdds,
+                randomNukeSuccessNumber
+            );
         } else {
             console.log("Nuke attaq thwarted");
             mis.decreaseNukeCountFromNukeContract(attackerId);
+            emit NukeThwarted(
+                requestNumber,
+                attackerId,
+                defenderId,
+                thwartOdds,
+                randomNukeSuccessNumber
+            );
         }
     }
 
@@ -259,7 +311,9 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         uint256 defenderId
     ) public view returns (uint256) {
         uint256 thwartOdds = 50;
-        bool strategicDefenseInitiative = won4.getStrategicDefenseInitiative(defenderId);
+        bool strategicDefenseInitiative = won4.getStrategicDefenseInitiative(
+            defenderId
+        );
         uint256 defenderMissileDefenses = imp4.getMissileDefenseCount(
             defenderId
         );
@@ -301,7 +355,12 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         force.decreaseDefendingTankCountFromNukeContract(defenderId);
         nav.decreaseNavyFromNukeContract(defenderId);
         inf.decreaseLandCountFromNukeContract(defenderId, 35, 1);
-        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId, 35, 1);
+        inf.decreaseInfrastructureCountFromNukeContract(
+            defenderId,
+            attackerId,
+            35,
+            1
+        );
         inf.decreaseTechCountFromNukeContract(defenderId, 35, 1);
     }
 
@@ -314,7 +373,12 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         force.decreaseDefendingTankCountFromNukeContract(defenderId);
         nav.decreaseNavyFromNukeContract(defenderId);
         inf.decreaseLandCountFromNukeContract(defenderId, 25, 2);
-        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId, 45, 2);
+        inf.decreaseInfrastructureCountFromNukeContract(
+            defenderId,
+            attackerId,
+            45,
+            2
+        );
         inf.decreaseTechCountFromNukeContract(defenderId, 25, 2);
     }
 
@@ -327,7 +391,12 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         force.decreaseDefendingTankCountFromNukeContract(defenderId);
         nav.decreaseNavyFromNukeContract(defenderId);
         inf.decreaseLandCountFromNukeContract(defenderId, 45, 3);
-        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId, 25, 3);
+        inf.decreaseInfrastructureCountFromNukeContract(
+            defenderId,
+            attackerId,
+            25,
+            3
+        );
         inf.decreaseTechCountFromNukeContract(defenderId, 25, 3);
     }
 
@@ -340,7 +409,12 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         force.decreaseDefendingTankCountFromNukeContract(defenderId);
         nav.decreaseNavyFromNukeContract(defenderId);
         inf.decreaseLandCountFromNukeContract(defenderId, 25, 4);
-        inf.decreaseInfrastructureCountFromNukeContract(defenderId, attackerId, 25, 4);
+        inf.decreaseInfrastructureCountFromNukeContract(
+            defenderId,
+            attackerId,
+            25,
+            4
+        );
         inf.decreaseTechCountFromNukeContract(defenderId, 45, 4);
     }
 
@@ -375,7 +449,9 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     ///@dev this is a function callable by the owner of the contract that will allow the caller to update the modifier for the global radiation level
     ///@notice this function will allow the owner of the contract to adjust the modifier for the global radiation level
     ///@param newModifier is the new modifier for the global radiation level
-    function updateGlobalRadiationModifier(uint256 newModifier) public onlyOwner {
+    function updateGlobalRadiationModifier(
+        uint256 newModifier
+    ) public onlyOwner {
         mod = newModifier;
     }
 }

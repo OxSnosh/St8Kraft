@@ -82,6 +82,11 @@ contract ForcesContract is Ownable {
         uint256 indexed tanks,
         uint256 warId
     );
+    
+    event SoldierDamageFromNukeAttack(
+        uint256 indexed id,
+        uint256 indexed amount
+    );
 
     event TankDamageFromAirAssault(uint256 indexed id, uint256 indexed amount);
 
@@ -89,6 +94,8 @@ contract ForcesContract is Ownable {
         uint256 indexed id,
         uint256 indexed amount
     );
+
+    event TankDamageFromNukeAttack(uint256 indexed id, uint256 indexed amount);
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -388,6 +395,7 @@ contract ForcesContract is Ownable {
             idToForces[id].defendingSoldiers = 0;
             idToForces[id].numberOfSoldiers -= numberOfDefendingSoldiers;
             idToCasualties[id].soldierCasualties += numberOfDefendingSoldiers;
+            emit SoldierDamageFromNukeAttack(id, numberOfDefendingSoldiers);
         } else {
             uint256 numberOfDefendingSoldierCasualties = ((
                 idToForces[id].defendingSoldiers
@@ -398,7 +406,12 @@ contract ForcesContract is Ownable {
                 .numberOfSoldiers -= numberOfDefendingSoldierCasualties;
             idToCasualties[id]
                 .soldierCasualties += numberOfDefendingSoldierCasualties;
+            emit SoldierDamageFromNukeAttack(
+                id,
+                numberOfDefendingSoldierCasualties
+            );
         }
+
     }
 
     ///@dev this is a public view function that will adjust the efficiency of a nations deployed soldiers
@@ -650,6 +663,7 @@ contract ForcesContract is Ownable {
             100);
         idToForces[id].numberOfTanks -= defendingTanksToDecrease;
         idToForces[id].defendingTanks -= defendingTanksToDecrease;
+        emit TankDamageFromNukeAttack(id, defendingTanksToDecrease);
     }
 
     ///@dev this is a public function that can only be called from the air battle contract

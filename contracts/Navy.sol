@@ -209,6 +209,35 @@ contract NavyContract is Ownable {
 
     mapping(uint256 => Navy) public idToNavy;
 
+    event CorvettePurchase(
+        uint256 indexed id,
+        uint256 indexed amount,
+        uint256 indexed purchasePrice
+    );
+    event LandingShipPurchase(
+        uint256 indexed id,
+        uint256 indexed amount,
+        uint256 indexed purchasePrice
+    );
+    event BattleshipPurchase(
+        uint256 indexed id,
+        uint256 indexed amount,
+        uint256 indexed purchasePrice
+    );
+    event CruiserPurchase(
+        uint256 indexed id,
+        uint256 indexed amount,
+        uint256 indexed purchasePrice
+    );
+
+    event NukeDamageToNavy(
+        uint256 indexed defenderId,
+        uint256 corvetteCount,
+        uint256 landingShip,
+        uint256 cruiserCount,
+        uint256 frigateCount
+    );
+
     ResourcesContract res;
     MilitaryContract mil;
     ImprovementsContract4 imp4;
@@ -490,6 +519,7 @@ contract NavyContract is Ownable {
         idToNavy[id].navyVessels += amount;
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+        emit CorvettePurchase(id, amount, purchasePrice);
     }
 
     ///@dev this is a public view function that will return the number of corvettes a nation owns
@@ -530,6 +560,7 @@ contract NavyContract is Ownable {
         idToNavy[id].navyVessels += amount;
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+        emit LandingShipPurchase(id, amount, purchasePrice);
     }
 
     ///@dev this is a public view function that will return the number of landing ships a nation owns
@@ -570,6 +601,7 @@ contract NavyContract is Ownable {
         idToNavy[id].navyVessels += amount;
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+        emit BattleshipPurchase(id, amount, purchasePrice);
     }
 
     ///@dev this is a public view function that will return the number of battleships a nation owns
@@ -610,6 +642,7 @@ contract NavyContract is Ownable {
         idToNavy[id].navyVessels += amount;
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+        emit CruiserPurchase(id, amount, purchasePrice);
     }
 
     ///@dev this is a public view function that will return the number of cruisers a nation owns
@@ -637,23 +670,26 @@ contract NavyContract is Ownable {
         uint256 defenderId
     ) public onlyNukeContract {
         //corvettes, landing ships, cruisers, frigates
-        uint256 corvetteCount = idToNavy[defenderId].corvetteCount;
-        uint256 landingShipCount = idToNavy[defenderId].landingShipCount;
-        uint256 cruiserCount = idToNavy[defenderId].cruiserCount;
-        uint256 frigateCount = navy2.getFrigateCount(defenderId);
         uint256 percentage = 40;
         bool falloutShelter = won1.getFalloutShelterSystem(defenderId);
         if (falloutShelter) {
             percentage = 20;
         }
-        idToNavy[defenderId].corvetteCount -= ((corvetteCount * percentage) /
-            100);
-        idToNavy[defenderId].landingShipCount -= ((landingShipCount *
-            percentage) / 100);
-        idToNavy[defenderId].cruiserCount -= ((cruiserCount * percentage) /
-            100);
-        uint256 frigatesToReduce = ((frigateCount * percentage) / 100);
-        navy2.decreaseFrigateCount(defenderId, frigatesToReduce);
+        uint256 corvetteCountToReduce = (idToNavy[defenderId].corvetteCount * percentage) / 100;
+        uint256 landingShipCountToReduce = (idToNavy[defenderId].landingShipCount * percentage) / 100;
+        uint256 cruiserCountToReduce = (idToNavy[defenderId].cruiserCount * percentage) / 100;
+        uint256 frigateCountToReduce = (navy2.getFrigateCount(defenderId) * percentage) / 100;
+        idToNavy[defenderId].corvetteCount -= corvetteCountToReduce;
+        idToNavy[defenderId].landingShipCount -= landingShipCountToReduce;
+        idToNavy[defenderId].cruiserCount -= cruiserCountToReduce;
+        navy2.decreaseFrigateCount(defenderId, frigateCountToReduce);
+        emit NukeDamageToNavy(
+            defenderId,
+            corvetteCountToReduce,
+            landingShipCountToReduce,
+            cruiserCountToReduce,
+            frigateCountToReduce
+        );
     }
 }
 
