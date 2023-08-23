@@ -81,6 +81,21 @@ contract InfrastructureContract is Ownable {
         uint256 indexed amount
     );
 
+    event LandDestroyedFromNukeAttack(
+        uint256 indexed countryId,
+        uint256 indexed amount
+    );
+
+    event InfrastructureDestroyedFromNukeAttack(
+        uint256 indexed countryId,
+        uint256 indexed amount
+    );
+
+    event TechDestroyedFromNukeAttack(
+        uint256 indexed countryId,
+        uint256 indexed amount
+    );
+
     mapping(uint256 => Infrastructure) public idToInfrastructure;
     mapping(uint256 => address) public idToOwnerInfrastructure;
 
@@ -444,9 +459,11 @@ contract InfrastructureContract is Ownable {
         }
         if (landAmountToDecrease > maxLandToDecrease) {
             idToInfrastructure[countryId].landArea -= maxLandToDecrease;
+            landAmountToDecrease = maxLandToDecrease;
         } else {
             idToInfrastructure[countryId].landArea -= landAmountToDecrease;
         }
+        emit LandDestroyedFromNukeAttack(countryId, landAmountToDecrease);
     }
 
     ///@dev this is a public view function that will retrun the amount of technology a nation has
@@ -532,10 +549,12 @@ contract InfrastructureContract is Ownable {
         }
         if (techAmountToDecrease > maxTechToDecrease) {
             idToInfrastructure[countryId].technologyCount -= maxTechToDecrease;
+            techAmountToDecrease = maxTechToDecrease;
         } else {
             idToInfrastructure[countryId]
                 .technologyCount -= techAmountToDecrease;
         }
+        emit TechDestroyedFromNukeAttack(countryId, techAmountToDecrease);
     }
 
     ///@dev this is a public view function that will return the amount of infrastructure for a nation
@@ -631,10 +650,15 @@ contract InfrastructureContract is Ownable {
         if (infrastructureAmountToDecrease > maxInfrastructureToDecrease) {
             idToInfrastructure[defenderId]
                 .infrastructureCount -= maxInfrastructureToDecrease;
+            infrastructureAmountToDecrease = maxInfrastructureToDecrease;
         } else {
             idToInfrastructure[defenderId]
                 .infrastructureCount -= infrastructureAmountToDecrease;
         }
+        emit InfrastructureDestroyedFromNukeAttack(
+            defenderId,
+            infrastructureAmountToDecrease
+        );
     }
 
     ///@dev this is a public function only callable from the air battle contract

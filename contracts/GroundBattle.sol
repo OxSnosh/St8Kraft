@@ -86,11 +86,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
-    event randomNumbersRequested(uint256 indexed requestId);
-    event randomNumbersFulfilled(
-        uint256 indexed randomResource1,
-        uint256 indexed randomResource2
-    );
     event battleResults(
         uint256 indexed battleId,
         uint256 attackSolderLosses,
@@ -486,7 +481,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         );
         s_requestIdToRequestIndex[requestId] = battleId;
         console.log("REQUEST ID: ", requestId);
-        emit randomNumbersRequested(requestId);
     }
 
     function fulfillRandomWords(

@@ -83,9 +83,9 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     }
 
     event AirAssaultLaunched(
-        uint256 battleId,
-        uint256 attackerId,
-        uint256 defenderId,
+        uint256 indexed battleId,
+        uint256 indexed attackerId,
+        uint256 indexed defenderId,
         uint256[] attackerFighterArray,
         uint256[] attackerBomberArray,
         uint256[] defenderFighterArray,
@@ -93,9 +93,9 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     );
 
     event AirAssaultCasualties(
-        uint256 battleId,
-        uint256 attackerId,
-        uint256 defenderId,
+        uint256 indexed battleId,
+        uint256 indexed attackerId,
+        uint256 indexed defenderId,
         uint256[] attackerFighterCasualties,
         uint256[] attackerBomberCasualties,
         uint256[] defenderFighterCasualties,

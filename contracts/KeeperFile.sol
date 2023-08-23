@@ -46,6 +46,8 @@ contract KeeperContract is Ownable, KeeperCompatibleInterface {
             lastTimeStamp = lastTimeStamp + interval;
             gameDay++;
             emit GameDayIncremented(gameDay);
+        } else {
+            revert("Not enough time has passed for upkeep");
         }
     }
 

@@ -209,22 +209,22 @@ contract NavyContract is Ownable {
 
     mapping(uint256 => Navy) public idToNavy;
 
-    event CorvettePurchase(
+    event CorvettePurchased(
         uint256 indexed id,
         uint256 indexed amount,
         uint256 indexed purchasePrice
     );
-    event LandingShipPurchase(
+    event LandingShipPurchased(
         uint256 indexed id,
         uint256 indexed amount,
         uint256 indexed purchasePrice
     );
-    event BattleshipPurchase(
+    event BattleshipPurchased(
         uint256 indexed id,
         uint256 indexed amount,
         uint256 indexed purchasePrice
     );
-    event CruiserPurchase(
+    event CruiserPurchased(
         uint256 indexed id,
         uint256 indexed amount,
         uint256 indexed purchasePrice
@@ -519,7 +519,7 @@ contract NavyContract is Ownable {
         idToNavy[id].navyVessels += amount;
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-        emit CorvettePurchase(id, amount, purchasePrice);
+        emit CorvettePurchased(id, amount, purchasePrice);
     }
 
     ///@dev this is a public view function that will return the number of corvettes a nation owns
@@ -560,7 +560,7 @@ contract NavyContract is Ownable {
         idToNavy[id].navyVessels += amount;
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-        emit LandingShipPurchase(id, amount, purchasePrice);
+        emit LandingShipPurchased(id, amount, purchasePrice);
     }
 
     ///@dev this is a public view function that will return the number of landing ships a nation owns
@@ -601,7 +601,7 @@ contract NavyContract is Ownable {
         idToNavy[id].navyVessels += amount;
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-        emit BattleshipPurchase(id, amount, purchasePrice);
+        emit BattleshipPurchased(id, amount, purchasePrice);
     }
 
     ///@dev this is a public view function that will return the number of battleships a nation owns
@@ -642,7 +642,7 @@ contract NavyContract is Ownable {
         idToNavy[id].navyVessels += amount;
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-        emit CruiserPurchase(id, amount, purchasePrice);
+        emit CruiserPurchased(id, amount, purchasePrice);
     }
 
     ///@dev this is a public view function that will return the number of cruisers a nation owns
@@ -733,6 +733,30 @@ contract NavyContract2 is Ownable {
     }
 
     mapping(uint256 => Navy) public idToNavy;
+
+    event FrigatePurchased(
+        uint256 indexed id,
+        uint256 indexed amount,
+        uint256 indexed purchasePrice
+    );
+
+    event DestroyerPurchased(
+        uint256 indexed id,
+        uint256 indexed amount,
+        uint256 indexed purchasePrice
+    );
+
+    event SubmarinePurchased(
+        uint256 indexed id,
+        uint256 indexed amount,
+        uint256 indexed purchasePrice
+    );
+
+    event AircraftCarrierPurchased(
+        uint256 indexed id,
+        uint256 indexed amount,
+        uint256 indexed purchasePrice
+    );
 
     ResourcesContract res;
     MilitaryContract mil;
@@ -938,6 +962,7 @@ contract NavyContract2 is Ownable {
         navy1.increaseNavyVesselCount(id, amount);
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+        emit FrigatePurchased(id, amount, purchasePrice);
     }
 
     ///@dev this is a public view function that will return the number of frigates a nation owns
@@ -989,6 +1014,7 @@ contract NavyContract2 is Ownable {
         navy1.increaseNavyVesselCount(id, amount);
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+        emit DestroyerPurchased(id, amount, purchasePrice);
     }
 
     ///@dev this is a public view function that will return the number of destroyers a nation owns
@@ -1040,6 +1066,7 @@ contract NavyContract2 is Ownable {
         navy1.increaseNavyVesselCount(id, amount);
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+        emit SubmarinePurchased(id, amount, purchasePrice);
     }
 
     ///@dev this is a public view function that will return the number of submarines a nation owns
@@ -1091,6 +1118,7 @@ contract NavyContract2 is Ownable {
         navy1.increaseNavyVesselCount(id, amount);
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
+        emit AircraftCarrierPurchased(id, amount, purchasePrice);
     }
 
     ///@dev this is a public view function that will return the number of aircraft carriers a nation owns

@@ -903,6 +903,10 @@ contract MissilesContract is Ownable {
     mapping(uint256 => mapping(uint256 => uint256))
         public idToNukesPurchasedToday;
 
+    event CruiseMissilesPurchased(uint256 indexed id, uint256 indexed amountPurchased);
+
+    event NukePurchased(uint256 indexed id);
+
     event CruiseMissilesDestroyedByAirAssault(
         uint256 indexed id,
         uint256 amountDestroyed
@@ -1065,6 +1069,7 @@ contract MissilesContract is Ownable {
         uint256 cost = (costPerMissile * amount);
         tsy.spendBalance(id, cost);
         idToMissiles[id].cruiseMissiles += amount;
+        emit CruiseMissilesPurchased(id, amount);
     }
 
     ///@dev this function is only callable by the contract owner
@@ -1191,6 +1196,7 @@ contract MissilesContract is Ownable {
         idToMissiles[id].nuclearWeapons += 1;
         uint256 cost = getNukeCost(id);
         tsy.spendBalance(id, cost);
+        emit NukePurchased(id);
     }
 
     ///@dev this is a public function that will return the cost per nuke for a nation
