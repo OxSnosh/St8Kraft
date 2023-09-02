@@ -880,6 +880,7 @@ async function main() {
         improvementscontract1.address,
         improvementscontract2.address,
         improvementscontract3.address,
+        improvementscontract4.address,
         countryparameterscontract.address,
         wonderscontract2.address)
     
@@ -1002,11 +1003,11 @@ async function main() {
         militarycontract.address)
     await groundbattlecontract.settings2(
         improvementscontract2.address,
-        improvementscontract3.address,
+        improvementscontract4.address,
         wonderscontract3.address,
         wonderscontract4.address,
         additionaltaxescontract.address,
-        countryparameterscontract.address)
+        countryparameterscontract.address,)
     
     await improvementscontract1.settings(
         treasurycontract.address,
@@ -1257,6 +1258,7 @@ async function main() {
         improvementscontract1.address,
         improvementscontract2.address,
         improvementscontract3.address,
+        improvementscontract4.address,
         additionaltaxescontract.address,
         bonusresourcescontract.address,
         keepercontract.address,
