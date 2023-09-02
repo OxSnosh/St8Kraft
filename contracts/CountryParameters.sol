@@ -421,6 +421,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         idToCountrySettings[id].governmentType = 0;
         idToCountrySettings[id].dayOfAnarchy = gameDay;
         emit AnarchyInflicted(id);
+        emit GovernmentChanged(id, 0);
     }
 
     ///@dev this is a view funtion that will return the ruler name for a country

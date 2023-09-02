@@ -71,6 +71,30 @@ contract TreasuryContract is Ownable {
 
     mapping(uint256 => Treasury) public idToTreasury;
 
+    event FundsWithdrawn(
+        uint256 countryId,
+        uint256 amount
+    );
+
+    event FundsAdded(
+        uint256 countryId,
+        uint256 amount
+    );
+
+    event OwnerWithdrawMilfRevenues(
+        uint256 amount
+    );
+
+    event SeedMoneyUpdated(
+        uint256 newSeedMoney
+    );
+
+    event SpoilsTransferred(
+        uint256 attackerId,
+        uint256 defenderId,
+        uint256 fundsTransferred
+    );
+
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings1(
@@ -205,6 +229,7 @@ contract TreasuryContract is Ownable {
         bool demonitized = idToTreasury[id].demonitized;
         require(demonitized == false, "ERROR");
         IWarBucks(warBucksAddress).mintFromTreasury(msg.sender, amount);
+        emit FundsWithdrawn(id, amount);
     }
 
     ///@dev this function is only callable from a nation owner
@@ -225,6 +250,7 @@ contract TreasuryContract is Ownable {
         bool demonitized = idToTreasury[id].demonitized;
         require(demonitized == false, "ERROR");
         IWarBucks(warBucksAddress).burnFromTreasury(msg.sender, amount);
+        emit FundsAdded(id, amount);
     }
 
     ///@dev this funtion is a public view function that will return the number of days it has been since a nation has collected taxes
@@ -403,6 +429,7 @@ contract TreasuryContract is Ownable {
             msg.sender,
             amount
         );
+        emit OwnerWithdrawMilfRevenues(amount);
     }
 
     ///@notice the seed money is the amount of warbucks that a nation owner will need to have in their wallet when the nation is minted 
@@ -410,6 +437,7 @@ contract TreasuryContract is Ownable {
     ///@param newSeedMoney is the new amount of warbucks that a nation owner will need to have in their wallet when the nation is minted
     function updateSeedMoney(uint256 newSeedMoney) public onlyOwner {
         seedMoney = (newSeedMoney * (10 ** 18));
+        emit SeedMoneyUpdated(newSeedMoney);
     }
 
     ///@notice this function will return the seed money that is required to mint a nation
@@ -510,16 +538,22 @@ contract TreasuryContract is Ownable {
             uint256 defenderTankLosses
         ) = ground.returnBattleResults(battleId);
         uint256 maximumFundsToTransfer = ((defenderSoldierLosses * 4) +
-            (defenderTankLosses * 150));
+            (defenderTankLosses * 150) * (10**18));
         uint256 fundsToTransfer = ((defenderBalance * randomNumber) / 100);
         if (fundsToTransfer >= maximumFundsToTransfer) {
             fundsToTransfer = maximumFundsToTransfer;
         }
-        if (fundsToTransfer < 1000000) {
+        if (fundsToTransfer < (1000000 * (10**18))) {
             idToTreasury[attackerId].balance += fundsToTransfer;
         } else {
-            idToTreasury[attackerId].balance += 1000000;
+            idToTreasury[attackerId].balance += (1000000 * (10**18));
+            fundsToTransfer = (1000000 * (10**18));
         }
+        emit SpoilsTransferred(
+            attackerId,
+            defenderId,
+            fundsToTransfer
+        );
     }
 
     modifier onlyInfrastructure() {

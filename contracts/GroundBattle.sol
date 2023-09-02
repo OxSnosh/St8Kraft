@@ -86,7 +86,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
-    event battleResults(
+    event BattleResultsEvent (
         uint256 indexed battleId,
         uint256 attackSolderLosses,
         uint256 attackTankLosses,
@@ -527,7 +527,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             ) = defenseVictory(requestNumber);
             groundBattleIdToAtackerVictory[requestNumber] = false;
         }
-        emit battleResults(
+        emit BattleResultsEvent (
             requestNumber,
             attackerSoldierLosses,
             attackerTankLosses,

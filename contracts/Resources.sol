@@ -165,8 +165,8 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
 
     event TradeProposed(uint256 indexed requestorId, uint256 indexed recipientId);
     event TradeAccepted(uint256 indexed requestorId, uint256 indexed recipientId);
-    event TradeCancelled(uint256 indexed requestorId, uint256 indexed recipientId);
     event TradeProposalCancelled(uint256 indexed requestorId, uint256 indexed recipientId);
+    event TradeCancelled(uint256 indexed requestorId, uint256 indexed recipientId);
 
     modifier onlyCountryMinter() {
         require(

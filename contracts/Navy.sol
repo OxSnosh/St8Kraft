@@ -669,7 +669,6 @@ contract NavyContract is Ownable {
     function decreaseNavyFromNukeContract(
         uint256 defenderId
     ) public onlyNukeContract {
-        //corvettes, landing ships, cruisers, frigates
         uint256 percentage = 40;
         bool falloutShelter = won1.getFalloutShelterSystem(defenderId);
         if (falloutShelter) {

@@ -51,6 +51,18 @@ contract SenateContract is ChainlinkClient, KeeperCompatibleInterface, Ownable {
         address voter
     );
 
+    event Sanction (
+        uint256 indexed senatorId,
+        uint256 indexed team,
+        uint256 indexed sanctionedId
+    );
+
+    event SanctionLifted(
+        uint256 indexed senatorId,
+        uint256 indexed team,
+        uint256 indexed sanctionedId
+    );
+
     mapping(uint256 => Voter) public idToVoter;
     mapping(uint256 => uint256[]) public teamToCurrentSanctions;
     mapping(uint256 => mapping(uint256 => uint256[])) epochToTeamToSenatorVotes;
@@ -310,6 +322,7 @@ contract SenateContract is ChainlinkClient, KeeperCompatibleInterface, Ownable {
         sanctioned.sanctionsByTeam[sanctionedTeam] = true;
         sanctioned.dayOfSanctionByTeam[sanctionedTeam] = gameDay;
         res.removeTradingPartnersFromSanction(idSanctioned, sanctionedTeam);
+        emit Sanction(idSenator, senatorTeam, idSanctioned);
     }
 
     ///@dev this is a public function callable by a senator
@@ -349,6 +362,7 @@ contract SenateContract is ChainlinkClient, KeeperCompatibleInterface, Ownable {
                 currentTeamSanctions.pop();
             }
         }
+        emit SanctionLifted(idSenator, senatorTeam, idSanctioned);
     }
 
     ///@dev this is a public view function that will return if a nation is a senator

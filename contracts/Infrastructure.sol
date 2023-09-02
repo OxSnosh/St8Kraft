@@ -96,6 +96,12 @@ contract InfrastructureContract is Ownable {
         uint256 indexed amount
     );
 
+    event LandSold(
+        uint256 indexed countryId,
+        uint256 indexed amount,
+        uint256 indexed cost
+    );
+
     mapping(uint256 => Infrastructure) public idToInfrastructure;
     mapping(uint256 => address) public idToOwnerInfrastructure;
 
@@ -421,6 +427,7 @@ contract InfrastructureContract is Ownable {
         }
         uint256 totalCost = (amount * costPerMile);
         TreasuryContract(treasury).returnBalance(id, totalCost);
+        emit LandSold(id, amount, totalCost);
     }
 
     ///@dev this is a public function that is only callable from the spy contract
@@ -605,7 +612,7 @@ contract InfrastructureContract is Ownable {
             idToInfrastructure[countryId]
                 .infrastructureCount -= amountToDecrease;
         }
-        emit TechDestroyedFromCruiseMissile(countryId, amountToDecrease);
+        emit InfrastructureDestroyedFromCruiseMissile(countryId, amountToDecrease);
     }
 
     ///@dev this is a public function only callable from the nuke contract

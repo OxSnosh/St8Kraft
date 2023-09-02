@@ -272,14 +272,14 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         newAirBattle.defenderId = defenderId;
         newAirBattle.attackerFighterArray = attackerFighterArray;
         newAirBattle.attackerBomberArray = attackerBomberArray;
-        generateDefenderFighters(defenderId, _airBattleId);
+        uint256[] memory defenderFighterArray = generateDefenderFighters(defenderId, _airBattleId);
         emit AirAssaultLaunched(
             airBattleId,
             attackerId,
             defenderId,
             attackerFighterArray,
             attackerBomberArray,
-            newAirBattle.defenderFighterArray,
+            defenderFighterArray,
             warId
         );
         fulfillRequest(_airBattleId);
@@ -395,7 +395,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     function generateDefenderFighters(
         uint256 defenderId,
         uint256 _airBattleId
-    ) internal {
+    ) internal returns (uint256[] memory) {
         uint256[] memory defenderFighterArray = new uint256[](9);
         defenderFighterArray[0] = fighter.getYak9Count(defenderId);
         defenderFighterArray[1] = fighter.getP51MustangCount(defenderId);
@@ -408,6 +408,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         defenderFighterArray[8] = fighter.getF22RaptorCount(defenderId);
         AirBattle storage newAirBattle = airBattleIdToAirBattle[_airBattleId];
         newAirBattle.defenderFighterArray = defenderFighterArray;
+        return defenderFighterArray;
     }
 
     function fulfillRequest(uint256 battleId) public {

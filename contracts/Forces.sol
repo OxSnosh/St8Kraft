@@ -151,7 +151,6 @@ contract ForcesContract is Ownable {
     }
 
     mapping(uint256 => Forces) public idToForces;
-    mapping(uint256 => uint256[]) public battlesToCalculate;
     mapping(uint256 => GroundBattleCasualties) public idToCasualties;
 
     ///@dev this function is a public function but only callable from the country minter contact when a country is minted
