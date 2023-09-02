@@ -27,6 +27,7 @@ contract TaxesContract is Ownable {
     address public improvements1;
     address public improvements2;
     address public improvements3;
+    address public improvements4;
     address public parameters;
     address public wonders1;
     address public wonders2;
@@ -46,6 +47,7 @@ contract TaxesContract is Ownable {
     ImprovementsContract1 imp1;
     ImprovementsContract2 imp2;
     ImprovementsContract3 imp3;
+    ImprovementsContract4 imp4;
     CountryParametersContract params;
     WondersContract1 won1;
     WondersContract2 won2;
@@ -72,6 +74,7 @@ contract TaxesContract is Ownable {
         address _improvements1,
         address _improvements2,
         address _improvements3,
+        address _improvements4,
         address _additionalTaxes,
         address _bonusResources,
         address _keeper,
@@ -89,6 +92,8 @@ contract TaxesContract is Ownable {
         imp2 = ImprovementsContract2(_improvements2);
         improvements3 = _improvements3;
         imp3 = ImprovementsContract3(_improvements3);
+        improvements4 = _improvements4;
+        imp4 = ImprovementsContract4(_improvements4);
         additionalTaxes = _additionalTaxes;
         addTax = AdditionalTaxesContract(_additionalTaxes);
         bonusResources = _bonusResources;
@@ -472,7 +477,7 @@ contract TaxesContract is Ownable {
         if (churchCount > 0) {
             pointsFromImprovements += churchCount;
         }
-        uint256 policeHeadquarters = imp3.getPoliceHeadquartersCount(id);
+        uint256 policeHeadquarters = imp4.getPoliceHeadquartersCount(id);
         if (policeHeadquarters > 0) {
             pointsFromImprovements += (2 * policeHeadquarters);
         }
@@ -699,43 +704,6 @@ contract TaxesContract is Ownable {
         }
         return subtractPoints;
     }
-
-    // function getPointsFromMilitary(uint256 id) public view returns (uint256) {
-    //     (uint256 ratio, , ) = soldierToPopulationRatio(id);
-    //     uint256 pointsFromMilitaryToSubtract;
-    //     if (ratio > 70) {
-    //         pointsFromMilitaryToSubtract = 10;
-    //     }
-    //     if (ratio < 20) {
-    //         pointsFromMilitaryToSubtract = 5;
-    //     }
-    //     if (ratio < 10) {
-    //         pointsFromMilitaryToSubtract = 14;
-    //     }
-    //     return pointsFromMilitaryToSubtract;
-    // }
-
-    // function soldierToPopulationRatio(uint256 id)
-    //     public
-    //     view
-    //     returns (uint256, bool, bool)
-    // {
-    //     uint256 soldierCount = frc.getSoldierCount(id);
-    //     if(soldierCount == 0) {
-    //         soldierCount = 1;
-    //     }
-    //     uint256 populationCount = inf.getTotalPopulationCount(id);
-    //     uint256 soldierPopulationRatio = ((soldierCount * 100 / populationCount));
-    //     bool environmentPenalty = false;
-    //     bool anarchyCheck = false;
-    //     if (soldierPopulationRatio > 60) {
-    //         environmentPenalty = true;
-    //     }
-    //     if (soldierPopulationRatio < 10) {
-    //         anarchyCheck = true;
-    //     }
-    //     return (soldierPopulationRatio, environmentPenalty, anarchyCheck);
-    // }
 
     function getPointsFromCriminals(uint256 id) public view returns (uint256) {
         (uint256 unincarceratedCriminals, , ) = crm.getCriminalCount(id);

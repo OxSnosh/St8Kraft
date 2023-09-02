@@ -16,6 +16,7 @@ contract CrimeContract is Ownable {
     address public improvements1;
     address public improvements2;
     address public improvements3;
+    address public improvements4;
     address public parameters;
     address public wonders2;
 
@@ -23,6 +24,7 @@ contract CrimeContract is Ownable {
     ImprovementsContract1 imp1;
     ImprovementsContract2 imp2;
     ImprovementsContract3 imp3;
+    ImprovementsContract4 imp4;
     CountryParametersContract cp;
     WondersContract2 won2;
 
@@ -33,6 +35,7 @@ contract CrimeContract is Ownable {
         address _improvements1,
         address _improvements2,
         address _improvements3,
+        address _improvements4,
         address _parameters,
         address _wonders2
     ) public onlyOwner {
@@ -45,6 +48,8 @@ contract CrimeContract is Ownable {
         improvements3 = _improvements3;
         imp3 = ImprovementsContract3(_improvements3);
         parameters = _parameters;
+        improvements4 = _improvements4;
+        imp4 = ImprovementsContract4(_improvements4);
         cp = CountryParametersContract(_parameters);
         wonders2 = _wonders2;
         won2 = WondersContract2(_wonders2);
@@ -74,6 +79,12 @@ contract CrimeContract is Ownable {
     function updateImprovementsContract3(address _newAddress) public onlyOwner {
         improvements3 = _newAddress;
         imp3 = ImprovementsContract3(_newAddress);
+    }
+
+    ///@dev this funtion is only callble from the contract owner
+    function updarteImprovementsContract4(address _newAddress) public onlyOwner {
+        improvements4 = _newAddress;
+        imp4 = ImprovementsContract4(_newAddress);
     }
 
     ///@dev this function is only callable by the contract owner
@@ -236,7 +247,7 @@ contract CrimeContract is Ownable {
     function getImprovementPoints(uint256 id) public view returns (uint256) {
         uint256 schools = imp3.getSchoolCount(id);
         uint256 universities = imp3.getUniversityCount(id);
-        uint256 policeHqs = imp3.getPoliceHeadquartersCount(id);
+        uint256 policeHqs = imp4.getPoliceHeadquartersCount(id);
         uint256 casinoCount = imp1.getCasinoCount(id);
         uint256 redLightDistricts = imp3.getRedLightDistrictCount(id);
         uint256 schoolPoints = (schools * 3);

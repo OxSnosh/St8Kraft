@@ -28,7 +28,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     address forces;
     address treasury;
     address improvements2;
-    address improvements3;
+    address improvements4;
     address wonders3;
     address wonders4;
     address countryMinter;
@@ -43,7 +43,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     ForcesContract force;
     TreasuryContract tsy;
     ImprovementsContract2 imp2;
-    ImprovementsContract3 imp3;
+    ImprovementsContract4 imp4;
     WondersContract3 won3;
     WondersContract4 won4;
     CountryMinter mint;
@@ -130,7 +130,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
 
     function settings2(
         address _improvements2,
-        address _improvements3,
+        address _improvements4,
         address _wonders3,
         address _wonders4,
         address _additionalTaxes,
@@ -138,14 +138,12 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     ) public onlyOwner {
         improvements2 = _improvements2;
         imp2 = ImprovementsContract2(_improvements2);
-        improvements3 = _improvements3;
-        imp3 = ImprovementsContract3(_improvements3);
+        improvements4 = _improvements4;
+        imp4 = ImprovementsContract4(_improvements4);
         wonders3 = _wonders3;
         won3 = WondersContract3(_wonders3);
         wonders4 = _wonders4;
         won4 = WondersContract4(_wonders4);
-        // taxes = _taxes;
-        // tax = TaxesContract(_taxes);
         additionalTaxes = _additionalTaxes;
         addTax = AdditionalTaxesContract(_additionalTaxes);
         parameters = _parameters;
@@ -175,11 +173,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     function updateImprovemetsContract2(address newAddress) public onlyOwner {
         improvements2 = newAddress;
         imp2 = ImprovementsContract2(newAddress);
-    }
-
-    function updateImprovemetsContract3(address newAddress) public onlyOwner {
-        improvements3 = newAddress;
-        imp3 = ImprovementsContract3(newAddress);
     }
 
     function updateWondersContract3(address newAddress) public onlyOwner {
@@ -446,7 +439,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
 
     function getDefenderStrengthModifier(uint256 defenderId, uint256 attackerId) public view returns (uint256) {
         uint256 mod = 100;
-        uint256 officeOfPropagandaCount = imp3.getOfficeOfPropagandaCount(
+        uint256 officeOfPropagandaCount = imp4.getOfficeOfPropagandaCount(
             attackerId
         );
         bool pentagon = won3.getPentagon(defenderId);
