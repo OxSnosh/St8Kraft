@@ -25,6 +25,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
 
     uint256 public attackId;
     address public forces;
+    address public spies;
     address public infrastructure;
     address public military;
     address public nationStrength;
@@ -56,6 +57,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     WondersContract2 won2;
     CountryMinter mint;
     KeeperContract keep;
+    SpyContract spy;
 
     struct SpyAttack {
         uint256 encryptedAttackerId;
@@ -117,9 +119,11 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         mint = CountryMinter(_countryMinter);
     }
 
-    function settings2(address _keeper) public onlyOwner {
+    function settings2(address _keeper, address _spies) public onlyOwner {
         keeper = _keeper;
         keep = KeeperContract(_keeper);
+        spies = _spies;
+        spy = SpyContract(_spies);
     }
 
     function updateInfrastructureContract(address newAddress) public onlyOwner {
@@ -312,7 +316,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     function getAttackerSuccessScore(
         uint256 countryId
     ) public view returns (uint256) {
-        uint256 spyCount = force.getSpyCount(countryId);
+        uint256 spyCount = spy.getSpyCount(countryId);
         uint256 techAmount = inf.getTechnologyCount(countryId);
         uint256 attackSuccessScore = (spyCount + (techAmount / 15));
         bool cia = won1.getCentralIntelligenceAgency(countryId);
@@ -348,7 +352,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     function getDefenseSuccessScore(
         uint256 countryId
     ) public view returns (uint256) {
-        uint256 spyCount = force.getSpyCount(countryId);
+        uint256 spyCount = spy.getSpyCount(countryId);
         uint256 techAmount = inf.getTechnologyCount(countryId);
         uint256 landAmount = inf.getLandCount(countryId);
         uint256 threatLevel = mil.getThreatLevel(countryId);
@@ -524,12 +528,12 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256[] memory randomNumbers = s_randomnessRequestIdToRandomWords[
             _randomnessRequestId
         ];
-        uint256 spyCount = force.getSpyCount(defenderId);
+        uint256 spyCount = spy.getSpyCount(defenderId);
         uint256 spyCountToDestroy = ((randomNumbers[1] % 20) + 1);
         if (spyCountToDestroy > spyCount) {
             spyCountToDestroy = spyCount;
         }
-        force.decreaseDefenderSpyCount(spyCountToDestroy, defenderId);
+        spy.decreaseDefenderSpyCount(spyCountToDestroy, defenderId);
     }
 
     function captueTechnology(

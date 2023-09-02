@@ -1,7 +1,7 @@
 {
   "HARDHAT": {
     "countryminter": {
-      "address": "0xbe18A1B61ceaF59aEB6A9bC81AB4FB87D56Ba167",
+      "address": "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e",
       "ABI": [
         {
           "inputs": [],
@@ -63,6 +63,37 @@
           "inputs": [
             {
               "indexed": true,
+              "internalType": "string",
+              "name": "nationName",
+              "type": "string"
+            },
+            {
+              "indexed": true,
+              "internalType": "string",
+              "name": "ruler",
+              "type": "string"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "countryId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+            }
+          ],
+          "name": "NationCreated",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
               "internalType": "address",
               "name": "previousOwner",
               "type": "address"
@@ -101,44 +132,6 @@
           ],
           "name": "Transfer",
           "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "countryOwner",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "string",
-              "name": "nationName",
-              "type": "string"
-            },
-            {
-              "indexed": true,
-              "internalType": "string",
-              "name": "ruler",
-              "type": "string"
-            }
-          ],
-          "name": "nationCreated",
-          "type": "event"
-        },
-        {
-          "inputs": [],
-          "name": "_countryId",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "_value",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
         },
         {
           "inputs": [],
@@ -248,6 +241,19 @@
               "internalType": "bool",
               "name": "",
               "type": "bool"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "countryId",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
             }
           ],
           "stateMutability": "view",
@@ -1014,8 +1020,39 @@
       ]
     },
     "forcescontract": {
-      "address": "0x6732128F9cc0c4344b2d4DC6285BCd516b7E59E6",
+      "address": "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
       "ABI": [
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "soldiers",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "tanks",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "warId",
+              "type": "uint256"
+            }
+          ],
+          "name": "ForcesDeployed",
+          "type": "event"
+        },
         {
           "anonymous": false,
           "inputs": [
@@ -1033,6 +1070,158 @@
             }
           ],
           "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "SoldierDamageFromNukeAttack",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "SoldiersDecommissioned",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "SoldiersPurchased",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "TankDamageFromAirAssault",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "TankDamageFromCruiseMissile",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "TankDamageFromNukeAttack",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "TanksDecommissioned",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "TanksPurchased",
           "type": "event"
         },
         {
@@ -1065,30 +1254,6 @@
           "inputs": [
             {
               "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "name": "battlesToCalculate",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
               "name": "amount",
               "type": "uint256"
             },
@@ -1099,24 +1264,6 @@
             }
           ],
           "name": "buySoldiers",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "amount",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "id",
-              "type": "uint256"
-            }
-          ],
-          "name": "buySpies",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -1187,19 +1334,6 @@
           "inputs": [
             {
               "internalType": "uint256",
-              "name": "id",
-              "type": "uint256"
-            }
-          ],
-          "name": "decreaseAttackerSpyCount",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
               "name": "amount",
               "type": "uint256"
             },
@@ -1209,7 +1343,7 @@
               "type": "uint256"
             }
           ],
-          "name": "decreaseDefenderSpyCount",
+          "name": "decomissionTanks",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -1538,25 +1672,6 @@
               "type": "uint256"
             }
           ],
-          "name": "getMaxSpyCount",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "id",
-              "type": "uint256"
-            }
-          ],
           "name": "getMaxTankCount",
           "outputs": [
             {
@@ -1600,38 +1715,6 @@
             {
               "internalType": "uint256",
               "name": "soldiers",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "countryId",
-              "type": "uint256"
-            }
-          ],
-          "name": "getSpyCount",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "count",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "getSpyPrice",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
               "type": "uint256"
             }
           ],
@@ -1751,11 +1834,6 @@
             {
               "internalType": "uint256",
               "name": "deployedTanks",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "numberOfSpies",
               "type": "uint256"
             },
             {
@@ -2029,19 +2107,6 @@
           "type": "function"
         },
         {
-          "inputs": [],
-          "name": "spyCost",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
           "inputs": [
             {
               "internalType": "address",
@@ -2065,19 +2130,6 @@
             }
           ],
           "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "newCost",
-              "type": "uint256"
-            }
-          ],
-          "name": "updateSpyPrice",
-          "outputs": [],
-          "stateMutability": "nonpayable",
           "type": "function"
         },
         {
@@ -2145,7 +2197,7 @@
       ]
     },
     "warbucks": {
-      "address": "0xe044814c9eD1e6442Af956a817c161192cBaE98F",
+      "address": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
       "ABI": [
         {
           "inputs": [
@@ -2591,8 +2643,59 @@
       ]
     },
     "treasurycontract": {
-      "address": "0xdB012DD3E3345e2f8D23c0F3cbCb2D94f430Be8C",
+      "address": "0x4c5859f0F772848b2D91F1D83E2Fe57935348029",
       "ABI": [
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "countryId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "FundsAdded",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "countryId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "FundsWithdrawn",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "OwnerWithdrawMilfRevenues",
+          "type": "event"
+        },
         {
           "anonymous": false,
           "inputs": [
@@ -2610,6 +2713,44 @@
             }
           ],
           "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "newSeedMoney",
+              "type": "uint256"
+            }
+          ],
+          "name": "SeedMoneyUpdated",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "attackerId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "defenderId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "fundsTransferred",
+              "type": "uint256"
+            }
+          ],
+          "name": "SpoilsTransferred",
           "type": "event"
         },
         {
@@ -3211,6 +3352,19 @@
           "type": "function"
         },
         {
+          "inputs": [],
+          "name": "parameters",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
           "inputs": [
             {
               "internalType": "uint256",
@@ -3490,6 +3644,11 @@
               "internalType": "address",
               "name": "_bombersMarket2",
               "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_parameters",
+              "type": "address"
             }
           ],
           "name": "settings3",
@@ -3733,8 +3892,52 @@
       ]
     },
     "infrastructurecontract": {
-      "address": "0x4f42528B7bF8Da96516bECb22c1c6f53a8Ac7312",
+      "address": "0x67d269191c92Caf3cD7723F116c85e6E9bf55933",
       "ABI": [
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "countryId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "InfrastructureDestroyed",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "countryId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "cost",
+              "type": "uint256"
+            }
+          ],
+          "name": "InfrastructurePurchased",
+          "type": "event"
+        },
         {
           "anonymous": false,
           "inputs": [
@@ -4115,7 +4318,7 @@
       ]
     },
     "technologymarketcontract": {
-      "address": "0x532802f2F9E0e3EE9d5Ba70C35E1F43C0498772D",
+      "address": "0x809d550fca64d94Bd9F66E60752A544199cfAC3D",
       "ABI": [
         {
           "anonymous": false,
@@ -4134,6 +4337,50 @@
             }
           ],
           "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "TechDestroyed",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "cost",
+              "type": "uint256"
+            }
+          ],
+          "name": "TechPurchased",
           "type": "event"
         },
         {
@@ -4440,8 +4687,27 @@
       ]
     },
     "militarycontract": {
-      "address": "0x74ef2B06A1D2035C33244A4a263FF00B84504865",
+      "address": "0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB",
       "ABI": [
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "newLevel",
+              "type": "uint256"
+            }
+          ],
+          "name": "DefconLevelUpdated",
+          "type": "event"
+        },
         {
           "anonymous": false,
           "inputs": [
@@ -4459,6 +4725,44 @@
             }
           ],
           "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "newLevel",
+              "type": "uint256"
+            }
+          ],
+          "name": "ThreatLevelUpdated",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "bool",
+              "name": "warPeacePreference",
+              "type": "bool"
+            }
+          ],
+          "name": "WarPeacePreferenceToggled",
           "type": "event"
         },
         {
@@ -4767,7 +5071,7 @@
       ]
     },
     "warcontract": {
-      "address": "0xd977422c9eE9B646f64A4C4389a6C98ad356d8C4",
+      "address": "0x1291Be112d480055DaFd8a610b7d1e203891C274",
       "ABI": [
         {
           "anonymous": false,
@@ -4786,6 +5090,75 @@
             }
           ],
           "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "warId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "offenseId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "defenseId",
+              "type": "uint256"
+            }
+          ],
+          "name": "PeaceDeclared",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "warId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "offeredBy",
+              "type": "uint256"
+            }
+          ],
+          "name": "PeaceOffered",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "warId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "offenseId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "defenseId",
+              "type": "uint256"
+            }
+          ],
+          "name": "WarDeclared",
           "type": "event"
         },
         {
@@ -5441,11 +5814,6 @@
               "internalType": "bool",
               "name": "",
               "type": "bool"
-            },
-            {
-              "internalType": "bool",
-              "name": "",
-              "type": "bool"
             }
           ],
           "stateMutability": "view",
@@ -5819,11 +6187,6 @@
             {
               "internalType": "bool",
               "name": "peaceDeclared",
-              "type": "bool"
-            },
-            {
-              "internalType": "bool",
-              "name": "expired",
               "type": "bool"
             },
             {

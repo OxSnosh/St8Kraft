@@ -759,6 +759,7 @@ contract ImprovementsContract2 is Ownable {
     address public wonders1;
     address public countryMinter;
     address public resources;
+    address public spies;
     uint256 public foreignMinistryCost = 120000 * (10 ** 18);
     uint256 public forwardOperatingBaseCost = 125000 * (10 ** 18);
     uint256 public guerillaCampCost = 20000 * (10 ** 18);
@@ -772,6 +773,7 @@ contract ImprovementsContract2 is Ownable {
     CountryMinter mint;
     TreasuryContract tres;
     ResourcesContract res;
+    SpyContract spy;
 
     struct Improvements2 {
         //Foreign Ministry
@@ -851,7 +853,8 @@ contract ImprovementsContract2 is Ownable {
         address _wonders1,
         address _countryMinter,
         address _improvements1,
-        address _resources
+        address _resources,
+        address _spies
     ) public onlyOwner {
         treasury = _treasury;
         tres = TreasuryContract(_treasury);
@@ -863,6 +866,8 @@ contract ImprovementsContract2 is Ownable {
         improvements1 = _improvements1;
         resources = _resources;
         res = ResourcesContract(_resources);
+        spies = _spies;
+        spy = SpyContract(_spies);
     }
 
     modifier onlyCountryMinter() {
@@ -1268,7 +1273,7 @@ contract ImprovementsContract2 is Ownable {
             uint256 existingCount = idToImprovements2[countryId]
                 .intelligenceAgencyCount;
             require((existingCount - amount) >= 0, "Cannot delete that many");
-            uint256 spyCount = ForcesContract(forces).getSpyCount(countryId);
+            uint256 spyCount = spy.getSpyCount(countryId);
             uint256 newIntelAgencyCount = existingCount - amount;
             bool centralIntelAgency = won1.getCentralIntelligenceAgency(
                 countryId

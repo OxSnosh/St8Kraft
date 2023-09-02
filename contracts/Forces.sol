@@ -20,7 +20,7 @@ import "hardhat/console.sol";
 ///@dev this contract inherits from the openzeppelin Ownable contract
 ///@notice this contract allows a nation owner to purchase soldiers, tanks and spies
 contract ForcesContract is Ownable {
-    uint256 public spyCost = 100000;
+    // uint256 public spyCost = 100000;
     address public countryMinter;
     address public treasuryAddress;
     address public aid;
@@ -55,7 +55,6 @@ contract ForcesContract is Ownable {
         uint256 numberOfTanks;
         uint256 defendingTanks;
         uint256 deployedTanks;
-        uint256 numberOfSpies;
         bool nationExists;
     }
 
@@ -71,10 +70,6 @@ contract ForcesContract is Ownable {
     event TanksPurchased(uint256 indexed id, uint256 indexed amount);
 
     event TanksDecommissioned(uint256 indexed id, uint256 indexed amount);
-
-    event SpiesPurchased(uint256 indexed id, uint256 indexed amount);
-
-    event SpiesDecommissioned(uint256 indexed id, uint256 indexed amount);
 
     event ForcesDeployed(
         uint256 indexed id,
@@ -157,7 +152,7 @@ contract ForcesContract is Ownable {
     ///@notice this function allows a nation to purchase forces once a country is minted
     ///@param id this is the nation ID of the nation being minted
     function generateForces(uint256 id) public {
-        Forces memory newForces = Forces(20, 20, 0, 0, 0, 0, 0, true);
+        Forces memory newForces = Forces(20, 20, 0, 0, 0, 0, true);
         idToForces[id] = newForces;
     }
 
@@ -719,97 +714,6 @@ contract ForcesContract is Ownable {
         return tankAmount;
     }
 
-    ///@dev this is a public function only callable by the nation owner that will purchase spies
-    ///@notice this function will allow a natio nowner to purchase spies
-    ///@notice you cannot buy more spies than the maximum amount for your nation
-    ///@param amount is the amount of spies being purchased
-    ///@param id is the nation id of the nation buying spies
-    function buySpies(uint256 amount, uint256 id) public {
-        bool isOwner = mint.checkOwnership(id, msg.sender);
-        require(isOwner, "!nation owner");
-        uint256 maxSpyCount = getMaxSpyCount(id);
-        uint256 currentSpyCount = idToForces[id].numberOfSpies;
-        require(
-            (currentSpyCount + amount) <= maxSpyCount,
-            "cannot own that many spies"
-        );
-        uint256 purchasePrice = spyCost * amount;
-        uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
-        require(
-            balance >= purchasePrice,
-            "insufficient balance to purchase spies"
-        );
-        idToForces[id].numberOfSpies += amount;
-        TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
-        emit SpiesPurchased(id, amount);
-    }
-
-    function updateSpyPrice(uint256 newCost) public onlyOwner {
-        spyCost = newCost;
-    }
-
-    function getSpyPrice() public view returns (uint256) {
-        return spyCost;
-    }
-
-    ///@dev this is a public view function that will return the maximum amount of spies a given country can own
-    ///@notice this function will return the maximum amount of spies a nation can own
-    ///@notice the base max spy count for a nation is 50
-    ///@notice intel agencies will increase the max number of spies by 100
-    ///@notice a central intelligence agency wonder will increase the max number of spies by 250
-    ///@param id is the nation id for the nation being queried
-    ///@return uint256 is the maximum number of spies for a given nation
-    function getMaxSpyCount(uint256 id) public view returns (uint256) {
-        uint256 maxSpyCount = 50;
-        uint256 intelAgencies = imp2.getIntelAgencyCount(id);
-        if (intelAgencies > 0) {
-            maxSpyCount += (intelAgencies * 100);
-        }
-        bool cia = won1.getCentralIntelligenceAgency(id);
-        if (cia) {
-            maxSpyCount += 250;
-        }
-        return maxSpyCount;
-    }
-
-    function decommissionSpies(uint256 amount, uint256 id) public {
-        bool isOwner = mint.checkOwnership(id, msg.sender);
-        require(isOwner, "!nation owner");
-        uint256 spyCount = idToForces[id].numberOfSpies;
-        require((spyCount - amount) >= 0, "not enough spies to decommission that many");
-        idToForces[id].numberOfSpies -= amount;
-        emit SpiesDecommissioned(id, amount);
-    }
-
-    ///@dev this is a public function only callable from the Spy Contract
-    ///@notice this function will allow the spy contract to decrease the number of spies of an nation that is lost by the attacker during a spy attack
-    ///@param id is the nation id of the nation losing their spy when the attack fails
-    function decreaseAttackerSpyCount(uint256 id) public onlySpyContract {
-        idToForces[id].numberOfSpies -= 1;
-    }
-
-    ///@dev this is a public view function that allows the spy contract to decrease the number of spies of a nation in a spy attack
-    ///@notice this function will allow the spy contract to decrease the number of spies lost during a spy attack
-    ///@param amount is the number of spies lost during the attack
-    ///@param id is the nation suffering losses during the spy attack
-    function decreaseDefenderSpyCount(
-        uint256 amount,
-        uint256 id
-    ) public onlySpyContract {
-        idToForces[id].numberOfSpies -= amount;
-    }
-
-    ///@dev this is a public view function that will return the current spy count for a nation
-    ///@notice this function will return a nations current spy count
-    ///@param countryId is the nation ID of the nation being queried
-    ///@return count is the spy count for a given nation
-    function getSpyCount(
-        uint256 countryId
-    ) public view returns (uint256 count) {
-        uint256 spyAmount = idToForces[countryId].numberOfSpies;
-        return spyAmount;
-    }
-
     ///@dev this is a public function only callable from the ground battle contract
     ///@dev this function will decrease the losses of an attacker during a ground battle
     ///@notice this function will decrease the number of losses of an attacker during a ground battle
@@ -855,6 +759,134 @@ contract ForcesContract is Ownable {
         uint256 soldierCasualties = idToCasualties[id].soldierCasualties;
         uint256 tankCasualties = idToCasualties[id].tankCasualties;
         return (soldierCasualties, tankCasualties);
+    }
+}
+
+contract SpyContract is Ownable {
+    uint256 public spyCost = 100000;
+    address public treasury;
+    address public spyOperations;
+
+    CountryMinter mint;
+    InfrastructureContract inf;
+    ResourcesContract res;
+    WondersContract1 won1;
+    ImprovementsContract1 imp1;
+    ImprovementsContract2 imp2;
+    WarContract war;
+    GroundBattleContract ground;
+    CountryParametersContract params;
+
+    event SpiesPurchased(uint256 indexed id, uint256 indexed amount);
+
+    event SpiesDecommissioned(uint256 indexed id, uint256 indexed amount);
+
+    ///@dev this function is only callable by the contract owner
+    ///@dev this function will be called immediately after contract deployment in order to set contract pointers
+    function settings(
+        address _spyOperations,
+        address _treasury
+    ) public onlyOwner {
+        spyOperations = _spyOperations;
+        treasury = _treasury;
+    }
+
+    mapping(uint256 => uint256) public idToSpies;
+
+    modifier onlySpyOperations() {
+        require(msg.sender == spyOperations, "only callable from spy operations contract");
+        _;
+    }
+
+    ///@dev this is a public function only callable by the nation owner that will purchase spies
+    ///@notice this function will allow a natio nowner to purchase spies
+    ///@notice you cannot buy more spies than the maximum amount for your nation
+    ///@param amount is the amount of spies being purchased
+    ///@param id is the nation id of the nation buying spies
+    function buySpies(uint256 amount, uint256 id) public {
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
+        uint256 maxSpyCount = getMaxSpyCount(id);
+        uint256 currentSpyCount = idToSpies[id];
+        require(
+            (currentSpyCount + amount) <= maxSpyCount,
+            "cannot own that many spies"
+        );
+        uint256 purchasePrice = spyCost * amount;
+        uint256 balance = TreasuryContract(treasury).checkBalance(id);
+        require(
+            balance >= purchasePrice,
+            "insufficient balance to purchase spies"
+        );
+        idToSpies[id] += amount;
+        TreasuryContract(treasury).spendBalance(id, purchasePrice);
+        emit SpiesPurchased(id, amount);
+    }
+
+    function updateSpyPrice(uint256 newCost) public onlyOwner {
+        spyCost = newCost;
+    }
+
+    function getSpyPrice() public view returns (uint256) {
+        return spyCost;
+    }
+
+    ///@dev this is a public view function that will return the maximum amount of spies a given country can own
+    ///@notice this function will return the maximum amount of spies a nation can own
+    ///@notice the base max spy count for a nation is 50
+    ///@notice intel agencies will increase the max number of spies by 100
+    ///@notice a central intelligence agency wonder will increase the max number of spies by 250
+    ///@param id is the nation id for the nation being queried
+    ///@return uint256 is the maximum number of spies for a given nation
+    function getMaxSpyCount(uint256 id) public view returns (uint256) {
+        uint256 maxSpyCount = 50;
+        uint256 intelAgencies = imp2.getIntelAgencyCount(id);
+        if (intelAgencies > 0) {
+            maxSpyCount += (intelAgencies * 100);
+        }
+        bool cia = won1.getCentralIntelligenceAgency(id);
+        if (cia) {
+            maxSpyCount += 250;
+        }
+        return maxSpyCount;
+    }
+
+    function decommissionSpies(uint256 amount, uint256 id) public {
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
+        uint256 spyCount = idToSpies[id];
+        require((spyCount - amount) >= 0, "not enough spies to decommission that many");
+        idToSpies[id] -= amount;
+        emit SpiesDecommissioned(id, amount);
+    }
+
+    ///@dev this is a public function only callable from the Spy Contract
+    ///@notice this function will allow the spy contract to decrease the number of spies of an nation that is lost by the attacker during a spy attack
+    ///@param id is the nation id of the nation losing their spy when the attack fails
+    function decreaseAttackerSpyCount(uint256 id) public onlySpyOperations {
+        idToSpies[id] -= 1;
+    }
+
+    ///@dev this is a public view function that allows the spy contract to decrease the number of spies of a nation in a spy attack
+    ///@notice this function will allow the spy contract to decrease the number of spies lost during a spy attack
+    ///@param amount is the number of spies lost during the attack
+    ///@param id is the nation suffering losses during the spy attack
+    function decreaseDefenderSpyCount(
+        uint256 amount,
+        uint256 id
+    ) public onlySpyOperations {
+        idToSpies[id] -= amount;
+    }
+
+    ///@dev this is a public view function that will return the current spy count for a nation
+    ///@notice this function will return a nations current spy count
+    ///@param countryId is the nation ID of the nation being queried
+    ///@return count is the spy count for a given nation
+    function getSpyCount(
+        uint256 countryId
+    ) public view returns (uint256 count) {
+        uint256 spyAmount = idToSpies[countryId];
+        return spyAmount;
     }
 }
 

@@ -41,6 +41,7 @@ import {
     NukeContract,
     ResourcesContract,
     SenateContract,
+    SpyContract,
     SpyOperationsContract,
     TaxesContract,
     AdditionalTaxesContract,
@@ -131,6 +132,7 @@ async function main() {
     let resourcescontract: ResourcesContract
     let bonusresourcescontract: BonusResourcesContract
     let senatecontract: SenateContract
+    let spycontract: SpyContract
     let spyoperationscontract: SpyOperationsContract
     let taxescontract: TaxesContract
     let additionaltaxescontract: AdditionalTaxesContract
@@ -366,6 +368,11 @@ async function main() {
         // address _improvements2,
         // address _wonders1,
         // address _countryMinter
+
+    const SpyContract = await ethers.getContractFactory("SpyContract")
+    spycontract = await SpyContract.deploy() as SpyContract
+    await spycontract.deployed()
+    console.log(`SpyContract deployed to ${spycontract.address}`)
 
     const MissilesContract = await ethers.getContractFactory("MissilesContract")
     missilescontract = await MissilesContract.deploy() as MissilesContract
@@ -1026,7 +1033,8 @@ async function main() {
         wonderscontract1.address,
         countryminter.address,
         improvementscontract1.address,
-        resourcescontract.address
+        resourcescontract.address,
+        spycontract.address
         )
     
     await improvementscontract3.settings(
@@ -1235,6 +1243,11 @@ async function main() {
         resourcescontract.address
     )
 
+    await spycontract.settings(
+        spyoperationscontract.address,
+        treasurycontract.address
+        )
+
     await spyoperationscontract.settings(
         infrastructurecontract.address,
         forcescontract.address,
@@ -1248,7 +1261,8 @@ async function main() {
         countryminter.address
     )
     await spyoperationscontract.settings2(
-        keepercontract.address
+        keepercontract.address,
+        spycontract.address
     )
 
     await taxescontract.settings1(
