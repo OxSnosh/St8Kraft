@@ -903,7 +903,7 @@ async function main() {
         wonderscontract4.address,
         forcescontract.address,
         countryparameterscontract.address,
-        taxescontract.address,
+        additionaltaxescontract.address,
         missilescontract.address,
         nukecontract.address)
     await environmentcontract.settings2(
@@ -1005,7 +1005,7 @@ async function main() {
         improvementscontract3.address,
         wonderscontract3.address,
         wonderscontract4.address,
-        taxescontract.address,
+        additionaltaxescontract.address,
         countryparameterscontract.address)
     
     await improvementscontract1.settings(
@@ -1091,17 +1091,6 @@ async function main() {
         infrastructurecontract.address,
         bonusresourcescontract.address
     )
-
-    // await keepercontract.settings(
-    //     nukecontract.address,
-    //     aidcontract.address,
-    //     warcontract.address,
-    //     treasurycontract.address,
-    //     missilescontract.address,
-    //     navalactionscontract.address,
-    //     countryparameterscontract.address,
-    //     militarycontract.address
-    // )
 
     await landmarketcontract.settings(
         resourcescontract.address,
@@ -1298,7 +1287,8 @@ async function main() {
     )
     await additionaltaxescontract.settings2(
         improvementscontract2.address,
-        improvementscontract3.address
+        improvementscontract3.address,
+        forcescontract.address,
     )
 
     await technologymarketcontrat.settings(

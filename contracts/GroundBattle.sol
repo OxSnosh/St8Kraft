@@ -32,7 +32,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     address wonders3;
     address wonders4;
     address countryMinter;
-    address taxes;
+    address additionalTaxes;
     address parameters;
     address military;
 
@@ -47,7 +47,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
     WondersContract3 won3;
     WondersContract4 won4;
     CountryMinter mint;
-    TaxesContract tax;
+    AdditionalTaxesContract addTax;
     CountryParametersContract param;
     MilitaryContract mil;
 
@@ -133,7 +133,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         address _improvements3,
         address _wonders3,
         address _wonders4,
-        address _taxes,
+        address _additionalTaxes,
         address _parameters
     ) public onlyOwner {
         improvements2 = _improvements2;
@@ -144,8 +144,10 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         won3 = WondersContract3(_wonders3);
         wonders4 = _wonders4;
         won4 = WondersContract4(_wonders4);
-        taxes = _taxes;
-        tax = TaxesContract(_taxes);
+        // taxes = _taxes;
+        // tax = TaxesContract(_taxes);
+        additionalTaxes = _additionalTaxes;
+        addTax = AdditionalTaxesContract(_additionalTaxes);
         parameters = _parameters;
         param = CountryParametersContract(_parameters);
     }
@@ -573,10 +575,10 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             warId
         );
         war.cancelPeaceOffersUponAttack(warId);
-        (, , bool anarchyCheckDefender) = tax.soldierToPopulationRatio(
+        (, , bool anarchyCheckDefender) = addTax.soldierToPopulationRatio(
             defenderId
         );
-        (, , bool anarchyCheckAttacker) = tax.soldierToPopulationRatio(
+        (, , bool anarchyCheckAttacker) = addTax.soldierToPopulationRatio(
             attackerId
         );
         if (anarchyCheckDefender) {

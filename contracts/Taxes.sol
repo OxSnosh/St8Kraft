@@ -65,7 +65,7 @@ contract TaxesContract is Ownable {
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings1 (
+    function settings1(
         address _countryMinter,
         address _infrastructure,
         address _treasury,
@@ -101,7 +101,7 @@ contract TaxesContract is Ownable {
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings2 (
+    function settings2(
         address _parameters,
         address _wonders1,
         address _wonders2,
@@ -176,10 +176,9 @@ contract TaxesContract is Ownable {
     }
 
     ///@dev this function is only callable by the contract owner
-    function updateCountryParametersContract(address newAddress)
-        public
-        onlyOwner
-    {
+    function updateCountryParametersContract(
+        address newAddress
+    ) public onlyOwner {
         parameters = newAddress;
         params = CountryParametersContract(newAddress);
     }
@@ -219,7 +218,7 @@ contract TaxesContract is Ownable {
     ///@param id this is the nation id of the nation collecting taxes
     function collectTaxes(uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
-        require (isOwner, "!nation owner");
+        require(isOwner, "!nation owner");
         bool war = mil.getWarPeacePreference(id);
         require(war, "must be ready for war to collct taxes");
         (, uint256 taxesCollectible) = getTaxesCollectible(id);
@@ -233,19 +232,22 @@ contract TaxesContract is Ownable {
     ///@notice this function will return a nations taxes collectible
     ///@param id is the nation id of the nation being queried
     ///@return dailyTaxesCollectiblePerCitizen is the tax portion of each citizens income per day
-    ///@return taxesCollectible is the amount of taxes that are collectible (daily taxes per citizen * days since last collection * citizen count)    
-    function getTaxesCollectible(uint256 id) public view returns (uint256, uint256) {
+    ///@return taxesCollectible is the amount of taxes that are collectible (daily taxes per citizen * days since last collection * citizen count)
+    function getTaxesCollectible(
+        uint256 id
+    ) public view returns (uint256, uint256) {
         uint256 dailyIncomePerCitizen = getDailyIncome(id);
         uint256 daysSinceLastTaxCollection = tsy.getDaysSinceLastTaxCollection(
             id
         );
-        (uint256 citizenCount,) = inf.getTaxablePopulationCount(0);
+        (uint256 citizenCount, ) = inf.getTaxablePopulationCount(0);
         uint256 taxRate = inf.getTaxRate(id);
         uint256 dailyTaxesCollectiblePerCitizen = ((dailyIncomePerCitizen *
             taxRate) / 100);
         uint256 taxesCollectible = (dailyTaxesCollectiblePerCitizen *
-            daysSinceLastTaxCollection * citizenCount) * (10**18);
-        return (dailyTaxesCollectiblePerCitizen, taxesCollectible);        
+            daysSinceLastTaxCollection *
+            citizenCount) * (10 ** 18);
+        return (dailyTaxesCollectiblePerCitizen, taxesCollectible);
     }
 
     ///@dev this is a public view function that will return the daily gross income per citizen for a given nation
@@ -268,11 +270,11 @@ contract TaxesContract is Ownable {
             (ministries * 5) +
             (harbors * 1) +
             (schools * 5) +
-            universityPoints - 
+            universityPoints -
             (guerillaCamp * 8) -
             (casinos * 1));
-        uint256 baseDailyIncomePerCitizen = (((35 +
-            (2 * happiness)) * multipliers) / 100);
+        uint256 baseDailyIncomePerCitizen = (((35 + (2 * happiness)) *
+            multipliers) / 100);
         uint256 incomeAdjustments = addTax.getIncomeAdjustments(id);
         uint256 dailyIncomePerCitizen = baseDailyIncomePerCitizen +
             incomeAdjustments;
@@ -316,11 +318,9 @@ contract TaxesContract is Ownable {
         return happinessPointsToAdd;
     }
 
-    function getAdditionalHappinessPointsToAdd(uint256 id)
-        internal
-        view
-        returns (uint256)
-    {
+    function getAdditionalHappinessPointsToAdd(
+        uint256 id
+    ) internal view returns (uint256) {
         uint256 technologyPoints = getTechnologyPoints(id);
         uint256 pointsFromAge = getPointsFromNationAge(id);
         uint256 pointsFromTrades = addTax.getPointsFromTrades(id);
@@ -334,34 +334,28 @@ contract TaxesContract is Ownable {
         return additonalHappinessPointsToAdd;
     }
 
-    function getHappinessPointsToSubtract(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
+    function getHappinessPointsToSubtract(
+        uint256 id
+    ) public view returns (uint256) {
         uint256 taxRatePoints = getTaxRatePoints(id);
-        uint256 pointsFromStability = getPointsFromMilitary(id);
+        uint256 pointsFromStability = addTax.getPointsFromMilitary(id);
         uint256 pointsFromCrime = getPointsFromCriminals(id);
-        uint256 pointsFromImprovements = addTax.getPointsToSubtractFromImprovements(
-            id
-        );
+        uint256 pointsFromImprovements = addTax
+            .getPointsToSubtractFromImprovements(id);
         uint256 pointsFromIntelAgencies = getPointsFromIntelAgencies(id);
         uint256 environmentPoints = env.getEnvironmentScore(id);
-        uint256 happinessPointsToSubtract = (
-            taxRatePoints +
+        uint256 happinessPointsToSubtract = (taxRatePoints +
             pointsFromCrime +
             pointsFromImprovements +
             pointsFromStability +
             pointsFromIntelAgencies +
-            environmentPoints );
+            environmentPoints);
         return happinessPointsToSubtract;
     }
 
-    function checkCompatability(uint256 id)
-        public
-        view
-        returns (uint256 compatability)
-    {
+    function checkCompatability(
+        uint256 id
+    ) public view returns (uint256 compatability) {
         uint256 religion = params.getReligionType(id);
         uint256 govType = params.getGovernmentType(id);
         uint256 preferredReligion = params.getReligionPreference(id);
@@ -447,11 +441,9 @@ contract TaxesContract is Ownable {
         return pointsFromResources;
     }
 
-    function getAdditionalPointsFromResources(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
+    function getAdditionalPointsFromResources(
+        uint256 id
+    ) public view returns (uint256) {
         uint256 additionalPointsFromResources;
         bool automobiles = bonus.viewAutomobiles(id);
         if (automobiles) {
@@ -464,11 +456,9 @@ contract TaxesContract is Ownable {
         return additionalPointsFromResources;
     }
 
-    function getPointsFromImprovements(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
+    function getPointsFromImprovements(
+        uint256 id
+    ) public view returns (uint256) {
         uint256 pointsFromImprovements;
         uint256 borderWalls = imp1.getBorderWallCount(id);
         if (borderWalls > 0) {
@@ -502,11 +492,9 @@ contract TaxesContract is Ownable {
         return pointsFromImprovements;
     }
 
-    function getHappinessFromWonders(uint256 id)
-        public
-        view
-        returns (uint256 wonderPts)
-    {
+    function getHappinessFromWonders(
+        uint256 id
+    ) public view returns (uint256 wonderPts) {
         (
             bool monument,
             bool temple,
@@ -576,17 +564,9 @@ contract TaxesContract is Ownable {
         return wonderPoints;
     }
 
-    function wonderChecks1(uint256 id)
-        internal
-        view
-        returns (
-            bool,
-            bool,
-            bool,
-            bool,
-            bool
-        )
-    {
+    function wonderChecks1(
+        uint256 id
+    ) internal view returns (bool, bool, bool, bool, bool) {
         bool isMonument = won2.getGreatMonument(id);
         bool isTemple = won2.getGreatTemple(id);
         bool isUniversity = won2.getGreatUniversity(id);
@@ -602,16 +582,9 @@ contract TaxesContract is Ownable {
         );
     }
 
-    function wonderChecks2(uint256 id)
-        internal
-        view
-        returns (
-            bool,
-            bool,
-            bool,
-            bool
-        )
-    {
+    function wonderChecks2(
+        uint256 id
+    ) internal view returns (bool, bool, bool, bool) {
         bool isWarMemorial = won3.getNationalWarMemorial(id);
         bool isScientificDevCenter = won3.getScientificDevelopmentCenter(id);
         bool isSpaceProgram = won4.getSpaceProgram(id);
@@ -629,7 +602,7 @@ contract TaxesContract is Ownable {
         (uint256 casualties, ) = frc.getCasualties(id);
         uint256 casualtyPoints = 0;
         if (nationalCemetary) {
-            if(casualties > 5000000) {
+            if (casualties > 5000000) {
                 casualtyPoints = 1;
             } else if (casualties > 10000000) {
                 casualtyPoints = 2;
@@ -709,14 +682,16 @@ contract TaxesContract is Ownable {
         return subtractTaxPoints;
     }
 
-    function getPointsFromIntelAgencies(uint256 id) public view returns (uint256) {
+    function getPointsFromIntelAgencies(
+        uint256 id
+    ) public view returns (uint256) {
         uint256 intelAgencies = imp2.getIntelAgencyCount(id);
         uint256 subtractPoints;
         uint256 taxRate = inf.getTaxRate(id);
         if (taxRate <= 20) {
             subtractPoints = 0;
         } else if (intelAgencies >= 1 && taxRate > 20 && taxRate <= 23) {
-            subtractPoints = 1;  
+            subtractPoints = 1;
         } else if (intelAgencies >= 1 && taxRate > 23) {
             subtractPoints = intelAgencies;
         } else {
@@ -725,46 +700,45 @@ contract TaxesContract is Ownable {
         return subtractPoints;
     }
 
+    // function getPointsFromMilitary(uint256 id) public view returns (uint256) {
+    //     (uint256 ratio, , ) = soldierToPopulationRatio(id);
+    //     uint256 pointsFromMilitaryToSubtract;
+    //     if (ratio > 70) {
+    //         pointsFromMilitaryToSubtract = 10;
+    //     }
+    //     if (ratio < 20) {
+    //         pointsFromMilitaryToSubtract = 5;
+    //     }
+    //     if (ratio < 10) {
+    //         pointsFromMilitaryToSubtract = 14;
+    //     }
+    //     return pointsFromMilitaryToSubtract;
+    // }
 
-    function getPointsFromMilitary(uint256 id) public view returns (uint256) {
-        (uint256 ratio, , ) = soldierToPopulationRatio(id);
-        uint256 pointsFromMilitaryToSubtract;
-        if (ratio > 70) {
-            pointsFromMilitaryToSubtract = 10;
-        }
-        if (ratio < 20) {
-            pointsFromMilitaryToSubtract = 5;
-        }
-        if (ratio < 10) {
-            pointsFromMilitaryToSubtract = 14;
-        }
-        return pointsFromMilitaryToSubtract;
-    }
-
-    function soldierToPopulationRatio(uint256 id)
-        public
-        view
-        returns (uint256, bool, bool)
-    {
-        uint256 soldierCount = frc.getSoldierCount(id);
-        if(soldierCount == 0) {
-            soldierCount = 1;
-        }
-        uint256 populationCount = inf.getTotalPopulationCount(id);
-        uint256 soldierPopulationRatio = ((soldierCount * 100 / populationCount));
-        bool environmentPenalty = false;
-        bool anarchyCheck = false;
-        if (soldierPopulationRatio > 60) {
-            environmentPenalty = true;
-        }
-        if (soldierPopulationRatio < 10) {
-            anarchyCheck = true;
-        }
-        return (soldierPopulationRatio, environmentPenalty, anarchyCheck);
-    }
+    // function soldierToPopulationRatio(uint256 id)
+    //     public
+    //     view
+    //     returns (uint256, bool, bool)
+    // {
+    //     uint256 soldierCount = frc.getSoldierCount(id);
+    //     if(soldierCount == 0) {
+    //         soldierCount = 1;
+    //     }
+    //     uint256 populationCount = inf.getTotalPopulationCount(id);
+    //     uint256 soldierPopulationRatio = ((soldierCount * 100 / populationCount));
+    //     bool environmentPenalty = false;
+    //     bool anarchyCheck = false;
+    //     if (soldierPopulationRatio > 60) {
+    //         environmentPenalty = true;
+    //     }
+    //     if (soldierPopulationRatio < 10) {
+    //         anarchyCheck = true;
+    //     }
+    //     return (soldierPopulationRatio, environmentPenalty, anarchyCheck);
+    // }
 
     function getPointsFromCriminals(uint256 id) public view returns (uint256) {
-        (uint256 unincarceratedCriminals,, )= crm.getCriminalCount(id);
+        (uint256 unincarceratedCriminals, , ) = crm.getCriminalCount(id);
         uint256 pointsFromCrime;
         if (unincarceratedCriminals < 200) {
             pointsFromCrime = 0;
@@ -784,7 +758,7 @@ contract TaxesContract is Ownable {
 }
 
 ///@title AdditionalTaxesContract
-///@author OxSnosh 
+///@author OxSnosh
 ///@dev tis contract inherits from openzeppelin's ownable contract
 ///@notice this contract will have additional formulas that will allow a nation to collect taxes from its citizens
 contract AdditionalTaxesContract is Ownable {
@@ -799,6 +773,7 @@ contract AdditionalTaxesContract is Ownable {
     address public resources;
     address public military;
     address public bonusResources;
+    address public forces;
 
     InfrastructureContract inf;
     ImprovementsContract2 imp2;
@@ -811,10 +786,11 @@ contract AdditionalTaxesContract is Ownable {
     ResourcesContract res;
     MilitaryContract mil;
     BonusResourcesContract bonus;
+    ForcesContract frc;
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings (
+    function settings(
         address _parameters,
         address _wonders1,
         address _wonders2,
@@ -847,11 +823,17 @@ contract AdditionalTaxesContract is Ownable {
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings2(address _improvements2, address _improvements3) public onlyOwner {
+    function settings2(
+        address _improvements2,
+        address _improvements3,
+        address _forces
+    ) public onlyOwner {
         improvements2 = _improvements2;
         imp2 = ImprovementsContract2(_improvements2);
         improvements3 = _improvements3;
         imp3 = ImprovementsContract3(_improvements3);
+        forces = _forces;
+        frc = ForcesContract(_forces);
     }
 
     function getIncomeAdjustments(uint256 id) public view returns (uint256) {
@@ -894,11 +876,9 @@ contract AdditionalTaxesContract is Ownable {
         return adjustments;
     }
 
-    function getResourcePointsForMiningConsortium(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
+    function getResourcePointsForMiningConsortium(
+        uint256 id
+    ) public view returns (uint256) {
         uint256 points = 0;
         bool coal = res.viewCoal(id);
         if (coal) {
@@ -919,7 +899,9 @@ contract AdditionalTaxesContract is Ownable {
         return points;
     }
 
-    function getNuclearAndUraniumBonus(uint256 id) public view returns (uint256) {
+    function getNuclearAndUraniumBonus(
+        uint256 id
+    ) public view returns (uint256) {
         bool nuclearPowerPlant = won3.getNuclearPowerPlant(id);
         bool uranium = res.viewUranium(id);
         uint256 techAmount = inf.getTechnologyCount(id);
@@ -958,11 +940,9 @@ contract AdditionalTaxesContract is Ownable {
         return (defconLevel - 1);
     }
 
-    function getPointsToSubtractFromImprovements(uint256 id)
-        public
-        view
-        returns (uint256)
-    {
+    function getPointsToSubtractFromImprovements(
+        uint256 id
+    ) public view returns (uint256) {
         uint256 pointsToSubtractFromImprovements;
         uint256 laborCamps = imp2.getLaborCampCount(id);
         if (laborCamps > 0) {
@@ -974,7 +954,9 @@ contract AdditionalTaxesContract is Ownable {
     function getUniversityPoints(uint256 id) public view returns (uint256) {
         uint256 universities = imp3.getUniversityCount(id);
         uint256 universityPoints = 0;
-        bool scientificDevelopmentCenter = won3.getScientificDevelopmentCenter(id);
+        bool scientificDevelopmentCenter = won3.getScientificDevelopmentCenter(
+            id
+        );
         if (universities > 0) {
             if (!scientificDevelopmentCenter) {
                 universityPoints = (universities * 8);
@@ -993,9 +975,46 @@ contract AdditionalTaxesContract is Ownable {
             governmentType == 6 ||
             governmentType == 8 ||
             governmentType == 9
-        ){
+        ) {
             pointsFromGovernmentType = 1;
         }
         return pointsFromGovernmentType;
+    }
+
+    function getPointsFromMilitary(uint256 id) public view returns (uint256) {
+        (uint256 ratio, , ) = soldierToPopulationRatio(id);
+        uint256 pointsFromMilitaryToSubtract;
+        if (ratio > 70) {
+            pointsFromMilitaryToSubtract = 10;
+        }
+        if (ratio < 20) {
+            pointsFromMilitaryToSubtract = 5;
+        }
+        if (ratio < 10) {
+            pointsFromMilitaryToSubtract = 14;
+        }
+        return pointsFromMilitaryToSubtract;
+    }
+
+    function soldierToPopulationRatio(
+        uint256 id
+    ) public view returns (uint256, bool, bool) {
+        uint256 soldierCount = frc.getSoldierCount(id);
+        if (soldierCount == 0) {
+            soldierCount = 1;
+        }
+        uint256 populationCount = inf.getTotalPopulationCount(id);
+        uint256 soldierPopulationRatio = (
+            ((soldierCount * 100) / populationCount)
+        );
+        bool environmentPenalty = false;
+        bool anarchyCheck = false;
+        if (soldierPopulationRatio > 60) {
+            environmentPenalty = true;
+        }
+        if (soldierPopulationRatio < 10) {
+            anarchyCheck = true;
+        }
+        return (soldierPopulationRatio, environmentPenalty, anarchyCheck);
     }
 }

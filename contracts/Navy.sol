@@ -200,7 +200,6 @@ contract NavyContract is Ownable {
     uint256 public cruiserRequiredTechnology = 350;
 
     struct Navy {
-        uint256 navyVessels;
         uint256 corvetteCount;
         uint256 landingShipCount;
         uint256 battleshipCount;
@@ -228,6 +227,26 @@ contract NavyContract is Ownable {
         uint256 indexed id,
         uint256 indexed amount,
         uint256 indexed purchasePrice
+    );
+
+    event CorvetteDecommissioned(
+        uint256 indexed id,
+        uint256 indexed amount
+    );
+
+    event LandingShipDecommissioned(
+        uint256 indexed id,
+        uint256 indexed amount
+    );
+
+    event BattleshipDecommissioned(
+        uint256 indexed id,
+        uint256 indexed amount
+    );
+
+    event CruiserDecommissioned(
+        uint256 indexed id,
+        uint256 indexed amount
     );
 
     event NukeDamageToNavy(
@@ -317,7 +336,7 @@ contract NavyContract is Ownable {
     ///@notice this function will allow a nation owner to buy navy vessels
     ///@param id this is the nation id of the nation being minted
     function generateNavy(uint256 id) public onlyCountryMinter {
-        Navy memory newNavy = Navy(0, 0, 0, 0, 0);
+        Navy memory newNavy = Navy(0, 0, 0, 0);
         idToNavy[id] = newNavy;
     }
 
@@ -487,10 +506,6 @@ contract NavyContract is Ownable {
         return navyVessels;
     }
 
-    function increaseNavyVesselCount(uint256 id, uint256 amount) public onlyNavy2Contract {
-        idToNavy[id].navyVessels += amount;
-    }
-
     ///@dev this is a public function callable only by the nation owner
     ///@dev this function will allow a nation owner to purchase a corvette vessel
     ///@notice this function will allow a nation owner to purchase a corvette vessel
@@ -516,10 +531,17 @@ contract NavyContract is Ownable {
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].corvetteCount += amount;
-        idToNavy[id].navyVessels += amount;
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
         emit CorvettePurchased(id, amount, purchasePrice);
+    }
+
+    function decommissionCorvette(uint256 amount, uint256 id) public {
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
+        require(amount <= idToNavy[id].corvetteCount, "not enough corvettes");
+        idToNavy[id].corvetteCount -= amount;
+        emit CorvetteDecommissioned(id, amount);
     }
 
     ///@dev this is a public view function that will return the number of corvettes a nation owns
@@ -557,10 +579,20 @@ contract NavyContract is Ownable {
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].landingShipCount += amount;
-        idToNavy[id].navyVessels += amount;
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
         emit LandingShipPurchased(id, amount, purchasePrice);
+    }
+
+    function decomissionLandingShip(uint256 amount, uint256 id) public {
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
+        require(
+            amount <= idToNavy[id].landingShipCount,
+            "not enough landing ships"
+        );
+        idToNavy[id].landingShipCount -= amount;
+        emit LandingShipDecommissioned(id, amount);
     }
 
     ///@dev this is a public view function that will return the number of landing ships a nation owns
@@ -598,10 +630,20 @@ contract NavyContract is Ownable {
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].battleshipCount += amount;
-        idToNavy[id].navyVessels += amount;
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
         emit BattleshipPurchased(id, amount, purchasePrice);
+    }
+
+    function decommissionBattleship(uint256 amount, uint256 id) public {
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
+        require(
+            amount <= idToNavy[id].battleshipCount,
+            "not enough battleships"
+        );
+        idToNavy[id].battleshipCount -= amount;
+        emit BattleshipDecommissioned(id, amount);
     }
 
     ///@dev this is a public view function that will return the number of battleships a nation owns
@@ -639,10 +681,17 @@ contract NavyContract is Ownable {
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].cruiserCount += amount;
-        idToNavy[id].navyVessels += amount;
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
         emit CruiserPurchased(id, amount, purchasePrice);
+    }
+
+    function decommissionCruiser(uint256 amount, uint256 id) public {
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
+        require(amount <= idToNavy[id].cruiserCount, "not enough cruisers");
+        idToNavy[id].cruiserCount -= amount;
+        emit CruiserDecommissioned(id, amount);
     }
 
     ///@dev this is a public view function that will return the number of cruisers a nation owns
@@ -755,6 +804,26 @@ contract NavyContract2 is Ownable {
         uint256 indexed id,
         uint256 indexed amount,
         uint256 indexed purchasePrice
+    );
+
+    event FrigateDecommissioned(
+        uint256 indexed id,
+        uint256 indexed amount
+    );
+
+    event DestroyerDecommissioned(
+        uint256 indexed id,
+        uint256 indexed amount
+    );
+
+    event SubmarineDecommissioned(
+        uint256 indexed id,
+        uint256 indexed amount
+    );
+
+    event AircraftCarrierDecommissioned(
+        uint256 indexed id,
+        uint256 indexed amount
     );
 
     ResourcesContract res;
@@ -958,10 +1027,17 @@ contract NavyContract2 is Ownable {
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].frigateCount += amount;
-        navy1.increaseNavyVesselCount(id, amount);
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
         emit FrigatePurchased(id, amount, purchasePrice);
+    }
+
+    function decommissionFrigate(uint256 amount, uint256 id) public {
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
+        require(amount <= idToNavy[id].frigateCount, "not enough frigates");
+        idToNavy[id].frigateCount -= amount;
+        emit FrigateDecommissioned(id, amount);
     }
 
     ///@dev this is a public view function that will return the number of frigates a nation owns
@@ -1010,10 +1086,20 @@ contract NavyContract2 is Ownable {
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].destroyerCount += amount;
-        navy1.increaseNavyVesselCount(id, amount);
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
         emit DestroyerPurchased(id, amount, purchasePrice);
+    }
+
+    function decommissionDestroyer(uint256 amount, uint256 id) public {
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
+        require(
+            amount <= idToNavy[id].destroyerCount,
+            "not enough destroyers"
+        );
+        idToNavy[id].destroyerCount -= amount;
+        emit DestroyerDecommissioned(id, amount);
     }
 
     ///@dev this is a public view function that will return the number of destroyers a nation owns
@@ -1062,10 +1148,20 @@ contract NavyContract2 is Ownable {
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].submarineCount += amount;
-        navy1.increaseNavyVesselCount(id, amount);
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
         emit SubmarinePurchased(id, amount, purchasePrice);
+    }
+
+    function decommissionSubmarine(uint256 amount, uint256 id) public {
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
+        require(
+            amount <= idToNavy[id].submarineCount,
+            "not enough submarines"
+        );
+        idToNavy[id].submarineCount -= amount;
+        emit SubmarineDecommissioned(id, amount);
     }
 
     ///@dev this is a public view function that will return the number of submarines a nation owns
@@ -1114,10 +1210,20 @@ contract NavyContract2 is Ownable {
         uint256 balance = TreasuryContract(treasuryAddress).checkBalance(id);
         require(balance >= purchasePrice);
         idToNavy[id].aircraftCarrierCount += amount;
-        navy1.increaseNavyVesselCount(id, amount);
         navAct.increasePurchases(id, amount);
         TreasuryContract(treasuryAddress).spendBalance(id, purchasePrice);
         emit AircraftCarrierPurchased(id, amount, purchasePrice);
+    }
+
+    function decommissionAircraftCarrier(uint256 amount, uint256 id) public {
+        bool isOwner = mint.checkOwnership(id, msg.sender);
+        require(isOwner, "!nation owner");
+        require(
+            amount <= idToNavy[id].aircraftCarrierCount,
+            "not enough aircraft carriers"
+        );
+        idToNavy[id].aircraftCarrierCount -= amount;
+        emit AircraftCarrierDecommissioned(id, amount);
     }
 
     ///@dev this is a public view function that will return the number of aircraft carriers a nation owns

@@ -27,7 +27,7 @@ contract EnvironmentContract is Ownable {
     address public wonders4;
     address public forces;
     address public parameters;
-    address public taxes;
+    address public additionalTaxes;
     address public missiles;
     address public nukes;
     address public bonusResources;
@@ -42,7 +42,7 @@ contract EnvironmentContract is Ownable {
     WondersContract4 won4;
     ForcesContract force;
     CountryParametersContract param;
-    TaxesContract tax;
+    AdditionalTaxesContract addTax;
     MissilesContract mis;
     NukeContract nuke;
     BonusResourcesContract bonus;
@@ -57,7 +57,7 @@ contract EnvironmentContract is Ownable {
         address _wonders4,
         address _forces,
         address _parameters,
-        address _taxes,
+        address _additionalTaxes,
         address _missiles,
         address _nukes
     ) public onlyOwner {
@@ -75,8 +75,7 @@ contract EnvironmentContract is Ownable {
         force = ForcesContract(_forces);
         parameters = _parameters;
         param = CountryParametersContract(_parameters);
-        taxes = _taxes;
-        tax = TaxesContract(_taxes);
+        additionalTaxes = _additionalTaxes;
         missiles = _missiles;
         mis = MissilesContract(_missiles);
         nukes = _nukes;
@@ -144,9 +143,9 @@ contract EnvironmentContract is Ownable {
     }
 
     ///@dev this function is only callable by the contract owner
-    function updateTaxesContract(address newAddress) public onlyOwner {
-        taxes = newAddress;
-        tax = TaxesContract(newAddress);
+    function updateAdditionalTaxesContract(address newAddress) public onlyOwner {
+        additionalTaxes = newAddress;
+        addTax = AdditionalTaxesContract(newAddress);
     }
 
     ///@dev this function is only callable by the contract owner
@@ -382,7 +381,7 @@ contract EnvironmentContract is Ownable {
         returns (int256)
     {
         int256 pointsFromMilitaryRatiio;
-        ( , bool environmentPenalty, ) = tax.soldierToPopulationRatio(id);
+        ( , bool environmentPenalty, ) = addTax.soldierToPopulationRatio(id);
         if (environmentPenalty) {
             pointsFromMilitaryRatiio += 10;
         }

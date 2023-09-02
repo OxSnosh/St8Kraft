@@ -421,11 +421,6 @@ describe("Air Battle", async function () {
     
         // console.log("contracts deployed")
 
-        await warbucks.settings(
-            treasurycontract.address,
-            countryminter.address
-        )
-        
         await aidcontract.settings(
             countryminter.address, 
             treasurycontract.address, 
@@ -555,7 +550,7 @@ describe("Air Battle", async function () {
             wonderscontract4.address,
             forcescontract.address,
             countryparameterscontract.address,
-            taxescontract.address,
+            additionaltaxescontract.address,
             missilescontract.address,
             nukecontract.address)
         await environmentcontract.settings2(
@@ -657,7 +652,7 @@ describe("Air Battle", async function () {
             improvementscontract3.address,
             wonderscontract3.address,
             wonderscontract4.address,
-            taxescontract.address,
+            additionaltaxescontract.address,
             countryparameterscontract.address)
         
         await improvementscontract1.settings(
@@ -743,17 +738,6 @@ describe("Air Battle", async function () {
             infrastructurecontract.address,
             bonusresourcescontract.address
         )
-    
-        // await keepercontract.settings(
-        //     nukecontract.address,
-        //     aidcontract.address,
-        //     warcontract.address,
-        //     treasurycontract.address,
-        //     missilescontract.address,
-        //     navalactionscontract.address,
-        //     countryparameterscontract.address,
-        //     militarycontract.address
-        // )
     
         await landmarketcontract.settings(
             resourcescontract.address,
@@ -950,7 +934,8 @@ describe("Air Battle", async function () {
         )
         await additionaltaxescontract.settings2(
             improvementscontract2.address,
-            improvementscontract3.address
+            improvementscontract3.address,
+            forcescontract.address,
         )
     
         await technologymarketcontrat.settings(

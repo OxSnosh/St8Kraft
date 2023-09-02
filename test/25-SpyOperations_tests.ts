@@ -421,11 +421,6 @@ describe("Spy Operations", async function () {
     
         // console.log("contracts deployed")
 
-        await warbucks.settings(
-            treasurycontract.address,
-            countryminter.address
-        )
-        
         await aidcontract.settings(
             countryminter.address, 
             treasurycontract.address, 
@@ -555,7 +550,7 @@ describe("Spy Operations", async function () {
             wonderscontract4.address,
             forcescontract.address,
             countryparameterscontract.address,
-            taxescontract.address,
+            additionaltaxescontract.address,
             missilescontract.address,
             nukecontract.address)
         await environmentcontract.settings2(
@@ -657,7 +652,7 @@ describe("Spy Operations", async function () {
             improvementscontract3.address,
             wonderscontract3.address,
             wonderscontract4.address,
-            taxescontract.address,
+            additionaltaxescontract.address,
             countryparameterscontract.address)
         
         await improvementscontract1.settings(
@@ -743,17 +738,6 @@ describe("Spy Operations", async function () {
             infrastructurecontract.address,
             bonusresourcescontract.address
         )
-    
-        // await keepercontract.settings(
-        //     nukecontract.address,
-        //     aidcontract.address,
-        //     warcontract.address,
-        //     treasurycontract.address,
-        //     missilescontract.address,
-        //     navalactionscontract.address,
-        //     countryparameterscontract.address,
-        //     militarycontract.address
-        // )
     
         await landmarketcontract.settings(
             resourcescontract.address,
@@ -950,7 +934,8 @@ describe("Spy Operations", async function () {
         )
         await additionaltaxescontract.settings2(
             improvementscontract2.address,
-            improvementscontract3.address
+            improvementscontract3.address,
+            forcescontract.address,
         )
     
         await technologymarketcontrat.settings(
@@ -1089,10 +1074,10 @@ describe("Spy Operations", async function () {
             "TestCapitalCity2",
             "TestNationSlogan2"
         )
-        const tx2 = await countryparameterscontract.fulfillRequest(1);
-        let txReceipt2 = await tx2.wait(1);
-        let requestId2 = txReceipt2?.events?.[1].args?.requestId;
-        await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, countryparameterscontract.address);
+        // const tx2 = await countryparameterscontract.fulfillRequest(1);
+        // let txReceipt2 = await tx2.wait(1);
+        // let requestId2 = txReceipt2?.events?.[1].args?.requestId;
+        // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, countryparameterscontract.address);
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
         await warbucks.connect(signer0).transfer(signer2.address, BigInt(2000000000*(10**18)));
         await treasurycontract.connect(signer2).addFunds(BigInt(2000000000*(10**18)), 1);
