@@ -43,6 +43,7 @@ import {
     NukeContract,
     ResourcesContract,
     SenateContract,
+    SpyContract,
     SpyOperationsContract,
     TaxesContract,
     AdditionalTaxesContract,
@@ -102,6 +103,7 @@ describe("CountryMinter", function () {
     let resourcescontract: ResourcesContract
     let bonusresourcescontract: BonusResourcesContract
     let senatecontract: SenateContract
+    let spycontract: SpyContract
     let spyoperationscontract: SpyOperationsContract
     let taxescontract: TaxesContract
     let additionaltaxescontract: AdditionalTaxesContract
@@ -370,6 +372,11 @@ describe("CountryMinter", function () {
         senatecontract = await SenateContract.deploy(20) as SenateContract
         await senatecontract.deployed()
         // console.log(`SenateContract deployed to ${senatecontract.address}`)
+
+        const SpyContract = await ethers.getContractFactory("SpyContract")
+        spycontract = await SpyContract.deploy() as SpyContract
+        await spycontract.deployed()
+        // console.log(`SpyContract deployed to ${spycontract.address}`)
         
         const SpyOperationsContract = await ethers.getContractFactory("SpyOperationsContract")
         spyoperationscontract = await SpyOperationsContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as SpyOperationsContract
@@ -423,6 +430,11 @@ describe("CountryMinter", function () {
     
         // console.log("contracts deployed")
 
+        await warbucks.settings(
+            treasurycontract.address,
+            countryminter.address
+        )
+        
         await aidcontract.settings(
             countryminter.address, 
             treasurycontract.address, 
@@ -529,6 +541,7 @@ describe("CountryMinter", function () {
             improvementscontract1.address,
             improvementscontract2.address,
             improvementscontract3.address,
+            improvementscontract4.address,
             countryparameterscontract.address,
             wonderscontract2.address)
         
@@ -651,11 +664,11 @@ describe("CountryMinter", function () {
             militarycontract.address)
         await groundbattlecontract.settings2(
             improvementscontract2.address,
-            improvementscontract3.address,
+            improvementscontract4.address,
             wonderscontract3.address,
             wonderscontract4.address,
             additionaltaxescontract.address,
-            countryparameterscontract.address)
+            countryparameterscontract.address,)
         
         await improvementscontract1.settings(
             treasurycontract.address,
@@ -674,7 +687,8 @@ describe("CountryMinter", function () {
             wonderscontract1.address,
             countryminter.address,
             improvementscontract1.address,
-            resourcescontract.address
+            resourcescontract.address,
+            spycontract.address
             )
         
         await improvementscontract3.settings(
@@ -883,6 +897,11 @@ describe("CountryMinter", function () {
             resourcescontract.address
         )
     
+        await spycontract.settings(
+            spyoperationscontract.address,
+            treasurycontract.address
+            )
+    
         await spyoperationscontract.settings(
             infrastructurecontract.address,
             forcescontract.address,
@@ -896,7 +915,8 @@ describe("CountryMinter", function () {
             countryminter.address
         )
         await spyoperationscontract.settings2(
-            keepercontract.address
+            keepercontract.address,
+            spycontract.address
         )
     
         await taxescontract.settings1(
@@ -906,6 +926,7 @@ describe("CountryMinter", function () {
             improvementscontract1.address,
             improvementscontract2.address,
             improvementscontract3.address,
+            improvementscontract4.address,
             additionaltaxescontract.address,
             bonusresourcescontract.address,
             keepercontract.address,
@@ -1046,7 +1067,6 @@ describe("CountryMinter", function () {
             wonderscontract3.address,
             countryminter.address
         )
-  
         // console.log("settings initiated");
 
         if(chainId == 31337 || chainId == 1337) {

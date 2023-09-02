@@ -1,4 +1,4 @@
-import { expect } from "chai"
+import { expect, assert } from "chai"
 import { network, ethers } from "hardhat"
 import { INITIAL_SUPPLY } from "../helper-hardhat-config"
 import { 
@@ -10,6 +10,7 @@ import {
     BombersContract,
     BombersMarketplace1,
     BombersMarketplace2,
+    BonusResourcesContract,
     CountryMinter,
     CountryParametersContract,
     CrimeContract,
@@ -42,6 +43,7 @@ import {
     NukeContract,
     ResourcesContract,
     SenateContract,
+    SpyContract,
     SpyOperationsContract,
     TaxesContract,
     AdditionalTaxesContract,
@@ -52,13 +54,13 @@ import {
     WondersContract2,
     WondersContract3,
     WondersContract4,
-    BonusResourcesContract,
-    ForcesContract__factory,
+    VRFConsumerBaseV2,
+    VRFCoordinatorV2Mock
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("Spies in Forces Contract", async function () {
+describe("CountryMinter", function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -101,6 +103,7 @@ describe("Spies in Forces Contract", async function () {
     let resourcescontract: ResourcesContract
     let bonusresourcescontract: BonusResourcesContract
     let senatecontract: SenateContract
+    let spycontract: SpyContract
     let spyoperationscontract: SpyOperationsContract
     let taxescontract: TaxesContract
     let additionaltaxescontract: AdditionalTaxesContract
@@ -369,6 +372,11 @@ describe("Spies in Forces Contract", async function () {
         senatecontract = await SenateContract.deploy(20) as SenateContract
         await senatecontract.deployed()
         // console.log(`SenateContract deployed to ${senatecontract.address}`)
+
+        const SpyContract = await ethers.getContractFactory("SpyContract")
+        spycontract = await SpyContract.deploy() as SpyContract
+        await spycontract.deployed()
+        // console.log(`SpyContract deployed to ${spycontract.address}`)
         
         const SpyOperationsContract = await ethers.getContractFactory("SpyOperationsContract")
         spyoperationscontract = await SpyOperationsContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as SpyOperationsContract
@@ -422,6 +430,11 @@ describe("Spies in Forces Contract", async function () {
     
         // console.log("contracts deployed")
 
+        await warbucks.settings(
+            treasurycontract.address,
+            countryminter.address
+        )
+        
         await aidcontract.settings(
             countryminter.address, 
             treasurycontract.address, 
@@ -528,6 +541,7 @@ describe("Spies in Forces Contract", async function () {
             improvementscontract1.address,
             improvementscontract2.address,
             improvementscontract3.address,
+            improvementscontract4.address,
             countryparameterscontract.address,
             wonderscontract2.address)
         
@@ -650,11 +664,11 @@ describe("Spies in Forces Contract", async function () {
             militarycontract.address)
         await groundbattlecontract.settings2(
             improvementscontract2.address,
-            improvementscontract3.address,
+            improvementscontract4.address,
             wonderscontract3.address,
             wonderscontract4.address,
             additionaltaxescontract.address,
-            countryparameterscontract.address)
+            countryparameterscontract.address,)
         
         await improvementscontract1.settings(
             treasurycontract.address,
@@ -673,7 +687,8 @@ describe("Spies in Forces Contract", async function () {
             wonderscontract1.address,
             countryminter.address,
             improvementscontract1.address,
-            resourcescontract.address
+            resourcescontract.address,
+            spycontract.address
             )
         
         await improvementscontract3.settings(
@@ -882,6 +897,11 @@ describe("Spies in Forces Contract", async function () {
             resourcescontract.address
         )
     
+        await spycontract.settings(
+            spyoperationscontract.address,
+            treasurycontract.address
+            )
+    
         await spyoperationscontract.settings(
             infrastructurecontract.address,
             forcescontract.address,
@@ -895,7 +915,8 @@ describe("Spies in Forces Contract", async function () {
             countryminter.address
         )
         await spyoperationscontract.settings2(
-            keepercontract.address
+            keepercontract.address,
+            spycontract.address
         )
     
         await taxescontract.settings1(
@@ -905,6 +926,7 @@ describe("Spies in Forces Contract", async function () {
             improvementscontract1.address,
             improvementscontract2.address,
             improvementscontract3.address,
+            improvementscontract4.address,
             additionaltaxescontract.address,
             bonusresourcescontract.address,
             keepercontract.address,
@@ -1074,7 +1096,7 @@ describe("Spies in Forces Contract", async function () {
 
     describe("Buy Spies", function () {
         it("tests that default max spy count works", async function () {
-            var maxSpies = await forcescontract.getMaxSpyCount(0)
+            var maxSpies = await spycontract.getMaxSpyCount(0)
             // console.log((maxSpies).toNumber())
             expect(maxSpies).to.equal(50)
         })
@@ -1082,7 +1104,7 @@ describe("Spies in Forces Contract", async function () {
         it("tests that max spy count changes with intel agencies", async function () {
             await billscontract.connect(signer1).payBills(0)
             await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 6)
-            var maxSpies = await forcescontract.getMaxSpyCount(0)
+            var maxSpies = await spycontract.getMaxSpyCount(0)
             // console.log((maxSpies).toNumber())
             expect(maxSpies).to.equal(550)
         })
@@ -1091,24 +1113,24 @@ describe("Spies in Forces Contract", async function () {
             await billscontract.connect(signer1).payBills(0)
             await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 6)
             await wonderscontract1.connect(signer1).buyWonder1(0, 3)
-            var maxSpies = await forcescontract.getMaxSpyCount(0)
+            var maxSpies = await spycontract.getMaxSpyCount(0)
             // console.log((maxSpies).toNumber())
             expect(maxSpies).to.equal(800)
         })
 
         it("tests that updateSpyPrice works", async function () {
-            var cost = await forcescontract.getSpyPrice();
+            var cost = await spycontract.getSpyPrice();
             expect(cost).to.equal(100000)
-            await forcescontract.connect(signer0).updateSpyPrice(200000)
-            var cost2 = await forcescontract.getSpyPrice();
+            await spycontract.connect(signer0).updateSpyPrice(200000)
+            var cost2 = await spycontract.getSpyPrice();
             expect(cost2).to.equal(200000)
         })
 
         it("tests that buySpies works correctly", async function () {
-            await expect(forcescontract.connect(signer1).buySpies(60, 0)).to.be.revertedWith("cannot own that many spies")
-            await expect(forcescontract.connect(signer1).buySpies(40, 1)).to.be.revertedWith("!nation owner")
-            await forcescontract.connect(signer1).buySpies(40, 0)
-            var spyCount = await forcescontract.getSpyCount(0)
+            await expect(spycontract.connect(signer1).buySpies(60, 0)).to.be.revertedWith("cannot own that many spies")
+            await expect(spycontract.connect(signer1).buySpies(40, 1)).to.be.revertedWith("!nation owner")
+            await spycontract.connect(signer1).buySpies(40, 0)
+            var spyCount = await spycontract.getSpyCount(0)
             expect(spyCount).to.equal(40)
         })
 

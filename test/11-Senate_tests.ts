@@ -1,4 +1,4 @@
-import { expect } from "chai"
+import { expect, assert } from "chai"
 import { network, ethers } from "hardhat"
 import { INITIAL_SUPPLY } from "../helper-hardhat-config"
 import { 
@@ -10,6 +10,7 @@ import {
     BombersContract,
     BombersMarketplace1,
     BombersMarketplace2,
+    BonusResourcesContract,
     CountryMinter,
     CountryParametersContract,
     CrimeContract,
@@ -42,6 +43,7 @@ import {
     NukeContract,
     ResourcesContract,
     SenateContract,
+    SpyContract,
     SpyOperationsContract,
     TaxesContract,
     AdditionalTaxesContract,
@@ -52,13 +54,13 @@ import {
     WondersContract2,
     WondersContract3,
     WondersContract4,
-    BonusResourcesContract,
+    VRFConsumerBaseV2,
+    VRFCoordinatorV2Mock
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
-import { kMostFrequent } from "../scripts/SenatorImplementation"; 
 
-describe("Senate Contract", async function () {
+describe("CountryMinter", function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -101,6 +103,7 @@ describe("Senate Contract", async function () {
     let resourcescontract: ResourcesContract
     let bonusresourcescontract: BonusResourcesContract
     let senatecontract: SenateContract
+    let spycontract: SpyContract
     let spyoperationscontract: SpyOperationsContract
     let taxescontract: TaxesContract
     let additionaltaxescontract: AdditionalTaxesContract
@@ -379,6 +382,11 @@ describe("Senate Contract", async function () {
         senatecontract = await SenateContract.deploy(20) as SenateContract
         await senatecontract.deployed()
         // console.log(`SenateContract deployed to ${senatecontract.address}`)
+
+        const SpyContract = await ethers.getContractFactory("SpyContract")
+        spycontract = await SpyContract.deploy() as SpyContract
+        await spycontract.deployed()
+        // console.log(`SpyContract deployed to ${spycontract.address}`)
         
         const SpyOperationsContract = await ethers.getContractFactory("SpyOperationsContract")
         spyoperationscontract = await SpyOperationsContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as SpyOperationsContract
@@ -432,6 +440,11 @@ describe("Senate Contract", async function () {
     
         // console.log("contracts deployed")
 
+        await warbucks.settings(
+            treasurycontract.address,
+            countryminter.address
+        )
+        
         await aidcontract.settings(
             countryminter.address, 
             treasurycontract.address, 
@@ -538,6 +551,7 @@ describe("Senate Contract", async function () {
             improvementscontract1.address,
             improvementscontract2.address,
             improvementscontract3.address,
+            improvementscontract4.address,
             countryparameterscontract.address,
             wonderscontract2.address)
         
@@ -660,11 +674,11 @@ describe("Senate Contract", async function () {
             militarycontract.address)
         await groundbattlecontract.settings2(
             improvementscontract2.address,
-            improvementscontract3.address,
+            improvementscontract4.address,
             wonderscontract3.address,
             wonderscontract4.address,
             additionaltaxescontract.address,
-            countryparameterscontract.address)
+            countryparameterscontract.address,)
         
         await improvementscontract1.settings(
             treasurycontract.address,
@@ -683,7 +697,8 @@ describe("Senate Contract", async function () {
             wonderscontract1.address,
             countryminter.address,
             improvementscontract1.address,
-            resourcescontract.address
+            resourcescontract.address,
+            spycontract.address
             )
         
         await improvementscontract3.settings(
@@ -892,6 +907,11 @@ describe("Senate Contract", async function () {
             resourcescontract.address
         )
     
+        await spycontract.settings(
+            spyoperationscontract.address,
+            treasurycontract.address
+            )
+    
         await spyoperationscontract.settings(
             infrastructurecontract.address,
             forcescontract.address,
@@ -905,7 +925,8 @@ describe("Senate Contract", async function () {
             countryminter.address
         )
         await spyoperationscontract.settings2(
-            keepercontract.address
+            keepercontract.address,
+            spycontract.address
         )
     
         await taxescontract.settings1(
@@ -915,6 +936,7 @@ describe("Senate Contract", async function () {
             improvementscontract1.address,
             improvementscontract2.address,
             improvementscontract3.address,
+            improvementscontract4.address,
             additionaltaxescontract.address,
             bonusresourcescontract.address,
             keepercontract.address,
@@ -1235,7 +1257,7 @@ describe("Senate Contract", async function () {
     
             // console.log(team7Votes);
     
-            const team7Senators = kMostFrequent(team7Votes, 5);
+            // const team7Senators = kMostFrequent(team7Votes, 5);
     
             // console.log("senators", team7Senators);
 

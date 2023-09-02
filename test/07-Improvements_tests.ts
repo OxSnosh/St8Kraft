@@ -1,4 +1,4 @@
-import { expect } from "chai"
+import { expect, assert } from "chai"
 import { network, ethers } from "hardhat"
 import { INITIAL_SUPPLY } from "../helper-hardhat-config"
 import { 
@@ -10,6 +10,7 @@ import {
     BombersContract,
     BombersMarketplace1,
     BombersMarketplace2,
+    BonusResourcesContract,
     CountryMinter,
     CountryParametersContract,
     CrimeContract,
@@ -42,6 +43,7 @@ import {
     NukeContract,
     ResourcesContract,
     SenateContract,
+    SpyContract,
     SpyOperationsContract,
     TaxesContract,
     AdditionalTaxesContract,
@@ -52,12 +54,13 @@ import {
     WondersContract2,
     WondersContract3,
     WondersContract4,
-    BonusResourcesContract,
+    VRFConsumerBaseV2,
+    VRFCoordinatorV2Mock
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("Improvements", async function () {
+describe("CountryMinter", function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -100,6 +103,7 @@ describe("Improvements", async function () {
     let resourcescontract: ResourcesContract
     let bonusresourcescontract: BonusResourcesContract
     let senatecontract: SenateContract
+    let spycontract: SpyContract
     let spyoperationscontract: SpyOperationsContract
     let taxescontract: TaxesContract
     let additionaltaxescontract: AdditionalTaxesContract
@@ -368,6 +372,11 @@ describe("Improvements", async function () {
         senatecontract = await SenateContract.deploy(20) as SenateContract
         await senatecontract.deployed()
         // console.log(`SenateContract deployed to ${senatecontract.address}`)
+
+        const SpyContract = await ethers.getContractFactory("SpyContract")
+        spycontract = await SpyContract.deploy() as SpyContract
+        await spycontract.deployed()
+        // console.log(`SpyContract deployed to ${spycontract.address}`)
         
         const SpyOperationsContract = await ethers.getContractFactory("SpyOperationsContract")
         spyoperationscontract = await SpyOperationsContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as SpyOperationsContract
@@ -678,7 +687,8 @@ describe("Improvements", async function () {
             wonderscontract1.address,
             countryminter.address,
             improvementscontract1.address,
-            resourcescontract.address
+            resourcescontract.address,
+            spycontract.address
             )
         
         await improvementscontract3.settings(
@@ -887,6 +897,11 @@ describe("Improvements", async function () {
             resourcescontract.address
         )
     
+        await spycontract.settings(
+            spyoperationscontract.address,
+            treasurycontract.address
+            )
+    
         await spyoperationscontract.settings(
             infrastructurecontract.address,
             forcescontract.address,
@@ -900,7 +915,8 @@ describe("Improvements", async function () {
             countryminter.address
         )
         await spyoperationscontract.settings2(
-            keepercontract.address
+            keepercontract.address,
+            spycontract.address
         )
     
         await taxescontract.settings1(
@@ -1945,21 +1961,21 @@ describe("Improvements", async function () {
         })
 
         //office of propaganda
-        it("improvement3 office of propaganda tests", async function () {
+        it("improvement4 office of propaganda tests", async function () {
             await billscontract.connect(signer1).payBills(0);
             await expect(improvementscontract4.connect(signer1).buyImprovement4(1, 0, 5)).to.be.revertedWith("Must own 1 forward operating base for each office of propaganda")
             await improvementscontract2.connect(signer1).buyImprovement2(2, 0, 2);
             await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 1);
             var count = await improvementscontract4.getOfficeOfPropagandaCount(0);
-            expect(count.toNumber()).to.equal(1);
+            expect(count.toNumber()).to.equal(0);
             await improvementscontract4.connect(signer1).buyImprovement4(1, 0, 5);
             var newCount = await improvementscontract4.getOfficeOfPropagandaCount(0);
-            expect(newCount.toNumber()).to.equal(2);
+            expect(newCount.toNumber()).to.equal(1);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(4);
         })
 
-        it("improvement3 office of propaganda purchase errors", async function () {
+        it("improvement4 office of propaganda purchase errors", async function () {
             await keepercontract.incrementGameDay();
             await expect(improvementscontract4.connect(signer1).buyImprovement4(6, 0, 5)).to.be.revertedWith("must pay bills before buying improvements");
             await billscontract.connect(signer1).payBills(0);
@@ -1973,18 +1989,18 @@ describe("Improvements", async function () {
             await expect(improvementscontract4.connect(signer1).buyImprovement4(1, 0, 5)).to.be.revertedWith("Insufficient balance");
         })
 
-        it("improvement3 office of propaganda price can be updated", async function () {
-            let prices = await improvementscontract3.getCost3();
+        it("improvement4 office of propaganda price can be updated", async function () {
+            let prices = await improvementscontract4.getCost4();
             var cost : any = prices[4];
             expect(BigInt(cost).toString()).to.equal("200000000000000000000000")
             await improvementscontract4.connect(signer0).updateOfficeOfPropagandaCost(100);
-            let newPrices = await improvementscontract3.getCost3();
+            let newPrices = await improvementscontract4.getCost4();
             var newCost = newPrices[4];
             expect(newCost.toNumber()).to.equal(100);
         })
 
         //police headquarters
-        it("improvement3 police headquarters tests", async function () {
+        it("improvement4 police headquarters tests", async function () {
             await billscontract.connect(signer1).payBills(0);
             await improvementscontract4.connect(signer1).buyImprovement4(1, 0, 6);
             var count = await improvementscontract4.getPoliceHeadquartersCount(0);
@@ -1996,7 +2012,7 @@ describe("Improvements", async function () {
             expect(improvementCount).to.equal(2);
         })
 
-        it("improvement3 police headquarters purchase errors", async function () {
+        it("improvement4 police headquarters purchase errors", async function () {
             await expect(improvementscontract4.connect(signer1).buyImprovement4(1, 1, 6)).to.be.revertedWith("!nation owner");
             await keepercontract.incrementGameDay();
             await expect(improvementscontract4.connect(signer1).buyImprovement4(6, 0, 6)).to.be.revertedWith("must pay bills before buying improvements");
@@ -2009,12 +2025,12 @@ describe("Improvements", async function () {
             await expect(improvementscontract4.connect(signer1).buyImprovement4(1, 0, 6)).to.be.revertedWith("Insufficient balance");
         })
 
-        it("improvement3 police headquarters price can be updated", async function () {
-            let prices = await improvementscontract3.getCost3();
+        it("improvement4 police headquarters price can be updated", async function () {
+            let prices = await improvementscontract4.getCost4();
             var cost : any = prices[5];
             expect(BigInt(cost).toString()).to.equal("75000000000000000000000");
             await improvementscontract4.connect(signer0).updatePoliceHeadquartersCost(100);
-            let newPrices = await improvementscontract3.getCost3();
+            let newPrices = await improvementscontract4.getCost4();
             var newCost = newPrices[5];
             expect(newCost.toNumber()).to.equal(100);
         })
@@ -2372,8 +2388,8 @@ describe("Improvements", async function () {
             await billscontract.connect(signer1).payBills(0);
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500)
             await expect(improvementscontract3.connect(signer1).buyImprovement3(1, 0, 9)).to.be.revertedWith("Must own 3 schools to own a university");
-            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 8);
-            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 11);
+            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 6);
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 9);
             var count = await improvementscontract3.getUniversityCount(0);
             expect(count.toNumber()).to.equal(1);
             await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 9);
