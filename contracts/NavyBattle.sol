@@ -140,6 +140,7 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
         ];
         newActiveBlockadesFor.push(blockadeId);
         idToActiveBlockadesFor[attackerId] = newActiveBlockadesFor;
+        war.cancelPeaceOffersUponAttack(warId);
         blockadeId++;
     }
 
@@ -380,6 +381,8 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
         generateDefendBlockadeStruct(warId, blockaderId, breakBlockadeId);
         generateBreakBlockadeChanceArray(breakBlockadeId);
         generateDefendBlockadeChanceArray(breakBlockadeId);
+        war.cancelPeaceOffersUponAttack(warId);
+        navAct.increaseAction(attackerId);
         fulfillRequest(breakBlockadeId);
         breakBlockadeId++;
     }
@@ -948,6 +951,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         generateDefenderNavyStruct(warId, navyBattleId, defenderId);
         generateAttackerChanceArray(navyBattleId);
         generateDefenderChanceArray(navyBattleId);
+        war.cancelPeaceOffersUponAttack(warId);
         fulfillRequest(navyBattleId);
         navAct.increaseAction(attackerId);
         navyBattleId++;

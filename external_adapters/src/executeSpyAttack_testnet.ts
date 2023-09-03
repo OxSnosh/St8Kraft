@@ -52,7 +52,7 @@ app.post("/", async function (req: Request<{}, {}, EAInput>, res: Response) {
 
   let randomnessRequestId : number = eaInputData.data.randomnessRequestId
 
-  const provider = new ethers.providers.JsonRpcProvider(/** INSERT RPC URL */);
+  const provider = new ethers.providers.JsonRpcProvider(/*'http://127.0.0.1:8545/'*/);
   
   const privateKey : any = process.env.PRIVATE_KEY_FOR_REENCRYPTION;
   const privateKeyString : string = privateKey.toString();

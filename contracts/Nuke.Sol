@@ -69,6 +69,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
     mapping(uint256 => uint256) public gameDayToNukesLanded;
+    mapping(uint256 => mapping (uint256 => bool)) public nationIdToDayToNukeLanded;
 
     event NukeLaunched(
         uint256 indexed id,
@@ -202,6 +203,17 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         require(daysLeft < 6, "not at war long enough to launch a nuke");
         uint256 count = mis.getNukeCount(attackerId);
         require(count >= 1, "need to own a nuke");
+        uint256 day = keep.getGameDay();
+        require(nationIdToDayToNukeLanded[defenderId][day] = false, "defender already nuked this day");
+        completeNukeLaunch(warId, attackerId, defenderId, attackType);
+    }
+
+    function completeNukeLaunch(
+        uint256 warId,
+        uint256 attackerId,
+        uint256 defenderId,
+        uint256 attackType
+    ) internal {
         bool emp = won1.getEmpWeaponization(attackerId);
         if (!emp) {
             require(
@@ -218,15 +230,6 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
                 "emp attacks require a nation to have 5,000 tech"
             );
         }
-        completeNukeLaunch(warId, attackerId, defenderId, attackType);
-    }
-
-    function completeNukeLaunch(
-        uint256 warId,
-        uint256 attackerId,
-        uint256 defenderId,
-        uint256 attackType
-    ) internal {
         NukeAttack memory newAttack = NukeAttack(
             warId,
             attackerId,
@@ -234,6 +237,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
             attackType
         );
         nukeAttackIdToNukeAttack[nukeAttackId] = newAttack;
+        war.cancelPeaceOffersUponAttack(warId);
         fulfillRequest(nukeAttackId);
         emit NukeLaunched(
             nukeAttackId,
@@ -293,6 +297,8 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
                 thwartOdds,
                 randomNukeSuccessNumber
             );
+            uint256 day = keep.getGameDay();
+            nationIdToDayToNukeLanded[defenderId][day] = true;
         } else {
             console.log("Nuke attaq thwarted");
             mis.decreaseNukeCountFromNukeContract(attackerId);

@@ -259,6 +259,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
             attackType
         );
         generateDefenderForcesStruct(warId, groundBattleId, defenderId);
+        war.cancelPeaceOffersUponAttack(warId);
         fulfillRequest(groundBattleId);
         groundBattleId++;
         console.log("GROUND BATTLE ID: ", groundBattleId);
@@ -571,7 +572,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
             attackerId,
             warId
         );
-        war.cancelPeaceOffersUponAttack(warId);
         (, , bool anarchyCheckDefender) = addTax.soldierToPopulationRatio(
             defenderId
         );

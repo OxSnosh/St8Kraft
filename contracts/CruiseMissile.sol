@@ -220,6 +220,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
             defenderId,
             warId
         );
+        war.cancelPeaceOffersUponAttack(warId);
         fulfillRequest(cruiseMissileAttackId);
         cruiseMissileAttackId++;
     }

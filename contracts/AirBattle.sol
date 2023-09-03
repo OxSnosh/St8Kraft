@@ -266,6 +266,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256[] memory attackerBomberArray,
         uint256 _airBattleId
     ) internal {
+        war.cancelPeaceOffersUponAttack(warId);
         AirBattle storage newAirBattle = airBattleIdToAirBattle[_airBattleId];
         newAirBattle.warId = warId;
         newAirBattle.attackerId = attackerId;
