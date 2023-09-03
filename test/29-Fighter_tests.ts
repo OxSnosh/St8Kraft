@@ -60,7 +60,7 @@ import {
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("CountryMinter", function () {
+describe("Fighter Contract", function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -899,8 +899,11 @@ describe("CountryMinter", function () {
     
         await spycontract.settings(
             spyoperationscontract.address,
-            treasurycontract.address
-            )
+            treasurycontract.address,
+            countryminter.address,
+            improvementscontract2.address,
+            wonderscontract1.address,
+        )
     
         await spyoperationscontract.settings(
             infrastructurecontract.address,
@@ -1008,7 +1011,8 @@ describe("CountryMinter", function () {
             fightersmarketplace2.address,
             bombersmarketplace1.address,
             bombersmarketplace2.address,
-            countryparameterscontract.address
+            countryparameterscontract.address,
+            spycontract.address
         )
     
         await warcontract.settings(

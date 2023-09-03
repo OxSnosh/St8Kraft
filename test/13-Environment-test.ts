@@ -60,7 +60,7 @@ import {
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("CountryMinter", function () {
+describe("Environment Contract", function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -899,8 +899,11 @@ describe("CountryMinter", function () {
     
         await spycontract.settings(
             spyoperationscontract.address,
-            treasurycontract.address
-            )
+            treasurycontract.address,
+            countryminter.address,
+            improvementscontract2.address,
+            wonderscontract1.address,
+        )
     
         await spyoperationscontract.settings(
             infrastructurecontract.address,
@@ -1008,7 +1011,8 @@ describe("CountryMinter", function () {
             fightersmarketplace2.address,
             bombersmarketplace1.address,
             bombersmarketplace2.address,
-            countryparameterscontract.address
+            countryparameterscontract.address,
+            spycontract.address
         )
     
         await warcontract.settings(
@@ -1199,7 +1203,7 @@ describe("CountryMinter", function () {
             await improvementscontract4.connect(signer1).buyImprovement4(3, 0, 2);
             const wondersScore3 = await environmentcontract.getEnvironmentScoreFromImprovementsAndWonders(0);
             expect(wondersScore3.toNumber()).to.equal(-11);
-            await improvementscontract3.connect(signer1).buyImprovement3(2, 0, 5);
+            await improvementscontract3.connect(signer1).buyImprovement3(2, 0, 3);
             const wondersScore4 = await environmentcontract.getEnvironmentScoreFromImprovementsAndWonders(0);
             expect(wondersScore4.toNumber()).to.equal(-1);
             await wonderscontract3.connect(signer1).buyWonder3(0, 3);

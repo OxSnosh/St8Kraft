@@ -60,7 +60,7 @@ import {
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("CountryMinter", function () {
+describe("Wonders Contracts", function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -899,8 +899,11 @@ describe("CountryMinter", function () {
     
         await spycontract.settings(
             spyoperationscontract.address,
-            treasurycontract.address
-            )
+            treasurycontract.address,
+            countryminter.address,
+            improvementscontract2.address,
+            wonderscontract1.address,
+        )
     
         await spyoperationscontract.settings(
             infrastructurecontract.address,
@@ -1008,7 +1011,8 @@ describe("CountryMinter", function () {
             fightersmarketplace2.address,
             bombersmarketplace1.address,
             bombersmarketplace2.address,
-            countryparameterscontract.address
+            countryparameterscontract.address,
+            spycontract.address
         )
     
         await warcontract.settings(
@@ -1605,7 +1609,7 @@ describe("CountryMinter", function () {
             expect(wonderCount).to.equal(0);
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
             await billscontract.connect(signer1).payBills(0)
-            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 7);
+            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 5);
             await improvementscontract4.connect(signer1).buyImprovement4(3, 0, 1);
             await wonderscontract4.connect(signer1).buyWonder4(0, 4);
             await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
@@ -1620,7 +1624,7 @@ describe("CountryMinter", function () {
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 5)).to.be.revertedWith("Strategic Defense Inititive required to purchase");
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
             await billscontract.connect(signer1).payBills(0)
-            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 7);
+            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 5);
             await improvementscontract4.connect(signer1).buyImprovement4(3, 0, 1);
             await wonderscontract4.connect(signer1).buyWonder4(0, 4);
             await expect(wonderscontract2.connect(signer1).buyWonder2(0, 5)).to.be.revertedWith("Must have 5000 Technology to purchase");

@@ -41,6 +41,7 @@ contract TreasuryContract is Ownable {
     address public bombersMarket2;
     address public warBucksAddress;
     address public forces;
+    address public spies;
     address public missiles;
     address public aid;
     address public taxes;
@@ -162,7 +163,8 @@ contract TreasuryContract is Ownable {
         address _fightersMarket2,
         address _bombersMarket1,
         address _bombersMarket2,
-        address _parameters
+        address _parameters,
+        address _spies
     ) public onlyOwner {
         navy2 = _navy2;
         missiles = _missiles;
@@ -174,6 +176,7 @@ contract TreasuryContract is Ownable {
         bombersMarket1 = _bombersMarket1;
         bombersMarket2 = _bombersMarket2;
         parameters = _parameters;
+        spies = _spies;
     }
 
     modifier onlyCountryMinter() {
@@ -381,7 +384,8 @@ contract TreasuryContract is Ownable {
                 msg.sender == techMarket ||
                 msg.sender == landMarket ||
                 msg.sender == spyOperations ||
-                msg.sender == parameters,
+                msg.sender == parameters ||
+                msg.sender == spies,
             "cannot call spendBalance()"
         );
         _;

@@ -60,7 +60,7 @@ import {
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("CountryMinter", function () {
+describe("Taxes Contract", function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -899,8 +899,11 @@ describe("CountryMinter", function () {
     
         await spycontract.settings(
             spyoperationscontract.address,
-            treasurycontract.address
-            )
+            treasurycontract.address,
+            countryminter.address,
+            improvementscontract2.address,
+            wonderscontract1.address,
+        )
     
         await spyoperationscontract.settings(
             infrastructurecontract.address,
@@ -1008,7 +1011,8 @@ describe("CountryMinter", function () {
             fightersmarketplace2.address,
             bombersmarketplace1.address,
             bombersmarketplace2.address,
-            countryparameterscontract.address
+            countryparameterscontract.address,
+            spycontract.address
         )
     
         await warcontract.settings(
@@ -1440,7 +1444,7 @@ describe("CountryMinter", function () {
         it("taxes1 happiness tests other additions to happiness from improvements", async function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 15000);
             await forcescontract.connect(signer1).buySoldiers(35000, 0)
-            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 3);
+            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 1);
             const happiness1 = await taxescontract.getHappiness(0)
             // console.log("happiness 1", happiness1.toNumber());
             expect(happiness1.toNumber()).to.equal(4);
@@ -1461,23 +1465,23 @@ describe("CountryMinter", function () {
             // console.log("happiness 4", happiness4.toNumber());
             expect(happiness4.toNumber()).to.equal(10);
             //police hq
-            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 2);
+            await improvementscontract4.connect(signer1).buyImprovement4(1, 0, 6);
             const happiness5 = await taxescontract.getHappiness(0)
             // console.log("happiness 5", happiness5.toNumber());
             expect(happiness5.toNumber()).to.equal(12);
-            //red light disrict
-            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 5);
+            //stadium
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 8);
             const happiness6 = await taxescontract.getHappiness(0)
             // console.log("happiness 6", happiness6.toNumber());
-            expect(happiness6.toNumber()).to.equal(12);
+            expect(happiness6.toNumber()).to.equal(15);
             //stadiums
-            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 10);
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 8);
             const happiness7 = await taxescontract.getHappiness(0)
             // console.log("happiness 7", happiness7.toNumber());
-            expect(happiness7.toNumber()).to.equal(15);
+            expect(happiness7.toNumber()).to.equal(18);
             const income = await taxescontract.getDailyIncome(0);
             // console.log("income", income.toNumber());
-            expect(income.toNumber()).to.equal(64);
+            expect(income.toNumber()).to.equal(70);
             // var improvementPoints = await taxescontract.getPointsFromImprovements(0);
             // console.log("improvement points", improvementPoints.toNumber());
         })
@@ -1487,7 +1491,7 @@ describe("CountryMinter", function () {
         it("taxes1 tests multipliers to income", async function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 15000);
             await forcescontract.connect(signer1).buySoldiers(35000, 0)
-            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 3);
+            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 1);
             const happiness1 = await taxescontract.getHappiness(0)
             // console.log("happiness 1", happiness1.toNumber());
             const dailyIncome = await taxescontract.getDailyIncome(0);
@@ -1506,7 +1510,7 @@ describe("CountryMinter", function () {
             const dailyIncome4 = await taxescontract.getDailyIncome(0);
             // console.log("income4", dailyIncome4.toNumber());
             //schools
-            await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 8);
+            await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 6);
             const dailyIncome5 = await taxescontract.getDailyIncome(0);
             // console.log("income5", dailyIncome5.toNumber());
             //guerilla camps

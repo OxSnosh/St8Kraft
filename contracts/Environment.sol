@@ -76,6 +76,7 @@ contract EnvironmentContract is Ownable {
         parameters = _parameters;
         param = CountryParametersContract(_parameters);
         additionalTaxes = _additionalTaxes;
+        addTax = AdditionalTaxesContract(_additionalTaxes);
         missiles = _missiles;
         mis = MissilesContract(_missiles);
         nukes = _nukes;

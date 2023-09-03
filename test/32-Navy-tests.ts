@@ -60,7 +60,7 @@ import {
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("CountryMinter", function () {
+describe("Navy Contract", function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -896,11 +896,14 @@ describe("CountryMinter", function () {
             keepercontract.address,
             resourcescontract.address
         )
-    
+
         await spycontract.settings(
             spyoperationscontract.address,
-            treasurycontract.address
-            )
+            treasurycontract.address,
+            countryminter.address,
+            improvementscontract2.address,
+            wonderscontract1.address,
+        )
     
         await spyoperationscontract.settings(
             infrastructurecontract.address,
@@ -1008,7 +1011,8 @@ describe("CountryMinter", function () {
             fightersmarketplace2.address,
             bombersmarketplace1.address,
             bombersmarketplace2.address,
-            countryparameterscontract.address
+            countryparameterscontract.address,
+            spycontract.address
         )
     
         await warcontract.settings(
@@ -1185,7 +1189,7 @@ describe("CountryMinter", function () {
             await militarycontract.connect(signer1).toggleWarPeacePreference(0)
             await expect(navycontract.connect(signer1).buyLandingShip(3, 0)).to.be.revertedWith("Must own a shipyard to purchase")
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
-            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 9)
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 7)
             await navycontract.connect(signer1).buyLandingShip(3, 0)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(3)
@@ -1281,7 +1285,7 @@ describe("CountryMinter", function () {
             await militarycontract.connect(signer1).toggleWarPeacePreference(0)
             await expect(navycontract2.connect(signer1).buyFrigate(3, 0)).to.be.revertedWith("Must own a shipyard to purchase")
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
-            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 9)
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 7)
             await navycontract2.connect(signer1).buyFrigate(3, 0)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(3)
@@ -1345,7 +1349,7 @@ describe("CountryMinter", function () {
             await militarycontract.connect(signer1).toggleWarPeacePreference(0)
             await expect(navycontract2.connect(signer1).buySubmarine(3, 0)).to.be.revertedWith("Must own a shipyard to purchase")
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
-            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 9)
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 7)
             await navycontract2.connect(signer1).buySubmarine(3, 0)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(3)
@@ -1377,7 +1381,7 @@ describe("CountryMinter", function () {
             await militarycontract.connect(signer1).toggleWarPeacePreference(0)
             await expect(navycontract2.connect(signer1).buyAircraftCarrier(3, 0)).to.be.revertedWith("Must own a shipyard to purchase")
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
-            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 9)
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 7)
             await navycontract2.connect(signer1).buyAircraftCarrier(3, 0)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(3)

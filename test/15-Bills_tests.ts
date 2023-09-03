@@ -60,7 +60,7 @@ import {
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("CountryMinter", function () {
+describe("Bills Contract", function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -899,8 +899,11 @@ describe("CountryMinter", function () {
     
         await spycontract.settings(
             spyoperationscontract.address,
-            treasurycontract.address
-            )
+            treasurycontract.address,
+            countryminter.address,
+            improvementscontract2.address,
+            wonderscontract1.address,
+        )
     
         await spyoperationscontract.settings(
             infrastructurecontract.address,
@@ -1008,7 +1011,8 @@ describe("CountryMinter", function () {
             fightersmarketplace2.address,
             bombersmarketplace1.address,
             bombersmarketplace2.address,
-            countryparameterscontract.address
+            countryparameterscontract.address,
+            spycontract.address
         )
     
         await warcontract.settings(
@@ -1378,7 +1382,7 @@ describe("CountryMinter", function () {
             await technologymarketcontrat.connect(signer1).buyTech(0, 30000);
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4);
             await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 10);
-            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 9);
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 7);
             await improvementscontract4.connect(signer1).buyImprovement4(3, 0, 4);
             await wonderscontract1.connect(signer1).buyWonder1(0, 11);
             await navycontract.connect(signer1).buyCorvette(1, 0);

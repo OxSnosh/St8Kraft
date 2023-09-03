@@ -766,16 +766,13 @@ contract SpyContract is Ownable {
     uint256 public spyCost = 100000;
     address public treasury;
     address public spyOperations;
+    address public countryMinter;
+    address public improvements2;
+    address public wonder1;
 
     CountryMinter mint;
-    InfrastructureContract inf;
-    ResourcesContract res;
-    WondersContract1 won1;
-    ImprovementsContract1 imp1;
     ImprovementsContract2 imp2;
-    WarContract war;
-    GroundBattleContract ground;
-    CountryParametersContract params;
+    WondersContract1 won1;
 
     event SpiesPurchased(uint256 indexed id, uint256 indexed amount);
 
@@ -785,10 +782,19 @@ contract SpyContract is Ownable {
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
         address _spyOperations,
-        address _treasury
+        address _treasury,
+        address _countryMinter,
+        address _improvements2,
+        address _wonders1
     ) public onlyOwner {
         spyOperations = _spyOperations;
         treasury = _treasury;
+        countryMinter = _countryMinter;
+        mint = CountryMinter(countryMinter);
+        improvements2 = _improvements2;
+        imp2 = ImprovementsContract2(improvements2);
+        wonder1 = _wonders1;
+        won1 = WondersContract1(wonder1);
     }
 
     mapping(uint256 => uint256) public idToSpies;

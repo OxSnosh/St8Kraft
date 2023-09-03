@@ -60,7 +60,7 @@ import {
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("CountryMinter", function () {
+describe("Crime Contract", function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -899,8 +899,11 @@ describe("CountryMinter", function () {
     
         await spycontract.settings(
             spyoperationscontract.address,
-            treasurycontract.address
-            )
+            treasurycontract.address,
+            countryminter.address,
+            improvementscontract2.address,
+            wonderscontract1.address,
+        )
     
         await spyoperationscontract.settings(
             infrastructurecontract.address,
@@ -1008,7 +1011,8 @@ describe("CountryMinter", function () {
             fightersmarketplace2.address,
             bombersmarketplace1.address,
             bombersmarketplace2.address,
-            countryparameterscontract.address
+            countryparameterscontract.address,
+            spycontract.address
         )
     
         await warcontract.settings(
@@ -1189,7 +1193,7 @@ describe("CountryMinter", function () {
             // console.log("criminal count 3", criminalCount3.toNumber());
             expect(criminalCount3[0].toNumber()).to.equal(12009);
             await billscontract.connect(signer1).payBills(0)
-            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 8);
+            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 6);
             await improvementscontract3.connect(signer1).buyImprovement3(2, 0, 11);
             var literacyAfterSchools = await crimecontract.getLiteracy(0);
             // console.log("lit after school and unis", literacyAfterSchools.toNumber());
@@ -1203,10 +1207,10 @@ describe("CountryMinter", function () {
             var cps1 = await crimecontract.getCrimePreventionScore(0);
             // console.log("cps 1", cps1.toNumber());
             await billscontract.connect(signer1).payBills(0)
-            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 8);
-            await improvementscontract3.connect(signer1).buyImprovement3(2, 0, 11);
-            await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 2);
-            await improvementscontract3.connect(signer1).buyImprovement3(2, 0, 5);
+            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 6);
+            await improvementscontract3.connect(signer1).buyImprovement3(2, 0, 9);
+            await improvementscontract4.connect(signer1).buyImprovement4(5, 0, 6);
+            await improvementscontract3.connect(signer1).buyImprovement3(2, 0, 3);
             await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 7);
             var improvementPoints1 = await crimecontract.getImprovementPoints(0);
             // console.log("imp points", improvementPoints1.toNumber());
@@ -1237,7 +1241,7 @@ describe("CountryMinter", function () {
             var criminalCount3 = await crimecontract.getCriminalCount(0);
             expect(criminalCount3[0].toNumber()).to.equal(13311);
             
-            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 3);
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 1);
             var criminalCount4 = await crimecontract.getCriminalCount(0);
             expect(criminalCount4[0].toNumber()).to.equal(8311);
 

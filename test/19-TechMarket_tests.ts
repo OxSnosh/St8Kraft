@@ -60,7 +60,7 @@ import {
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("CountryMinter", function () {
+describe("Technology Marketplace Contract", function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -899,8 +899,11 @@ describe("CountryMinter", function () {
     
         await spycontract.settings(
             spyoperationscontract.address,
-            treasurycontract.address
-            )
+            treasurycontract.address,
+            countryminter.address,
+            improvementscontract2.address,
+            wonderscontract1.address,
+        )
     
         await spyoperationscontract.settings(
             infrastructurecontract.address,
@@ -1008,7 +1011,8 @@ describe("CountryMinter", function () {
             fightersmarketplace2.address,
             bombersmarketplace1.address,
             bombersmarketplace2.address,
-            countryparameterscontract.address
+            countryparameterscontract.address,
+            spycontract.address
         )
     
         await warcontract.settings(
@@ -1225,8 +1229,8 @@ describe("CountryMinter", function () {
             expect(BigInt(costPerLevel).toString()).to.equal("665000000000000000000")
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 3000)
             await billscontract.connect(signer1).payBills(0)
-            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 8)
-            await improvementscontract3.connect(signer1).buyImprovement3(2, 0, 11)
+            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 6)
+            await improvementscontract3.connect(signer1).buyImprovement3(2, 0, 9)
             var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
             // console.log(BigInt(costPerLevel).toString())
             expect(BigInt(costPerLevel).toString()).to.equal("525000000000000000000")
