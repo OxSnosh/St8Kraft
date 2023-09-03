@@ -1,7 +1,7 @@
 {
   "HARDHAT": {
     "countryminter": {
-      "address": "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e",
+      "address": "0xf3eD22390fDb06067633518199a9F56E635DF804",
       "ABI": [
         {
           "inputs": [],
@@ -1020,7 +1020,7 @@
       ]
     },
     "forcescontract": {
-      "address": "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
+      "address": "0x9297A6E66dDB832cD6125B140B3E020Fc36a54ca",
       "ABI": [
         {
           "anonymous": false,
@@ -2197,7 +2197,7 @@
       ]
     },
     "warbucks": {
-      "address": "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
+      "address": "0xeB5d863ae7cdC20235A97Ec4CD919377c5FA1D7e",
       "ABI": [
         {
           "inputs": [
@@ -2643,7 +2643,7 @@
       ]
     },
     "treasurycontract": {
-      "address": "0x4c5859f0F772848b2D91F1D83E2Fe57935348029",
+      "address": "0xee4736a4293c9C700631FD21E7d9016a5546454A",
       "ABI": [
         {
           "anonymous": false,
@@ -3649,6 +3649,11 @@
               "internalType": "address",
               "name": "_parameters",
               "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_spies",
+              "type": "address"
             }
           ],
           "name": "settings3",
@@ -3672,6 +3677,19 @@
           "name": "spendBalance",
           "outputs": [],
           "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "spies",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
           "type": "function"
         },
         {
@@ -3892,7 +3910,7 @@
       ]
     },
     "infrastructurecontract": {
-      "address": "0x67d269191c92Caf3cD7723F116c85e6E9bf55933",
+      "address": "0x568b7FEEDCD4F377568B9710dCAab92006020623",
       "ABI": [
         {
           "anonymous": false,
@@ -4318,7 +4336,7 @@
       ]
     },
     "technologymarketcontract": {
-      "address": "0x809d550fca64d94Bd9F66E60752A544199cfAC3D",
+      "address": "0x539F46F6d633dD80E10C70e6ed8dBeAD8b84177f",
       "ABI": [
         {
           "anonymous": false,
@@ -4687,7 +4705,7 @@
       ]
     },
     "militarycontract": {
-      "address": "0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB",
+      "address": "0xaDf60DD7504D2CdD8f596815114E8F49Ce886B0D",
       "ABI": [
         {
           "anonymous": false,
@@ -5071,7 +5089,7 @@
       ]
     },
     "warcontract": {
-      "address": "0x1291Be112d480055DaFd8a610b7d1e203891C274",
+      "address": "0x03A5beF4E1A506a3061A4dAEB274fBD4003f7eC2",
       "ABI": [
         {
           "anonymous": false,

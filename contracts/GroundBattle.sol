@@ -14,6 +14,7 @@ import "./Military.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
 import "hardhat/console.sol";
 
 ///@title GroundBattleContract
@@ -21,7 +22,9 @@ import "hardhat/console.sol";
 ///@dev this contract inherits from the openzeppelin ownable contract
 ///@dev this contract inherits from the chainlink vrf contract
 ///@notice the GroundBattleContract will allow nations at war to launch ground attacks against each other
-contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
+contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
+    using Chainlink for Chainlink.Request;
+
     uint256 groundBattleId;
     address warAddress;
     address infrastructure;
@@ -466,6 +469,22 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         return mod;
     }
 
+    bytes32 groundBattleJobId;
+    address oracleAddress;
+    uint256 fee;
+
+    function updateGroundBattleJobId(bytes32 _jobId) public onlyOwner {
+        groundBattleJobId = _jobId;
+    }
+
+    function updateOracleAddress(address _oracleAddress) public onlyOwner {
+        oracleAddress = _oracleAddress;
+    }
+
+    function updateFee(uint256 _fee) public onlyOwner {
+        fee = _fee;
+    }
+
     function fulfillRequest(uint256 battleId) public {
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
@@ -488,42 +507,40 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             .strength;
         uint256 defenderStrength = groundBattleIdToDefenderForces[requestNumber]
             .strength;
-
-        uint256 randomNumberForOutcomeSelection = (randomWords[0] %
-            (attackerStrength + defenderStrength));
-        uint256 attackerSoldierLosses;
-        uint256 attackerTankLosses;
-        uint256 defenderSoldierLosses;
-        uint256 defenderTankLosses;
         uint256 attackerId = groundBattleIdToAttackerForces[requestNumber]
             .countryId;
         uint256 defenderId = groundBattleIdToDefenderForces[requestNumber]
             .countryId;
         uint256 warId = groundBattleIdToAttackerForces[requestNumber].warId;
-        if (randomNumberForOutcomeSelection <= attackerStrength) {
-            console.log("ATTACKER VICTORY");
-            (
-                attackerSoldierLosses,
-                attackerTankLosses,
-                defenderSoldierLosses,
-                defenderTankLosses
-            ) = attackVictory(requestNumber);
-            collectSpoils(requestNumber, attackerId);
-            console.log("SPOILS COLLECTED");
-            groundBattleIdToAtackerVictory[requestNumber] = true;
-            console.log("VICTORY SET TO", groundBattleIdToAtackerVictory[requestNumber]);
-        } else if (randomNumberForOutcomeSelection > attackerStrength) {
-            console.log("DEFENDER VICTORY");
-            (
-                attackerSoldierLosses,
-                attackerTankLosses,
-                defenderSoldierLosses,
-                defenderTankLosses
-            ) = defenseVictory(requestNumber);
-            groundBattleIdToAtackerVictory[requestNumber] = false;
-        }
+        Chainlink.Request memory req = buildChainlinkRequest(
+            groundBattleJobId,
+            address(this),
+            this.completeBattleSequence.selector
+        );
+        req.addUint("requestNumber", requestNumber);
+        req.addBytes("randomWords", abi.encodePacked(randomWords));
+        req.addUint("attackerStrength", attackerStrength);
+        req.addUint("defenderStrength", defenderStrength);
+        req.addUint("attackerId", attackerId);
+        req.addUint("defenderId", defenderId);
+        req.addUint("warId", warId);
+        sendChainlinkRequestTo(oracleAddress, req, fee);
+    }
+
+    function completeBattleSequence(
+        uint256 battleId, 
+        uint256 attackerId,
+        uint256 attackerSoldierLosses,
+        uint256 attackerTankLosses,
+        uint256 defenderId,
+        uint256 defenderSoldierLosses,
+        uint256 defenderTankLosses,
+        uint256 warId,
+        bool attackerVictory
+    ) external {
+        groundBattleIdToAtackerVictory[battleId] = attackerVictory;
         emit BattleResultsEvent (
-            requestNumber,
+            battleId,
             attackerSoldierLosses,
             attackerTankLosses,
             defenderSoldierLosses,
@@ -538,7 +555,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             defenderTankLosses
         );
         groundBattleIdToBattleResults[
-            requestNumber
+            battleId
         ] = newBattleResults;
         force.decreaseUnits(
             attackerSoldierLosses,
@@ -548,19 +565,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
             defenderTankLosses,
             defenderId
         );
-        console.log("HERE?");
-        completeBattleSequence(requestNumber, warId);
-    }
-
-    function completeBattleSequence(uint256 battleId, uint256 warId) internal {
-        (
-            uint256 attackerId,
-            uint256 attackerSoldierLosses,
-            uint256 attackerTankLosses,
-            uint256 defenderId,
-            ,
-
-        ) = returnBattleResults(battleId);
         war.decreaseGroundBattleLosses(
             attackerSoldierLosses,
             attackerTankLosses,
@@ -580,6 +584,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2 {
         if (anarchyCheckAttacker) {
             param.inflictAnarchy(attackerId);
         }
+        collectSpoils(battleId, attackerId);
         console.log("BATTLE COMPLETE");
     }
 

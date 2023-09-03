@@ -60,8 +60,6 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-wit
 import { networkConfig } from "../helper-hardhat-config"
 import fs from "fs"
 
-const eaPath = "../MetaNations-external-adapters/Contracts/"
-
 async function main() {
     let chainId = network.config.chainId
     let subscriptionId    
@@ -1245,7 +1243,10 @@ async function main() {
 
     await spycontract.settings(
         spyoperationscontract.address,
-        treasurycontract.address
+        treasurycontract.address,
+        countryminter.address,
+        improvementscontract2.address,
+        wonderscontract1.address
         )
 
     await spyoperationscontract.settings(
@@ -1354,7 +1355,8 @@ async function main() {
         fightersmarketplace2.address,
         bombersmarketplace1.address,
         bombersmarketplace2.address,
-        countryparameterscontract.address
+        countryparameterscontract.address,
+        spycontract.address
     )
 
     await warcontract.settings(
@@ -1416,6 +1418,8 @@ async function main() {
 
     console.log("settings initiated");
 
+    const eaPath = "external_adapters/Contracts";
+
     if(chainId == 31337) {
         const contractMetadataLocation = `${eaPath}/contract-metadata.json`;
         let contractMetadata : any;
@@ -1449,6 +1453,9 @@ async function main() {
 
         let spyOperationArtifact = await artifacts.readArtifact("SpyOperationsContract")
         let spyOperationAbi = spyOperationArtifact.abi
+
+        let groundBattleArtifact = await artifacts.readArtifact("GroundBattleContract")
+        let groundBattleAbi = groundBattleArtifact.abi
 
         // Read Contract Metadata
         try {
@@ -1484,8 +1491,12 @@ async function main() {
                 spyoperationscontract: {
                     address: spyoperationscontract.address,
                     ABI: spyOperationAbi,
+                },
+                groundbattlecontract: {
+                    address: groundbattlecontract.address,
+                    ABI: groundBattleAbi,
                 }
-            };
+            }
         } else if (chainId == 4002) {
             contractMetadata.TESTNET = {
                 ...contractMetadata.TESTNET,
