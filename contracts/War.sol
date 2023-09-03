@@ -21,11 +21,13 @@ contract WarContract is Ownable {
     address public countryMinter;
     address public nationStrength;
     address public military;
-    address public breakBlockadeAddress;
-    address public navalAttackAddress;
-    address public airBattleAddress;
+    address public breakBlockade;
+    address public navalAttack;
+    address public airBattle;
     address public groundBattle;
     address public cruiseMissile;
+    address public blockade;
+    address public nuke;
     address public forces;
     address public wonders1;
     address public keeper;
@@ -135,9 +137,9 @@ contract WarContract is Ownable {
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
         nationStrength = _nationStrength;
-        breakBlockadeAddress = _breakBlockadeAddress;
-        navalAttackAddress = _navalAttackAddress;
-        airBattleAddress = _airBattleAddress;
+        breakBlockade = _breakBlockadeAddress;
+        navalAttack = _navalAttackAddress;
+        airBattle = _airBattleAddress;
         groundBattle = _groundBattle;
         nsc = NationStrengthContract(_nationStrength);
         military = _military;
@@ -150,11 +152,13 @@ contract WarContract is Ownable {
         keep = KeeperContract(_keeper);
     }
 
-    function settings2(address _treasury, address _forces) public onlyOwner {
+    function settings2(address _treasury, address _forces, address _blockade, address _nuke) public onlyOwner {
         treasury = _treasury;
         tres = TreasuryContract(_treasury);
         forces = _forces;
         forc = ForcesContract(_forces);
+        blockade = _blockade;
+        nuke = _nuke;
     }
 
     ///@dev this function is only callable by the contract owner
@@ -431,8 +435,8 @@ contract WarContract is Ownable {
 
     modifier onlyNavyBattle() {
         require(
-            msg.sender == breakBlockadeAddress ||
-                msg.sender == navalAttackAddress,
+            msg.sender == breakBlockade ||
+                msg.sender == navalAttack,
             "function only callable from navy battle contract"
         );
         _;
@@ -529,7 +533,13 @@ contract WarContract is Ownable {
 
     modifier onlyBattle() {
         require(
-            msg.sender == groundBattle,
+            msg.sender == groundBattle ||
+                msg.sender == airBattle ||
+                msg.sender == navalAttack ||
+                msg.sender == breakBlockade ||
+                msg.sender == blockade ||
+                msg.sender == cruiseMissile ||
+                msg.sender == nuke,
             "function only callable dring an attack"
         );
         _;
@@ -560,7 +570,7 @@ contract WarContract is Ownable {
 
     modifier onlyAirBattle() {
         require(
-            msg.sender == airBattleAddress,
+            msg.sender == airBattle,
             "function only callable from air battle"
         );
         _;

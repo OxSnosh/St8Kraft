@@ -30,9 +30,9 @@ contract NavalActionsContract is Ownable {
     KeeperContract keep;
 
     struct NavalActions {
-        bool blockadedToday;
-        uint256 purchasesToday;
-        uint256 actionSlotsUsedToday;
+        mapping(uint256 => bool) blockadedToday;
+        mapping(uint256 => uint256) purchasesToday;
+        mapping(uint256 => uint256) actionSlotsUsedToday;
     }
 
     mapping(uint256 => NavalActions) idToNavalActions;
@@ -84,8 +84,11 @@ contract NavalActionsContract is Ownable {
     ///@notice this function will allow the contract to keep track of each nations action slots, blockades and purchases
     ///@param id is the nation ID of the country being minted
     function generateNavalActions(uint256 id) public onlyCountryMinter {
-        NavalActions memory newNavalActions = NavalActions(false, 0, 0);
-        idToNavalActions[id] = newNavalActions;
+        uint256 gameDay = keep.getGameDay();
+        NavalActions storage newNavalActions = idToNavalActions[id];
+        newNavalActions.blockadedToday[gameDay] = false;
+        newNavalActions.purchasesToday[gameDay] = 0;
+        newNavalActions.actionSlotsUsedToday[gameDay] = 0;
     }
 
     ///@dev this is a public view function that is only callable from the navy battle contracts
@@ -93,7 +96,8 @@ contract NavalActionsContract is Ownable {
     ///@notice a nation is only allowed to make 3 naval actions per day
     ///@notice this function will increase naval actions when they occur
     function increaseAction(uint256 id) public onlyNavalAction {
-        idToNavalActions[id].actionSlotsUsedToday += 1;
+        uint256 gameDay = keep.getGameDay();
+        idToNavalActions[id].actionSlotsUsedToday[gameDay] += 1;
     }
 
     modifier onlyNavy() {
@@ -113,7 +117,7 @@ contract NavalActionsContract is Ownable {
     ///@param amount is the amount of navy vessels being purchased
     function increasePurchases(uint256 id, uint256 amount) public onlyNavy {
         uint256 gameDay = keep.getGameDay();
-        idToDayToPurchases[id][gameDay] += amount;
+        idToNavalActions[id].purchasesToday[gameDay] += amount;
     }
 
     modifier onlyBlockade() {
@@ -130,7 +134,8 @@ contract NavalActionsContract is Ownable {
     ///@notice this function will be called when a nation is blockaded and set the blockadedToday to true
     ///@param id is the nation id of the nation being blockaded
     function toggleBlockaded(uint256 id) public onlyNavalAction {
-        idToNavalActions[id].blockadedToday = true;
+        uint256 day = keep.getGameDay();
+        idToNavalActions[id].blockadedToday[day] = true;
     }
 
     modifier onlyKeeper() {
@@ -144,7 +149,7 @@ contract NavalActionsContract is Ownable {
     ///@return uint256 is the number of ships purchased today
     function getPurchasesToday(uint256 id) public view returns (uint256) {
         uint256 gameDay = keep.getGameDay();
-        uint256 purchasesToday = idToDayToPurchases[id][gameDay];
+        uint256 purchasesToday = idToNavalActions[id].purchasesToday[gameDay];
         return purchasesToday;
     }
 
@@ -153,7 +158,8 @@ contract NavalActionsContract is Ownable {
     ///@param id is the nation id of the nation being queried
     ///@return uint256 is the number of action slots used today
     function getActionSlotsUsed(uint256 id) public view returns (uint256) {
-        uint256 actionSlotsUsed = idToNavalActions[id].actionSlotsUsedToday;
+        uint256 gameDay = keep.getGameDay();
+        uint256 actionSlotsUsed = idToNavalActions[id].actionSlotsUsedToday[gameDay];
         return actionSlotsUsed;
     }
 
@@ -162,7 +168,8 @@ contract NavalActionsContract is Ownable {
     ///@param id is the nation id of the nation being queried
     ///@return bool will be true if a nation has been blockaded today
     function getBlockadedToday(uint256 id) public view returns (bool) {
-        bool blockadedToday = idToNavalActions[id].blockadedToday;
+        uint256 gameDay = keep.getGameDay();
+        bool blockadedToday = idToNavalActions[id].blockadedToday[gameDay];
         return blockadedToday;
     }
 }

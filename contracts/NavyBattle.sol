@@ -6,9 +6,11 @@ import "./Navy.sol";
 import "./War.sol";
 import "./Improvements.sol";
 import "./War.sol";
+import "./KeeperFile.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+import "hardhat/console.sol";
 
 ///@title NavalBlocadeContract
 ///@author OxSnosh
@@ -21,6 +23,7 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
     address public navalAction;
     address public warContract;
     address public countryMinter;
+    address public keeper;
 
     //Chainlik Variables
     uint256[] private s_randomWords;
@@ -36,19 +39,22 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
     NavyContract nav;
     NavalActionsContract navAct;
     AdditionalNavyContract addNav;
+    KeeperContract keep;
 
     struct Blockade {
         uint256 blockadeId;
         uint256 blockaderId;
         uint256 blockadedId;
         uint256 blockadePercentageReduction;
-        uint256 blockadeDays;
+        uint256 blockadeDay;
         bool blockadeActive;
     }
 
     mapping(uint256 => Blockade) public blockadeIdToBlockade;
-    mapping(uint256 => uint256[]) public idToActiveBlockadesAgainst;
+    mapping(uint256 => uint256[]) public idDefenderToIdAttackerToActiveBlockadesAgainst;
+    mapping(uint256 => uint256[]) public idAttackerToIdDefenderToActiveBlockadesFor;
     mapping(uint256 => uint256[]) public idToActiveBlockadesFor;
+    mapping(uint256 => uint256[]) public idToActiveBlockadesAgainst;
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
@@ -68,7 +74,9 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
         address _navy,
         address _additionalNavy,
         address _navalAction,
-        address _war
+        address _war,
+        address _countryMinter,
+        address _keeper
     ) public onlyOwner {
         navy = _navy;
         nav = NavyContract(_navy);
@@ -78,6 +86,10 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
         navAct = NavalActionsContract(_navalAction);
         warContract = _war;
         war = WarContract(_war);
+        countryMinter = _countryMinter;
+        mint = CountryMinter(_countryMinter);
+        keeper = _keeper;
+        keep = KeeperContract(_keeper);
     }
 
     ///@dev this is a public function callable only from the nation owner
@@ -92,7 +104,7 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
         uint256 warId
     ) public {
         bool requirementsMet = checkRequirements(attackerId, defenderId, warId);
-        require (requirementsMet);
+        require (requirementsMet, "requrements not met");
         uint256 slotsUsed = navAct.getActionSlotsUsed(attackerId);
         require((slotsUsed + 1) <= 3, "max slots used");
         uint256 activeBlockadesAgainstCount = idToActiveBlockadesAgainst[
@@ -117,18 +129,18 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
             attackerAlreadyBlockaded == false,
             "attacker already blockaded this nation"
         );
+        uint256 day = keep.getGameDay();
         Blockade memory newBlockade = Blockade(
             blockadeId,
             attackerId,
             defenderId,
             1,
-            0,
+            day,
             true
         );
         blockadeIdToBlockade[blockadeId] = newBlockade;
-        //need keeper to increment blockade days
         navAct.increaseAction(attackerId);
-        fulfillRequest(blockadeId);
+        navAct.toggleBlockaded(defenderId);
         uint256[]
             storage newActiveBlockadesAgainst = idToActiveBlockadesAgainst[
                 defenderId
@@ -141,6 +153,7 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
         newActiveBlockadesFor.push(blockadeId);
         idToActiveBlockadesFor[attackerId] = newActiveBlockadesFor;
         war.cancelPeaceOffersUponAttack(warId);
+        fulfillRequest(blockadeId);
         blockadeId++;
     }
 
@@ -198,6 +211,7 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
         uint256 blockadePercentage = ((s_randomWords[0] % 5) + 1);
         blockadeIdToBlockade[requestNumber]
             .blockadePercentageReduction = blockadePercentage;
+        console.log("blockade percentage: ", blockadePercentage);
     }
 
     function getActiveBlockadesAgainst(uint256 countryId)
@@ -209,6 +223,25 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
             countryId
         ];
         return (activeBlockadesToReturn);
+    }
+
+    function getBlockadePercentageReduction(uint256 countryId)
+        public
+        view
+        returns (uint256)
+    {
+        uint256[] memory activeBlockadesAgainst = idToActiveBlockadesAgainst[
+            countryId
+        ];
+        uint256 percentageReduction;
+        for (uint256 i = 0; i < activeBlockadesAgainst.length; i++) {
+            uint256 _blockadeId = activeBlockadesAgainst[i];
+            uint256 blockadePercentage = blockadeIdToBlockade[_blockadeId]
+                .blockadePercentageReduction;
+            percentageReduction += blockadePercentage;
+        }
+        console.log("percentage reduction: ", percentageReduction);
+        return percentageReduction;
     }
 
     function checkIfBlockadeCapable(uint256 countryId) public {

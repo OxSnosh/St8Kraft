@@ -13,6 +13,7 @@ import "./Crime.sol";
 import "./CountryMinter.sol";
 import "./KeeperFile.sol";
 import "./Environment.sol";
+import "./NavyBattle.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
@@ -41,6 +42,7 @@ contract TaxesContract is Ownable {
     address public bonusResources;
     address public keeper;
     address public environment;
+    address public blockade;
 
     InfrastructureContract inf;
     TreasuryContract tsy;
@@ -62,6 +64,7 @@ contract TaxesContract is Ownable {
     BonusResourcesContract bonus;
     KeeperContract keep;
     EnvironmentContract env;
+    NavalBlockadeContract blk;
 
     event TaxesCollected(uint256 indexed id, uint256 indexed amount);
 
@@ -115,7 +118,8 @@ contract TaxesContract is Ownable {
         address _resources,
         address _forces,
         address _military,
-        address _crime
+        address _crime,
+        address _blockade
     ) public onlyOwner {
         parameters = _parameters;
         params = CountryParametersContract(_parameters);
@@ -135,6 +139,8 @@ contract TaxesContract is Ownable {
         mil = MilitaryContract(_military);
         crime = _crime;
         crm = CrimeContract(_crime);
+        blockade = _blockade;
+        blk = NavalBlockadeContract(_blockade);
     }
 
     modifier onlyCountryMinter() {
@@ -252,6 +258,13 @@ contract TaxesContract is Ownable {
         uint256 taxesCollectible = (dailyTaxesCollectiblePerCitizen *
             daysSinceLastTaxCollection *
             citizenCount) * (10 ** 18);
+        uint256 mod = 100;
+        uint256 percentageReductionForBlockades = blk.getBlockadePercentageReduction(
+            id
+        );
+        mod = mod - percentageReductionForBlockades;
+        console.log("mod", mod);
+        taxesCollectible = (taxesCollectible * mod) / 100;        
         return (dailyTaxesCollectiblePerCitizen, taxesCollectible);
     }
 
@@ -347,7 +360,7 @@ contract TaxesContract is Ownable {
         uint256 pointsFromCrime = getPointsFromCriminals(id);
         uint256 pointsFromImprovements = addTax
             .getPointsToSubtractFromImprovements(id);
-        uint256 pointsFromIntelAgencies = getPointsFromIntelAgencies(id);
+        uint256 pointsFromIntelAgencies = addTax.getPointsFromIntelAgencies(id);
         uint256 environmentPoints = env.getEnvironmentScore(id);
         uint256 happinessPointsToSubtract = (taxRatePoints +
             pointsFromCrime +
@@ -687,23 +700,7 @@ contract TaxesContract is Ownable {
         return subtractTaxPoints;
     }
 
-    function getPointsFromIntelAgencies(
-        uint256 id
-    ) public view returns (uint256) {
-        uint256 intelAgencies = imp2.getIntelAgencyCount(id);
-        uint256 subtractPoints;
-        uint256 taxRate = inf.getTaxRate(id);
-        if (taxRate <= 20) {
-            subtractPoints = 0;
-        } else if (intelAgencies >= 1 && taxRate > 20 && taxRate <= 23) {
-            subtractPoints = 1;
-        } else if (intelAgencies >= 1 && taxRate > 23) {
-            subtractPoints = intelAgencies;
-        } else {
-            subtractPoints = 0;
-        }
-        return subtractPoints;
-    }
+
 
     function getPointsFromCriminals(uint256 id) public view returns (uint256) {
         (uint256 unincarceratedCriminals, , ) = crm.getCriminalCount(id);
@@ -984,5 +981,23 @@ contract AdditionalTaxesContract is Ownable {
             anarchyCheck = true;
         }
         return (soldierPopulationRatio, environmentPenalty, anarchyCheck);
+    }
+
+        function getPointsFromIntelAgencies(
+        uint256 id
+    ) public view returns (uint256) {
+        uint256 intelAgencies = imp2.getIntelAgencyCount(id);
+        uint256 subtractPoints;
+        uint256 taxRate = inf.getTaxRate(id);
+        if (taxRate <= 20) {
+            subtractPoints = 0;
+        } else if (intelAgencies >= 1 && taxRate > 20 && taxRate <= 23) {
+            subtractPoints = 1;
+        } else if (intelAgencies >= 1 && taxRate > 23) {
+            subtractPoints = intelAgencies;
+        } else {
+            subtractPoints = 0;
+        }
+        return subtractPoints;
     }
 }

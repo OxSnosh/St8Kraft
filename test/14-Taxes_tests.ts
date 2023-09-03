@@ -793,7 +793,8 @@ describe("Taxes Contract", function () {
         await navycontract.settings2(
             countryminter.address,
             bonusresourcescontract.address,
-            navycontract2.address
+            navycontract2.address,
+            infrastructurecontract.address
         )
     
         await navycontract2.settings(
@@ -811,9 +812,9 @@ describe("Taxes Contract", function () {
         await navycontract2.settings2(
             countryminter.address,
             bonusresourcescontract.address,
-            navycontract.address
-        )
-    
+            navycontract.address,
+            infrastructurecontract.address
+        ) 
     
         await navalactionscontract.settings(
             navalblockadecontract.address,
@@ -838,7 +839,9 @@ describe("Taxes Contract", function () {
             navycontract.address,
             additionalnavycontract.address,
             navalactionscontract.address,
-            warcontract.address
+            warcontract.address,
+            countryminter.address,
+            keepercontract.address
         )
     
         await breakblockadecontract.settings(
@@ -944,7 +947,8 @@ describe("Taxes Contract", function () {
             resourcescontract.address,
             forcescontract.address,
             militarycontract.address,
-            crimecontract.address
+            crimecontract.address,
+            navalblockadecontract.address
         )
     
         await additionaltaxescontract.settings(
@@ -1030,7 +1034,9 @@ describe("Taxes Contract", function () {
         )
         await warcontract.settings2(
             treasurycontract.address,
-            forcescontract.address
+            forcescontract.address,
+            navalblockadecontract.address,
+            nukecontract.address
         )
     
         await wonderscontract1.settings(
@@ -1175,7 +1181,7 @@ describe("Taxes Contract", function () {
             const pointsToSubtractFromImprovements = await additionaltaxescontract.getPointsToSubtractFromImprovements(0)
             // console.log(pointsToSubtractFromImprovements.toNumber(), "points to subtract from improvements");
             expect(pointsToSubtractFromImprovements.toNumber()).to.equal(0);
-            const pointsFromIntelAgencies = await taxescontract.getPointsFromIntelAgencies(0);
+            const pointsFromIntelAgencies = await additionaltaxescontract.getPointsFromIntelAgencies(0);
             // console.log(pointsFromIntelAgencies.toNumber(), "points from intel agencies");
             expect(pointsFromIntelAgencies.toNumber()).to.equal(0);
             const pointsFromEnvironment = await environmentcontract.getEnvironmentScore(0);

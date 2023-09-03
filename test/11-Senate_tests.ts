@@ -803,7 +803,8 @@ describe("Senate Contract", function () {
         await navycontract.settings2(
             countryminter.address,
             bonusresourcescontract.address,
-            navycontract2.address
+            navycontract2.address,
+            infrastructurecontract.address
         )
     
         await navycontract2.settings(
@@ -821,9 +822,9 @@ describe("Senate Contract", function () {
         await navycontract2.settings2(
             countryminter.address,
             bonusresourcescontract.address,
-            navycontract.address
-        )
-    
+            navycontract.address,
+            infrastructurecontract.address
+        ) 
     
         await navalactionscontract.settings(
             navalblockadecontract.address,
@@ -848,7 +849,9 @@ describe("Senate Contract", function () {
             navycontract.address,
             additionalnavycontract.address,
             navalactionscontract.address,
-            warcontract.address
+            warcontract.address,
+            countryminter.address,
+            keepercontract.address
         )
     
         await breakblockadecontract.settings(
@@ -954,7 +957,8 @@ describe("Senate Contract", function () {
             resourcescontract.address,
             forcescontract.address,
             militarycontract.address,
-            crimecontract.address
+            crimecontract.address,
+            navalblockadecontract.address
         )
     
         await additionaltaxescontract.settings(
@@ -1040,7 +1044,9 @@ describe("Senate Contract", function () {
         )
         await warcontract.settings2(
             treasurycontract.address,
-            forcescontract.address
+            forcescontract.address,
+            navalblockadecontract.address,
+            nukecontract.address
         )
     
         await wonderscontract1.settings(

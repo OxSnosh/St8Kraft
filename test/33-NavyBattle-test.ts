@@ -60,7 +60,7 @@ import {
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("Technology Marketplace Contract", function () {
+describe("Navy Contract", function () {
 
     let warbucks: WarBucks  
     let metanationsgovtoken: MetaNationsGovToken
@@ -814,7 +814,7 @@ describe("Technology Marketplace Contract", function () {
             bonusresourcescontract.address,
             navycontract.address,
             infrastructurecontract.address
-        ) 
+        )    
     
         await navalactionscontract.settings(
             navalblockadecontract.address,
@@ -834,7 +834,7 @@ describe("Technology Marketplace Contract", function () {
             improvementscontract4.address,
             navycontract2.address
         )
-
+    
         await navalblockadecontract.settings(
             navycontract.address,
             additionalnavycontract.address,
@@ -899,7 +899,7 @@ describe("Technology Marketplace Contract", function () {
             keepercontract.address,
             resourcescontract.address
         )
-    
+
         await spycontract.settings(
             spyoperationscontract.address,
             treasurycontract.address,
@@ -947,7 +947,7 @@ describe("Technology Marketplace Contract", function () {
             resourcescontract.address,
             forcescontract.address,
             militarycontract.address,
-            crimecontract.address,
+            crimecontract.address, 
             navalblockadecontract.address
         )
     
@@ -1077,10 +1077,14 @@ describe("Technology Marketplace Contract", function () {
             wonderscontract3.address,
             countryminter.address
         )
-
+        
         if(chainId == 31337 || chainId == 1337) {
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, groundbattlecontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, navalblockadecontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, breakblockadecontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, navalattackcontract.address);
         }
 
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
@@ -1090,168 +1094,134 @@ describe("Technology Marketplace Contract", function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        await warbucks.connect(signer0).approve(warbucks.address, BigInt(25000000000*(10**18)));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000*(10**18)));
-        await treasurycontract.connect(signer1).addFunds(BigInt(20000000000*(10**18)), 0);
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0);
+        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000)
+        await technologymarketcontrat.connect(signer1).buyTech(0, 20000)
+
+
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
+        await countryminter.connect(signer2).generateCountry(
+            "TestRuler2",
+            "TestNationName2",
+            "TestCapitalCity2",
+            "TestNationSlogan2"
+        )
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(2000000000*(10**18)));
+        await treasurycontract.connect(signer2).addFunds(BigInt(2000000000*(10**18)), 1);
+        await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 20000)
+        await technologymarketcontrat.connect(signer2).buyTech(1, 20000)
+
+        await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+        await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+        await warcontract.connect(signer1).declareWar(0, 1)
+       
+        await warbucks.connect(signer0).transfer(signer3.address, BigInt(2100000000000000000000000))
+        await countryminter.connect(signer3).generateCountry(
+            "TestRuler3",
+            "TestNationName3",
+            "TestCapitalCity3",
+            "TestNationSlogan3"
+        )
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer3.address, BigInt(2000000000*(10**18)));
+        await treasurycontract.connect(signer3).addFunds(BigInt(2000000000*(10**18)), 2);
+        await infrastructuremarketplace.connect(signer3).buyInfrastructure(2, 20000)
+        await technologymarketcontrat.connect(signer3).buyTech(2, 20000)
+
+        await militarycontract.connect(signer3).toggleWarPeacePreference(2)
+        await warcontract.connect(signer3).declareWar(2, 1)
+
     });
 
-    describe("Technology Market", function () {
-        it("tech market tests that buyTech() works", async function () {
-            var tech = await infrastructurecontract.getTechnologyCount(0);
-            // console.log(tech.toNumber());
-            expect(tech.toNumber()).to.equal(0);
-            await technologymarketcontrat.connect(signer1).buyTech(0, 50);
-            var tech = await infrastructurecontract.getTechnologyCount(0);
-            // console.log(tech.toNumber());
-            expect(tech.toNumber()).to.equal(50);
+    describe("Blockade", function () {
+        
+        it("tests that blockade occurs", async function () {
+            await navycontract.connect(signer1).buyBattleship(2, 0);
+            await navycontract.connect(signer1).buyCruiser(2, 0);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer1).buyFrigate(2, 0);
+            await navycontract2.connect(signer1).buySubmarine(2, 0);
+            await navalblockadecontract.connect(signer1).blockade(0, 1, 0);
         })
 
-        it("tech market tests that tech cost per level works correctly", async function () {
-            var costPerLevel : any = await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("100000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 5);
-            var costPerLevel : any = await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("120000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 3);
-            var costPerLevel : any  = await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("130000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 2);
-            var costPerLevel : any = await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("140000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 5);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("160000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 15);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("180000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 20);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("200000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 25);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("220000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 25);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("240000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 50);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("260000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 50);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("300000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 50);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("400000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 50);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("500000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 100);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("600000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 100);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("700000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 100);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("800000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 100);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("1100000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 300);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("1600000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("2100000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("2600000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("3100000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("3600000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("4100000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("4600000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("5100000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("5600000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("6600000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 5000);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("7600000000000000000000")
-            await technologymarketcontrat.connect(signer1).buyTech(0, 5000);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("8600000000000000000000")
+        it("tests that blockade reverts without blockade capable ships", async function () {
+            await expect(navalblockadecontract.connect(signer1).blockade(0, 1, 0)).to.be.revertedWith("not enough blockade capable ships");
         })
 
-        it("tech market tests that tech cost multipliers work correctly", async function () {
-            await technologymarketcontrat.connect(signer1).buyTech(0, 500);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("700000000000000000000")
-            await resourcescontract.mockResourcesForTesting(0, 0, 6);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("665000000000000000000")
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 3000)
-            await billscontract.connect(signer1).payBills(0)
-            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 6)
-            await improvementscontract3.connect(signer1).buyImprovement3(2, 0, 9)
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("525000000000000000000")
-            await wonderscontract2.connect(signer1).buyWonder2(0, 3);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("455000000000000000000")
-            await wonderscontract3.connect(signer1).buyWonder3(0, 4);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("434000000000000000000")
-            await wonderscontract4.connect(signer1).buyWonder4(0, 2);
-            var costPerLevel : any= await technologymarketcontrat.getTechCostPerLevel(0)
-            // console.log(BigInt(costPerLevel).toString())
-            expect(BigInt(costPerLevel).toString()).to.equal("413000000000000000000")
+        it("tests that blockade reverts when defender already blockaded", async function () {
+            await navycontract.connect(signer1).buyBattleship(2, 0);
+            await navycontract.connect(signer1).buyCruiser(2, 0);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer1).buyFrigate(2, 0);
+            await navycontract2.connect(signer1).buySubmarine(2, 0);
+            await navalblockadecontract.connect(signer1).blockade(0, 1, 0);
+            await expect(navalblockadecontract.connect(signer1).blockade(0, 1, 0)).to.be.revertedWith("nation already blockaded today");
+        })
+
+        it("tests that blockade reverts when defender already blockaded", async function () {
+            await navycontract.connect(signer1).buyBattleship(2, 0);
+            await navycontract.connect(signer1).buyCruiser(2, 0);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer1).buyFrigate(2, 0);
+            await navycontract2.connect(signer1).buySubmarine(2, 0);
+            await navalblockadecontract.connect(signer1).blockade(0, 1, 0);
+            await expect(navalblockadecontract.connect(signer1).blockade(0, 1, 0)).to.be.revertedWith("nation already blockaded today");
+        })
+
+        it("tests that blockade reverts when defender has blockade capable ships", async function () {
+            await navycontract.connect(signer1).buyBattleship(2, 0);
+            await navycontract.connect(signer1).buyCruiser(2, 0);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer1).buyFrigate(2, 0);
+            await navycontract2.connect(signer1).buySubmarine(2, 0);
+            //defender purchases blockade capable ships
+            await navycontract.connect(signer2).buyBattleship(2, 1);
+            await expect(navalblockadecontract.connect(signer1).blockade(0, 1, 0)).to.be.revertedWith("defender has ships that can break blockade");
+        })
+
+        it("tests that a nation being blockaded cannot blockade", async function () {
+            await navycontract.connect(signer1).buyBattleship(2, 0);
+            await navycontract.connect(signer1).buyCruiser(2, 0);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer1).buyFrigate(2, 0);
+            await navycontract2.connect(signer1).buySubmarine(2, 0);
+            await navalblockadecontract.connect(signer1).blockade(0, 1, 0);
+            await navycontract.connect(signer2).buyBattleship(2, 1);
+            await navycontract.connect(signer2).buyCruiser(2, 1);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer2).buyFrigate(2, 1);
+            await navycontract2.connect(signer2).buySubmarine(2, 1);
+            await expect(navalblockadecontract.connect(signer2).blockade(1, 2, 1)).to.be.revertedWith("you cannot blockade while being blockaded");
+        })
+
+        it("tests that a random number is selected for tax percentage reduction", async function () {
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            var collection = await taxescontract.getTaxesCollectible(1);
+            console.log(collection.toString(), "collection");
+            await navycontract.connect(signer1).buyBattleship(2, 0);
+            await navycontract.connect(signer1).buyCruiser(2, 0);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer1).buyFrigate(2, 0);
+            await navycontract2.connect(signer1).buySubmarine(2, 0);
+            await navalblockadecontract.connect(signer1).blockade(0, 1, 0);
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            }
+            await vrfCoordinatorV2Mock.fulfillRandomWords(7, navalblockadecontract.address);
+            const blockadesAgainst = await navalblockadecontract.getActiveBlockadesAgainst(1);
+            expect(blockadesAgainst[0].toString()).to.equal("0");
+            const blockadeTaxReductionPercentage = await navalblockadecontract.getBlockadePercentageReduction(1);
+            expect(blockadeTaxReductionPercentage.toString()).to.equal("2");
+            var collection2 = await taxescontract.getTaxesCollectible(1);
+            console.log(collection.toString(), "collection");
         })
     })
 })
