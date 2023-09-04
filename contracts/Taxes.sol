@@ -264,7 +264,7 @@ contract TaxesContract is Ownable {
         );
         mod = mod - percentageReductionForBlockades;
         console.log("mod", mod);
-        taxesCollectible = (taxesCollectible * mod) / 100;        
+        taxesCollectible = ((taxesCollectible * mod) / 100);        
         return (dailyTaxesCollectiblePerCitizen, taxesCollectible);
     }
 

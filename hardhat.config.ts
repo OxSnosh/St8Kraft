@@ -50,6 +50,12 @@ const config = {
       {
         version: "0.7.6"
       },
+      {
+        version: "0.4.24"
+      },
+      {
+        version: "0.4.11"
+      },
     ],
   },
   defaultNetwork: "hardhat",

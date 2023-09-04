@@ -841,7 +841,8 @@ describe("Taxes Contract", function () {
             navalactionscontract.address,
             warcontract.address,
             countryminter.address,
-            keepercontract.address
+            keepercontract.address,
+            breakblockadecontract.address
         )
     
         await breakblockadecontract.settings(

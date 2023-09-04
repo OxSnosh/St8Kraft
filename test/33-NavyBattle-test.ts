@@ -841,7 +841,8 @@ describe("Navy Contract", function () {
             navalactionscontract.address,
             warcontract.address,
             countryminter.address,
-            keepercontract.address
+            keepercontract.address,
+            breakblockadecontract.address
         )
     
         await breakblockadecontract.settings(
@@ -1198,11 +1199,145 @@ describe("Navy Contract", function () {
         })
 
         it("tests that a random number is selected for tax percentage reduction", async function () {
+            await navycontract.connect(signer1).buyBattleship(2, 0);
+            await navycontract.connect(signer1).buyCruiser(2, 0);
             await keepercontract.incrementGameDay();
             await keepercontract.incrementGameDay();
             await keepercontract.incrementGameDay();
-            var collection = await taxescontract.getTaxesCollectible(1);
-            console.log(collection.toString(), "collection");
+            await keepercontract.incrementGameDay();
+            var collection : any = await taxescontract.getTaxesCollectible(1);
+            // console.log((collection[1]/(10**18)).toString(), "collection");
+            expect((collection[1]/(10**18)).toString()).to.equal("3010620");
+            await navycontract2.connect(signer1).buyFrigate(2, 0);
+            await navycontract2.connect(signer1).buySubmarine(2, 0);
+            await navalblockadecontract.connect(signer1).blockade(0, 1, 0);
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            }
+            await vrfCoordinatorV2Mock.fulfillRandomWords(7, navalblockadecontract.address);
+            const blockadesAgainst = await navalblockadecontract.getActiveBlockadesAgainst(1);
+            expect(blockadesAgainst[0].toString()).to.equal("0");
+            expect(blockadesAgainst.length.toString()).to.equal("1");
+            const blockadeTaxReductionPercentage = await navalblockadecontract.getBlockadePercentageReduction(1);
+            expect(blockadeTaxReductionPercentage.toString()).to.equal("2");
+            var collection2 : any = await taxescontract.getTaxesCollectible(1);
+            // console.log((collection2[1]/(10**18)).toString(), "collection");
+            expect((collection2[1]/(10**18)).toString()).to.equal("2950407.6");
+        })
+
+        it("tests that naval actions increments when break blockade called", async function () {
+            const navalActionsInitial = await navalactionscontract.getActionSlotsUsed(0);
+            // console.log(navalActionsInitial.toString(), "navalActionsInitial");
+            expect(navalActionsInitial.toString()).to.equal("0");
+            await navycontract.connect(signer1).buyBattleship(2, 0);
+            await navycontract.connect(signer1).buyCruiser(2, 0);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer1).buyFrigate(2, 0);
+            await navycontract2.connect(signer1).buySubmarine(2, 0);
+            await navalblockadecontract.connect(signer1).blockade(0, 1, 0);
+            const navalActionsFinal = await navalactionscontract.getActionSlotsUsed(0);
+            // console.log(navalActionsFinal.toString(), "navalActionsFinal");
+            expect(navalActionsFinal.toString()).to.equal("1");
+        })
+    })
+
+    describe("Break Blockade", function () {
+
+        it("tests that break blockade occurs", async function () {
+            await navycontract.connect(signer1).buyBattleship(2, 0);
+            await navycontract.connect(signer1).buyCruiser(2, 0);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer1).buyFrigate(2, 0);
+            await navycontract2.connect(signer1).buySubmarine(2, 0);
+            await navalblockadecontract.connect(signer1).blockade(0, 1, 0);
+            await navycontract.connect(signer2).buyBattleship(2, 1);
+            await navycontract.connect(signer2).buyCruiser(2, 1);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer2).buyFrigate(2, 1);
+            await navycontract2.connect(signer2).buySubmarine(2, 1);
+            await breakblockadecontract.connect(signer2).breakBlockade(0, 1, 0);
+        })
+
+        it("tests that break blockade reverts when a non blockading nation attacks", async function () {
+            await navycontract.connect(signer1).buyBattleship(2, 0);
+            await navycontract.connect(signer1).buyCruiser(2, 0);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer1).buyFrigate(2, 0);
+            await navycontract2.connect(signer1).buySubmarine(2, 0);
+            await navalblockadecontract.connect(signer1).blockade(0, 1, 0);
+            await navycontract.connect(signer2).buyBattleship(2, 1);
+            await navycontract.connect(signer2).buyCruiser(2, 1);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer2).buyFrigate(2, 1);
+            await navycontract2.connect(signer2).buySubmarine(2, 1);
+            await expect(breakblockadecontract.connect(signer2).breakBlockade(0, 1, 2)).to.be.revertedWith("!blockaded by this nation");
+        })
+
+        it("tests that break blockade reverts when a non blockaded nation calls function", async function () {
+            await navycontract.connect(signer1).buyBattleship(2, 0);
+            await navycontract.connect(signer1).buyCruiser(2, 0);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer1).buyFrigate(2, 0);
+            await navycontract2.connect(signer1).buySubmarine(2, 0);
+            await navalblockadecontract.connect(signer1).blockade(0, 1, 0);
+            await navycontract.connect(signer2).buyBattleship(2, 1);
+            await navycontract.connect(signer2).buyCruiser(2, 1);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer2).buyFrigate(2, 1);
+            await navycontract2.connect(signer2).buySubmarine(2, 1);
+            await expect(breakblockadecontract.connect(signer2).breakBlockade(0, 2, 1)).to.be.revertedWith("caller not nation owner");
+        })
+
+        it("tests that break blockade cancels peace offer", async function () {
+            await navycontract.connect(signer1).buyBattleship(2, 0);
+            await navycontract.connect(signer1).buyCruiser(2, 0);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer1).buyFrigate(2, 0);
+            await navycontract2.connect(signer1).buySubmarine(2, 0);
+            await navalblockadecontract.connect(signer1).blockade(0, 1, 0);
+            await navycontract.connect(signer2).buyBattleship(2, 1);
+            await navycontract.connect(signer2).buyCruiser(2, 1);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer2).buyFrigate(2, 1);
+            await navycontract2.connect(signer2).buySubmarine(2, 1);
+            await warcontract.connect(signer1).offerPeace(0, 0);
+            var warDetails = await warcontract.returnWar(0);
+            expect(warDetails[0].toString()).to.equal(true);
+            // console.log(warDetails[0].toString(), "peace offered"); 
+            // console.log(warDetails[1].toString(), "peace offered"); 
+            await breakblockadecontract.connect(signer2).breakBlockade(0, 1, 0)
+            var warDetails = await warcontract.returnWar(0);
+            expect(warDetails[0].toString()).to.equal(false);
+            // console.log(warDetails[0].toString(), "peace offered"); 
+            // console.log(warDetails[1].toString(), "peace offered"); 
+        })
+
+        it("tests that break blockade increments naval actions", async function () {
+            const navalActionsInitial = await navalactionscontract.getActionSlotsUsed(1);
+            // console.log(navalActionsInitial.toString(), "navalActionsInitial");
+            expect(navalActionsInitial.toString()).to.equal("0");
+            await navycontract.connect(signer1).buyBattleship(2, 0);
+            await navycontract.connect(signer1).buyCruiser(2, 0);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer1).buyFrigate(2, 0);
+            await navycontract2.connect(signer1).buySubmarine(2, 0);
+            await navalblockadecontract.connect(signer1).blockade(0, 1, 0);
+            await navycontract.connect(signer2).buyBattleship(2, 1);
+            await navycontract.connect(signer2).buyCruiser(2, 1);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer2).buyFrigate(2, 1);
+            await navycontract2.connect(signer2).buySubmarine(2, 1);
+            await warcontract.connect(signer1).offerPeace(0, 0);
+            await breakblockadecontract.connect(signer2).breakBlockade(0, 1, 0)
+            const navalActionsFinal = await navalactionscontract.getActionSlotsUsed(1);
+            // console.log(navalActionsFinal.toString(), "navalActionsFinal");
+            expect(navalActionsFinal.toString()).to.equal("1");
+        })
+
+        it("tests that break blockade randomly determined the outcome of the break blockade event", async function () {
             await navycontract.connect(signer1).buyBattleship(2, 0);
             await navycontract.connect(signer1).buyCruiser(2, 0);
             await keepercontract.incrementGameDay();
@@ -1216,12 +1351,39 @@ describe("Navy Contract", function () {
                 // console.log(Number(requestIdReturn), "requestIdReturn for Event");
             }
             await vrfCoordinatorV2Mock.fulfillRandomWords(7, navalblockadecontract.address);
-            const blockadesAgainst = await navalblockadecontract.getActiveBlockadesAgainst(1);
-            expect(blockadesAgainst[0].toString()).to.equal("0");
-            const blockadeTaxReductionPercentage = await navalblockadecontract.getBlockadePercentageReduction(1);
-            expect(blockadeTaxReductionPercentage.toString()).to.equal("2");
-            var collection2 = await taxescontract.getTaxesCollectible(1);
-            console.log(collection.toString(), "collection");
+            await navycontract.connect(signer2).buyBattleship(2, 1);
+            await navycontract.connect(signer2).buyCruiser(2, 1);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer2).buyFrigate(2, 1);
+            await navycontract2.connect(signer2).buySubmarine(2, 1);
+            await warcontract.connect(signer1).offerPeace(0, 0);
+            await breakblockadecontract.connect(signer2).breakBlockade(0, 1, 0)
+            console.log("here?")
+            await vrfCoordinatorV2Mock.fulfillRandomWords(8, breakblockadecontract.address);
+            console.log("here2?")
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer2).buyDestroyer(2, 1);
+            await navycontract2.connect(signer2).buyDestroyer(2, 1);
+            await breakblockadecontract.connect(signer2).breakBlockade(0, 1, 0)
+            console.log("here3?")
+            await vrfCoordinatorV2Mock.fulfillRandomWords(9, breakblockadecontract.address);
+            console.log("here4?")
+            await keepercontract.incrementGameDay();
+            await billscontract.connect(signer2).payBills(1)
+            await improvementscontract2.connect(signer2).buyImprovement2(1, 1, 4);
+            await improvementscontract1.connect(signer2).buyImprovement1(5, 1, 10);
+            await navycontract2.connect(signer2).buyDestroyer(2, 1);
+            await navycontract2.connect(signer2).buyDestroyer(2, 1);
+            await breakblockadecontract.connect(signer2).breakBlockade(0, 1, 0)
+            console.log("here5?")
+            await vrfCoordinatorV2Mock.fulfillRandomWords(10, breakblockadecontract.address);
+            console.log("here6?")
+            await keepercontract.incrementGameDay();
+            await breakblockadecontract.connect(signer2).breakBlockade(0, 1, 0)
+            await vrfCoordinatorV2Mock.fulfillRandomWords(11, breakblockadecontract.address);
+            console.log("here7?")
         })
+
+        
     })
 })

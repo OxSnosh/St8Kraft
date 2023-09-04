@@ -537,7 +537,7 @@ contract NavyContract is Ownable {
         uint256 currentShips = getCorvetteCount(id);
         uint256 nationInfrastructure = inf.getInfrastructureCount(id);
         uint256 additionalPurchases = (nationInfrastructure / corvetteRequiredInfrastructure);
-        require((currentShips + amount) <= (drydockAmount + additionalPurchases), "need more drydocs or infrastructure");
+        require((currentShips + amount) <= (drydockAmount + additionalPurchases), "need more drydocks or infrastructure");
         require(inf.getTechnologyCount(id) >= corvetteRequiredTechnology, "need more technology");
         uint256 purchasePrice = (corvetteCost * amount);
         bool steel = bonus.viewSteel(id);
@@ -644,7 +644,7 @@ contract NavyContract is Ownable {
         uint256 currentShips = getBattleshipCount(id);
         uint256 nationInfrastructure = inf.getInfrastructureCount(id);
         uint256 additionalPurchases = (nationInfrastructure / battleshipRequiredInfrastructure);
-        require((currentShips + amount) <= (drydockAmount + additionalPurchases), "need more drydocs or infrastructure");
+        require((currentShips + amount) <= (drydockAmount + additionalPurchases), "need more drydocks or infrastructure");
         require(inf.getTechnologyCount(id) >= battleshipRequiredTechnology, "need more technology");
         uint256 purchasePrice = battleshipCost * amount;
         bool steel = bonus.viewSteel(id);
@@ -699,7 +699,7 @@ contract NavyContract is Ownable {
         uint256 currentShips = getCruiserCount(id);
         uint256 nationInfrastructure = inf.getInfrastructureCount(id);
         uint256 additionalPurchases = (nationInfrastructure / cruiserRequiredInfrastructure);
-        require((currentShips + amount) <= (drydockAmount + additionalPurchases), "need more drydocs or infrastructure");
+        require((currentShips + amount) <= (drydockAmount + additionalPurchases), "need more drydocks or infrastructure");
         require(inf.getTechnologyCount(id) >= cruiserRequiredTechnology, "need more technology");
         uint256 purchasePrice = cruiserCost * amount;
         bool steel = bonus.viewSteel(id);
@@ -1113,7 +1113,7 @@ contract NavyContract2 is Ownable {
         uint256 currentShips = getDestroyerCount(id);
         uint256 nationInfrastructure = inf.getInfrastructureCount(id);
         uint256 additionalPurchases = (nationInfrastructure / destroyerRequiredInfrastructure);
-        require((currentShips + amount) <= (drydockAmount + additionalPurchases), "need more drydocs or infrastructure");
+        require((currentShips + amount) <= (drydockAmount + additionalPurchases), "need more drydocks or infrastructure");
         require(inf.getTechnologyCount(id) >= destroyerRequiredTechnology, "need more technology");
         uint256 purchasePrice = destroyerCost * amount;
         bool steel = bonus.viewSteel(id);
