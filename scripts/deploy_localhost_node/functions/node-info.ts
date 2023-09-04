@@ -20,7 +20,8 @@ declare interface ResponseData {
   }>;
 }
 
-const getInfo = async (authToken: string): Promise<ResponseData> => {
+const getInfo = async (authToken: string) /*: Promise<ResponseData>*/ => {
+  console.log(authToken, "AUTH TOKEN")
   const response = await axios.request({
     url: "http://127.0.0.1:6688/query",
     headers: {
@@ -37,24 +38,31 @@ const getInfo = async (authToken: string): Promise<ResponseData> => {
 };
 
 export const nodeInfo = async (): Promise<void> => {
+  console.log("Getting Node Info...");
   const authenticationToken = await login();
-
+  console.log("authenticationToken", authenticationToken)
+  console.log("1")
   try {
+    console.log("2")
     const info = await getInfo(authenticationToken);
+    console.log("3")
     if (info.errors != null) {
       console.log("Errors found when trying to get node info:\n");
       console.log(
-        info.errors.reduce((acc, error) => {
+        info.errors.reduce((acc : any, error : any) => {
           acc += `\t${error.message}\n`;
           return acc;
         }, "\t")
-      );
-    } else {
-      console.table({
-        Address: info.data?.ethKeys?.results[0]?.address,
-        Balance: info.data?.ethKeys?.results[0]?.ethBalance,
-        ChainID: info.data?.ethKeys?.results[0]?.chain?.id,
-      });
+        );
+        console.log("4")
+      } else {
+        console.table({
+          Address: info.data?.ethKeys?.results[0]?.address,
+          Balance: info.data?.ethKeys?.results[0]?.ethBalance,
+          ChainID: info.data?.ethKeys?.results[0]?.chain?.id,
+        });
+      const address = info.data?.ethKeys?.results[0]?.address;
+      return address;
     }
   } catch (error) {
     console.log("Could not get Node address reason: ", error);

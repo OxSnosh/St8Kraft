@@ -1,11 +1,9 @@
 import { ActionType } from "hardhat/types";
+import hre from "hardhat";
 
 import OracleArtifact from "../../../artifacts/@chainlink/contracts/src/v0.4/Oracle.sol/Oracle.json";
 
-export const deployOracle: ActionType<{
-  nodeAddress: string;
-  linkAddress: string;
-}> = async (taskArgs, hre) => {
+export const deployOracle = async (taskArgs : any) => {
   const { nodeAddress, linkAddress } = taskArgs;
 
   const Oracle = await hre.ethers.getContractFactoryFromArtifact(
@@ -23,4 +21,5 @@ export const deployOracle: ActionType<{
   );
 
   console.table({ "Oracle Address": oracle.address });
+  return oracle.address;
 };

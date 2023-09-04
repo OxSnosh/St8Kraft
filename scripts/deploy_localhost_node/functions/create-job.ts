@@ -11,10 +11,7 @@ declare interface QueryResponse {
   data: any;
 }
 
-export const createJob: ActionType<{
-  oracleAddress: string;
-  jobType: string;
-}> = async (taskArgs, env, runSuper) => {
+export const createJob = async (taskArgs : any) => {
   const direct = "direct";
   const cron = "cron";
 

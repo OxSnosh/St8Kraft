@@ -1,8 +1,9 @@
 import { ActionType } from "hardhat/types";
+import hre from "hardhat";
 
 import LinkTokenArtifact from "../../../artifacts/@chainlink/contracts/src/v0.4/LinkToken.sol/LinkToken.json";
 
-export const deployLinkToken: ActionType<void> = async (taskArguments, hre) => {
+export const deployLinkToken = async () => {
   const LinkToken = await hre.ethers.getContractFactoryFromArtifact(
     LinkTokenArtifact
   );
@@ -11,4 +12,5 @@ export const deployLinkToken: ActionType<void> = async (taskArguments, hre) => {
   await linkToken.deployed();
 
   console.table({ "Link Token Address": linkToken.address });
+  return linkToken.address;
 };

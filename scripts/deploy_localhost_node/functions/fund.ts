@@ -1,9 +1,7 @@
 import { ActionType } from "hardhat/types";
+import hre from "hardhat";
 
-export const fundEth: ActionType<{
-  nodeAddress: string;
-  amount: string;
-}> = async (taskArgs, hre, runSuper) => {
+export const fundEth = async (taskArgs: any) => {
   const { nodeAddress, amount } = taskArgs;
   const { ethers } = hre;
 
