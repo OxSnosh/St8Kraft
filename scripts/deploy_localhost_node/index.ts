@@ -16,11 +16,12 @@ const launchNode : any = async () => {
 
     runNode(runNodeArgs);
 
-    const nodeAddress = await nodeInfo()
-    console.log(nodeAddress)
+    let dataFromNode : any = await nodeInfo()
+    console.log(dataFromNode[0])
+    console.log(dataFromNode[1])
 
     const fundEthArgs = {
-        nodeAddress: nodeAddress,
+        nodeAddress: dataFromNode[0],
         amount: "20"
     }
 
@@ -29,7 +30,7 @@ const launchNode : any = async () => {
     const linkTokenAddress = await deployLinkToken()
 
     const deployOracleArgs = {
-        nodeAddress: nodeAddress,
+        nodeAddress: dataFromNode[0],
         linkAddress: linkTokenAddress
     }
 
@@ -37,10 +38,11 @@ const launchNode : any = async () => {
 
     const createJobArgs = {
         contractAddress: oracleAddress,
-        jobType: "direct"
+        jobType: "direct",
+        authToken: dataFromNode[1]
     }
     
-    await createJob(createJobArgs)
+    createJob(createJobArgs)
 
 }
 

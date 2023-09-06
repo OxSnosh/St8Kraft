@@ -37,9 +37,9 @@ const getInfo = async (authToken: string) /*: Promise<ResponseData>*/ => {
   return response.data;
 };
 
-export const nodeInfo = async (): Promise<void> => {
+export const nodeInfo = async () => {
   console.log("Getting Node Info...");
-  const authenticationToken = await login();
+  const authenticationToken : any = await login();
   console.log("authenticationToken", authenticationToken)
   console.log("1")
   try {
@@ -61,8 +61,8 @@ export const nodeInfo = async (): Promise<void> => {
           Balance: info.data?.ethKeys?.results[0]?.ethBalance,
           ChainID: info.data?.ethKeys?.results[0]?.chain?.id,
         });
-      const address = info.data?.ethKeys?.results[0]?.address;
-      return address;
+      const address : any = info.data?.ethKeys?.results[0]?.address;
+      return [address, authenticationToken];
     }
   } catch (error) {
     console.log("Could not get Node address reason: ", error);
