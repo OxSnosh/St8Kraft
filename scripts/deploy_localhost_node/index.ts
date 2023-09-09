@@ -1,4 +1,5 @@
-console.log("hello world")
+import * as fs from 'fs';
+import * as path from 'path';
 
 import { fundEth, fundLink } from "./functions/fund";
 import { nodeInfo } from "./functions/node-info";
@@ -7,14 +8,15 @@ import { createJob } from "./functions/create-job";
 import { deployLinkToken } from "./functions/deploy-link-token";
 import { deployOracle } from "./functions/deploy-oracle";
 import hre from "hardhat";
+import { json } from 'stream/consumers';
 
 const launchNode : any = async () => {
 
-    const runNodeArgs = {
-        restartOnly: true
-    }
+    // const runNodeArgs = {
+    //     restartOnly: true
+    // }
 
-    runNode(runNodeArgs);
+    // await runNode(runNodeArgs);
 
     let dataFromNode : any = await nodeInfo()
     console.log(dataFromNode[0])
@@ -36,13 +38,36 @@ const launchNode : any = async () => {
 
     const oracleAddress = await deployOracle(deployOracleArgs)
 
-    const createJobArgs = {
-        contractAddress: oracleAddress,
-        jobType: "direct",
-        authToken: dataFromNode[1]
+    const jobMetadata = {
+        "authToken" : dataFromNode[1],
+        "oracleAddress" : oracleAddress
     }
+
+    const jsonMetadata = JSON.stringify(jobMetadata)
+
+    const dataToWrite = `export const metadata = ${jsonMetadata};\n`;
+
+    // Define the path
+    const outputPath = path.join(__dirname, 'deploy_jobs', 'metadata.ts');
+
+    // Writing to the file
+    fs.writeFile(outputPath, dataToWrite, (err) => {
+        if (err) {
+            console.error('Error writing to file:', err);
+        } else {
+            console.log(`Data successfully written to ${outputPath}`);
+        }
+    });
+
+    //
+
+    // const createJobArgs = {
+    //     contractAddress: oracleAddress,
+    //     jobType: "direct",
+    //     authToken: authToken
+    // }
     
-    createJob(createJobArgs)
+    // createJob(createJobArgs)
 
 }
 
