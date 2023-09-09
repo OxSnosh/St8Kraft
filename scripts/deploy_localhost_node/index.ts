@@ -12,63 +12,11 @@ import { json } from 'stream/consumers';
 
 const launchNode : any = async () => {
 
-    // const runNodeArgs = {
-    //     restartOnly: true
-    // }
-
-    // await runNode(runNodeArgs);
-
-    let dataFromNode : any = await nodeInfo()
-    console.log(dataFromNode[0])
-    console.log(dataFromNode[1])
-
-    const fundEthArgs = {
-        nodeAddress: dataFromNode[0],
-        amount: "20"
+    const runNodeArgs = {
+        restartOnly: false
     }
 
-    await fundEth(fundEthArgs)
-
-    const linkTokenAddress = await deployLinkToken()
-
-    const deployOracleArgs = {
-        nodeAddress: dataFromNode[0],
-        linkAddress: linkTokenAddress
-    }
-
-    const oracleAddress = await deployOracle(deployOracleArgs)
-
-    const jobMetadata = {
-        "authToken" : dataFromNode[1],
-        "oracleAddress" : oracleAddress
-    }
-
-    const jsonMetadata = JSON.stringify(jobMetadata)
-
-    const dataToWrite = `export const metadata = ${jsonMetadata};\n`;
-
-    // Define the path
-    const outputPath = path.join(__dirname, 'deploy_jobs', 'metadata.ts');
-
-    // Writing to the file
-    fs.writeFile(outputPath, dataToWrite, (err) => {
-        if (err) {
-            console.error('Error writing to file:', err);
-        } else {
-            console.log(`Data successfully written to ${outputPath}`);
-        }
-    });
-
-    //
-
-    // const createJobArgs = {
-    //     contractAddress: oracleAddress,
-    //     jobType: "direct",
-    //     authToken: authToken
-    // }
-    
-    // createJob(createJobArgs)
-
+    await runNode(runNodeArgs);
 }
 
 launchNode()

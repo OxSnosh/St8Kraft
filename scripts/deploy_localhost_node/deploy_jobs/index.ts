@@ -6,7 +6,7 @@ import { metadata } from "./metadata";
 const deployTestJob : any = async () => {
 
     const createJobArgs = {
-        contractAddress: metadata.oracleAddress,
+        oracleAddress: metadata.oracleAddress,
         jobType: "direct",
         authToken: metadata.authToken
     }

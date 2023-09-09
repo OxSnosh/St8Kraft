@@ -38,9 +38,7 @@ export const login = async (
 
     const regex = /clsession=[a-zA-Z0-9=\-_]+/g; // Grab the session token
     const cookies = authResponse.headers["set-cookie"];
-    console.log("cookies", cookies)
     const sessionCookie = cookies?.find((cookie:any) => cookie.match("clsession"));
-    console.log("sessionCookie", sessionCookie)
     const session = sessionCookie?.match(regex);
 
     if (session !== null && session !== undefined) {

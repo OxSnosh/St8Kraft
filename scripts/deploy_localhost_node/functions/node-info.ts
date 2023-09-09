@@ -21,7 +21,6 @@ declare interface ResponseData {
 }
 
 const getInfo = async (authToken: string) /*: Promise<ResponseData>*/ => {
-  console.log(authToken, "AUTH TOKEN")
   const response = await axios.request({
     url: "http://127.0.0.1:6688/query",
     headers: {
@@ -40,12 +39,8 @@ const getInfo = async (authToken: string) /*: Promise<ResponseData>*/ => {
 export const nodeInfo = async () => {
   console.log("Getting Node Info...");
   const authenticationToken : any = await login();
-  console.log("authenticationToken", authenticationToken)
-  console.log("1")
   try {
-    console.log("2")
     const info = await getInfo(authenticationToken);
-    console.log("3")
     if (info.errors != null) {
       console.log("Errors found when trying to get node info:\n");
       console.log(
@@ -54,7 +49,6 @@ export const nodeInfo = async () => {
           return acc;
         }, "\t")
         );
-        console.log("4")
       } else {
         console.table({
           Address: info.data?.ethKeys?.results[0]?.address,
