@@ -7,6 +7,7 @@ dotenv.config();
 type EAInput = {
   id: number;
   data: {
+    attackId : number
     defenderFightersArr : number[]
     attackerFightersArr : number[]
     attackerBombersArr : number[]
@@ -28,11 +29,12 @@ type EAOutput = {
     infrastructureDamage?: number;
     tankDamage?: number;
     cruiseMissileDamage?: number;
+    battleId?: number;
   };
   error?: string;
 };
 
-const PORT = process.env.PORT_AIR_BATTLE || 8082;
+const PORT = process.env.PORT_AIR_BATTLE || 8080;
 const app: Express = express();
 
 app.use(bodyParser.json());
@@ -46,6 +48,7 @@ app.post("/", async function (req: Request<{}, {}, EAInput>, res: Response) {
     console.log(" Request data received: ", eaInputData);
 
     let jobRunId = eaInputData.id;
+    let attackId = eaInputData.data.attackId;
     const defenderFightersArr = eaInputData.data.defenderFightersArr;
     const attackerFightersArr = eaInputData.data.attackerFightersArr;
     const attackerBombersArr = eaInputData.data.attackerBombersArr;
@@ -264,6 +267,7 @@ app.post("/", async function (req: Request<{}, {}, EAInput>, res: Response) {
     eaResponse.data.infrastructureDamage = infrastructureDamage
     eaResponse.data.tankDamage = tankDamage
     eaResponse.data.cruiseMissileDamage = cruiseMissileDamage
+    eaResponse.data.battleId = attackId
     eaResponse.statusCode = 200;
     res.json(eaResponse);
   } catch (error: any) {

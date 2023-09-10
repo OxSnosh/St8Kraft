@@ -2,7 +2,7 @@ import axios from "axios";
 import { ActionType } from "hardhat/types";
 import { v4 as uuidv4 } from "uuid";
 
-import { login } from "../helpers/login";
+import { login } from "../../helpers/login";
 
 declare interface QueryResponse {
   errors?: Array<{
