@@ -12,7 +12,8 @@
     "startSpyOperations-testnet": "nodemon src/spyOperation-testnet.ts",
     "startTrainSpy-testnet": "nodemon src/trainSpy_testnet.ts",
     "startExecuteSpyOperation-testnet": "nodemon src/executeSpyAttack_testnet.ts",
-    "startGroundBattle-localhost": "nodemon src/groundBattle_localhost.ts"
+    "startGroundBattle-localhost": "nodemon src/groundBattle_localhost.ts",
+    "startTestEa-localhost": "nodemon src/test_ea.ts"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.5.1",

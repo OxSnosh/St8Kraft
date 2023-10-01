@@ -40,7 +40,8 @@ const setupNode : any = async () => {
 
     const jobMetadata = {
         "authToken" : dataFromNode[1],
-        "oracleAddress" : oracleAddress
+        "oracleAddress" : oracleAddress,
+        "nodeAddress" : dataFromNode[0],
     }
 
     const jsonMetadata = JSON.stringify(jobMetadata)
