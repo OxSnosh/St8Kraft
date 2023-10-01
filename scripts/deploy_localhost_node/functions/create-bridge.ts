@@ -11,12 +11,18 @@ declare interface QueryResponse {
   data: any;
 }
 
-export const createBridge = async () => {
+export const createBridge = async (
+  name : String,
+  url : String,
+  minimumContractPayment : String,
+  confirmations: Number
+) => {
   const direct = "direct";
   const cron = "cron";
 
   const authenticationToken = await login();
 
+  // console.log(authenticationToken);
 
   try {
     console.info("\nCreating Bridge...\n");
@@ -29,9 +35,20 @@ export const createBridge = async () => {
         Referer: "http://127.0.0.1:6688/bridges/new",
       },
       method: "POST",
-      data: {name: "bridge-3", url: "http://localhost.8081", minimumContractPayment: "0", confirmations: 0},
+      data: {
+        operationName: "CreateBridge",
+        variables: {
+          input: {
+            name, url, minimumContractPayment, confirmations
+          }
+        },
+        query:
+        "mutation CreateBridge($input: CreateBridgeInput!) {createBridge(input: $input) { ... on CreateBridgeSuccess { bridge { id __typename }incomingToken __typename } __typename } }"
+     },
     });
 
+    console.log(data.data);
+    
     console.log("Bridge Created");
   } catch (e) {
     console.log("Could not create bridge");

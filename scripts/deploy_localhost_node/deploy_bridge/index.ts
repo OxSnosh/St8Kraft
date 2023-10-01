@@ -5,7 +5,12 @@ import hre from "hardhat";
 
 const deployTestBridge : any = async () => {
     
-    await createBridge()
+    await createBridge(
+        "Test-Bridge",
+        "http://localhost:8081",
+        "0",
+        0
+    )
 
 }
 
