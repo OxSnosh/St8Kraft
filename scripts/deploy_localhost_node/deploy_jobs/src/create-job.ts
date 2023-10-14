@@ -85,7 +85,7 @@ export const createJob = async (taskArgs : any) => {
       data: jobDesc,
     });
 
-    const dataToWrite = `export const jobId = ${externalID};\n`;
+    const dataToWrite = `export const jobId = "${externalID}";\n`;
 
     // Define the path
     const outputPath = path.join(__dirname, "..", 'jobMetadata.ts');

@@ -1,25 +1,32 @@
 import { ActionType } from "hardhat/types";
 import hre from "hardhat";
 
-import OracleArtifact from "../../../artifacts/@chainlink/contracts/src/v0.4/Oracle.sol/Oracle.json";
+import OperatorArtifact from "../../../artifacts/contracts/tests/Operator.sol/Operator.json";
 
 export const deployOracle = async (taskArgs : any) => {
   const { nodeAddress, linkAddress } = taskArgs;
 
-  const Oracle = await hre.ethers.getContractFactoryFromArtifact(
-    OracleArtifact
-  );
-  const oracle = await Oracle.deploy(linkAddress);
+  const signers : any = await hre.ethers.getSigners()
+  const signer0 = signers[0]
 
-  await oracle.deployed();
+  const Operator = await hre.ethers.getContractFactoryFromArtifact(
+    OperatorArtifact
+  );
+  const operator = await Operator.deploy(linkAddress, signer0.address);
+
+  await operator.deployed();
+
+  const arr = []
+
+  arr.push(nodeAddress)
 
   // Set Fulfillment on Oracle
-  await oracle.setFulfillmentPermission(nodeAddress, true);
+  await operator.setAuthorizedSenders(arr);
 
   console.log(
     "All set on this end! If you've setup everything correctly, you can start getting external data from your smart contract"
   );
 
-  console.table({ "Oracle Address": oracle.address });
-  return oracle.address;
+  console.table({ "Oracle Address": operator.address });
+  return operator.address;
 };
