@@ -52,6 +52,7 @@ contract CountryMinter is ERC721, Ownable {
     address public missiles;
     address public senate;
     address public warbucks;
+    address public bonusResources;
 
     mapping(uint256 => address) public idToOwner;
     mapping(address => uint256) public ownerCountryCount;
@@ -76,7 +77,8 @@ contract CountryMinter is ERC721, Ownable {
         address _resources,
         address _missiles,
         address _senate,
-        address _warbucks
+        address _warbucks,
+        address _bonusResources
     ) public onlyOwner {
         countryParameters = _countryParameters;
         treasury = _treasury;
@@ -85,6 +87,7 @@ contract CountryMinter is ERC721, Ownable {
         missiles = _missiles;
         senate = _senate;
         warbucks = _warbucks;
+        bonusResources = _bonusResources;
     }
 
     ///@dev this function is only callable by the contract owner
@@ -163,6 +166,7 @@ contract CountryMinter is ERC721, Ownable {
         NavalActionsContract(navalActions).generateNavalActions(countryId);
         NavyContract(navy).generateNavy(countryId);
         ResourcesContract(resources).generateResources(countryId);
+        BonusResourcesContract(bonusResources).generateBonusResources(countryId);
         SenateContract(senate).generateVoter(countryId);
         TreasuryContract(treasury).generateTreasury(countryId);
         WondersContract1(wonders1).generateWonders1(countryId);

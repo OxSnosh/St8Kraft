@@ -507,7 +507,8 @@ describe("CountryMinter", function () {
             resourcescontract.address,
             missilescontract.address,
             senatecontract.address,
-            warbucks.address)
+            warbucks.address,
+            bonusresourcescontract.address)
         await countryminter.settings2(
             improvementscontract1.address,
             improvementscontract2.address,
@@ -1141,6 +1142,30 @@ describe("CountryMinter", function () {
             )
             const country2Name = await countryparameterscontract.getNationName(1);
             expect(country2Name).to.equal("TestNationName2");
+        })
+
+        it("Tests check ownership", async function () {
+            await warbucks.connect(signer0).transfer(signer1.address, BigInt(4100000000000000000000000))
+            await countryminter.connect(signer1).generateCountry(
+                "TestRuler",
+                "TestNationName",
+                "TestCapitalCity",
+                "TestNationSlogan"
+            )
+            const owner = await countryminter.connect(signer1).checkOwnership(0, signer1.address);
+            expect(owner).to.equal(true);
+        })
+
+        it("Tests check ownership (false)", async function () {
+            await warbucks.connect(signer0).transfer(signer1.address, BigInt(4100000000000000000000000))
+            await countryminter.connect(signer1).generateCountry(
+                "TestRuler",
+                "TestNationName",
+                "TestCapitalCity",
+                "TestNationSlogan"
+            )
+            const owner = await countryminter.connect(signer2).checkOwnership(0, signer2.address);
+            expect(owner).to.equal(false);
         })
     });
 });

@@ -507,7 +507,8 @@ describe("Treasury Contract", function () {
             resourcescontract.address,
             missilescontract.address,
             senatecontract.address,
-            warbucks.address)
+            warbucks.address,
+            bonusresourcescontract.address)
         await countryminter.settings2(
             improvementscontract1.address,
             improvementscontract2.address,
@@ -1227,4 +1228,247 @@ describe("Treasury Contract", function () {
             // console.log("Second Balance", ownerWarBucksBalance.toNumber());
         })
     })
+
+    describe("Tax Functionality", function () {
+        it("tests that daysSinceLastTaxCollection works when days since is greater than max tax days", async function () {
+            var daysSinceLastTaxCollection = await treasurycontract.getDaysSinceLastTaxCollection(0);
+            // console.log("Days since last tax collection", daysSinceLastTaxCollection.toNumber());
+            expect(daysSinceLastTaxCollection.toNumber()).to.equal(0);
+            //increase 21 days
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            var daysSinceLastTaxCollection = await treasurycontract.getDaysSinceLastTaxCollection(0);
+            // console.log("Days since last tax collection", daysSinceLastTaxCollection.toNumber());
+            expect(daysSinceLastTaxCollection.toNumber()).to.equal(20);
+        })
+
+        it("test that maxDaysOfTaxes can be updated", async function () {
+            let maxDaysOfTaxes = await treasurycontract.getMaxDaysOfTaxes();
+            // console.log("max days of taxes", maxDaysOfTaxes.toNumber());
+            expect(maxDaysOfTaxes.toNumber()).to.equal(20);
+            await treasurycontract.setMaxDaysOfTaxes(30);
+            let maxDaysOfTaxes2 = await treasurycontract.getMaxDaysOfTaxes();
+            // console.log("max days of taxes", maxDaysOfTaxes2.toNumber());
+            expect(maxDaysOfTaxes2.toNumber()).to.equal(30);
+        })
+
+        it("tests that taxes can be collected", async function () {
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            let taxesCollectible : any = await taxescontract.getTaxesCollectible(0);
+            console.log("taxes collectible", (taxesCollectible / (10**18)));
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0);
+            await taxescontract.connect(signer1).collectTaxes(0);
+        })
+    })
+
+    describe("Days To Inactive", function () {
+        it("tests that days to inactive can be changed and a nation can be inactive", async function () {
+            var inactive = await treasurycontract.checkInactive(0);
+            console.log("inactive", inactive);
+            expect(inactive).to.equal(false);
+            await treasurycontract.setDaysToInactive(10);
+            var daysToInactive = await treasurycontract.getDaysToInactive();
+            console.log("days to inactive", daysToInactive.toNumber());
+            expect(daysToInactive.toNumber()).to.equal(10);
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            var inactive = await treasurycontract.checkInactive(0);
+            console.log("inactive", inactive);
+            expect(inactive).to.equal(false);
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            var inactive = await treasurycontract.checkInactive(0);
+            console.log("inactive", inactive);
+            expect(inactive).to.equal(true);
+        })
+
+        it("tests that inactive nations can be reactivated", async function () {
+            await treasurycontract.setDaysToInactive(10);
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            var inactive = await treasurycontract.checkInactive(0);
+            console.log("inactive", inactive);
+            expect(inactive).to.equal(true);
+            await billscontract.connect(signer1).payBills(0);
+            var inactive = await treasurycontract.checkInactive(0);
+            console.log("inactive", inactive);
+            expect(inactive).to.equal(false);
+        })
+    })
+
+    describe("Demonitize Nation", function () {
+        it("tests that a nation can be demonitized", async function () {
+            var demonitized = await treasurycontract.isNationDemonetized(0);
+            console.log("demonitized", demonitized);
+            expect(demonitized).to.equal(false);
+            await treasurycontract.demonetizeNation(0);
+            var demonitized = await treasurycontract.isNationDemonetized(0);
+            console.log("demonitized", demonitized);
+            expect(demonitized).to.equal(true);
+        })
+
+        it("tests that a demonitized nation can be re-monetized", async function () {
+            await treasurycontract.demonetizeNation(0);
+            var demonitized = await treasurycontract.isNationDemonetized(0);
+            console.log("demonitized", demonitized);
+            expect(demonitized).to.equal(true);
+            await treasurycontract.remonetizeNation(0);
+            var demonitized = await treasurycontract.isNationDemonetized(0);
+            console.log("demonitized", demonitized);
+            expect(demonitized).to.equal(false);
+        })
+    })
+
+    describe("Total Game Balance", function () {
+        it("tests that the total game balance can be viewed", async function () {
+            let totalGameBalanceGross : any = await treasurycontract.getTotalGameBalance();
+            let totalGameBalance = (BigInt(totalGameBalanceGross / (10**18)));
+            console.log("total game balance", totalGameBalance.toString());
+        })
+
+        it("total game balance updates when a nation adds funds", async function () {
+            let totalGameBalanceGross : any = await treasurycontract.getTotalGameBalance();
+            let totalGameBalance = (BigInt(totalGameBalanceGross / (10**18)));
+            console.log("total game balance", totalGameBalance.toString());
+            await warbucks.connect(signer0).transfer(signer1.address, BigInt(500000000*(10**18)));
+            await treasurycontract.connect(signer1).addFunds(BigInt(500000000*(10**18)), 0);
+            let totalGameBalanceGross2 : any = await treasurycontract.getTotalGameBalance();
+            let totalGameBalance2 = (BigInt(totalGameBalanceGross2 / (10**18)));
+            console.log("total game balance", totalGameBalance2.toString());
+            expect(totalGameBalance2.toString()).to.equal("504000000");
+        })
+
+        it("total game balance updates when a nation withdraws funds", async function () {
+            let totalGameBalanceGross : any = await treasurycontract.getTotalGameBalance();
+            let totalGameBalance = (BigInt(totalGameBalanceGross / (10**18)));
+            console.log("total game balance", totalGameBalance.toString());
+            await warbucks.connect(signer0).transfer(signer1.address, BigInt(500000000*(10**18)));
+            await treasurycontract.connect(signer1).addFunds(BigInt(500000000*(10**18)), 0);
+            let totalGameBalanceGross2 : any = await treasurycontract.getTotalGameBalance();
+            let totalGameBalance2 = (BigInt(totalGameBalanceGross2 / (10**18)));
+            console.log("total game balance", totalGameBalance2.toString());
+            expect(totalGameBalance2.toString()).to.equal("504000000");
+            await billscontract.connect(signer1).payBills(0);
+            await treasurycontract.connect(signer1).withdrawFunds(BigInt(500000000*(10**18)), 0);
+            let totalGameBalanceGross3 : any = await treasurycontract.getTotalGameBalance();
+            let totalGameBalance3 = (BigInt(totalGameBalanceGross3 / (10**18)));
+            console.log("total game balance", totalGameBalance3.toString());
+            expect(totalGameBalance3.toString()).to.equal("4000000");
+        })
+
+        it("total game balance updates when a nation collects taxes", async function () {
+            let totalGameBalanceGross : any = await treasurycontract.getTotalGameBalance();
+            let totalGameBalance = (BigInt(totalGameBalanceGross / (10**18)));
+            console.log("total game balance", totalGameBalance.toString());
+            await warbucks.connect(signer0).transfer(signer1.address, BigInt(500000000*(10**18)));
+            await treasurycontract.connect(signer1).addFunds(BigInt(500000000*(10**18)), 0);
+            let totalGameBalanceGross2 : any = await treasurycontract.getTotalGameBalance();
+            let totalGameBalance2 = (BigInt(totalGameBalanceGross2 / (10**18)));
+            console.log("total game balance", totalGameBalance2.toString());
+            expect(totalGameBalance2.toString()).to.equal("504000000");
+            await billscontract.connect(signer1).payBills(0);
+            await treasurycontract.connect(signer1).withdrawFunds(BigInt(500000000*(10**18)), 0);
+            let totalGameBalanceGross3 : any = await treasurycontract.getTotalGameBalance();
+            let totalGameBalance3 = (BigInt(totalGameBalanceGross3 / (10**18)));
+            console.log("total game balance", totalGameBalance3.toString());
+            expect(totalGameBalance3.toString()).to.equal("4000000");
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0);
+            await taxescontract.connect(signer1).collectTaxes(0);
+            let totalGameBalanceGross4 : any = await treasurycontract.getTotalGameBalance();
+            let totalGameBalance4 = (BigInt(totalGameBalanceGross4 / (10**18)));
+            console.log("total game balance", totalGameBalance4.toString());
+            expect(totalGameBalance4.toString()).to.equal("4002877");
+        })
+
+        it("total game balance updates when a nation pays bills", async function () {
+            let totalGameBalanceGross : any = await treasurycontract.getTotalGameBalance();
+            let totalGameBalance = (BigInt(totalGameBalanceGross / (10**18)));
+            console.log("total game balance", totalGameBalance.toString());
+            await warbucks.connect(signer0).transfer(signer1.address, BigInt(500000000*(10**18)));
+            await treasurycontract.connect(signer1).addFunds(BigInt(500000000*(10**18)), 0);
+            let totalGameBalanceGross2 : any = await treasurycontract.getTotalGameBalance();
+            let totalGameBalance2 = (BigInt(totalGameBalanceGross2 / (10**18)));
+            console.log("total game balance", totalGameBalance2.toString());
+            expect(totalGameBalance2.toString()).to.equal("504000000");
+            await billscontract.connect(signer1).payBills(0);
+            await treasurycontract.connect(signer1).withdrawFunds(BigInt(500000000*(10**18)), 0);
+            let totalGameBalanceGross3 : any = await treasurycontract.getTotalGameBalance();
+            let totalGameBalance3 = (BigInt(totalGameBalanceGross3 / (10**18)));
+            console.log("total game balance", totalGameBalance3.toString());
+            expect(totalGameBalance3.toString()).to.equal("4000000");
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0);
+            await taxescontract.connect(signer1).collectTaxes(0);
+            let totalGameBalanceGross4 : any = await treasurycontract.getTotalGameBalance();
+            let totalGameBalance4 = (BigInt(totalGameBalanceGross4 / (10**18)));
+            console.log("total game balance", totalGameBalance4.toString());
+            expect(totalGameBalance4.toString()).to.equal("4002877");
+            await billscontract.connect(signer1).payBills(0);
+            let totalGameBalanceGross5 : any = await treasurycontract.getTotalGameBalance();
+            let totalGameBalance5 = (BigInt(totalGameBalanceGross5 / (10**18)));
+            console.log("total game balance", totalGameBalance5.toString());
+            expect(totalGameBalance5.toString()).to.equal("4001557");
+        })
+
+        it("total game balance updates when a nation buys spends money", async function () {
+            let totalGameBalanceGross : any = await treasurycontract.getTotalGameBalance();
+            let totalGameBalance = (BigInt(totalGameBalanceGross / (10**18)));
+            console.log("total game balance", totalGameBalance.toString());
+            await warbucks.connect(signer0).transfer(signer1.address, BigInt(500000000*(10**18)));
+            await treasurycontract.connect(signer1).addFunds(BigInt(500000000*(10**18)), 0);
+            let totalGameBalanceGross2 : any = await treasurycontract.getTotalGameBalance();
+            let totalGameBalance2 = (BigInt(totalGameBalanceGross2 / (10**18)));
+            console.log("total game balance", totalGameBalance2.toString());
+            expect(totalGameBalance2.toString()).to.equal("504000000");
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 10000);
+            let totalGameBalanceGross3 : any = await treasurycontract.getTotalGameBalance();
+            let totalGameBalance3 = (BigInt(totalGameBalanceGross3 / (10**18)));
+            console.log("total game balance", totalGameBalance3.toString());
+            // expect(totalGameBalance3.toString()).to.equal("503000000");    
+        })
+
+    })
+    
 });

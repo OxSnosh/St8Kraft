@@ -360,6 +360,10 @@ contract TreasuryContract is Ownable {
         daysToInactive = newDays;
     }
 
+    function getDaysToInactive() public view returns (uint256) {
+        return daysToInactive;
+    }
+
     modifier approvedBalanceSpender() {
         require(
             msg.sender == bombers ||
@@ -464,12 +468,16 @@ contract TreasuryContract is Ownable {
         return milf;
     }
 
-    function demonitizeNation(uint256 id) public onlyOwner {
+    function demonetizeNation(uint256 id) public onlyOwner {
         idToTreasury[id].demonitized = true;
     }
 
-    function remonitizeNation(uint256 id) public onlyOwner {
+    function remonetizeNation(uint256 id) public onlyOwner {
         idToTreasury[id].demonitized = false;
+    }
+
+    function isNationDemonetized(uint256 id) public view returns (bool) {
+        return idToTreasury[id].demonitized;
     }
 
     function getTotalGameBalance() public view returns (uint256) {

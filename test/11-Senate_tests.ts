@@ -517,7 +517,8 @@ describe("Senate Contract", function () {
             resourcescontract.address,
             missilescontract.address,
             senatecontract.address,
-            warbucks.address)
+            warbucks.address,
+            bonusresourcescontract.address)
         await countryminter.settings2(
             improvementscontract1.address,
             improvementscontract2.address,

@@ -507,7 +507,8 @@ describe("Country Parameters", function () {
             resourcescontract.address,
             missilescontract.address,
             senatecontract.address,
-            warbucks.address)
+            warbucks.address,
+            bonusresourcescontract.address)
         await countryminter.settings2(
             improvementscontract1.address,
             improvementscontract2.address,
@@ -1082,6 +1083,7 @@ describe("Country Parameters", function () {
         if(chainId == 31337 || chainId == 1337) {
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, groundbattlecontract.address);
         }
 
         // console.log("country 1");
@@ -1302,6 +1304,26 @@ describe("Country Parameters", function () {
             await keepercontract.incrementGameDay();
             await keepercontract.incrementGameDay();
             await expect(countryparameterscontract.connect(signer1).setReligion(0, 15)).to.be.revertedWith("invalid type");
+        })
+
+        it("tests that inflict anarchy works", async function () {
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await countryparameterscontract.connect(signer1).setGovernment(0, 5)
+            await countryparameterscontract.connect(signer1).setGovernment(1, 4)
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer1).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 100)
+            await forcescontract.connect(signer1).buySoldiers(100, 0)
+            await groundbattlecontract.connect(signer1).groundAttack(0, 0, 1, 4)
+            let government = await countryparameterscontract.connect(signer1).getGovernmentType(1);
+            console.log(government.toNumber())
+            //finish this test when ground battle external adapter is done
+            // expect(government).to.equal(0);
         })
     })
 });

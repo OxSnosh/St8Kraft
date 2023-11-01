@@ -507,7 +507,8 @@ describe("Resources Contract", function () {
             resourcescontract.address,
             missilescontract.address,
             senatecontract.address,
-            warbucks.address)
+            warbucks.address,
+            bonusresourcescontract.address)
         await countryminter.settings2(
             improvementscontract1.address,
             improvementscontract2.address,
@@ -1153,6 +1154,33 @@ describe("Resources Contract", function () {
             "TestCapitalCity3",
             "TestNationSlogan3"
         )
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000000000000000000))
+        await countryminter.connect(signer1).generateCountry(
+            "TestRuler4",
+            "TestNationName4",
+            "TestCapitalCity4",
+            "TestNationSlogan4"
+        )
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000000000000000000))
+        await countryminter.connect(signer1).generateCountry(
+            "TestRuler5",
+            "TestNationName5",
+            "TestCapitalCity5",
+            "TestNationSlogan5"
+        )
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000000000000000000))
+        await countryminter.connect(signer1).generateCountry(
+            "TestRuler6",
+            "TestNationName6",
+            "TestCapitalCity6",
+            "TestNationSlogan6"
+        )
+        await countryminter.connect(signer1).generateCountry(
+            "TestRuler7",
+            "TestNationName7",
+            "TestCapitalCity7",
+            "TestNationSlogan7"
+        )
         const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
         const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
         for (const log of event1Logs) {
@@ -1169,6 +1197,22 @@ describe("Resources Contract", function () {
             } else if (requestIdReturn == 6) {
                 await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
                 let resources3 = await resourcescontract.getPlayerResources(2);
+                // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+            } else if (requestIdReturn == 8) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources3 = await resourcescontract.getPlayerResources(3);
+                // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+            } else if (requestIdReturn == 10) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources3 = await resourcescontract.getPlayerResources(4);
+                // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+            } else if (requestIdReturn == 12) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources3 = await resourcescontract.getPlayerResources(5);
+                // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+            } else if (requestIdReturn == 14) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources3 = await resourcescontract.getPlayerResources(6);
                 // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
             }
         }
@@ -1219,6 +1263,64 @@ describe("Resources Contract", function () {
         })
     })
 
+    describe("Trade Reverts if Not Possible", function () {
+        it("Test that trades revert if not possible for requestor", async function () {
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
+            await expect(resourcescontract.connect(signer1).proposeTrade(0, 4)).to.be.revertedWith("trade is not possible");
+            await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
+            // await resourcescontract.connect(signer1).fulfillTradingPartner(4, 0);
+            // await expect(resourcescontract.connect(signer1).proposeTrade(0, 5)).to.be.revertedWith("trade is not possible")
+        })
+
+        it("Test that trades revert if not possible for recipient", async function () {
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
+            await resourcescontract.connect(signer1).proposeTrade(4, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 4);
+            await expect(resourcescontract.connect(signer1).proposeTrade(5, 0)).to.be.revertedWith("trade is not possible")
+        })
+
+        it("Test that trades revert if not possible for requestor", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
+            await billscontract.connect(signer1).payBills(0);
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4);
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
+            await resourcescontract.connect(signer1).proposeTrade(4, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 4);
+            await expect(resourcescontract.connect(signer1).proposeTrade(0, 5)).to.be.revertedWith("trade is not possible")
+        })
+
+        it("Test that trades revert if not possible for recipient", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
+            await billscontract.connect(signer1).payBills(0);
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4);
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
+            await resourcescontract.connect(signer1).proposeTrade(0, 4);
+            await resourcescontract.connect(signer1).proposeTrade(5, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(4, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 5);
+            await expect(resourcescontract.connect(signer1).proposeTrade(6, 0)).to.be.revertedWith("trade is not possible")
+        })
+    })
+
     describe("Cancel Proposed Partner", function () {
         it("Test that a nation can cancel a proposed trade", async function () {
             await resourcescontract.connect(signer1).proposeTrade(0, 1);
@@ -1244,6 +1346,15 @@ describe("Resources Contract", function () {
             var partners1 = await resourcescontract.getProposedTradingPartners(1)
             expect(partners.length).to.equal(0)
             expect(partners1.length).to.equal(0)
+        })
+
+        it("Test that cancel proposed trade reverts correctly when theres no trade proposed between partners", async function () {
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await expect(resourcescontract.connect(signer1).cancelProposedTrade(1, 2)).to.be.revertedWith("No proposed trade with this partner")
+            var proposed = await resourcescontract.isProposedTrade(1, 2)
+            expect(proposed).to.equal(false)
+            var active = await resourcescontract.isActiveTrade(1, 2)
+            expect(active).to.equal(false)
         })
     })
 
@@ -1277,6 +1388,276 @@ describe("Resources Contract", function () {
             expect(resource1).to.equal(true);
             var resource2 = await resourcescontract.viewCattle(0);
             expect(resource2).to.equal(true);
+        })
+
+        it("tests that the mock set resources functionality works 2", async function () {
+            await resourcescontract.mockResourcesForTesting(0, 2, 3)
+            // await resourcescontract.mockResourcesForTesting(0, 1, 2);
+            var resource1 = await resourcescontract.viewCoal(0);
+            expect(resource1).to.equal(true);
+            var resource2 = await resourcescontract.viewFish(0);
+            expect(resource2).to.equal(true);
+        })
+
+        it("tests that the mock set resources functionality works 3", async function () {
+            await resourcescontract.mockResourcesForTesting(0, 4, 5)
+            var resource1 = await resourcescontract.viewFurs(0);
+            expect(resource1).to.equal(true);
+            var resource2 = await resourcescontract.viewGems(0);
+            expect(resource2).to.equal(true);
+        })
+
+        it("tests that the mock set resources functionality works 4", async function () {
+            await resourcescontract.mockResourcesForTesting(0, 6, 7)
+            var resource1 = await resourcescontract.viewGold(0);
+            expect(resource1).to.equal(true);
+            var resource2 = await resourcescontract.viewIron(0);
+            expect(resource2).to.equal(true);
+        })
+
+        it("tests that the mock set resources functionality works 5", async function () {
+            await resourcescontract.mockResourcesForTesting(0, 8, 9)
+            var resource1 = await resourcescontract.viewLead(0);
+            expect(resource1).to.equal(true);
+            var resource2 = await resourcescontract.viewLumber(0);
+            expect(resource2).to.equal(true);
+        })
+
+        it("tests that the mock set resources functionality works 6", async function () {
+            await resourcescontract.mockResourcesForTesting(0, 10, 11)
+            var resource1 = await resourcescontract.viewMarble(0);
+            expect(resource1).to.equal(true);
+            var resource2 = await resourcescontract.viewOil(0);
+            expect(resource2).to.equal(true);
+        })
+
+        it("tests that the mock set resources functionality works 7", async function () {
+            await resourcescontract.mockResourcesForTesting(0, 12, 13)
+            var resource1 = await resourcescontract.viewPigs(0);
+            expect(resource1).to.equal(true);
+            var resource2 = await resourcescontract.viewRubber(0);
+            expect(resource2).to.equal(true);
+        })
+
+        it("tests that the mock set resources functionality works 8", async function () {
+            await resourcescontract.mockResourcesForTesting(0, 14, 15)
+            var resource1 = await resourcescontract.viewSilver(0);
+            expect(resource1).to.equal(true);
+            var resource2 = await resourcescontract.viewSpices(0);
+            expect(resource2).to.equal(true);
+        })
+
+        it("tests that the mock set resources functionality works 9", async function () {
+            await resourcescontract.mockResourcesForTesting(0, 16, 17)
+            var resource1 = await resourcescontract.viewSugar(0);
+            expect(resource1).to.equal(true);
+            var resource2 = await resourcescontract.viewUranium(0);
+            expect(resource2).to.equal(true);
+        })
+
+        it("tests that the mock set resources functionality works 10", async function () {
+            await resourcescontract.mockResourcesForTesting(0, 18, 19)
+            var resource1 = await resourcescontract.viewWater(0);
+            expect(resource1).to.equal(true);
+            var resource2 = await resourcescontract.viewWheat(0);
+            expect(resource2).to.equal(true);
+        })
+
+        it("tests that the mock set resources functionality works 10", async function () {
+            await resourcescontract.mockResourcesForTesting(0, 20, 19)
+            var resource1 = await resourcescontract.viewWine(0);
+            expect(resource1).to.equal(true);
+            var resource2 = await resourcescontract.viewWheat(0);
+            expect(resource2).to.equal(true);
+        })
+    })
+
+    describe("Bonus Resources", async function () {
+        it("test bonus resources beer", async function () {
+            // aluminium, lumber, water, wheat
+            await resourcescontract.mockResourcesForTesting(0, 0, 1)
+            await resourcescontract.mockResourcesForTesting(1, 2, 3)
+            await resourcescontract.mockResourcesForTesting(2, 4, 5)
+            await resourcescontract.mockResourcesForTesting(3, 6, 7)
+            await resourcescontract.mockResourcesForTesting(4, 8, 9)
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
+            await resourcescontract.connect(signer1).proposeTrade(0, 4);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(4, 0);
+        })
+
+        it("test bonus resources steel", async function () {
+            // iron, coal
+            await resourcescontract.mockResourcesForTesting(0, 0, 1)
+            await resourcescontract.mockResourcesForTesting(1, 2, 3)
+            await resourcescontract.mockResourcesForTesting(2, 4, 5)
+            await resourcescontract.mockResourcesForTesting(3, 6, 7)
+            await resourcescontract.mockResourcesForTesting(4, 8, 9)
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
+            await resourcescontract.connect(signer1).proposeTrade(0, 4);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(4, 0);
+        })
+
+        it("test bonus resources construction", async function () {
+            // aluminium, iron, lumber, marble
+            await resourcescontract.mockResourcesForTesting(0, 0, 1)
+            await resourcescontract.mockResourcesForTesting(1, 2, 3)
+            await resourcescontract.mockResourcesForTesting(2, 4, 5)
+            await resourcescontract.mockResourcesForTesting(3, 6, 7)
+            await resourcescontract.mockResourcesForTesting(4, 8, 9)
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
+            await resourcescontract.connect(signer1).proposeTrade(0, 4);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(4, 0);
+        })
+
+        it("test bonus resources fast food", async function () {
+            // cattle, sugar, spices, pigs
+            await resourcescontract.mockResourcesForTesting(0, 0, 1)
+            await resourcescontract.mockResourcesForTesting(1, 2, 3)
+            await resourcescontract.mockResourcesForTesting(2, 4, 5)
+            await resourcescontract.mockResourcesForTesting(3, 6, 7)
+            await resourcescontract.mockResourcesForTesting(4, 8, 9)
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
+            await resourcescontract.connect(signer1).proposeTrade(0, 4);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(4, 0);
+        })
+
+        it("test bonus resources fine jewelry", async function () {
+            // gold, silver, gems, coal
+            await resourcescontract.mockResourcesForTesting(0, 0, 1)
+            await resourcescontract.mockResourcesForTesting(1, 2, 3)
+            await resourcescontract.mockResourcesForTesting(2, 4, 5)
+            await resourcescontract.mockResourcesForTesting(3, 6, 7)
+            await resourcescontract.mockResourcesForTesting(4, 8, 9)
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
+            await resourcescontract.connect(signer1).proposeTrade(0, 4);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(4, 0);
+        })
+
+        it("test bonus resources scholars", async function () {
+            // lumber, lead
+            await resourcescontract.mockResourcesForTesting(0, 0, 1)
+            await resourcescontract.mockResourcesForTesting(1, 2, 3)
+            await resourcescontract.mockResourcesForTesting(2, 4, 5)
+            await resourcescontract.mockResourcesForTesting(3, 6, 7)
+            await resourcescontract.mockResourcesForTesting(4, 8, 9)
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
+            await resourcescontract.connect(signer1).proposeTrade(0, 4);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(4, 0);
+        })
+
+        it("test bonus resources asphalt", async function () {
+            // lumber, lead
+            await resourcescontract.mockResourcesForTesting(0, 0, 1)
+            await resourcescontract.mockResourcesForTesting(1, 2, 3)
+            await resourcescontract.mockResourcesForTesting(2, 4, 5)
+            await resourcescontract.mockResourcesForTesting(3, 6, 7)
+            await resourcescontract.mockResourcesForTesting(4, 8, 9)
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
+            await resourcescontract.connect(signer1).proposeTrade(0, 4);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(4, 0);
+        })
+
+        it("test bonus resources automobiles", async function () {
+            // asphalt, steel
+            await resourcescontract.mockResourcesForTesting(0, 0, 1)
+            await resourcescontract.mockResourcesForTesting(1, 2, 3)
+            await resourcescontract.mockResourcesForTesting(2, 4, 5)
+            await resourcescontract.mockResourcesForTesting(3, 6, 7)
+            await resourcescontract.mockResourcesForTesting(4, 8, 9)
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
+            await resourcescontract.connect(signer1).proposeTrade(0, 4);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(4, 0);
+        })
+
+        it("test bonus resources affluent population", async function () {
+            // fine jewelry, fish, furs, wine
+            await resourcescontract.mockResourcesForTesting(0, 0, 1)
+            await resourcescontract.mockResourcesForTesting(1, 2, 3)
+            await resourcescontract.mockResourcesForTesting(2, 4, 5)
+            await resourcescontract.mockResourcesForTesting(3, 6, 7)
+            await resourcescontract.mockResourcesForTesting(4, 8, 9)
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
+            await resourcescontract.connect(signer1).proposeTrade(0, 4);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(4, 0);
+        })
+
+        it("test bonus resources microchips", async function () {
+            // gold, lead, oil
+            await resourcescontract.mockResourcesForTesting(0, 0, 1)
+            await resourcescontract.mockResourcesForTesting(1, 2, 3)
+            await resourcescontract.mockResourcesForTesting(2, 4, 5)
+            await resourcescontract.mockResourcesForTesting(3, 6, 7)
+            await resourcescontract.mockResourcesForTesting(4, 8, 9)
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
+            await resourcescontract.connect(signer1).proposeTrade(0, 4);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(4, 0);
+        })
+
+        it("test bonus resources radiation cleanup", async function () {
+            // construction, microships, steel
+            await resourcescontract.mockResourcesForTesting(0, 0, 1)
+            await resourcescontract.mockResourcesForTesting(1, 2, 3)
+            await resourcescontract.mockResourcesForTesting(2, 4, 5)
+            await resourcescontract.mockResourcesForTesting(3, 6, 7)
+            await resourcescontract.mockResourcesForTesting(4, 8, 9)
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
+            await resourcescontract.connect(signer1).proposeTrade(0, 4);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(4, 0);
         })
     })
 })
