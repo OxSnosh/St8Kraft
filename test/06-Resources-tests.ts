@@ -1593,10 +1593,10 @@ describe("Resources Contract", function () {
         })
 
         it("test bonus resources asphalt", async function () {
-            // lumber, lead
-            await resourcescontract.mockResourcesForTesting(0, 0, 1)
-            await resourcescontract.mockResourcesForTesting(1, 2, 3)
-            await resourcescontract.mockResourcesForTesting(2, 4, 5)
+            // oil, rubber, construction
+            await resourcescontract.mockResourcesForTesting(0, 11, 13)
+            await resourcescontract.mockResourcesForTesting(1, 9, 7)
+            await resourcescontract.mockResourcesForTesting(2, 10, 0)
             await resourcescontract.mockResourcesForTesting(3, 6, 7)
             await resourcescontract.mockResourcesForTesting(4, 8, 9)
             await resourcescontract.connect(signer1).proposeTrade(0, 1);
@@ -1607,14 +1607,16 @@ describe("Resources Contract", function () {
             await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
             await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
             await resourcescontract.connect(signer1).fulfillTradingPartner(0, 4);
+            var asphalt = await bonusresourcescontract.viewAsphalt(0);
+            expect(asphalt).to.equal(true);
         })
 
         it("test bonus resources automobiles", async function () {
             // asphalt, steel
-            await resourcescontract.mockResourcesForTesting(0, 0, 1)
-            await resourcescontract.mockResourcesForTesting(1, 2, 3)
-            await resourcescontract.mockResourcesForTesting(2, 4, 5)
-            await resourcescontract.mockResourcesForTesting(3, 6, 7)
+            await resourcescontract.mockResourcesForTesting(0, 11, 13)
+            await resourcescontract.mockResourcesForTesting(1, 9, 7)
+            await resourcescontract.mockResourcesForTesting(2, 10, 0)
+            await resourcescontract.mockResourcesForTesting(3, 2, 7)
             await resourcescontract.mockResourcesForTesting(4, 8, 9)
             await resourcescontract.connect(signer1).proposeTrade(0, 1);
             await resourcescontract.connect(signer1).proposeTrade(0, 2);
@@ -1624,14 +1626,16 @@ describe("Resources Contract", function () {
             await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
             await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
             await resourcescontract.connect(signer1).fulfillTradingPartner(0, 4);
+            var automobiles = await bonusresourcescontract.viewAutomobiles(0);
+            expect(automobiles).to.equal(true);
         })
 
         it("test bonus resources affluent population", async function () {
             // fine jewelry, fish, furs, wine
-            await resourcescontract.mockResourcesForTesting(0, 0, 1)
-            await resourcescontract.mockResourcesForTesting(1, 2, 3)
-            await resourcescontract.mockResourcesForTesting(2, 4, 5)
-            await resourcescontract.mockResourcesForTesting(3, 6, 7)
+            await resourcescontract.mockResourcesForTesting(0, 6, 14)
+            await resourcescontract.mockResourcesForTesting(1, 5, 2)
+            await resourcescontract.mockResourcesForTesting(2, 3, 4)
+            await resourcescontract.mockResourcesForTesting(3, 20, 7)
             await resourcescontract.mockResourcesForTesting(4, 8, 9)
             await resourcescontract.connect(signer1).proposeTrade(0, 1);
             await resourcescontract.connect(signer1).proposeTrade(0, 2);
@@ -1641,12 +1645,15 @@ describe("Resources Contract", function () {
             await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
             await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
             await resourcescontract.connect(signer1).fulfillTradingPartner(0, 4);
+            var affluentpopulation = await bonusresourcescontract.viewAffluentPopulation(0);
+            expect(affluentpopulation).to.equal(true);
         })
 
         it("test bonus resources microchips", async function () {
-            // gold, lead, oil
-            await resourcescontract.mockResourcesForTesting(0, 0, 1)
-            await resourcescontract.mockResourcesForTesting(1, 2, 3)
+            // gold, lead, oil, tech > 10
+            await technologymarketcontrat.connect(signer1).buyTech(0, 100);
+            await resourcescontract.mockResourcesForTesting(0, 6, 11)
+            await resourcescontract.mockResourcesForTesting(1, 8, 3)
             await resourcescontract.mockResourcesForTesting(2, 4, 5)
             await resourcescontract.mockResourcesForTesting(3, 6, 7)
             await resourcescontract.mockResourcesForTesting(4, 8, 9)
@@ -1658,15 +1665,18 @@ describe("Resources Contract", function () {
             await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
             await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
             await resourcescontract.connect(signer1).fulfillTradingPartner(0, 4);
+            var microchips = await bonusresourcescontract.viewMicrochips(0);
+            expect(microchips).to.equal(true);
         })
 
         it("test bonus resources radiation cleanup", async function () {
             // construction, microships, steel
-            await resourcescontract.mockResourcesForTesting(0, 0, 1)
-            await resourcescontract.mockResourcesForTesting(1, 2, 3)
-            await resourcescontract.mockResourcesForTesting(2, 4, 5)
-            await resourcescontract.mockResourcesForTesting(3, 6, 7)
-            await resourcescontract.mockResourcesForTesting(4, 8, 9)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 100);
+            await resourcescontract.mockResourcesForTesting(0, 9, 7)
+            await resourcescontract.mockResourcesForTesting(1, 10, 0)
+            await resourcescontract.mockResourcesForTesting(2, 6, 8)
+            await resourcescontract.mockResourcesForTesting(3, 11, 7)
+            await resourcescontract.mockResourcesForTesting(4, 2, 9)
             await resourcescontract.connect(signer1).proposeTrade(0, 1);
             await resourcescontract.connect(signer1).proposeTrade(0, 2);
             await resourcescontract.connect(signer1).proposeTrade(0, 3);
@@ -1675,6 +1685,8 @@ describe("Resources Contract", function () {
             await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
             await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
             await resourcescontract.connect(signer1).fulfillTradingPartner(0, 4);
+            var radiationcleanup = await bonusresourcescontract.viewRadiationCleanup(0);
+            expect(radiationcleanup).to.equal(true);
         })
     })
 })

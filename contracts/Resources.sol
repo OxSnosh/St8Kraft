@@ -1015,7 +1015,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         _;
     }
 
-    function literacyTriggerForResources(uint256 id) external onlyTechMarket {
+    function triggerForResources(uint256 id) external onlyTechMarket {
         setResources(id);
     }
 }
@@ -1218,7 +1218,7 @@ contract BonusResourcesContract is Ownable {
         }
         //radiation cleanup (Construction, Microchips, Steel and Technology > 15)
         bool radiationCleanup = checkRadiationCleanup(id);
-        if (techAmount >= 15 && radiationCleanup) {
+        if (techAmount >= 10 && radiationCleanup) {
             idToBonusResources[id].radiationCleanup = true;
         }
     }
@@ -1285,9 +1285,6 @@ contract BonusResourcesContract is Ownable {
         bool lumber = res.viewLumber(id);
         bool lead = res.viewLead(id);
         uint256 literacyPercentage = crim.getLiteracy(id);
-        console.log(literacyPercentage, "literacy percentage");
-        console.log(lumber, "lumber");
-        console.log(lead, "lead");
         if (lumber && lead && literacyPercentage >= 90) {
             return true;
         } else {

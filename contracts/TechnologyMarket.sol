@@ -94,7 +94,11 @@ contract TechnologyMarketContract is Ownable {
         tsy.spendBalance(id, cost);
         uint256 finalLiteracy = crim.getLiteracy(id);
         if(initialLiteracy < 90 && finalLiteracy >= 90){
-            res.literacyTriggerForResources(id);
+            res.triggerForResources(id);
+        }
+        uint256 currentTechAmount = inf.getTechnologyCount(id);
+        if((currentTechAmount) < 10 && (currentTechAmount + amount) >= 10){
+            res.triggerForResources(id);
         }
         emit TechPurchased(id, amount, cost);
     }
