@@ -896,12 +896,14 @@ describe("Senate Contract", function () {
             improvementscontract2.address,
             countryminter.address,
             bonusresourcescontract.address,
-            senatecontract.address
+            senatecontract.address,
+            technologymarketcontrat.address,
         )
         await bonusresourcescontract.settings(
             infrastructurecontract.address,
             countryminter.address,
-            resourcescontract.address
+            resourcescontract.address,
+            crimecontract.address
         )
     
         await senatecontract.settings(
@@ -989,7 +991,8 @@ describe("Senate Contract", function () {
             wonderscontract4.address,
             treasurycontract.address,
             countryminter.address,
-            bonusresourcescontract.address
+            bonusresourcescontract.address,
+            crimecontract.address
         )
     
         await treasurycontract.settings1(

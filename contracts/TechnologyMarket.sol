@@ -7,6 +7,7 @@ import "./Resources.sol";
 import "./Improvements.sol";
 import "./Wonders.sol";
 import "./Treasury.sol";
+import "./Crime.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 ///@title TechnologyMarketContract
@@ -23,6 +24,7 @@ contract TechnologyMarketContract is Ownable {
     address public wonders4;
     address public treasury;
     address public bonusResources;
+    address public crime;
 
     CountryMinter mint;
     ResourcesContract res;
@@ -33,6 +35,7 @@ contract TechnologyMarketContract is Ownable {
     WondersContract4 won4;
     InfrastructureContract inf;
     BonusResourcesContract bonus;
+    CrimeContract crim;
 
     event TechPurchased(
         uint256 indexed id,
@@ -53,7 +56,8 @@ contract TechnologyMarketContract is Ownable {
         address _wonders4,
         address _treasury,
         address _countryMinter,
-        address _bonusResources
+        address _bonusResources,
+        address _crime
     ) public onlyOwner {
         resources = _resources;
         res = ResourcesContract(_resources);
@@ -73,6 +77,8 @@ contract TechnologyMarketContract is Ownable {
         mint = CountryMinter(_countryMinter);
         bonusResources = _bonusResources;
         bonus = BonusResourcesContract(_bonusResources);
+        crime = _crime;
+        crim = CrimeContract(_crime);
     }
 
     ///@dev this is a public function that is only callable by the nation owner
@@ -80,11 +86,16 @@ contract TechnologyMarketContract is Ownable {
     ///@param id this is the nation id of the nation buying technology
     ///@param amount this is the amount of technology being purchased
     function buyTech(uint256 id, uint256 amount) public {
+        uint256 initialLiteracy = crim.getLiteracy(id);
         bool owner = mint.checkOwnership(id, msg.sender);
         require(owner, "!nation owner");
         uint256 cost = getTechCost(id, amount);
         inf.increaseTechnologyFromMarket(id, amount);
         tsy.spendBalance(id, cost);
+        uint256 finalLiteracy = crim.getLiteracy(id);
+        if(initialLiteracy < 90 && finalLiteracy >= 90){
+            res.literacyTriggerForResources(id);
+        }
         emit TechPurchased(id, amount, cost);
     }
 

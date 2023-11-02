@@ -6,6 +6,7 @@ import "./Improvements.sol";
 import "./CountryMinter.sol";
 import "./CountryParameters.sol";
 import "./Senate.sol";
+import "./Crime.sol";
 import "hardhat/console.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
@@ -28,6 +29,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
     address public bonusResources;
     address public senate;
     address public parameters;
+    address public techMkt;
 
     CountryMinter mint;
     BonusResourcesContract bonus;
@@ -163,10 +165,22 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
 
-    event TradeProposed(uint256 indexed requestorId, uint256 indexed recipientId);
-    event TradeAccepted(uint256 indexed requestorId, uint256 indexed recipientId);
-    event TradeProposalCancelled(uint256 indexed requestorId, uint256 indexed recipientId);
-    event TradeCancelled(uint256 indexed requestorId, uint256 indexed recipientId);
+    event TradeProposed(
+        uint256 indexed requestorId,
+        uint256 indexed recipientId
+    );
+    event TradeAccepted(
+        uint256 indexed requestorId,
+        uint256 indexed recipientId
+    );
+    event TradeProposalCancelled(
+        uint256 indexed requestorId,
+        uint256 indexed recipientId
+    );
+    event TradeCancelled(
+        uint256 indexed requestorId,
+        uint256 indexed recipientId
+    );
 
     modifier onlyCountryMinter() {
         require(
@@ -196,7 +210,8 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         address _improvements2,
         address _countryMinter,
         address _bonusResources,
-        address _senate
+        address _senate,
+        address _technologyMarket
     ) public onlyOwner {
         infrastructure = _infrastructure;
         improvements2 = _improvements2;
@@ -206,6 +221,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         bonus = BonusResourcesContract(_bonusResources);
         senate = _senate;
         sen = SenateContract(_senate);
+        techMkt = _technologyMarket;
     }
 
     ///@dev this is a public function that is only callable from the country minter contract when a nation is minted
@@ -496,15 +512,23 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
     function cancelProposedTrade(uint256 nationId, uint256 partnerId) public {
         bool isOwner = mint.checkOwnership(nationId, msg.sender);
         require(isOwner, "!nation owner");
-        uint256[] storage nationProposedTrades = idToProposedTradingPartners[nationId];
-        uint256[] storage partnerProposedTrades = idToProposedTradingPartners[partnerId];
+        uint256[] storage nationProposedTrades = idToProposedTradingPartners[
+            nationId
+        ];
+        uint256[] storage partnerProposedTrades = idToProposedTradingPartners[
+            partnerId
+        ];
         for (uint i = 0; i <= nationProposedTrades.length; i++) {
             if (nationProposedTrades[i] == partnerId) {
-                nationProposedTrades[i] = nationProposedTrades[nationProposedTrades.length - 1];
+                nationProposedTrades[i] = nationProposedTrades[
+                    nationProposedTrades.length - 1
+                ];
                 nationProposedTrades.pop();
                 for (uint j = 0; j <= partnerProposedTrades.length; j++) {
                     if (partnerProposedTrades[j] == nationId) {
-                        partnerProposedTrades[j] = partnerProposedTrades[partnerProposedTrades.length - 1];
+                        partnerProposedTrades[j] = partnerProposedTrades[
+                            partnerProposedTrades.length - 1
+                        ];
                         partnerProposedTrades.pop();
                     }
                 }
@@ -942,32 +966,57 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
         _;
     }
 
-    function removeTradingPartnersFromSanction(uint256 idSanctioned, uint256 sanctionTeam) public onlySenateContract {
+    function removeTradingPartnersFromSanction(
+        uint256 idSanctioned,
+        uint256 sanctionTeam
+    ) public onlySenateContract {
         uint256[] memory partners = idToTradingPartners[idSanctioned];
         for (uint256 i = 0; i < partners.length; i++) {
             uint256 partnerId = partners[i];
             uint256 partnerTeam = params.getTeam(partnerId);
             if (partnerTeam == sanctionTeam) {
-                for (uint256 j = 0; j < idToTradingPartners[idSanctioned].length; j++) {
+                for (
+                    uint256 j = 0;
+                    j < idToTradingPartners[idSanctioned].length;
+                    j++
+                ) {
                     if (idToTradingPartners[idSanctioned][j] == partnerId) {
-                        idToTradingPartners[idSanctioned][j] = idToTradingPartners[
-                            idSanctioned
-                        ][idToTradingPartners[idSanctioned].length - 1];
+                        idToTradingPartners[idSanctioned][
+                            j
+                        ] = idToTradingPartners[idSanctioned][
+                            idToTradingPartners[idSanctioned].length - 1
+                        ];
                         idToTradingPartners[idSanctioned].pop();
                     }
                 }
-                for (uint256 k = 0; k < idToTradingPartners[partnerId].length; k++) {
+                for (
+                    uint256 k = 0;
+                    k < idToTradingPartners[partnerId].length;
+                    k++
+                ) {
                     if (idToTradingPartners[partnerId][k] == idSanctioned) {
                         idToTradingPartners[partnerId][k] = idToTradingPartners[
                             partnerId
                         ][idToTradingPartners[partnerId].length - 1];
                         idToTradingPartners[partnerId].pop();
-                        setResources(partnerId);   
+                        setResources(partnerId);
                     }
                 }
             }
         }
         setResources(idSanctioned);
+    }
+
+    modifier onlyTechMarket() {
+        require(
+            msg.sender == techMkt,
+            "function only callable from tech market"
+        );
+        _;
+    }
+
+    function literacyTriggerForResources(uint256 id) external onlyTechMarket {
+        setResources(id);
     }
 }
 
@@ -981,9 +1030,11 @@ contract BonusResourcesContract is Ownable {
     address public improvements2;
     address public countryMinter;
     address public resources;
+    address public crime;
 
     CountryMinter mint;
     ResourcesContract res;
+    CrimeContract crim;
 
     struct BonusResources {
         bool beer;
@@ -1049,7 +1100,10 @@ contract BonusResourcesContract is Ownable {
     }
 
     modifier onlyResources() {
-        require(msg.sender == resources, "function only callable from resources contract");
+        require(
+            msg.sender == resources,
+            "function only callable from resources contract"
+        );
         _;
     }
 
@@ -1058,13 +1112,16 @@ contract BonusResourcesContract is Ownable {
     function settings(
         address _infrastructure,
         address _countryMinter,
-        address _resources
+        address _resources,
+        address _crime
     ) public onlyOwner {
         infrastructure = _infrastructure;
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
         resources = _resources;
         res = ResourcesContract(_resources);
+        crime = _crime;
+        crim = CrimeContract(_crime);
     }
 
     ///@dev this is a public function that is only callable from the country minter contract when a nation is minted
@@ -1129,9 +1186,8 @@ contract BonusResourcesContract is Ownable {
             idToBonusResources[id].fineJewelry = true;
         }
         //scholars (lumber, lead, literacy >90%)
-        uint256 literacyRate;
         bool scholars = checkScholars(id);
-        if (literacyRate > 90 && scholars) {
+        if (scholars) {
             idToBonusResources[id].scholars = true;
         }
         //asphalt (construction, oil, rubber)
@@ -1168,9 +1224,9 @@ contract BonusResourcesContract is Ownable {
     }
 
     function checkBeer(uint256 id) public view returns (bool) {
-        bool aluminium = res.viewAluminium(id);    
-        bool lumber = res.viewLumber(id);    
-        bool water = res.viewWater(id);    
+        bool aluminium = res.viewAluminium(id);
+        bool lumber = res.viewLumber(id);
+        bool water = res.viewWater(id);
         bool wheat = res.viewWheat(id);
         if (aluminium && lumber && water && wheat) {
             return true;
@@ -1180,7 +1236,7 @@ contract BonusResourcesContract is Ownable {
     }
 
     function checkSteel(uint256 id) public view returns (bool) {
-        bool iron = res.viewIron(id);    
+        bool iron = res.viewIron(id);
         bool coal = res.viewCoal(id);
         if (iron && coal) {
             return true;
@@ -1190,9 +1246,9 @@ contract BonusResourcesContract is Ownable {
     }
 
     function checkConstruction(uint256 id) public view returns (bool) {
-        bool aluminium = res.viewAluminium(id);    
-        bool iron = res.viewIron(id);    
-        bool lumber = res.viewLumber(id);    
+        bool aluminium = res.viewAluminium(id);
+        bool iron = res.viewIron(id);
+        bool lumber = res.viewLumber(id);
         bool marble = res.viewMarble(id);
         if (aluminium && iron && lumber && marble) {
             return true;
@@ -1202,9 +1258,9 @@ contract BonusResourcesContract is Ownable {
     }
 
     function checkFastFood(uint256 id) public view returns (bool) {
-        bool cattle = res.viewCattle(id);    
-        bool sugar = res.viewSugar(id);    
-        bool spices = res.viewSpices(id);    
+        bool cattle = res.viewCattle(id);
+        bool sugar = res.viewSugar(id);
+        bool spices = res.viewSpices(id);
         bool pigs = res.viewPigs(id);
         if (cattle && sugar && spices && pigs) {
             return true;
@@ -1214,9 +1270,9 @@ contract BonusResourcesContract is Ownable {
     }
 
     function checkFineJewelry(uint256 id) public view returns (bool) {
-        bool gold = res.viewGold(id);    
-        bool silver = res.viewSilver(id);    
-        bool gems = res.viewGems(id);    
+        bool gold = res.viewGold(id);
+        bool silver = res.viewSilver(id);
+        bool gems = res.viewGems(id);
         bool coal = res.viewCoal(id);
         if (gold && silver && gems && coal) {
             return true;
@@ -1226,9 +1282,13 @@ contract BonusResourcesContract is Ownable {
     }
 
     function checkScholars(uint256 id) public view returns (bool) {
-        bool lumber = res.viewLumber(id);    
+        bool lumber = res.viewLumber(id);
         bool lead = res.viewLead(id);
-        if (lumber && lead) {
+        uint256 literacyPercentage = crim.getLiteracy(id);
+        console.log(literacyPercentage, "literacy percentage");
+        console.log(lumber, "lumber");
+        console.log(lead, "lead");
+        if (lumber && lead && literacyPercentage >= 90) {
             return true;
         } else {
             return false;
@@ -1236,7 +1296,7 @@ contract BonusResourcesContract is Ownable {
     }
 
     function checkAsphalt(uint256 id) public view returns (bool) {
-        bool construction = idToBonusResources[id].construction;    
+        bool construction = idToBonusResources[id].construction;
         bool oil = res.viewOil(id);
         bool rubber = res.viewRubber(id);
         if (construction && oil && rubber) {
@@ -1247,8 +1307,8 @@ contract BonusResourcesContract is Ownable {
     }
 
     function checkAutomobiles(uint256 id) public view returns (bool) {
-        bool asphalt = idToBonusResources[id].asphalt;    
-        bool steel = idToBonusResources[id].steel;    
+        bool asphalt = idToBonusResources[id].asphalt;
+        bool steel = idToBonusResources[id].steel;
         if (asphalt && steel) {
             return true;
         } else {
@@ -1257,10 +1317,10 @@ contract BonusResourcesContract is Ownable {
     }
 
     function checkAffluentPopulation(uint256 id) public view returns (bool) {
-        bool fineJewelry = idToBonusResources[id].fineJewelry;    
+        bool fineJewelry = idToBonusResources[id].fineJewelry;
         bool fish = res.viewFish(id);
-        bool furs = res.viewFurs(id);   
-        bool wine = res.viewWine(id);   
+        bool furs = res.viewFurs(id);
+        bool wine = res.viewWine(id);
         if (fineJewelry && fish && furs && wine) {
             return true;
         } else {
@@ -1268,10 +1328,10 @@ contract BonusResourcesContract is Ownable {
         }
     }
 
-    function checkMicrochips(uint256 id) public view returns (bool) {  
+    function checkMicrochips(uint256 id) public view returns (bool) {
         bool gold = res.viewGold(id);
-        bool lead = res.viewLead(id);   
-        bool oil = res.viewOil(id);   
+        bool lead = res.viewLead(id);
+        bool oil = res.viewOil(id);
         if (gold && lead && oil) {
             return true;
         } else {
@@ -1279,7 +1339,7 @@ contract BonusResourcesContract is Ownable {
         }
     }
 
-    function checkRadiationCleanup(uint256 id) public view returns (bool) {  
+    function checkRadiationCleanup(uint256 id) public view returns (bool) {
         bool construction = idToBonusResources[id].construction;
         bool microchips = idToBonusResources[id].microchips;
         bool steel = idToBonusResources[id].steel;
