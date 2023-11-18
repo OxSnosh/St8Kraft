@@ -888,6 +888,7 @@ describe("Spy Operations Contract", function () {
             bonusresourcescontract.address,
             senatecontract.address,
             technologymarketcontrat.address,
+            countryparameterscontract.address
         )
         await bonusresourcescontract.settings(
             infrastructurecontract.address,

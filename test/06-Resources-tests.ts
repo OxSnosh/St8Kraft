@@ -888,6 +888,7 @@ describe("Resources Contract", function () {
             bonusresourcescontract.address,
             senatecontract.address,
             technologymarketcontrat.address,
+            countryparameterscontract.address
         )
         await bonusresourcescontract.settings(
             infrastructurecontract.address,
@@ -1688,5 +1689,29 @@ describe("Resources Contract", function () {
             var radiationcleanup = await bonusresourcescontract.viewRadiationCleanup(0);
             expect(radiationcleanup).to.equal(true);
         })
+    })
+
+    it("tests that the sanction functionality removes trading partners", async function () {
+        await resourcescontract.mockResourcesForTesting(0, 9, 7)
+        await resourcescontract.mockResourcesForTesting(1, 10, 0)
+        await resourcescontract.mockResourcesForTesting(2, 6, 8)
+        await resourcescontract.mockResourcesForTesting(3, 11, 7)
+        await resourcescontract.mockResourcesForTesting(4, 2, 9)
+        await resourcescontract.connect(signer1).proposeTrade(0, 1);
+        await resourcescontract.connect(signer1).proposeTrade(0, 2);
+        await resourcescontract.connect(signer1).proposeTrade(0, 3);
+        await resourcescontract.connect(signer1).proposeTrade(4, 0);
+        await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
+        await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
+        await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
+        await resourcescontract.connect(signer1).fulfillTradingPartner(0, 4);
+        var tradingpartners = await resourcescontract.getTradingPartners(0);
+        expect(tradingpartners.length).to.equal(4);
+        await senatecontract.electSenatorForTesting(1)
+        await senatecontract.connect(signer1).sanctionTeamMember(1, 0);
+        var sanctioned = await senatecontract.isSanctioned(0, 2);
+        expect(sanctioned).to.equal(true);
+        var tradingpartners = await resourcescontract.getTradingPartners(0);
+        expect(tradingpartners.length).to.equal(0);
     })
 })

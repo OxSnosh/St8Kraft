@@ -404,4 +404,8 @@ contract SenateContract is ChainlinkClient, KeeperCompatibleInterface, Ownable {
         }
         return sanctioned;
     }
+
+    function electSenatorForTesting(uint256 id) public onlyOwner {
+        idToVoter[id].senator = true;
+    }
 }
