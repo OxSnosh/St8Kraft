@@ -1099,8 +1099,8 @@ describe("Improvements Contract", function () {
         )
         // let ownerInitialWarBucksBalance : any = await warbucks.balanceOf(signer0.address);
         // await warbucks.connect(signer0).approve(warbucks.address, BigInt(6000000 000000000 000000000));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(60000000000000000000000000));
-        await treasurycontract.connect(signer1).addFunds(BigInt(55000000*(10**18)), 0);
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(600000000000000000000000000));
+        await treasurycontract.connect(signer1).addFunds(BigInt(550000000*(10**18)), 0);
         await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500);
 
         await warbucks.connect(signer0).transfer(signer2.address, BigInt(21000000000000000000000000))
@@ -1125,6 +1125,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract1.connect(signer1).deleteImprovement1(1, 0, 1);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement1 airport purchase errors", async function () {
@@ -1161,6 +1164,12 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await wonderscontract4.connect(signer1).buyWonder4(0, 3);
+            await wonderscontract1.connect(signer1).buyWonder1(0, 8);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 2);            
+            await improvementscontract1.connect(signer1).deleteImprovement1(1, 0, 2);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(2);
         })
 
         it("improvement1 bank purchase errors", async function () {
@@ -1197,6 +1206,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract1.connect(signer1).deleteImprovement1(1, 0, 3);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement1 barracks purchase errors", async function () {
@@ -1236,6 +1248,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(4);
+            await improvementscontract1.connect(signer1).deleteImprovement1(1, 0, 4);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(3);
         })
 
         it("improvement1 border fortification purchase errors", async function () {
@@ -1278,6 +1293,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract1.connect(signer1).deleteImprovement1(1, 0, 5);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement1 border wall purchase errors", async function () {
@@ -1321,6 +1339,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(4);
+            await improvementscontract1.connect(signer1).deleteImprovement1(1, 0, 6);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(3);
         })
 
         it("improvement1 bunker purchase errors", async function () {
@@ -1365,6 +1386,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract1.connect(signer1).deleteImprovement1(1, 0, 7);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement1 casino purchase errors", async function () {
@@ -1401,6 +1425,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract1.connect(signer1).deleteImprovement1(1, 0, 8);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement1 church purchase errors", async function () {
@@ -1435,6 +1462,9 @@ describe("Improvements Contract", function () {
             await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 9);
             var newCount = await improvementscontract1.getClinicCount(0);
             expect(newCount.toNumber()).to.equal(2);
+            await improvementscontract1.connect(signer1).deleteImprovement1(1, 0, 9);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement1 clinic purchase errors", async function () {
@@ -1472,6 +1502,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(3);
+            await improvementscontract1.connect(signer1).deleteImprovement1(1, 0, 10);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(2);
         })
 
         it("improvement1 drydock purchase errors", async function () {
@@ -1509,6 +1542,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract1.connect(signer1).deleteImprovement1(1, 0, 11);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement1 factory purchase errors", async function () {
@@ -1546,6 +1582,9 @@ describe("Improvements Contract", function () {
             await expect(improvementscontract2.connect(signer1).buyImprovement2(1, 0, 1)).to.be.revertedWith("Cannot own more than 1");
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(1);
+            await improvementscontract2.connect(signer1).deleteImprovement2(1, 0, 1);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(0);
         })
 
         it("improvement2 foreign ministry purchase errors", async function () {
@@ -1582,6 +1621,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract2.connect(signer1).deleteImprovement2(1, 0, 2);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement2 forward operating base purchase errors", async function () {
@@ -1618,6 +1660,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract2.connect(signer1).deleteImprovement2(1, 0, 3);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement2 guerilla camp purchase errors", async function () {
@@ -1651,6 +1696,9 @@ describe("Improvements Contract", function () {
             expect(count.toNumber()).to.equal(1);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(1);
+            await improvementscontract2.connect(signer1).deleteImprovement2(1, 0, 4);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(0);
         })
 
         it("improvement2 harbor purchase errors", async function () {
@@ -1686,6 +1734,9 @@ describe("Improvements Contract", function () {
             expect(count.toNumber()).to.equal(1);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(3);
+            await improvementscontract2.connect(signer1).deleteImprovement2(1, 0, 5);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(2);
         })
 
         it("improvement2 hospital purchase errors", async function () {
@@ -1723,6 +1774,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract2.connect(signer1).deleteImprovement2(1, 0, 6);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement2 intel agency purchase errors", async function () {
@@ -1759,6 +1813,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract2.connect(signer1).deleteImprovement2(1, 0, 7);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement2 jail purchase errors", async function () {
@@ -1795,6 +1852,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract2.connect(signer1).deleteImprovement2(1, 0, 8);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement2 labor camp purchase errors", async function () {
@@ -1833,6 +1893,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract4.connect(signer1).deleteImprovement4(1, 0, 1);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement4 missile defense purchase errors", async function () {
@@ -1873,6 +1936,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(3);
+            await improvementscontract4.connect(signer1).deleteImprovement4(1, 0, 2);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(2);
         })
 
         it("improvement4 munitions factory purchase errors", async function () {
@@ -1911,6 +1977,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(3);
+            await improvementscontract4.connect(signer1).deleteImprovement4(1, 0, 3);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(2);
         })
 
         it("improvement4 naval academy purchase errors", async function () {
@@ -1950,6 +2019,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(3);
+            await improvementscontract4.connect(signer1).deleteImprovement4(1, 0, 4);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(2);
         })
 
         it("improvement4 naval construction yard purchase errors", async function () {
@@ -1989,6 +2061,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(1);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(4);
+            await improvementscontract4.connect(signer1).deleteImprovement4(1, 0, 5);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(3);
         })
 
         it("improvement4 office of propaganda purchase errors", async function () {
@@ -2026,6 +2101,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract4.connect(signer1).deleteImprovement4(1, 0, 6);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement4 police headquarters purchase errors", async function () {
@@ -2064,6 +2142,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract3.connect(signer1).deleteImprovement3(1, 0, 1);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement3 prison purchase errors", async function () {
@@ -2158,6 +2239,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(6);
+            await improvementscontract3.connect(signer1).deleteImprovement3(1, 0, 2);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(5);
         })
 
         it("improvement3 radiation containment chamber purchase errors", async function () {
@@ -2194,6 +2278,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract3.connect(signer1).deleteImprovement3(1, 0, 3);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement3 red light district purchase errors", async function () {
@@ -2230,6 +2317,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract3.connect(signer1).deleteImprovement3(1, 0, 4);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement3 rehabilitation facility purchase errors", async function () {
@@ -2266,6 +2356,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract3.connect(signer1).deleteImprovement3(1, 0, 5);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement3 satellite purchase errors", async function () {
@@ -2302,6 +2395,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract3.connect(signer1).deleteImprovement3(1, 0, 6);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement3 school purchase errors", async function () {
@@ -2338,6 +2434,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract3.connect(signer1).deleteImprovement3(1, 0, 7);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement3 shipyard purchase errors", async function () {
@@ -2374,6 +2473,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await improvementscontract3.connect(signer1).deleteImprovement3(1, 0, 8);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(1);
         })
 
         it("improvement3 stadium purchase errors", async function () {
@@ -2413,6 +2515,9 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(5);
+            await improvementscontract3.connect(signer1).deleteImprovement3(1, 0, 9);
+            const improvementCount2 = await improvementscontract1.getImprovementCount(0);
+            expect(improvementCount2).to.equal(4);
         })
 
         it("improvement3 university purchase errors", async function () {

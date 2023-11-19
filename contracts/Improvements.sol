@@ -175,27 +175,6 @@ contract ImprovementsContract1 is Ownable {
         _;
     }
 
-    ///@dev this function is only callable by the contract owner
-    function updateTreasuryAddress(address _newAddress) public onlyOwner {
-        treasury = _newAddress;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementContractAddresses(
-        address _improvements2,
-        address _improvements3,
-        address _improvements4
-    ) public onlyOwner {
-        improvements2 = _improvements2;
-        improvements3 = _improvements3;
-        improvements4 = _improvements4;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateNavyContractAddress(address _navy) public onlyOwner {
-        navy = _navy;
-    }
-
     ///@dev this function is only callable by the countryMinter contract
     ///@dev this function will initialize the struct to store the info about the minted nations improvements
     ///@notice this function will allow each minted nation to buy imoprovements
@@ -876,28 +855,6 @@ contract ImprovementsContract2 is Ownable {
             "function only callable by countryMinter contract"
         );
         _;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateTreasuryAddress(address _treasury) public onlyOwner {
-        treasury = _treasury;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementContract1Address(
-        address _improvements1
-    ) public onlyOwner {
-        improvements1 = _improvements1;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWondersContract1Address(address _wonders1) public onlyOwner {
-        wonders1 = _wonders1;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateForcesAddress(address _forces) public onlyOwner {
-        forces = _forces;
     }
 
     ///@dev this function is only callable by the countryMinter contract
@@ -2222,33 +2179,6 @@ contract ImprovementsContract4 is Ownable {
         _;
     }
 
-    ///@dev this function is only callable by the contract owner
-    function updateTreasuryAddress(
-        address _newTreasuryAddress
-    ) public onlyOwner {
-        treasury = _newTreasuryAddress;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementContract1Address(
-        address _improvements1
-    ) public onlyOwner {
-        improvements1 = _improvements1;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementContract2Address(
-        address _improvements2
-    ) public onlyOwner {
-        improvements2 = _improvements2;
-        imp2 = ImprovementsContract2(_improvements2);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateForcesAddress(address _forces) public onlyOwner {
-        forces = _forces;
-    }
-
     ///@dev this function is only callable by the countryMinter contract
     ///@dev this function will initialize the struct to store the info about the minted nations improvements
     ///@notice this function will allow each minted nation to buy imoprovements
@@ -2471,6 +2401,8 @@ contract ImprovementsContract4 is Ownable {
      * 2 = munitions factory
      * 3 = naval academy
      * 4 = naval construction yard
+     * 5 = office of propaganda
+     * 6 = police headquarters
      */
     function deleteImprovement4(
         uint256 amount,
