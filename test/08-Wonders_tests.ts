@@ -1110,6 +1110,22 @@ describe("Wonders Contracts", function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )
+        
+        const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+        const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+        for (const log of event1Logs) {
+            const requestIdReturn = log.args.requestId;
+            // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            if (requestIdReturn == 2) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources1 = await resourcescontract.getPlayerResources(0);
+                // console.log("resources 1", resources1[0].toNumber(), resources1[1].toNumber());
+            } else if (requestIdReturn == 4) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources2 = await resourcescontract.getPlayerResources(1);
+                // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
+            }
+        }
     });
 
     describe("Wonders Contract 1", function () {
@@ -1117,6 +1133,9 @@ describe("Wonders Contracts", function () {
         it("wonder1 agriculture development program tests", async function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 10000);
             await landmarketcontract.connect(signer1).buyLand(0, 10000);
+            // var resourcesArray = await resourcescontract.getPlayerResources(0);
+            // console.log(resourcesArray[0].toNumber(), "resourcesArray[0]");
+            // console.log(resourcesArray[1].toNumber(), "resourcesArray[1]");
             await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
             let wonderCount = await wonderscontract1.getWonderCount(0);
             expect(wonderCount).to.equal(0);
@@ -2212,7 +2231,7 @@ describe("Wonders Contracts", function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             await improvementscontract4.connect(signer1).buyImprovement4(3, 0, 1);
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 4)).to.be.revertedWith("Must own at least 3 satellite improvements");
-            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 7);
+            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 5);
             let wonderCount = await wonderscontract1.getWonderCount(0);
             expect(wonderCount).to.equal(0);
             await wonderscontract4.connect(signer1).buyWonder4(0, 4);
@@ -2226,7 +2245,7 @@ describe("Wonders Contracts", function () {
             await billscontract.connect(signer1).payBills(0)
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             await improvementscontract4.connect(signer1).buyImprovement4(3, 0, 1);
-            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 7);
+            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 5);
             await expect(wonderscontract4.connect(signer1).buyWonder4(1, 4)).to.be.revertedWith("!nation owner");
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 15)).to.be.revertedWith("Invalid wonder ID");
             await wonderscontract4.connect(signer0).updateStrategicDefenseInitiativeCost(BigInt(100000000000*(10**18)));

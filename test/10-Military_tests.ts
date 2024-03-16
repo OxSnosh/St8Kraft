@@ -1154,5 +1154,11 @@ describe("Military Contract", function () {
             var war2 = await militarycontract.getWarPeacePreference(0);
             expect(war2).to.equal(false);
         })
+
+        it("return days in pace mode" , async function () {
+            var daysInPeace = await militarycontract.getDaysInPeaceMode(0);
+            expect(daysInPeace).to.equal(0)
+            // console.log(daysInPeace.toNumber())
+        })
     })
 });
