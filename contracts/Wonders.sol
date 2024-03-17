@@ -155,31 +155,6 @@ contract WondersContract1 is Ownable {
         mint = CountryMinter(_countryMinter);
     }
 
-    ///@dev this function is only callable by the contract owner
-    function updateTreasuryAddress(
-        address _newTreasuryAddress
-    ) public onlyOwner {
-        treasuryAddress = _newTreasuryAddress;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWondersAddresses(
-        address _wonderContract2Address,
-        address _wonderContract3Address,
-        address _wonderContract4Address
-    ) public onlyOwner {
-        wondersContract2Address = _wonderContract2Address;
-        wondersContract3Address = _wonderContract3Address;
-        wondersContract4Address = _wonderContract4Address;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateInfrastructureAddresses(
-        address _infrastructureAddress
-    ) public onlyOwner {
-        infrastructureAddress = _infrastructureAddress;
-    }
-
     ///@dev this is a public view function that will return the number of wonders a given nation owns
     ///@notice this function will return the number of wonders a given nation owns
     ///@param id is the nation id of the nation being queried
@@ -794,41 +769,6 @@ contract WondersContract2 is Ownable {
         mint = CountryMinter(_countryMinter);
     }
 
-    ///@dev this function is only callable by the contract owner
-    function updateTreasuryAddress(
-        address _newTreasuryAddress
-    ) public onlyOwner {
-        treasuryAddress = _newTreasuryAddress;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWonderContract1Address(
-        address _wonderContract1Address
-    ) public onlyOwner {
-        wonderContract1Address = _wonderContract1Address;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWonderContract3Address(
-        address _wonderContract3Address
-    ) public onlyOwner {
-        wonderContract3Address = _wonderContract3Address;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWonderContract4Address(
-        address _wonderContract4Address
-    ) public onlyOwner {
-        wonderContract4Address = _wonderContract4Address;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateInfrastructureAddress(
-        address _infrastructureAddress
-    ) public onlyOwner {
-        infrastructureAddress = _infrastructureAddress;
-    }
-
     modifier onlyCountryMinter() {
         require(
             msg.sender == countryMinter,
@@ -1383,41 +1323,6 @@ contract WondersContract3 is Ownable {
         mint = CountryMinter(_countryMinter);
     }
 
-    ///@dev this function is only callable by the contract owner
-    function updateTreasuryAddress(
-        address _newTreasuryAddress
-    ) public onlyOwner {
-        treasuryAddress = _newTreasuryAddress;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateInfrastructureAddress(
-        address _newInfrastructureAddress
-    ) public onlyOwner {
-        infrastructureAddress = _newInfrastructureAddress;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWonderContract1Address(
-        address _wonderContract1Address
-    ) public onlyOwner {
-        wonderContract1Address = _wonderContract1Address;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWonderContract2Address(
-        address _wonderContract2Address
-    ) public onlyOwner {
-        wonderContract2Address = _wonderContract2Address;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWonderContract4Address(
-        address _wonderContract4Address
-    ) public onlyOwner {
-        wonderContract4Address = _wonderContract4Address;
-    }
-
     modifier onlyCountryMinter() {
         require(
             msg.sender == countryMinter,
@@ -1967,43 +1872,6 @@ contract WondersContract4 is Ownable {
         wonderContract3Address = _wonders3;
         countryMinter = _countryMinter;
         mint = CountryMinter(_countryMinter);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateTreasuryAddress(
-        address _newTreasuryAddress
-    ) public onlyOwner {
-        treasuryAddress = _newTreasuryAddress;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWonderContract1Address(
-        address _wonderContract1Address
-    ) public onlyOwner {
-        wonderContract1Address = _wonderContract1Address;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWonderContract3Address(
-        address _wonderContract3Address
-    ) public onlyOwner {
-        wonderContract3Address = _wonderContract3Address;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateInfrastructureAddress(
-        address _infrastructureAddress
-    ) public onlyOwner {
-        infrastructureAddress = _infrastructureAddress;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementContractAddresses(
-        address _improvementsContract2Address,
-        address _improvementsContract3Address
-    ) public onlyOwner {
-        improvementsContract2Address = _improvementsContract2Address;
-        improvementsContract3Address = _improvementsContract3Address;
     }
 
     modifier onlyCountryMinter() {
