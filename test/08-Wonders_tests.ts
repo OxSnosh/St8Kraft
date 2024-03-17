@@ -2643,6 +2643,22 @@ describe("Wonders Contracts", function () {
             expect(newCost.toNumber()).to.equal(100);
         })
 
+        it("wonder4 tests that social security can be deleted", async function () {
+            // await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 14000);
+            // await landmarketcontract.connect(signer1).buyLand(0, 10000);
+            // await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
+            let wonderCount = await wonderscontract1.getWonderCount(0);
+            expect(wonderCount).to.equal(0);
+            await wonderscontract4.connect(signer1).buyWonder4(0, 1);
+            var isWonder = await wonderscontract4.getSocialSecuritySystem(0);
+            expect(isWonder).to.equal(true); 
+            let newWonderCount = await wonderscontract1.getWonderCount(0);
+            expect(newWonderCount).to.equal(1);
+            await wonderscontract4.connect(signer1).deleteWonder4(0, 1);
+            var isWonder = await wonderscontract4.getSocialSecuritySystem(0);
+            expect(isWonder).to.equal(false);
+        })
+
         //space program
         it("wonder4 space program tests", async function () {
             let wonderCount = await wonderscontract1.getWonderCount(0);
@@ -2672,6 +2688,22 @@ describe("Wonders Contracts", function () {
             let newPrices = await wonderscontract4.getWonderCosts4();
             var newCost = newPrices[1];
             expect(newCost.toNumber()).to.equal(100);
+        })
+
+        it("wonder4 tests that space program can be deleted", async function () {
+            // await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 14000);
+            // await landmarketcontract.connect(signer1).buyLand(0, 10000);
+            // await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
+            let wonderCount = await wonderscontract1.getWonderCount(0);
+            expect(wonderCount).to.equal(0);
+            await wonderscontract4.connect(signer1).buyWonder4(0, 2);
+            var isWonder = await wonderscontract4.getSpaceProgram(0);
+            expect(isWonder).to.equal(true); 
+            let newWonderCount = await wonderscontract1.getWonderCount(0);
+            expect(newWonderCount).to.equal(1);
+            await wonderscontract4.connect(signer1).deleteWonder4(0, 2);
+            var isWonder = await wonderscontract4.getSpaceProgram(0);
+            expect(isWonder).to.equal(false);
         })
         
         //stock market
@@ -2703,6 +2735,22 @@ describe("Wonders Contracts", function () {
             let newPrices = await wonderscontract4.getWonderCosts4();
             var newCost = newPrices[2];
             expect(newCost.toNumber()).to.equal(100);
+        })
+
+        it("wonder4 tests that stock market can be deleted", async function () {
+            // await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 14000);
+            // await landmarketcontract.connect(signer1).buyLand(0, 10000);
+            // await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
+            let wonderCount = await wonderscontract1.getWonderCount(0);
+            expect(wonderCount).to.equal(0);
+            await wonderscontract4.connect(signer1).buyWonder4(0, 3);
+            var isWonder = await wonderscontract4.getStockMarket(0);
+            expect(isWonder).to.equal(true); 
+            let newWonderCount = await wonderscontract1.getWonderCount(0);
+            expect(newWonderCount).to.equal(1);
+            await wonderscontract4.connect(signer1).deleteWonder4(0, 3);
+            var isWonder = await wonderscontract4.getStockMarket(0);
+            expect(isWonder).to.equal(false);
         })
 
         //strategic defense initiative
@@ -2746,6 +2794,26 @@ describe("Wonders Contracts", function () {
             expect(newCost.toNumber()).to.equal(100);
         })
 
+        it("wonder4 tests that strategic defense initiative can be deleted", async function () {
+            // await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 14000);
+            // await landmarketcontract.connect(signer1).buyLand(0, 10000);
+            // await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
+            await improvementscontract4.connect(signer1).buyImprovement4(3, 0, 1);
+            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 5);
+            let wonderCount = await wonderscontract1.getWonderCount(0);
+            expect(wonderCount).to.equal(0);
+            await wonderscontract4.connect(signer1).buyWonder4(0, 4);
+            var isWonder = await wonderscontract4.getStrategicDefenseInitiative(0);
+            expect(isWonder).to.equal(true); 
+            let newWonderCount = await wonderscontract1.getWonderCount(0);
+            expect(newWonderCount).to.equal(1);
+            await wonderscontract4.connect(signer1).deleteWonder4(0, 4);
+            var isWonder = await wonderscontract4.getStrategicDefenseInitiative(0);
+            expect(isWonder).to.equal(false);
+        })
+
         //superior logistical support
         it("wonder4 superior logistical support tests", async function () {
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 5)).to.be.revertedWith("Pentagon required in order to purchase");
@@ -2778,6 +2846,23 @@ describe("Wonders Contracts", function () {
             let newPrices = await wonderscontract4.getWonderCosts4();
             var newCost = newPrices[4];
             expect(newCost.toNumber()).to.equal(100);
+        })
+
+        it("wonder4 tests that superior logistical support can be deleted", async function () {
+            // await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 14000);
+            // await landmarketcontract.connect(signer1).buyLand(0, 10000);
+            // await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
+            await wonderscontract3.connect(signer1).buyWonder3(0, 7);
+            let wonderCount = await wonderscontract1.getWonderCount(0);
+            expect(wonderCount).to.equal(1);
+            await wonderscontract4.connect(signer1).buyWonder4(0, 5);
+            var isWonder = await wonderscontract4.getSuperiorLogisticalSupport(0);
+            expect(isWonder).to.equal(true); 
+            let newWonderCount = await wonderscontract1.getWonderCount(0);
+            expect(newWonderCount).to.equal(2);
+            await wonderscontract4.connect(signer1).deleteWonder4(0, 5);
+            var isWonder = await wonderscontract4.getSuperiorLogisticalSupport(0);
+            expect(isWonder).to.equal(false);
         })
 
         //universal healthcare
@@ -2826,6 +2911,22 @@ describe("Wonders Contracts", function () {
             expect(newCost.toNumber()).to.equal(100);
         })
 
+        it("wonder4 tests that superior logistical support can be deleted", async function () {
+            // await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 14000);
+            // await landmarketcontract.connect(signer1).buyLand(0, 10000);
+            // await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
+            let wonderCount = await wonderscontract1.getWonderCount(0);
+            expect(wonderCount).to.equal(0);
+            await wonderscontract4.connect(signer1).buyWonder4(0, 6);
+            var isWonder = await wonderscontract4.getUniversalHealthcare(0);
+            expect(isWonder).to.equal(true); 
+            let newWonderCount = await wonderscontract1.getWonderCount(0);
+            expect(newWonderCount).to.equal(1);
+            await wonderscontract4.connect(signer1).deleteWonder4(0, 6);
+            var isWonder = await wonderscontract4.getUniversalHealthcare(0);
+            expect(isWonder).to.equal(false);
+        })
+
         //weapons research center
         it("wonder4 weapons research center tests", async function () {
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 7)).to.be.revertedWith("Pentagon required in order to purchase");
@@ -2833,7 +2934,7 @@ describe("Wonders Contracts", function () {
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 7)).to.be.revertedWith("National Research Lab required to Purchase");
             await wonderscontract3.connect(signer1).buyWonder3(0, 4);
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 7)).to.be.revertedWith("Must have 8500 Infrastructure to purchase");
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 8500);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 11000);
             await expect(wonderscontract4.connect(signer1).buyWonder4(0, 7)).to.be.revertedWith("Must have 2000 Technology to purchase");
             await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
             let wonderCount = await wonderscontract1.getWonderCount(0);
@@ -2867,6 +2968,26 @@ describe("Wonders Contracts", function () {
             let newPrices = await wonderscontract4.getWonderCosts4();
             var newCost = newPrices[6];
             expect(newCost.toNumber()).to.equal(100);
+        })
+
+        it("wonder4 tests that weapons research center can be deleted", async function () {
+            // await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 14000);
+            // await landmarketcontract.connect(signer1).buyLand(0, 10000);
+            // await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
+            await wonderscontract3.connect(signer1).buyWonder3(0, 7);
+            await wonderscontract3.connect(signer1).buyWonder3(0, 4);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 11000);
+            await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
+            let wonderCount = await wonderscontract1.getWonderCount(0);
+            expect(wonderCount).to.equal(2);
+            await wonderscontract4.connect(signer1).buyWonder4(0, 7);
+            var isWonder = await wonderscontract4.getWeaponsResearchCenter(0);
+            expect(isWonder).to.equal(true); 
+            let newWonderCount = await wonderscontract1.getWonderCount(0);
+            expect(newWonderCount).to.equal(3);
+            await wonderscontract4.connect(signer1).deleteWonder4(0, 7);
+            var isWonder = await wonderscontract4.getWeaponsResearchCenter(0);
+            expect(isWonder).to.equal(false);
         })
     })
 });
