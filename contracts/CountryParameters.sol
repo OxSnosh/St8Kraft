@@ -170,14 +170,6 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         _;
     }
 
-    modifier onlyKeeperContract() {
-        require(
-            msg.sender == keeper,
-            "function only callable from the keeper contract"
-        );
-        _;
-    }
-
     ///@dev this is a public function but only callable from the counry minter contract
     ///@notice this function will get called only when a nation is minted
     ///@param id this will be the nations ID that is passed in from the country minter contact

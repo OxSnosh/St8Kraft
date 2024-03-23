@@ -1153,7 +1153,7 @@ describe("Nuke Attack Contract", function () {
     });
 
     describe("Nuke Attack", function () {
-        it("tests that launchNuke reverts correctly", async function () {
+        // it("tests that launchNuke reverts correctly", async function () {
         //     await expect(nukecontract.connect(signer1).launchNuke(0, 1, 0, 1)).to.be.revertedWith("!nation owner")
         //     await expect(nukecontract.connect(signer1).launchNuke(1, 0, 1, 1)).to.be.revertedWith("war not active")
         //     await expect(nukecontract.connect(signer1).launchNuke(0, 0, 2, 1)).to.be.revertedWith("defender not involved in this war")
@@ -1262,6 +1262,6 @@ describe("Nuke Attack Contract", function () {
         //     var defenderInfrastructure = await infrastructurecontract.getInfrastructureCount(1)
         //     // console.log(defenderInfrastructure.toNumber(), "defender infrastructure after launch");
         //     expect(defenderInfrastructure.toNumber()).to.equal(1870)
-        })
+        // })
     })
 })

@@ -2911,17 +2911,20 @@ describe("Wonders Contracts", function () {
             expect(newCost.toNumber()).to.equal(100);
         })
 
-        it("wonder4 tests that superior logistical support can be deleted", async function () {
-            // await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 14000);
+        it("wonder4 tests that universal healthcare can be deleted", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 15000);
             // await landmarketcontract.connect(signer1).buyLand(0, 10000);
             // await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
+            await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 9);
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 5);
+            await wonderscontract3.connect(signer1).buyWonder3(0, 4);
             let wonderCount = await wonderscontract1.getWonderCount(0);
-            expect(wonderCount).to.equal(0);
+            expect(wonderCount).to.equal(1);
             await wonderscontract4.connect(signer1).buyWonder4(0, 6);
             var isWonder = await wonderscontract4.getUniversalHealthcare(0);
             expect(isWonder).to.equal(true); 
             let newWonderCount = await wonderscontract1.getWonderCount(0);
-            expect(newWonderCount).to.equal(1);
+            expect(newWonderCount).to.equal(2);
             await wonderscontract4.connect(signer1).deleteWonder4(0, 6);
             var isWonder = await wonderscontract4.getUniversalHealthcare(0);
             expect(isWonder).to.equal(false);

@@ -1190,6 +1190,14 @@ describe("Treasury Contract", function () {
             await billscontract.connect(signer1).payBills(0);
             await expect(treasurycontract.connect(signer1).withdrawFunds(BigInt(50000000000*(10**18)), 0)).to.be.revertedWith("insufficient game balance");
         })
+
+        it("tests that the Seed Money amount can be changed", async function () {
+            let seedMoney : any = await treasurycontract.getSeedMoney();
+            expect(BigInt(seedMoney).toString()).to.equal("2000000000000000000000000");
+            await treasurycontract.updateSeedMoney(1000000);
+            let seedMoney2 : any = await treasurycontract.getSeedMoney();
+            expect(BigInt(seedMoney2).toString()).to.equal("1000000000000000000000000");
+        })
     })
 
     describe("MILF Functionality", function () {
@@ -1472,7 +1480,36 @@ describe("Treasury Contract", function () {
             console.log("total game balance", totalGameBalance3.toString());
             // expect(totalGameBalance3.toString()).to.equal("503000000");    
         })
+    })
 
+    describe("Outside Contract Calls", function () {
+        it("tests that the Aid Contract can send balance", async function () {
+            await warbucks.connect(signer0).approve(warbucks.address, BigInt(100000000*(10**18)));
+            await warbucks.connect(signer0).transfer(signer1.address, BigInt(100000000*(10**18)));
+            await treasurycontract.connect(signer1).addFunds(BigInt(100000000*(10**18)), 0);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 0, BigInt(6000000*(10**18)), 0);
+            var balance = await treasurycontract.checkBalance(1);
+            // console.log("balance", balance.toString());
+            expect(balance.toString()).to.equal("2000000000000000000000000");
+            await aidcontract.connect(signer2).acceptProposal(0);
+            var balance = await treasurycontract.checkBalance(1);
+            // console.log("balance", balance.toString());
+            expect(balance.toString()).to.equal("7999999999999999899336704");
+        })
+
+        it("tests that Infrastructure contract can return balance when land is sold", async function () {
+            await warbucks.connect(signer0).approve(warbucks.address, BigInt(100000000*(10**18)));
+            await warbucks.connect(signer0).transfer(signer1.address, BigInt(100000000*(10**18)));
+            await treasurycontract.connect(signer1).addFunds(BigInt(100000000*(10**18)), 0);
+            await landmarketcontract.connect(signer1).buyLand(0, 500);
+            var balance = await treasurycontract.checkBalance(0);
+            // console.log("balance", balance.toString());
+            expect(balance.toString()).to.equal("101780000000000004764729344");
+            await infrastructurecontract.connect(signer1).sellLand(0, 300);
+            var balance = await treasurycontract.checkBalance(0);
+            // console.log("balance", balance.toString());
+            expect(balance.toString()).to.equal("101810000000000004764729344");
+        })
     })
     
 });

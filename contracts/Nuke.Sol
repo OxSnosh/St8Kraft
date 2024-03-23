@@ -185,7 +185,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         uint256 attackerId,
         uint256 defenderId,
         uint256 attackType
-    ) public {
+    ) public { 
         bool isOwner = mint.checkOwnership(attackerId, msg.sender);
         require(isOwner, "!nation owner");
         bool isActive = war.isWarActive(warId);
@@ -204,7 +204,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         uint256 count = mis.getNukeCount(attackerId);
         require(count >= 1, "need to own a nuke");
         uint256 day = keep.getGameDay();
-        require(nationIdToDayToNukeLanded[defenderId][day] = false, "defender already nuked this day");
+        require(nationIdToDayToNukeLanded[defenderId][day] == false, "defender already nuked this day");
         completeNukeLaunch(warId, attackerId, defenderId, attackType);
     }
 
@@ -251,7 +251,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
 
     ///@dev this function will be called by the launchNuke() function
     ///@dev this function will send a randomness request to the chainlink VRF contract
-    function fulfillRequest(uint256 id) public {
+    function fulfillRequest(uint256 id) internal {
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,

@@ -265,7 +265,7 @@ contract ResourcesContract is VRFConsumerBaseV2, Ownable {
 
     ///@dev this is the function that will call the chainlink vrf contract to return random numbers
     ///@dev this is an internal function that can only be called from within this contract
-    function fulfillRequest(uint256 id) public {
+    function fulfillRequest(uint256 id) internal {
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,

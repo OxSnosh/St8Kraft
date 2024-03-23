@@ -420,10 +420,10 @@ contract InfrastructureContract is Ownable {
         uint256 currentLand = idToInfrastructure[id].landArea;
         require(amount < (currentLand - 20), "cannot sell land below 20 miles");
         idToInfrastructure[id].landArea -= amount;
-        uint256 costPerMile = 100;
+        uint256 costPerMile = 100 * (10**18);
         bool rubber = res.viewRubber(id);
         if (rubber) {
-            costPerMile = 300;
+            costPerMile = 300 * (10**18);
         }
         uint256 totalCost = (amount * costPerMile);
         TreasuryContract(treasury).returnBalance(id, totalCost);
