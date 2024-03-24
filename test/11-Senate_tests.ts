@@ -59,6 +59,7 @@ import {
 } from "../typechain-types"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
+import { kMostFrequent } from "../scripts/SenatorImplementation";
 
 describe("Senate Contract", function () {
 
@@ -1271,20 +1272,20 @@ describe("Senate Contract", function () {
     
             team7Votes.push(signer1Vote, signer2Vote, signer3Vote, signer4Vote, signer5Vote, signer6Vote, signer7Vote, signer8Vote, signer9Vote, signer10Vote, signer11Vote, signer12Vote);
     
-            // console.log(team7Votes);
+            console.log(team7Votes);
     
-            // const team7Senators = kMostFrequent(team7Votes, 5);
+            const team7Senators = kMostFrequent(team7Votes, 5);
     
-            // console.log("senators", team7Senators);
+            console.log("senators", team7Senators);
 
             // await senatecontract.inaugurateTeam7Senators(team7Senators);
             
-            var isNation7ASenator = await senatecontract.isSenator(7);
-            var isNation8ASenator = await senatecontract.isSenator(8);
-            var isNation9ASenator = await senatecontract.isSenator(9);
-            var isNation10ASenator = await senatecontract.isSenator(10);
-            var isNation11ASenator = await senatecontract.isSenator(11);
-            var isNation6ASenator = await senatecontract.isSenator(6);
+            // var isNation7ASenator = await senatecontract.isSenator(7);
+            // var isNation8ASenator = await senatecontract.isSenator(8);
+            // var isNation9ASenator = await senatecontract.isSenator(9);
+            // var isNation10ASenator = await senatecontract.isSenator(10);
+            // var isNation11ASenator = await senatecontract.isSenator(11);
+            // var isNation6ASenator = await senatecontract.isSenator(6);
 
             // expect(isNation7ASenator).to.equal(true);
             // expect(isNation8ASenator).to.equal(true);

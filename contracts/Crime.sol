@@ -55,44 +55,6 @@ contract CrimeContract is Ownable {
         won2 = WondersContract2(_wonders2);
     }
 
-    ///@dev this function is only callable by the contract owner
-    function updateInfrastructureContract(
-        address _newAddress
-    ) public onlyOwner {
-        infrastructure = _newAddress;
-        inf = InfrastructureContract(_newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementsContract1(address _newAddress) public onlyOwner {
-        improvements1 = _newAddress;
-        imp1 = ImprovementsContract1(_newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementsContract2(address _newAddress) public onlyOwner {
-        improvements2 = _newAddress;
-        imp2 = ImprovementsContract2(_newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementsContract3(address _newAddress) public onlyOwner {
-        improvements3 = _newAddress;
-        imp3 = ImprovementsContract3(_newAddress);
-    }
-
-    ///@dev this funtion is only callble from the contract owner
-    function updarteImprovementsContract4(address _newAddress) public onlyOwner {
-        improvements4 = _newAddress;
-        imp4 = ImprovementsContract4(_newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateCountryParameters(address _newAddress) public onlyOwner {
-        parameters = _newAddress;
-        cp = CountryParametersContract(_newAddress);
-    }
-
     ///@dev this is a public view function that will calculate the number of criminals in a nations population
     ///@notice this will calulate the number of criminals in a nations population
     ///@notice criminals will rduce the amount of your tax paying citizens

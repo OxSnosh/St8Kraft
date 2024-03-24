@@ -1089,7 +1089,7 @@ describe("Aid Contract", function () {
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
         }
 
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(21000000000000000000000000))
         await countryminter.connect(signer1).generateCountry(
             "TestRuler",
             "TestNationName",
@@ -1097,7 +1097,7 @@ describe("Aid Contract", function () {
             "TestNationSlogan"
         )
 
-        await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(21000000000000000000000000))
         await countryminter.connect(signer2).generateCountry(
             "NextRuler",
             "NextNationName",
@@ -1121,11 +1121,11 @@ describe("Aid Contract", function () {
             }
         }
 
-        await warbucks.connect(signer0).approve(warbucks.address, BigInt(100000000*(10**18)));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(100000000*(10**18)));
-        await treasurycontract.connect(signer1).addFunds(BigInt(100000000*(10**18)), 0);
-        await warbucks.connect(signer0).transfer(signer2.address, BigInt(100000000*(10**18)));
-        await treasurycontract.connect(signer2).addFunds(BigInt(100000000*(10**18)), 1);
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(1000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(1000000000*(10**18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(1000000000*(10**18)), 0);
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(1000000000*(10**18)));
+        await treasurycontract.connect(signer2).addFunds(BigInt(1000000000*(10**18)), 1);
         await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
         await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 10000);
         await forcescontract.connect(signer1).buySoldiers(5000, 0);
@@ -1148,7 +1148,7 @@ describe("Aid Contract", function () {
             await aidcontract.connect(signer2).acceptProposal(0);
             await expect((await forcescontract.getSoldierCount(1)).toNumber()).to.equal(4020);
             await expect((await infrastructurecontract.getTechnologyCount(1)).toNumber()).to.equal(100);
-            await expect((await (await treasurycontract.checkBalance(1)))).to.equal(BigInt("108000000000000004664066048"));
+            await expect((await (await treasurycontract.checkBalance(1)))).to.equal(BigInt("1008000000000000013186891776"));
         })
 
         it("aid1 tests proposeAid() function reverts correctly with slot not available", async function () {
@@ -1173,7 +1173,7 @@ describe("Aid Contract", function () {
             await technologymarketcontrat.connect(signer1).destroyTech(0, 10000);
             await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("not enough tech for this proposal"); 
             await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
-            await treasurycontract.connect(signer1).withdrawFunds(BigInt(92600000000000004764669344), 0), 
+            await treasurycontract.connect(signer1).withdrawFunds(BigInt(992600000000000004764669344), 0), 
             await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("not enough funds for this porposal");
             await treasurycontract.connect(signer1).addFunds(BigInt(60888888*(10**18)), 0);
             await forcescontract.connect(signer1).decomissionSoldiers(5000, 0);
@@ -1243,7 +1243,7 @@ describe("Aid Contract", function () {
             await billscontract.connect(signer1).payBills(0)
             // var balance = await treasurycontract.checkBalance(0);
             // console.log(balance.toString())
-            await treasurycontract.connect(signer1).withdrawFunds(BigInt(92600000000000004764669344), 0), 
+            await treasurycontract.connect(signer1).withdrawFunds(BigInt(992600000000000004764669344), 0), 
             await expect(aidcontract.connect(signer2).acceptProposal(0)).to.be.revertedWith("not enough funds for this porposal");
         })
 
@@ -1281,5 +1281,26 @@ describe("Aid Contract", function () {
             var newOneWeek = await aidcontract.getProposalExpiration();
             expect(newOneWeek).to.equal(oneWeek+5);
         })  
+
+        it("aid1 tests that max aid proposals increases from 10 to 13 with a disaster relief agency", async function () {
+            var maxAidSlots = await aidcontract.getMaxAidSlots(0);
+            // console.log(maxAidSlots.toNumber())
+            expect(maxAidSlots.toNumber()).to.equal(10);
+            await wonderscontract1.connect(signer1).buyWonder1(0, 4);
+            var maxAidSlots2 = await aidcontract.getMaxAidSlots(0);
+            // console.log(maxAidSlots2.toNumber())
+            expect(maxAidSlots2.toNumber()).to.equal(13);
+        })
+
+        it("aid1 tests that aid proposals last 10 days decreases when an aid proposal is cancelled", async function () {
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
+            let proposals = await aidcontract.getAidProposalsLast10Days(0);
+            // console.log(proposals.toNumber())
+            expect(proposals.toNumber()).to.equal(1);
+            await aidcontract.connect(signer1).cancelAid(0);
+            let proposals2 = await aidcontract.getAidProposalsLast10Days(0);
+            // console.log(proposals2.toNumber())
+            expect(proposals2.toNumber()).to.equal(0);
+        })
     })
 });

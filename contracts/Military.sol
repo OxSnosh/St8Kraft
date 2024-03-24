@@ -47,11 +47,6 @@ contract MilitaryContract is Ownable {
         _;
     }
 
-    modifier onlyKeeper() {
-        require(msg.sender == keeper, "only callable from keeper contract");
-        _;
-    }
-
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings (address _spyAddress, address _countryMinter, address _keeper) public onlyOwner {

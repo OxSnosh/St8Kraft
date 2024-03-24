@@ -262,7 +262,7 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     }
 
     //make internal
-    function fulfillRequest(uint256 _randomnessRequestId) public {
+    function fulfillRequest(uint256 _randomnessRequestId) internal {
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
