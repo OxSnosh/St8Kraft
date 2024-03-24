@@ -486,7 +486,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         fee = _fee;
     }
 
-    function fulfillRequest(uint256 battleId) public {
+    function fulfillRequest(uint256 battleId) internal {
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,

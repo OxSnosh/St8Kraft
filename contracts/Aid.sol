@@ -100,48 +100,6 @@ contract AidContract is Ownable {
     mapping(uint256 => mapping(uint256 => uint256[]))
         public idToAidProposalsLast10Days;
 
-    /// @dev this function is only callable from the owner
-    function updateCountryMinterAddress(address _newAddress) public onlyOwner {
-        countryMinter = _newAddress;
-        mint = CountryMinter(_newAddress);
-    }
-
-    /// @dev this function is only callable from the owner
-    function updateTreasuryAddress(address _newAddress) public onlyOwner {
-        treasury = _newAddress;
-    }
-
-    /// @dev this function is only callable from the owner
-    function updateForcesAddress(address _newAddress) public onlyOwner {
-        forces = _newAddress;
-    }
-
-    /// @dev this function is only callable from the owner
-    function updateInfrastructureAddress(address _newAddress) public onlyOwner {
-        infrastructure = _newAddress;
-    }
-
-    /// @dev this function is only callable from the owner
-    function updateKeeperAddress(address _newAddress) public onlyOwner {
-        keeper = _newAddress;
-        keep = KeeperContract(_newAddress);
-    }
-
-    /// @dev this function is only callable from the owner
-    function updateWonderContract1Address(
-        address _newAddress
-    ) public onlyOwner {
-        wonder1 = _newAddress;
-        won1 = WondersContract1(_newAddress);
-    }
-
-    modifier onlyCountryMinter() {
-        require(
-            msg.sender == countryMinter,
-            "caller must be country minter contract"
-        );
-        _;
-    }
 
     /// @dev this is the function a nations owner will call to initiate an aid proposal
     /// @param idSender is the country ID of the aid sender (caller of the function)

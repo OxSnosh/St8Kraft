@@ -1774,9 +1774,14 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
+            await wonderscontract1.connect(signer1).buyWonder1(0, 3);
+            await spycontract.connect(signer1).buySpies(500, 0);
+            await expect(improvementscontract2.connect(signer1).deleteImprovement2(1, 0, 6)).to.be.revertedWith("You have too many spies to delete, each intel agency supports 100 spies")
+            await spycontract.connect(signer1).decommissionSpies(300, 0)
             await improvementscontract2.connect(signer1).deleteImprovement2(1, 0, 6);
             const improvementCount2 = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount2).to.equal(1);
+
         })
 
         it("improvement2 intel agency purchase errors", async function () {
@@ -1893,9 +1898,14 @@ describe("Improvements Contract", function () {
             expect(newCount.toNumber()).to.equal(2);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
             expect(improvementCount).to.equal(2);
-            await improvementscontract4.connect(signer1).deleteImprovement4(1, 0, 1);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
+            await improvementscontract4.connect(signer1).buyImprovement4(2, 0, 1);
+            await improvementscontract3.connect(signer1).buyImprovement3(3, 0, 5);
+            await wonderscontract4.connect(signer1).buyWonder4(0, 4);
+            await expect(improvementscontract4.connect(signer1).deleteImprovement4(2, 0, 1)).to.be.revertedWith("Cannot delete if Strategic Defense Initiative owned");
+            await improvementscontract4.connect(signer1).deleteImprovement4(1, 0, 1)
             const improvementCount2 = await improvementscontract1.getImprovementCount(0);
-            expect(improvementCount2).to.equal(1);
+            expect(improvementCount2).to.equal(6);
         })
 
         it("improvement4 missile defense purchase errors", async function () {
@@ -2354,11 +2364,19 @@ describe("Improvements Contract", function () {
             await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 5);
             var newCount = await improvementscontract3.getSatelliteCount(0);
             expect(newCount.toNumber()).to.equal(2);
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 5);
+            var newCount = await improvementscontract3.getSatelliteCount(0);
+            expect(newCount.toNumber()).to.equal(3);
             const improvementCount = await improvementscontract1.getImprovementCount(0);
-            expect(improvementCount).to.equal(2);
-            await improvementscontract3.connect(signer1).deleteImprovement3(1, 0, 5);
+            expect(improvementCount).to.equal(3);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
+            await improvementscontract4.connect(signer1).buyImprovement4(3, 0, 1);
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 5);
+            await wonderscontract4.connect(signer1).buyWonder4(0, 4);
+            await expect(improvementscontract3.connect(signer1).deleteImprovement3(2, 0, 5)).to.be.revertedWith("must maintain 3 satellites with strategic defense initiative");
+            await improvementscontract3.connect(signer1).deleteImprovement3(1, 0, 5)
             const improvementCount2 = await improvementscontract1.getImprovementCount(0);
-            expect(improvementCount2).to.equal(1);
+            expect(improvementCount2).to.equal(6);
         })
 
         it("improvement3 satellite purchase errors", async function () {

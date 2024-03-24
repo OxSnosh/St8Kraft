@@ -1104,6 +1104,23 @@ describe("Aid Contract", function () {
             "NextCapitalCity",
             "NextNationSlogan"
         )
+
+        const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+        const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+        for (const log of event1Logs) {
+            const requestIdReturn = log.args.requestId;
+            // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            if (requestIdReturn == 2) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources1 = await resourcescontract.getPlayerResources(0);
+                // console.log("resources 1", resources1[0].toNumber(), resources1[1].toNumber());
+            } else if (requestIdReturn == 4) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources2 = await resourcescontract.getPlayerResources(1);
+                // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
+            }
+        }
+
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(100000000*(10**18)));
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(100000000*(10**18)));
         await treasurycontract.connect(signer1).addFunds(BigInt(100000000*(10**18)), 0);
@@ -1199,9 +1216,17 @@ describe("Aid Contract", function () {
             await expect(aidcontract.connect(signer2).acceptProposal(0)).to.be.revertedWith("proposal expired");
         })
 
-        it("aid1 tests acceptProposal() function reverts when proposal is cancelled", async function () {
+        it("aid1 tests acceptProposal() function reverts when proposal is cancelled by sender", async function () {
             await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
             await aidcontract.connect(signer1).cancelAid(0);
+            let array = await aidcontract.checkCancelledOrAccepted(0);
+            expect(array[1]).to.equal(true);
+            await expect(aidcontract.connect(signer2).acceptProposal(0)).to.be.revertedWith("this offer has been cancelled");
+        })
+
+        it("aid1 tests acceptProposal() function reverts when proposal is cancelled by reciever", async function () {
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000);
+            await aidcontract.connect(signer2).cancelAid(0);
             let array = await aidcontract.checkCancelledOrAccepted(0);
             expect(array[1]).to.equal(true);
             await expect(aidcontract.connect(signer2).acceptProposal(0)).to.be.revertedWith("this offer has been cancelled");

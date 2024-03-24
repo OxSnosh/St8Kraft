@@ -1086,6 +1086,7 @@ describe("Treasury Contract", function () {
         if(chainId == 31337 || chainId == 1337) {
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, groundbattlecontract.address);
         }
 
         // console.log("country 1");
@@ -1104,6 +1105,7 @@ describe("Treasury Contract", function () {
             "TestCapitalCity2",
             "TestNationSlogan2"
         )   
+
     });
 
     describe("Deposit and Withdraw Functionality", function () {
@@ -1497,6 +1499,7 @@ describe("Treasury Contract", function () {
             expect(balance.toString()).to.equal("7999999999999999899336704");
         })
 
+        
         it("tests that Infrastructure contract can return balance when land is sold", async function () {
             await warbucks.connect(signer0).approve(warbucks.address, BigInt(100000000*(10**18)));
             await warbucks.connect(signer0).transfer(signer1.address, BigInt(100000000*(10**18)));
@@ -1510,6 +1513,57 @@ describe("Treasury Contract", function () {
             // console.log("balance", balance.toString());
             expect(balance.toString()).to.equal("101810000000000004764729344");
         })
+        
+        //External Adapter Required
+        
+        // it("tests that a ground battle will transfer money spoils", async function () {
+        //     await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
+        //     await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
+        //     await treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0);
+        //     await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 5000)
+        //     await technologymarketcontrat.connect(signer1).buyTech(0, 100)
+        //     await forcescontract.connect(signer1).buySoldiers(2000, 0)
+        //     await forcescontract.connect(signer1).buyTanks(40, 0)
+
+        //     await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
+        //     await warbucks.connect(signer0).transfer(signer2.address, BigInt(2000000000*(10**18)));
+        //     await treasurycontract.connect(signer2).addFunds(BigInt(2000000000*(10**18)), 1);
+        //     await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 5000)
+        //     await technologymarketcontrat.connect(signer2).buyTech(1, 100)
+        //     await forcescontract.connect(signer2).buySoldiers(1000, 1)
+        //     await forcescontract.connect(signer2).buyTanks(20, 1)
+
+        //     await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+        //     await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+        //     await warcontract.connect(signer1).declareWar(0, 1)
+        //     await forcescontract.connect(signer1).deployForces(1000, 30, 0, 0)
+
+        //     await forcescontract.connect(signer1).buySoldiers(20000, 0)
+        //     await forcescontract.connect(signer1).buyTanks(400, 0)
+
+        //     var balance = await treasurycontract.checkBalance(0)
+        //     console.log(BigInt(balance.toString()), "balance")
+
+        //     await groundbattlecontract.connect(signer1).groundAttack(0, 0, 1, 1)
+
+        //     const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+        //     const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+        //     for (const log of event1Logs) {
+        //         const requestIdReturn = log.args.requestId;
+        //         console.log(Number(requestIdReturn), "requestIdReturn for Event");
+        //         if (requestIdReturn == 5) {
+        //             await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, groundbattlecontract.address);
+
+        //         }
+        //     }
+
+        //     var attackVictory = await groundbattlecontract.returnAttackVictorious(0);
+        //     // expect(attackVictory).to.equal(false);
+        //     console.log(attackVictory, "attacker victory")
+
+        //     var balance2 = await treasurycontract.checkBalance(0)
+        //     console.log(BigInt(balance2.toString()), "balance")
+        // })
     })
     
 });

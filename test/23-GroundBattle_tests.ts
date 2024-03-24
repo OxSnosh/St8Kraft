@@ -1207,10 +1207,17 @@ describe("Ground Battle Contract", function () {
             // console.log(attackerTanks.toNumber(), "attackerTanks");            
 
             await groundbattlecontract.connect(signer1).groundAttack(0, 0, 1, 1)
-            const tx1 = await groundbattlecontract.fulfillRequest(0);
-            let txReceipt1 = await tx1.wait(1);
-            let requestId1 : any  = txReceipt1?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, groundbattlecontract.address);
+
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 5) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, groundbattlecontract.address);
+
+                }
+            }
             const results : any = await groundbattlecontract.returnBattleResults(0)
             // console.log(results);
             var attackerId : any = results[0].toNumber()
@@ -1248,10 +1255,17 @@ describe("Ground Battle Contract", function () {
             expect(defenderInfrastructure).to.equal(5020)
             
             await groundbattlecontract.connect(signer1).groundAttack(0, 0, 1, 1)
-            const tx1 = await groundbattlecontract.fulfillRequest(0);
-            let txReceipt1 = await tx1.wait(1);
-            let requestId1 : any  = txReceipt1?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, groundbattlecontract.address);
+
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 5) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, groundbattlecontract.address);
+
+                }
+            }
 
             const attackVictory = await groundbattlecontract.returnAttackVictorious(0);
             console.log(attackVictory, "attacker victory")
