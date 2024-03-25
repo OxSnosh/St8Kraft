@@ -1087,6 +1087,7 @@ describe("Environment Contract", function () {
         if(chainId == 31337 || chainId == 1337) {
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, nukecontract.address);
         }
 
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
@@ -1129,7 +1130,33 @@ describe("Environment Contract", function () {
             "TestNationSlogan5"
         )
 
-
+        const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+        const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+        for (const log of event1Logs) {
+            const requestIdReturn = log.args.requestId;
+            // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            if (requestIdReturn == 2) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources1 = await resourcescontract.getPlayerResources(0);
+                // console.log("resources 1", resources1[0].toNumber(), resources1[1].toNumber());
+            } else if (requestIdReturn == 4) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources2 = await resourcescontract.getPlayerResources(1);
+                // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
+            } else if (requestIdReturn == 6) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources3 = await resourcescontract.getPlayerResources(2);
+                // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+            } else if (requestIdReturn == 8) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources3 = await resourcescontract.getPlayerResources(3);
+                // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+            } else if (requestIdReturn == 10) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources3 = await resourcescontract.getPlayerResources(4);
+                // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+            }
+        }
 
     });
 
@@ -1301,10 +1328,515 @@ describe("Environment Contract", function () {
             await keepercontract.incrementGameDay();
             const nukeCount = await missilescontract.getNukeCount(0);
             const nukeScore = await environmentcontract.getScoreFromNukes(0);
-            expect(nukeScore).to.equal(2);
+            expect(nukeScore).to.equal(20);
+            //lead resuces penalty by 50%
             await resourcescontract.mockResourcesForTesting(0, 8, 9);
             const nukeScore1 = await environmentcontract.getScoreFromNukes(0);
-            expect(nukeScore1).to.equal(1);
-        })    
+            expect(nukeScore1).to.equal(10);
+        })  
+        
+        it("environement1 tests that global radiation over 5 defaults to 5 in environment score", async function () {
+            var globalRadiation0 = await nukecontract.getGlobalRadiation();
+            expect(globalRadiation0).to.equal(0);
+            // console.log("global radiation", globalRadiation0.toNumber());
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await billscontract.connect(signer2).payBills(1)
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 17, 1);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 500)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 400);
+            await wonderscontract2.connect(signer1).buyWonder2(0, 8);
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await nukecontract.connect(signer1).launchNuke(0, 0, 1, 1)
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 11) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, nukecontract.address);
+                }
+            }
+            var globalRadiation1 = await nukecontract.getGlobalRadiation();
+            expect(globalRadiation1).to.equal(10);
+            // console.log("global radiation", globalRadiation1.toNumber());
+            var envScore = await environmentcontract.getEnvironmentScore(0);
+            //Env Score of 2 and Global radiation of 10 should result in a score of 2 + 5 = 7
+            expect(envScore).to.equal(8);
+            // console.log("environment score", envScore.toNumber());
+        })
+
+        it("environement1 tests rediation cleanup reduces global radiation by 50%", async function () {
+            var globalRadiation0 = await nukecontract.getGlobalRadiation();
+            expect(globalRadiation0).to.equal(0);
+            // console.log("global radiation", globalRadiation0.toNumber());
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await billscontract.connect(signer2).payBills(1)
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 17, 1);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 500)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 400);
+            await wonderscontract2.connect(signer1).buyWonder2(0, 8);
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await nukecontract.connect(signer1).launchNuke(0, 0, 1, 1)
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 11) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, nukecontract.address);
+                }
+            }
+            var globalRadiation1 = await nukecontract.getGlobalRadiation();
+            expect(globalRadiation1).to.equal(10);
+            // console.log("global radiation", globalRadiation1.toNumber());
+            await technologymarketcontrat.connect(signer1).buyTech(0, 100);
+            await resourcescontract.mockResourcesForTesting(0, 9, 7)
+            await resourcescontract.mockResourcesForTesting(1, 10, 0)
+            await resourcescontract.mockResourcesForTesting(2, 6, 8)
+            await resourcescontract.mockResourcesForTesting(3, 11, 7)
+            await resourcescontract.mockResourcesForTesting(4, 2, 9)
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
+            await resourcescontract.connect(signer5).proposeTrade(4, 0);
+            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer3).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer4).fulfillTradingPartner(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 4);
+            var radiationcleanup = await bonusresourcescontract.viewRadiationCleanup(0);
+            expect(radiationcleanup).to.equal(true);
+            var environmentScore = await environmentcontract.getEnvironmentScore(0);
+            // console.log("environment score", environmentScore.toNumber());
+            //would be 8 without radiation cleanup
+            expect(environmentScore).to.equal(5);
+        })
+
+        it("environment1 tests that each environment score is possible", async function () {
+            await resourcescontract.mockResourcesForTesting(0, 18, 1);
+            var globalRadiation1 = await nukecontract.getGlobalRadiation();
+            // console.log("global radiation", globalRadiation1.toNumber());
+            var grossEnvScore = await environmentcontract.getGrossEnvironmentScore(0);
+            // console.log("gross environment score", grossEnvScore.toNumber());
+            var scoreFromNukes = await environmentcontract.getScoreFromNukes(0);
+            // console.log("score from nukes", scoreFromNukes.toNumber());
+            await technologymarketcontrat.connect(signer1).buyTech(0, 31000);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000);
+            await resourcescontract.mockResourcesForTesting(0, 17, 18);
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await billscontract.connect(signer1).payBills(0);
+            var environmentScore = await environmentcontract.getEnvironmentScore(0);
+            // console.log("environment score", environmentScore.toNumber());
+            expect(environmentScore).to.equal(2);
+            var scoreFromNukes = await environmentcontract.getScoreFromNukes(0);
+            // console.log("score from nukes", scoreFromNukes.toNumber());
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await billscontract.connect(signer1).payBills(0);
+            var environmentScore = await environmentcontract.getEnvironmentScore(0);
+            // console.log("environment score", environmentScore.toNumber());
+            expect(environmentScore).to.equal(3);
+            var scoreFromNukes = await environmentcontract.getScoreFromNukes(0);
+            // console.log("score from nukes", scoreFromNukes.toNumber());
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await billscontract.connect(signer1).payBills(0);
+            var environmentScore = await environmentcontract.getEnvironmentScore(0);
+            // console.log("environment score", environmentScore.toNumber());
+            expect(environmentScore).to.equal(4);
+            var scoreFromNukes = await environmentcontract.getScoreFromNukes(0);
+            // console.log("score from nukes", scoreFromNukes.toNumber());
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await billscontract.connect(signer1).payBills(0);
+            var environmentScore = await environmentcontract.getEnvironmentScore(0);
+            // console.log("environment score", environmentScore.toNumber());
+            expect(environmentScore).to.equal(5);
+            var scoreFromNukes = await environmentcontract.getScoreFromNukes(0);
+            // console.log("score from nukes", scoreFromNukes.toNumber());
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await billscontract.connect(signer1).payBills(0);
+            var environmentScore = await environmentcontract.getEnvironmentScore(0);
+            // console.log("environment score", environmentScore.toNumber());
+            expect(environmentScore).to.equal(6);
+            var scoreFromNukes = await environmentcontract.getScoreFromNukes(0);
+            // console.log("score from nukes", scoreFromNukes.toNumber());
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await billscontract.connect(signer1).payBills(0);
+            var environmentScore = await environmentcontract.getEnvironmentScore(0);
+            // console.log("environment score", environmentScore.toNumber());
+            expect(environmentScore).to.equal(7);
+            var scoreFromNukes = await environmentcontract.getScoreFromNukes(0);
+            // console.log("score from nukes", scoreFromNukes.toNumber());
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await billscontract.connect(signer1).payBills(0);
+            var environmentScore = await environmentcontract.getEnvironmentScore(0);
+            // console.log("environment score", environmentScore.toNumber());
+            expect(environmentScore).to.equal(8);
+            var scoreFromNukes = await environmentcontract.getScoreFromNukes(0);
+            // console.log("score from nukes", scoreFromNukes.toNumber());
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await billscontract.connect(signer1).payBills(0);
+            var environmentScore = await environmentcontract.getEnvironmentScore(0);
+            // console.log("environment score", environmentScore.toNumber());
+            expect(environmentScore).to.equal(9);
+            var scoreFromNukes = await environmentcontract.getScoreFromNukes(0);
+            // console.log("score from nukes", scoreFromNukes.toNumber());
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await billscontract.connect(signer1).payBills(0);
+            var environmentScore = await environmentcontract.getEnvironmentScore(0);
+            // console.log("environment score", environmentScore.toNumber());
+            expect(environmentScore).to.equal(10);
+            var scoreFromNukes = await environmentcontract.getScoreFromNukes(0);
+            // console.log("score from nukes", scoreFromNukes.toNumber());
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await billscontract.connect(signer1).payBills(0);
+            var environmentScore = await environmentcontract.getEnvironmentScore(0);
+            // console.log("environment score", environmentScore.toNumber());
+            expect(environmentScore).to.equal(10);
+            var scoreFromNukes = await environmentcontract.getScoreFromNukes(0);
+            // console.log("score from nukes", scoreFromNukes.toNumber());
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await billscontract.connect(signer1).payBills(0);
+            var environmentScore = await environmentcontract.getEnvironmentScore(0);
+            // console.log("environment score", environmentScore.toNumber());
+            expect(environmentScore).to.equal(10);
+            var scoreFromNukes = await environmentcontract.getScoreFromNukes(0);
+            // console.log("score from nukes", scoreFromNukes.toNumber());
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0);
+            await keepercontract.incrementGameDay();
+            await billscontract.connect(signer1).payBills(0);
+            var environmentScore = await environmentcontract.getEnvironmentScore(0);
+            // console.log("environment score", environmentScore.toNumber());
+            expect(environmentScore).to.equal(10);
+            var scoreFromNukes = await environmentcontract.getScoreFromNukes(0);
+            // console.log("score from nukes", scoreFromNukes.toNumber());
+        })
+
+        it("environment1 tests that border walls affect environment score correctly", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000);
+            var grossEnvironmentScore = await environmentcontract.getGrossEnvironmentScore(0);
+            // console.log("gross environment score", grossEnvironmentScore.toNumber());
+            expect(grossEnvironmentScore).to.equal(20);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5)
+            var grossEnvironmentScore1 = await environmentcontract.getGrossEnvironmentScore(0);
+            // console.log("gross environment score", grossEnvironmentScore1.toNumber());
+            expect(grossEnvironmentScore1).to.equal(10);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5)
+            var grossEnvironmentScore2 = await environmentcontract.getGrossEnvironmentScore(0);
+            // console.log("gross environment score", grossEnvironmentScore2.toNumber());
+            expect(grossEnvironmentScore2).to.equal(0);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5)
+            var grossEnvironmentScore3 = await environmentcontract.getGrossEnvironmentScore(0);
+            // console.log("gross environment score", grossEnvironmentScore3.toNumber());
+            expect(grossEnvironmentScore3).to.equal(-10);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5)
+            var grossEnvironmentScore4 = await environmentcontract.getGrossEnvironmentScore(0);
+            // console.log("gross environment score", grossEnvironmentScore4.toNumber());
+            expect(grossEnvironmentScore4).to.equal(-20);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5)
+            var grossEnvironmentScore5 = await environmentcontract.getGrossEnvironmentScore(0);
+            // console.log("gross environment score", grossEnvironmentScore5.toNumber());
+            expect(grossEnvironmentScore5).to.equal(-30);
+        })  
+
+        it("environment1 tests that munitions factories affect environment score correctly", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000);
+            var grossEnvironmentScore = await environmentcontract.getGrossEnvironmentScore(0);
+            // console.log("gross environment score", grossEnvironmentScore.toNumber());
+            expect(grossEnvironmentScore).to.equal(20);
+            await improvementscontract4.connect(signer1).buyImprovement4(1, 0, 2)
+            var grossEnvironmentScore1 = await environmentcontract.getGrossEnvironmentScore(0);
+            // console.log("gross environment score", grossEnvironmentScore1.toNumber());
+            expect(grossEnvironmentScore1).to.equal(23);
+            await improvementscontract4.connect(signer1).buyImprovement4(1, 0, 2)
+            var grossEnvironmentScore2 = await environmentcontract.getGrossEnvironmentScore(0);
+            // console.log("gross environment score", grossEnvironmentScore2.toNumber());
+            expect(grossEnvironmentScore2).to.equal(26);
+            await improvementscontract4.connect(signer1).buyImprovement4(1, 0, 2)
+            var grossEnvironmentScore3 = await environmentcontract.getGrossEnvironmentScore(0);
+            // console.log("gross environment score", grossEnvironmentScore3.toNumber());
+            expect(grossEnvironmentScore3).to.equal(29);
+            await improvementscontract4.connect(signer1).buyImprovement4(1, 0, 2)
+            var grossEnvironmentScore4 = await environmentcontract.getGrossEnvironmentScore(0);
+            // console.log("gross environment score", grossEnvironmentScore4.toNumber());
+            expect(grossEnvironmentScore4).to.equal(32);
+            await improvementscontract4.connect(signer1).buyImprovement4(1, 0, 2)
+            var grossEnvironmentScore5 = await environmentcontract.getGrossEnvironmentScore(0);
+            // console.log("gross environment score", grossEnvironmentScore5.toNumber());
+            expect(grossEnvironmentScore5).to.equal(35);
+        })  
+
+        it("environment1 tests that red light districts affect environment score correctly", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000);
+            var grossEnvironmentScore = await environmentcontract.getGrossEnvironmentScore(0);
+            // console.log("gross environment score", grossEnvironmentScore.toNumber());
+            expect(grossEnvironmentScore).to.equal(20);
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 3)
+            var grossEnvironmentScore1 = await environmentcontract.getGrossEnvironmentScore(0);
+            // console.log("gross environment score", grossEnvironmentScore1.toNumber());
+            expect(grossEnvironmentScore1).to.equal(25);
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 3)
+            var grossEnvironmentScore2 = await environmentcontract.getGrossEnvironmentScore(0);
+            // console.log("gross environment score", grossEnvironmentScore2.toNumber());
+            expect(grossEnvironmentScore2).to.equal(30);
+        })  
     })
 });

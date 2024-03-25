@@ -101,84 +101,6 @@ contract EnvironmentContract is Ownable {
         bonus = BonusResourcesContract(_bonusResources);
     }
 
-    ///@dev this function is only callable by the contract owner
-    function updateCountryMinter(address newAddress) public onlyOwner {
-        countryMinter = newAddress;
-        mint = CountryMinter(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateResourcesContract(address newAddress) public onlyOwner {
-        resources = newAddress;
-        res = ResourcesContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateInfrastructureContract(address newAddress) public onlyOwner {
-        infrastructure = newAddress;
-        inf = InfrastructureContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWondersContract3(address newAddress) public onlyOwner {
-        wonders3 = newAddress;
-        won3 = WondersContract3(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWondersContract4(address newAddress) public onlyOwner {
-        wonders4 = newAddress;
-        won4 = WondersContract4(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateForcesContract(address newAddress) public onlyOwner {
-        forces = newAddress;
-        force = ForcesContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateParametersContract(address newAddress) public onlyOwner {
-        parameters = newAddress;
-        param = CountryParametersContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateAdditionalTaxesContract(address newAddress) public onlyOwner {
-        additionalTaxes = newAddress;
-        addTax = AdditionalTaxesContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateMissilesContract(address newAddress) public onlyOwner {
-        missiles = newAddress;
-        mis = MissilesContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateNukeContract(address newAddress) public onlyOwner {
-        nukes = newAddress;
-        nuke = NukeContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementsContract1(address newAddress) public onlyOwner {
-        improvements1 = newAddress;
-        imp1 = ImprovementsContract1(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementsContract3(address newAddress) public onlyOwner {
-        improvements3 = newAddress;
-        imp3 = ImprovementsContract3(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementsContract4(address newAddress) public onlyOwner {
-        improvements4 = newAddress;
-        imp4 = ImprovementsContract4(newAddress);
-    }
-
     ///@dev this is a public view function that will return the environment score for a nation
     ///@notice a higher environment score will decrease a nations happiness and population
     ///@param id is the nation ID of the nation being queried
@@ -417,7 +339,7 @@ contract EnvironmentContract is Ownable {
         int256 pointsFromNukes;
         uint256 nukeCount = mis.getNukeCount(id);
         if (nukeCount > 0) {
-            pointsFromNukes = (int256(nukeCount / 10));
+            pointsFromNukes = (int256(nukeCount));
         }
         bool isLead = res.viewLead(id);
         if (isLead) {
