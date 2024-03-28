@@ -128,83 +128,6 @@ contract BillsContract is Ownable {
         param = CountryParametersContract(_parameters);
     }
 
-    function updateCountryMinter(address newAddress) public onlyOwner {
-        countryMinter = newAddress;
-    }
-
-    function updateTreasuryContract(address newAddress) public onlyOwner {
-        treasury = newAddress;
-        tsy = TreasuryContract(newAddress);
-    }
-
-    function updateInfrastructureContract(address newAddress) public onlyOwner {
-        infrastructure = newAddress;
-        inf = InfrastructureContract(newAddress);
-    }
-
-    function updateForcesContract(address newAddress) public onlyOwner {
-        forces = newAddress;
-        frc = ForcesContract(newAddress);
-    }
-
-    function updateFightersContract(address newAddress) public onlyOwner {
-        fighters = newAddress;
-        fight = FightersContract(newAddress);
-    }
-
-    function updateNavyContract(address newAddress) public onlyOwner {
-        navy = newAddress;
-        nav = NavyContract(newAddress);
-    }
-
-    function updateImprovementsContract1(address newAddress) public onlyOwner {
-        improvements1 = newAddress;
-        imp1 = ImprovementsContract1(newAddress);
-    }
-
-    function updateImprovementsContract2(address newAddress) public onlyOwner {
-        improvements2 = newAddress;
-        imp2 = ImprovementsContract2(newAddress);
-    }
-
-    function updateMissilesContract(address newAddress) public onlyOwner {
-        missiles = newAddress;
-        mis = MissilesContract(newAddress);
-    }
-
-    function updateResourcesContract(address newAddress) public onlyOwner {
-        resources = newAddress;
-        res = ResourcesContract(newAddress);
-    }
-
-    function updateWondersContract1(address newAddress) public onlyOwner {
-        wonders1 = newAddress;
-        won1 = WondersContract1(newAddress);
-    }
-
-    function updateWondersContract2(address newAddress) public onlyOwner {
-        wonders2 = newAddress;
-        won2 = WondersContract2(newAddress);
-    }
-
-    function updateWondersContract3(address newAddress) public onlyOwner {
-        wonders3 = newAddress;
-        won3 = WondersContract3(newAddress);
-    }
-
-    function updateWondersContract4(address newAddress) public onlyOwner {
-        wonders4 = newAddress;
-        won4 = WondersContract4(newAddress);
-    }
-
-    modifier onlyCountryMinter() {
-        require(
-            msg.sender == countryMinter,
-            "caller must be country minter contract"
-        );
-        _;
-    }
-
     ///@dev this is public function but will only work for the nation owner who owes the bill payment
     ///@param id is the nation ID of the nation looking to pay bills
     ///@notice function allows a nation owner to pay their bills
@@ -220,7 +143,6 @@ contract BillsContract is Ownable {
         );
         tsy.decreaseBalanceOnBillsPaid(id, billsPayable);
         emit BillsPaid(id, billsPayable);
-
     }
 
     ///@notice this is a public view function that will determine a nations bill payment

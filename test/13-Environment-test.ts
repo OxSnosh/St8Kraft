@@ -1335,7 +1335,7 @@ describe("Environment Contract", function () {
             expect(nukeScore1).to.equal(10);
         })  
         
-        it("environement1 tests that global radiation over 5 defaults to 5 in environment score", async function () {
+        it("environment1 tests that global radiation over 5 defaults to 5 in environment score", async function () {
             var globalRadiation0 = await nukecontract.getGlobalRadiation();
             expect(globalRadiation0).to.equal(0);
             // console.log("global radiation", globalRadiation0.toNumber());
@@ -1377,7 +1377,7 @@ describe("Environment Contract", function () {
             // console.log("environment score", envScore.toNumber());
         })
 
-        it("environement1 tests rediation cleanup reduces global radiation by 50%", async function () {
+        it("environment1 tests rediation cleanup reduces global radiation by 50%", async function () {
             var globalRadiation0 = await nukecontract.getGlobalRadiation();
             expect(globalRadiation0).to.equal(0);
             // console.log("global radiation", globalRadiation0.toNumber());

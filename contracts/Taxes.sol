@@ -143,87 +143,6 @@ contract TaxesContract is Ownable {
         blk = NavalBlockadeContract(_blockade);
     }
 
-    modifier onlyCountryMinter() {
-        require(
-            msg.sender == countryMinter,
-            "caller must be country minter contract"
-        );
-        _;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateCountryMinter(address newAddress) public onlyOwner {
-        countryMinter = newAddress;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateInfrastructureContract(address newAddress) public onlyOwner {
-        infrastructure = newAddress;
-        inf = InfrastructureContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateTreasuryContract(address newAddress) public onlyOwner {
-        treasury = newAddress;
-        tsy = TreasuryContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementsContract1(address newAddress) public onlyOwner {
-        improvements1 = newAddress;
-        imp1 = ImprovementsContract1(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementsContract2(address newAddress) public onlyOwner {
-        improvements2 = newAddress;
-        imp2 = ImprovementsContract2(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementsContract3(address newAddress) public onlyOwner {
-        improvements3 = newAddress;
-        imp3 = ImprovementsContract3(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateCountryParametersContract(
-        address newAddress
-    ) public onlyOwner {
-        parameters = newAddress;
-        params = CountryParametersContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWondersContract2(address newAddress) public onlyOwner {
-        wonders2 = newAddress;
-        won2 = WondersContract2(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWondersContract3(address newAddress) public onlyOwner {
-        wonders3 = newAddress;
-        won3 = WondersContract3(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateResourcesContract(address newAddress) public onlyOwner {
-        resources = newAddress;
-        res = ResourcesContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateForcesContract(address newAddress) public onlyOwner {
-        forces = newAddress;
-        frc = ForcesContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateMilitaryContract(address newAddress) public onlyOwner {
-        military = newAddress;
-        mil = MilitaryContract(newAddress);
-    }
-
     ///@dev this is a public function callable only by the nation owner collecting taxes
     ///@notice this function will allow a nation owner to collect taxes from their citizens
     ///@param id this is the nation id of the nation collecting taxes
@@ -620,15 +539,15 @@ contract TaxesContract is Ownable {
         (uint256 casualties, ) = frc.getCasualties(id);
         uint256 casualtyPoints = 0;
         if (nationalCemetary) {
-            if (casualties > 5000000) {
+            if (casualties < 10000000) {
                 casualtyPoints = 1;
-            } else if (casualties > 10000000) {
+            } else if (casualties < 15000000) {
                 casualtyPoints = 2;
-            } else if (casualties > 15000000) {
+            } else if (casualties < 20000000) {
                 casualtyPoints = 3;
-            } else if (casualties > 20000000) {
+            } else if (casualties < 25000000) {
                 casualtyPoints = 4;
-            } else if (casualties > 25000000) {
+            } else if (casualties >= 25000000) {
                 casualtyPoints = 5;
             }
         }
@@ -650,21 +569,16 @@ contract TaxesContract is Ownable {
             pointsFromTechnology = 4;
         } else if (tech <= 15) {
             pointsFromTechnology = 5;
+        } else if (tech <= 50) {
+            pointsFromTechnology = 6;
+        } else if (tech <= 100) {
+            pointsFromTechnology = 7;
+        } else if (tech <= 150) {
+            pointsFromTechnology = 8;
         } else if (tech <= 200) {
-            uint256 techDivided = (tech / 50);
-            if (techDivided == 0) {
-                pointsFromTechnology = 5;
-            } else if (techDivided == 1) {
-                pointsFromTechnology = 6;
-            } else if (techDivided == 2) {
-                pointsFromTechnology = 7;
-            } else if (techDivided == 3) {
-                pointsFromTechnology = 8;
-            } else {
-                pointsFromTechnology = 9;
-            }
-        } else {
             pointsFromTechnology = 9;
+        } else {
+            pointsFromTechnology = 10;
         }
         return pointsFromTechnology;
     }
