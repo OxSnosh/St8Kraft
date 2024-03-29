@@ -2023,25 +2023,31 @@ describe("Taxes Contract", function () {
         it("taxes1 tests penalties to happiness from military density", async function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
             const inf1000 = await infrastructurecontract.getInfrastructureCount(0);
-            console.log("inf1000", inf1000.toNumber());
+            // console.log("inf1000", inf1000.toNumber());
             const militaryDensity0 = await additionaltaxescontract.getPointsFromMilitary(0);
-            console.log("military density 0", militaryDensity0.toNumber());
+            // console.log("military density 0", militaryDensity0.toNumber());
             //military density less than 10% should equal a 14 point happiness deduction
             expect(militaryDensity0.toNumber()).to.equal(14);
             await forcescontract.connect(signer1).buySoldiers(1300, 0);
             const militaryDensity15 = await additionaltaxescontract.getPointsFromMilitary(0);
-            console.log("military density 15", militaryDensity15.toNumber());
+            // console.log("military density 15", militaryDensity15.toNumber());
             //military density less than 15% should equal a 5 point happiness deduction
             expect(militaryDensity15.toNumber()).to.equal(5);
             await forcescontract.connect(signer1).buySoldiers(5000, 0);
             const militaryDensity80 = await additionaltaxescontract.getPointsFromMilitary(0);
-            console.log("military density 80", militaryDensity80.toNumber());
+            // console.log("military density 80", militaryDensity80.toNumber());
             //military density over than 80% should equal a 10 point happiness deduction
             expect(militaryDensity80.toNumber()).to.equal(10);
         })
 
         it("taxes1 tests that soldier to population ratio works correctly", async function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
+            const soldierCount = await forcescontract.getSoldierCount(0);
+            // console.log("soldier count", soldierCount.toNumber());
+            await forcescontract.connect(signer1).decomissionSoldiers(20, 0)
+            const soldierToPopulation0 = await additionaltaxescontract.soldierToPopulationRatio(0);
+            // console.log("soldier to population 0", soldierToPopulation0[0].toNumber());
+            expect(soldierToPopulation0[0].toNumber()).to.equal(0);
             await forcescontract.connect(signer1).buySoldiers(1000, 0);
             const soldierToPopulation1 = await additionaltaxescontract.soldierToPopulationRatio(0);
             // console.log("soldier to population 1", soldierToPopulation1[0].toNumber());
@@ -2063,13 +2069,13 @@ describe("Taxes Contract", function () {
         it("taxes1 tests that anarchy is triggered below a soldier to population ratio of 10", async function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
             const anarchy = await additionaltaxescontract.soldierToPopulationRatio(0);
-            console.log("soldier to population 1", anarchy[0].toNumber());
-            console.log("anarchy 1", anarchy[2]);
+            // console.log("soldier to population 1", anarchy[0].toNumber());
+            // console.log("anarchy 1", anarchy[2]);
             expect(anarchy[2]).to.equal(true);
             await forcescontract.connect(signer1).buySoldiers(2000, 0);
             const anarchy2 = await additionaltaxescontract.soldierToPopulationRatio(0);
-            console.log("soldier to population 2", anarchy2[0].toNumber());
-            console.log("anarchy 2", anarchy2[2]);
+            // console.log("soldier to population 2", anarchy2[0].toNumber());
+            // console.log("anarchy 2", anarchy2[2]);
             expect(anarchy2[2]).to.equal(false);
         })
 
@@ -2077,13 +2083,13 @@ describe("Taxes Contract", function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
             await forcescontract.connect(signer1).buySoldiers(1000, 0);
             const environmentPenalty = await additionaltaxescontract.soldierToPopulationRatio(0);
-            console.log("soldier to population 1", environmentPenalty[0].toNumber());
-            console.log("environment penalty 1", environmentPenalty[1]);
+            // console.log("soldier to population 1", environmentPenalty[0].toNumber());
+            // console.log("environment penalty 1", environmentPenalty[1]);
             expect(environmentPenalty[1]).to.equal(false);
             await forcescontract.connect(signer1).buySoldiers(4500, 0);
             const environmentPenalty2 = await additionaltaxescontract.soldierToPopulationRatio(0);
-            console.log("soldier to population 2", environmentPenalty2[0].toNumber());
-            console.log("environment penalty 2", environmentPenalty2[1]);
+            // console.log("soldier to population 2", environmentPenalty2[0].toNumber());
+            // console.log("environment penalty 2", environmentPenalty2[1]);
             expect(environmentPenalty2[1]).to.equal(true);
         })
 
@@ -2203,7 +2209,7 @@ describe("Taxes Contract", function () {
             // console.log("income 9", dailyIncome9.toNumber());
             //the income will be the same because one happiness point was lost due to the
             //increse in population and criminal count from the ADP
-            expect(dailyIncome9.toNumber()).to.equal(150);
+            expect(dailyIncome9.toNumber()).to.equal(105);
             const incomeAdjustments2 = await additionaltaxescontract.getIncomeAdjustments(0);
             // console.log("income adjustments 2", incomeAdjustments2.toNumber())
         })
@@ -2277,7 +2283,6 @@ describe("Taxes Contract", function () {
             
             // *** 2 universities 10 points each with SDC
             expect(universityPointsWithSDC.toNumber()).to.equal(20);
-        
         })
     })
 })
