@@ -836,12 +836,10 @@ contract AdditionalTaxesContract is Ownable {
         bool scientificDevelopmentCenter = won3.getScientificDevelopmentCenter(
             id
         );
-        if (universities > 0) {
-            if (!scientificDevelopmentCenter) {
+        if (universities > 0 && !scientificDevelopmentCenter) {
                 universityPoints = (universities * 8);
-            } else if (scientificDevelopmentCenter) {
+        } else if (universities > 0 && scientificDevelopmentCenter) {
                 universityPoints = (universities * 10);
-            }
         }
         return universityPoints;
     }
@@ -880,7 +878,7 @@ contract AdditionalTaxesContract is Ownable {
     ) public view returns (uint256, bool, bool) {
         uint256 soldierCount = frc.getSoldierCount(id);
         if (soldierCount == 0) {
-            soldierCount = 1;
+            return(0, false, true);
         }
         uint256 populationCount = inf.getTotalPopulationCount(id);
         uint256 soldierPopulationRatio = (

@@ -2409,7 +2409,7 @@ describe("Wonders Contracts", function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 12000);
             let wonderCount = await wonderscontract1.getWonderCount(0);
             expect(wonderCount).to.equal(0);
-            await wonderscontract3.connect(signer1).buyWonder3(0, 6);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 12000);
             var isWonder = await wonderscontract3.getNuclearPowerPlant(0);
             expect(isWonder).to.equal(true); 
             let newWonderCount = await wonderscontract1.getWonderCount(0);
