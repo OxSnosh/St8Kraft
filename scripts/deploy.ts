@@ -852,7 +852,8 @@ async function main() {
         resourcescontract.address,
         missilescontract.address,
         senatecontract.address,
-        warbucks.address)
+        warbucks.address,
+        bonusresourcescontract.address)
     await countryminter.settings2(
         improvementscontract1.address,
         improvementscontract2.address,
@@ -1138,7 +1139,8 @@ async function main() {
     await navycontract.settings2(
         countryminter.address,
         bonusresourcescontract.address,
-        navycontract2.address
+        navycontract2.address,
+        infrastructurecontract.address
     )
 
     await navycontract2.settings(
@@ -1156,7 +1158,8 @@ async function main() {
     await navycontract2.settings2(
         countryminter.address,
         bonusresourcescontract.address,
-        navycontract.address
+        navycontract.address,
+        infrastructurecontract.address
     )
 
 
@@ -1183,7 +1186,10 @@ async function main() {
         navycontract.address,
         additionalnavycontract.address,
         navalactionscontract.address,
-        warcontract.address
+        warcontract.address,
+        countryminter.address,
+        keepercontract.address,
+        breakblockadecontract.address
     )
 
     await breakblockadecontract.settings(
@@ -1226,12 +1232,15 @@ async function main() {
         improvementscontract2.address,
         countryminter.address,
         bonusresourcescontract.address,
-        senatecontract.address
+        senatecontract.address,
+        technologymarketcontrat.address,
+        countryparameterscontract.address
     )
     await bonusresourcescontract.settings(
         infrastructurecontract.address,
         countryminter.address,
-        resourcescontract.address
+        resourcescontract.address,
+        crimecontract.address
     )
 
     await senatecontract.settings(
@@ -1289,7 +1298,8 @@ async function main() {
         resourcescontract.address,
         forcescontract.address,
         militarycontract.address,
-        crimecontract.address
+        crimecontract.address,
+        navalblockadecontract.address
     )
 
     await additionaltaxescontract.settings(
@@ -1318,7 +1328,8 @@ async function main() {
         wonderscontract4.address,
         treasurycontract.address,
         countryminter.address,
-        bonusresourcescontract.address
+        bonusresourcescontract.address,
+        crimecontract.address
     )
 
     await treasurycontract.settings1(
@@ -1375,7 +1386,9 @@ async function main() {
     )
     await warcontract.settings2(
         treasurycontract.address,
-        forcescontract.address
+        forcescontract.address,
+        navalblockadecontract.address,
+        nukecontract.address
     )
 
     await wonderscontract1.settings(

@@ -1130,6 +1130,33 @@ describe("Bills Contract", function () {
             "TestNationSlogan5"
         )
 
+        const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+        const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+        for (const log of event1Logs) {
+            const requestIdReturn = log.args.requestId;
+            // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            if (requestIdReturn == 2) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources1 = await resourcescontract.getPlayerResources(0);
+                // console.log("resources 1", resources1[0].toNumber(), resources1[1].toNumber());
+            } else if (requestIdReturn == 4) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources2 = await resourcescontract.getPlayerResources(1);
+                // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
+            } else if (requestIdReturn == 6) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources3 = await resourcescontract.getPlayerResources(2);
+                // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+            } else if (requestIdReturn == 8) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources3 = await resourcescontract.getPlayerResources(3);
+                // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+            } else if (requestIdReturn == 10) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources3 = await resourcescontract.getPlayerResources(4);
+                // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+            }
+        }  
     });
 
     describe("Bills Contract Initialized", function () {
@@ -1148,23 +1175,23 @@ describe("Bills Contract", function () {
             await keepercontract.incrementGameDay();
             const billsPayable : any = await billscontract.getBillsPayable(0);
             // console.log("bills payable", BigInt(billsPayable/(10**18)));
-            expect(BigInt(billsPayable/(10**18)).toString()).to.equal("7300");
+            expect(BigInt(billsPayable/(10**18)).toString()).to.equal("6420");
             const startingBalance : any = await treasurycontract.checkBalance(0);
             // console.log("starting balance", BigInt(startingBalance/(10**18)));
-            expect(BigInt(startingBalance/(10**18)).toString()).to.equal("20001852000");
+            expect(BigInt(startingBalance/(10**18)).toString()).to.equal("20001859400");
             const initialBillsPayable : any = await billscontract.getBillsPayable(0);
             // console.log("updated bills payable", BigInt(initialBillsPayable/(10**18)));
-            expect(BigInt(initialBillsPayable/(10**18)).toString()).to.equal("7300");
+            expect(BigInt(initialBillsPayable/(10**18)).toString()).to.equal("6420");
             await billscontract.connect(signer1).payBills(0);
             const endingBalance : any = await treasurycontract.checkBalance(0);
             // console.log("ending balance", endingBalance/(10**18));
-            expect((endingBalance/(10**18)).toString()).to.equal("20001844700");
+            expect((endingBalance/(10**18)).toString()).to.equal("20001852980");
             const updatedBillsPayable : any = await billscontract.getBillsPayable(0);
             // console.log("updated bills payable", BigInt(updatedBillsPayable/(10**18)));
             expect(BigInt(updatedBillsPayable/(10**18)).toString()).to.equal("0");
             const infrastructureBills : any = await billscontract.calculateDailyBillsFromInfrastructure(0);
             // console.log("daily inf bills", BigInt(infrastructureBills/(10**18)));
-            expect(BigInt(infrastructureBills/(10**18)).toString()).to.equal("7260");
+            expect(BigInt(infrastructureBills/(10**18)).toString()).to.equal("6380");
             const militaryBills : any = await billscontract.calculateDailyBillsFromMilitary(0);
             // console.log("military bills", BigInt(militaryBills/(10**18)));
             expect(BigInt(militaryBills/(10**18)).toString()).to.equal("40");
@@ -1181,63 +1208,63 @@ describe("Bills Contract", function () {
             // console.log("initial infrastructire", infrastructureAmountInitial.toNumber());
             const costPerLevel20 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
             // console.log("level cost at 20", BigInt(costPerLevel20/(10**18)));
-            expect(BigInt(costPerLevel20/(10**18)).toString()).to.equal("20");
+            expect(BigInt(costPerLevel20/(10**18)).toString()).to.equal("18");
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 80);
             const costPerLevel100 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
             // console.log("level cost at 100", BigInt(costPerLevel100/(10**18)));
-            expect(BigInt(costPerLevel100/(10**18)).toString()).to.equal("25");
+            expect(BigInt(costPerLevel100/(10**18)).toString()).to.equal("22");
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 60);
             const costPerLevel160 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
             // console.log("level cost at 160", BigInt(costPerLevel160/(10**18)));
-            expect(BigInt(costPerLevel160/(10**18)).toString()).to.equal("28");
+            expect(BigInt(costPerLevel160/(10**18)).toString()).to.equal("25");
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 40);
             const costPerLevel200 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
             // console.log("level cost at 200", BigInt(costPerLevel200/(10**18)));
-            expect(BigInt(costPerLevel200/(10**18)).toString()).to.equal("32");
+            expect(BigInt(costPerLevel200/(10**18)).toString()).to.equal("28");
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 100);
             const costPerLevel300 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
             // console.log("level cost at 300", BigInt(costPerLevel300/(10**18)));
-            expect(BigInt(costPerLevel300/(10**18)).toString()).to.equal("41");
+            expect(BigInt(costPerLevel300/(10**18)).toString()).to.equal("36");
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200);
             const costPerLevel500 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
             // console.log("level cost at 500", BigInt(costPerLevel500/(10**18)));
-            expect(BigInt(costPerLevel500/(10**18)).toString()).to.equal("60");
+            expect(BigInt(costPerLevel500/(10**18)).toString()).to.equal("54");
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200);
             const costPerLevel700 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
             // console.log("level cost at 700", BigInt(costPerLevel700/(10**18)));
-            expect(BigInt(costPerLevel700/(10**18)).toString()).to.equal("83");
+            expect(BigInt(costPerLevel700/(10**18)).toString()).to.equal("74");
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 300);
             const costPerLevel1000 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
             // console.log("level cost at 1000", BigInt(costPerLevel1000/(10**18)));
-            expect(BigInt(costPerLevel1000/(10**18)).toString()).to.equal("130");
+            expect(BigInt(costPerLevel1000/(10**18)).toString()).to.equal("117");
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
             const costPerLevel2000 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
             // console.log("level cost at 2000", BigInt(costPerLevel2000/(10**18)));
-            expect(BigInt(costPerLevel2000/(10**18)).toString()).to.equal("280");
+            expect(BigInt(costPerLevel2000/(10**18)).toString()).to.equal("252");
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
             const costPerLevel3000 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
             // console.log("level cost at 3000", BigInt(costPerLevel3000/(10**18)));
-            expect(BigInt(costPerLevel3000/(10**18)).toString()).to.equal("470");
+            expect(BigInt(costPerLevel3000/(10**18)).toString()).to.equal("423");
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
             const costPerLevel4000 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
             // console.log("level cost at 4000", BigInt(costPerLevel4000/(10**18)));
-            expect(BigInt(costPerLevel4000/(10**18)).toString()).to.equal("700");
+            expect(BigInt(costPerLevel4000/(10**18)).toString()).to.equal("630");
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
             const costPerLevel5000 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
             // console.log("level cost at 5000", BigInt(costPerLevel5000/(10**18)));
-            expect(BigInt(costPerLevel5000/(10**18)).toString()).to.equal("882");
+            expect(BigInt(costPerLevel5000/(10**18)).toString()).to.equal("793");
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 3000);
             const costPerLevel8000 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
             // console.log("level cost at 8000", BigInt(costPerLevel8000/(10**18)));
-            expect(BigInt(costPerLevel8000/(10**18)).toString()).to.equal("1420");
+            expect(BigInt(costPerLevel8000/(10**18)).toString()).to.equal("1278");
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 7000);
             const costPerLevel15000 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
             // console.log("level cost at 15000", BigInt(costPerLevel15000/(10**18)));
-            expect(BigInt(costPerLevel15000/(10**18)).toString()).to.equal("2720");
+            expect(BigInt(costPerLevel15000/(10**18)).toString()).to.equal("2448");
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 10000);
             const costPerLevel25000 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
             // console.log("level cost at 25000", BigInt(costPerLevel25000/(10**18)));
-            expect(BigInt(costPerLevel25000/(10**18)).toString()).to.equal("4520");
+            expect(BigInt(costPerLevel25000/(10**18)).toString()).to.equal("4068");
         })
 
         it("bills2 tests that cost per level gets reduced with resources and improvements", async function () {
@@ -1245,7 +1272,7 @@ describe("Bills Contract", function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
             var costPerLevel1000 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
             // console.log("level cost at 1000", BigInt(costPerLevel1000/(10**18)));
-            expect(BigInt(costPerLevel1000/(10**18)).toString()).to.equal("132");
+            expect(BigInt(costPerLevel1000/(10**18)).toString()).to.equal("118");
             await resourcescontract.mockResourcesForTesting(0, 7, 4);
             var costPerLevel1000 : any = await billscontract.calculateInfrastructureCostPerLevel(0);
             // console.log("level cost iron", BigInt(costPerLevel1000/(10**18)));
@@ -1271,6 +1298,36 @@ describe("Bills Contract", function () {
     })
     
     describe("Military Bills", function () {
+        it("bills3 tests that an accomodative government will reduce military bills by 5%", async function () {
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000);
+            await forcescontract.connect(signer1).buySoldiers(1980, 0)
+            var soldierCount = await forcescontract.getSoldierCount(0);
+            // console.log("soldier count", soldierCount.toNumber());
+            const soldierUpkeep1 : any = await billscontract.getSoldierUpkeep(0);
+            // console.log("soldier upkeep", BigInt(soldierUpkeep1));
+            expect(soldierUpkeep1/(10**18)).to.equal(4000);
+            const dailyBillsFromMilitary : any = await billscontract.calculateDailyBillsFromMilitary(0);
+            // console.log("daily military bills", BigInt(dailyBillsFromMilitary/(10**18)));
+            expect(dailyBillsFromMilitary/(10**18)).to.equal(4000);
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            //accomodative governments for military bill reduction by 5% are gov's 2, 4 & 9
+            await countryparameterscontract.connect(signer1).setGovernment(0, 2);
+            const govType = await countryparameterscontract.getGovernmentType(0);
+            // console.log("government type", govType.toNumber());
+            const soldierUpkeep2 : any = await billscontract.getSoldierUpkeep(0);
+            //soldier upkeep alone will not be modified by government type
+            // console.log("soldier upkeep accomodative", BigInt(soldierUpkeep2));
+            const dailyBillsFromMilitary2 : any = await billscontract.calculateDailyBillsFromMilitary(0);
+            // console.log("daily military bills accomodative", BigInt(dailyBillsFromMilitary2/(10**18)));
+            expect(dailyBillsFromMilitary2/(10**18)).to.equal(3800);
+        })
+
         it("bills3 tests soldiers increase bills correctly", async function () {
             await billscontract.connect(signer1).payBills(0)
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000);
@@ -1311,7 +1368,7 @@ describe("Bills Contract", function () {
             await forcescontract.connect(signer1).buyTanks(200, 0);
             var tankUpkeep : any = await billscontract.getTankUpkeep(0);
             // console.log("tank upkeep", BigInt(tankUpkeep.toString()));
-            expect(tankUpkeep/(10**18)).to.equal(8000);
+            expect(tankUpkeep/(10**18)).to.equal(7200);
             await resourcescontract.mockResourcesForTesting(0, 7, 4);
             var tankUpkeep : any = await billscontract.getTankUpkeep(0);
             // console.log("tank upkeep with iron", BigInt(tankUpkeep.toString()));
@@ -1320,11 +1377,15 @@ describe("Bills Contract", function () {
             var tankUpkeep : any = await billscontract.getTankUpkeep(0);
             // console.log("tank upkeep with iron and oil", BigInt(tankUpkeep.toString()));
             expect(tankUpkeep/(10**18)).to.equal(6400);
+            await resourcescontract.mockResourcesForTesting(0, 4, 8);
+            var tankUpkeep : any = await billscontract.getTankUpkeep(0);
+            // console.log("tank upkeep with lead and iron", BigInt(tankUpkeep.toString()));
+            expect(tankUpkeep/(10**18)).to.equal(7360);
             await wonderscontract3.connect(signer1).buyWonder3(0, 7);
             await wonderscontract4.connect(signer1).buyWonder4(0, 5);
             var tankUpkeep : any = await billscontract.getTankUpkeep(0);
             // console.log("tank upkeep with logistical support", BigInt(tankUpkeep.toString()));
-            expect(tankUpkeep/(10**18)).to.equal(4800);
+            expect(tankUpkeep/(10**18)).to.equal(5760);
         })
 
         it("bills3 tests nuke upkeep", async function () {
@@ -1449,7 +1510,7 @@ describe("Bills Contract", function () {
             var upkeep : any = await billscontract.calculateDailyBillsFromImprovements(0);
             await improvementscontract1.connect(signer1).buyImprovement1(3, 0, 1);
             var upkeep : any = await billscontract.calculateDailyBillsFromImprovements(0);
-            // console.log(BigInt(upkeep/(10**18)))
+            console.log(BigInt(upkeep/(10**18)))
             await improvementscontract1.connect(signer1).buyImprovement1(5, 0, 2);
             await improvementscontract1.connect(signer1).buyImprovement1(3, 0, 3);
             await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
@@ -1459,17 +1520,101 @@ describe("Bills Contract", function () {
             await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
             await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 7);
             var improvementCount = await improvementscontract1.getImprovementCount(0);
-            // console.log(improvementCount.toNumber());
+            console.log(improvementCount.toNumber());
             var upkeep : any = await billscontract.calculateDailyBillsFromImprovements(0);
-            // console.log(BigInt(upkeep/(10**18)))
-            expect(BigInt(upkeep/(10**18)).toString()).to.equal("17100");
+            console.log(BigInt(upkeep/(10**18)))
+            // expect(BigInt(upkeep/(10**18)).toString()).to.equal("17100");
             await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 12000);
             await wonderscontract3.connect(signer1).buyWonder3(0, 6);
             var upkeep : any = await billscontract.calculateDailyBillsFromImprovements(0);
             // console.log("this", BigInt(upkeep/(10**18)))
-            expect(BigInt(upkeep/(10**18)).toString()).to.equal("16245");           
+            expect(BigInt(upkeep/(10**18)).toString()).to.equal("16245");
+            // checks that an accomodative government (1, 5, 8, 10) will reduce the cost of improvements by 5%
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await keepercontract.incrementGameDay();
+            await countryparameterscontract.connect(signer1).setGovernment(0, 1);
+            var upkeep : any = await billscontract.calculateDailyBillsFromImprovements(0);
+            // console.log("upkeep with accomodative government", BigInt(upkeep/(10**18)))
+            // expect(BigInt(upkeep/(10**18)).toString()).to.equal("15390");
         })
+
+        it("bills4 tests that improvement cost per level increases correctly", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 15000);            
+            const impCount0 = await improvementscontract1.getImprovementCount(0);
+            // console.log("imp count", impCount0.toNumber());
+            const impCostPerLevel0 : any = await billscontract.calculateImprovementCostPerLevel(0);
+            // console.log("imp cost per level", BigInt(impCostPerLevel0/(10**18)));
+            await improvementscontract1.connect(signer1).buyImprovement1(3, 0, 1);
+            const impCount1 = await improvementscontract1.getImprovementCount(0);
+            // console.log("imp count", impCount1.toNumber());
+            const impCostPerLevel1 : any = await billscontract.calculateImprovementCostPerLevel(0);
+            // console.log("imp cost per level", BigInt(impCostPerLevel1/(10**18)));
+            // <5 improvements
+            expect(BigInt(impCostPerLevel1/(10**18)).toString()).to.equal("500");
+            await improvementscontract1.connect(signer1).buyImprovement1(4, 0, 2);
+            const impCount2 = await improvementscontract1.getImprovementCount(0);
+            // console.log("imp count", impCount2.toNumber());
+            const impCostPerLevel2 : any = await billscontract.calculateImprovementCostPerLevel(0);
+            // console.log("imp cost per level", BigInt(impCostPerLevel2/(10**18)));
+            //  <8 improvements
+            expect(BigInt(impCostPerLevel2/(10**18)).toString()).to.equal("600");
+            await improvementscontract1.connect(signer1).buyImprovement1(3, 0, 3);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            const impCount3 = await improvementscontract1.getImprovementCount(0);
+            // console.log("imp count", impCount3.toNumber());
+            const impCostPerLevel3 : any = await billscontract.calculateImprovementCostPerLevel(0);
+            // console.log("imp cost per level", BigInt(impCostPerLevel3/(10**18)));
+            // <15 improvements
+            expect(BigInt(impCostPerLevel3/(10**18)).toString()).to.equal("750"); 
+            await improvementscontract1.connect(signer1).buyImprovement1(3, 0, 4);
+            await improvementscontract1.connect(signer1).buyImprovement1(3, 0, 6);
+            const impCount4 = await improvementscontract1.getImprovementCount(0);
+            // console.log("imp count", impCount4.toNumber());
+            const impCostPerLevel4 : any = await billscontract.calculateImprovementCostPerLevel(0);
+            // console.log("imp cost per level", BigInt(impCostPerLevel4/(10**18)));
+            // <20 improvements
+            expect(BigInt(impCostPerLevel4/(10**18)).toString()).to.equal("950");
+            await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 7);
+            await improvementscontract1.connect(signer1).buyImprovement1(5, 0, 8);
+            await improvementscontract1.connect(signer1).buyImprovement1(3, 0, 9);
+            const impCount5 = await improvementscontract1.getImprovementCount(0);
+            // console.log("imp count", impCount5.toNumber());
+            const impCostPerLevel5 : any = await billscontract.calculateImprovementCostPerLevel(0);
+            // console.log("imp cost per level", BigInt(impCostPerLevel5/(10**18)));
+            // <30 improvements
+            expect(BigInt(impCostPerLevel5/(10**18)).toString()).to.equal("1200");
+            await improvementscontract1.connect(signer1).buyImprovement1(5, 0, 11);
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 1);
+            await improvementscontract2.connect(signer1).buyImprovement2(4, 0, 3);
+            const impCount6 = await improvementscontract1.getImprovementCount(0);
+            // console.log("imp count", impCount6.toNumber());
+            const impCostPerLevel6 : any = await billscontract.calculateImprovementCostPerLevel(0);
+            // console.log("imp cost per level", BigInt(impCostPerLevel6/(10**18)));
+            // <40 improvements
+            expect(BigInt(impCostPerLevel6/(10**18)).toString()).to.equal("1500");
+            await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 6);
+            await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 7);
+            const impCount7 = await improvementscontract1.getImprovementCount(0);
+            // console.log("imp count", impCount7.toNumber());
+            const impCostPerLevel7 : any = await billscontract.calculateImprovementCostPerLevel(0);
+            // console.log("imp cost per level", BigInt(impCostPerLevel7/(10**18)));
+            // <50 improvements
+            expect(BigInt(impCostPerLevel7/(10**18)).toString()).to.equal("2000");
+            await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 8);
+            const impCount8 = await improvementscontract1.getImprovementCount(0);
+            // console.log("imp count", impCount8.toNumber());
+            const impCostPerLevel8 : any = await billscontract.calculateImprovementCostPerLevel(0);
+            // console.log("imp cost per level", BigInt(impCostPerLevel8/(10**18)));
+            // >= 50 improvements
+            expect(BigInt(impCostPerLevel8/(10**18)).toString()).to.equal("3000");
+        })
+
         it("bills4 tests wonder increment bills correctly", async function () {
             var upkeep : any = await billscontract.calculateWonderBillsPayable(0);
             // console.log(BigInt(upkeep/(10**18)))

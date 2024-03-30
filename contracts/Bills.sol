@@ -17,7 +17,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 ///@title BillsContact
 ///@author OxSnosh
 ///@notice this contact allows a nation owner to calculate and pay the daily upkeep bills owed for the nation
-///@notice source of bill payments come from infrastructure, improvements, wonders, military and missiles 
+///@notice source of bill payments come from infrastructure, improvements, wonders, military and missiles
 contract BillsContract is Ownable {
     address public countryMinter;
     address public treasury;
@@ -57,10 +57,7 @@ contract BillsContract is Ownable {
 
     mapping(uint256 => address) public idToOwnerBills;
 
-    event BillsPaid(
-        uint256 indexed id,
-        uint256 indexed billsPaid
-    );
+    event BillsPaid(uint256 indexed id, uint256 indexed billsPaid);
 
     ///@dev this function is only callable from the contact owner
     ///@dev this function will be called right after contract deployment to set contract pointers
@@ -288,9 +285,7 @@ contract BillsContract is Ownable {
         uint256 aircraftUpkeep = getAircraftUpkeep(id);
         uint256 navyUpkeep = getNavyUpkeep(id);
         uint256 nukeUpkeep = getNukeUpkeep(id);
-        uint256 cruiseMissileUpkeep = getCruiseMissileUpkeep(
-            id
-        );
+        uint256 cruiseMissileUpkeep = getCruiseMissileUpkeep(id);
         uint256 dailyMilitaryUpkeep = soldierUpkeep +
             tankUpkeep +
             aircraftUpkeep +
@@ -307,9 +302,7 @@ contract BillsContract is Ownable {
     ///@notice this function calculates daily bills for soldiers
     ///@param id this is the nation ID for the soldier upkeep calculation
     ///@return uint256 is the daily upkeep cost of soldiers for the nation
-    function getSoldierUpkeep(
-        uint256 id
-    ) public view returns (uint256) {
+    function getSoldierUpkeep(uint256 id) public view returns (uint256) {
         uint256 soldierCount = frc.getSoldierCount(id);
         uint256 soldierUpkeep = (soldierCount * 2);
         uint256 soldierUpkeepModifier = 100;
@@ -331,15 +324,13 @@ contract BillsContract is Ownable {
         }
         uint256 adjustedSoldierUpkeep = ((soldierUpkeep *
             soldierUpkeepModifier) / 100);
-        return adjustedSoldierUpkeep * (10**18);
+        return adjustedSoldierUpkeep * (10 ** 18);
     }
 
     ///@notice this functions calculates daily bills for tanks
     ///@param id is the nation ID of the daily tank upkeep calculation
     ///@return uint256 is the daily cost of tank upkeep for the nation
-    function getTankUpkeep(
-        uint256 id
-    ) public view returns (uint256) {
+    function getTankUpkeep(uint256 id) public view returns (uint256) {
         uint256 tankCount = frc.getTankCount(id);
         uint256 tankUpkeep = (tankCount * 40);
         uint256 tankUpkeepModifier = 100;
@@ -360,14 +351,12 @@ contract BillsContract is Ownable {
             tankUpkeepModifier -= 20;
         }
         uint256 adjustedTankUpkeep = ((tankUpkeep * tankUpkeepModifier) / 100);
-        return adjustedTankUpkeep * (10**18);
+        return adjustedTankUpkeep * (10 ** 18);
     }
 
     ///@notice this finction calculates daily bills for a ntaions nukes
     ///@param id is the nation for the calculation of daily nuke upkeep costs
-    function getNukeUpkeep(
-        uint256 id
-    ) public view returns (uint256) {
+    function getNukeUpkeep(uint256 id) public view returns (uint256) {
         uint256 nukeCount = mis.getNukeCount(id);
         uint256 nukeUpkeep = (nukeCount * 5000);
         uint256 nukeUpkeepModifier = 100;
@@ -380,15 +369,13 @@ contract BillsContract is Ownable {
         if (!uranium) {
             adjustedNukeUpkeep = (adjustedNukeUpkeep * 2);
         }
-        return adjustedNukeUpkeep * (10**18);
+        return adjustedNukeUpkeep * (10 ** 18);
     }
 
     ///@notice this function claculates daily bills for a nations cruise missiles
     ///@param id this is the nation ID of the calulation for daily cruise missile upkeep costs
     ///@return uint256 this is the daily cruise missile upkeep cost for the nation
-    function getCruiseMissileUpkeep(
-        uint256 id
-    ) public view returns (uint256) {
+    function getCruiseMissileUpkeep(uint256 id) public view returns (uint256) {
         uint256 cruiseMissileCount = mis.getCruiseMissileCount(id);
         uint256 missileUpkeep = (cruiseMissileCount * 500);
         uint256 missileUpkeepModifier = 100;
@@ -398,15 +385,13 @@ contract BillsContract is Ownable {
         }
         uint256 adjustedMissileUpkeep = ((missileUpkeep *
             missileUpkeepModifier) / 100);
-        return adjustedMissileUpkeep * (10**18);
+        return adjustedMissileUpkeep * (10 ** 18);
     }
 
     ///@notice this function calculates daily bills for a nations aircraft
     ///@param id is the nation ID for the calculation of daily aircraft upkeep
     ///@return uint256 this is the daily upkeep cost for a nations aircraft
-    function getAircraftUpkeep(
-        uint256 id
-    ) public view returns (uint256) {
+    function getAircraftUpkeep(uint256 id) public view returns (uint256) {
         uint256 aircraftCount = fight.getAircraftCount(id);
         uint256 aircraftUpkeep = (aircraftCount * 200);
         uint256 aircraftUpkeepModifier = 100;
@@ -424,7 +409,7 @@ contract BillsContract is Ownable {
         }
         uint256 adjustedAircraftUpkeep = ((aircraftUpkeep *
             aircraftUpkeepModifier) / 100);
-        return adjustedAircraftUpkeep * (10**18);
+        return adjustedAircraftUpkeep * (10 ** 18);
     }
 
     ///@notice this function calculates daily bills for a nations navy
@@ -448,7 +433,7 @@ contract BillsContract is Ownable {
             battleshipUpkeep +
             cruiserUpkeep;
         uint256 dailyNavyUpkeep = getAdjustedNavyUpkeep(id, baseNavyUpkeep);
-        return dailyNavyUpkeep * (10**18);
+        return dailyNavyUpkeep * (10 ** 18);
     }
 
     ///@notice this function calculates additional nacy upkeep for a nation
@@ -501,12 +486,12 @@ contract BillsContract is Ownable {
         return adjustedNavyUpkeep;
     }
 
-    ///@notice this function calculated bills from a nations improvements
+    ///@notice this function will calculate the upkeep cost per improvement for a given nation
     ///@param id this is the nation ID for the country for the daily improvement upkeep calculation
-    ///@return improvementBills is the daily cost of imprvements for the nation
-    function calculateDailyBillsFromImprovements(
+    ///@return improvementBillsPerLevel is the daily cost of imprvements per level for the nation
+    function calculateImprovementCostPerLevel(
         uint256 id
-    ) public view returns (uint256 improvementBills) {
+    ) public view returns (uint256 improvementBillsPerLevel) {
         uint256 improvementCount = imp1.getImprovementCount(id);
         uint256 upkeepPerLevel;
         if (improvementCount < 5) {
@@ -526,18 +511,32 @@ contract BillsContract is Ownable {
         } else {
             upkeepPerLevel = 3000;
         }
+        return upkeepPerLevel * (10 ** 18);
+    }
+
+    ///@notice this function calculates bills from a nations improvements
+    ///@param id this is the nation ID for the country for the daily improvement upkeep calculation
+    ///@return improvementBills is the daily cost of imprvements for the nation
+    function calculateDailyBillsFromImprovements(
+        uint256 id
+    ) public view returns (uint256 improvementBills) {
+        uint256 improvementCount = imp1.getImprovementCount(id);
+        uint256 upkeepPerLevel = calculateImprovementCostPerLevel(id);
         uint256 dailyImprovementBillsDue = (improvementCount * upkeepPerLevel);
         uint256 modifiers = 100;
         bool nuclearPowerPlant = won3.getNuclearPowerPlant(id);
         if (nuclearPowerPlant) {
             modifiers -= 5;
         }
-        bool accomodativeGovernment = checkAccomodativeGovernmentForImprovementsAndWonders(id);
+        bool accomodativeGovernment = checkAccomodativeGovernmentForImprovementsAndWonders(
+                id
+            );
         if (accomodativeGovernment) {
             modifiers -= 5;
         }
-        dailyImprovementBillsDue = ((dailyImprovementBillsDue * modifiers) / 100);
-        return dailyImprovementBillsDue * (10 ** 18);
+        dailyImprovementBillsDue = ((dailyImprovementBillsDue * modifiers) /
+            100);
+        return dailyImprovementBillsDue;
     }
 
     ///@notice this function calculated bills from a nations wonders
@@ -553,7 +552,9 @@ contract BillsContract is Ownable {
         if (nuclearPowerPlant) {
             modifiers -= 5;
         }
-        bool accomodativeGovernment = checkAccomodativeGovernmentForImprovementsAndWonders(id);
+        bool accomodativeGovernment = checkAccomodativeGovernmentForImprovementsAndWonders(
+                id
+            );
         if (accomodativeGovernment) {
             modifiers -= 5;
         }
@@ -588,11 +589,7 @@ contract BillsContract is Ownable {
         uint256 countryId
     ) public view returns (bool) {
         uint256 governmentType = param.getGovernmentType(countryId);
-        if (
-            governmentType == 2 ||
-            governmentType == 4 ||
-            governmentType == 9
-        ) {
+        if (governmentType == 2 || governmentType == 4 || governmentType == 9) {
             return true;
         }
         return false;
