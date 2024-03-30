@@ -1,3 +1,4 @@
+//St8kraft © 2022 by OxSnosh is licensed under Attribution-NonCommercial-NoDerivatives 4.0 International
 import { expect, assert } from "chai"
 import { network, ethers } from "hardhat"
 import { INITIAL_SUPPLY } from "../helper-hardhat-config"

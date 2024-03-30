@@ -1,3 +1,4 @@
+//St8kraft © 2022 by OxSnosh is licensed under Attribution-NonCommercial-NoDerivatives 4.0 International
 import { network, ethers, artifacts } from "hardhat"
 import { INITIAL_SUPPLY } from "../helper-hardhat-config"
 import { 
