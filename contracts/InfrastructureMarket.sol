@@ -9,6 +9,7 @@ import "./Wonders.sol";
 import "./Treasury.sol";
 import "./CountryParameters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
 
 ///@title InfrastructureMarketContract
 ///@author OxSnosh
@@ -116,23 +117,23 @@ contract InfrastructureMarketContract is Ownable {
         uint256 currentInfrastructureAmount = inf.getInfrastructureCount(id);
         if (currentInfrastructureAmount < 20) {
             grossCost = 500;
-        } else if (currentInfrastructureAmount < 100) {
+        } else if (currentInfrastructureAmount >= 20) {
             grossCost = ((currentInfrastructureAmount * 12) + 500);
-        } else if (currentInfrastructureAmount < 200) {
+        } else if (currentInfrastructureAmount >= 100) {
             grossCost = ((currentInfrastructureAmount * 15) + 500);
-        } else if (currentInfrastructureAmount < 1000) {
+        } else if (currentInfrastructureAmount >= 200) {
             grossCost = ((currentInfrastructureAmount * 20) + 500);
-        } else if (currentInfrastructureAmount < 2000) {
+        } else if (currentInfrastructureAmount >= 1000) {
             grossCost = ((currentInfrastructureAmount * 25) + 500);
-        } else if (currentInfrastructureAmount < 4000) {
+        } else if (currentInfrastructureAmount >= 2000) {
             grossCost = ((currentInfrastructureAmount * 30) + 500);
-        } else if (currentInfrastructureAmount < 5000) {
+        } else if (currentInfrastructureAmount >= 4000) {
             grossCost = ((currentInfrastructureAmount * 40) + 500);
-        } else if (currentInfrastructureAmount < 8000) {
+        } else if (currentInfrastructureAmount >= 5000) {
+            grossCost = ((currentInfrastructureAmount * 50) + 500);
+        } else if (currentInfrastructureAmount >= 8000) {
             grossCost = ((currentInfrastructureAmount * 60) + 500);
-        } else if (currentInfrastructureAmount < 15000) {
-            grossCost = ((currentInfrastructureAmount * 70) + 500);
-        } else {
+        } else if (currentInfrastructureAmount >= 15000) {
             grossCost = ((currentInfrastructureAmount * 80) + 500);
         }
         uint256 costAdjustments1 = getInfrastructureCostMultiplier1(id);

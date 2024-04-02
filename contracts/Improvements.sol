@@ -443,7 +443,7 @@ contract ImprovementsContract1 is Ownable {
             uint256 purchasePrice = bunkerCost * amount;
             require(balance >= purchasePrice, "Insufficient balance");
             uint256 existingCount = idToImprovements1[countryId].bunkerCount;
-            require((existingCount + amount) <= 5, "Cannot own more than 5");
+            require((existingCount + amount) <= 3, "Cannot own more than 3");
             uint256 barracksAmount = idToImprovements1[countryId].barracksCount;
             require(
                 (existingCount + amount) <= barracksAmount,

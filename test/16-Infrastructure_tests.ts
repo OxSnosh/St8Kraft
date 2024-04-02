@@ -1089,6 +1089,7 @@ describe("Infrastructure Contract", function () {
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, nukecontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, cruisemissilecontract.address);
         }
 
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
@@ -1150,9 +1151,9 @@ describe("Infrastructure Contract", function () {
         })
 
         it("infrastructure tests that destroy infrastructure function works crrectly", async function () {
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 180);
             var infrastructureAmount = await infrastructurecontract.getInfrastructureCount(0);
-            expect(infrastructureAmount.toNumber()).to.equal(220);
+            expect(infrastructureAmount.toNumber()).to.equal(200);
             await infrastructuremarketplace.connect(signer1).destroyInfrastructure(0, 20);
             var infrastructureAmount = await infrastructurecontract.getInfrastructureCount(0);
             expect(infrastructureAmount.toNumber()).to.equal(180);
@@ -1182,15 +1183,33 @@ describe("Infrastructure Contract", function () {
             expect(land.toNumber()).to.equal(3000);
             var balance = await treasurycontract.checkBalance(0);
             // console.log(balance.toString(), "balance");
-            expect(balance.toString()).to.equal("2000819920000000026575110144");
+            expect(balance.toString()).to.equal("3000819919999999764984758272");
             await infrastructurecontract.connect(signer1).sellLand(0, 200);
             var land = await infrastructurecontract.getLandCount(0);
             expect(land.toNumber()).to.equal(2800);
             var balance = await treasurycontract.checkBalance(0);
             // console.log(balance.toString(), "balance");
             //increases by 20,000 WB
-            expect(balance.toString()).to.equal("2000839920000000026575110144");
+            expect(balance.toString()).to.equal("3000839919999999764984758272");
         })
+        
+        it("infrastructure tests that land can be sold by a nation owner for a higher price (300WB per mile) with rubber as a resource", async function () {
+            await resourcescontract.mockResourcesForTesting(0, 13, 1)
+            await landmarketcontract.connect(signer1).buyLand(0, 2980);
+            var land = await infrastructurecontract.getLandCount(0);
+            expect(land.toNumber()).to.equal(3000);
+            var balance = await treasurycontract.checkBalance(0);
+            // console.log(balance.toString(), "balance");
+            expect(balance.toString()).to.equal("3000951039999999764984758272");
+            await infrastructurecontract.connect(signer1).sellLand(0, 200);
+            var land = await infrastructurecontract.getLandCount(0);
+            expect(land.toNumber()).to.equal(2800);
+            var balance = await treasurycontract.checkBalance(0);
+            // console.log(balance.toString(), "balance");
+            //increases by 60,000 WB
+            expect(balance.toString()).to.equal("3001011039999999764984758272");
+        })
+
 
         it("infrastructure tests setTaxRate() and getTaxRate() function", async function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 200);
@@ -1257,7 +1276,7 @@ describe("Infrastructure Contract", function () {
             expect(areaOfInfluence.toNumber()).to.equal(3450);
         })
 
-        it("inrastructure tests that area of influence will increase by 5% with an accomodative government (1, 2, 6, 7, 9, 10)", async function () {
+        it("infrastructure tests that area of influence will increase by 5% with an accomodative government (1, 2, 6, 7, 9, 10)", async function () {
             await landmarketcontract.connect(signer1).buyLand(0, 2980);
             var areaOfInfluence = await infrastructurecontract.getAreaOfInfluence(0);
             // console.log(areaOfInfluence.toNumber(), "area");
@@ -1295,7 +1314,7 @@ describe("Infrastructure Contract", function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 980);
             var population = await infrastructurecontract.getTotalPopulationCount(0);
             // console.log(population.toNumber());
-            expect(population.toNumber()).to.equal(8000);
+            expect(population.toNumber()).to.equal(8400);
             await resourcescontract.mockResourcesForTesting(0, 0, 1)
             var population = await infrastructurecontract.getTotalPopulationCount(0);
             // console.log(population.toNumber());
@@ -1377,48 +1396,31 @@ describe("Infrastructure Contract", function () {
                 "TestCapitalCity5",
                 "TestNationSlogan5"
             )
-            await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000000000000000000))
-            await countryminter.connect(signer1).generateCountry(
-                "TestRuler6",
-                "TestNationName6",
-                "TestCapitalCity6",
-                "TestNationSlogan6"
-            )
-            await countryminter.connect(signer1).generateCountry(
-                "TestRuler7",
-                "TestNationName7",
-                "TestCapitalCity7",
-                "TestNationSlogan7"
-            )
             const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
             const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
             for (const log of event1Logs) {
                 const requestIdReturn = log.args.requestId;
                 // console.log(Number(requestIdReturn), "requestIdReturn for Event");
-                if (requestIdReturn == 4) {
-                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
-                    let resources2 = await resourcescontract.getPlayerResources(1);
-                    // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
-                } else if (requestIdReturn == 6) {
+                if (requestIdReturn == 6) {
                     await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
                     let resources3 = await resourcescontract.getPlayerResources(2);
                     // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
                 } else if (requestIdReturn == 8) {
                     await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
                     let resources3 = await resourcescontract.getPlayerResources(3);
-                    // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+                    // console.log("resources 4", resources3[0].toNumber(), resources3[1].toNumber());
                 } else if (requestIdReturn == 10) {
                     await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
                     let resources3 = await resourcescontract.getPlayerResources(4);
-                    // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+                    // console.log("resources 5", resources3[0].toNumber(), resources3[1].toNumber());
                 } else if (requestIdReturn == 12) {
                     await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
                     let resources3 = await resourcescontract.getPlayerResources(5);
-                    // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+                    // console.log("resources 6", resources3[0].toNumber(), resources3[1].toNumber());
                 } else if (requestIdReturn == 14) {
                     await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
                     let resources3 = await resourcescontract.getPlayerResources(6);
-                    // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+                    // console.log("resources 7", resources3[0].toNumber(), resources3[1].toNumber());
                 }
             }
             const population0 = await infrastructurecontract.getTotalPopulationCount(0);
@@ -1433,7 +1435,7 @@ describe("Infrastructure Contract", function () {
             await resourcescontract.connect(signer1).proposeTrade(0, 2);
             await resourcescontract.connect(signer1).proposeTrade(0, 3);
             await resourcescontract.connect(signer1).proposeTrade(4, 0);
-            await resourcescontract.connect(signer1).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
             await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
             await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
             await resourcescontract.connect(signer1).fulfillTradingPartner(0, 4);
@@ -1465,15 +1467,15 @@ describe("Infrastructure Contract", function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 980);
             await forcescontract.connect(signer1).buySoldiers(2000, 0);
             const taxablePopulation = await infrastructurecontract.getTaxablePopulationCount(0);
-            console.log("taxable population", taxablePopulation[0].toNumber());
-            expect(taxablePopulation[0].toNumber()).to.equal(5820);
-            console.log("citizen defecit", taxablePopulation[1].toNumber());
+            // console.log("taxable population", taxablePopulation[0].toNumber());
+            expect(taxablePopulation[0].toNumber()).to.equal(6212);
+            // console.log("citizen defecit", taxablePopulation[1].toNumber());
             expect(taxablePopulation[1].toNumber()).to.equal(0);
             await infrastructuremarketplace.connect(signer1).destroyInfrastructure(0, 1000);
             const taxablePopulation2 = await infrastructurecontract.getTaxablePopulationCount(0);
-            console.log("taxable population", taxablePopulation2[0].toNumber());
+            // console.log("taxable population", taxablePopulation2[0].toNumber());
             expect(taxablePopulation2[0].toNumber()).to.equal(0);
-            console.log("citizen defecit", taxablePopulation2[1].toNumber());
+            // console.log("citizen defecit", taxablePopulation2[1].toNumber());
             expect(taxablePopulation2[1].toNumber()).to.equal(2020);
         })
     })
@@ -1676,6 +1678,273 @@ describe("Infrastructure Contract", function () {
             // console.log("inf", inf.toNumber());
             //normally 9850
             expect(inf.toNumber()).to.equal(9900);  
+        })
+
+        it("infrastructure2 tests that inf, tech & land gets decreased by a percentage when below max amounts", async function () {
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await billscontract.connect(signer2).payBills(1)
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 17, 1);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 9980)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 10000)
+            await landmarketcontract.connect(signer1).buyLand(0, 9980)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 100)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 100)
+            await landmarketcontract.connect(signer2).buyLand(1, 100)
+            await wonderscontract2.connect(signer1).buyWonder2(0, 8);
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await nukecontract.connect(signer1).launchNuke(0, 0, 1, 1)
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 5) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, nukecontract.address);
+                }
+            }
+            const tech = await infrastructurecontract.getTechnologyCount(1);
+            // console.log("tech", tech.toNumber());
+            expect(tech.toNumber()).to.equal(65);
+            const land = await infrastructurecontract.getLandCount(1);
+            // console.log("land", land.toNumber());
+            expect(land.toNumber()).to.equal(78);
+            const inf = await infrastructurecontract.getInfrastructureCount(1);
+            // console.log("inf", inf.toNumber());
+            expect(inf.toNumber()).to.equal(78);  
+        })
+
+        it("infrastructure2 tests that inf damage gets decreased less when defender has bunkers", async function () {
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await billscontract.connect(signer2).payBills(1)
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 17, 1);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 9980)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 10000)
+            await landmarketcontract.connect(signer1).buyLand(0, 9980)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 1000)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 1000)
+            await landmarketcontract.connect(signer2).buyLand(1, 1000)
+            await improvementscontract1.connect(signer2).buyImprovement1(3, 1, 3)
+            await improvementscontract1.connect(signer2).buyImprovement1(3, 1, 6)
+            await wonderscontract2.connect(signer1).buyWonder2(0, 8);
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await nukecontract.connect(signer1).launchNuke(0, 0, 1, 1)
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 5) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, nukecontract.address);
+                }
+            }
+            const tech = await infrastructurecontract.getTechnologyCount(1);
+            // console.log("tech", tech.toNumber());
+            expect(tech.toNumber()).to.equal(950);
+            const land = await infrastructurecontract.getLandCount(1);
+            // console.log("land", land.toNumber());
+            expect(land.toNumber()).to.equal(870);
+            const inf = await infrastructurecontract.getInfrastructureCount(1);
+            // console.log("inf", inf.toNumber());
+            expect(inf.toNumber()).to.equal(885);
+        })
+
+        it("infrastructure2 tests that inf damage gets increased when attacker has munitions factories", async function () {
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await billscontract.connect(signer2).payBills(1)
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 17, 1);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 9980)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 10000)
+            await landmarketcontract.connect(signer1).buyLand(0, 9980)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 1000)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 1000)
+            await landmarketcontract.connect(signer2).buyLand(1, 1000)
+            await improvementscontract4.connect(signer1).buyImprovement4(5, 0, 2)
+            await wonderscontract2.connect(signer1).buyWonder2(0, 8);
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await nukecontract.connect(signer1).launchNuke(0, 0, 1, 1)
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 5) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, nukecontract.address);
+                }
+            }
+            const tech = await infrastructurecontract.getTechnologyCount(1);
+            // console.log("tech", tech.toNumber());
+            expect(tech.toNumber()).to.equal(950);
+            const land = await infrastructurecontract.getLandCount(1);
+            // console.log("land", land.toNumber());
+            expect(land.toNumber()).to.equal(870);
+            const inf = await infrastructurecontract.getInfrastructureCount(1);
+            // console.log("inf", inf.toNumber());
+            expect(inf.toNumber()).to.equal(845);
+        })
+
+        it("infrastructure2 tests that a successful cruise missile strike will decrease tech", async function () {
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 9980)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 10000)
+            await landmarketcontract.connect(signer1).buyLand(0, 9980)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 1000)
+            await missilescontract.connect(signer1).buyCruiseMissiles(4, 0)
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 5) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            const tech = await infrastructurecontract.getTechnologyCount(1);
+            // console.log("tech", tech.toNumber());
+            expect(tech.toNumber()).to.equal(994);
+        }) 
+
+        it("infrastructure2 tests that a successful cruise missile strike will decrease infrastructure", async function () {
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 9980)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 10000)
+            await landmarketcontract.connect(signer1).buyLand(0, 9980)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 1000)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 1000)
+            await missilescontract.connect(signer1).buyCruiseMissiles(4, 0)
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
+            await keepercontract.connect(signer0).incrementGameDay()
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 7) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            const inf = await infrastructurecontract.getInfrastructureCount(1);
+            // console.log("inf", inf.toNumber());
+            // 1020 -> 1013
+            expect(inf.toNumber()).to.equal(1013);
+        })
+
+        it("infrastructure2 tests bunkers will decrease infrastructure damage from cruise missiles", async function () {
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 9980)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 10000)
+            await landmarketcontract.connect(signer1).buyLand(0, 9980)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 1000)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 1000)
+            await improvementscontract1.connect(signer2).buyImprovement1(3, 1, 3)
+            await improvementscontract1.connect(signer2).buyImprovement1(3, 1, 6)
+            await missilescontract.connect(signer1).buyCruiseMissiles(4, 0)
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
+            await keepercontract.connect(signer0).incrementGameDay()
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 7) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            const inf = await infrastructurecontract.getInfrastructureCount(1);
+            console.log("inf", inf.toNumber());
+            // 1020 -> 1016 (3 more than above test without 3 bunkers)
+            expect(inf.toNumber()).to.equal(1013);
+        })
+
+        it("infrastructure2 tests infrastructure damage will not overflow when theres low infrastructure already in a cruise missile attack", async function () {
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 9980)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 10000)
+            await landmarketcontract.connect(signer1).buyLand(0, 9980)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 1000)
+            await infrastructuremarketplace.connect(signer2).destroyInfrastructure(1, 18)
+            await missilescontract.connect(signer1).buyCruiseMissiles(4, 0)
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
+            await keepercontract.connect(signer0).incrementGameDay()
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 7) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            const inf = await infrastructurecontract.getInfrastructureCount(1);
+            console.log("inf", inf.toNumber());
+            expect(inf.toNumber()).to.equal(0);
+        })    
+    })
+
+    describe("Infrastructure Contract / Sending Aid", function () {
+        it("infrastructure3 tests that sending aid package with tech will send tech to recipient", async function () {
+            await technologymarketcontrat.connect(signer1).buyTech(0, 100);
+            var tech0 = await infrastructurecontract.getTechnologyCount(0);
+            expect(tech0.toNumber()).to.equal(100);
+            var tech1 = await infrastructurecontract.getTechnologyCount(1);
+            expect(tech1.toNumber()).to.equal(0);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, 0, 0);
+            await aidcontract.connect(signer2).acceptProposal(0);
+            var tech0 = await infrastructurecontract.getTechnologyCount(0);
+            expect(tech0.toNumber()).to.equal(0);
+            var tech1 = await infrastructurecontract.getTechnologyCount(1);
+            expect(tech1.toNumber()).to.equal(100);
+        })
+
+        it("infrastructure3 tests that accept aid function will revert when there is not enought tech to send", async function () {
+            await technologymarketcontrat.connect(signer1).buyTech(0, 100);
+            await aidcontract.connect(signer1).proposeAid(0, 1, 100, 0, 0);
+            await technologymarketcontrat.connect(signer1).destroyTech(0, 50);
+            await expect(aidcontract.connect(signer2).acceptProposal(0)).to.be.revertedWith("not enough tech for this proposal");
         })
     })
 })

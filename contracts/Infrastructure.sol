@@ -268,6 +268,11 @@ contract InfrastructureContract is Ownable {
         _;
     }
 
+    modifier onlyAidContract() {
+        require(msg.sender == aid);
+        _;
+    }
+
     ///@dev this function is only callable by the countryMinter contract
     ///@dev this function will initialize the struct to store the info about the minted nations infrastructure
     ///@notice this function allows this contract to store info about a nations infrastructure
@@ -485,11 +490,6 @@ contract InfrastructureContract is Ownable {
         return technologyAmount;
     }
 
-    modifier onlyAidContract() {
-        require(msg.sender == aid);
-        _;
-    }
-
     ///@dev this is a public function only callable from the aid contract
     ///@dev this function will send the technology when an aid proposal is accepted
     ///@notice this function will send the technology when an aid proposal is accepted
@@ -501,8 +501,6 @@ contract InfrastructureContract is Ownable {
         uint256 idReciever,
         uint256 amount
     ) public onlyAidContract {
-        uint256 balanceOfSender = idToInfrastructure[idSender].technologyCount;
-        require(balanceOfSender >= amount, "sender does not have enought tech");
         idToInfrastructure[idSender].technologyCount -= amount;
         idToInfrastructure[idReciever].technologyCount += amount;
     }
@@ -599,12 +597,6 @@ contract InfrastructureContract is Ownable {
     ) public onlyCruiseMissileContract {
         uint256 infrastructureAmount = idToInfrastructure[countryId]
             .infrastructureCount;
-        uint256 damagePercentage = 100;
-        uint256 bunkerCount = imp1.getBunkerCount(countryId);
-        if (bunkerCount > 0) {
-            damagePercentage -= (bunkerCount * 3);
-        }
-        amountToDecrease = ((amountToDecrease * damagePercentage) / 100);
         if (amountToDecrease >= infrastructureAmount) {
             idToInfrastructure[countryId].infrastructureCount = 0;
             amountToDecrease = infrastructureAmount;
@@ -647,12 +639,12 @@ contract InfrastructureContract is Ownable {
         }
         uint256 infrastructureAmountToDecrease = ((infrastructureAmount *
             damagePercentage) / 100);
-        uint256 maxInfrastructureToDecrease = 150;
+        uint256 maxInfrastructureToDecrease = (150 - (bunkerCount * 5) + (attackerMunitionsFactory * 5));
         if (attackType == 2) {
-            maxInfrastructureToDecrease = 200;
+            maxInfrastructureToDecrease = (200 - (bunkerCount * 5) + (attackerMunitionsFactory * 5));
         }
         if (attackType == 3 || attackType == 4) {
-            maxInfrastructureToDecrease = 100;
+            maxInfrastructureToDecrease = (100 - (bunkerCount * 5) + (attackerMunitionsFactory * 5));
         }
         if (infrastructureAmountToDecrease > maxInfrastructureToDecrease) {
             idToInfrastructure[defenderId]

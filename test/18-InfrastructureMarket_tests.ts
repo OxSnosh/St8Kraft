@@ -1100,6 +1100,18 @@ describe("Infrastructure Marketplace Contract", function () {
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(25000000000*(10**18)));
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000*(10**18)));
         await treasurycontract.connect(signer1).addFunds(BigInt(20000000000*(10**18)), 0);
+
+        const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+        const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+        for (const log of event1Logs) {
+            const requestIdReturn = log.args.requestId;
+            // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            if (requestIdReturn == 2) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources1 = await resourcescontract.getPlayerResources(0);
+                // console.log("resources 1", resources1[0].toNumber(), resources1[1].toNumber());
+            }
+        }
     });
 
     describe("Infrastructure Market", function () {
@@ -1208,6 +1220,235 @@ describe("Infrastructure Marketplace Contract", function () {
             var costPerLevel : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
             // console.log(BigInt(costPerLevel).toString(), "cost per level with steel");
             expect(BigInt(costPerLevel).toString()).to.equal("29939000000000000000000")
+        })
+
+        it("inf market tests that infrastructure can be destroyed", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 100);
+            var inf = await infrastructurecontract.getInfrastructureCount(0);
+            // console.log(inf.toNumber(), "inf amount initial");
+            expect(inf.toNumber()).to.equal(120);
+            await infrastructuremarketplace.connect(signer1).destroyInfrastructure(0, 100);
+            var inf = await infrastructurecontract.getInfrastructureCount(0);
+            // console.log(inf.toNumber(), "inf amount updated");
+            expect(inf.toNumber()).to.equal(20);
+        })
+
+        it("inf market get infrastructure cost per level at <20 levels", async function () {
+            await infrastructuremarketplace.connect(signer1).destroyInfrastructure(0, 15);
+            var cost : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log("cost per level", BigInt(cost).toString())
+            expect(BigInt(cost).toString()).to.equal("500000000000000000000");
+        })
+
+        it("inf market tests that construction will reduce the cost of infrastructure", async function () {
+            await infrastructuremarketplace.connect(signer1).destroyInfrastructure(0, 15);
+            var cost : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log("cost per level", BigInt(cost).toString())
+            expect(BigInt(cost).toString()).to.equal("500000000000000000000");
+            await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
+            await countryminter.connect(signer2).generateCountry(
+                "TestRuler2",
+                "TestNationName2",
+                "TestCapitalCity2",
+                "TestNationSlogan2"
+            )
+            await warbucks.connect(signer0).transfer(signer3.address, BigInt(2100000000000000000000000))
+            await countryminter.connect(signer3).generateCountry(
+                "TestRuler3",
+                "TestNationName3",
+                "TestCapitalCity3",
+                "TestNationSlogan3"
+            )
+            await warbucks.connect(signer0).transfer(signer4.address, BigInt(2100000000000000000000000))
+            await countryminter.connect(signer4).generateCountry(
+                "TestRuler4",
+                "TestNationName4",
+                "TestCapitalCity4",
+                "TestNationSlogan4"
+            )
+            await warbucks.connect(signer0).transfer(signer5.address, BigInt(2100000000000000000000000))
+            await countryminter.connect(signer5).generateCountry(
+                "TestRuler5",
+                "TestNationName5",
+                "TestCapitalCity5",
+                "TestNationSlogan5"
+            )
+
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 2) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                    let resources1 = await resourcescontract.getPlayerResources(0);
+                    // console.log("resources 1", resources1[0].toNumber(), resources1[1].toNumber());
+                } else if (requestIdReturn == 4) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                    let resources2 = await resourcescontract.getPlayerResources(1);
+                    // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
+                } else if (requestIdReturn == 6) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                    let resources3 = await resourcescontract.getPlayerResources(2);
+                    // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+                } else if (requestIdReturn == 8) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                    let resources3 = await resourcescontract.getPlayerResources(3);
+                    // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+                } else if (requestIdReturn == 10) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                    let resources3 = await resourcescontract.getPlayerResources(4);
+                    // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+                }
+            }
+            await resourcescontract.mockResourcesForTesting(0, 0, 7)
+            await resourcescontract.mockResourcesForTesting(1, 9, 10)
+            await resourcescontract.mockResourcesForTesting(2, 4, 5)
+            await resourcescontract.mockResourcesForTesting(3, 6, 7)
+            await resourcescontract.mockResourcesForTesting(4, 8, 9)
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
+            await resourcescontract.connect(signer5).proposeTrade(4, 0);
+            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer3).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer4).fulfillTradingPartner(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 4);
+            var construction = await bonusresourcescontract.viewConstruction(0);
+            expect(construction).to.equal(true);
+            var cost : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log("cost per level", BigInt(cost).toString())
+            expect(BigInt(cost).toString()).to.equal("335000000000000000000");
+        })
+
+        it("inf market tests that asphalt will reduce the cost of infrastructure", async function () {
+            await infrastructuremarketplace.connect(signer1).destroyInfrastructure(0, 15);
+            var cost : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log("cost per level", BigInt(cost).toString())
+            expect(BigInt(cost).toString()).to.equal("500000000000000000000");
+            await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
+            await countryminter.connect(signer2).generateCountry(
+                "TestRuler2",
+                "TestNationName2",
+                "TestCapitalCity2",
+                "TestNationSlogan2"
+            )
+            await warbucks.connect(signer0).transfer(signer3.address, BigInt(2100000000000000000000000))
+            await countryminter.connect(signer3).generateCountry(
+                "TestRuler3",
+                "TestNationName3",
+                "TestCapitalCity3",
+                "TestNationSlogan3"
+            )
+            await warbucks.connect(signer0).transfer(signer4.address, BigInt(2100000000000000000000000))
+            await countryminter.connect(signer4).generateCountry(
+                "TestRuler4",
+                "TestNationName4",
+                "TestCapitalCity4",
+                "TestNationSlogan4"
+            )
+            await warbucks.connect(signer0).transfer(signer5.address, BigInt(2100000000000000000000000))
+            await countryminter.connect(signer5).generateCountry(
+                "TestRuler5",
+                "TestNationName5",
+                "TestCapitalCity5",
+                "TestNationSlogan5"
+            )
+
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 2) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                    let resources1 = await resourcescontract.getPlayerResources(0);
+                    // console.log("resources 1", resources1[0].toNumber(), resources1[1].toNumber());
+                } else if (requestIdReturn == 4) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                    let resources2 = await resourcescontract.getPlayerResources(1);
+                    // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
+                } else if (requestIdReturn == 6) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                    let resources3 = await resourcescontract.getPlayerResources(2);
+                    // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+                } else if (requestIdReturn == 8) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                    let resources3 = await resourcescontract.getPlayerResources(3);
+                    // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+                } else if (requestIdReturn == 10) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                    let resources3 = await resourcescontract.getPlayerResources(4);
+                    // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+                }
+            }
+            await resourcescontract.mockResourcesForTesting(0, 11, 13)
+            await resourcescontract.mockResourcesForTesting(1, 9, 7)
+            await resourcescontract.mockResourcesForTesting(2, 10, 0)
+            await resourcescontract.mockResourcesForTesting(3, 6, 7)
+            await resourcescontract.mockResourcesForTesting(4, 8, 9)
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
+            await resourcescontract.connect(signer5).proposeTrade(4, 0);
+            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer3).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer4).fulfillTradingPartner(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 4);
+            var construction = await bonusresourcescontract.viewConstruction(0);
+            expect(construction).to.equal(true);
+            var cost : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log("cost per level", BigInt(cost).toString())
+            expect(BigInt(cost).toString()).to.equal("295000000000000000000");
+        })
+
+        it("inf market tests that accomodative govt (1,4,5,6,7,8) reduce the cost of infrastructure", async function () {
+            await infrastructuremarketplace.connect(signer1).destroyInfrastructure(0, 15);
+            var cost : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log("cost per level", BigInt(cost).toString())
+            expect(BigInt(cost).toString()).to.equal("500000000000000000000");
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await countryparameterscontract.connect(signer1).setGovernment(0, 7)
+            var cost : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log("cost per level", BigInt(cost).toString())
+            expect(BigInt(cost).toString()).to.equal("475000000000000000000");
+        })
+
+        it("inf market tests that an interstate system will reduce the cost of infrastructure", async function () {
+            await infrastructuremarketplace.connect(signer1).destroyInfrastructure(0, 15);
+            var cost : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log("cost per level", BigInt(cost).toString())
+            expect(BigInt(cost).toString()).to.equal("500000000000000000000");
+            await wonderscontract2.connect(signer1).buyWonder2(0, 7);
+            var cost : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log("cost per level", BigInt(cost).toString())
+            expect(BigInt(cost).toString()).to.equal("460000000000000000000");
+        })
+
+        it("inf market tests that factories will reduce the cost 10% per factore with SDC", async function () {
+            await infrastructuremarketplace.connect(signer1).destroyInfrastructure(0, 15);
+            var cost : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log("cost per level", BigInt(cost).toString())
+            expect(BigInt(cost).toString()).to.equal("475000000000000000000");
+            await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 14000);
+            await wonderscontract2.connect(signer1).buyWonder2(0, 3);
+            await wonderscontract3.connect(signer1).buyWonder3(0, 4);
+            await wonderscontract3.connect(signer1).buyWonder3(0, 9);
+            await improvementscontract1.connect(signer1).buyImprovement1(5, 0, 11);
+            var isWonder = await wonderscontract3.getScientificDevelopmentCenter(0);
+            expect(isWonder).to.equal(true); 
+            var newCount = await improvementscontract1.getFactoryCount(0);
+            expect(newCount.toNumber()).to.equal(5);
+            await infrastructuremarketplace.connect(signer1).destroyInfrastructure(0, 14000);
+            var cost : any = await infrastructuremarketplace.getInfrastructureCostPerLevel(0);
+            // console.log("cost per level", BigInt(cost).toString())
+            expect(BigInt(cost).toString()).to.equal("225000000000000000000");
         })
     })
 })

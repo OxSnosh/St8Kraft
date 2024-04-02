@@ -379,24 +379,21 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
     function destroyInfrastructure(uint256 attackId) internal {
         uint256 defenderId = attackIdToCruiseMissile[attackId].defenderId;
         uint256 attackerId = attackIdToCruiseMissile[attackId].attackerId;
-        uint256 infrastructureCount = inf.getInfrastructureCount(defenderId);
-        if (infrastructureCount >= 15) {
-            uint256[] memory randomNumbers = s_requestIndexToRandomWords[
-                attackId
-            ];
-            uint256 defenderBunkerCount = imp1.getBunkerCount(defenderId);
-            uint256 attackerMunitionsFactory = imp4.getMunitionsFactoryCount(
-                attackerId
-            );
-            uint256 randomInfrastructureCount = 6;
-            uint256 randomModulus = randomNumbers[2] % 6;
-            randomInfrastructureCount += randomModulus;
-            randomInfrastructureCount += attackerMunitionsFactory;
-            randomInfrastructureCount -= defenderBunkerCount;
-            inf.decreaseInfrastructureCountFromCruiseMissileContract(
-                defenderId,
-                randomInfrastructureCount
-            );
-        }
+        uint256[] memory randomNumbers = s_requestIndexToRandomWords[
+            attackId
+        ];
+        uint256 defenderBunkerCount = imp1.getBunkerCount(defenderId);
+        uint256 attackerMunitionsFactory = imp4.getMunitionsFactoryCount(
+            attackerId
+        );
+        uint256 randomInfrastructureCount = 6;
+        uint256 randomModulus = randomNumbers[2] % 6;
+        randomInfrastructureCount += randomModulus;
+        randomInfrastructureCount += attackerMunitionsFactory;
+        randomInfrastructureCount -= defenderBunkerCount;
+        inf.decreaseInfrastructureCountFromCruiseMissileContract(
+            defenderId,
+            randomInfrastructureCount
+        );
     }
 }
