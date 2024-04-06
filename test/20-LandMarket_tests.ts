@@ -1115,60 +1115,94 @@ describe("Land Marketplace Contract", function () {
 
         it("land market tests that land cost per level works correctly", async function () {
             var costPerMile : any = await landmarketcontract.getLandCostPerMile(0);
-            // console.log(BigInt(costPerMile).toString());
+            // console.log(BigInt(costPerMile).toString(), "cost at 20");
+            var landMiles = await infrastructurecontract.getLandCount(0)
+            // console.log(landMiles.toNumber(), "land miles")
             expect(BigInt(costPerMile).toString()).to.equal("440000000000000000000")
-            await landmarketcontract.connect(signer1).buyLand(0, 80);
+            await landmarketcontract.connect(signer1).buyLand(0, 20);
             var costPerMile : any = await landmarketcontract.getLandCostPerMile(0);
-            // console.log(BigInt(costPerMile).toString());
+            // console.log(BigInt(costPerMile).toString(), "cost at 40");
+            expect(BigInt(costPerMile).toString()).to.equal("520000000000000000000")
+            var landMiles = await infrastructurecontract.getLandCount(0)
+            // console.log(landMiles.toNumber(), "land miles")
+            await landmarketcontract.connect(signer1).buyLand(0, 60);
+            var costPerMile : any = await landmarketcontract.getLandCostPerMile(0);
+            // console.log(BigInt(costPerMile).toString(), "cost at 100");
             expect(BigInt(costPerMile).toString()).to.equal("900000000000000000000")
+            var landMiles = await infrastructurecontract.getLandCount(0)
+            // console.log(landMiles.toNumber(), "land miles")
             await landmarketcontract.connect(signer1).buyLand(0, 100);
             var costPerMile : any = await landmarketcontract.getLandCostPerMile(0);
-            // console.log(BigInt(costPerMile).toString());
+            // console.log(BigInt(costPerMile).toString(), "cost at 200");
             expect(BigInt(costPerMile).toString()).to.equal("2400000000000000000000")
+            var landMiles = await infrastructurecontract.getLandCount(0)
+            // console.log(landMiles.toNumber(), "land miles")
             await landmarketcontract.connect(signer1).buyLand(0, 50);
             var costPerMile : any = await landmarketcontract.getLandCostPerMile(0);
-            // console.log(BigInt(costPerMile).toString());
+            // console.log(BigInt(costPerMile).toString(), "cost at 250");
             expect(BigInt(costPerMile).toString()).to.equal("4150000000000000000000")
+            var landMiles = await infrastructurecontract.getLandCount(0)
+            // console.log(landMiles.toNumber(), "land miles")
             await landmarketcontract.connect(signer1).buyLand(0, 100);
             var costPerMile : any = await landmarketcontract.getLandCostPerMile(0);
-            // console.log(BigInt(costPerMile).toString());
+            // console.log(BigInt(costPerMile).toString(), "cost at 350");
             expect(BigInt(costPerMile).toString()).to.equal("7400000000000000000000")
+            var landMiles = await infrastructurecontract.getLandCount(0)
+            // console.log(landMiles.toNumber(), "land miles")
             await landmarketcontract.connect(signer1).buyLand(0, 100);
             var costPerMile : any = await landmarketcontract.getLandCostPerMile(0);
-            // console.log(BigInt(costPerMile).toString());
+            // console.log(BigInt(costPerMile).toString(), "cost at 450");
             expect(BigInt(costPerMile).toString()).to.equal("11650000000000000000000")
+            var landMiles = await infrastructurecontract.getLandCount(0)
+            // console.log(landMiles.toNumber(), "land miles")
             await landmarketcontract.connect(signer1).buyLand(0, 100);
             var costPerMile : any = await landmarketcontract.getLandCostPerMile(0);
-            // console.log(BigInt(costPerMile).toString());
+            // console.log(BigInt(costPerMile).toString(), "cost at 550");
             expect(BigInt(costPerMile).toString()).to.equal("16900000000000000000000")
+            var landMiles = await infrastructurecontract.getLandCount(0)
+            // console.log(landMiles.toNumber(), "land miles")
             await landmarketcontract.connect(signer1).buyLand(0, 300);
             var costPerMile : any = await landmarketcontract.getLandCostPerMile(0);
-            // console.log(BigInt(costPerMile).toString());
+            // console.log(BigInt(costPerMile).toString(), "cost at 850");
             expect(BigInt(costPerMile).toString()).to.equal("30150000000000000000000")
+            var landMiles = await infrastructurecontract.getLandCount(0)
+            // console.log(landMiles.toNumber(), "land miles")
             await landmarketcontract.connect(signer1).buyLand(0, 400);
             var costPerMile : any = await landmarketcontract.getLandCostPerMile(0);
-            // console.log(BigInt(costPerMile).toString());
+            // console.log(BigInt(costPerMile).toString(), "cost at 1250");
             expect(BigInt(costPerMile).toString()).to.equal("50400000000000000000000")
+            var landMiles = await infrastructurecontract.getLandCount(0)
+            // console.log(landMiles.toNumber(), "land miles")
             await landmarketcontract.connect(signer1).buyLand(0, 800);
             var costPerMile : any = await landmarketcontract.getLandCostPerMile(0);
-            // console.log(BigInt(costPerMile).toString());
+            // console.log(BigInt(costPerMile).toString(), "cost at 2050");
             expect(BigInt(costPerMile).toString()).to.equal("92650000000000000000000")
+            var landMiles = await infrastructurecontract.getLandCount(0)
+            // console.log(landMiles.toNumber(), "land miles")
             await landmarketcontract.connect(signer1).buyLand(0, 1000);
             var costPerMile : any = await landmarketcontract.getLandCostPerMile(0);
-            // console.log(BigInt(costPerMile).toString());
+            // console.log(BigInt(costPerMile).toString(), "cost at 3050");
             expect(BigInt(costPerMile).toString()).to.equal("168150000000000000000000")
+            var landMiles = await infrastructurecontract.getLandCount(0)
+            // console.log(landMiles.toNumber(), "land miles")
             await landmarketcontract.connect(signer1).buyLand(0, 1000);
             var costPerMile : any = await landmarketcontract.getLandCostPerMile(0);
-            // console.log(BigInt(costPerMile).toString());
+            // console.log(BigInt(costPerMile).toString(), "cost at 4050");
             expect(BigInt(costPerMile).toString()).to.equal("304150000000000000000000")
+            var landMiles = await infrastructurecontract.getLandCount(0)
+            // console.log(landMiles.toNumber(), "land miles")
             await landmarketcontract.connect(signer1).buyLand(0, 1000);
             var costPerMile : any = await landmarketcontract.getLandCostPerMile(0);
-            // console.log(BigInt(costPerMile).toString());
+            // console.log(BigInt(costPerMile).toString(), "cost at 5050");
             expect(BigInt(costPerMile).toString()).to.equal("379150000000000000000000")
+            var landMiles = await infrastructurecontract.getLandCount(0)
+            // console.log(landMiles.toNumber(), "land miles")
             await landmarketcontract.connect(signer1).buyLand(0, 1000);
             var costPerMile : any = await landmarketcontract.getLandCostPerMile(0);
-            // console.log(BigInt(costPerMile).toString());
+            // console.log(BigInt(costPerMile).toString(), "cost at 6050");
             expect(BigInt(costPerMile).toString()).to.equal("454150000000000000000000")
+            var landMiles = await infrastructurecontract.getLandCount(0)
+            // console.log(landMiles.toNumber(), "land miles")
         })
 
         it("land market tests land cost multipliers", async function () {
@@ -1188,6 +1222,17 @@ describe("Land Marketplace Contract", function () {
             var costPerMile : any = await landmarketcontract.getLandCostPerMile(0);
             // console.log(BigInt(costPerMile).toString());
             expect(BigInt(costPerMile).toString()).to.equal("31860000000000000000000")
+        })
+
+        it("land market tests that land can be destroyed", async function () {
+            await landmarketcontract.connect(signer1).buyLand(0, 980);
+            var land = await infrastructurecontract.getLandCount(0);
+            // console.log(land.toNumber());
+            expect(land.toNumber()).to.equal(1000);
+            await landmarketcontract.connect(signer1).destroyLand(0, 500);
+            var land = await infrastructurecontract.getLandCount(0);
+            // console.log(land.toNumber());
+            expect(land.toNumber()).to.equal(500);
         })
     })
 })

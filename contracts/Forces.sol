@@ -77,7 +77,7 @@ contract ForcesContract is Ownable {
         uint256 indexed tanks,
         uint256 warId
     );
-    
+
     event SoldierDamageFromNukeAttack(
         uint256 indexed id,
         uint256 indexed amount
@@ -369,7 +369,10 @@ contract ForcesContract is Ownable {
         uint256 id
     ) public onlyWar {
         uint256 deployedSoldierCount = idToForces[id].deployedSoldiers;
-        require(deployedSoldierCount >= amountToWithdraw);
+        require(
+            deployedSoldierCount >= amountToWithdraw,
+            "not enough deployed soldiers to withdraw that many"
+        );
         idToForces[id].defendingSoldiers += amountToWithdraw;
         idToForces[id].deployedSoldiers -= amountToWithdraw;
     }
@@ -405,7 +408,6 @@ contract ForcesContract is Ownable {
                 numberOfDefendingSoldierCasualties
             );
         }
-
     }
 
     ///@dev this is a public view function that will adjust the efficiency of a nations deployed soldiers
@@ -550,7 +552,7 @@ contract ForcesContract is Ownable {
         emit TanksPurchased(id, amount);
     }
 
-        ///@dev this is a public function that allows a nation owner to decommission soldiers
+    ///@dev this is a public function that allows a nation owner to decommission soldiers
     ///@notice this function allows a nation owner to decomission soldiers
     ///@param amount is the amount of soldiers being decomissioned
     ///@param id is the nation ID of the nation
@@ -611,7 +613,7 @@ contract ForcesContract is Ownable {
         uint256 id
     ) public onlyWar {
         uint256 deployedTankCount = idToForces[id].deployedTanks;
-        require(deployedTankCount >= amountToWithdraw);
+        require(deployedTankCount >= amountToWithdraw, "not enough tanks to withdraw that many");
         idToForces[id].defendingTanks += amountToWithdraw;
         idToForces[id].deployedTanks -= amountToWithdraw;
     }
@@ -800,7 +802,10 @@ contract SpyContract is Ownable {
     mapping(uint256 => uint256) public idToSpies;
 
     modifier onlySpyOperations() {
-        require(msg.sender == spyOperations, "only callable from spy operations contract");
+        require(
+            msg.sender == spyOperations,
+            "only callable from spy operations contract"
+        );
         _;
     }
 
@@ -861,7 +866,10 @@ contract SpyContract is Ownable {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         uint256 spyCount = idToSpies[id];
-        require((spyCount - amount) >= 0, "not enough spies to decommission that many");
+        require(
+            (spyCount - amount) >= 0,
+            "not enough spies to decommission that many"
+        );
         idToSpies[id] -= amount;
         emit SpiesDecommissioned(id, amount);
     }
@@ -940,7 +948,10 @@ contract MissilesContract is Ownable {
     mapping(uint256 => mapping(uint256 => uint256))
         public idToNukesPurchasedToday;
 
-    event CruiseMissilesPurchased(uint256 indexed id, uint256 indexed amountPurchased);
+    event CruiseMissilesPurchased(
+        uint256 indexed id,
+        uint256 indexed amountPurchased
+    );
 
     event NukePurchased(uint256 indexed id);
 

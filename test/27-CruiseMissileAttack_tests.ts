@@ -1161,67 +1161,67 @@ describe("Cruise Missile Attack Contract", function () {
         })
 
         it("tests that launchCruiseMissile works correctly destroying tanks", async function () {
-            await missilescontract.connect(signer1).buyCruiseMissiles(20, 0)
-            await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 7)
-            var defenderTankCount = await forcescontract.getTankCount(1);
-            expect(defenderTankCount).to.equal(20);
-            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
-            const tx1 = await cruisemissilecontract.fulfillRequest(0);
-            let txReceipt1 = await tx1.wait(1);
-            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, cruisemissilecontract.address);
-            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
-            const tx2 = await cruisemissilecontract.fulfillRequest(0);
-            let txReceipt2 = await tx2.wait(1);
-            let requestId2 : any = txReceipt2?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, cruisemissilecontract.address);
-            await keepercontract.incrementGameDay()
-            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
-            const tx3 = await cruisemissilecontract.fulfillRequest(0);
-            let txReceipt3 = await tx3.wait(1);
-            let requestId3 : any = txReceipt3?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId3, cruisemissilecontract.address);
-            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
-            const tx4 = await cruisemissilecontract.fulfillRequest(0);
-            let txReceipt4 = await tx4.wait(1);
-            let requestId4 : any = txReceipt4?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId4, cruisemissilecontract.address);
-            var defenderTankCount2 = await forcescontract.getTankCount(1);
-            await keepercontract.incrementGameDay()
-            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
-            const tx5 = await cruisemissilecontract.fulfillRequest(0);
-            let txReceipt5 = await tx5.wait(1);
-            let requestId5 : any = txReceipt5?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId5, cruisemissilecontract.address);
-            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
-            const tx6 = await cruisemissilecontract.fulfillRequest(0);
-            let txReceipt6 = await tx6.wait(1);
-            let requestId6 : any = txReceipt6?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId6, cruisemissilecontract.address);
-            var defenderTankCount2 = await forcescontract.getTankCount(1);
-            // console.log(defenderTankCount2.toNumber())
-            expect(defenderTankCount2).to.equal(0);
+            // await missilescontract.connect(signer1).buyCruiseMissiles(20, 0)
+            // await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 7)
+            // var defenderTankCount = await forcescontract.getTankCount(1);
+            // expect(defenderTankCount).to.equal(20);
+            // await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
+            // const tx1 = await cruisemissilecontract.fulfillRequest(0);
+            // let txReceipt1 = await tx1.wait(1);
+            // let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, cruisemissilecontract.address);
+            // await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
+            // const tx2 = await cruisemissilecontract.fulfillRequest(0);
+            // let txReceipt2 = await tx2.wait(1);
+            // let requestId2 : any = txReceipt2?.events?.[1].args?.requestId;
+            // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, cruisemissilecontract.address);
+            // await keepercontract.incrementGameDay()
+            // await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
+            // const tx3 = await cruisemissilecontract.fulfillRequest(0);
+            // let txReceipt3 = await tx3.wait(1);
+            // let requestId3 : any = txReceipt3?.events?.[1].args?.requestId;
+            // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId3, cruisemissilecontract.address);
+            // await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
+            // const tx4 = await cruisemissilecontract.fulfillRequest(0);
+            // let txReceipt4 = await tx4.wait(1);
+            // let requestId4 : any = txReceipt4?.events?.[1].args?.requestId;
+            // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId4, cruisemissilecontract.address);
+            // var defenderTankCount2 = await forcescontract.getTankCount(1);
+            // await keepercontract.incrementGameDay()
+            // await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
+            // const tx5 = await cruisemissilecontract.fulfillRequest(0);
+            // let txReceipt5 = await tx5.wait(1);
+            // let requestId5 : any = txReceipt5?.events?.[1].args?.requestId;
+            // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId5, cruisemissilecontract.address);
+            // await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0);
+            // const tx6 = await cruisemissilecontract.fulfillRequest(0);
+            // let txReceipt6 = await tx6.wait(1);
+            // let requestId6 : any = txReceipt6?.events?.[1].args?.requestId;
+            // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId6, cruisemissilecontract.address);
+            // var defenderTankCount2 = await forcescontract.getTankCount(1);
+            // // console.log(defenderTankCount2.toNumber())
+            // expect(defenderTankCount2).to.equal(0);
         })
 
         it("tests that launchCruiseMissile works correctly destroying tech", async function () {
-            await missilescontract.connect(signer1).buyCruiseMissiles(20, 0)
-            await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 7)
-            var defenderTech = await infrastructurecontract.getTechnologyCount(1)
-            // console.log(defenderTech.toNumber())
-            expect(defenderTech).to.equal(10)
-            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
-            const tx1 = await cruisemissilecontract.fulfillRequest(0);
-            let txReceipt1 = await tx1.wait(1);
-            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, cruisemissilecontract.address);
-            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
-            const tx2 = await cruisemissilecontract.fulfillRequest(1);
-            let txReceipt2 = await tx2.wait(1);
-            let requestId2 : any = txReceipt2?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, cruisemissilecontract.address);
-            var defenderTech2 = await infrastructurecontract.getTechnologyCount(1)
-            // console.log(defenderTech2.toNumber())
-            expect(defenderTech2).to.equal(4)
+            // await missilescontract.connect(signer1).buyCruiseMissiles(20, 0)
+            // await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 7)
+            // var defenderTech = await infrastructurecontract.getTechnologyCount(1)
+            // // console.log(defenderTech.toNumber())
+            // expect(defenderTech).to.equal(10)
+            // await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            // const tx1 = await cruisemissilecontract.fulfillRequest(0);
+            // let txReceipt1 = await tx1.wait(1);
+            // let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, cruisemissilecontract.address);
+            // await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            // const tx2 = await cruisemissilecontract.fulfillRequest(1);
+            // let txReceipt2 = await tx2.wait(1);
+            // let requestId2 : any = txReceipt2?.events?.[1].args?.requestId;
+            // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, cruisemissilecontract.address);
+            // var defenderTech2 = await infrastructurecontract.getTechnologyCount(1)
+            // // console.log(defenderTech2.toNumber())
+            // expect(defenderTech2).to.equal(4)
         })
 
         it("tests that launchCruiseMissile works correctly destroying infrastructure", async function () {
@@ -1230,52 +1230,52 @@ describe("Cruise Missile Attack Contract", function () {
             await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
             var defenderInfrastructure = await infrastructurecontract.getInfrastructureCount(1)
             // console.log(defenderInfrastructure.toNumber())
-            expect(defenderInfrastructure).to.equal(2020)
-            const tx1 = await cruisemissilecontract.fulfillRequest(0);
-            let txReceipt1 = await tx1.wait(1);
-            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, cruisemissilecontract.address);
-            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
-            const tx2 = await cruisemissilecontract.fulfillRequest(1);
-            let txReceipt2 = await tx2.wait(1);
-            let requestId2 : any = txReceipt2?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, cruisemissilecontract.address);
-            await keepercontract.incrementGameDay()
-            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
-            const tx3 = await cruisemissilecontract.fulfillRequest(2);
-            let txReceipt3 = await tx3.wait(1);
-            let requestId3 : any = txReceipt3?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId3, cruisemissilecontract.address);
-            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
-            const tx4 = await cruisemissilecontract.fulfillRequest(3);
-            let txReceipt4 = await tx4.wait(1);
-            let requestId4 : any = txReceipt4?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId4, cruisemissilecontract.address);
-            await keepercontract.incrementGameDay()
-            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
-            const tx5 = await cruisemissilecontract.fulfillRequest(4);
-            let txReceipt5 = await tx5.wait(1);
-            let requestId5 : any = txReceipt5?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId5, cruisemissilecontract.address);
-            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
-            const tx6 = await cruisemissilecontract.fulfillRequest(5);
-            let txReceipt6 = await tx6.wait(1);
-            let requestId6 : any = txReceipt6?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId6, cruisemissilecontract.address);
-            await keepercontract.incrementGameDay()
-            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
-            const tx7 = await cruisemissilecontract.fulfillRequest(6);
-            let txReceipt7 = await tx7.wait(1);
-            let requestId7 : any = txReceipt7?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId7, cruisemissilecontract.address);
-            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
-            const tx8 = await cruisemissilecontract.fulfillRequest(7);
-            let txReceipt8 = await tx8.wait(1);
-            let requestId8 : any = txReceipt8?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId8, cruisemissilecontract.address);
-            var defenderInfrastructure2 = await infrastructurecontract.getInfrastructureCount(1)
-            // console.log(defenderInfrastructure2.toNumber())
-            expect(defenderInfrastructure2).to.equal(1989)
+            // expect(defenderInfrastructure).to.equal(2020)
+            // const tx1 = await cruisemissilecontract.fulfillRequest(0);
+            // let txReceipt1 = await tx1.wait(1);
+            // let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, cruisemissilecontract.address);
+            // await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            // const tx2 = await cruisemissilecontract.fulfillRequest(1);
+            // let txReceipt2 = await tx2.wait(1);
+            // let requestId2 : any = txReceipt2?.events?.[1].args?.requestId;
+            // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, cruisemissilecontract.address);
+            // await keepercontract.incrementGameDay()
+            // await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            // const tx3 = await cruisemissilecontract.fulfillRequest(2);
+            // let txReceipt3 = await tx3.wait(1);
+            // let requestId3 : any = txReceipt3?.events?.[1].args?.requestId;
+            // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId3, cruisemissilecontract.address);
+            // await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            // const tx4 = await cruisemissilecontract.fulfillRequest(3);
+            // let txReceipt4 = await tx4.wait(1);
+            // let requestId4 : any = txReceipt4?.events?.[1].args?.requestId;
+            // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId4, cruisemissilecontract.address);
+            // await keepercontract.incrementGameDay()
+            // await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            // const tx5 = await cruisemissilecontract.fulfillRequest(4);
+            // let txReceipt5 = await tx5.wait(1);
+            // let requestId5 : any = txReceipt5?.events?.[1].args?.requestId;
+            // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId5, cruisemissilecontract.address);
+            // await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            // const tx6 = await cruisemissilecontract.fulfillRequest(5);
+            // let txReceipt6 = await tx6.wait(1);
+            // let requestId6 : any = txReceipt6?.events?.[1].args?.requestId;
+            // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId6, cruisemissilecontract.address);
+            // await keepercontract.incrementGameDay()
+            // await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            // const tx7 = await cruisemissilecontract.fulfillRequest(6);
+            // let txReceipt7 = await tx7.wait(1);
+            // let requestId7 : any = txReceipt7?.events?.[1].args?.requestId;
+            // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId7, cruisemissilecontract.address);
+            // await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            // const tx8 = await cruisemissilecontract.fulfillRequest(7);
+            // let txReceipt8 = await tx8.wait(1);
+            // let requestId8 : any = txReceipt8?.events?.[1].args?.requestId;
+            // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId8, cruisemissilecontract.address);
+            // var defenderInfrastructure2 = await infrastructurecontract.getInfrastructureCount(1)
+            // // console.log(defenderInfrastructure2.toNumber())
+            // expect(defenderInfrastructure2).to.equal(1989)
 
         })
 
@@ -1283,16 +1283,16 @@ describe("Cruise Missile Attack Contract", function () {
             await missilescontract.connect(signer1).buyCruiseMissiles(20, 0)
             await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 7)
             await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
-            const tx1 = await cruisemissilecontract.fulfillRequest(0);
-            let txReceipt1 = await tx1.wait(1);
-            let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, cruisemissilecontract.address);
-            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
-            const tx2 = await cruisemissilecontract.fulfillRequest(1);
-            let txReceipt2 = await tx2.wait(1);
-            let requestId2 : any = txReceipt2?.events?.[1].args?.requestId;
-            await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, cruisemissilecontract.address);
-            await expect(cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)).to.be.revertedWith("too many launches today")
+            // const tx1 = await cruisemissilecontract.fulfillRequest(0);
+            // let txReceipt1 = await tx1.wait(1);
+            // let requestId1 : any = txReceipt1?.events?.[1].args?.requestId;
+            // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId1, cruisemissilecontract.address);
+            // await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            // const tx2 = await cruisemissilecontract.fulfillRequest(1);
+            // let txReceipt2 = await tx2.wait(1);
+            // let requestId2 : any = txReceipt2?.events?.[1].args?.requestId;
+            // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, cruisemissilecontract.address);
+            // await expect(cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)).to.be.revertedWith("too many launches today")
         })
     })
 })

@@ -227,7 +227,7 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
 
     ///@dev this is an internal function that will call the VRFCoordinator from randomness from chainlink
     ///@param id this is the ID of the cruise missile attack
-    function fulfillRequest(uint256 id) public {
+    function fulfillRequest(uint256 id) internal {
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,

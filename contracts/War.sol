@@ -9,6 +9,7 @@ import "./Treasury.sol";
 import "./KeeperFile.sol";
 import "./Forces.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
 
 // import "hardhat/console.sol";
 
@@ -159,31 +160,6 @@ contract WarContract is Ownable {
         forc = ForcesContract(_forces);
         blockade = _blockade;
         nuke = _nuke;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateCountryMinterContract(address newAddress) public onlyOwner {
-        countryMinter = newAddress;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateNationStrengthContract(address newAddress) public onlyOwner {
-        nationStrength = newAddress;
-        nsc = NationStrengthContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateMilitaryContract(address newAddress) public onlyOwner {
-        military = newAddress;
-        mil = MilitaryContract(newAddress);
-    }
-
-    modifier onlyCountryMinter() {
-        require(
-            msg.sender == countryMinter,
-            "caller not Country Minter contract"
-        );
-        _;
     }
 
     modifier onlyCruiseMissileContract() {
@@ -463,14 +439,13 @@ contract WarContract is Ownable {
         uint256 _warId,
         uint256 nationId
     ) public onlyCruiseMissileContract {
-        (uint256 offenseId, uint256 defenseId) = getInvolvedParties(warId);
+        (uint256 offenseId, uint256 defenseId) = getInvolvedParties(_warId);
         uint256 day = keep.getGameDay();
         War storage war = warIdToWar[_warId];
         if (nationId == offenseId) {
             require(war.offenseIdToCruiseMissileLaunchesToday[day] < 2, "too many launches today");
             war.offenseIdToCruiseMissileLaunchesToday[day] += 1;
-        }
-        if (nationId == defenseId) {
+        } else if (nationId == defenseId) {
             require(war.defenseIdToCruiseMissileLaunchesToday[day] < 2, "too many launches today");
             war.defenseIdToCruiseMissileLaunchesToday[day] += 1;
         }
@@ -483,8 +458,7 @@ contract WarContract is Ownable {
         War storage war = warIdToWar[_warId];
         if (id == offenseId) {
             launches = war.offenseIdToCruiseMissileLaunchesToday[day];
-        }
-        if (id == defenseId) {
+        } else if (id == defenseId) {
             launches = war.defenseIdToCruiseMissileLaunchesToday[day];
         }
         return launches;
@@ -681,6 +655,7 @@ contract WarContract is Ownable {
     }
 
     function recallTroopsFromDeactivatedWars(uint256 id) public {
+        console.log("ID of recall", id);
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         uint256[] memory activeWars = idToActiveWars[id];
@@ -708,8 +683,8 @@ contract WarContract is Ownable {
                     .soldiersDeployed;
                 uint256 tanksDeployed = warIdToDefenseDeployed1[war]
                     .tanksDeployed;
-                forc.withdrawSoldiers(id, soldiersDeployed);
-                forc.withdrawTanks(id, tanksDeployed);
+                forc.withdrawSoldiers(soldiersDeployed, id);
+                forc.withdrawTanks(tanksDeployed, id);
                 warIdToDefenseDeployed1[war].soldiersDeployed = 0;
                 warIdToDefenseDeployed1[war].tanksDeployed = 0;
             }

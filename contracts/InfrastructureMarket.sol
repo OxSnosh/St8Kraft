@@ -99,7 +99,10 @@ contract InfrastructureMarketContract is Ownable {
     ///@param id is the nation id of the nation buying infrastructure
     ///@param buyAmount this is the amount of infrastructure being purchased
     ///@return uint256 this is the cost of the purchase
-    function getInfrastructureCost(uint256 id, uint256 buyAmount) public view returns (uint256) {
+    function getInfrastructureCost(
+        uint256 id,
+        uint256 buyAmount
+    ) public view returns (uint256) {
         uint256 costPerLevel = getInfrastructureCostPerLevel(id);
         uint256 cost = buyAmount * costPerLevel;
         return cost;
@@ -117,23 +120,47 @@ contract InfrastructureMarketContract is Ownable {
         uint256 currentInfrastructureAmount = inf.getInfrastructureCount(id);
         if (currentInfrastructureAmount < 20) {
             grossCost = 500;
-        } else if (currentInfrastructureAmount >= 20) {
+        } else if (
+            currentInfrastructureAmount >= 20 &&
+            currentInfrastructureAmount < 100
+        ) {
             grossCost = ((currentInfrastructureAmount * 12) + 500);
-        } else if (currentInfrastructureAmount >= 100) {
+        } else if (
+            currentInfrastructureAmount >= 100 &&
+            currentInfrastructureAmount < 200
+        ) {
             grossCost = ((currentInfrastructureAmount * 15) + 500);
-        } else if (currentInfrastructureAmount >= 200) {
+        } else if (
+            currentInfrastructureAmount >= 200 &&
+            currentInfrastructureAmount < 1000
+        ) {
             grossCost = ((currentInfrastructureAmount * 20) + 500);
-        } else if (currentInfrastructureAmount >= 1000) {
+        } else if (
+            currentInfrastructureAmount >= 1000 &&
+            currentInfrastructureAmount < 2000
+        ) {
             grossCost = ((currentInfrastructureAmount * 25) + 500);
-        } else if (currentInfrastructureAmount >= 2000) {
+        } else if (
+            currentInfrastructureAmount >= 2000 &&
+            currentInfrastructureAmount < 4000
+        ) {
             grossCost = ((currentInfrastructureAmount * 30) + 500);
-        } else if (currentInfrastructureAmount >= 4000) {
+        } else if (
+            currentInfrastructureAmount >= 4000 &&
+            currentInfrastructureAmount < 5000
+        ) {
             grossCost = ((currentInfrastructureAmount * 40) + 500);
-        } else if (currentInfrastructureAmount >= 5000) {
+        } else if (
+            currentInfrastructureAmount >= 5000 &&
+            currentInfrastructureAmount < 8000
+        ) {
             grossCost = ((currentInfrastructureAmount * 50) + 500);
-        } else if (currentInfrastructureAmount >= 8000) {
+        } else if (
+            currentInfrastructureAmount >= 8000 &&
+            currentInfrastructureAmount < 15000
+        ) {
             grossCost = ((currentInfrastructureAmount * 60) + 500);
-        } else if (currentInfrastructureAmount >= 15000) {
+        } else {
             grossCost = ((currentInfrastructureAmount * 80) + 500);
         }
         uint256 costAdjustments1 = getInfrastructureCostMultiplier1(id);
@@ -144,7 +171,7 @@ contract InfrastructureMarketContract is Ownable {
             costAdjustments3);
         uint256 multiplier = (100 - adjustments);
         uint256 adjustedCostPerLevel = ((grossCost * multiplier) / 100);
-        return adjustedCostPerLevel * (10**18);
+        return adjustedCostPerLevel * (10 ** 18);
     }
 
     ///@dev this function is one of three functions that will adjust the cost of infrastructure lower
@@ -282,7 +309,7 @@ contract InfrastructureMarketContract is Ownable {
         return false;
     }
 
-    ///@dev this is a public function callable by the nation owner 
+    ///@dev this is a public function callable by the nation owner
     ///@dev this function will allow a nation owner to destroy infrastructure
     ///@notice this function will allow a nation owner to destroy infrastructure
     ///@param id this is the nation id of the nation destroying infrastructure
