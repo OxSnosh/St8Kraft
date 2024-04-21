@@ -10,6 +10,7 @@ import "./Forces.sol";
 import "./Taxes.sol";
 import "./Nuke.sol";
 import "./CountryParameters.sol";
+import "./Missiles.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 ///@title EnvironmentContract

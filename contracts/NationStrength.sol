@@ -6,6 +6,7 @@ import "./Forces.sol";
 import "./Fighters.sol";
 import "./Bombers.sol";
 import "./Navy.sol";
+import "./Missiles.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 

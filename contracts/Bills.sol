@@ -11,6 +11,7 @@ import "./Improvements.sol";
 import "./Resources.sol";
 import "./CountryMinter.sol";
 import "./CountryParameters.sol";
+import "./Missiles.sol";
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 

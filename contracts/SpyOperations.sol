@@ -10,6 +10,8 @@ import "./CountryParameters.sol";
 import "./Wonders.sol";
 import "./CountryMinter.sol";
 import "./KeeperFile.sol";
+import "./Spies.sol";
+import "./Missiles.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
