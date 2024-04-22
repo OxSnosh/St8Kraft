@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International
 pragma solidity 0.8.17;
 
+import "./CountryMinter.sol";
 import "./Infrastructure.sol";
 import "./Resources.sol";
 import "./Wonders.sol";
@@ -11,7 +12,6 @@ import "./CountryParameters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 // import "./Treasury.sol";
-// import "./CountryMinter.sol";
 // import "./NationStrength.sol";
 // import "./KeeperFile.sol";
 
@@ -207,7 +207,7 @@ contract ForcesContract is Ownable {
     function buySoldiers(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
-        uint256 populationCount = inf.getTotalPopulationCount(0);
+        uint256 populationCount = inf.getTotalPopulationCount(id);
         uint256 maxSoldierCount = ((populationCount * 80) / 100);
         uint256 currentSoldierCount = idToForces[id].numberOfSoldiers;
         require(
@@ -354,8 +354,10 @@ contract ForcesContract is Ownable {
     ) public view returns (uint256) {
         uint256 maxDeployablePercentage = 80;
         uint256 borderFortificationCount = imp1.getBorderFortificationCount(id);
+        console.log("border fortification count", borderFortificationCount);
         if (borderFortificationCount > 0) {
             maxDeployablePercentage -= (2 * borderFortificationCount);
+            console.log("max deployable percentage", maxDeployablePercentage);
         }
         return maxDeployablePercentage;
     }
@@ -368,6 +370,9 @@ contract ForcesContract is Ownable {
         uint256 amountToWithdraw,
         uint256 id
     ) public onlyWar {
+        console.log("withdraw soldiers function");
+        console.log("amount to withdraw", amountToWithdraw);
+        console.log("id", id);
         uint256 deployedSoldierCount = idToForces[id].deployedSoldiers;
         require(
             deployedSoldierCount >= amountToWithdraw,
@@ -514,7 +519,7 @@ contract ForcesContract is Ownable {
     ///@notice this function allows a nation owner to decomission soldiers
     ///@param amount is the amount of soldiers being decomissioned
     ///@param id is the nation ID of the nation
-    function decomissionSoldiers(uint256 amount, uint256 id) public {
+    function decommissionSoldiers(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         uint256 defendingSoldierCount = getDefendingSoldierCount(id);
@@ -556,7 +561,7 @@ contract ForcesContract is Ownable {
     ///@notice this function allows a nation owner to decomission soldiers
     ///@param amount is the amount of soldiers being decomissioned
     ///@param id is the nation ID of the nation
-    function decomissionTanks(uint256 amount, uint256 id) public {
+    function decommissionTanks(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         uint256 defendingTankCount = getDefendingTankCount(id);

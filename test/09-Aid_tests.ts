@@ -1177,7 +1177,7 @@ describe("Aid Contract", function () {
             await treasurycontract.connect(signer1).withdrawFunds(BigInt(992600000000000004764669344), 0), 
             await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("not enough funds for this porposal");
             await treasurycontract.connect(signer1).addFunds(BigInt(60888888*(10**18)), 0);
-            await forcescontract.connect(signer1).decomissionSoldiers(5000, 0);
+            await forcescontract.connect(signer1).decommissionSoldiers(5000, 0);
             await expect(aidcontract.connect(signer1).proposeAid(0, 1, 100, BigInt(6000000*(10**18)), 4000)).to.be.revertedWith("not enough soldiers for this porposal");
             await forcescontract.connect(signer1).buySoldiers(5000, 0);
         })

@@ -2045,7 +2045,7 @@ describe("Taxes Contract", function () {
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000);
             const soldierCount = await forcescontract.getSoldierCount(0);
             // console.log("soldier count", soldierCount.toNumber());
-            await forcescontract.connect(signer1).decomissionSoldiers(20, 0)
+            await forcescontract.connect(signer1).decommissionSoldiers(20, 0)
             const soldierToPopulation0 = await additionaltaxescontract.soldierToPopulationRatio(0);
             // console.log("soldier to population 0", soldierToPopulation0[0].toNumber());
             expect(soldierToPopulation0[0].toNumber()).to.equal(0);

@@ -1088,6 +1088,7 @@ describe("Forces Contract", function () {
         if(chainId == 31337 || chainId == 1337) {
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, nukecontract.address);
         }
 
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
@@ -1109,8 +1110,24 @@ describe("Forces Contract", function () {
             "TestNationSlogan2"
         )
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(5000000000*(10**18)));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(5000000000*(10**18)));
-        await treasurycontract.connect(signer1).addFunds(BigInt(4900000000*(10**18)), 0);
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(5000000000*(10**18)));
+        await treasurycontract.connect(signer2).addFunds(BigInt(4900000000*(10**18)), 1);
+
+        const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+        const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+        for (const log of event1Logs) {
+            const requestIdReturn = log.args.requestId;
+            // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            if (requestIdReturn == 2) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources1 = await resourcescontract.getPlayerResources(0);
+                // console.log("resources 1", resources1[0].toNumber(), resources1[1].toNumber());
+            } else if (requestIdReturn == 4) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources2 = await resourcescontract.getPlayerResources(1);
+                // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
+            }
+        }
     });
 
     describe("Buy Forces", function () {
@@ -1146,6 +1163,223 @@ describe("Forces Contract", function () {
             await resourcescontract.connect(signer0).mockResourcesForTesting(0, 7, 11)
             var cost = await forcescontract.getSoldierCost(0)
             expect(cost.toNumber()).to.equal(6);
+        })
+
+        it("tests that soldiers can be sent in an aid package", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 3000)
+            await forcescontract.connect(signer1).buySoldiers(4000, 0)
+            await aidcontract.connect(signer1).proposeAid(0, 1, 0, 0, 4000);
+            await aidcontract.connect(signer2).acceptProposal(0);
+            var soldiers = await forcescontract.getSoldierCount(1);
+            expect(soldiers.toNumber()).to.equal(4020);
+        })
+
+        it("tests that border fortifications affect max deployable pecentage", async function () {
+            var maxDeployablePercentage = await forcescontract.getMaxDeployablePercentage(0);
+            expect(maxDeployablePercentage.toNumber()).to.equal(80);
+            // console.log(maxDeployablePercentage.toNumber(), "max deployable percentage 1");
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5);
+            await improvementscontract1.connect(signer1).buyImprovement1(3, 0, 4);
+            var maxDeployablePercentage = await forcescontract.getMaxDeployablePercentage(0);
+            expect(maxDeployablePercentage.toNumber()).to.equal(74);
+            // console.log(maxDeployablePercentage.toNumber(), "max deployable percentage 2")
+        })
+
+        it("tests that deploy and withdrawSoldiers() works correctly", async function () {
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 3000)
+            await forcescontract.connect(signer1).buySoldiers(4000, 0)
+            await forcescontract.connect(signer1).deployForces(2000, 0, 0, 0)
+            var deployedSoldiers = await forcescontract.getDeployedSoldierCount(0);
+            // console.log(deployedSoldiers.toNumber(), "deployed soldiers")
+            expect(deployedSoldiers.toNumber()).to.equal(2000);
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await warcontract.connect(signer1).recallTroopsFromDeactivatedWars(0)
+            var deployedSoldiers = await forcescontract.getDeployedSoldierCount(0);
+            // console.log(deployedSoldiers.toNumber(), "deployed soldiers")
+        })
+
+        it("tests that a successful nuke attack will decrease soldier count", async function () {
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await billscontract.connect(signer2).payBills(1)
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 17, 1);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 500)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 400);
+            await wonderscontract2.connect(signer1).buyWonder2(0, 8);
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 2000)
+            await forcescontract.connect(signer2).buySoldiers(4000, 1)
+            var soldierCount = await forcescontract.getSoldierCount(1);
+            // console.log(soldierCount.toNumber(), "soldier count")
+            expect(soldierCount.toNumber()).to.equal(4020);
+            await nukecontract.connect(signer1).launchNuke(0, 0, 1, 1)
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 5) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, nukecontract.address);
+                }
+            }
+            var soldierCount = await forcescontract.getSoldierCount(1);
+            // console.log(soldierCount.toNumber(), "soldier count")
+            //all soldiers dead
+            expect(soldierCount.toNumber()).to.equal(0);
+        })
+
+        it("tests that a successful nuke attack will decrease soldier count less 50% with fallout shelter", async function () {
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await billscontract.connect(signer2).payBills(1)
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 17, 1);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 500)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 400);
+            await wonderscontract2.connect(signer1).buyWonder2(0, 8);
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 6000)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 2000)
+            await forcescontract.connect(signer2).buySoldiers(4000, 1)
+            var soldierCount = await forcescontract.getSoldierCount(1);
+            // console.log(soldierCount.toNumber(), "soldier count")
+            expect(soldierCount.toNumber()).to.equal(4020);
+            await wonderscontract1.connect(signer2).buyWonder1(1, 6)
+            await nukecontract.connect(signer1).launchNuke(0, 0, 1, 1)
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 5) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, nukecontract.address);
+                }
+            }
+            var soldierCount = await forcescontract.getSoldierCount(1);
+            // console.log(soldierCount.toNumber(), "soldier count")
+            //50% soldiers dead
+            expect(soldierCount.toNumber()).to.equal(2010);
+        })
+
+        describe("Soldier Efficiency", function () {
+            it("tests that deployed soldier efficiency works correctly", async function () {
+                await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 3000)
+                await technologymarketcontrat.connect(signer2).buyTech(1, 100)
+                await forcescontract.connect(signer2).buySoldiers(1000, 1)
+                await forcescontract.connect(signer2).buyTanks(50, 1)
+                await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+                await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+                await warcontract.connect(signer1).declareWar(0, 1)
+                await forcescontract.connect(signer1).buySoldiers(500, 0)
+                await forcescontract.connect(signer1).deployForces(500, 20, 0, 0);
+                var attackingSoldierEfficiency = await groundbattlecontract.getAttackingSoldierEfficiency(0, 0);
+                // console.log(attackingSoldierEfficiency.toNumber(), "default efficiency");
+                expect(attackingSoldierEfficiency.toNumber()).to.equal(500)
+                await resourcescontract.connect(signer0).mockResourcesForTesting(0, 0, 2);
+                var attackingSoldierEfficiency = await groundbattlecontract.getAttackingSoldierEfficiency(0, 0);
+                // console.log(attackingSoldierEfficiency.toNumber(), "aluminium and coal efficiency");
+                expect(attackingSoldierEfficiency.toNumber()).to.equal(640)
+                await resourcescontract.connect(signer0).mockResourcesForTesting(0, 11, 12);
+                var attackingSoldierEfficiency = await groundbattlecontract.getAttackingSoldierEfficiency(0, 0);
+                // console.log(attackingSoldierEfficiency.toNumber(), "oil and pigs efficiency");
+                expect(attackingSoldierEfficiency.toNumber()).to.equal(625)
+                await billscontract.connect(signer1).payBills(0)
+                await improvementscontract1.connect(signer1).buyImprovement1(3, 0, 3)
+                var attackingSoldierEfficiency = await groundbattlecontract.getAttackingSoldierEfficiency(0, 0);
+                // console.log(attackingSoldierEfficiency.toNumber(), "barracks efficiency");
+                expect(attackingSoldierEfficiency.toNumber()).to.equal(775)
+                await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 3)
+                var attackingSoldierEfficiency = await groundbattlecontract.getAttackingSoldierEfficiency(0, 0);
+                // console.log(attackingSoldierEfficiency.toNumber(), "guerilla camp efficiency");
+                expect(attackingSoldierEfficiency.toNumber()).to.equal(1650)
+            })
+    
+            it("tests that defending soldier efficiency works correctly", async function () {
+                await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 3000)
+                await technologymarketcontrat.connect(signer2).buyTech(1, 100)
+                await forcescontract.connect(signer2).buySoldiers(1000, 1)
+                await forcescontract.connect(signer2).buyTanks(50, 1)
+                await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+                await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+                await warcontract.connect(signer1).declareWar(0, 1)
+                await forcescontract.connect(signer1).buySoldiers(480, 0)
+                await forcescontract.connect(signer1).deployForces(500, 20, 0, 0);
+                var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
+                // console.log(defendingSoldierEfficiency.toNumber(), "default efficiency");
+                expect(defendingSoldierEfficiency.toNumber()).to.equal(500)
+                await resourcescontract.connect(signer0).mockResourcesForTesting(0, 0, 2);
+                var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
+                // console.log(defendingSoldierEfficiency.toNumber(), "aluminium and coal efficiency");
+                expect(defendingSoldierEfficiency.toNumber()).to.equal(640)
+                await resourcescontract.connect(signer0).mockResourcesForTesting(0, 11, 12);
+                var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
+                // console.log(defendingSoldierEfficiency.toNumber(), "oil and pigs efficiency");
+                expect(defendingSoldierEfficiency.toNumber()).to.equal(625)
+                await billscontract.connect(signer1).payBills(0)
+                await improvementscontract1.connect(signer1).buyImprovement1(3, 0, 3)
+                var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
+                // console.log(defendingSoldierEfficiency.toNumber(), "barracks efficiency");
+                expect(defendingSoldierEfficiency.toNumber()).to.equal(775)
+                await improvementscontract2.connect(signer1).buyImprovement2(5, 0, 3)
+                var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
+                // console.log(defendingSoldierEfficiency.toNumber(), "guerilla camp efficiency");
+                expect(defendingSoldierEfficiency.toNumber()).to.equal(1650)
+                await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5)
+                await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 5)
+                await improvementscontract1.connect(signer1).buyImprovement1(2, 0, 4)
+                var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
+                // console.log(defendingSoldierEfficiency.toNumber(), "border fortification efficiency");
+                await improvementscontract1.connect(signer1).deleteImprovement1(2, 0, 4)
+                expect(defendingSoldierEfficiency.toNumber()).to.equal(1670)
+                await improvementscontract2.connect(signer1).buyImprovement2(2, 0, 2)
+                var defendingSoldierEfficiency = await groundbattlecontract.getDefendingSoldierEfficiency(0)
+                // console.log(defendingSoldierEfficiency.toNumber(), "forward operating base efficiency");
+                expect(defendingSoldierEfficiency.toNumber()).to.equal(1620)
+            })
+        })
+
+        it("tests that decommission soldiers works correctly", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500)
+            await forcescontract.connect(signer1).buySoldiers(500, 0)
+            var soldierCount = await forcescontract.getSoldierCount(0);
+            expect(soldierCount.toNumber()).to.equal(520);
+            await forcescontract.connect(signer1).decommissionSoldiers(20, 0)
+            var soldierCount = await forcescontract.getSoldierCount(0);
+            expect(soldierCount.toNumber()).to.equal(500);
         })
 
         it("tests that buyTanks() works correctly", async function () {
@@ -1184,6 +1418,111 @@ describe("Forces Contract", function () {
             var cost = await forcescontract.getTankCost(0)
             // console.log(cost.toNumber(), "cost 4");
             expect(cost.toNumber()).to.equal(180);
+        })
+
+        it("tests that decommission tanks works correctly", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500)
+            await forcescontract.connect(signer1).buySoldiers(500, 0)
+            await forcescontract.connect(signer1).buyTanks(50, 0)
+            var tankCount = await forcescontract.getTankCount(0);
+            expect(tankCount.toNumber()).to.equal(50);
+            await forcescontract.connect(signer1).decommissionTanks(10, 0)
+            var tankCount = await forcescontract.getTankCount(0);
+            expect(tankCount.toNumber()).to.equal(40);
+        })
+
+        it("tests that tank count decreases 35% from nuke strike", async function () {
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await keepercontract.connect(signer0).incrementGameDay()
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 500)
+            await forcescontract.connect(signer2).buySoldiers(500, 1)
+            await forcescontract.connect(signer2).buyTanks(50, 1)
+            var tankCount = await forcescontract.getTankCount(1);
+            expect(tankCount.toNumber()).to.equal(50);
+            await billscontract.connect(signer2).payBills(1)
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 17, 1);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 500)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 400);
+            await wonderscontract2.connect(signer1).buyWonder2(0, 8);
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await nukecontract.connect(signer1).launchNuke(0, 0, 1, 1)
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 5) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, nukecontract.address);
+                }
+            }
+            var tankCount = await forcescontract.getTankCount(1);
+            // console.log(tankCount.toNumber(), "tank count after nuke strike")
+            expect(tankCount.toNumber()).to.equal(33);
+        })
+
+        it("tests that tank count decreases from nuke strike less 25% with fallout shelter", async function () {
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await keepercontract.connect(signer0).incrementGameDay()
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 1000)
+            await forcescontract.connect(signer2).buySoldiers(500, 1)
+            await forcescontract.connect(signer2).buyTanks(50, 1)
+            var tankCount = await forcescontract.getTankCount(1);
+            expect(tankCount.toNumber()).to.equal(50);
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 6000)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 2000)
+            await wonderscontract1.connect(signer2).buyWonder1(1, 6)
+            await billscontract.connect(signer2).payBills(1)
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 17, 1);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 500)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 400);
+            await wonderscontract2.connect(signer1).buyWonder2(0, 8);
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.connect(signer0).incrementGameDay()
+            await missilescontract.connect(signer1).buyNukes(0)
+            await nukecontract.connect(signer1).launchNuke(0, 0, 1, 1)
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 5) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, nukecontract.address);
+                }
+            }
+            var tankCount = await forcescontract.getTankCount(1);
+            // console.log(tankCount.toNumber(), "tank count after nuke strike")
+            expect(tankCount.toNumber()).to.equal(38);
+        })
+
+        it("tests that tank max by citizen works correctly", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 500)
+            await forcescontract.connect(signer1).buySoldiers(500, 0)
+            await forcescontract.connect(signer1).buyTanks(50, 0)
+            var maxTankCount1 = await forcescontract.getMaxTankCount(0);
+            // console.log("max tanks", maxTankCount1.toNumber())
+            expect(maxTankCount1.toNumber()).to.equal(52);
+            await infrastructuremarketplace.connect(signer1).destroyInfrastructure(0, 450)
+            var maxTankCount2 = await forcescontract.getMaxTankCount(0);
+            // console.log("max tanks", maxTankCount2.toNumber())
+            expect(maxTankCount2.toNumber()).to.equal(47);
+        })
+
+        it("tests that the contract owner can increase soldier casualties for tests", async function () {
+            await forcescontract.connect(signer0).increaseSoldierCasualties(0, 10000)
+            var casualties = await forcescontract.getCasualties(0)
+            expect(casualties[0].toNumber()).to.equal(10000)
         })
     })
 

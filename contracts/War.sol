@@ -655,7 +655,6 @@ contract WarContract is Ownable {
     }
 
     function recallTroopsFromDeactivatedWars(uint256 id) public {
-        console.log("ID of recall", id);
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         uint256[] memory activeWars = idToActiveWars[id];
@@ -674,8 +673,8 @@ contract WarContract is Ownable {
                     .soldiersDeployed;
                 uint256 tanksDeployed = warIdToOffenseDeployed1[war]
                     .tanksDeployed;
-                forc.withdrawSoldiers(id, soldiersDeployed);
-                forc.withdrawTanks(id, tanksDeployed);
+                forc.withdrawSoldiers(soldiersDeployed, id);
+                forc.withdrawTanks(tanksDeployed, id);
                 warIdToOffenseDeployed1[war].soldiersDeployed = 0;
                 warIdToOffenseDeployed1[war].tanksDeployed = 0;
             } else if (id == defenseId) {
