@@ -1163,18 +1163,22 @@ describe("Cruise Missile Attack Contract", function () {
         
         it("tests that getSuccessOdds works correctly", async function () {
             var oddsOfSuccess = await cruisemissilecontract.getSuccessOdds(0, 1);
+            // console.log("oddsOfSuccess1", oddsOfSuccess.toNumber())
             expect(oddsOfSuccess).to.equal(75)
-            await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 7)
+            await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 5)
             var oddsOfSuccess2 = await cruisemissilecontract.getSuccessOdds(0, 1);
+            // console.log("oddsOfSuccess2", oddsOfSuccess2.toNumber())
             expect(oddsOfSuccess2).to.equal(100)
             await improvementscontract4.connect(signer2).buyImprovement4(5, 1, 1)
             var oddsOfSuccess3 = await cruisemissilecontract.getSuccessOdds(0, 1);
+            // console.log("oddsOfSuccess3", oddsOfSuccess3.toNumber())
             expect(oddsOfSuccess3).to.equal(75)
-            await improvementscontract3.connect(signer2).buyImprovement3(5, 1, 7)
+            await improvementscontract3.connect(signer2).buyImprovement3(5, 1, 5)
             await wonderscontract4.connect(signer2).buyWonder4(1, 4)
             await technologymarketcontrat.connect(signer2).buyTech(1, 5000)
             await wonderscontract2.connect(signer2).buyWonder2(1, 5)
             var oddsOfSuccess4 = await cruisemissilecontract.getSuccessOdds(0, 1);
+            // console.log("oddsOfSuccess4", oddsOfSuccess4.toNumber())
             expect(oddsOfSuccess4).to.equal(50)
             
         })
@@ -1261,7 +1265,7 @@ describe("Cruise Missile Attack Contract", function () {
             await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 7)
 
             var tech = await infrastructurecontract.getTechnologyCount(1)
-            console.log(tech.toNumber())
+            // console.log(tech.toNumber())
             expect(tech).to.equal(1010)
 
             await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
@@ -1286,7 +1290,7 @@ describe("Cruise Missile Attack Contract", function () {
             }
 
             var tech = await infrastructurecontract.getTechnologyCount(1)
-            console.log(tech.toNumber())
+            // console.log(tech.toNumber())
             expect(tech).to.equal(998)
 
         })
