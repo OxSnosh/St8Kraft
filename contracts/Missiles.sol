@@ -126,69 +126,6 @@ contract MissilesContract is Ownable {
         idToMissiles[id] = newMissiles;
     }
 
-    ///@dev this function is only callable by the contract owner
-    function updateTreasuryContract(address newAddress) public onlyOwner {
-        treasury = newAddress;
-        tsy = TreasuryContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateSpyContract(address newAddress) public onlyOwner {
-        spyAddress = newAddress;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateNukeContract(address newAddress) public onlyOwner {
-        nukeAddress = newAddress;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateAirBattleContract(address newAddress) public onlyOwner {
-        airBattle = newAddress;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateNationStrengthContract(address newAddress) public onlyOwner {
-        strength = newAddress;
-        stren = NationStrengthContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateResourcesContract(address newAddress) public onlyOwner {
-        resources = newAddress;
-        res = ResourcesContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementsContract1(address newAddress) public onlyOwner {
-        improvements1 = newAddress;
-        imp1 = ImprovementsContract1(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWondersContract1(address newAddress) public onlyOwner {
-        wonders1 = newAddress;
-        won1 = WondersContract1(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWondersContract2(address newAddress) public onlyOwner {
-        wonders2 = newAddress;
-        won2 = WondersContract2(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWondersContract4(address newAddress) public onlyOwner {
-        wonders4 = newAddress;
-        won4 = WondersContract4(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateCountryMinter(address newAddress) public onlyOwner {
-        countryMinter = newAddress;
-        mint = CountryMinter(newAddress);
-    }
-
     modifier onlySpyContract() {
         require(msg.sender == spyAddress, "only callable from spy contract");
         _;
@@ -207,13 +144,13 @@ contract MissilesContract is Ownable {
         _;
     }
 
-    modifier onlyKeeper() {
-        require(
-            msg.sender == keeper,
-            "function only callable from keeper contract"
-        );
-        _;
-    }
+    // modifier onlyKeeper() {
+    //     require(
+    //         msg.sender == keeper,
+    //         "function only callable from keeper contract"
+    //     );
+    //     _;
+    // }
 
     ///@dev this function is a public function that will allow a nation owner to purchase cruise missiles
     ///@notice this function allows a nation owner to purchase cruise missiles
@@ -290,6 +227,8 @@ contract MissilesContract is Ownable {
     function decreaseCruiseMissileCountFromNukeContract(
         uint256 id
     ) public onlyNukeContract {
+        console.log("decreasing cruise missiles");
+        console.log("id", id);
         uint256 cruiseMissiles = idToMissiles[id].cruiseMissiles;
         uint256 percentage = 35;
         bool falloutShelter = won1.getFalloutShelterSystem(id);

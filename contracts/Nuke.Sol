@@ -369,6 +369,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
             1
         );
         inf.decreaseTechCountFromNukeContract(defenderId, 35, 1);
+        mis.decreaseCruiseMissileCountFromNukeContract(defenderId);
     }
 
     ///@dev this is the function that will be called in the event of a infrastructure attack
@@ -387,6 +388,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
             2
         );
         inf.decreaseTechCountFromNukeContract(defenderId, 25, 2);
+        mis.decreaseCruiseMissileCountFromNukeContract(defenderId);
     }
 
     ///@dev this is the function that will be called in the event of a land attack
@@ -405,6 +407,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
             3
         );
         inf.decreaseTechCountFromNukeContract(defenderId, 25, 3);
+        mis.decreaseCruiseMissileCountFromNukeContract(defenderId);
     }
 
     ///@dev this is the function that will be called in the event of a tech attack
@@ -423,6 +426,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
             4
         );
         inf.decreaseTechCountFromNukeContract(defenderId, 45, 4);
+        mis.decreaseCruiseMissileCountFromNukeContract(defenderId);
     }
 
     ///@dev this function is a public view function that will return the number of nukes launched in the game in the last 7 days
