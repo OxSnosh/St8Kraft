@@ -128,60 +128,6 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
         won2 = WondersContract2(_wonders2);
     }
 
-    ///@dev this function is only callable by the contract owner
-    function updateForcesContract(address newAddress) public onlyOwner {
-        forces = newAddress;
-        force = ForcesContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateCountryMinter(address newAddress) public onlyOwner {
-        countryMinter = newAddress;
-        mint = CountryMinter(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWarContract(address newAddress) public onlyOwner {
-        warAddress = newAddress;
-        war = WarContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateInfrastructureContract(address newAddress) public onlyOwner {
-        warAddress = newAddress;
-        war = WarContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateMissilesContract(address newAddress) public onlyOwner {
-        missiles = newAddress;
-        mis = MissilesContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementsContract1(address newAddress) public onlyOwner {
-        improvements1 = newAddress;
-        imp1 = ImprovementsContract1(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementsContract3(address newAddress) public onlyOwner {
-        improvements3 = newAddress;
-        imp3 = ImprovementsContract3(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovementsContract4(address newAddress) public onlyOwner {
-        improvements4 = newAddress;
-        imp4 = ImprovementsContract4(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWondersContract2(address newAddress) public onlyOwner {
-        wonders2 = newAddress;
-        won2 = WondersContract2(newAddress);
-    }
-
     ///@dev this is a public function that will allow a nation to launch a cruise missile attack against another nation
     ///@notice this function allows a nation owner to launch a cruise missile attack
     ///@notice can only attack another nation where war is currently declared
