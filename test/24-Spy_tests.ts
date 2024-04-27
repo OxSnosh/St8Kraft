@@ -1151,6 +1151,15 @@ describe("Spy Contract", function () {
             expect(spyCount).to.equal(40)
         })
 
+        it("tests that spies can be decommissioned", async function () {
+            await spycontract.connect(signer1).buySpies(40, 0)
+            var spyCount = await spycontract.getSpyCount(0)
+            expect(spyCount).to.equal(40)
+            await spycontract.connect(signer1).decommissionSpies(20, 0)
+            var spyCount2 = await spycontract.getSpyCount(0)
+            expect(spyCount2).to.equal(20)
+        })
+
 
     })
 })

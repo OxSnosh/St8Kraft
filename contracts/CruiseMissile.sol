@@ -272,10 +272,13 @@ contract CruiseMissileContract is Ownable, VRFConsumerBaseV2 {
                 damageTypeNumber
             );
             if (damageTypeNumber == 0) {
+                console.log("destroying tanks");
                 destroyTanks(requestNumber);
             } else if (damageTypeNumber == 1) {
+                console.log("destroying tech");
                 destroyTech(requestNumber);
             } else if (damageTypeNumber == 2) {
+                console.log("destroying infrastructure");
                 destroyInfrastructure(requestNumber);
             }
         } else {
