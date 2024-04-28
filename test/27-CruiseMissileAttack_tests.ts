@@ -1258,6 +1258,167 @@ describe("Cruise Missile Attack Contract", function () {
             expect(defenderTankCount2).to.equal(86);
         })
 
+        it("tests that a cruise missile attack will reduce the number of tanks to 0 when the damage is more than the number of tanks", async function () {
+            await technologymarketcontrat.connect(signer1).buyTech(0, 100)
+
+            await missilescontract.connect(signer1).buyCruiseMissiles(20, 0)
+            await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 7)
+
+            await forcescontract.connect(signer2).decommissionTanks(90, 1)
+
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+                for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 5) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const eventFilter2 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs2 = await vrfCoordinatorV2Mock.queryFilter(eventFilter2);
+                for (const log of event1Logs2) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 6) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            await keepercontract.incrementGameDay()
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const eventFilter3 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs3 = await vrfCoordinatorV2Mock.queryFilter(eventFilter3);
+                for (const log of event1Logs3) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 7) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const eventFilter4 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs4 = await vrfCoordinatorV2Mock.queryFilter(eventFilter4);
+                for (const log of event1Logs4) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 8) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            await keepercontract.incrementGameDay()
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const eventFilter5 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs5 = await vrfCoordinatorV2Mock.queryFilter(eventFilter5);
+                for (const log of event1Logs5) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 9) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            //needed to launch 6 attacks to get to a tank attack "randomly" here
+            const eventFilter6 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs6 = await vrfCoordinatorV2Mock.queryFilter(eventFilter6);
+                for (const log of event1Logs6) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 10) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            await keepercontract.incrementGameDay()
+            var defenderTankCount2 = await forcescontract.getTankCount(1);
+            // console.log(defenderTankCount2.toNumber())
+            expect(defenderTankCount2).to.equal(0);
+        })
+
+        it("tests that a cruise missile attack will reduce infrastructure when tanks are 0", async function () {
+            await technologymarketcontrat.connect(signer1).buyTech(0, 100)
+
+            await missilescontract.connect(signer1).buyCruiseMissiles(20, 0)
+            await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 7)
+
+            await forcescontract.connect(signer2).decommissionTanks(100, 1)
+
+            var inf = await infrastructurecontract.getInfrastructureCount(1)
+            // console.log(inf.toNumber())
+            expect(inf).to.equal(2020)
+
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+                for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 5) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const eventFilter2 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs2 = await vrfCoordinatorV2Mock.queryFilter(eventFilter2);
+                for (const log of event1Logs2) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 6) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            await keepercontract.incrementGameDay()
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const eventFilter3 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs3 = await vrfCoordinatorV2Mock.queryFilter(eventFilter3);
+                for (const log of event1Logs3) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 7) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const eventFilter4 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs4 = await vrfCoordinatorV2Mock.queryFilter(eventFilter4);
+                for (const log of event1Logs4) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 8) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            await keepercontract.incrementGameDay()
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const eventFilter5 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs5 = await vrfCoordinatorV2Mock.queryFilter(eventFilter5);
+                for (const log of event1Logs5) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 9) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            //needed to launch 6 attacks to get to a tank attack "randomly" here
+            const eventFilter6 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs6 = await vrfCoordinatorV2Mock.queryFilter(eventFilter6);
+                for (const log of event1Logs6) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 10) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            await keepercontract.incrementGameDay()
+            var defenderTankCount2 = await forcescontract.getTankCount(1);
+            // console.log(defenderTankCount2.toNumber())
+            expect(defenderTankCount2).to.equal(0);
+            var inf = await infrastructurecontract.getInfrastructureCount(1)
+            // console.log(inf.toNumber())
+            expect(inf).to.equal(2003)
+        })
+
         it("tests that launchCruiseMissile works correctly destroying tech", async function () {
             await technologymarketcontrat.connect(signer2).buyTech(1, 1000)
 
@@ -1288,11 +1449,87 @@ describe("Cruise Missile Attack Contract", function () {
                     await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
                 }
             }
-
             var tech = await infrastructurecontract.getTechnologyCount(1)
             // console.log(tech.toNumber())
             expect(tech).to.equal(998)
+        })
 
+        it("tests that launchCruiseMissile works correctly destroying less tech when defender has bunkers", async function () {
+            await technologymarketcontrat.connect(signer2).buyTech(1, 1000)
+
+            await missilescontract.connect(signer1).buyCruiseMissiles(20, 0)
+            await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 7)
+
+            var tech = await infrastructurecontract.getTechnologyCount(1)
+            // console.log(tech.toNumber())
+            expect(tech).to.equal(1010)
+
+            //purchase a barracks for each bunker
+            await improvementscontract1.connect(signer2).buyImprovement1(3, 1, 3)
+            //defender bunkers
+            await improvementscontract1.connect(signer2).buyImprovement1(3, 1, 6)
+
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+                for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 5) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const eventFilter2 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs2 = await vrfCoordinatorV2Mock.queryFilter(eventFilter2);
+                for (const log of event1Logs2) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 6) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            var tech = await infrastructurecontract.getTechnologyCount(1)
+            // console.log(tech.toNumber())
+            expect(tech).to.equal(1004)
+        })
+
+        it("tests that launchCruiseMissile works correctly destroying more tech when attacker has munitions factory", async function () {
+            await technologymarketcontrat.connect(signer2).buyTech(1, 1000)
+
+            await missilescontract.connect(signer1).buyCruiseMissiles(20, 0)
+            await improvementscontract3.connect(signer1).buyImprovement3(5, 0, 7)
+
+            var tech = await infrastructurecontract.getTechnologyCount(1)
+            // console.log(tech.toNumber())
+            expect(tech).to.equal(1010)
+
+            //attacker muntions factory
+            await improvementscontract4.connect(signer1).buyImprovement4(5, 0, 2)
+
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+                for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 5) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            await cruisemissilecontract.connect(signer1).launchCruiseMissileAttack(0, 1, 0)
+            const eventFilter2 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs2 = await vrfCoordinatorV2Mock.queryFilter(eventFilter2);
+                for (const log of event1Logs2) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 6) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, cruisemissilecontract.address);
+                }
+            }
+            var tech = await infrastructurecontract.getTechnologyCount(1)
+            // console.log(tech.toNumber())
+            expect(tech).to.equal(988)
         })
 
         it("tests that launchCruiseMissile works correctly destroying infrastructure", async function () {
