@@ -144,14 +144,6 @@ contract MissilesContract is Ownable {
         _;
     }
 
-    // modifier onlyKeeper() {
-    //     require(
-    //         msg.sender == keeper,
-    //         "function only callable from keeper contract"
-    //     );
-    //     _;
-    // }
-
     ///@dev this function is a public function that will allow a nation owner to purchase cruise missiles
     ///@notice this function allows a nation owner to purchase cruise missiles
     ///@param amount is the amount of cruise missiles being purchased

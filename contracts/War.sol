@@ -470,9 +470,12 @@ contract WarContract is Ownable {
     ///@return bool will be true if the war is active
     function isWarActive(uint256 _warId) public view returns (bool) {
         bool isActive = true;
+        bool warDoesntExist = warIdToWar[_warId].active;
         (, bool expired) = getDaysLeft(_warId);
         bool peaceDeclared = warIdToWar[_warId].peaceDeclared;
         if (expired == true || peaceDeclared == true) {
+            isActive = false;
+        } else if (warDoesntExist == false) {
             isActive = false;
         }
         return isActive;

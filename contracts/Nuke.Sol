@@ -70,7 +70,8 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
     mapping(uint256 => uint256) public gameDayToNukesLanded;
-    mapping(uint256 => mapping (uint256 => bool)) public nationIdToDayToNukeLanded;
+    mapping(uint256 => mapping(uint256 => bool))
+        public nationIdToDayToNukeLanded;
 
     event NukeLaunched(
         uint256 indexed id,
@@ -153,24 +154,6 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         param = CountryParametersContract(_parameters);
     }
 
-    ///@dev this function is only callable by the contract owner
-    function updateCountryMinterContract(address newAddress) public onlyOwner {
-        countryMinter = newAddress;
-        mint = CountryMinter(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWarContract(address newAddress) public onlyOwner {
-        warAddress = newAddress;
-        war = WarContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWonders1Contract(address newAddress) public onlyOwner {
-        wonders1 = newAddress;
-        won1 = WondersContract1(newAddress);
-    }
-
     ///@dev this is a public function callable only by the attacking nation owner
     ///@dev this function will launch a nuke strike against another nation, nations are required to be at war
     ///@notice this function will launch a nuke strike against another nation, nations are required to be at war
@@ -186,7 +169,7 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         uint256 attackerId,
         uint256 defenderId,
         uint256 attackType
-    ) public { 
+    ) public {
         bool isOwner = mint.checkOwnership(attackerId, msg.sender);
         require(isOwner, "!nation owner");
         bool isActive = war.isWarActive(warId);
@@ -205,7 +188,10 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         uint256 count = mis.getNukeCount(attackerId);
         require(count >= 1, "need to own a nuke");
         uint256 day = keep.getGameDay();
-        require(nationIdToDayToNukeLanded[defenderId][day] == false, "defender already nuked this day");
+        require(
+            nationIdToDayToNukeLanded[defenderId][day] == false,
+            "defender already nuked this day"
+        );
         completeNukeLaunch(warId, attackerId, defenderId, attackType);
     }
 
@@ -275,11 +261,15 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         uint256 requestId,
         uint256[] memory randomWords
     ) internal override {
+        console.log("request ID from fullfill", requestId);
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
+        console.log("requestNumber", requestNumber);
         s_requestIndexToRandomWords[requestNumber] = randomWords;
         s_randomWords = randomWords;
         uint256 attackerId = nukeAttackIdToNukeAttack[requestNumber].attackerId;
         uint256 defenderId = nukeAttackIdToNukeAttack[requestNumber].defenderId;
+        console.log("attackerId", attackerId);
+        console.log("defenderId", defenderId);
         uint256 thwartOdds = getThwartOdds(attackerId, defenderId);
         console.log("thwartOdds", thwartOdds);
         uint256 randomNukeSuccessNumber = ((s_randomWords[0] % 100) + 1);
@@ -300,6 +290,8 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
             );
             uint256 day = keep.getGameDay();
             nationIdToDayToNukeLanded[defenderId][day] = true;
+            console.log("did this run?", nationIdToDayToNukeLanded[defenderId][day]);
+            console.log(defenderId, day);
         } else {
             console.log("Nuke attaq thwarted");
             mis.decreaseNukeCountFromNukeContract(attackerId);
