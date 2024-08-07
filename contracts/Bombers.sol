@@ -114,50 +114,6 @@ contract BombersContract is Ownable {
         _;
     }
 
-    ///@dev this function is only callable from the contact owner
-    function updateCountryMinterAddress(
-        address _countryMinter
-    ) public onlyOwner {
-        countryMinter = _countryMinter;
-        mint = CountryMinter(_countryMinter);
-    }
-
-    ///@dev this function is only callable from the contact owner
-    function updateBombersMarketAddresses(
-        address _bombersMarket1,
-        address _bombersMarket2
-    ) public onlyOwner {
-        bombersMarket1 = _bombersMarket1;
-        bombersMarket2 = _bombersMarket2;
-    }
-
-    ///@dev this function is only callable from the contact owner
-    function updateAirBattleAddress(address _airBattle) public onlyOwner {
-        airBattle = _airBattle;
-    }
-
-    ///@dev this function is only callable from the contact owner
-    function updateTreasuryAddress(address _treasury) public onlyOwner {
-        treasury = _treasury;
-    }
-
-    ///@dev this function is only callable from the contact owner
-    function updateFightersAddress(address _fighters) public onlyOwner {
-        fighters = _fighters;
-    }
-
-    ///@dev this function is only callable from the contact owner
-    function updateInfrastructureAddress(
-        address _infrastructure
-    ) public onlyOwner {
-        infrastructure = _infrastructure;
-    }
-
-    ///@dev this function is only callable from the contact owner
-    function updateWarAddress(address _war) public onlyOwner {
-        war = _war;
-    }
-
     ///@dev this function is only callable from the country minter contract
     ///@notice this function will initiate a nation to be bale to buy bombers when a nation is minted
     function generateBombers(uint256 id) public onlyCountryMinter {
@@ -682,41 +638,6 @@ contract BombersMarketplace1 is Ownable {
         tsy = TreasuryContract(_treasury);
     }
 
-    modifier onlyCountryMinter() {
-        require(msg.sender == countryMinter, "only countryMinter can call");
-        _;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateCountryMinterAddress(address newAddress) public onlyOwner {
-        countryMinter = newAddress;
-        mint = CountryMinter(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateBombers1Address(address newAddress) public onlyOwner {
-        bombers1 = newAddress;
-        bomb1 = BombersContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateFightersAddress(address newAddress) public onlyOwner {
-        fighters = newAddress;
-        fight = FightersContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateInfrastructureAddress(address newAddress) public onlyOwner {
-        infrastructure = newAddress;
-        inf = InfrastructureContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateTreasuryAddress(address newAddress) public onlyOwner {
-        treasury = newAddress;
-        tsy = TreasuryContract(newAddress);
-    }
-
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be used to update the price, infrastructure requirement and tech requirement in order to purchase a AH1 Cobra
     function updateAh1CobraSpecs(
@@ -1047,41 +968,6 @@ contract BombersMarketplace2 is Ownable {
         inf = InfrastructureContract(_infrastructure);
         treasury = _treasury;
         tsy = TreasuryContract(_treasury);
-    }
-
-    modifier onlyCountryMinter() {
-        require(msg.sender == countryMinter, "only countryMinter can call");
-        _;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateCountryMinterAddress(address newAddress) public onlyOwner {
-        countryMinter = newAddress;
-        mint = CountryMinter(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateBombers1Address(address newAddress) public onlyOwner {
-        bombers1 = newAddress;
-        bomb1 = BombersContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateFightersAddress(address newAddress) public onlyOwner {
-        fighters = newAddress;
-        fight = FightersContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateInfrastructureAddress(address newAddress) public onlyOwner {
-        infrastructure = newAddress;
-        inf = InfrastructureContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateTreasuryAddress(address newAddress) public onlyOwner {
-        treasury = newAddress;
-        tsy = TreasuryContract(newAddress);
     }
 
     ///@dev this function is only callable by the contract owner

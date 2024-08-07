@@ -116,14 +116,6 @@ contract FightersContract is Ownable {
         _;
     }
 
-    modifier onlyWar() {
-        require(
-            msg.sender == war,
-            "this function can only be called by battle"
-        );
-        _;
-    }
-
     modifier onlyMarket() {
         require(
             msg.sender == fightersMarket1 || msg.sender == fightersMarket2,
@@ -136,18 +128,13 @@ contract FightersContract is Ownable {
         require(msg.sender == losses, "only callable from losses contract");
         _;
     }
-
+    
     ///@dev this function is a public function but only callable from the country minter contact when a country is minted
     ///@notice this function allows a nation to purchase fighter aircraft once a country is minted
     ///@param id this is the nation ID of the nation being minted
     function generateFighters(uint256 id) public onlyCountryMinter {
         Fighters memory newFighters = Fighters(0, 0, 0, 0, 0, 0, 0, 0, 0);
         idToFighters[id] = newFighters;
-    }
-
-    modifier onlyBomberContract() {
-        require(msg.sender == bombers);
-        _;
     }
 
     ///@notice this function will return the amount of defending Yak9's of a nation
@@ -622,15 +609,6 @@ contract FighterLosses is Ownable {
         _;
     }
 
-    function updateFightersAddress(address _newAddress) public onlyOwner {
-        fighters = _newAddress;
-        fight = FightersContract(_newAddress);
-    }
-
-    function updateAirBattleAddress(address _newAddress) public onlyOwner {
-        airBattle = _newAddress;
-    }
-
     ///@dev this is a public function that is only callable from the Air Battle contract
     ///@notice this function will decrease the amount of fighers lost in battle from the FighersContract
     ///@param losses is an array of uints that represent the fighters that the defender lost in battle
@@ -749,58 +727,6 @@ contract FightersMarketplace1 is Ownable {
         bonus = BonusResourcesContract(_bonusResources);
         navy2 = _navy2;
         nav2 = NavyContract2(_navy2);
-    }
-
-    mapping(uint256 => address) public idToOwnerFightersMarket;
-
-    modifier onlyCountryMinter() {
-        require(msg.sender == countryMinter, "only countryMinter can call");
-        _;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateCountryMinterAddress(address newAddress) public onlyOwner {
-        countryMinter = newAddress;
-        mint = CountryMinter(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateBombersAddress(address newAddress) public onlyOwner {
-        bombers = newAddress;
-        bomb = BombersContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateFightersAddress(address newAddress) public onlyOwner {
-        fighters = newAddress;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateTreasuryAddress(address newAddress) public onlyOwner {
-        treasury = newAddress;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateInfrastructureAddress(address newAddress) public onlyOwner {
-        infrastructure = newAddress;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateResourcesAddress(address newAddress) public onlyOwner {
-        resources = newAddress;
-        res = ResourcesContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovements1Address(address newAddress) public onlyOwner {
-        improvements1 = newAddress;
-        imp1 = ImprovementsContract1(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateWonders4Address(address newAddress) public onlyOwner {
-        wonders4 = newAddress;
-        won4 = WondersContract4(newAddress);
     }
 
     ///@dev this function is only callable by the contract owner
@@ -1192,52 +1118,6 @@ contract FightersMarketplace2 is Ownable {
         fightersMarket1 = _fightersMarket1;
         fightMarket1 = FightersMarketplace1(_fightersMarket1);
         infrastructure = _infrastructure;
-    }
-
-    mapping(uint256 => address) public idToOwnerFightersMarket;
-
-    modifier onlyCountryMinter() {
-        require(msg.sender == countryMinter, "only countryMinter can call");
-        _;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateCountryMinterAddress(address newAddress) public onlyOwner {
-        countryMinter = newAddress;
-        mint = CountryMinter(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateBombersAddress(address newAddress) public onlyOwner {
-        bombers = newAddress;
-        bomb = BombersContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateFightersAddress(address newAddress) public onlyOwner {
-        fighters = newAddress;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateTreasuryAddress(address newAddress) public onlyOwner {
-        treasury = newAddress;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateInfrastructureAddress(address newAddress) public onlyOwner {
-        infrastructure = newAddress;
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateResourcesAddress(address newAddress) public onlyOwner {
-        resources = newAddress;
-        res = ResourcesContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the contract owner
-    function updateImprovements1Address(address newAddress) public onlyOwner {
-        improvements1 = newAddress;
-        imp1 = ImprovementsContract1(newAddress);
     }
 
     ///@dev this function is only callable by the contract owner

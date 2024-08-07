@@ -102,8 +102,7 @@ contract NavalActionsContract is Ownable {
 
     modifier onlyNavy() {
         require(
-            msg.sender == navy ||
-            msg.sender == navy2,
+            msg.sender == navy || msg.sender == navy2,
             "function only callable from navy contract"
         );
         _;
@@ -138,11 +137,6 @@ contract NavalActionsContract is Ownable {
         idToNavalActions[id].blockadedToday[day] = true;
     }
 
-    modifier onlyKeeper() {
-        require(msg.sender == keeper, "only callable from keeper");
-        _;
-    }
-
     ///@dev this is a public view function that will return a nations daily purchases
     ///@notice this function will return the amount of vessels a nation purchases today
     ///@param id is the nation id of the nation being queried
@@ -159,7 +153,9 @@ contract NavalActionsContract is Ownable {
     ///@return uint256 is the number of action slots used today
     function getActionSlotsUsed(uint256 id) public view returns (uint256) {
         uint256 gameDay = keep.getGameDay();
-        uint256 actionSlotsUsed = idToNavalActions[id].actionSlotsUsedToday[gameDay];
+        uint256 actionSlotsUsed = idToNavalActions[id].actionSlotsUsedToday[
+            gameDay
+        ];
         return actionSlotsUsed;
     }
 
@@ -237,25 +233,13 @@ contract NavyContract is Ownable {
         uint256 indexed purchasePrice
     );
 
-    event CorvetteDecommissioned(
-        uint256 indexed id,
-        uint256 indexed amount
-    );
+    event CorvetteDecommissioned(uint256 indexed id, uint256 indexed amount);
 
-    event LandingShipDecommissioned(
-        uint256 indexed id,
-        uint256 indexed amount
-    );
+    event LandingShipDecommissioned(uint256 indexed id, uint256 indexed amount);
 
-    event BattleshipDecommissioned(
-        uint256 indexed id,
-        uint256 indexed amount
-    );
+    event BattleshipDecommissioned(uint256 indexed id, uint256 indexed amount);
 
-    event CruiserDecommissioned(
-        uint256 indexed id,
-        uint256 indexed amount
-    );
+    event CruiserDecommissioned(uint256 indexed id, uint256 indexed amount);
 
     event NukeDamageToNavy(
         uint256 indexed defenderId,
@@ -287,7 +271,8 @@ contract NavyContract is Ownable {
 
     modifier onlyNavy2Contract() {
         require(
-            msg.sender == navy2Contract, "function only callable from navy contract 2"
+            msg.sender == navy2Contract,
+            "function only callable from navy contract 2"
         );
         _;
     }
@@ -536,9 +521,16 @@ contract NavyContract is Ownable {
         ).getDrydockCount(id);
         uint256 currentShips = getCorvetteCount(id);
         uint256 nationInfrastructure = inf.getInfrastructureCount(id);
-        uint256 additionalPurchases = (nationInfrastructure / corvetteRequiredInfrastructure);
-        require((currentShips + amount) <= (drydockAmount + additionalPurchases), "need more drydocks or infrastructure");
-        require(inf.getTechnologyCount(id) >= corvetteRequiredTechnology, "need more technology");
+        uint256 additionalPurchases = (nationInfrastructure /
+            corvetteRequiredInfrastructure);
+        require(
+            (currentShips + amount) <= (drydockAmount + additionalPurchases),
+            "need more drydocks or infrastructure"
+        );
+        require(
+            inf.getTechnologyCount(id) >= corvetteRequiredTechnology,
+            "need more technology"
+        );
         uint256 purchasePrice = (corvetteCost * amount);
         bool steel = bonus.viewSteel(id);
         if (steel) {
@@ -588,9 +580,16 @@ contract NavyContract is Ownable {
         ).getShipyardCount(id);
         uint256 currentShips = getLandingShipCount(id);
         uint256 nationInfrastructure = inf.getInfrastructureCount(id);
-        uint256 additionalPurchases = (nationInfrastructure / landingShipRequiredInfrastructure);
-        require((currentShips + amount) <= (shipyardAmount + additionalPurchases), "need more shipyards or infrastructure");
-        require(inf.getTechnologyCount(id) >= landingShipRequiredTechnology, "need more technology");
+        uint256 additionalPurchases = (nationInfrastructure /
+            landingShipRequiredInfrastructure);
+        require(
+            (currentShips + amount) <= (shipyardAmount + additionalPurchases),
+            "need more shipyards or infrastructure"
+        );
+        require(
+            inf.getTechnologyCount(id) >= landingShipRequiredTechnology,
+            "need more technology"
+        );
         uint256 purchasePrice = landingShipCost * amount;
         bool steel = bonus.viewSteel(id);
         if (steel) {
@@ -643,9 +642,16 @@ contract NavyContract is Ownable {
         ).getDrydockCount(id);
         uint256 currentShips = getBattleshipCount(id);
         uint256 nationInfrastructure = inf.getInfrastructureCount(id);
-        uint256 additionalPurchases = (nationInfrastructure / battleshipRequiredInfrastructure);
-        require((currentShips + amount) <= (drydockAmount + additionalPurchases), "need more drydocks or infrastructure");
-        require(inf.getTechnologyCount(id) >= battleshipRequiredTechnology, "need more technology");
+        uint256 additionalPurchases = (nationInfrastructure /
+            battleshipRequiredInfrastructure);
+        require(
+            (currentShips + amount) <= (drydockAmount + additionalPurchases),
+            "need more drydocks or infrastructure"
+        );
+        require(
+            inf.getTechnologyCount(id) >= battleshipRequiredTechnology,
+            "need more technology"
+        );
         uint256 purchasePrice = battleshipCost * amount;
         bool steel = bonus.viewSteel(id);
         if (steel) {
@@ -698,9 +704,16 @@ contract NavyContract is Ownable {
         ).getDrydockCount(id);
         uint256 currentShips = getCruiserCount(id);
         uint256 nationInfrastructure = inf.getInfrastructureCount(id);
-        uint256 additionalPurchases = (nationInfrastructure / cruiserRequiredInfrastructure);
-        require((currentShips + amount) <= (drydockAmount + additionalPurchases), "need more drydocks or infrastructure");
-        require(inf.getTechnologyCount(id) >= cruiserRequiredTechnology, "need more technology");
+        uint256 additionalPurchases = (nationInfrastructure /
+            cruiserRequiredInfrastructure);
+        require(
+            (currentShips + amount) <= (drydockAmount + additionalPurchases),
+            "need more drydocks or infrastructure"
+        );
+        require(
+            inf.getTechnologyCount(id) >= cruiserRequiredTechnology,
+            "need more technology"
+        );
         uint256 purchasePrice = cruiserCost * amount;
         bool steel = bonus.viewSteel(id);
         if (steel) {
@@ -751,10 +764,14 @@ contract NavyContract is Ownable {
         if (falloutShelter) {
             percentage = 20;
         }
-        uint256 corvetteCountToReduce = (idToNavy[defenderId].corvetteCount * percentage) / 100;
-        uint256 landingShipCountToReduce = (idToNavy[defenderId].landingShipCount * percentage) / 100;
-        uint256 cruiserCountToReduce = (idToNavy[defenderId].cruiserCount * percentage) / 100;
-        uint256 frigateCountToReduce = (navy2.getFrigateCount(defenderId) * percentage) / 100;
+        uint256 corvetteCountToReduce = (idToNavy[defenderId].corvetteCount *
+            percentage) / 100;
+        uint256 landingShipCountToReduce = (idToNavy[defenderId]
+            .landingShipCount * percentage) / 100;
+        uint256 cruiserCountToReduce = (idToNavy[defenderId].cruiserCount *
+            percentage) / 100;
+        uint256 frigateCountToReduce = (navy2.getFrigateCount(defenderId) *
+            percentage) / 100;
         idToNavy[defenderId].corvetteCount -= corvetteCountToReduce;
         idToNavy[defenderId].landingShipCount -= landingShipCountToReduce;
         idToNavy[defenderId].cruiserCount -= cruiserCountToReduce;
@@ -835,20 +852,11 @@ contract NavyContract2 is Ownable {
         uint256 indexed purchasePrice
     );
 
-    event FrigateDecommissioned(
-        uint256 indexed id,
-        uint256 indexed amount
-    );
+    event FrigateDecommissioned(uint256 indexed id, uint256 indexed amount);
 
-    event DestroyerDecommissioned(
-        uint256 indexed id,
-        uint256 indexed amount
-    );
+    event DestroyerDecommissioned(uint256 indexed id, uint256 indexed amount);
 
-    event SubmarineDecommissioned(
-        uint256 indexed id,
-        uint256 indexed amount
-    );
+    event SubmarineDecommissioned(uint256 indexed id, uint256 indexed amount);
 
     event AircraftCarrierDecommissioned(
         uint256 indexed id,
@@ -1049,9 +1057,16 @@ contract NavyContract2 is Ownable {
         ).getShipyardCount(id);
         uint256 currentShips = getFrigateCount(id);
         uint256 nationInfrastructure = inf.getInfrastructureCount(id);
-        uint256 additionalPurchases = (nationInfrastructure / frigateRequiredInfrastructure);
-        require((currentShips + amount) <= (shipyardAmount + additionalPurchases), "need more shipyards or infrastructure");
-        require(inf.getTechnologyCount(id) >= frigateRequiredTechnology, "need more technology");
+        uint256 additionalPurchases = (nationInfrastructure /
+            frigateRequiredInfrastructure);
+        require(
+            (currentShips + amount) <= (shipyardAmount + additionalPurchases),
+            "need more shipyards or infrastructure"
+        );
+        require(
+            inf.getTechnologyCount(id) >= frigateRequiredTechnology,
+            "need more technology"
+        );
         uint256 purchasePrice = frigateCost * amount;
         bool steel = bonus.viewSteel(id);
         if (steel) {
@@ -1112,9 +1127,16 @@ contract NavyContract2 is Ownable {
         ).getDrydockCount(id);
         uint256 currentShips = getDestroyerCount(id);
         uint256 nationInfrastructure = inf.getInfrastructureCount(id);
-        uint256 additionalPurchases = (nationInfrastructure / destroyerRequiredInfrastructure);
-        require((currentShips + amount) <= (drydockAmount + additionalPurchases), "need more drydocks or infrastructure");
-        require(inf.getTechnologyCount(id) >= destroyerRequiredTechnology, "need more technology");
+        uint256 additionalPurchases = (nationInfrastructure /
+            destroyerRequiredInfrastructure);
+        require(
+            (currentShips + amount) <= (drydockAmount + additionalPurchases),
+            "need more drydocks or infrastructure"
+        );
+        require(
+            inf.getTechnologyCount(id) >= destroyerRequiredTechnology,
+            "need more technology"
+        );
         uint256 purchasePrice = destroyerCost * amount;
         bool steel = bonus.viewSteel(id);
         if (steel) {
@@ -1135,10 +1157,7 @@ contract NavyContract2 is Ownable {
     function decommissionDestroyer(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
-        require(
-            amount <= idToNavy[id].destroyerCount,
-            "not enough destroyers"
-        );
+        require(amount <= idToNavy[id].destroyerCount, "not enough destroyers");
         idToNavy[id].destroyerCount -= amount;
         emit DestroyerDecommissioned(id, amount);
     }
@@ -1178,9 +1197,16 @@ contract NavyContract2 is Ownable {
         ).getShipyardCount(id);
         uint256 currentShips = getSubmarineCount(id);
         uint256 nationInfrastructure = inf.getInfrastructureCount(id);
-        uint256 additionalPurchases = (nationInfrastructure / submarineRequiredInfrastructure);
-        require((currentShips + amount) <= (shipyardAmount + additionalPurchases), "need more shipyards or infrastructure");
-        require(inf.getTechnologyCount(id) >= submarineRequiredTechnology, "need more technology");
+        uint256 additionalPurchases = (nationInfrastructure /
+            submarineRequiredInfrastructure);
+        require(
+            (currentShips + amount) <= (shipyardAmount + additionalPurchases),
+            "need more shipyards or infrastructure"
+        );
+        require(
+            inf.getTechnologyCount(id) >= submarineRequiredTechnology,
+            "need more technology"
+        );
         uint256 purchasePrice = submarineCost * amount;
         bool steel = bonus.viewSteel(id);
         if (steel) {
@@ -1201,10 +1227,7 @@ contract NavyContract2 is Ownable {
     function decommissionSubmarine(uint256 amount, uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
-        require(
-            amount <= idToNavy[id].submarineCount,
-            "not enough submarines"
-        );
+        require(amount <= idToNavy[id].submarineCount, "not enough submarines");
         idToNavy[id].submarineCount -= amount;
         emit SubmarineDecommissioned(id, amount);
     }
@@ -1244,9 +1267,16 @@ contract NavyContract2 is Ownable {
         ).getShipyardCount(id);
         uint256 currentShips = getAircraftCarrierCount(id);
         uint256 nationInfrastructure = inf.getInfrastructureCount(id);
-        uint256 additionalPurchases = (nationInfrastructure / aircraftCarrierRequiredInfrastructure);
-        require((currentShips + amount) <= (shipyardAmount + additionalPurchases), "need more shipyards or infrastructure");
-        require(inf.getTechnologyCount(id) >= aircraftCarrierRequiredTechnology, "need more technology");
+        uint256 additionalPurchases = (nationInfrastructure /
+            aircraftCarrierRequiredInfrastructure);
+        require(
+            (currentShips + amount) <= (shipyardAmount + additionalPurchases),
+            "need more shipyards or infrastructure"
+        );
+        require(
+            inf.getTechnologyCount(id) >= aircraftCarrierRequiredTechnology,
+            "need more technology"
+        );
         uint256 purchasePrice = aircraftCarrierCost * amount;
         bool steel = bonus.viewSteel(id);
         if (steel) {

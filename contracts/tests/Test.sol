@@ -41,7 +41,6 @@ contract Test is Ownable, ChainlinkClient {
     ) public {
         // console.log(fee, "fee");
         // string memory jobIdDecoded = abi.decode(bytes(jobId), (string));
-        console.log(oracleAddress, "oracleAddress", fee, "fee");
         Chainlink.Request memory req = buildChainlinkRequest(
             jobId,
             address(this),

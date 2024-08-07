@@ -1090,26 +1090,97 @@ describe("Fighter Contract", function () {
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
         }
 
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000000000000000000))
         await countryminter.connect(signer1).generateCountry(
             "TestRuler",
             "TestNationName",
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
-        await treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0);
-        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 50)
-        await technologymarketcontrat.connect(signer1).buyTech(0, 10)
-
-        await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(25000000000000000000000000))
         await countryminter.connect(signer2).generateCountry(
             "TestRuler2",
             "TestNationName2",
             "TestCapitalCity2",
             "TestNationSlogan2"
         )
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000000000000000000))
+        await countryminter.connect(signer1).generateCountry(
+            "TestRuler3",
+            "TestNationName3",
+            "TestCapitalCity3",
+            "TestNationSlogan3"
+        )
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000000000000000000))
+        await countryminter.connect(signer1).generateCountry(
+            "TestRuler4",
+            "TestNationName4",
+            "TestCapitalCity4",
+            "TestNationSlogan4"
+        )
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000000000000000000))
+        await countryminter.connect(signer1).generateCountry(
+            "TestRuler5",
+            "TestNationName5",
+            "TestCapitalCity5",
+            "TestNationSlogan5"
+        )
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000000000000000000))
+        await countryminter.connect(signer1).generateCountry(
+            "TestRuler6",
+            "TestNationName6",
+            "TestCapitalCity6",
+            "TestNationSlogan6"
+        )
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(25000000000000000000000000))
+        await countryminter.connect(signer1).generateCountry(
+            "TestRuler7",
+            "TestNationName7",
+            "TestCapitalCity7",
+            "TestNationSlogan7"
+        )
+        const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+        const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+        for (const log of event1Logs) {
+            const requestIdReturn = log.args.requestId;
+            // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            if (requestIdReturn == 2) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources1 = await resourcescontract.getPlayerResources(0);
+                // console.log("resources 1", resources1[0].toNumber(), resources1[1].toNumber());
+            } else if (requestIdReturn == 4) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources2 = await resourcescontract.getPlayerResources(1);
+                // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
+            } else if (requestIdReturn == 6) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources3 = await resourcescontract.getPlayerResources(2);
+                // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+            } else if (requestIdReturn == 8) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources3 = await resourcescontract.getPlayerResources(3);
+                // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+            } else if (requestIdReturn == 10) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources3 = await resourcescontract.getPlayerResources(4);
+                // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+            } else if (requestIdReturn == 12) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources3 = await resourcescontract.getPlayerResources(5);
+                // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+            } else if (requestIdReturn == 14) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources3 = await resourcescontract.getPlayerResources(6);
+                // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+            }
+        }
+
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0);
+        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 50)
+        await technologymarketcontrat.connect(signer1).buyTech(0, 10)
+
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
         await warbucks.connect(signer0).transfer(signer2.address, BigInt(2000000000*(10**18)));
         await treasurycontract.connect(signer2).addFunds(BigInt(2000000000*(10**18)), 1);
@@ -1784,4 +1855,71 @@ describe("Fighter Contract", function () {
             expect(cost6).to.equal(BigInt("45500000000000000000000"))
         })
     }) 
+    
+    describe("Max Aircraft Count", function () {
+        it("tests that the max aircraft count adjusts for resources, improvements and wonders", async function () {
+            var maxAircraftCount = await fightersmarketplace1.getMaxAircraftCount(0);
+            // console.log(maxAircraftCount.toNumber(), "max aircraft count");
+            expect(maxAircraftCount.toNumber()).to.equal(50)
+
+            //construction
+            await resourcescontract.mockResourcesForTesting(0, 0, 7)
+            await resourcescontract.mockResourcesForTesting(1, 9, 10)
+            await resourcescontract.mockResourcesForTesting(2, 4, 5)
+            await resourcescontract.mockResourcesForTesting(3, 6, 7)
+            await resourcescontract.mockResourcesForTesting(4, 8, 9)
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
+            await resourcescontract.connect(signer1).proposeTrade(4, 0);
+            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(3, 0);
+            await resourcescontract.connect(signer1).fulfillTradingPartner(0, 4);
+            var construction = await bonusresourcescontract.viewConstruction(0);
+            console.log(construction)
+            expect(construction).to.equal(true);
+            var maxAircraftCount = await fightersmarketplace1.getMaxAircraftCount(0);
+            // console.log(maxAircraftCount.toNumber(), "max aircraft count with construction");
+            expect(maxAircraftCount.toNumber()).to.equal(60)
+
+            //foreign air force base
+            await wonderscontract1.connect(signer1).buyWonder1(0, 9);
+            var isWonder = await wonderscontract1.getForeignAirforceBase(0);
+            expect(isWonder).to.equal(true); 
+            var maxAircraftCount = await fightersmarketplace1.getMaxAircraftCount(0);
+            // console.log(maxAircraftCount.toNumber(), "max aircraft count with construction");
+            expect(maxAircraftCount.toNumber()).to.equal(80)
+
+            //aircraft carriers
+            await billscontract.connect(signer1).payBills(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 25000)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 10000)
+            var purchasesToday = await navalactionscontract.getPurchasesToday(0)
+            expect(purchasesToday).to.equal(0)
+            var shipCount = await navycontract2.getAircraftCarrierCount(0)
+            expect(shipCount).to.equal(0)
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 7)
+            await navycontract2.connect(signer1).buyAircraftCarrier(3, 0)
+            var shipCount = await navycontract2.getAircraftCarrierCount(0)
+            expect(shipCount).to.equal(3)
+
+            var maxAircraftCount = await fightersmarketplace1.getMaxAircraftCount(0);
+            // console.log(maxAircraftCount.toNumber(), "max aircraft count with construction");
+            expect(maxAircraftCount.toNumber()).to.equal(95)
+
+            await keepercontract.incrementGameDay()
+            
+            //3 more aircraft carriers
+            await navycontract2.connect(signer1).buyAircraftCarrier(3, 0)
+            var shipCount = await navycontract2.getAircraftCarrierCount(0)
+            expect(shipCount).to.equal(6)
+
+            var maxAircraftCount = await fightersmarketplace1.getMaxAircraftCount(0);
+            // console.log(maxAircraftCount.toNumber(), "max aircraft count with construction");
+            expect(maxAircraftCount.toNumber()).to.equal(105)
+        })
+    })
 })

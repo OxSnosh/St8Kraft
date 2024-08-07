@@ -1098,14 +1098,7 @@ describe("Navy Contract", function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
-        await treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0);
-        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20)
-        await technologymarketcontrat.connect(signer1).buyTech(0, 100)
-        // await forcescontract.connect(signer1).buySoldiers(2000, 0)
-        // await forcescontract.connect(signer1).buyTanks(40, 0)
-
+        
         await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer2).generateCountry(
             "TestRuler2",
@@ -1113,6 +1106,31 @@ describe("Navy Contract", function () {
             "TestCapitalCity2",
             "TestNationSlogan2"
         )
+
+        const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+        const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+        for (const log of event1Logs) {
+            const requestIdReturn = log.args.requestId;
+            // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            if (requestIdReturn == 2) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources1 = await resourcescontract.getPlayerResources(0);
+                // console.log("resources 1", resources1[0].toNumber(), resources1[1].toNumber());
+            } else if (requestIdReturn == 4) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources2 = await resourcescontract.getPlayerResources(1);
+                // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
+            }
+        }
+        
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0);
+        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20)
+        await technologymarketcontrat.connect(signer1).buyTech(0, 100)
+        // await forcescontract.connect(signer1).buySoldiers(2000, 0)
+        // await forcescontract.connect(signer1).buyTanks(40, 0)
+        
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
         await warbucks.connect(signer0).transfer(signer2.address, BigInt(2000000000*(10**18)));
         await treasurycontract.connect(signer2).addFunds(BigInt(2000000000*(10**18)), 1);
@@ -1160,7 +1178,6 @@ describe("Navy Contract", function () {
 
         it("tests that buyCorvette() works", async function () {
             await billscontract.connect(signer1).payBills(0)
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(0)
             var shipCount = await navycontract.getCorvetteCount(0)
@@ -1168,9 +1185,12 @@ describe("Navy Contract", function () {
             await expect(navycontract.connect(signer1).buyCorvette(2, 1)).to.be.revertedWith("!nation owner")
             await expect(navycontract.connect(signer1).buyCorvette(3, 0)).to.be.revertedWith("purchase exceeds daily purchase limit")
             await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await expect(navycontract.connect(signer1).buyCorvette(3, 0)).to.be.revertedWith("Must own a drydock to purchase")
+            await expect(navycontract.connect(signer1).buyCorvette(3, 0)).to.be.revertedWith("need more drydocks or infrastructure")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000)
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
             await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 10)
+            await expect(navycontract.connect(signer1).buyCorvette(3, 0)).to.be.revertedWith("need more technology")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
             await navycontract.connect(signer1).buyCorvette(3, 0)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(3)
@@ -1192,7 +1212,6 @@ describe("Navy Contract", function () {
 
         it("tests that buyLandingShip() works", async function () {
             await billscontract.connect(signer1).payBills(0)
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(0)
             var shipCount = await navycontract.getLandingShipCount(0)
@@ -1200,9 +1219,12 @@ describe("Navy Contract", function () {
             await expect(navycontract.connect(signer1).buyLandingShip(2, 1)).to.be.revertedWith("!nation owner")
             await expect(navycontract.connect(signer1).buyLandingShip(3, 0)).to.be.revertedWith("purchase exceeds daily purchase limit")
             await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await expect(navycontract.connect(signer1).buyLandingShip(3, 0)).to.be.revertedWith("Must own a shipyard to purchase")
+            await expect(navycontract.connect(signer1).buyLandingShip(3, 0)).to.be.revertedWith("need more shipyards or infrastructure")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000)
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
             await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 7)
+            await expect(navycontract.connect(signer1).buyLandingShip(3, 0)).to.be.revertedWith("need more technology")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
             await navycontract.connect(signer1).buyLandingShip(3, 0)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(3)
@@ -1224,7 +1246,6 @@ describe("Navy Contract", function () {
 
         it("tests that buyBattleship() works", async function () {
             await billscontract.connect(signer1).payBills(0)
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(0)
             var shipCount = await navycontract.getBattleshipCount(0)
@@ -1232,9 +1253,12 @@ describe("Navy Contract", function () {
             await expect(navycontract.connect(signer1).buyBattleship(2, 1)).to.be.revertedWith("!nation owner")
             await expect(navycontract.connect(signer1).buyBattleship(3, 0)).to.be.revertedWith("purchase exceeds daily purchase limit")
             await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await expect(navycontract.connect(signer1).buyBattleship(3, 0)).to.be.revertedWith("Must own a drydock to purchase")
+            await expect(navycontract.connect(signer1).buyBattleship(3, 0)).to.be.revertedWith("need more drydocks or infrastructure")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000)
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
             await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 10)
+            await expect(navycontract.connect(signer1).buyBattleship(3, 0)).to.be.revertedWith("need more technology")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
             await navycontract.connect(signer1).buyBattleship(3, 0)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(3)
@@ -1256,7 +1280,6 @@ describe("Navy Contract", function () {
 
         it("tests that buyCruiser() works", async function () {
             await billscontract.connect(signer1).payBills(0)
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(0)
             var shipCount = await navycontract.getCruiserCount(0)
@@ -1264,9 +1287,12 @@ describe("Navy Contract", function () {
             await expect(navycontract.connect(signer1).buyCruiser(2, 1)).to.be.revertedWith("!nation owner")
             await expect(navycontract.connect(signer1).buyCruiser(3, 0)).to.be.revertedWith("purchase exceeds daily purchase limit")
             await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await expect(navycontract.connect(signer1).buyCruiser(3, 0)).to.be.revertedWith("Must own a drydock to purchase")
+            await expect(navycontract.connect(signer1).buyCruiser(3, 0)).to.be.revertedWith("need more drydocks or infrastructure")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000)
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
             await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 10)
+            await expect(navycontract.connect(signer1).buyCruiser(3, 0)).to.be.revertedWith("need more technology")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
             await navycontract.connect(signer1).buyCruiser(3, 0)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(3)
@@ -1288,7 +1314,6 @@ describe("Navy Contract", function () {
 
         it("tests that buyFrigate() works", async function () {
             await billscontract.connect(signer1).payBills(0)
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(0)
             var shipCount = await navycontract2.getFrigateCount(0)
@@ -1296,9 +1321,12 @@ describe("Navy Contract", function () {
             await expect(navycontract2.connect(signer1).buyFrigate(2, 1)).to.be.revertedWith("!nation owner")
             await expect(navycontract2.connect(signer1).buyFrigate(3, 0)).to.be.revertedWith("purchase exceeds daily purchase limit")
             await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await expect(navycontract2.connect(signer1).buyFrigate(3, 0)).to.be.revertedWith("Must own a shipyard to purchase")
+            await expect(navycontract2.connect(signer1).buyFrigate(3, 0)).to.be.revertedWith("need more shipyards or infrastructure")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000)
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
             await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 7)
+            await expect(navycontract2.connect(signer1).buyFrigate(3, 0)).to.be.revertedWith("need more technology")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
             await navycontract2.connect(signer1).buyFrigate(3, 0)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(3)
@@ -1320,7 +1348,6 @@ describe("Navy Contract", function () {
 
         it("tests that buyDestroyer() works", async function () {
             await billscontract.connect(signer1).payBills(0)
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(0)
             var shipCount = await navycontract2.getDestroyerCount(0)
@@ -1328,9 +1355,12 @@ describe("Navy Contract", function () {
             await expect(navycontract2.connect(signer1).buyDestroyer(2, 1)).to.be.revertedWith("!nation owner")
             await expect(navycontract2.connect(signer1).buyDestroyer(3, 0)).to.be.revertedWith("purchase exceeds daily purchase limit")
             await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await expect(navycontract2.connect(signer1).buyDestroyer(3, 0)).to.be.revertedWith("Must own a drydock to purchase")
+            await expect(navycontract2.connect(signer1).buyDestroyer(3, 0)).to.be.revertedWith("need more drydocks or infrastructure")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000)
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
             await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 10)
+            await expect(navycontract2.connect(signer1).buyDestroyer(3, 0)).to.be.revertedWith("need more technology")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
             await navycontract2.connect(signer1).buyDestroyer(3, 0)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(3)
@@ -1352,7 +1382,6 @@ describe("Navy Contract", function () {
 
         it("tests that buySubmarine() works", async function () {
             await billscontract.connect(signer1).payBills(0)
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(0)
             var shipCount = await navycontract2.getSubmarineCount(0)
@@ -1360,9 +1389,12 @@ describe("Navy Contract", function () {
             await expect(navycontract2.connect(signer1).buySubmarine(2, 1)).to.be.revertedWith("!nation owner")
             await expect(navycontract2.connect(signer1).buySubmarine(3, 0)).to.be.revertedWith("purchase exceeds daily purchase limit")
             await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await expect(navycontract2.connect(signer1).buySubmarine(3, 0)).to.be.revertedWith("Must own a shipyard to purchase")
+            await expect(navycontract2.connect(signer1).buySubmarine(3, 0)).to.be.revertedWith("need more shipyards or infrastructure")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000)
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
             await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 7)
+            await expect(navycontract2.connect(signer1).buySubmarine(3, 0)).to.be.revertedWith("need more technology")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
             await navycontract2.connect(signer1).buySubmarine(3, 0)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(3)
@@ -1384,7 +1416,6 @@ describe("Navy Contract", function () {
 
         it("tests that buyAircraftCarrier() works", async function () {
             await billscontract.connect(signer1).payBills(0)
-            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 1000)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(0)
             var shipCount = await navycontract2.getAircraftCarrierCount(0)
@@ -1392,9 +1423,12 @@ describe("Navy Contract", function () {
             await expect(navycontract2.connect(signer1).buyAircraftCarrier(2, 1)).to.be.revertedWith("!nation owner")
             await expect(navycontract2.connect(signer1).buyAircraftCarrier(3, 0)).to.be.revertedWith("purchase exceeds daily purchase limit")
             await militarycontract.connect(signer1).toggleWarPeacePreference(0)
-            await expect(navycontract2.connect(signer1).buyAircraftCarrier(3, 0)).to.be.revertedWith("Must own a shipyard to purchase")
+            await expect(navycontract2.connect(signer1).buyAircraftCarrier(3, 0)).to.be.revertedWith("need more shipyards or infrastructure")
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000)
             await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
             await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 7)
+            await expect(navycontract2.connect(signer1).buyAircraftCarrier(3, 0)).to.be.revertedWith("need more technology")
+            await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
             await navycontract2.connect(signer1).buyAircraftCarrier(3, 0)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
             expect(purchasesToday).to.equal(3)

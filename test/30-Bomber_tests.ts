@@ -1115,6 +1115,22 @@ describe("Bomber Contract", function () {
         await treasurycontract.connect(signer2).addFunds(BigInt(2000000000*(10**18)), 1);
         await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 50)
         await technologymarketcontrat.connect(signer2).buyTech(1, 10)
+
+        const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+        const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+        for (const log of event1Logs) {
+            const requestIdReturn = log.args.requestId;
+            // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            if (requestIdReturn == 2) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources1 = await resourcescontract.getPlayerResources(0);
+                // console.log("resources 1", resources1[0].toNumber(), resources1[1].toNumber());
+            } else if (requestIdReturn == 4) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources2 = await resourcescontract.getPlayerResources(1);
+                // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
+            }
+        }
     });
 
     describe("Buying Bombers", function () {
@@ -1776,4 +1792,6 @@ describe("Bomber Contract", function () {
             expect(cost6).to.equal(BigInt("43500000000000000000000"))
         })
     }) 
+
+    
 })
