@@ -42,6 +42,7 @@ contract CountryMinter is ERC721, Ownable {
     address public treasury;
     address public aid;
     address public navy;
+    address public navy2;
     address public navalActions;
     address public fighters;
     address public fightersMarket1;
@@ -118,6 +119,7 @@ contract CountryMinter is ERC721, Ownable {
         address _military,
         address _forces,
         address _navy,
+        address _navy2,
         address _navalActions,
         address _fighters,
         address _bombers
@@ -125,6 +127,7 @@ contract CountryMinter is ERC721, Ownable {
         military = _military;
         forces = _forces;
         navy = _navy;
+        navy2 = _navy2;
         navalActions = _navalActions;
         fighters = _fighters;
         bombers = _bombers;
@@ -165,6 +168,7 @@ contract CountryMinter is ERC721, Ownable {
         MilitaryContract(military).generateMilitary(countryId);
         NavalActionsContract(navalActions).generateNavalActions(countryId);
         NavyContract(navy).generateNavy(countryId);
+        NavyContract2(navy2).generateNavy2(countryId);
         ResourcesContract(resources).generateResources(countryId);
         BonusResourcesContract(bonusResources).generateBonusResources(countryId);
         SenateContract(senate).generateVoter(countryId);

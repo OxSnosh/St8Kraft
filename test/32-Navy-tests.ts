@@ -523,6 +523,7 @@ describe("Navy Contract", function () {
             militarycontract.address,
             forcescontract.address,
             navycontract.address,
+            navycontract2.address,
             navalactionscontract.address,
             fighterscontract.address,
             bomberscontract.address)
@@ -1210,6 +1211,45 @@ describe("Navy Contract", function () {
             expect(specs[2].toNumber()).to.equal(100)
         })
 
+        it("tests that buyCorvette() works with steel resource", async function () {
+            await billscontract.connect(signer1).payBills(0)
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000)
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 10)
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 7)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
+            await resourcescontract.mockResourcesForTesting(0, 2, 7)
+            await resourcescontract.mockResourcesForTesting(1, 9, 10)
+            await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
+            var steel = await bonusresourcescontract.viewSteel(0);
+            expect(steel).to.equal(true);
+            await navycontract.connect(signer1).buyCorvette(3, 0);
+        })
+
+        it("tests that decommissionCorvette() works", async function () {
+            await billscontract.connect(signer1).payBills(0)
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000)
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
+            await improvementscontract1.connect(signer1).buyImprovement1(1, 0, 10)
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 7)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
+            await navycontract.connect(signer1).buyCorvette(3, 0);
+            var shipCount = await navycontract.getNavyVesselCount(0)
+            expect(shipCount.toNumber()).to.equal(3)
+            var corvetteCount = await navycontract.getCorvetteCount(0)
+            expect(corvetteCount.toNumber()).to.equal(3)
+            await expect(navycontract.connect(signer1).decommissionCorvette(3, 1)).to.be.revertedWith("!nation owner")
+            await expect(navycontract.connect(signer1).decommissionCorvette(4, 0)).to.be.revertedWith("not enough corvettes")
+            await navycontract.connect(signer1).decommissionCorvette(3, 0)
+            var shipCount2 = await navycontract.getNavyVesselCount(0)
+            expect(shipCount2.toNumber()).to.equal(0)
+            var corvetteCount = await navycontract.getCorvetteCount(0)
+            expect(corvetteCount.toNumber()).to.equal(0)
+        })
+
         it("tests that buyLandingShip() works", async function () {
             await billscontract.connect(signer1).payBills(0)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
@@ -1446,6 +1486,34 @@ describe("Navy Contract", function () {
             expect(specs[0]).to.equal(10000)
             expect(specs[1].toNumber()).to.equal(1000)
             expect(specs[2].toNumber()).to.equal(100)
+        })
+
+        it("tests that getNavyVesselCount() works", async function () {
+            var navyVesselCount = await navycontract.getNavyVesselCount(0)
+            expect(navyVesselCount).to.equal(0)
+            await billscontract.connect(signer1).payBills(0)
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000)
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4)
+            await improvementscontract3.connect(signer1).buyImprovement3(1, 0, 7)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
+            await navycontract2.connect(signer1).buyAircraftCarrier(3, 0)
+            var shipCount = await navycontract2.getAircraftCarrierCount(0)
+            expect(shipCount).to.equal(3)
+            var navyVesselCount = await navycontract.getNavyVesselCount(0)
+            expect(navyVesselCount).to.equal(3)
+        })
+    })
+
+    describe("Navy Action Tests", function () {
+        it("tests that getActionSlotsUsed works correctly", async function () {
+            var actionSlotsUsed = await navalactionscontract.getActionSlotsUsed(0)
+            expect(actionSlotsUsed.toNumber()).to.equal(0)
+        })
+
+        it("tests that blockaded today returns false by default", async function () {
+            var blockadedToday = await navalactionscontract.getBlockadedToday(0)
+            expect(blockadedToday).to.equal(false)
         })
     })
 })

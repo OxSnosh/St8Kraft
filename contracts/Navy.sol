@@ -269,14 +269,6 @@ contract NavyContract is Ownable {
         _;
     }
 
-    modifier onlyNavy2Contract() {
-        require(
-            msg.sender == navy2Contract,
-            "function only callable from navy contract 2"
-        );
-        _;
-    }
-
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
@@ -946,7 +938,7 @@ contract NavyContract2 is Ownable {
     ///@dev this function will allow a nation owner to buy navy vessels
     ///@notice this function will allow a nation owner to buy navy vessels
     ///@param id this is the nation id of the nation being minted
-    function generateNavy(uint256 id) public onlyCountryMinter {
+    function generateNavy2(uint256 id) public onlyCountryMinter {
         Navy memory newNavy = Navy(0, 0, 0, 0);
         idToNavy[id] = newNavy;
     }

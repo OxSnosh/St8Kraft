@@ -523,6 +523,7 @@ describe("Infrastructure Contract", function () {
             militarycontract.address,
             forcescontract.address,
             navycontract.address,
+            navycontract2.address,
             navalactionscontract.address,
             fighterscontract.address,
             bomberscontract.address)
