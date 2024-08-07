@@ -1086,6 +1086,11 @@ contract NavyContract2 is Ownable {
         return frigateAmount;
     }
 
+    modifier onlyNavy1Contract () {
+        require(msg.sender == navy1Address, "function only callable from the navy1 contract");
+        _;
+    }
+
     function decreaseFrigateCount(
         uint256 id,
         uint256 amount
