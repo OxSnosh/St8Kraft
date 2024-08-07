@@ -875,14 +875,6 @@ contract NavyContract2 is Ownable {
         _;
     }
 
-    modifier onlyNavy1Contract() {
-        require(
-            msg.sender == navy1Address,
-            "function only callable from navy contract 1"
-        );
-        _;
-    }
-
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
     function settings(
