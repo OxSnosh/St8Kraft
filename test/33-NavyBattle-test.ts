@@ -1102,12 +1102,6 @@ describe("Navy Contract", function () {
             "TestCapitalCity",
             "TestNationSlogan"
         )
-        await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
-        await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
-        await treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0);
-        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000)
-        await technologymarketcontrat.connect(signer1).buyTech(0, 20000)
-
 
         await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
         await countryminter.connect(signer2).generateCountry(
@@ -1116,6 +1110,41 @@ describe("Navy Contract", function () {
             "TestCapitalCity2",
             "TestNationSlogan2"
         )
+        
+        await warbucks.connect(signer0).transfer(signer3.address, BigInt(2100000000000000000000000))
+        await countryminter.connect(signer3).generateCountry(
+            "TestRuler3",
+            "TestNationName3",
+            "TestCapitalCity3",
+            "TestNationSlogan3"
+        )
+
+        const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+        const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+        for (const log of event1Logs) {
+            const requestIdReturn = log.args.requestId;
+            // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            if (requestIdReturn == 2) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources1 = await resourcescontract.getPlayerResources(0);
+                // console.log("resources 1", resources1[0].toNumber(), resources1[1].toNumber());
+            } else if (requestIdReturn == 4) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources2 = await resourcescontract.getPlayerResources(1);
+                // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
+            } else if (requestIdReturn == 6) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources3 = await resourcescontract.getPlayerResources(2);
+                // console.log("resources 3", resources3[0].toNumber(), resources3[1].toNumber());
+            }
+        }
+
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0);
+        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000)
+        await technologymarketcontrat.connect(signer1).buyTech(0, 20000)
+        
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
         await warbucks.connect(signer0).transfer(signer2.address, BigInt(2000000000*(10**18)));
         await treasurycontract.connect(signer2).addFunds(BigInt(2000000000*(10**18)), 1);
@@ -1126,13 +1155,6 @@ describe("Navy Contract", function () {
         await militarycontract.connect(signer2).toggleWarPeacePreference(1)
         await warcontract.connect(signer1).declareWar(0, 1)
        
-        await warbucks.connect(signer0).transfer(signer3.address, BigInt(2100000000000000000000000))
-        await countryminter.connect(signer3).generateCountry(
-            "TestRuler3",
-            "TestNationName3",
-            "TestCapitalCity3",
-            "TestNationSlogan3"
-        )
         await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
         await warbucks.connect(signer0).transfer(signer3.address, BigInt(2000000000*(10**18)));
         await treasurycontract.connect(signer3).addFunds(BigInt(2000000000*(10**18)), 2);
@@ -1214,7 +1236,7 @@ describe("Navy Contract", function () {
             await keepercontract.incrementGameDay();
             var collection : any = await taxescontract.getTaxesCollectible(1);
             // console.log((collection[1]/(10**18)).toString(), "collection");
-            expect((collection[1]/(10**18)).toString()).to.equal("3010620");
+            expect((collection[1]/(10**18)).toString()).to.equal("3161160");
             await navycontract2.connect(signer1).buyFrigate(2, 0);
             await navycontract2.connect(signer1).buySubmarine(2, 0);
             await navalblockadecontract.connect(signer1).blockade(0, 1, 0);
@@ -1232,7 +1254,7 @@ describe("Navy Contract", function () {
             expect(blockadeTaxReductionPercentage.toString()).to.equal("2");
             var collection2 : any = await taxescontract.getTaxesCollectible(1);
             // console.log((collection2[1]/(10**18)).toString(), "collection");
-            expect((collection2[1]/(10**18)).toString()).to.equal("2950407.6");
+            expect((collection2[1]/(10**18)).toString()).to.equal("3097936.8");
         })
 
         it("tests that naval actions increments when break blockade called", async function () {
@@ -1312,12 +1334,12 @@ describe("Navy Contract", function () {
             await navycontract2.connect(signer2).buySubmarine(2, 1);
             await warcontract.connect(signer1).offerPeace(0, 0);
             var warDetails = await warcontract.returnWar(0);
-            expect(warDetails[0].toString()).to.equal(true);
+            expect(warDetails[0]).to.equal(true);
             // console.log(warDetails[0].toString(), "peace offered"); 
             // console.log(warDetails[1].toString(), "peace offered"); 
             await breakblockadecontract.connect(signer2).breakBlockade(0, 1, 0)
             var warDetails = await warcontract.returnWar(0);
-            expect(warDetails[0].toString()).to.equal(false);
+            expect(warDetails[0]).to.equal(false);
             // console.log(warDetails[0].toString(), "peace offered"); 
             // console.log(warDetails[1].toString(), "peace offered"); 
         })

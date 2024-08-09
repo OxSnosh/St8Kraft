@@ -1090,6 +1090,7 @@ describe("Navy Contract", function () {
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, groundbattlecontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, nukecontract.address);
         }
 
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
@@ -1107,6 +1108,20 @@ describe("Navy Contract", function () {
             "TestCapitalCity2",
             "TestNationSlogan2"
         )
+        await warbucks.connect(signer0).transfer(signer3.address, BigInt(2100000000000000000000000))
+        await countryminter.connect(signer3).generateCountry(
+            "TestRuler3",
+            "TestNationName3",
+            "TestCapitalCity3",
+            "TestNationSlogan3"
+        )
+        await warbucks.connect(signer0).transfer(signer4.address, BigInt(2100000000000000000000000))
+        await countryminter.connect(signer4).generateCountry(
+            "TestRuler4",
+            "TestNationName4",
+            "TestCapitalCity4",
+            "TestNationSlogan4"
+        )
 
         const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
         const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
@@ -1120,6 +1135,14 @@ describe("Navy Contract", function () {
             } else if (requestIdReturn == 4) {
                 await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
                 let resources2 = await resourcescontract.getPlayerResources(1);
+                // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
+            } else if (requestIdReturn == 6) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources2 = await resourcescontract.getPlayerResources(2);
+                // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
+            } else if (requestIdReturn == 8) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources2 = await resourcescontract.getPlayerResources(3);
                 // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
             }
         }
@@ -1177,6 +1200,29 @@ describe("Navy Contract", function () {
             expect(purchases[1]).to.equal(7)
         })
 
+        it("tests that daily navy max purchases increases with naval construction yards", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000)            
+            await wonderscontract1.connect(signer1).buyWonder1(0, 11)
+            var purchases = await additionalnavycontract.getAvailablePurchases(0);
+            // console.log(purchases[0].toNumber())
+            // console.log(purchases[1].toNumber())
+            expect(purchases[0]).to.equal(4)
+            expect(purchases[1]).to.equal(4)
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            var purchases = await additionalnavycontract.getAvailablePurchases(0);
+            // console.log(purchases[0].toNumber())
+            // console.log(purchases[1].toNumber())
+            expect(purchases[0]).to.equal(7)
+            expect(purchases[1]).to.equal(7)
+            await improvementscontract2.connect(signer1).buyImprovement2(1, 0, 4);
+            await improvementscontract4.connect(signer1).buyImprovement4(3, 0, 4);
+            var purchases = await additionalnavycontract.getAvailablePurchases(0);
+            // console.log(purchases[0].toNumber())
+            // console.log(purchases[1].toNumber())
+            expect(purchases[0]).to.equal(10)
+            expect(purchases[1]).to.equal(10)
+        })
+
         it("tests that buyCorvette() works", async function () {
             await billscontract.connect(signer1).payBills(0)
             var purchasesToday = await navalactionscontract.getPurchasesToday(0)
@@ -1221,10 +1267,18 @@ describe("Navy Contract", function () {
             await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
             await resourcescontract.mockResourcesForTesting(0, 2, 7)
             await resourcescontract.mockResourcesForTesting(1, 9, 10)
+            await resourcescontract.mockResourcesForTesting(2, 6, 11)
+            await resourcescontract.mockResourcesForTesting(3, 8, 3)
             await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
             await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer3).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer4).fulfillTradingPartner(3, 0);
             var steel = await bonusresourcescontract.viewSteel(0);
             expect(steel).to.equal(true);
+            var microchips = await bonusresourcescontract.viewMicrochips(0);
+            expect(microchips).to.equal(true);
             await navycontract.connect(signer1).buyCorvette(3, 0);
         })
 
@@ -1294,10 +1348,18 @@ describe("Navy Contract", function () {
             await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
             await resourcescontract.mockResourcesForTesting(0, 2, 7)
             await resourcescontract.mockResourcesForTesting(1, 9, 10)
+            await resourcescontract.mockResourcesForTesting(2, 6, 11)
+            await resourcescontract.mockResourcesForTesting(3, 8, 3)
             await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
             await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer3).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer4).fulfillTradingPartner(3, 0);
             var steel = await bonusresourcescontract.viewSteel(0);
             expect(steel).to.equal(true);
+            var microchips = await bonusresourcescontract.viewMicrochips(0);
+            expect(microchips).to.equal(true);
             await navycontract.connect(signer1).buyLandingShip(3, 0);
         })
 
@@ -1357,7 +1419,7 @@ describe("Navy Contract", function () {
             expect(specs[2].toNumber()).to.equal(100)
         })
 
-        it("tests that buyBattleship() works with steel resource", async function () {
+        it("tests that buyBattleship() works with steel and microchips resource", async function () {
             await billscontract.connect(signer1).payBills(0)
             await militarycontract.connect(signer1).toggleWarPeacePreference(0)
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000)
@@ -1367,10 +1429,18 @@ describe("Navy Contract", function () {
             await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
             await resourcescontract.mockResourcesForTesting(0, 2, 7)
             await resourcescontract.mockResourcesForTesting(1, 9, 10)
+            await resourcescontract.mockResourcesForTesting(2, 6, 11)
+            await resourcescontract.mockResourcesForTesting(3, 8, 3)
             await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
             await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer3).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer4).fulfillTradingPartner(3, 0);
             var steel = await bonusresourcescontract.viewSteel(0);
             expect(steel).to.equal(true);
+            var microchips = await bonusresourcescontract.viewMicrochips(0);
+            expect(microchips).to.equal(true);
             await navycontract.connect(signer1).buyBattleship(3, 0);
         })
 
@@ -1440,10 +1510,18 @@ describe("Navy Contract", function () {
             await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
             await resourcescontract.mockResourcesForTesting(0, 2, 7)
             await resourcescontract.mockResourcesForTesting(1, 9, 10)
+            await resourcescontract.mockResourcesForTesting(2, 6, 11)
+            await resourcescontract.mockResourcesForTesting(3, 8, 3)
             await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
             await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer3).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer4).fulfillTradingPartner(3, 0);
             var steel = await bonusresourcescontract.viewSteel(0);
             expect(steel).to.equal(true);
+            var microchips = await bonusresourcescontract.viewMicrochips(0);
+            expect(microchips).to.equal(true);
             await navycontract.connect(signer1).buyCruiser(3, 0);
         })
 
@@ -1513,10 +1591,18 @@ describe("Navy Contract", function () {
             await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
             await resourcescontract.mockResourcesForTesting(0, 2, 7)
             await resourcescontract.mockResourcesForTesting(1, 9, 10)
+            await resourcescontract.mockResourcesForTesting(2, 6, 11)
+            await resourcescontract.mockResourcesForTesting(3, 8, 3)
             await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
             await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer3).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer4).fulfillTradingPartner(3, 0);
             var steel = await bonusresourcescontract.viewSteel(0);
             expect(steel).to.equal(true);
+            var microchips = await bonusresourcescontract.viewMicrochips(0);
+            expect(microchips).to.equal(true);
             await navycontract2.connect(signer1).buyFrigate(3, 0);
         })
 
@@ -1586,10 +1672,18 @@ describe("Navy Contract", function () {
             await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
             await resourcescontract.mockResourcesForTesting(0, 2, 7)
             await resourcescontract.mockResourcesForTesting(1, 9, 10)
+            await resourcescontract.mockResourcesForTesting(2, 6, 11)
+            await resourcescontract.mockResourcesForTesting(3, 8, 3)
             await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
             await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer3).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer4).fulfillTradingPartner(3, 0);
             var steel = await bonusresourcescontract.viewSteel(0);
             expect(steel).to.equal(true);
+            var microchips = await bonusresourcescontract.viewMicrochips(0);
+            expect(microchips).to.equal(true);
             await navycontract2.connect(signer1).buyDestroyer(3, 0);
         })
 
@@ -1659,10 +1753,18 @@ describe("Navy Contract", function () {
             await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
             await resourcescontract.mockResourcesForTesting(0, 2, 7)
             await resourcescontract.mockResourcesForTesting(1, 9, 10)
+            await resourcescontract.mockResourcesForTesting(2, 6, 11)
+            await resourcescontract.mockResourcesForTesting(3, 8, 3)
             await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
             await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer3).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer4).fulfillTradingPartner(3, 0);
             var steel = await bonusresourcescontract.viewSteel(0);
             expect(steel).to.equal(true);
+            var microchips = await bonusresourcescontract.viewMicrochips(0);
+            expect(microchips).to.equal(true);
             await navycontract2.connect(signer1).buySubmarine(3, 0);
         })
 
@@ -1722,7 +1824,7 @@ describe("Navy Contract", function () {
             expect(specs[2].toNumber()).to.equal(100)
         })
 
-        it("tests that buySircraftCarrier() works with steel resource", async function () {
+        it("tests that buyAircraftCarrier() works with steel resource", async function () {
             await billscontract.connect(signer1).payBills(0)
             await militarycontract.connect(signer1).toggleWarPeacePreference(0)
             await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 20000)
@@ -1732,10 +1834,18 @@ describe("Navy Contract", function () {
             await technologymarketcontrat.connect(signer1).buyTech(0, 2000);
             await resourcescontract.mockResourcesForTesting(0, 2, 7)
             await resourcescontract.mockResourcesForTesting(1, 9, 10)
+            await resourcescontract.mockResourcesForTesting(2, 6, 11)
+            await resourcescontract.mockResourcesForTesting(3, 8, 3)
             await resourcescontract.connect(signer1).proposeTrade(0, 1);
+            await resourcescontract.connect(signer1).proposeTrade(0, 2);
+            await resourcescontract.connect(signer1).proposeTrade(0, 3);
             await resourcescontract.connect(signer2).fulfillTradingPartner(1, 0);
+            await resourcescontract.connect(signer3).fulfillTradingPartner(2, 0);
+            await resourcescontract.connect(signer4).fulfillTradingPartner(3, 0);
             var steel = await bonusresourcescontract.viewSteel(0);
             expect(steel).to.equal(true);
+            var microchips = await bonusresourcescontract.viewMicrochips(0);
+            expect(microchips).to.equal(true);
             await navycontract2.connect(signer1).buyAircraftCarrier(3, 0);
         })
 
@@ -1861,6 +1971,91 @@ describe("Navy Contract", function () {
             await navycontract2.connect(signer1).buyAircraftCarrier(1, 0)
             var blockadeShips = await additionalnavycontract.getVesselCountForShipyard(0)
             await expect((blockadeShips).toNumber()).to.equal(4);
+        })
+    })
+
+    describe("Nuke Attack Results on Navy", function () {
+        it("navy1 tests that a nuke attack will reduce the number of navy vessles", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 500)
+            await forcescontract.connect(signer1).buySoldiers(2000, 0)
+            await forcescontract.connect(signer1).buyTanks(150, 0)
+            await billscontract.connect(signer1).payBills(0)
+
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 2000)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 500)
+            await forcescontract.connect(signer2).buySoldiers(2000, 1)
+            await forcescontract.connect(signer2).buyTanks(150, 1)
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await forcescontract.connect(signer1).deployForces(1000, 30, 0, 0)
+            await billscontract.connect(signer2).payBills(1)
+
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 17, 1);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 400);
+            await wonderscontract2.connect(signer1).buyWonder2(0, 8);
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await nukecontract.connect(signer1).launchNuke(0, 0, 1, 1)
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 5) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, nukecontract.address);
+                }
+            }
+        })
+
+        it("navy1 tests that a nuke attack will reduce the number of navy vessles less with fallout shelter", async function () {
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 500)
+            await forcescontract.connect(signer1).buySoldiers(2000, 0)
+            await forcescontract.connect(signer1).buyTanks(150, 0)
+            await billscontract.connect(signer1).payBills(0)
+
+            await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 2000)
+            await technologymarketcontrat.connect(signer2).buyTech(1, 500)
+            await forcescontract.connect(signer2).buySoldiers(2000, 1)
+            await forcescontract.connect(signer2).buyTanks(150, 1)
+            await militarycontract.connect(signer1).toggleWarPeacePreference(0)
+            await militarycontract.connect(signer2).toggleWarPeacePreference(1)
+
+            await warcontract.connect(signer1).declareWar(0, 1)
+            await forcescontract.connect(signer1).deployForces(1000, 30, 0, 0)
+            await billscontract.connect(signer2).payBills(1)
+
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 11000);
+            await landmarketcontract.connect(signer1).buyLand(0, 10000);
+            await technologymarketcontrat.connect(signer1).buyTech(0, 10000);
+            await wonderscontract1.connect(signer1).buyWonder1(0, 6);
+
+            await resourcescontract.connect(signer0).mockResourcesForTesting(0, 17, 1);
+            await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000)
+            await technologymarketcontrat.connect(signer1).buyTech(0, 400);
+            await wonderscontract2.connect(signer1).buyWonder2(0, 8);
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.incrementGameDay();
+            await missilescontract.connect(signer1).buyNukes(0)
+            await keepercontract.incrementGameDay()
+            await keepercontract.incrementGameDay()
+            await nukecontract.connect(signer1).launchNuke(0, 0, 1, 1)
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 5) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, nukecontract.address);
+                }
+            }
         })
     })
 })
