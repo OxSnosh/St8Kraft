@@ -130,7 +130,7 @@
               "type": "uint256"
             }
           ],
-          "name": "Transfer",
+          "name": "",
           "type": "event"
         },
         {
@@ -646,7 +646,7 @@
               "type": "uint256"
             }
           ],
-          "name": "safeTransferFrom",
+          "name": "safeFrom",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"

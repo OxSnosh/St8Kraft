@@ -1,5 +1,6 @@
 import { ActionType } from "hardhat/types";
 import hre from "hardhat";
+import { LinkToken } from '../../../typechain-types/@chainlink/contracts/src/v0.4/LinkToken';
 
 import LinkTokenArtifact from "../../../artifacts/@chainlink/contracts/src/v0.4/LinkToken.sol/LinkToken.json";
 

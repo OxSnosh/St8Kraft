@@ -15,7 +15,7 @@ import LinkTokenArtifact from "../artifacts/@chainlink/contracts/src/v0.4/LinkTo
 describe("Adapter Test", function () {
   
   // const oracleAbi = OracleArtifact.abi;
-  const linkTokenAbi = LinkTokenArtifact.abi;
+  // const linkTokenAbi = LinkTokenArtifact.abi;
 
   let testContract: Test
 
@@ -33,16 +33,24 @@ describe("Adapter Test", function () {
     signer1 = signers[1];
     signer2 = signers[2];
 
-    // const LinkToken  = await ethers.getContractFactory(
-    //         "LinkToken"
-    // )
-    // let linkToken = await LinkToken.deploy() as LinkToken
-    //     await linkToken.deployed()
+    const LinkToken  = await ethers.getContractFactory(
+            "LinkToken"
+    )
+    let linkToken = await LinkToken.connect(signer0).deploy() as LinkToken
+    await linkToken.deployed()
 
     // const linkToken = new ethers.Contract(metadata.linkAddress, linkTokenAbi, signer0) as LinkToken;
     
     console.log("is this the place 0")
-    const linkToken = await ethers.getContractAt("LinkToken", metadata.linkAddress) 
+
+    // const contractABI = LinkTokenArtifact.abi;
+
+    // const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545/");
+    // const contractAddress = metadata.linkAddress;
+
+    // const linkToken = new ethers.Contract(contractAddress, contractABI, provider) as LinkToken;
+
+    // const linkToken = await ethers.getContractAt("LinkToken", metadata.linkAddress) as LinkToken
     console.log("is this the place 1")
     console.log("address from metadata", metadata.linkAddress)
     console.log("address from test", linkToken.address)
@@ -53,29 +61,48 @@ describe("Adapter Test", function () {
     testContract = await TestContract.deploy() as Test
     await testContract.deployed()
 
-    await linkToken.transfer(testContract.address, BigInt(10000000000000))
+    console.log("isseus")
 
-    await testContract.updateOracleAddress(metadata.oracleAddress)
+    console.log(linkToken.address, "LINK token")
+    // console.log(linkToken, "LINK")
+    
+    console.log("more issues")
 
+    await linkToken.connect(signer0).transfer(testContract.address, BigInt(10000000000000000000))
+    const linkBalanceTestContract = await linkToken.balanceOf(testContract.address)
+    console.log("Test contract LINK Balance:", Number(linkBalanceTestContract));
+    
+    await linkToken.connect(signer0).transfer(testContract.address, BigInt(10000000000000000000))
+    const linkBalanceSigner0 = await linkToken.balanceOf(signer0.address)
+    console.log("Signer0 LINK Balance:", Number(linkBalanceSigner0));
+
+    // await linkToken.transferFrom(signer0.address, testContract.address, BigInt(1000000000000000000000))
+    
+    console.log("oracle address", metadata.oracleAddress);
+    
     const jobIdToRaw : any = jobId
-
+    
     const jobIdWithoutHyphens = jobIdToRaw.replace(/-/g, "");
     console.log("JobId", jobIdWithoutHyphens);
-
+    
     // const jobIdBytes = ethers.utils.toUtf8Bytes(jobIdWithoutHyphens)
     // console.log(jobIdBytes);
-
+    
     const jobIdString = jobIdWithoutHyphens.toString()
-
+    
     const jobIdBytes = ethers.utils.hexlify(
       ethers.utils.toUtf8Bytes(jobIdString)
     );
 
+    await testContract.updateLinkAddress(metadata.linkAddress)
+
+    await testContract.updateOracleAddress(metadata.oracleAddress)
+    
     await testContract.updateJobId(jobIdBytes)
+    
+    await testContract.updateFee(BigInt(1000000000000000000))
 
-    await testContract.updateFee(BigInt(10000000000))
-
-    await testContract.updateLinkAddress(linkToken.address)
+    console.log("maybe")
 
   });
 

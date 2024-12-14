@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 ///@title Test contract for testing external adpaters
 ///@author OxSnosh
@@ -25,7 +25,7 @@ contract Test is Ownable, ChainlinkClient {
     }
 
     function updateOracleAddress(address _oracleAddress) public onlyOwner {
-        oracleAddress = _oracleAddress;
+        setChainlinkOracle(_oracleAddress);
     }
 
     function updateFee(uint256 _fee) public onlyOwner {
@@ -39,15 +39,15 @@ contract Test is Ownable, ChainlinkClient {
     function multiplyBy1000(
         uint256 inputNumber
     ) public {
-        // console.log(fee, "fee");
+        console.log(fee, "fee");
         // string memory jobIdDecoded = abi.decode(bytes(jobId), (string));
-        Chainlink.Request memory req = buildChainlinkRequest(
+        Chainlink.Request memory req = buildOperatorRequest(
             jobId,
-            address(this),
             this.returnProduct.selector
         );
         req.addUint("inputNumber", inputNumber);
-        sendChainlinkRequestTo(oracleAddress, req, fee);
+        console.log("maybe, maybe");
+        sendOperatorRequest(req, fee);
     }
 
     function returnProduct(
