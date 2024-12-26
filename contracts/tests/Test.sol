@@ -48,6 +48,7 @@ contract Test is Ownable, ChainlinkClient {
         req.addUint("inputNumber", inputNumber);
         console.log("maybe, maybe");
         sendOperatorRequest(req, fee);
+        console.log("completed operator request");
     }
 
     function returnProduct(

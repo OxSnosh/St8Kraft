@@ -24,6 +24,8 @@ describe("Adapter Test", function () {
   let signer2: SignerWithAddress
   let signers: SignerWithAddress[]
 
+  let linkToken: LinkToken;
+
   beforeEach(async function () {
 
     console.log("hello world")
@@ -33,24 +35,30 @@ describe("Adapter Test", function () {
     signer1 = signers[1];
     signer2 = signers[2];
 
-    const LinkToken  = await ethers.getContractFactory(
-            "LinkToken"
-    )
-    let linkToken = await LinkToken.connect(signer0).deploy() as LinkToken
-    await linkToken.deployed()
+    // const LinkToken  = await ethers.getContractFactory(
+    //         "LinkToken"
+    // )
+    // let linkToken = await LinkToken.connect(signer0).deploy() as LinkToken
+    // await linkToken.deployed()
 
     // const linkToken = new ethers.Contract(metadata.linkAddress, linkTokenAbi, signer0) as LinkToken;
     
     console.log("is this the place 0")
 
-    // const contractABI = LinkTokenArtifact.abi;
+    const contractABI = LinkTokenArtifact.abi;
+
+    // console.log(contractABI)
 
     // const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545/");
-    // const contractAddress = metadata.linkAddress;
+    const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545/");
+    const contractAddress = metadata.linkAddress;
 
-    // const linkToken = new ethers.Contract(contractAddress, contractABI, provider) as LinkToken;
+    linkToken = new ethers.Contract(contractAddress, contractABI, provider) as LinkToken;
 
     // const linkToken = await ethers.getContractAt("LinkToken", metadata.linkAddress) as LinkToken
+
+    // UNCOMMENT FROM HERE
+
     console.log("is this the place 1")
     console.log("address from metadata", metadata.linkAddress)
     console.log("address from test", linkToken.address)
@@ -102,13 +110,16 @@ describe("Adapter Test", function () {
     
     await testContract.updateFee(BigInt(1000000000000000000))
 
-    console.log("maybe")
+    console.log("maybe end of before each")
 
   });
 
   describe("External Adapter", function () {
     it("Should send a request to the node", async function () {
         await testContract.multiplyBy1000(5);
+        //link token balance decreases in test contract
+        let linkBalanceTestContract = await linkToken.balanceOf(testContract.address)
+        console.log("Test contract LINK Balance:", Number(linkBalanceTestContract));
     });
   });
 });
