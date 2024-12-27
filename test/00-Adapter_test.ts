@@ -1,6 +1,6 @@
 //St8kraft © 2022 by OxSnosh is licensed under Attribution-NonCommercial-NoDerivatives 4.0 International
 import { expect } from "chai"
-import { ethers } from "hardhat"
+import { ethers, network } from "hardhat"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address"
 import { INITIAL_SUPPLY } from "../helper-hardhat-config"
 import { Test, Oracle } from "../typechain-types"
@@ -49,8 +49,13 @@ describe("Adapter Test", function () {
 
     // console.log(contractABI)
 
-    // const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545/");
-    const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545/");
+    const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545/");
+    // const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545/");
+
+    for (let i = 0; i < 50; i++) {
+      await network.provider.send("evm_mine");
+    }
+
     const contractAddress = metadata.linkAddress;
 
     linkToken = new ethers.Contract(contractAddress, contractABI, provider) as LinkToken;
@@ -80,9 +85,21 @@ describe("Adapter Test", function () {
     const linkBalanceTestContract = await linkToken.balanceOf(testContract.address)
     console.log("Test contract LINK Balance:", Number(linkBalanceTestContract));
     
-    await linkToken.connect(signer0).transfer(testContract.address, BigInt(10000000000000000000))
+    await linkToken.connect(signer0).transfer(signer0.address, BigInt(10000000000000000000))
     const linkBalanceSigner0 = await linkToken.balanceOf(signer0.address)
     console.log("Signer0 LINK Balance:", Number(linkBalanceSigner0));
+
+    const nodeAddress = metadata.nodeAddress;
+
+    await linkToken.connect(signer0).transfer(nodeAddress, BigInt(15000000000000000000))
+    const linkBalanceNode = await linkToken.balanceOf(nodeAddress)
+    console.log("Node LINK Balance:", Number(linkBalanceNode));
+
+    const operatorAddress = metadata.oracleAddress
+
+    await linkToken.connect(signer0).transfer(operatorAddress, BigInt(25000000000000000000))
+    const linkBalanceOperator = await linkToken.balanceOf(operatorAddress)
+    console.log("Operator LINK Balance:", Number(linkBalanceOperator));
 
     // await linkToken.transferFrom(signer0.address, testContract.address, BigInt(1000000000000000000000))
     

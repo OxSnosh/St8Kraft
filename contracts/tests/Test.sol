@@ -26,6 +26,7 @@ contract Test is Ownable, ChainlinkClient {
 
     function updateOracleAddress(address _oracleAddress) public onlyOwner {
         setChainlinkOracle(_oracleAddress);
+        oracleAddress = _oracleAddress;
     }
 
     function updateFee(uint256 _fee) public onlyOwner {
@@ -41,6 +42,7 @@ contract Test is Ownable, ChainlinkClient {
     ) public {
         console.log(fee, "fee");
         // string memory jobIdDecoded = abi.decode(bytes(jobId), (string));
+        console.log("oracle address", oracleAddress);
         Chainlink.Request memory req = buildOperatorRequest(
             jobId,
             this.returnProduct.selector

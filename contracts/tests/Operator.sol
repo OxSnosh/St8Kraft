@@ -10,6 +10,7 @@ import "@chainlink/contracts/src/v0.7/interfaces/OwnableInterface.sol";
 import "@chainlink/contracts/src/v0.7/interfaces/WithdrawalInterface.sol";
 import "@chainlink/contracts/src/v0.7/vendor/Address.sol";
 import "@chainlink/contracts/src/v0.7/vendor/SafeMathChainlink.sol";
+import "hardhat/console.sol";
 
 /**
  * @title The Chainlink Operator contract
@@ -137,6 +138,7 @@ contract Operator is AuthorizedReceiver, ConfirmedOwner, LinkTokenReceiver, Oper
     uint256 dataVersion,
     bytes calldata data
   ) external override validateFromLINK {
+    console.log("OPERATOR REQUESTED");
     (bytes32 requestId, uint256 expiration) = _verifyAndProcessOracleRequest(
       sender,
       payment,
@@ -146,6 +148,7 @@ contract Operator is AuthorizedReceiver, ConfirmedOwner, LinkTokenReceiver, Oper
       dataVersion
     );
     emit OracleRequest(specId, sender, requestId, payment, sender, callbackFunctionId, expiration, dataVersion, data);
+    console.log("OPERATOR REQUEST EMITTED");
   }
 
   /**
@@ -176,6 +179,7 @@ contract Operator is AuthorizedReceiver, ConfirmedOwner, LinkTokenReceiver, Oper
     validateCallbackAddress(callbackAddress)
     returns (bool)
   {
+    console.log("oracle request FULFILLED");
     _verifyOracleRequestAndProcessPayment(requestId, payment, callbackAddress, callbackFunctionId, expiration, 1);
     emit OracleResponse(requestId);
     require(gasleft() >= MINIMUM_CONSUMER_GAS_LIMIT, "Must provide consumer enough gas");
