@@ -131,12 +131,21 @@ describe("Adapter Test", function () {
 
   });
 
+  function delay(ms: any) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   describe("External Adapter", function () {
     it("Should send a request to the node", async function () {
         await testContract.multiplyBy1000(5);
         //link token balance decreases in test contract
         let linkBalanceTestContract = await linkToken.balanceOf(testContract.address)
         console.log("Test contract LINK Balance:", Number(linkBalanceTestContract));
+        console.log("waiting 7 seconds");
+        await delay(7000);
+        console.log("7 seconds passed");
+        const product = await testContract.getProduct();
+        console.log(product.toNumber())
     });
   });
 });

@@ -180,7 +180,7 @@ contract Operator is AuthorizedReceiver, ConfirmedOwner, LinkTokenReceiver, Oper
     returns (bool)
   {
     console.log("oracle request FULFILLED");
-    _verifyOracleRequestAndProcessPayment(requestId, payment, callbackAddress, callbackFunctionId, expiration, 1);
+    _verifyOracleRequestAndProcessPayment(requestId, payment, callbackAddress, callbackFunctionId, expiration, 2);
     emit OracleResponse(requestId);
     require(gasleft() >= MINIMUM_CONSUMER_GAS_LIMIT, "Must provide consumer enough gas");
     // All updates to the oracle's fulfillment should come before calling the
@@ -481,6 +481,7 @@ contract Operator is AuthorizedReceiver, ConfirmedOwner, LinkTokenReceiver, Oper
   ) internal {
     bytes31 paramsHash = _buildParamsHash(payment, callbackAddress, callbackFunctionId, expiration);
     require(s_commitments[requestId].paramsHash == paramsHash, "Params do not match request ID");
+    console.log(s_commitments[requestId].dataVersion, dataVersion);
     require(s_commitments[requestId].dataVersion <= _safeCastToUint8(dataVersion), "Data versions must match");
     s_tokensInEscrow = s_tokensInEscrow.sub(payment);
     delete s_commitments[requestId];

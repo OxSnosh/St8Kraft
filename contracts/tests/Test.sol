@@ -56,6 +56,8 @@ contract Test is Ownable, ChainlinkClient {
     function returnProduct(
         uint256 _product
     ) public {
+        
+        console.log("product returned is:", _product);
         product = _product;
     }
 
