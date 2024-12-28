@@ -186,7 +186,9 @@ contract Operator is AuthorizedReceiver, ConfirmedOwner, LinkTokenReceiver, Oper
     // All updates to the oracle's fulfillment should come before calling the
     // callback(addr+functionId) as it is untrusted.
     // See: https://solidity.readthedocs.io/en/develop/security-considerations.html#use-the-checks-effects-interactions-pattern
+    console.log("function callback");
     (bool success, ) = callbackAddress.call(abi.encodeWithSelector(callbackFunctionId, requestId, data)); // solhint-disable-line avoid-low-level-calls
+    console.log("function callback completed");
     return success;
   }
 
@@ -219,6 +221,7 @@ contract Operator is AuthorizedReceiver, ConfirmedOwner, LinkTokenReceiver, Oper
     validateMultiWordResponseId(requestId, data)
     returns (bool)
   {
+    console.log("we are HERE now FULFILLED");
     _verifyOracleRequestAndProcessPayment(requestId, payment, callbackAddress, callbackFunctionId, expiration, 2);
     emit OracleResponse(requestId);
     require(gasleft() >= MINIMUM_CONSUMER_GAS_LIMIT, "Must provide consumer enough gas");
@@ -226,6 +229,7 @@ contract Operator is AuthorizedReceiver, ConfirmedOwner, LinkTokenReceiver, Oper
     // callback(addr+functionId) as it is untrusted.
     // See: https://solidity.readthedocs.io/en/develop/security-considerations.html#use-the-checks-effects-interactions-pattern
     (bool success, ) = callbackAddress.call(abi.encodePacked(callbackFunctionId, data)); // solhint-disable-line avoid-low-level-calls
+    console.log("fulfillment completed");
     return success;
   }
 
@@ -539,12 +543,14 @@ contract Operator is AuthorizedReceiver, ConfirmedOwner, LinkTokenReceiver, Oper
    * @param data bytes
    */
   modifier validateMultiWordResponseId(bytes32 requestId, bytes calldata data) {
+    console.log("reverting here?");
     require(data.length >= 32, "Response must be > 32 bytes");
     bytes32 firstDataWord;
     assembly {
       firstDataWord := calldataload(data.offset)
     }
     require(requestId == firstDataWord, "First word must be requestId");
+    console.log("end of 2 param modifier");
     _;
   }
 

@@ -137,15 +137,17 @@ describe("Adapter Test", function () {
 
   describe("External Adapter", function () {
     it("Should send a request to the node", async function () {
-        await testContract.multiplyBy1000(5);
-        //link token balance decreases in test contract
-        let linkBalanceTestContract = await linkToken.balanceOf(testContract.address)
-        console.log("Test contract LINK Balance:", Number(linkBalanceTestContract));
-        console.log("waiting 7 seconds");
-        await delay(7000);
-        console.log("7 seconds passed");
-        const product = await testContract.getProduct();
-        console.log(product.toNumber())
+       await testContract.multiplyBy1000(5);
+        // console.log("waiting 3 seconds");
+        // await delay(3000);
+        // console.log("3 seconds passed");
+        // await network.provider.send("evm_mine")
+        // console.log("block mined");
+        const eventFilter1 = testContract.filters.CallbackCompleted();
+        const event1Logs = await testContract.queryFilter(eventFilter1);
+
+        const productUpdated = await testContract.getProduct();
+        console.log(productUpdated.toNumber())
     });
   });
 });

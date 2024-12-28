@@ -268,38 +268,38 @@ export const createJob = async (taskArgs : any) => {
   
 
 
-  const testJob = `{
-    "operationName":"CreateJob",
-    "variables":{
-      "input":{
-        "TOML":  
-          "type = "directrequest"
-          schemaVersion = 1
-          name = "Soccer-Data-EA"
-          contractAddress = "0xA74F1E1Bb6204B9397Dac33AE970E68F8aBC7651"
-          maxTaskDuration = "0s"
-          observationSource = """
-              decode_log   [type=ethabidecodelog
-                            abi="OracleRequest(bytes32 indexed specId, address requester, bytes32 requestId, uint256 payment, address callbackAddr, bytes4 callbackFunctionId, uint256 cancelExpiration, uint256 dataVersion, bytes data)"
-                            data="$(jobRun.logData)"
-                            topics="$(jobRun.logTopics)"]
+  // const testJob = `{
+  //   "operationName":"CreateJob",
+  //   "variables":{
+  //     "input":{
+  //       "TOML":  
+  //         "type = "directrequest"
+  //         schemaVersion = 1
+  //         name = "Soccer-Data-EA"
+  //         contractAddress = "0xA74F1E1Bb6204B9397Dac33AE970E68F8aBC7651"
+  //         maxTaskDuration = "0s"
+  //         observationSource = """
+  //             decode_log   [type=ethabidecodelog
+  //                           abi="OracleRequest(bytes32 indexed specId, address requester, bytes32 requestId, uint256 payment, address callbackAddr, bytes4 callbackFunctionId, uint256 cancelExpiration, uint256 dataVersion, bytes data)"
+  //                           data="$(jobRun.logData)"
+  //                           topics="$(jobRun.logTopics)"]
           
-              decode_cbor  [type=cborparse data="$(decode_log.data)"]
-              fetch        [type=bridge name="soccer-data" requestData="{\\"id\\": $(jobSpec.externalJobID), \\"data\\": { \\"playerId\\": $(decode_cbor.playerId)}}"]
-              parse        [type=jsonparse path="data,0,Games" data="$(fetch)"]
-              encode_data  [type=ethabiencode abi="(uint256 value)" data="{ \\"value\\": $(parse) }"]
-              encode_tx    [type=ethabiencode
-                            abi="fulfillOracleRequest(bytes32 requestId, uint256 payment, address callbackAddress, bytes4 callbackFunctionId, uint256 expiration, bytes32 data)"
-                            data="{\\"requestId\\": $(decode_log.requestId), \\"payment\\": $(decode_log.payment), \\"callbackAddress\\": $(decode_log.callbackAddr), \\"callbackFunctionId\\": $(decode_log.callbackFunctionId), \\"expiration\\": $(decode_log.cancelExpiration), \\"data\\": $(encode_data)}"
-                          ]
-              submit_tx    [type=ethtx to="0xA74F1E1Bb6204B9397Dac33AE970E68F8aBC7651" data="$(encode_tx)"]
+  //             decode_cbor  [type=cborparse data="$(decode_log.data)"]
+  //             fetch        [type=bridge name="soccer-data" requestData="{\\"id\\": $(jobSpec.externalJobID), \\"data\\": { \\"playerId\\": $(decode_cbor.playerId)}}"]
+  //             parse        [type=jsonparse path="data,0,Games" data="$(fetch)"]
+  //             encode_data  [type=ethabiencode abi="(uint256 value)" data="{ \\"value\\": $(parse) }"]
+  //             encode_tx    [type=ethabiencode
+  //                           abi="fulfillOracleRequest(bytes32 requestId, uint256 payment, address callbackAddress, bytes4 callbackFunctionId, uint256 expiration, bytes32 data)"
+  //                           data="{\\"requestId\\": $(decode_log.requestId), \\"payment\\": $(decode_log.payment), \\"callbackAddress\\": $(decode_log.callbackAddr), \\"callbackFunctionId\\": $(decode_log.callbackFunctionId), \\"expiration\\": $(decode_log.cancelExpiration), \\"data\\": $(encode_data)}"
+  //                         ]
+  //             submit_tx    [type=ethtx to="0xA74F1E1Bb6204B9397Dac33AE970E68F8aBC7651" data="$(encode_tx)"]
           
-              decode_log -> decode_cbor -> fetch -> parse -> encode_data -> encode_tx -> submit_tx
-          """"
-        },
-        "query":"mutation CreateJob($input: CreateJobInput!) {\\n  createJob(input: $input) {\\n    ... on CreateJobSuccess {\\n      job {\\n        id\\n        __typename\\n      }\\n      __typename\\n    }\\n    ... on InputErrors {\\n      errors {\\n        path\\n        message\\n        code\\n        __typename\\n      }\\n      __typename\\n    }\\n    __typename\\n  }\\n}\\n"
-      },
-    }`;
+  //             decode_log -> decode_cbor -> fetch -> parse -> encode_data -> encode_tx -> submit_tx
+  //         """"
+  //       },
+  //       "query":"mutation CreateJob($input: CreateJobInput!) {\\n  createJob(input: $input) {\\n    ... on CreateJobSuccess {\\n      job {\\n        id\\n        __typename\\n      }\\n      __typename\\n    }\\n    ... on InputErrors {\\n      errors {\\n        path\\n        message\\n        code\\n        __typename\\n      }\\n      __typename\\n    }\\n    __typename\\n  }\\n}\\n"
+  //     },
+  //   }`;
 
   let jobDesc;
 

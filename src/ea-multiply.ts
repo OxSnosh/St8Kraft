@@ -32,7 +32,7 @@ app.get("/", function (req: Request, res: Response) {
 
 app.post("/", async function (req: Request<{}, {}, EAInput>, res: Response) {
   const eaInputData: EAInput = req.body;
-  console.log(" Request data received: ", eaInputData);
+  console.log("Request data received: ", eaInputData);
 
     let answer = eaInputData.data.numberToMultiply * 1000
 
@@ -46,19 +46,17 @@ app.post("/", async function (req: Request<{}, {}, EAInput>, res: Response) {
 
   try {
     // It's common practice to store the desired result value in a top-level result field.
-    eaResponse.data.product = answer
     eaResponse.statusCode = 200;
-
+    console.log("returned response:  ", eaResponse);
     res.json(eaResponse);
-  } catch (error: any) {
+} catch (error: any) {
     console.error("Response Error: ", error);
     eaResponse.error = error.message;
     eaResponse.statusCode = error.response.status;
-
+    
     res.json(eaResponse);
-  }
+}
 
-  console.log("returned response:  ", eaResponse);
   return;
 });
 
