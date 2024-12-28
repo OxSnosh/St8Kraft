@@ -6,8 +6,8 @@ import hre from "hardhat";
 const deployTestBridge : any = async () => {
     
     await createBridge(
-        "Test-Bridge",
-        "http://localhost:8081",
+        "multiply",
+        "http://host.docker.internal:8081",
         "0",
         0
     )
