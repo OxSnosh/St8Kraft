@@ -114,6 +114,7 @@ contract Operator is AuthorizedReceiver, ConfirmedOwner, LinkTokenReceiver, Oper
       nonce,
       dataVersion
     );
+    console.log(dataVersion, "data verison");
     emit OracleRequest(specId, sender, requestId, payment, sender, callbackFunctionId, expiration, dataVersion, data);
   }
 
@@ -139,6 +140,7 @@ contract Operator is AuthorizedReceiver, ConfirmedOwner, LinkTokenReceiver, Oper
     bytes calldata data
   ) external override validateFromLINK {
     console.log("OPERATOR REQUESTED");
+    console.log(dataVersion, "data verison");
     (bytes32 requestId, uint256 expiration) = _verifyAndProcessOracleRequest(
       sender,
       payment,
@@ -180,7 +182,7 @@ contract Operator is AuthorizedReceiver, ConfirmedOwner, LinkTokenReceiver, Oper
     returns (bool)
   {
     console.log("oracle request FULFILLED");
-    _verifyOracleRequestAndProcessPayment(requestId, payment, callbackAddress, callbackFunctionId, expiration, 2);
+    _verifyOracleRequestAndProcessPayment(requestId, payment, callbackAddress, callbackFunctionId, expiration, 1);
     emit OracleResponse(requestId);
     require(gasleft() >= MINIMUM_CONSUMER_GAS_LIMIT, "Must provide consumer enough gas");
     // All updates to the oracle's fulfillment should come before calling the
@@ -457,6 +459,7 @@ contract Operator is AuthorizedReceiver, ConfirmedOwner, LinkTokenReceiver, Oper
     uint256 nonce,
     uint256 dataVersion
   ) private validateNotToLINK(callbackAddress) returns (bytes32 requestId, uint256 expiration) {
+    console.log("_verifyAndProcess");
     requestId = keccak256(abi.encodePacked(sender, nonce));
     require(s_commitments[requestId].paramsHash == 0, "Must use a unique ID");
     // solhint-disable-next-line not-rely-on-time
@@ -464,6 +467,7 @@ contract Operator is AuthorizedReceiver, ConfirmedOwner, LinkTokenReceiver, Oper
     bytes31 paramsHash = _buildParamsHash(payment, callbackAddress, callbackFunctionId, expiration);
     s_commitments[requestId] = Commitment(paramsHash, _safeCastToUint8(dataVersion));
     s_tokensInEscrow = s_tokensInEscrow.add(payment);
+    console.log("completed verify");
     return (requestId, expiration);
   }
 
@@ -577,6 +581,7 @@ contract Operator is AuthorizedReceiver, ConfirmedOwner, LinkTokenReceiver, Oper
    * @param to The callback address
    */
   modifier validateNotToLINK(address to) {
+    console.log("validateNotToLINK Modifier");
     require(to != address(linkToken), "Cannot call to LINK");
     _;
   }

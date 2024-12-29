@@ -6,14 +6,14 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 type EAInput = {
-  id: number | string;
+  requestId: number | string;
   data: {
     numberToMultiply: number
   };
 };
 
 type EAOutput = {
-  jobRunId: string | number;
+  requestId: string | number;
   statusCode: number;
   data: {
     product: number
@@ -40,7 +40,7 @@ app.post("/", async function (req: Request<{}, {}, EAInput>, res: Response) {
     data: {
       product: answer,
     },
-    jobRunId: eaInputData.id,
+    requestId: eaInputData.requestId,
     statusCode: 0,
   };
 

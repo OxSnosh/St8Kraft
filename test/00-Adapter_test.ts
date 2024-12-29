@@ -135,19 +135,33 @@ describe("Adapter Test", function () {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+  const eventPromise = new Promise((resolve, reject) => {
+    testContract.once("CallbackCompleted", (product) => {
+      try {
+        expect(product).to.equal(5000);
+        resolve(product);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  });
+
   describe("External Adapter", function () {
     it("Should send a request to the node", async function () {
-       await testContract.multiplyBy1000(5);
-        // console.log("waiting 3 seconds");
-        // await delay(3000);
-        // console.log("3 seconds passed");
-        // await network.provider.send("evm_mine")
-        // console.log("block mined");
-        const eventFilter1 = testContract.filters.CallbackCompleted();
-        const event1Logs = await testContract.queryFilter(eventFilter1);
-
-        const productUpdated = await testContract.getProduct();
-        console.log(productUpdated.toNumber())
+      testContract.multiplyBy1000(5)
+      // await expect(testContract.multiplyBy1000(5)).to.emit(testContract, "CallbackCompleted").withArgs(5000);
+      // console.log("waiting 3 seconds");
+      // await delay(3000);
+      // console.log("3 seconds passed");
+      // await network.provider.send("evm_mine")
+      // console.log("block mined");
+      // const eventResult = await eventPromise;
+      // console.log("CallbackCompleted event emitted")
+      // const eventFilter1 = testContract.filters.CallbackCompleted();
+      // const event1Logs = await testContract.queryFilter(eventFilter1);
+      // console.log(event1Logs);
+      const productUpdated = await testContract.getProduct();
+      console.log(productUpdated.toNumber())
     });
   });
 });

@@ -53,17 +53,19 @@ contract Test is Ownable, ChainlinkClient {
         console.log("completed operator request");
     }
 
-    event CallbackCompleted();
+    event CallbackCompleted(uint256 product);
 
     function returnProduct(bytes32 _requestId, uint256 _product) public recordChainlinkFulfillment(_requestId) {
     	console.log(_product, "poduct");
         product = _product;
         console.log(product, "product after");
-        emit CallbackCompleted();
+        uint256 productForConsole = getProduct();
+        console.log(productForConsole, "product for console from formula");
+        emit CallbackCompleted(product);
     }
 
     function getProduct() public view returns (uint256) {
-        console.log(product);
+        console.log(product, "fulfilled product");
         return product;
     }
 }
