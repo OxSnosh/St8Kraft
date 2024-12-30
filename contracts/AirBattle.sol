@@ -140,7 +140,8 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         address _bomber,
         address _infrastructure,
         address _forces,
-        address _fighterLosses
+        address _fighterLosses,
+        address _mint
     ) public onlyOwner {
         warAddress = _warAddress;
         fighterAddress = _fighter;
@@ -153,57 +154,27 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         force = ForcesContract(_forces);
         fighterLosses = _fighterLosses;
         fighterLoss = FighterLosses(_fighterLosses);
-    }
-
-    ///@dev this function is only callable by the owner of the contract
-    function updateWarAddress(address newAddress) public onlyOwner {
-        warAddress = newAddress;
-    }
-
-    ///@dev this function is only callable by the owner of the contract
-    function updateFighterAddress(address newAddress) public onlyOwner {
-        fighterAddress = newAddress;
-        fighter = FightersContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the owner of the contract
-    function updateBomberAddress(address newAddress) public onlyOwner {
-        bomberAddress = newAddress;
-        bomber = BombersContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the owner of the contract
-    function updateInfrastructureAddress(address newAddress) public onlyOwner {
-        infrastructure = newAddress;
-        inf = InfrastructureContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the owner of the contract
-    function updateForcesAddress(address newAddress) public onlyOwner {
-        forces = newAddress;
-        force = ForcesContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the owner of the contract
-    function updateFighterLossesAddress(address newAddress) public onlyOwner {
-        fighterLosses = newAddress;
-        fighterLoss = FighterLosses(newAddress);
-    }
-
-    ///@dev this function is only callable by the owner of the contract
-    function updateMissilesAddress(address newAddress) public onlyOwner {
-        missiles = newAddress;
-        mis = MissilesContract(newAddress);
-    }
-
-    ///@dev this function is only callable by the owner of the contract
-    function updateWonders1Address(address newAddress) public onlyOwner {
-        wonders1 = newAddress;
-        won1 = WondersContract1(newAddress);
+        countryMinter = _mint;
+        mint = CountryMinter(_mint);
     }
 
     function updateLinkAddress(address _linkAddress) public onlyOwner {
         setChainlinkToken(_linkAddress);
+    }
+
+    function test(
+        uint256 warId,
+        uint256 attackerId
+        // uint256 defenderId,
+        // uint256[] memory attackerFighterArray,
+        // uint256[] memory attackerBomberArray
+    ) public view {
+        console.log("arrived in airBattle()");
+        console.log(attackerId);
+        console.log(warId);
+        bool isOwner = mint.checkOwnership(attackerId, msg.sender);
+        console.log(isOwner);
+
     }
 
     ///@dev this function is a public function
@@ -211,56 +182,68 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     ///@notice can only be called if a war is active between the two nations
     ///@param warId is the ID of the current war between the two nations
     ///@param attackerId is the nation ID of the attacker nation
-    ///@param defenderId is the nation ID of the defending nation
+    // /@param defenderId is the nation ID of the defending nation
     function airBattle(
         uint256 warId,
-        uint256 attackerId,
-        uint256 defenderId,
-        uint256[] memory attackerFighterArray,
-        uint256[] memory attackerBomberArray
-    ) public {
+        uint256 attackerId
+        // uint256 defenderId,
+        // uint256[] memory attackerFighterArray,
+        // uint256[] memory attackerBomberArray
+    ) public view {
+        console.log("arrived in airBattle()");
+        console.log(attackerId);
         bool isOwner = mint.checkOwnership(attackerId, msg.sender);
+        console.log(isOwner);
+        console.log("arrived in airBattle() 111");
         require(isOwner, "!nation owner");
         bool isActiveWar = war.isWarActive(warId);
+        console.log("arrived in airBattle() 222");
         require(isActiveWar, "!not active war");
-        (uint256 warOffense, uint256 warDefense) = war.getInvolvedParties(
-            warId
-        );
-        require(
-            warOffense == attackerId || warOffense == defenderId,
-            "attacker not involved in this war"
-        );
-        require(
-            warDefense == attackerId || warDefense == defenderId,
-            "defender not involved in this war"
-        );
-        uint256 attackerFighterSum = getAttackerFighterSum(
-            attackerFighterArray
-        );
-        uint256 attackerBomberSum = getAttackerBomberSum(attackerBomberArray);
-        airBattleIdToAttackerFighterSum[airBattleId] = attackerFighterSum;
-        airBattleIdToAttackerBomberSum[airBattleId] = attackerBomberSum;
-        uint256 attackSum = (attackerFighterSum + attackerBomberSum);
-        require(attackSum <= 25, "cannot send more than 25 planes on a sortie");
-        bool fighterCheck = verifyAttackerFighterArrays(
-            attackerId,
-            attackerFighterArray
-        );
-        bool bomberCheck = verifyAttackerBomberArray(
-            attackerId,
-            attackerBomberArray
-        );
-        require(fighterCheck, "!fighter check");
-        require(bomberCheck, "!bomber check");
-        completeAirBattleLaunch(
-            warId,
-            attackerId,
-            defenderId,
-            attackerFighterArray,
-            attackerBomberArray,
-            airBattleId
-        );
-        airBattleId++;
+        // console.log("arrived in airBattle() 333");
+        // (uint256 warOffense, uint256 warDefense) = war.getInvolvedParties(
+        //     warId
+        // );
+        // console.log("arrived in airBattle() 444");
+        // require(
+        //     warOffense == attackerId || warOffense == defenderId,
+        //     "attacker not involved in this war"
+        // );
+        // console.log("arrived in airBattle() 555");
+        // require(
+        //     warDefense == attackerId || warDefense == defenderId,
+        //     "defender not involved in this war"
+        // );
+        // uint256 attackerFighterSum = getAttackerFighterSum(
+        //     attackerFighterArray
+        // );
+        // uint256 attackerBomberSum = getAttackerBomberSum(attackerBomberArray);
+        // airBattleIdToAttackerFighterSum[airBattleId] = attackerFighterSum;
+        // airBattleIdToAttackerBomberSum[airBattleId] = attackerBomberSum;
+        // uint256 attackSum = (attackerFighterSum + attackerBomberSum);
+        // require(attackSum <= 25, "cannot send more than 25 planes on a sortie");
+        // console.log("arrived in airBattle() 666");
+        // bool fighterCheck = verifyAttackerFighterArrays(
+        //     attackerId,
+        //     attackerFighterArray
+        // );
+        // console.log("arrived in airBattle() 777");
+        // bool bomberCheck = verifyAttackerBomberArray(
+        //     attackerId,
+        //     attackerBomberArray
+        // );
+        // console.log("arrived in airBattle() 888");
+        // require(fighterCheck, "!fighter check");
+        // require(bomberCheck, "!bomber check");
+        // console.log("arrived to end of airBattle()");
+        // completeAirBattleLaunch(
+        //     warId,
+        //     attackerId,
+        //     defenderId,
+        //     attackerFighterArray,
+        //     attackerBomberArray,
+        //     airBattleId
+        // );
+        // airBattleId++;
     }
 
     function completeAirBattleLaunch(
@@ -271,6 +254,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256[] memory attackerBomberArray,
         uint256 _airBattleId
     ) internal {
+        console.log("arrived to completeAirBattle()");
         war.cancelPeaceOffersUponAttack(warId);
         AirBattle storage newAirBattle = airBattleIdToAirBattle[_airBattleId];
         newAirBattle.warId = warId;
@@ -288,6 +272,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
             defenderFighterArray,
             warId
         );
+        console.log("arrived to end of completeAirBattle()");
         fulfillRequest(_airBattleId);
     }
 
@@ -418,6 +403,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     }
 
     function fulfillRequest(uint256 battleId) public {
+        console.log("arrived to end of fulfillRequest()");
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
@@ -448,6 +434,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256 requestId,
         uint256[] memory randomWords
     ) internal override {
+        console.log("arrived to end of fulfillRandomWords()");
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
         s_requestIndexToRandomWords[requestNumber] = randomWords;
         Chainlink.Request memory req = buildOperatorRequest(

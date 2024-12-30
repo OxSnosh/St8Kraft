@@ -452,7 +452,9 @@ describe("War Contract", function () {
             bomberscontract.address, 
             infrastructurecontract.address, 
             forcescontract.address, 
-            fighterlosses.address)
+            fighterlosses.address,
+            countryminter.address
+        )
         
         await billscontract.settings(
             countryminter.address,

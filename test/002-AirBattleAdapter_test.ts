@@ -467,7 +467,9 @@ describe("Adapter Test", function () {
         bomberscontract.address, 
         infrastructurecontract.address, 
         forcescontract.address, 
-        fighterlosses.address)
+        fighterlosses.address,
+        countryminter.address
+    )
     
     await billscontract.settings(
         countryminter.address,
@@ -1109,6 +1111,8 @@ describe("Adapter Test", function () {
         await vrfCoordinatorV2Mock.addConsumer(subscriptionId, airbattlecontract.address);
     }
 
+    console.log("hello world 1")
+
     await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000))
     await countryminter.connect(signer1).generateCountry(
         "TestRuler",
@@ -1116,6 +1120,34 @@ describe("Adapter Test", function () {
         "TestCapitalCity",
         "TestNationSlogan"
     )
+    await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
+    await countryminter.connect(signer2).generateCountry(
+        "TestRuler2",
+        "TestNationName2",
+        "TestCapitalCity2",
+        "TestNationSlogan2"
+    )
+
+    console.log("hello world 2")
+
+    const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+    const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+    for (const log of event1Logs) {
+        const requestIdReturn = log.args.requestId;
+        // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+        if (requestIdReturn == 2) {
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+            let resources1 = await resourcescontract.getPlayerResources(0);
+            // console.log("resources 1", resources1[0].toNumber(), resources1[1].toNumber());
+        } else if (requestIdReturn == 4) {
+            await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+            let resources2 = await resourcescontract.getPlayerResources(1);
+            // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
+        }
+    }
+    
+    console.log("hello world 3")
+
     await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000*(10**18)));
     await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000*(10**18)));
     await treasurycontract.connect(signer1).addFunds(BigInt(10000000000*(10**18)), 0);
@@ -1127,12 +1159,6 @@ describe("Adapter Test", function () {
     await billscontract.connect(signer1).payBills(0)
 
     await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000))
-    await countryminter.connect(signer2).generateCountry(
-        "TestRuler2",
-        "TestNationName2",
-        "TestCapitalCity2",
-        "TestNationSlogan2"
-    )
     await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000*(10**18)));
     await warbucks.connect(signer0).transfer(signer2.address, BigInt(2000000000*(10**18)));
     await treasurycontract.connect(signer2).addFunds(BigInt(2000000000*(10**18)), 1);
@@ -1146,7 +1172,6 @@ describe("Adapter Test", function () {
     await warcontract.connect(signer1).declareWar(0, 1)
     await forcescontract.connect(signer1).deployForces(1000, 30, 0, 0)
     await billscontract.connect(signer2).payBills(1)
-    signers = await ethers.getSigners();
 
     // const LinkToken  = await ethers.getContractFactory(
     //         "LinkToken"
@@ -1198,9 +1223,17 @@ describe("Adapter Test", function () {
     const linkBalanceTestContract = await linkToken.balanceOf(testContract.address)
     console.log("Test contract LINK Balance:", Number(linkBalanceTestContract));
     
+    await linkToken.connect(signer0).transfer(airbattlecontract.address, BigInt(10000000000000000000))
+    const airBattleContractLinkBalance = await linkToken.balanceOf(airbattlecontract.address)
+    console.log("Test contract AirBattle Balance:", Number(airBattleContractLinkBalance));
+    
     await linkToken.connect(signer0).transfer(signer0.address, BigInt(10000000000000000000))
     const linkBalanceSigner0 = await linkToken.balanceOf(signer0.address)
-    console.log("Signer0 LINK Balance:", Number(linkBalanceSigner0));
+    console.log("Signer1 LINK Balance:", Number(linkBalanceSigner0));
+    
+    await linkToken.connect(signer0).transfer(signer1.address, BigInt(10000000000000000000))
+    const linkBalanceSigner1 = await linkToken.balanceOf(signer1.address)
+    console.log("Signer0 LINK Balance:", Number(linkBalanceSigner1));
 
     const nodeAddress = metadata.nodeAddress;
 
@@ -1249,17 +1282,31 @@ describe("Adapter Test", function () {
   });
 
   describe("Air Battle External Adapter", function () {
-    it("Should send a request to the node", async function () {
-        airbattlecontract.airBattle(0, 0, 1, [0, 0, 0, 0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 0, 0])
-        const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
-        const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
-        for (const log of event1Logs) {
-            const requestIdReturn = log.args.requestId;
-            // console.log(Number(requestIdReturn), "requestIdReturn for Event");
-            if (requestIdReturn == 5) {
-                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, airbattlecontract.address);
-            }
-        }
-    });
+    it("test the test function", async function () {
+        const nation0Owner = await countryminter.connect(signer1).checkOwnership(0, signer1.address)
+        const nation1Owner = await countryminter.connect(signer2).checkOwnership(1, signer2.address)
+        console.log(`nation 0 ownership ${nation0Owner} and nation 1 ownership ${nation1Owner}`)
+
+        await airbattlecontract.connect(signer1).test(0,1)
+    })
+
+
+
+    // it("Should send a request to the node", async function () {
+    //     const attackerFighters = [1, 2, 3, 4, 4, 4, 4, 4, 4]
+    //     const attackerBombers = [1, 2, 3, 4, 4, 4, 4, 4, 4]
+    //     var isOwner = await countryminter.checkOwnership(0, signer1.address)
+    //     console.log(isOwner)
+    //     await airbattlecontract.connect(signer1).airBattle(0, 0)
+    //     const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+    //     const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+    //     for (const log of event1Logs) {
+    //         const requestIdReturn = log.args.requestId;
+    //         // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+    //         if (requestIdReturn == 5) {
+    //             await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, airbattlecontract.address);
+    //         }
+    //     }
+    // });
   });
 });

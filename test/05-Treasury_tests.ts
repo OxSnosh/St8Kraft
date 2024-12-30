@@ -445,14 +445,16 @@ describe("Treasury Contract", function () {
             wonderscontract1.address,
             senatecontract.address,
             countryparameterscontract.address)
-    
+
         await airbattlecontract.settings(
             warcontract.address, 
             fighterscontract.address, 
             bomberscontract.address, 
             infrastructurecontract.address, 
             forcescontract.address, 
-            fighterlosses.address)
+            fighterlosses.address,
+            countryminter.address
+        )
         
         await billscontract.settings(
             countryminter.address,
