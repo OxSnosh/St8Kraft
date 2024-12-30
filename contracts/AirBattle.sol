@@ -202,6 +202,10 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         won1 = WondersContract1(newAddress);
     }
 
+    function updateLinkAddress(address _linkAddress) public onlyOwner {
+        setChainlinkToken(_linkAddress);
+    }
+
     ///@dev this function is a public function
     ///@notice this function allows one nation to launch a bombing campaign against another nation
     ///@notice can only be called if a war is active between the two nations
@@ -446,9 +450,8 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     ) internal override {
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
         s_requestIndexToRandomWords[requestNumber] = randomWords;
-        Chainlink.Request memory req = buildChainlinkRequest(
+        Chainlink.Request memory req = buildOperatorRequest(
             jobId,
-            address(this),
             this.completeAirBattle.selector
         );
         uint256[] memory defenderFighters = airBattleIdToAirBattle[
@@ -468,7 +471,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         req.addBytes("randomNumbers", abi.encodePacked(randomWords));
         req.addUint("attackerId", attackerId);
         req.addUint("defenderId", defenderId);
-        sendChainlinkRequestTo(oracleAddress, req, fee);
+        sendOperatorRequest(req, fee);
     }
 
     function completeAirBattle(

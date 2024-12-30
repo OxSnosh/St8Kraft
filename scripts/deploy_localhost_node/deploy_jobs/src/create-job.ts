@@ -182,8 +182,10 @@ export const createJob = async (taskArgs : any) => {
 
   const authenticationToken = await login();
   const externalID = uuidv4();
+  const airBattleExternalID = uuidv4();
 
   const jobName = `Get > Uint256: ${new Date().getMilliseconds()}`;
+  const jobNameAirBattle = `Get > Uint256: ${new Date().getMilliseconds()}`;
   //       const defaultJob = `{    
   //         "operationName":"CreateJob",    
   //         "variables":{      
@@ -199,7 +201,7 @@ export const createJob = async (taskArgs : any) => {
           "query":"mutation CreateJob($input: CreateJobInput!) {\\n  createJob(input: $input) {\\n    ... on CreateJobSuccess {\\n      job {\\n        id\\n        __typename\\n      }\\n      __typename\\n    }\\n    ... on InputErrors {\\n      errors {\\n        path\\n        message\\n        code\\n        __typename\\n      }\\n      __typename\\n    }\\n    __typename\\n  }\\n}\\n"}`;
         
       console.log(defaultJob);
-      
+
   const outputForConsole = `
       type = "directrequest"
       schemaVersion = 1
@@ -227,6 +229,55 @@ export const createJob = async (taskArgs : any) => {
       """
   `
 
+  const airBattleOutputForConsole = `
+  type = "directrequest"
+  schemaVersion = 1
+  name = "${jobNameAirBattle}"
+  externalJobID = "${airBattleExternalID}"
+  maxTaskDuration = "0s"
+  contractAddress = "${oracleAddress}"
+  observationSource = """
+      decode_log   [type=ethabidecodelog
+                    abi="OracleRequest(bytes32 indexed specId, address requester, bytes32 requestId, uint256 payment, address callbackAddr, bytes4 callbackFunctionId, uint256 cancelExpiration, uint256 dataVersion, bytes data)"
+                    data="$(jobRun.logData)"
+                    topics="$(jobRun.logTopics)"]
+  
+      decode_cbor  [type=cborparse data="$(decode_log.data)"]
+      fetch        [type=bridge name="air-battle" requestData="{\\"id\\": $(jobSpec.externalJobID), \\"data\\": { 
+            \\"numberToMultiply\\": $(decode_cbor.orderId), \\"numberToMultiply\\": $(decode_cbor.defenderFighters), \\"numberToMultiply\\": $(decode_cbor.attackerFighters), \\"numberToMultiply\\": $(decode_cbor.attackerBombers), \\"numberToMultiply\\": $(decode_cbor.randomNumbers), \\"numberToMultiply\\": $(decode_cbor.attackerId), \\"numberToMultiply\\": $(decode_cbor.defenderId)}}"]
+      parseA       [type=jsonparse path="data,attackerFighterCasualties" data="$(fetch)"]
+      parseB        [type=jsonparse path="data,attackerBomberCasualties" data="$(fetch)"]
+      parseC        [type=jsonparse path="data,defenderFighterCasualties" data="$(fetch)"]
+      parseD        [type=jsonparse path="data,attackerId" data="$(fetch)"]
+      parseE        [type=jsonparse path="data,defenderId" data="$(fetch)"]
+      parseF        [type=jsonparse path="data,infrastructureDamage" data="$(fetch)"]
+      parseG        [type=jsonparse path="data,tankDamage" data="$(fetch)"]
+      parseH        [type=jsonparse path="data,cruiseMissileDamage" data="$(fetch)"]
+      parseI        [type=jsonparse path="data,battleId" data="$(fetch)"]
+      parseJ        [type=jsonparse path="jobRubId" data="$(fetch)"]
+      encode_data  [type=ethabiencode abi="(uint256[] attackerFighterCasualties, uint256[] attackerBomberCasualties, uint256[] defenderFighterCasualties, uint256 attackerId, uint256 defenderId, uint256 infrastructureDamage, uint256 tankDamage, uint256 cruiseMissileDamage, uint256 battleId)" data="{ 
+                \\"requestId\\": $(decode_log.requestId), 
+                \\"attackerFighterCasualties\\": $(parseA),
+                \\"attackerBomberCasualties\\": $(parseB),
+                \\"defenderFighterCasualties\\": $(parseC),
+                \\"attackerId\\": $(parseD),
+                \\"defenderId\\": $(parseE),
+                \\"infrastructureDamage\\": $(parseF),
+                \\"tankDamage\\": $(parseG),
+                \\"cruiseMissileDamage\\": $(parseH),
+                \\"battleId\\": $(parseI)}"]
+      encode_tx    [type=ethabiencode
+                    abi="fulfillOracleRequest2(bytes32 requestId, uint256 payment, address callbackAddress, bytes4 callbackFunctionId, uint256 expiration, bytes calldata data)"
+                    data="{\\"requestId\\": $(decode_log.requestId), \\"payment\\": $(decode_log.payment), \\"callbackAddress\\": $(decode_log.callbackAddr), \\"callbackFunctionId\\": $(decode_log.callbackFunctionId), \\"expiration\\": $(decode_log.cancelExpiration), \\"data\\": $(encode_data)}"
+                  ]
+      submit_tx    [type=ethtx to="${oracleAddress}" data="$(encode_tx)"]
+  
+      decode_log -> decode_cbor -> fetch -> parseA -> parseB -> parseC -> parseD -> parseE -> parseF -> parseG -> parseH -> parseI -> parseJ -> encode_data -> encode_tx -> submit_tx
+  """
+  `
+
+  console.log("AIR BATTLE JOB********", airBattleOutputForConsole);
+
   // const outputForConsole = `
   //       type = "directrequest"
   //       schemaVersion = 1
@@ -253,7 +304,7 @@ export const createJob = async (taskArgs : any) => {
   //           decode_log -> decode_cbor -> fetch -> parse -> encode_data -> encode_tx -> submit_tx
   //       """
   // `
-  console.log(outputForConsole)
+  // console.log(outputForConsole)
 
   // const defaultJob = `{
   //   "operationName": "CreateJob",
@@ -358,16 +409,16 @@ export const createJob = async (taskArgs : any) => {
   try {
     console.info("\nCreating Job...\n");
 
-    const data = await axios.request<any, QueryResponse>({
-      url: "http://127.0.0.1:6688/query",
-      headers: {
-        "content-type": "application/json",
-        cookie: `blocalauth=localapibe315fd0c14b5e47:; isNotIncognito=true; _ga=GA1.1.2055974768.1644792885; ${authenticationToken}`,
-        Referer: "http://127.0.0.1:6688/jobs/new",
-      },
-      method: "POST",
-      data: jobDesc,
-    });
+    // const data = await axios.request<any, QueryResponse>({
+    //   url: "http://127.0.0.1:6688/query",
+    //   headers: {
+    //     "content-type": "application/json",
+    //     cookie: `blocalauth=localapibe315fd0c14b5e47:; isNotIncognito=true; _ga=GA1.1.2055974768.1644792885; ${authenticationToken}`,
+    //     Referer: "http://127.0.0.1:6688/jobs/new",
+    //   },
+    //   method: "POST",
+    //   data: jobDesc,
+    // });
 
     const dataToWrite = `export const jobId = "${externalID}";\n`;
 
@@ -385,9 +436,9 @@ export const createJob = async (taskArgs : any) => {
 
     console.table({
       Status: "Success",
-      Error: data.errors != null ? data?.errors[0]?.message : null,
-      JobID: data?.data?.data?.createJob?.job?.id,
-      ExternalID: externalID,
+      // Error: data.errors != null ? data?.errors[0]?.message : null,
+      // JobID: data?.data?.data?.createJob?.job?.id,
+      // ExternalID: externalID,
     });
   } catch (e) {
     console.log("Could not create job");

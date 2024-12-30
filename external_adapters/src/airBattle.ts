@@ -34,7 +34,7 @@ type EAOutput = {
   error?: string;
 };
 
-const PORT = process.env.PORT_AIR_BATTLE || 8080;
+const PORT = process.env.PORT_AIR_BATTLE || 8082;
 const app: Express = express();
 
 app.use(bodyParser.json());

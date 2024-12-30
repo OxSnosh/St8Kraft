@@ -12,6 +12,13 @@ const deployTestBridge : any = async () => {
         0
     )
 
+    await createBridge(
+        "air-battle",
+        "http://host.docker.internal:8082",
+        "0",
+        0
+    )
+
 }
 
 deployTestBridge()

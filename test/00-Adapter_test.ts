@@ -164,4 +164,10 @@ describe("Adapter Test", function () {
       console.log(productUpdated.toNumber())
     });
   });
+
+  describe("Air Battle External Adapter", function () {
+    it("Should send a request to the node", async function () {
+      
+    });
+  });
 });
