@@ -256,7 +256,7 @@ export const createJob = async (taskArgs : any) => {
       parseG        [type=jsonparse path="data,tankDamage" data="$(fetch)"]
       parseH        [type=jsonparse path="data,cruiseMissileDamage" data="$(fetch)"]
       parseI        [type=jsonparse path="data,battleId" data="$(fetch)"]
-      encode_data  [type=ethabiencode abi="(uint256[] attackerFighterCasualties, uint256[] attackerBomberCasualties, uint256[] defenderFighterCasualties, uint256 attackerId, uint256 defenderId, uint256 infrastructureDamage, uint256 tankDamage, uint256 cruiseMissileDamage, uint256 battleId)" data="{ 
+      encode_data  [type=ethabiencode abi="(bytes memory attackerFighterCasualties, bytes memory attackerBomberCasualties, bytes memory defenderFighterCasualties, uint256 attackerId, uint256 defenderId, uint256 infrastructureDamage, uint256 tankDamage, uint256 cruiseMissileDamage, uint256 battleId)" data="{ 
                 \\"requestId\\": $(decode_log.requestId), 
                 \\"attackerFighterCasualties\\": $(parseA),
                 \\"attackerBomberCasualties\\": $(parseB),

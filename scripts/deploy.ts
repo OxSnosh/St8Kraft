@@ -195,7 +195,7 @@ async function main() {
 
 
     const AdditionalAirBattleContract = await ethers.getContractFactory("AdditionalAirBattle")
-    additionalairbattle = await AdditionalAirBattleContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as AdditionalAirBattle
+    additionalairbattle = await AdditionalAirBattleContract.deploy() as AdditionalAirBattle
     await additionalairbattle.deployed()
     // console.log(`AirBattleContract deployed tp ${airbattlecontract.address}`)
 
