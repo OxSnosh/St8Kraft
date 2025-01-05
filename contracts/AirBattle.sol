@@ -31,6 +31,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     address wonders1;
     address fighterLosses;
     address countryMinter;
+    address addAirBattleAddress;
     //fighter strength
     uint256 yak9Strength = 1;
     uint256 p51MustangStrength = 2;
@@ -61,6 +62,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     WondersContract1 won1;
     FighterLosses fighterLoss;
     CountryMinter mint;
+    AdditionalAirBattle addAirBattle;
 
     uint256[] private s_randomWords;
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
@@ -93,28 +95,8 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256 warId
     );
 
-    event AirAssaultCasualties(
-        uint256 indexed battleId,
-        uint256 indexed attackerId,
-        uint256 indexed defenderId,
-        uint256[] attackerFighterCasualties,
-        uint256[] attackerBomberCasualties,
-        uint256[] defenderFighterCasualties,
-        uint256 warId
-    );
 
     mapping(uint256 => AirBattle) airBattleIdToAirBattle;
-
-    mapping(uint256 => uint256[]) airBattleIdToAttackerFighters;
-    mapping(uint256 => uint256[]) airBattleIdToAttackerBombers;
-    mapping(uint256 => uint256) airBattleIdToAttackerFighterSum;
-    mapping(uint256 => uint256) airBattleIdToAttackerBomberSum;
-    mapping(uint256 => uint256[]) airBattleIdToAttackerFighterLosses;
-
-    mapping(uint256 => uint256[]) airBattleIdToDefenderFighters;
-    mapping(uint256 => uint256[]) airBattleIdToDefendederFighterArray;
-    mapping(uint256 => uint256) airBattleIdToDefenderFighterSum;
-    mapping(uint256 => uint256[]) airBattleIdToDefenderFighterLosses;
 
     mapping(uint256 => uint256) s_requestIdToRequestIndex;
     mapping(uint256 => uint256[]) public s_requestIndexToRandomWords;
@@ -141,9 +123,11 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         address _infrastructure,
         address _forces,
         address _fighterLosses,
-        address _mint
+        address _mint,
+        address _addAirBattle
     ) public onlyOwner {
         warAddress = _warAddress;
+        war = WarContract(_warAddress);
         fighterAddress = _fighter;
         fighter = FightersContract(_fighter);
         bomberAddress = _bomber;
@@ -156,25 +140,8 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         fighterLoss = FighterLosses(_fighterLosses);
         countryMinter = _mint;
         mint = CountryMinter(_mint);
-    }
-
-    function updateLinkAddress(address _linkAddress) public onlyOwner {
-        setChainlinkToken(_linkAddress);
-    }
-
-    function test(
-        uint256 warId,
-        uint256 attackerId
-        // uint256 defenderId,
-        // uint256[] memory attackerFighterArray,
-        // uint256[] memory attackerBomberArray
-    ) public view {
-        console.log("arrived in airBattle()");
-        console.log(attackerId);
-        console.log(warId);
-        bool isOwner = mint.checkOwnership(attackerId, msg.sender);
-        console.log(isOwner);
-
+        addAirBattleAddress = _addAirBattle;
+        addAirBattle = AdditionalAirBattle(_addAirBattle);
     }
 
     ///@dev this function is a public function
@@ -185,65 +152,53 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     // /@param defenderId is the nation ID of the defending nation
     function airBattle(
         uint256 warId,
-        uint256 attackerId
-        // uint256 defenderId,
-        // uint256[] memory attackerFighterArray,
-        // uint256[] memory attackerBomberArray
-    ) public view {
-        console.log("arrived in airBattle()");
-        console.log(attackerId);
+        uint256 attackerId,
+        uint256 defenderId,
+        uint256[] memory attackerFighterArray,
+        uint256[] memory attackerBomberArray
+    ) public {
         bool isOwner = mint.checkOwnership(attackerId, msg.sender);
-        console.log(isOwner);
-        console.log("arrived in airBattle() 111");
         require(isOwner, "!nation owner");
         bool isActiveWar = war.isWarActive(warId);
-        console.log("arrived in airBattle() 222");
         require(isActiveWar, "!not active war");
-        // console.log("arrived in airBattle() 333");
-        // (uint256 warOffense, uint256 warDefense) = war.getInvolvedParties(
-        //     warId
-        // );
-        // console.log("arrived in airBattle() 444");
-        // require(
-        //     warOffense == attackerId || warOffense == defenderId,
-        //     "attacker not involved in this war"
-        // );
-        // console.log("arrived in airBattle() 555");
-        // require(
-        //     warDefense == attackerId || warDefense == defenderId,
-        //     "defender not involved in this war"
-        // );
-        // uint256 attackerFighterSum = getAttackerFighterSum(
-        //     attackerFighterArray
-        // );
-        // uint256 attackerBomberSum = getAttackerBomberSum(attackerBomberArray);
+        (uint256 warOffense, uint256 warDefense) = war.getInvolvedParties(
+            warId
+        );
+        require(
+            warOffense == attackerId || warOffense == defenderId,
+            "attacker not involved in this war"
+        );
+        require(
+            warDefense == attackerId || warDefense == defenderId,
+            "defender not involved in this war"
+        );
+        uint256 attackerFighterSum = getAttackerFighterSum(
+            attackerFighterArray
+        );
+        uint256 attackerBomberSum = getAttackerBomberSum(attackerBomberArray);
         // airBattleIdToAttackerFighterSum[airBattleId] = attackerFighterSum;
         // airBattleIdToAttackerBomberSum[airBattleId] = attackerBomberSum;
-        // uint256 attackSum = (attackerFighterSum + attackerBomberSum);
-        // require(attackSum <= 25, "cannot send more than 25 planes on a sortie");
-        // console.log("arrived in airBattle() 666");
-        // bool fighterCheck = verifyAttackerFighterArrays(
-        //     attackerId,
-        //     attackerFighterArray
-        // );
-        // console.log("arrived in airBattle() 777");
-        // bool bomberCheck = verifyAttackerBomberArray(
-        //     attackerId,
-        //     attackerBomberArray
-        // );
-        // console.log("arrived in airBattle() 888");
-        // require(fighterCheck, "!fighter check");
-        // require(bomberCheck, "!bomber check");
-        // console.log("arrived to end of airBattle()");
-        // completeAirBattleLaunch(
-        //     warId,
-        //     attackerId,
-        //     defenderId,
-        //     attackerFighterArray,
-        //     attackerBomberArray,
-        //     airBattleId
-        // );
-        // airBattleId++;
+        uint256 attackSum = (attackerFighterSum + attackerBomberSum);
+        require(attackSum <= 25, "cannot send more than 25 planes on a sortie");
+        bool fighterCheck = verifyAttackerFighterArrays(
+            attackerId,
+            attackerFighterArray
+        );
+        bool bomberCheck = verifyAttackerBomberArray(
+            attackerId,
+            attackerBomberArray
+        );
+        require(fighterCheck, "!fighter check");
+        require(bomberCheck, "!bomber check");
+        completeAirBattleLaunch(
+            warId,
+            attackerId,
+            defenderId,
+            attackerFighterArray,
+            attackerBomberArray,
+            airBattleId
+        );
+        airBattleId++;
     }
 
     function completeAirBattleLaunch(
@@ -254,7 +209,6 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256[] memory attackerBomberArray,
         uint256 _airBattleId
     ) internal {
-        console.log("arrived to completeAirBattle()");
         war.cancelPeaceOffersUponAttack(warId);
         AirBattle storage newAirBattle = airBattleIdToAirBattle[_airBattleId];
         newAirBattle.warId = warId;
@@ -262,7 +216,10 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         newAirBattle.defenderId = defenderId;
         newAirBattle.attackerFighterArray = attackerFighterArray;
         newAirBattle.attackerBomberArray = attackerBomberArray;
-        uint256[] memory defenderFighterArray = generateDefenderFighters(defenderId, _airBattleId);
+        uint256[] memory defenderFighterArray = generateDefenderFighters(
+            defenderId,
+            _airBattleId
+        );
         emit AirAssaultLaunched(
             airBattleId,
             attackerId,
@@ -272,7 +229,6 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
             defenderFighterArray,
             warId
         );
-        console.log("arrived to end of completeAirBattle()");
         fulfillRequest(_airBattleId);
     }
 
@@ -403,7 +359,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     }
 
     function fulfillRequest(uint256 battleId) public {
-        console.log("arrived to end of fulfillRequest()");
+        console.log("arrived to fulfillRequest()");
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
@@ -412,6 +368,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
             NUM_WORDS
         );
         s_requestIdToRequestIndex[requestId] = battleId;
+        console.log("arrived to end of fulfillRequest()");
     }
 
     bytes32 jobId;
@@ -424,47 +381,64 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
 
     function updateOracleAddress(address _oracleAddress) public onlyOwner {
         oracleAddress = _oracleAddress;
+        setChainlinkOracle(_oracleAddress);
     }
 
     function updateFee(uint256 _fee) public onlyOwner {
         fee = _fee;
     }
 
+    function updateLinkAddress(address _linkAddress) public onlyOwner {
+        setChainlinkToken(_linkAddress);
+    }
+
     function fulfillRandomWords(
         uint256 requestId,
         uint256[] memory randomWords
     ) internal override {
-        console.log("arrived to end of fulfillRandomWords()");
+        console.log("arrived to fulfillRandomWords()");
+        console.log(randomWords[0]);
+        console.log(randomWords[1]);
+        console.log(randomWords[2]);
+        console.log(randomWords[3]);
+        console.log(randomWords[4]);
+        console.log(randomWords[5]);
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
         s_requestIndexToRandomWords[requestNumber] = randomWords;
         Chainlink.Request memory req = buildOperatorRequest(
             jobId,
             this.completeAirBattle.selector
         );
-        uint256[] memory defenderFighters = airBattleIdToAirBattle[
-            requestNumber
-        ].defenderFighterArray;
-        uint256[] memory attackerFighters = airBattleIdToAirBattle[
-            requestNumber
-        ].attackerFighterArray;
-        uint256[] memory attackerBombers = airBattleIdToAirBattle[requestNumber]
-            .attackerBomberArray;
+        bytes memory defenderFighters = abi.encode(
+            airBattleIdToAirBattle[requestNumber].defenderFighterArray
+        );
+        bytes memory attackerFighters = abi.encode(
+            airBattleIdToAirBattle[requestNumber].attackerFighterArray
+        );
+        bytes memory attackerBombers = abi.encode(
+            airBattleIdToAirBattle[requestNumber].attackerBomberArray
+        );
         uint256 attackerId = airBattleIdToAirBattle[requestNumber].attackerId;
         uint256 defenderId = airBattleIdToAirBattle[requestNumber].defenderId;
+        uint256 attackId = s_requestIdToRequestIndex[requestId];
         req.addUint("orderId", requestNumber);
-        req.addBytes("defenderFighters", abi.encodePacked(defenderFighters));
-        req.addBytes("attackerFighters", abi.encodePacked(attackerFighters));
-        req.addBytes("attackerBombers", abi.encodePacked(attackerBombers));
-        req.addBytes("randomNumbers", abi.encodePacked(randomWords));
+        req.addBytes("defenderFighters", defenderFighters);
+        req.addBytes("attackerFighters", attackerFighters);
+        req.addBytes("attackerBombers", attackerBombers);
+        req.addBytes("randomNumbers", abi.encode(randomWords));
         req.addUint("attackerId", attackerId);
         req.addUint("defenderId", defenderId);
+        req.addUint("defenderId", defenderId);
+        req.addUint("attackId", attackId);
+        console.log("arrived to sendOperatorRequest()");
         sendOperatorRequest(req, fee);
+        console.log("arrived to fulfillRandomWords()");
     }
 
     function completeAirBattle(
-        uint256[] memory attackerFighterCasualties,
-        uint256[] memory attackerBomberCasualties,
-        uint256[] memory defenderFighterCasualties,
+        bytes memory attackerFighterCasualtiesBytes,
+        bytes memory attackerBomberCasualtiesBytes,
+        bytes memory defenderFighterCasualtiesBytes,
         uint256 attackerId,
         uint256 defenderId,
         uint256 infrastructureDamage,
@@ -472,9 +446,177 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256 cruiseMissileDamage,
         uint256 battleId
     ) public {
-        fighterLoss.decrementLosses(attackerFighterCasualties, attackerId);
-        bomber.decrementBomberLosses(attackerBomberCasualties, attackerId);
-        fighterLoss.decrementLosses(defenderFighterCasualties, defenderId);
+        addAirBattle.completeAirBattle(
+            attackerFighterCasualtiesBytes,
+            attackerBomberCasualtiesBytes,
+            defenderFighterCasualtiesBytes,
+            attackerId,
+            defenderId,
+            infrastructureDamage,
+            tankDamage,
+            cruiseMissileDamage,
+            battleId
+        );
+    
+        // uint256[] memory attackerFighterCasualties = abi.decode(
+        //     attackerFighterCasualtiesBytes,
+        //     (uint256[])
+        // );
+        // uint256[] memory attackerBomberCasualties = abi.decode(
+        //     attackerBomberCasualtiesBytes,
+        //     (uint256[])
+        // );
+        // uint256[] memory defenderFighterCasualties = abi.decode(
+        //     defenderFighterCasualtiesBytes,
+        //     (uint256[])
+        // );
+        // fighterLoss.decrementLosses(attackerFighterCasualties, attackerId);
+        // bomber.decrementBomberLosses(attackerBomberCasualties, attackerId);
+        // fighterLoss.decrementLosses(defenderFighterCasualties, defenderId);
+        // completeAirBattleCont(
+        //     infrastructureDamage,
+        //     tankDamage,
+        //     cruiseMissileDamage,
+        //     battleId,
+        //     attackerFighterCasualties,
+        //     attackerBomberCasualties,
+        //     defenderFighterCasualties,
+        //     defenderId
+        // );
+    }
+
+    // function completeAirBattleCont(
+    //     uint256 infrastructureDamage,
+    //     uint256 tankDamage,
+    //     uint256 cruiseMissileDamage,
+    //     uint256 battleId,
+    //     uint256[] memory attackerFighterCasualties,
+    //     uint256[] memory attackerBomberCasualties,
+    //     uint256[] memory defenderFighterCasualties,
+    //     uint256 defenderId
+    // ) public {
+    //     bool antiAir = won1.getAntiAirDefenseNewtwork(defenderId);
+    //     if (antiAir) {
+    //         infrastructureDamage = ((infrastructureDamage * 60) / 100);
+    //         tankDamage = ((tankDamage * 60) / 100);
+    //         cruiseMissileDamage = ((cruiseMissileDamage * 60) / 100);
+    //     }
+    //     inf.decreaseInfrastructureCountFromAirBattleContract(
+    //         defenderId,
+    //         infrastructureDamage
+    //     );
+    //     force.decreaseDefendingTankCountFromAirBattleContract(
+    //         defenderId,
+    //         tankDamage
+    //     );
+    //     mis.decreaseCruiseMissileCountFromAirBattleContract(
+    //         defenderId,
+    //         cruiseMissileDamage
+    //     );
+    //     uint256[3] memory damage = [
+    //         infrastructureDamage,
+    //         tankDamage,
+    //         cruiseMissileDamage
+    //     ];
+    //     AirBattle storage newAirBattle = airBattleIdToAirBattle[battleId];
+    //     newAirBattle.attackerFighterCasualties = attackerFighterCasualties;
+    //     newAirBattle.attackerBomberCasualties = attackerBomberCasualties;
+    //     newAirBattle.defenderFighterCasualties = defenderFighterCasualties;
+    //     newAirBattle.damage = damage;
+    //     emit AirAssaultCasualties(
+    //         battleId,
+    //         newAirBattle.attackerId,
+    //         newAirBattle.defenderId,
+    //         attackerFighterCasualties,
+    //         attackerBomberCasualties,
+    //         defenderFighterCasualties,
+    //         newAirBattle.warId
+    //     );
+    // }
+}
+
+contract AdditionalAirBattle is Ownable {    
+    address warAddress;
+    address fighterAddress;
+    address bomberAddress;
+    address infrastructure;
+    address forces;
+    address missiles;
+    address wonders1;
+    address fighterLosses;
+    address countryMinter;
+    address airBattleAddress;
+
+    WarContract war;
+    FightersContract fighter;
+    BombersContract bomber;
+    InfrastructureContract inf;
+    ForcesContract force;
+    MissilesContract mis;
+    WondersContract1 won1;
+    FighterLosses fighterLoss;
+    CountryMinter mint;
+    AirBattleContract airBattle;
+
+    struct AirBattleCasualties{
+        uint256[] attackerFighterCasualties;
+        uint256[] attackerBomberCasualties;
+        uint256[] defenderFighterCasualties;
+        uint256[] damage;
+    }
+
+    mapping(uint256 => AirBattleCasualties) airBattleIdToAirBattleCasualties;
+
+    event AirAssaultCasualties(
+        uint256 indexed battleId,
+        uint256 indexed attackerId,
+        uint256 indexed defenderId,
+        uint256[] attackerFighterCasualties,
+        uint256[] attackerBomberCasualties,
+        uint256[] defenderFighterCasualties
+    );
+
+    //@dev this function is only callable by the owner
+    ///@dev this function will be called right after deployment in order to set up contract pointers
+    function settings(
+        address _warAddress,
+        address _fighter,
+        address _bomber,
+        address _infrastructure,
+        address _forces,
+        address _fighterLosses,
+        address _mint,
+        address _airBattle
+    ) public onlyOwner {
+        warAddress = _warAddress;
+        war = WarContract(_warAddress);
+        fighterAddress = _fighter;
+        fighter = FightersContract(_fighter);
+        bomberAddress = _bomber;
+        bomber = BombersContract(_bomber);
+        infrastructure = _infrastructure;
+        inf = InfrastructureContract(_infrastructure);
+        forces = _forces;
+        force = ForcesContract(_forces);
+        fighterLosses = _fighterLosses;
+        fighterLoss = FighterLosses(_fighterLosses);
+        countryMinter = _mint;
+        mint = CountryMinter(_mint);
+        airBattleAddress = _airBattle;
+        airBattle = AirBattleContract(_airBattle);
+    }
+    
+    function completeAirBattle(
+        bytes memory attackerFighterCasualtiesBytes,
+        bytes memory attackerBomberCasualtiesBytes,
+        bytes memory defenderFighterCasualtiesBytes,
+        uint256 attackerId,
+        uint256 defenderId,
+        uint256 infrastructureDamage,
+        uint256 tankDamage,
+        uint256 cruiseMissileDamage,
+        uint256 battleId
+    ) public {
         bool antiAir = won1.getAntiAirDefenseNewtwork(defenderId);
         if (antiAir) {
             infrastructureDamage = ((infrastructureDamage * 60) / 100);
@@ -493,24 +635,56 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
             defenderId,
             cruiseMissileDamage
         );
-        uint256[3] memory damage = [
-            infrastructureDamage,
-            tankDamage,
-            cruiseMissileDamage
-        ];
-        AirBattle storage newAirBattle = airBattleIdToAirBattle[airBattleId];
+        completeAirBattleCont(
+            // infrastructureDamage,
+            // tankDamage,
+            // cruiseMissileDamage,
+            battleId,
+            attackerFighterCasualtiesBytes,
+            attackerBomberCasualtiesBytes,
+            defenderFighterCasualtiesBytes,
+            defenderId,
+            attackerId
+        );
+    }
+
+    function completeAirBattleCont(
+        // uint256 infrastructureDamage,
+        // uint256 tankDamage,
+        // uint256 cruiseMissileDamage,
+        uint256 battleId,
+        bytes memory attackerFighterCasualtiesBytes,
+        bytes memory attackerBomberCasualtiesBytes,
+        bytes memory defenderFighterCasualtiesBytes,
+        uint256 defenderId,
+        uint256 attackerId
+    ) public {
+        uint256[] memory attackerFighterCasualties = abi.decode(
+            attackerFighterCasualtiesBytes,
+            (uint256[])
+        );
+        uint256[] memory attackerBomberCasualties = abi.decode(
+            attackerBomberCasualtiesBytes,
+            (uint256[])
+        );
+        uint256[] memory defenderFighterCasualties = abi.decode(
+            defenderFighterCasualtiesBytes,
+            (uint256[])
+        );
+        fighterLoss.decrementLosses(attackerFighterCasualties, attackerId);
+        bomber.decrementBomberLosses(attackerBomberCasualties, attackerId);
+        fighterLoss.decrementLosses(defenderFighterCasualties, defenderId);
+        AirBattleCasualties storage newAirBattle = airBattleIdToAirBattleCasualties[battleId];
         newAirBattle.attackerFighterCasualties = attackerFighterCasualties;
         newAirBattle.attackerBomberCasualties = attackerBomberCasualties;
         newAirBattle.defenderFighterCasualties = defenderFighterCasualties;
-        newAirBattle.damage = damage;
         emit AirAssaultCasualties(
             battleId,
-            newAirBattle.attackerId,
-            newAirBattle.defenderId,
+            attackerId,
+            defenderId,
             attackerFighterCasualties,
             attackerBomberCasualties,
-            defenderFighterCasualties,
-            newAirBattle.warId
+            defenderFighterCasualties
         );
     }
 }

@@ -6,6 +6,7 @@ import {
     MetaNationsGovToken,
     AidContract,
     AirBattleContract,
+    AdditionalAirBattle,
     BillsContract,
     BombersContract,
     BombersMarketplace1,
@@ -94,6 +95,7 @@ async function main() {
     let metanationsgovtoken: MetaNationsGovToken
     let aidcontract: AidContract
     let airbattlecontract: AirBattleContract
+    let additionalairbattle: AdditionalAirBattle
     let billscontract: BillsContract
     let bombersmarketplace1: BombersMarketplace1
     let bombersmarketplace2: BombersMarketplace2
@@ -190,6 +192,12 @@ async function main() {
         //subscriptionId
         //gasLAne
         //callbackGasLimit
+
+
+    const AdditionalAirBattleContract = await ethers.getContractFactory("AdditionalAirBattle")
+    additionalairbattle = await AdditionalAirBattleContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as AdditionalAirBattle
+    await additionalairbattle.deployed()
+    // console.log(`AirBattleContract deployed tp ${airbattlecontract.address}`)
 
     const BillsContract = await ethers.getContractFactory("BillsContract")
     billscontract = await BillsContract.deploy() as BillsContract
@@ -797,7 +805,19 @@ async function main() {
         infrastructurecontract.address, 
         forcescontract.address, 
         fighterlosses.address,
-        countryminter.address
+        countryminter.address,
+        additionalairbattle.address
+    )
+
+    await additionalairbattle.settings(
+        warcontract.address, 
+        fighterscontract.address, 
+        bomberscontract.address, 
+        infrastructurecontract.address, 
+        forcescontract.address, 
+        fighterlosses.address,
+        countryminter.address,
+        airbattlecontract.address
     )
     
     await billscontract.settings(

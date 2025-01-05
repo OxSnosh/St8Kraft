@@ -2,28 +2,29 @@ import process from "process";
 import express, { Express, Request, Response } from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
+import { ethers } from "ethers";
 dotenv.config();
 
 type EAInput = {
   id: number;
   data: {
-    attackId : number
-    defenderFightersArr : number[]
-    attackerFightersArr : number[]
-    attackerBombersArr : number[]
-    randomNumbers : number[]
+    attackerBombers : string
+    attackerFighters : string
     attackerId : number
+    defenderFighters : string
     defenderId : number
-  };
+    attackId : number
+    randomNumbers : string
+  }
 };
 
 type EAOutput = {
   jobRunId: string | number;
   statusCode: number;
   data: {
-    attackerFighterCasualties?: number[];
-    attackerBomberCasualties?: number[];
-    defenderFighterCasualties?: number[];
+    attackerFighterCasualties?: string;
+    attackerBomberCasualties?: string;
+    defenderFighterCasualties?: string;
     attackerId?: number;
     defenderId?: number;
     infrastructureDamage?: number;
@@ -34,25 +35,71 @@ type EAOutput = {
   error?: string;
 };
 
-const PORT = process.env.PORT_AIR_BATTLE || 8082;
+const PORT = 8082;
 const app: Express = express();
 
 app.use(bodyParser.json());
 
 app.get("/", function (req: Request, res: Response) {
-  res.send("Senate Elections Running");
+  res.send("Air Battle Running");
 });
 
 app.post("/", async function (req: Request<{}, {}, EAInput>, res: Response) {
     const eaInputData: EAInput = req.body;
     console.log(" Request data received: ", eaInputData);
 
+    console.log("and so it begins");
+
+    function decodeBase64ToUint8Array(base64String: string, length: number): Uint8Array {
+      // Decode Base64 string to a Buffer
+      const buffer = Buffer.from(base64String, 'base64');
+  
+      // Convert Buffer to Uint8Array
+      const uint8Array = new Uint8Array(buffer);
+  
+      // Ensure the Uint8Array has at least the desired length
+      if (uint8Array.length < length) {
+          throw new Error(`Decoded data is shorter than the specified length: ${length}`);
+      }
+  
+      // Return the array truncated to the specified length
+      return uint8Array.slice(-length);
+    }
+
+    function decodeBase64ToUint256Array(base64String: string) {
+      // Decode Base64 string into a Buffer
+      const buffer = Buffer.from(base64String, 'base64');
+  
+      // Ensure the buffer length is divisible by 32 (256 bits per integer)
+      const uint256Size = 32; // 256 bits = 32 bytes
+      if (buffer.length % uint256Size !== 0) {
+          throw new Error("Invalid Base64 string: Buffer length must be a multiple of 32.");
+      }
+  
+      // Convert the buffer into an array of 256-bit unsigned integers
+      const uint256Array = [];
+      for (let i = 0; i < buffer.length; i += uint256Size) {
+          const chunk = buffer.subarray(i, i + uint256Size); // Extract 32-byte chunk
+          const bigIntValue = BigInt(`0x${chunk.toString('hex')}`); // Convert to BigInt
+          uint256Array.push(bigIntValue);
+      }
+  
+      return uint256Array;
+    }
+
     let jobRunId = eaInputData.id;
-    let attackId = eaInputData.data.attackId;
-    const defenderFightersArr = eaInputData.data.defenderFightersArr;
-    const attackerFightersArr = eaInputData.data.attackerFightersArr;
-    const attackerBombersArr = eaInputData.data.attackerBombersArr;
-    let randomNumbers = eaInputData.data.randomNumbers
+    const defenderFightersArrBase64 = eaInputData.data.defenderFighters;
+    console.log("defenderFighterArray", defenderFightersArrBase64)
+    const defenderFightersArr = decodeBase64ToUint8Array(defenderFightersArrBase64, 9)
+    console.log(defenderFightersArr)
+    const attackerFightersArrBase64 = eaInputData.data.attackerFighters;
+    const attackerFightersArr = decodeBase64ToUint8Array(attackerFightersArrBase64, 9)
+    console.log("attackerFightersArr", attackerFightersArr)
+    const attackerBombersArrBase64 = eaInputData.data.attackerBombers;
+    const attackerBombersArr = decodeBase64ToUint8Array(attackerBombersArrBase64, 9)
+    console.log("attackerBombersArr", attackerBombersArr)
+    let randomNumbers = decodeBase64ToUint256Array(eaInputData.data.randomNumbers)
+    console.log("random numbers", randomNumbers)
 
     let defenderBattleArray = []
     let i = 0
@@ -153,14 +200,6 @@ app.post("/", async function (req: Request<{}, {}, EAInput>, res: Response) {
     let numbers = []
 
     for (let i = 0; i < 50; i += 10) {
-    const number = randomNumbers[0].toString().substring(i, i + 10)
-    numbers.push(Number(number))
-    }
-    for (let i = 0; i < 50; i += 10) {
-    const number = randomNumbers[1].toString().substring(i, i + 10)
-    numbers.push(Number(number))
-    }
-    for (let i = 0; i < 50; i += 10) {
     const number = randomNumbers[2].toString().substring(i, i + 10)
     numbers.push(Number(number))
     }
@@ -170,6 +209,14 @@ app.post("/", async function (req: Request<{}, {}, EAInput>, res: Response) {
     }
     for (let i = 0; i < 50; i += 10) {
     const number = randomNumbers[4].toString().substring(i, i + 10)
+    numbers.push(Number(number))
+    }
+    for (let i = 0; i < 50; i += 10) {
+    const number = randomNumbers[5].toString().substring(i, i + 10)
+    numbers.push(Number(number))
+    }
+    for (let i = 0; i < 50; i += 10) {
+    const number = randomNumbers[6].toString().substring(i, i + 10)
     numbers.push(Number(number))
     }
 
@@ -188,18 +235,26 @@ app.post("/", async function (req: Request<{}, {}, EAInput>, res: Response) {
         console.log("attacker wins")
         //an attacker victory will result in a defender plane being lost and bomber damage inflicted (if bombers are present)
         var randomIndex = Math.floor(Math.random() * defenderFightersInvolved)
-        console.log(randomIndex, "randomIndex")
-        console.log(defenderBattleArray[randomIndex], "type of defender fighter lost")
-        defenderFighterCasualties.push(defenderBattleArray[randomIndex])
-        defenderFighterStrength -= defenderBattleArray[randomIndex]
+        if (defenderFightersInvolved = 0) {
+          console.log("bombing")
+        } else if (defenderFightersInvolved >= 1) {
+          console.log(randomIndex, "randomIndex")
+          console.log(defenderBattleArray[randomIndex], "type of defender fighter lost")
+          defenderFighterCasualties.push(defenderBattleArray[randomIndex])
+          if(defenderFighterStrength >= defenderBattleArray[randomIndex]) {
+            defenderFighterStrength -= defenderBattleArray[randomIndex]
+          } else if (defenderFighterStrength < defenderBattleArray[randomIndex]) {
+            defenderFighterStrength = 0
+          }
+          totalStrength -= defenderBattleArray[randomIndex]
+          defenderBattleArray[randomIndex] = 0
+          console.log(defenderBattleArray, "defenderBattleArray")
+          defenderBattleArray.splice(randomIndex, 1)
+          defenderFightersInvolved -= 1
+        }
         console.log(defenderFighterStrength, "new defenderFighterStrength")
-        totalStrength -= defenderBattleArray[randomIndex]
         console.log(totalStrength, "new totalStrength")
-        defenderBattleArray[randomIndex] = 0
         // defenderBattleArray[randomIndex] = defenderBattleArray[defenderBattleArray.length - 1];
-        defenderBattleArray.splice(randomIndex, 1)
-        defenderFightersInvolved -= 1
-        console.log(defenderBattleArray, "defenderBattleArray")
         console.log(defenderFighterCasualties, "defenderFighterCasualties")
         //inflict bomber damage if bombers are present
         bomberDamage += attackerBomberStrength
@@ -212,7 +267,11 @@ app.post("/", async function (req: Request<{}, {}, EAInput>, res: Response) {
         console.log(randomIndex, "randomIndex")
         console.log(attackerBattleArray[randomIndex], "type of attacker fighter lost")
         attackerFighterCasualties.push(attackerBattleArray[randomIndex])
-        attackerFighterStrength -= attackerBattleArray[randomIndex]
+        if(attackerFighterStrength >= attackerBattleArray[randomIndex]) {
+          attackerFighterStrength -= attackerBattleArray[randomIndex]
+        } else if (attackerFighterStrength < attackerBattleArray[randomIndex]) {
+          attackerFighterStrength = 0
+        }
         console.log(attackerFighterStrength, "new attackerFighterStrength")
         totalStrength -= attackerBattleArray[randomIndex]
         console.log(totalStrength, "new totalStrength")
@@ -257,17 +316,19 @@ app.post("/", async function (req: Request<{}, {}, EAInput>, res: Response) {
         statusCode: 0,
     };
 
+  const encoder = ethers.utils.defaultAbiCoder
+
   try {
     eaResponse.jobRunId = jobRunId;
-    eaResponse.data.attackerFighterCasualties = attackerFighterCasualties
-    eaResponse.data.attackerBomberCasualties = attackerBomberCasualties
-    eaResponse.data.defenderFighterCasualties = defenderFighterCasualties
+    eaResponse.data.attackerFighterCasualties = encoder.encode(["uint256[]"], [attackerFighterCasualties])
+    eaResponse.data.attackerBomberCasualties = encoder.encode(["uint256[]"], [attackerBomberCasualties])
+    eaResponse.data.defenderFighterCasualties = encoder.encode(["uint256[]"], [defenderFighterCasualties])
     eaResponse.data.attackerId = eaInputData.data.attackerId
     eaResponse.data.defenderId = eaInputData.data.defenderId
     eaResponse.data.infrastructureDamage = infrastructureDamage
     eaResponse.data.tankDamage = tankDamage
     eaResponse.data.cruiseMissileDamage = cruiseMissileDamage
-    eaResponse.data.battleId = attackId
+    eaResponse.data.battleId = eaInputData.data.attackId
     eaResponse.statusCode = 200;
     res.json(eaResponse);
   } catch (error: any) {

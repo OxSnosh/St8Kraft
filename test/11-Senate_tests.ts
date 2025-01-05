@@ -7,6 +7,7 @@ import {
     MetaNationsGovToken,
     AidContract,
     AirBattleContract,
+    AdditionalAirBattle,
     BillsContract,
     BombersContract,
     BombersMarketplace1,
@@ -68,6 +69,7 @@ describe("Senate Contract", function () {
     let metanationsgovtoken: MetaNationsGovToken
     let aidcontract: AidContract
     let airbattlecontract: AirBattleContract
+    let additionalairbattle: AdditionalAirBattle
     let billscontract: BillsContract
     let bombersmarketplace1: BombersMarketplace1
     let bombersmarketplace2: BombersMarketplace2
@@ -199,6 +201,11 @@ describe("Senate Contract", function () {
         const AirBattleContract = await ethers.getContractFactory("AirBattleContract")
         airbattlecontract = await AirBattleContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as AirBattleContract
         await airbattlecontract.deployed()
+        // console.log(`AirBattleContract deployed tp ${airbattlecontract.address}`)
+
+        const AdditionalAirBattleContract = await ethers.getContractFactory("AdditionalAirBattle")
+        additionalairbattle = await AdditionalAirBattleContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as AdditionalAirBattle
+        await additionalairbattle.deployed()
         // console.log(`AirBattleContract deployed tp ${airbattlecontract.address}`)
             
         const BillsContract = await ethers.getContractFactory("BillsContract")
@@ -456,7 +463,7 @@ describe("Senate Contract", function () {
             wonderscontract1.address,
             senatecontract.address,
             countryparameterscontract.address)
-    
+
         await airbattlecontract.settings(
             warcontract.address, 
             fighterscontract.address, 
@@ -464,7 +471,19 @@ describe("Senate Contract", function () {
             infrastructurecontract.address, 
             forcescontract.address, 
             fighterlosses.address,
-            countryminter.address
+            countryminter.address,
+            additionalairbattle.address
+        )
+    
+        await additionalairbattle.settings(
+            warcontract.address, 
+            fighterscontract.address, 
+            bomberscontract.address, 
+            infrastructurecontract.address, 
+            forcescontract.address, 
+            fighterlosses.address,
+            countryminter.address,
+            airbattlecontract.address
         )
         
         await billscontract.settings(
