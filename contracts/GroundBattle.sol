@@ -519,7 +519,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
             this.completeBattleSequence.selector
         );
         req.addUint("requestNumber", requestNumber);
-        req.addBytes("randomWords", abi.encodePacked(randomWords));
+        req.addBytes("randomWords", abi.encode(randomWords));
         req.addUint("attackerStrength", attackerStrength);
         req.addUint("defenderStrength", defenderStrength);
         req.addUint("attackerId", attackerId);

@@ -205,9 +205,10 @@ contract SenateContract is ChainlinkClient, KeeperCompatibleInterface, Ownable {
     function performUpkeep(bytes calldata /* performData */) external override {
         uint256 gameDay = keep.getGameDay();
         if ((gameDay - dayOfLastElection) > interval) {
-            dayOfLastElection = gameDay;
-            for (uint256 i = 0; i <= 15; i++) {
-                runElections(jobId, oracleAddress, fee, i);
+            console.log("performing upkeep");
+            for (uint256 i = 0; i <= 8; i++) {
+                console.log("TEAM", i);
+                runElections(i, epoch);
             }
             epoch++;
             dayOfLastElection = gameDay;
@@ -219,32 +220,35 @@ contract SenateContract is ChainlinkClient, KeeperCompatibleInterface, Ownable {
     uint256 fee;
     uint256 orderId;
 
-    function updateExecuteAttackJobId(bytes32 _jobId) public onlyOwner {
+    function updateJobId(bytes32 _jobId) public onlyOwner {
         jobId = _jobId;
     }
 
     function updateOracleAddress(address _oracleAddress) public onlyOwner {
         oracleAddress = _oracleAddress;
+        setChainlinkOracle(_oracleAddress);
     }
 
     function updateFee(uint256 _fee) public onlyOwner {
         fee = _fee;
     }
 
+    function updateLinkAddress(address _linkAddress) public onlyOwner {
+        setChainlinkToken(_linkAddress);
+    }
+
     ///@dev this is a public function that will be called from an off chain source
+    ///@notice this function is only callable from the keeper performUpkeep()
     ///@notice this function will make the nations who won the team 7 election senators
-    ///@param _jobId is the job id for the chainlink oracle to run
-    ///@param _oracleAddress is the address of the chainlink oracle
-    ///@param _fee is the fee paid to the chainlink oracle
+    ///@param team this is the team for which the election is being conducted
+    ///@param _epoch this is the epoch for which the election is occuring
     function runElections(
-        bytes32 _jobId,
-        address _oracleAddress,
-        uint256 _fee,
-         uint256 team
+        uint256 team,
+        uint256 _epoch
     ) internal returns (bytes32 _requestId) {
-        Chainlink.Request memory req = buildChainlinkRequest(
-            _jobId,
-            address(this),
+        console.log("election called for", team);
+        Chainlink.Request memory req = buildOperatorRequest(
+            jobId,
             this.completeElection.selector
         );
         uint256[] memory teamVotes = epochToTeamToSenatorVotes[epoch][
@@ -252,31 +256,32 @@ contract SenateContract is ChainlinkClient, KeeperCompatibleInterface, Ownable {
         ];
         req.addUint("orderId", orderId);
         req.addUint("teamNumber", team);
-        req.addBytes("teamVotes", abi.encodePacked(teamVotes));
-        req.addUint("epoch", epoch);
+        req.addBytes("teamVotes", abi.encode(teamVotes));
+        req.addUint("epoch", _epoch);
         orderId++;
-        bytes32 requestId = sendChainlinkRequestTo(_oracleAddress, req, _fee);
+        console.log("sending election for team", team);
+        bytes32 requestId = sendOperatorRequest(req, fee);
+        console.log("operator request sent for", team);
         return requestId;
     }
 
     ///@dev 
     function completeElection(
-        bytes32 _requestId,
-        // uint256 _orderId,
-        uint256[] memory winners,
+        bytes memory winners,
         uint256 team,
         uint256 _epoch
-    ) public recordChainlinkFulfillment(_requestId) {
+    ) public {
+        uint256[] memory _winners = abi.decode(winners, (uint256[]));
         if(epoch > 0) {
             uint256[] memory currentSenators = epochToTeamToWinners[_epoch-1][team];
             for (uint i = 0; i < currentSenators.length; i++) {
                 idToVoter[currentSenators[i]].senator = false;
             }
         }
-        for (uint256 i = 0; i < winners.length; i++) {
-            idToVoter[winners[i]].senator = true;
+        for (uint256 i = 0; i < _winners.length; i++) {
+            idToVoter[_winners[i]].senator = true;
         }        
-        epochToTeamToWinners[_epoch][team] = winners;
+        epochToTeamToWinners[_epoch][team] = _winners;
     }
 
     ///@dev this is a public function that can only be called by the contract owner 

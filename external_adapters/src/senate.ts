@@ -2,27 +2,33 @@ import process from "process";
 import express, { Express, Request, Response } from "express";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
+import {ethers} from "ethers"
 dotenv.config();
 
+const decoder = ethers.utils.defaultAbiCoder
+
 type EAInput = {
-  id: number;
+  id: string;
   data: {
-    team: number;
-    votes: number[];
+    epoch: number
+    orderId: number;
+    teamNumber: number;
+    teamVotes: string;
   };
 };
 
 type EAOutput = {
-  jobRunId: string | number;
+  requestId: string;
   statusCode: number;
   data: {
+    winners?: string;
     team?: number;
-    result?: number[];
+    _epoch: number
   };
   error?: string;
 };
 
-const PORT = process.env.PORT_SENATE_ELECTION || 8081;
+const PORT = 8083;
 const app: Express = express();
 
 app.use(bodyParser.json());
@@ -35,11 +41,41 @@ app.post("/", async function (req: Request<{}, {}, EAInput>, res: Response) {
   const eaInputData: EAInput = req.body;
   console.log(" Request data received: ", eaInputData);
 
-  let jobRunId = eaInputData.id;
-  let nums = eaInputData.data.votes;
-  let team = eaInputData.data.team;
+  console.log("raw data", eaInputData.data.teamVotes)
+  let rawData = eaInputData.data.teamVotes
+  let nums
+  if (rawData === undefined) {
+    nums = [0]
+  }
+
+  function decodeBase64ToSpecificArray(base64String: string ) {
+    // Decode Base64 string to Buffer
+    const buffer = Buffer.from(base64String, 'base64');
+
+    // Convert Buffer to Uint8Array
+    const uint8Array = new Uint8Array(buffer);
+
+    // Process the array to include only non-zero values
+    const result = [];
+    for (let i = 0; i < uint8Array.length; i++) {
+        const value = uint8Array[i];
+        if (value !== 0) { // Exclude zeros
+            result.push(value);
+        }
+    }
+
+    // Remove the first value
+    return result.slice(1);
+  }
+
+  let rawVotes : string = eaInputData.data.teamVotes
+
+  nums = decodeBase64ToSpecificArray(rawVotes)
+
+  console.log("nums", nums)
+
+  let num
   let freqs : any = {};
-  let num;
   for (num of nums) {
       if (freqs[num] === undefined) { 
           freqs[num] = 1; 
@@ -73,16 +109,26 @@ app.post("/", async function (req: Request<{}, {}, EAInput>, res: Response) {
   }
 
   console.log("mostFreq: ", mostFreq);
-  let eaResponse: EAOutput = {
-    data: {},
-    jobRunId: eaInputData.id,
+  
+  const encodedData = decoder.encode(
+     ["uint[]"],
+     [mostFreq.length > 0 ? mostFreq.map(Number) : [0]] // Default to [0] if empty
+   );
+  
+   let eaResponse: EAOutput = {
+    requestId: eaInputData.id,
+    data:  {
+      winners: encodedData,
+      team: eaInputData.data.teamNumber,
+      _epoch: eaInputData.data.epoch
+    },
     statusCode: 0,
   };
 
   try {
-    eaResponse.jobRunId = jobRunId;
-    eaResponse.data.team = team;
-    eaResponse.data.result = mostFreq;
+    eaResponse.requestId = eaInputData.id;
+    eaResponse.data.team = eaInputData.data.teamNumber;
+    eaResponse.data.winners = encodedData;
     eaResponse.statusCode = 200;
     res.json(eaResponse);
   } catch (error: any) {

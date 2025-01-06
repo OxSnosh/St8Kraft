@@ -93,6 +93,35 @@ describe("Encode", function () {
         const attackerFightersOutput = decodeBase64ToUint8Array(attackerFighters, 9);
 
         console.log(attackerFightersOutput.map((bigInt) => bigInt));
+
+        
+        // Example usage
+        const base64String = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABg==';
+
+        function decodeBase64ToSpecificArray(base64String: string): number[] {
+            // Decode Base64 string to Buffer
+            const buffer = Buffer.from(base64String, 'base64');
+        
+            // Convert Buffer to Uint8Array
+            const uint8Array = new Uint8Array(buffer);
+        
+            // Process the array to match the desired output
+            const result = [];
+            for (let i = 0; i < uint8Array.length; i++) {
+                const value = uint8Array[i];
+                if (value !== 0) { // Include only non-zero values
+                    result.push(value);
+                }
+            }
+        
+            return result;
+        }
+        
+        const outputRaw = decodeBase64ToSpecificArray(base64String);
+
+        const output = outputRaw.slice(1);
+        
+        console.log("output", output);        
       })
     });
   });

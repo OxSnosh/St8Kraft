@@ -19,6 +19,13 @@ const deployTestBridge : any = async () => {
         0
     )
 
+    await createBridge(
+        "senate",
+        "http://host.docker.internal:8083",
+        "0",
+        0
+    )
+
 }
 
 deployTestBridge()

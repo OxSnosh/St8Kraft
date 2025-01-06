@@ -572,7 +572,9 @@ contract Operator is AuthorizedReceiver, ConfirmedOwner, LinkTokenReceiver, Oper
    * @param requestId The given request ID to check in stored `commitments`
    */
   modifier validateRequestId(bytes32 requestId) {
+    console.log("validating RequestId");
     require(s_commitments[requestId].paramsHash != 0, "Must have a valid requestId");
+    console.log("RequestId validated");
     _;
   }
 
