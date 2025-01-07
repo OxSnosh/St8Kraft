@@ -1250,7 +1250,7 @@ describe("Adapter Test", function () {
 
     await linkToken.connect(signer0).transfer(groundbattlecontract.address, BigInt(10000000000000000000))
     const groundBattleContractLinkBalance = await linkToken.balanceOf(groundbattlecontract.address)
-    console.log("Test contract GroundBattle Balance:", Number(groundBattleContractLinkBalance));
+    // console.log("Test contract GroundBattle Balance:", Number(groundBattleContractLinkBalance));
     
     await linkToken.connect(signer0).transfer(signer0.address, BigInt(10000000000000000000))
     const linkBalanceSigner0 = await linkToken.balanceOf(signer0.address)

@@ -106,14 +106,19 @@ app.post("/", async function (req: Request<{}, {}, EAInput>, res: Response) {
     let defenderSoldierLosses = 0
     let defenderTankLosses = 0
 
+    console.log("requestNumber", requestNumber)
+    console.log("attack Id", eaInputData.data.attackId)
+ 
     if (attackerVictory) {
         const results = await groundBattleContract.attackVictory(requestNumber)
+        console.log("results", results)
         attackerSoldierLosses = results[0].toNumber()
         attackerTankLosses = results[1].toNumber()
         defenderSoldierLosses = results[2].toNumber()
         defenderTankLosses = results[3].toNumber()
-    } else {
+      } else {
         const results = await groundBattleContract.defenseVictory(requestNumber)
+        console.log("results", results)
         attackerSoldierLosses = results[0].toNumber()
         attackerTankLosses = results[1].toNumber()
         defenderSoldierLosses = results[2].toNumber()

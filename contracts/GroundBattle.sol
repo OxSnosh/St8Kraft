@@ -534,7 +534,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         console.log(randomWords[7]);
         console.log(randomWords[8]);
         console.log(randomWords[9]);
-        req.addUint("requestNumber", requestNumber);
+        req.addUint("attackId", requestNumber);
         req.addBytes("randomWords", abi.encode(randomWords));
         req.addUint("attackerStrength", attackerStrength);
         req.addUint("defenderStrength", defenderStrength);
@@ -546,6 +546,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     }
 
     function completeBattleSequence(
+        bytes32 requestId,
         uint256 battleId, 
         uint256 attackerId,
         uint256 attackerSoldierLosses,

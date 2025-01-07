@@ -297,19 +297,19 @@ export const createJob = async (taskArgs : any) => {
     maxTaskDuration = "0s"
     contractAddress = "${oracleAddress}"
     observationSource = """
-        decode_log   [type=ethabidecodelog
-          abi="OracleRequest(bytes32 indexed specId, address requester, bytes32 requestId, uint256 payment, address callbackAddr, bytes4 callbackFunctionId, uint256 cancelExpiration, uint256 dataVersion, bytes data)"
-          data="$(jobRun.logData)"
-          topics="$(jobRun.logTopics)"]
-        decode_cbor  [type=cborparse data="$(decode_log.data)"]
-        fetch        [type=bridge name="ground-battle" requestData="{\\"id\\": $(jobSpec.externalJobID), \\"data\\": $(decode_cbor)}"]
-        parse       [type=jsonparse path="data" data="$(fetch)"]
-        encode_data  [type=ethabiencode abi="(bytes32 requestId, bytes memory attackerFighterCasualties, bytes memory attackerBomberCasualties, bytes memory defenderFighterCasualties, uint256 attackerId, uint256 defenderId, uint256 infrastructureDamage, uint256 tankDamage, uint256 cruiseMissileDamage, uint256 battleId)" data="{ \\"requestId\\": $(decode_log.requestId), \\"attackerFighterCasualties\\": $(parse.attackerFighterCasualties), \\"attackerBomberCasualties\\": $(parse.attackerBomberCasualties), \\"defenderFighterCasualties\\": $(parse.defenderFighterCasualties), \\"attackerId\\": $(parse.attackerId), \\"defenderId\\": $(parse.defenderId), \\"infrastructureDamage\\": $(parse.infrastructureDamage), \\"tankDamage\\": $(parse.tankDamage), \\"cruiseMissileDamage\\": $(parse.cruiseMissileDamage), \\"battleId\\": $(parse.battleId)}"]
-        encode_tx    [type=ethabiencode
-            abi="fulfillOracleRequest2(bytes32 requestId, uint256 payment, address callbackAddress, bytes4 callbackFunctionId, uint256 expiration, bytes calldata data)"
-            data="{\\"requestId\\": $(decode_log.requestId), \\"payment\\": $(decode_log.payment), \\"callbackAddress\\": $(decode_log.callbackAddr), \\"callbackFunctionId\\": $(decode_log.callbackFunctionId), \\"expiration\\": $(decode_log.cancelExpiration), \\"data\\": $(encode_data)}"
-          ]
-        submit_tx    [type=ethtx to="${oracleAddress}" data="$(encode_tx)"]
+    decode_log   [type=ethabidecodelog
+      abi="OracleRequest(bytes32 indexed specId, address requester, bytes32 requestId, uint256 payment, address callbackAddr, bytes4 callbackFunctionId, uint256 cancelExpiration, uint256 dataVersion, bytes data)"
+      data="$(jobRun.logData)"
+      topics="$(jobRun.logTopics)"]
+    decode_cbor  [type=cborparse data="$(decode_log.data)"]
+    fetch        [type=bridge name="ground-battle" requestData="{\\"id\\": $(jobSpec.externalJobID), \\"data\\": $(decode_cbor)}"]
+    parse       [type=jsonparse path="data" data="$(fetch)"]
+    encode_data  [type=ethabiencode abi="(bytes32 requestId, uint256 battleId, uint256 attackerId, uint256 attackerSoldierLosses, uint256 attackerTankLosses, uint256 defenderId, uint256 defenderSoldierLosses, uint256 defenderTankLosses, uint256 warId, bool attackerVictory))" data="{ \\"requestId\\": $(decode_log.requestId), \\"battleId\\": $(parse.attackId), \\"attackerId\\": $(parse.attackerId), \\"attackerSoldierLosses\\": $(parse.attackerSoldierLosses), \\"attackerTankLosses\": $(parse.attackerTankLosses), \\"defenderId\\": $(parse.defenderId), \\"defenderSoldierLosses\\": $(parse.defenderSoldierLosses), \\"defenderTankLosses\\": $(parse.defenderTankLosses), \\"warId\\": $(parse.warId), \\"attackerVictory\\": $(parse.attackVictory)}"]
+    encode_tx    [type=ethabiencode
+        abi="fulfillOracleRequest2(bytes32 requestId, uint256 payment, address callbackAddress, bytes4 callbackFunctionId, uint256 expiration, bytes calldata data)"
+        data="{\\"requestId\\": $(decode_log.requestId), \\"payment\\": $(decode_log.payment), \\"callbackAddress\\": $(decode_log.callbackAddr), \\"callbackFunctionId\\": $(decode_log.callbackFunctionId), \\"expiration\\": $(decode_log.cancelExpiration), \\"data\\": $(encode_data)}"
+      ]
+    submit_tx    [type=ethtx to="${oracleAddress}" data="$(encode_tx)"]
   
         decode_log -> decode_cbor -> fetch -> parse -> encode_data -> encode_tx -> submit_tx
     """
