@@ -121,7 +121,40 @@ describe("Encode", function () {
 
         const output = outputRaw.slice(1);
         
-        console.log("output", output);        
+        console.log("output", output);                
+    })
+    it("runs another encode test", async function () {
+        
+        function decodeBase64ToBigIntArray(base64String : string) {
+            // Decode the Base64 string to a Buffer
+            const buffer = Buffer.from(base64String, 'base64');
+        
+            // Define the size of each 256-bit number (32 bytes)
+            const chunkSize = 32;
+        
+            // Start processing from the first valid 32-byte chunk
+            const startIndex = buffer.length % chunkSize;
+        
+            // Extract the 32-byte chunks as BigInt values
+            const bigIntArray = [];
+            for (let i = startIndex; i < buffer.length; i += chunkSize) {
+                const chunk = buffer.subarray(i, i + chunkSize); // Get a 32-byte chunk
+                const bigIntValue = BigInt(`0x${chunk.toString('hex')}`); // Convert the chunk to BigInt
+                bigIntArray.push(bigIntValue);
+            }
+        
+            // Return only the first 10 numbers
+            return bigIntArray.slice(2, 12);
+        }
+
+        // Example usage
+        const base64String : string =
+            'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACisjLJdFLwlQyU4lOf3H5p0hFmETz3qby5myIKP+XXIK4mic1KhOI60vVkAE8ckBPpWJ0mC95jgKujyn4J5N9Ay5i3hjMJn6Nu2LhoDE+AkmieHgQIDrnLsHfKOKFNfjhEBarTLhrbrIm7fxduM4uPxumUyiEMm7e9yiSbRllCJQBM3nYu8ItrbF3tjoxMCz9OXJrXNCyI/Mk2gbRYi3PwVFizDC1yv9LGMXMEpFlOy6/l9ynTERtl/cOjO9SOVDLb/TWOk/GNo+0nbDr9vboAuPC2AIoDR2pqhr1jIO5pOLvN2la10IRm7EYsu+Ct+lfLChX8yJQO9o9wLyG3h7yTWRI48w8obJocbpAcTto7IUw4HIRuPb5I35XCFIjo4f23SwUpLR1LK0i2UmGwcJnSQkS8sGnxONmmv9z3dr7KxM';
+
+        const result = decodeBase64ToBigIntArray(base64String);
+
+        console.log(result);
       })
+
     });
   });

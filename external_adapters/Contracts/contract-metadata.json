@@ -1,7 +1,7 @@
 {
   "HARDHAT": {
     "countryminter": {
-      "address": "0xf3eD22390fDb06067633518199a9F56E635DF804",
+      "address": "0x4a4f98A6a68B103cef93436390D5b97233B098A7",
       "ABI": [
         {
           "inputs": [],
@@ -212,6 +212,19 @@
         {
           "inputs": [],
           "name": "bombersMarket2",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "bonusResources",
           "outputs": [
             {
               "internalType": "address",
@@ -559,6 +572,19 @@
         },
         {
           "inputs": [],
+          "name": "navy2",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
           "name": "owner",
           "outputs": [
             {
@@ -746,6 +772,11 @@
               "internalType": "address",
               "name": "_warbucks",
               "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_bonusResources",
+              "type": "address"
             }
           ],
           "name": "settings",
@@ -816,6 +847,11 @@
             {
               "internalType": "address",
               "name": "_navy",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_navy2",
               "type": "address"
             },
             {
@@ -1020,7 +1056,7 @@
       ]
     },
     "forcescontract": {
-      "address": "0x9297A6E66dDB832cD6125B140B3E020Fc36a54ca",
+      "address": "0xd90CdFE92d934030D17549B78f6030a1979F447e",
       "ABI": [
         {
           "anonymous": false,
@@ -1325,7 +1361,7 @@
               "type": "uint256"
             }
           ],
-          "name": "decomissionSoldiers",
+          "name": "decommissionSoldiers",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -1343,7 +1379,7 @@
               "type": "uint256"
             }
           ],
-          "name": "decomissionTanks",
+          "name": "decommissionTanks",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -2197,7 +2233,7 @@
       ]
     },
     "nationstrengthcontract": {
-      "address": "0xE7312A5500761D5e151179d7391b653a2a26311D",
+      "address": "0xD425878443b0be54d114e12455FbcBF0a50ecaB0",
       "ABI": [
         {
           "anonymous": false,
@@ -2529,7 +2565,7 @@
       ]
     },
     "treasurycontract": {
-      "address": "0xee4736a4293c9C700631FD21E7d9016a5546454A",
+      "address": "0x48AFf7A5c79e012aE9Bd81D4393587b3F5657326",
       "ABI": [
         {
           "anonymous": false,
@@ -2825,7 +2861,7 @@
               "type": "uint256"
             }
           ],
-          "name": "demonitizeNation",
+          "name": "demonetizeNation",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -2941,6 +2977,19 @@
             }
           ],
           "name": "getDaysSinceLastTaxCollection",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "getDaysToInactive",
           "outputs": [
             {
               "internalType": "uint256",
@@ -3147,6 +3196,25 @@
           "type": "function"
         },
         {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            }
+          ],
+          "name": "isNationDemonetized",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
           "inputs": [],
           "name": "keeper",
           "outputs": [
@@ -3258,7 +3326,7 @@
               "type": "uint256"
             }
           ],
-          "name": "remonitizeNation",
+          "name": "remonetizeNation",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -4953,7 +5021,7 @@
       ]
     },
     "spyoperationscontract": {
-      "address": "0xd45fb0381b92558ADB736DD478160686768EDF6f",
+      "address": "0xb619931A62b1541BDcB15E3fAB7Bf6fA95b5aEde",
       "ABI": [
         {
           "inputs": [
@@ -5233,19 +5301,6 @@
             }
           ],
           "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "_randomnessRequestId",
-              "type": "uint256"
-            }
-          ],
-          "name": "fulfillRequest",
-          "outputs": [],
-          "stateMutability": "nonpayable",
           "type": "function"
         },
         {
@@ -5658,7 +5713,7 @@
       ]
     },
     "groundbattlecontract": {
-      "address": "0x93209803f6eA5BCE9F3eF3994b0F3d129a6166B3",
+      "address": "0x565e82f8D6737490e64e3D881B3bd82A07840Db7",
       "ABI": [
         {
           "inputs": [
@@ -5801,6 +5856,40 @@
           "inputs": [
             {
               "internalType": "uint256",
+              "name": "battleId",
+              "type": "uint256"
+            }
+          ],
+          "name": "attackVictory",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
               "name": "_warId",
               "type": "uint256"
             },
@@ -5835,8 +5924,43 @@
             },
             {
               "internalType": "uint256",
+              "name": "attackerId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "attackerSoldierLosses",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "attackerTankLosses",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "defenderId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "defenderSoldierLosses",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "defenderTankLosses",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
               "name": "warId",
               "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "attackerVictory",
+              "type": "bool"
             }
           ],
           "name": "completeBattleSequence",
@@ -5852,9 +5976,30 @@
               "type": "uint256"
             }
           ],
-          "name": "fulfillRequest",
-          "outputs": [],
-          "stateMutability": "nonpayable",
+          "name": "defenseVictory",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
           "type": "function"
         },
         {
@@ -6403,19 +6548,6 @@
         {
           "inputs": [
             {
-              "internalType": "bytes32",
-              "name": "_jobId",
-              "type": "bytes32"
-            }
-          ],
-          "name": "updateGroundBattleJobId",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
               "internalType": "address",
               "name": "newAddress",
               "type": "address"
@@ -6435,6 +6567,32 @@
             }
           ],
           "name": "updateInfrastructureContract",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "_jobId",
+              "type": "bytes32"
+            }
+          ],
+          "name": "updateJobId",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_linkToken",
+              "type": "address"
+            }
+          ],
+          "name": "updateLinkAddress",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"

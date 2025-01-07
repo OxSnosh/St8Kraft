@@ -474,12 +474,17 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     address oracleAddress;
     uint256 fee;
 
-    function updateGroundBattleJobId(bytes32 _jobId) public onlyOwner {
+    function updateJobId(bytes32 _jobId) public onlyOwner {
         groundBattleJobId = _jobId;
     }
 
     function updateOracleAddress(address _oracleAddress) public onlyOwner {
         oracleAddress = _oracleAddress;
+        setChainlinkOracle(_oracleAddress);
+    }
+
+    function updateLinkAddress(address _linkToken) public onlyOwner {
+        setChainlinkToken(_linkToken);
     }
 
     function updateFee(uint256 _fee) public onlyOwner {
@@ -487,6 +492,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     }
 
     function fulfillRequest(uint256 battleId) internal {
+        console.log("at fulfillRequest()");
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
@@ -502,6 +508,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256 requestId,
         uint256[] memory randomWords
     ) internal override {
+        console.log("arrived at fulfillRandom()");
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
         s_requestIndexToRandomWords[requestNumber] = randomWords;
         uint256 attackerStrength = groundBattleIdToAttackerForces[requestNumber]
@@ -513,11 +520,20 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256 defenderId = groundBattleIdToDefenderForces[requestNumber]
             .countryId;
         uint256 warId = groundBattleIdToAttackerForces[requestNumber].warId;
-        Chainlink.Request memory req = buildChainlinkRequest(
+        Chainlink.Request memory req = buildOperatorRequest(
             groundBattleJobId,
-            address(this),
             this.completeBattleSequence.selector
         );
+        console.log(randomWords[0]);
+        console.log(randomWords[1]);
+        console.log(randomWords[2]);
+        console.log(randomWords[3]);
+        console.log(randomWords[4]);
+        console.log(randomWords[5]);
+        console.log(randomWords[6]);
+        console.log(randomWords[7]);
+        console.log(randomWords[8]);
+        console.log(randomWords[9]);
         req.addUint("requestNumber", requestNumber);
         req.addBytes("randomWords", abi.encode(randomWords));
         req.addUint("attackerStrength", attackerStrength);
@@ -525,7 +541,8 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         req.addUint("attackerId", attackerId);
         req.addUint("defenderId", defenderId);
         req.addUint("warId", warId);
-        sendChainlinkRequestTo(oracleAddress, req, fee);
+        sendOperatorRequest(req, fee);
+        console.log("request sent");
     }
 
     function completeBattleSequence(
@@ -584,7 +601,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         if (anarchyCheckAttacker) {
             param.inflictAnarchy(attackerId);
         }
-        collectSpoils(battleId, attackerId);
+        // collectSpoils(battleId, attackerId);
         console.log("BATTLE COMPLETE");
     }
 
@@ -707,7 +724,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
 
     function attackVictory(
         uint256 battleId
-    ) internal view returns (uint256, uint256, uint256, uint256) {
+    ) public view returns (uint256, uint256, uint256, uint256) {
         (
             uint256 winnerSoldierLossesPercentage,
             uint256 winnerTankLossesPercentage,
@@ -746,7 +763,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
 
     function defenseVictory(
         uint256 battleId
-    ) internal view returns (uint256, uint256, uint256, uint256) {
+    ) public view returns (uint256, uint256, uint256, uint256) {
         (
             uint256 winnerSoldierLossesPercentage,
             uint256 winnerTankLossesPercentage,
@@ -783,43 +800,45 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         );
     }
 
-    function collectSpoils(uint256 battleId, uint256 attackerId) internal {
-        uint256 defenderId = groundBattleIdToDefenderForces[battleId].countryId;
-        uint256[] memory randomWords = s_requestIndexToRandomWords[battleId];
-        uint256 randomLandMiles;
-        uint256 randomInfrastructure;
-        uint256 attackType = groundBattleIdToAttackerForces[battleId]
-            .attackType;
-        uint256 fobCount = imp2.getForwardOperatingBaseCount(attackerId);
-        if (attackType == 1) {
-            randomLandMiles = (1 + fobCount + (randomWords[6] % 3));
-            randomInfrastructure = (1 + fobCount + ((randomWords[7]) % 3));
-        } else if (attackType == 2) {
-            randomLandMiles = (2 + fobCount + (randomWords[6] % 3));
-            randomInfrastructure = (2 + fobCount + ((randomWords[7]) % 3));
-        } else if (attackType == 3) {
-            randomLandMiles = (3 + fobCount + (randomWords[6] % 4));
-            randomInfrastructure = (3 + fobCount + ((randomWords[7]) % 4));
-        } else if (attackType == 4) {
-            randomLandMiles = (4 + fobCount + (randomWords[6] % 5));
-            randomInfrastructure = (4 + fobCount + ((randomWords[7]) % 5));
-        }
-        uint256 attackerTech = inf.getTechnologyCount(attackerId);
-        uint256 defenderTech = inf.getTechnologyCount(defenderId);
-        uint256 multiple = (attackerTech / defenderTech);
-        if (multiple > 5) {
-            multiple = 5;
-        }
-        console.log("MULTIPLE", multiple);
-        randomLandMiles = (randomLandMiles * multiple);
-        randomInfrastructure = (randomInfrastructure * multiple);
-        console.log("LAND MILES", randomLandMiles);
-        console.log("INFRASTRUCTURE", randomInfrastructure);
-        inf.transferLandAndInfrastructure(
-            randomLandMiles,
-            randomInfrastructure,
-            attackerId,
-            defenderId
-        );
-    }
+    // function collectSpoils(uint256 battleId, uint256 attackerId) internal {
+    //     uint256 defenderId = groundBattleIdToDefenderForces[battleId].countryId;
+    //     uint256[] memory randomWords = s_requestIndexToRandomWords[battleId];
+    //     uint256 randomLandMiles;
+    //     uint256 randomInfrastructure;
+    //     uint256 attackType = groundBattleIdToAttackerForces[battleId]
+    //         .attackType;
+    //     uint256 fobCount = imp2.getForwardOperatingBaseCount(attackerId);
+    //     if (attackType == 1) {
+    //         randomLandMiles = (1 + fobCount + (randomWords[6] % 3));
+    //         randomInfrastructure = (1 + fobCount + ((randomWords[7]) % 3));
+    //     } else if (attackType == 2) {
+    //         randomLandMiles = (2 + fobCount + (randomWords[6] % 3));
+    //         randomInfrastructure = (2 + fobCount + ((randomWords[7]) % 3));
+    //     } else if (attackType == 3) {
+    //         randomLandMiles = (3 + fobCount + (randomWords[6] % 4));
+    //         randomInfrastructure = (3 + fobCount + ((randomWords[7]) % 4));
+    //     } else if (attackType == 4) {
+    //         randomLandMiles = (4 + fobCount + (randomWords[6] % 5));
+    //         randomInfrastructure = (4 + fobCount + ((randomWords[7]) % 5));
+    //     }
+    //     uint256 attackerTech = inf.getTechnologyCount(attackerId);
+    //     uint256 defenderTech = inf.getTechnologyCount(defenderId);
+    //     uint256 multiple = (attackerTech / defenderTech);
+    //     if (multiple > 5) {
+    //         multiple = 5;
+    //     }
+    //     console.log("MULTIPLE", multiple);
+    //     randomLandMiles = (randomLandMiles * multiple);
+    //     randomInfrastructure = (randomInfrastructure * multiple);
+    //     console.log("LAND MILES", randomLandMiles);
+    //     console.log("INFRASTRUCTURE", randomInfrastructure);
+    //     inf.transferLandAndInfrastructure(
+    //         randomLandMiles,
+    //         randomInfrastructure,
+    //         attackerId,
+    //         defenderId
+    //     );
+    // }
 }
+
+

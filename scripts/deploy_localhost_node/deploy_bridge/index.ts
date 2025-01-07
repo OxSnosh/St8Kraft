@@ -26,6 +26,13 @@ const deployTestBridge : any = async () => {
         0
     )
 
+    await createBridge(
+        "ground-battle",
+        "http://host.docker.internal:8087",
+        "0",
+        0
+    )
+
 }
 
 deployTestBridge()
