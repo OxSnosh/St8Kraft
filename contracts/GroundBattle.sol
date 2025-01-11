@@ -524,16 +524,6 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
             groundBattleJobId,
             this.completeBattleSequence.selector
         );
-        console.log(randomWords[0]);
-        console.log(randomWords[1]);
-        console.log(randomWords[2]);
-        console.log(randomWords[3]);
-        console.log(randomWords[4]);
-        console.log(randomWords[5]);
-        console.log(randomWords[6]);
-        console.log(randomWords[7]);
-        console.log(randomWords[8]);
-        console.log(randomWords[9]);
         req.addUint("attackId", requestNumber);
         req.addBytes("randomWords", abi.encode(randomWords));
         req.addUint("attackerStrength", attackerStrength);
@@ -556,7 +546,7 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256 defenderTankLosses,
         uint256 warId,
         bool attackerVictory
-    ) external {
+    ) external recordChainlinkFulfillment(requestId) {
         groundBattleIdToAtackerVictory[battleId] = attackerVictory;
         emit BattleResultsEvent (
             battleId,
@@ -801,45 +791,45 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         );
     }
 
-    // function collectSpoils(uint256 battleId, uint256 attackerId) internal {
-    //     uint256 defenderId = groundBattleIdToDefenderForces[battleId].countryId;
-    //     uint256[] memory randomWords = s_requestIndexToRandomWords[battleId];
-    //     uint256 randomLandMiles;
-    //     uint256 randomInfrastructure;
-    //     uint256 attackType = groundBattleIdToAttackerForces[battleId]
-    //         .attackType;
-    //     uint256 fobCount = imp2.getForwardOperatingBaseCount(attackerId);
-    //     if (attackType == 1) {
-    //         randomLandMiles = (1 + fobCount + (randomWords[6] % 3));
-    //         randomInfrastructure = (1 + fobCount + ((randomWords[7]) % 3));
-    //     } else if (attackType == 2) {
-    //         randomLandMiles = (2 + fobCount + (randomWords[6] % 3));
-    //         randomInfrastructure = (2 + fobCount + ((randomWords[7]) % 3));
-    //     } else if (attackType == 3) {
-    //         randomLandMiles = (3 + fobCount + (randomWords[6] % 4));
-    //         randomInfrastructure = (3 + fobCount + ((randomWords[7]) % 4));
-    //     } else if (attackType == 4) {
-    //         randomLandMiles = (4 + fobCount + (randomWords[6] % 5));
-    //         randomInfrastructure = (4 + fobCount + ((randomWords[7]) % 5));
-    //     }
-    //     uint256 attackerTech = inf.getTechnologyCount(attackerId);
-    //     uint256 defenderTech = inf.getTechnologyCount(defenderId);
-    //     uint256 multiple = (attackerTech / defenderTech);
-    //     if (multiple > 5) {
-    //         multiple = 5;
-    //     }
-    //     console.log("MULTIPLE", multiple);
-    //     randomLandMiles = (randomLandMiles * multiple);
-    //     randomInfrastructure = (randomInfrastructure * multiple);
-    //     console.log("LAND MILES", randomLandMiles);
-    //     console.log("INFRASTRUCTURE", randomInfrastructure);
-    //     inf.transferLandAndInfrastructure(
-    //         randomLandMiles,
-    //         randomInfrastructure,
-    //         attackerId,
-    //         defenderId
-    //     );
-    // }
+    function collectSpoils(uint256 battleId, uint256 attackerId) internal {
+        uint256 defenderId = groundBattleIdToDefenderForces[battleId].countryId;
+        uint256[] memory randomWords = s_requestIndexToRandomWords[battleId];
+        uint256 randomLandMiles;
+        uint256 randomInfrastructure;
+        uint256 attackType = groundBattleIdToAttackerForces[battleId]
+            .attackType;
+        uint256 fobCount = imp2.getForwardOperatingBaseCount(attackerId);
+        if (attackType == 1) {
+            randomLandMiles = (1 + fobCount + (randomWords[6] % 3));
+            randomInfrastructure = (1 + fobCount + ((randomWords[7]) % 3));
+        } else if (attackType == 2) {
+            randomLandMiles = (2 + fobCount + (randomWords[6] % 3));
+            randomInfrastructure = (2 + fobCount + ((randomWords[7]) % 3));
+        } else if (attackType == 3) {
+            randomLandMiles = (3 + fobCount + (randomWords[6] % 4));
+            randomInfrastructure = (3 + fobCount + ((randomWords[7]) % 4));
+        } else if (attackType == 4) {
+            randomLandMiles = (4 + fobCount + (randomWords[6] % 5));
+            randomInfrastructure = (4 + fobCount + ((randomWords[7]) % 5));
+        }
+        uint256 attackerTech = inf.getTechnologyCount(attackerId);
+        uint256 defenderTech = inf.getTechnologyCount(defenderId);
+        uint256 multiple = (attackerTech / defenderTech);
+        if (multiple > 5) {
+            multiple = 5;
+        }
+        console.log("MULTIPLE", multiple);
+        randomLandMiles = (randomLandMiles * multiple);
+        randomInfrastructure = (randomInfrastructure * multiple);
+        console.log("LAND MILES", randomLandMiles);
+        console.log("INFRASTRUCTURE", randomInfrastructure);
+        inf.transferLandAndInfrastructure(
+            randomLandMiles,
+            randomInfrastructure,
+            attackerId,
+            defenderId
+        );
+    }
 }
 
 

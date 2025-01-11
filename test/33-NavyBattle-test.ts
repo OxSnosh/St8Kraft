@@ -5,6 +5,8 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-wit
 import { INITIAL_SUPPLY } from "../helper-hardhat-config"
 import { Test, Oracle } from "../typechain-types"
 import { LinkToken } from '../typechain-types/@chainlink/contracts/src/v0.4/LinkToken';
+import { metadata } from "../scripts/deploy_localhost_node/deploy_jobs/metadata";
+import { jobId } from "../scripts/deploy_localhost_node/deploy_jobs/jobMetadata";
 
 import { 
     WarBucks, 
@@ -63,12 +65,10 @@ import {
     VRFConsumerBaseV2,
     VRFCoordinatorV2Mock
 } from "../typechain-types"
-// import operatorArtifact from "../artifacts/contracts/tests/Operator.sol/Operator.json";
-// import OracleArtifact from "../artifacts/@chainlink/contracts/src/v0.4/Oracle.sol/Oracle.json";
 import LinkTokenArtifact from "../artifacts/@chainlink/contracts/src/v0.4/LinkToken.sol/LinkToken.json";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("Adapter Test", function () {
+describe("Naval Actions", function () {
   
   // const oracleAbi = OracleArtifact.abi;
   // const linkTokenAbi = LinkTokenArtifact.abi;
@@ -373,7 +373,7 @@ describe("Adapter Test", function () {
     const NavalAttackContract = await ethers.getContractFactory("NavalAttackContract")
     navalattackcontract = await NavalAttackContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as NavalAttackContract
     await navalattackcontract.deployed()
-    // console.log(`NavalAttackContract deployed to ${navalattackcontract.address}`)
+    console.log(`NavalAttackContract deployed to ${navalattackcontract.address}`)
     
     const NukeContract = await ethers.getContractFactory("NukeContract")
     nukecontract = await NukeContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as NukeContract
@@ -1198,6 +1198,125 @@ describe("Adapter Test", function () {
         await militarycontract.connect(signer3).toggleWarPeacePreference(2)
         await warcontract.connect(signer3).declareWar(2, 1)
 
+        const contractABI = LinkTokenArtifact.abi;
+
+        // console.log(contractABI)
+
+        const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545/");
+        // const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545/");
+
+        for (let i = 0; i < 50; i++) {
+        await network.provider.send("evm_mine");
+        }
+
+        const contractAddress = metadata.linkAddress;
+
+        linkToken = new ethers.Contract(contractAddress, contractABI, provider) as LinkToken;
+
+        // const linkToken = await ethers.getContractAt("LinkToken", metadata.linkAddress) as LinkToken
+
+        // UNCOMMENT FROM HERE
+
+        // console.log("is this the place 1")
+        console.log("address from metadata", metadata.linkAddress)
+        console.log("address from test", linkToken.address)
+
+        const TestContract = await ethers.getContractFactory(
+            "Test"
+        )
+        testContract = await TestContract.deploy() as Test
+        await testContract.deployed()
+
+        // console.log("isseus")
+
+        // console.log(linkToken.address, "LINK token")
+        // console.log(linkToken, "LINK")
+        
+        // console.log("more issues")
+
+        await linkToken.connect(signer0).transfer(testContract.address, BigInt(10000000000000000000))
+        const linkBalanceTestContract = await linkToken.balanceOf(testContract.address)
+        // console.log("Test contract LINK Balance:", Number(linkBalanceTestContract));
+        
+        await linkToken.connect(signer0).transfer(airbattlecontract.address, BigInt(10000000000000000000))
+        const airBattleContractLinkBalance = await linkToken.balanceOf(airbattlecontract.address)
+        // console.log("Test contract AirBattle Balance:", Number(airBattleContractLinkBalance));
+
+        await linkToken.connect(signer0).transfer(groundbattlecontract.address, BigInt(10000000000000000000))
+        const groundBattleContractLinkBalance = await linkToken.balanceOf(groundbattlecontract.address)
+        // console.log("Test contract GroundBattle Balance:", Number(groundBattleContractLinkBalance));
+
+        await linkToken.connect(signer0).transfer(navalattackcontract.address, BigInt(10000000000000000000))
+        const navalAttackContractLinkBalance = await linkToken.balanceOf(navalattackcontract.address)
+        console.log("Test contract Naval Attack Balance:", Number(navalAttackContractLinkBalance));
+
+        
+        
+        await linkToken.connect(signer0).transfer(signer0.address, BigInt(10000000000000000000))
+        const linkBalanceSigner0 = await linkToken.balanceOf(signer0.address)
+        // console.log("Signer1 LINK Balance:", Number(linkBalanceSigner0));
+        
+        await linkToken.connect(signer0).transfer(signer1.address, BigInt(10000000000000000000))
+        const linkBalanceSigner1 = await linkToken.balanceOf(signer1.address)
+        // console.log("Signer0 LINK Balance:", Number(linkBalanceSigner1));
+
+        const nodeAddress = metadata.nodeAddress;
+        console.log("NODE ADDRESS", nodeAddress)
+
+
+        await linkToken.connect(signer0).transfer(nodeAddress, BigInt(15000000000000000000))
+        const linkBalanceNode = await linkToken.balanceOf(nodeAddress)
+        // console.log("Node LINK Balance:", Number(linkBalanceNode));
+
+        const operatorAddress = metadata.oracleAddress
+        console.log("ORACLE ADDRESS", metadata.oracleAddress)
+
+        await linkToken.connect(signer0).transfer(operatorAddress, BigInt(25000000000000000000))
+        const linkBalanceOperator = await linkToken.balanceOf(operatorAddress)
+        // console.log("Operator LINK Balance:", Number(linkBalanceOperator));
+
+        // await linkToken.transferFrom(signer0.address, testContract.address, BigInt(1000000000000000000000))
+        
+        // console.log("oracle address", metadata.oracleAddress);
+        
+        console.log(jobId, "JOBID")
+
+        const jobIdToRaw : any = jobId
+        
+        const jobIdWithoutHyphens = jobIdToRaw.replace(/-/g, "");
+        // console.log("JobId", jobIdWithoutHyphens);
+        
+        // const jobIdBytes = ethers.utils.toUtf8Bytes(jobIdWithoutHyphens)
+        // console.log(jobIdBytes);
+        
+        const jobIdString = jobIdWithoutHyphens.toString()
+        
+        const jobIdBytes = ethers.utils.hexlify(
+        ethers.utils.toUtf8Bytes(jobIdString)
+        );
+
+        console.log(metadata.oracleAddress)
+
+        await testContract.updateLinkAddress(metadata.linkAddress)
+        await airbattlecontract.updateLinkAddress(metadata.linkAddress)
+        await groundbattlecontract.updateLinkAddress(metadata.linkAddress)
+        await navalattackcontract.updateLinkAddress(metadata.linkAddress)
+
+        await testContract.updateOracleAddress(metadata.oracleAddress)
+        await airbattlecontract.updateOracleAddress(metadata.oracleAddress)
+        await groundbattlecontract.updateOracleAddress(metadata.oracleAddress)
+        await navalattackcontract.updateOracleAddress(metadata.oracleAddress)
+        
+        await testContract.updateJobId(jobIdBytes)
+        await airbattlecontract.updateJobId(jobIdBytes)
+        await groundbattlecontract.updateJobId(jobIdBytes)
+        await navalattackcontract.updateJobId(jobIdBytes)
+        
+        await testContract.updateFee(BigInt(1000000000000000000))
+        await airbattlecontract.updateFee(BigInt(1000000000000000000))
+        await groundbattlecontract.updateFee(BigInt(1000000000000000000))
+        await navalattackcontract.updateFee(BigInt(1000000000000000000))
+
     });
 
     describe("Blockade", function () {
@@ -1235,7 +1354,7 @@ describe("Adapter Test", function () {
             await expect(navalblockadecontract.connect(signer1).blockade(0, 1, 0)).to.be.revertedWith("nation already blockaded today");
         })
 
-        it("tests that blockade reverts when defender has blockade capable ships", async function () {
+        it("tests that blockade reverts when defender has break blockade capable ships", async function () {
             await navycontract.connect(signer1).buyBattleship(2, 0);
             await navycontract.connect(signer1).buyCruiser(2, 0);
             await keepercontract.incrementGameDay();
@@ -1447,6 +1566,94 @@ describe("Adapter Test", function () {
             console.log("here7?")
         })
 
-        
+        it("tests that a break blockade attack occurs", async function () {
+            await navycontract.connect(signer1).buyBattleship(2, 0);
+            await navycontract.connect(signer2).buyBattleship(2, 1);
+            await navycontract.connect(signer1).buyCruiser(2, 0);
+            await navycontract.connect(signer2).buyCruiser(2, 1);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer1).buyFrigate(2, 0);
+            await navycontract2.connect(signer2).buyFrigate(2, 1);
+            await navycontract2.connect(signer1).buySubmarine(2, 0);
+            await navycontract2.connect(signer2).buySubmarine(2, 1);
+            await keepercontract.incrementGameDay()
+            await navycontract.connect(signer1).buyBattleship(2, 0);
+            await navycontract.connect(signer2).buyBattleship(2, 1);
+            await navycontract.connect(signer1).buyCruiser(2, 0);
+            await navycontract.connect(signer2).buyCruiser(2, 1);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer1).buyFrigate(2, 0);
+            await navycontract2.connect(signer2).buyFrigate(2, 1);
+            await navycontract2.connect(signer1).buySubmarine(2, 0);
+            await navycontract2.connect(signer2).buySubmarine(2, 1);
+            await navalblockadecontract.connect(signer1).blockade(0, 1, 0);
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            }
+            await vrfCoordinatorV2Mock.fulfillRandomWords(7, navalblockadecontract.address);
+            await keepercontract.incrementGameDay()
+            console.log("Naval Attack");
+            await breakblockadecontract.connect(signer1).breakBlockade(0, 0, 1);
+            // const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            // const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            // for (const log of event1Logs) {
+            //     const requestIdReturn = log.args.requestId;
+            //     // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            // }
+            const tx = await vrfCoordinatorV2Mock.fulfillRandomWords(8,navalattackcontract.address);
+
+            // Wait for the transaction to be mined
+            const receipt = await tx.wait();
+
+            console.log(`Gas Used: ${receipt.gasUsed.toString()}`);
+            
+            console.log("break blockade completed");
+
+        })
     })
+
+    describe("Naval Attack", function () {
+        it("tests that a naval attack occurs", async function () {
+            await navycontract.connect(signer1).buyBattleship(2, 0);
+            await navycontract.connect(signer2).buyBattleship(2, 1);
+            await navycontract.connect(signer1).buyCruiser(2, 0);
+            await navycontract.connect(signer2).buyCruiser(2, 1);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer1).buyFrigate(2, 0);
+            await navycontract2.connect(signer2).buyFrigate(2, 1);
+            await navycontract2.connect(signer1).buySubmarine(2, 0);
+            await navycontract2.connect(signer2).buySubmarine(2, 1);
+            await keepercontract.incrementGameDay()
+            await navycontract.connect(signer1).buyBattleship(2, 0);
+            await navycontract.connect(signer2).buyBattleship(2, 1);
+            await navycontract.connect(signer1).buyCruiser(2, 0);
+            await navycontract.connect(signer2).buyCruiser(2, 1);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer1).buyFrigate(2, 0);
+            await navycontract2.connect(signer2).buyFrigate(2, 1);
+            await navycontract2.connect(signer1).buySubmarine(2, 0);
+            await navycontract2.connect(signer2).buySubmarine(2, 1);
+            await keepercontract.incrementGameDay()
+            console.log("Naval Attack");
+            await navalattackcontract.connect(signer1).navalAttack(0, 0, 1);
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            }
+            const tx = await vrfCoordinatorV2Mock.fulfillRandomWords(7,navalattackcontract.address);
+
+            // Wait for the transaction to be mined
+            const receipt = await tx.wait();
+
+            console.log(`Gas Used: ${receipt.gasUsed.toString()}`);
+
+            console.log("attack completed");
+
+        })
+    })        
 })

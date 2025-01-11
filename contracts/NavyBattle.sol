@@ -10,6 +10,7 @@ import "./KeeperFile.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
 import "hardhat/console.sol";
 
 ///@title NavalBlocadeContract
@@ -315,7 +316,6 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
             uint256 _blockadeId = blockadesFor[j];
             console.log(_blockadeId, "blockade id");
             if (blockadeIdToBlockade[_blockadeId].blockadedId == breakerId) {
-
                 blockadesFor[j] = blockadesFor[j] - 1;
                 blockadesFor.pop();
                 console.log("blockade for deleted");
@@ -936,7 +936,9 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2 {
 ///@author OxSnosh
 ///@dev this contract inherits from the openzeppelin ownable contract
 ///@dev this contract inherits from the chainlink VRF contract
-contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
+contract NavalAttackContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
+    using Chainlink for Chainlink.Request;
+
     address public navy;
     uint256 public navyBattleId;
     address public navyBlockade;
@@ -969,7 +971,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
     bytes32 private immutable i_gasLane;
     uint32 private immutable i_callbackGasLimit;
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
-    uint32 private constant NUM_WORDS = 17;
+    uint32 private constant NUM_WORDS = 6;
 
     NavyContract nav;
     NavalBlockadeContract navBlock;
@@ -1085,21 +1087,31 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         uint256 destroyerCount = nav2.getDestroyerCount(countryId);
         uint256 submarineCount = nav2.getSubmarineCount(countryId);
         uint256 aircraftCarrierCount = nav2.getAircraftCarrierCount(countryId);
-        uint256 strengthAttacker = getAttackerStrength(navyBattleId);
-        NavyForces memory newNavyForces = NavyForces(
-            corvetteCount,
-            landingShipCount,
+        console.log("creating struct");
+        console.log(
             battleshipCount,
             cruiserCount,
             frigateCount,
-            destroyerCount,
-            submarineCount,
-            aircraftCarrierCount,
-            strengthAttacker,
-            warId,
-            countryId
+            submarineCount
         );
-        idToAttackerNavy[battleId] = newNavyForces;
+        NavyForces storage newNavyForces = idToAttackerNavy[battleId];
+        newNavyForces.corvetteCount = corvetteCount;
+        newNavyForces.landingShipCount = landingShipCount;
+        newNavyForces.battleshipCount = battleshipCount;
+        console.log(
+            "battleship count from mapping",
+            idToAttackerNavy[battleId].battleshipCount,
+            battleId
+        );
+        newNavyForces.cruiserCount = cruiserCount;
+        newNavyForces.frigateCount = frigateCount;
+        newNavyForces.destroyerCount = destroyerCount;
+        newNavyForces.submarineCount = submarineCount;
+        newNavyForces.aircraftCarrierCount = aircraftCarrierCount;
+        uint256 strengthAttacker = getAttackerStrength(navyBattleId);
+        newNavyForces.startingStrength = strengthAttacker;
+        newNavyForces.warId = warId;
+        newNavyForces.countryId = countryId;
     }
 
     function generateDefenderNavyStruct(
@@ -1115,21 +1127,25 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         uint256 destroyerCount = nav2.getDestroyerCount(countryId);
         uint256 submarineCount = nav2.getSubmarineCount(countryId);
         uint256 aircraftCarrierCount = nav2.getAircraftCarrierCount(countryId);
-        uint256 defnederStrength = getDefenderStrength(navyBattleId);
-        NavyForces memory newNavyForces = NavyForces(
-            corvetteCount,
-            landingShipCount,
+        console.log(
             battleshipCount,
             cruiserCount,
             frigateCount,
-            destroyerCount,
-            submarineCount,
-            aircraftCarrierCount,
-            defnederStrength,
-            warId,
-            countryId
+            submarineCount
         );
-        idToDefenderNavy[attackId] = newNavyForces;
+        NavyForces storage newNavyForces = idToDefenderNavy[attackId];
+        newNavyForces.corvetteCount = corvetteCount;
+        newNavyForces.landingShipCount = landingShipCount;
+        newNavyForces.battleshipCount = battleshipCount;
+        newNavyForces.cruiserCount = cruiserCount;
+        newNavyForces.frigateCount = frigateCount;
+        newNavyForces.destroyerCount = destroyerCount;
+        newNavyForces.submarineCount = submarineCount;
+        newNavyForces.aircraftCarrierCount = aircraftCarrierCount;
+        uint256 defenderStrength = getDefenderStrength(navyBattleId);
+        newNavyForces.startingStrength = defenderStrength;
+        newNavyForces.warId = warId;
+        newNavyForces.countryId = countryId;
     }
 
     function generateAttackerChanceArray(uint256 battleId) internal {
@@ -1154,12 +1170,19 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
             cumulativeSum = landingShipOddsToPush;
         }
         //battleship
+        console.log(
+            idToAttackerNavy[battleId].battleshipCount,
+            "triggering array generation"
+        );
         if (idToAttackerNavy[battleId].battleshipCount > 0) {
+            console.log("creating chance and type array");
             uint256 battleshipOdds = (idToAttackerNavy[battleId]
                 .battleshipCount * battleshipTargetSize);
             uint256 battleshipOddsToPush = (battleshipOdds + cumulativeSum);
             chances.push(battleshipOddsToPush);
+            console.log(chances[chances.length - 1]);
             types.push(3);
+            console.log(types[types.length - 1]);
             cumulativeSum = battleshipOddsToPush;
         }
         //cruiser
@@ -1303,8 +1326,16 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
             .landingShipCount * landingShipStrength;
         uint256 _battleshipStrength = idToAttackerNavy[battleId]
             .battleshipCount * battleshipStrength;
+        console.log(
+            "count from getStrenf()",
+            idToAttackerNavy[battleId].battleshipCount
+        );
         uint256 _cruiserStrength = idToAttackerNavy[battleId].cruiserCount *
             cruiserStrength;
+        console.log(
+            "count from getStrenf()",
+            idToAttackerNavy[battleId].cruiserCount
+        );
         uint256 _frigateStrength = idToAttackerNavy[battleId].frigateCount *
             frigateStrength;
         uint256 _destroyerStrength = idToAttackerNavy[battleId].destroyerCount *
@@ -1313,6 +1344,9 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
             submarineStrength;
         uint256 _aircraftCarrierStrength = idToAttackerNavy[battleId]
             .aircraftCarrierCount * aircraftCarrierStrength;
+        console.log("cruisers", idToAttackerNavy[battleId].cruiserCount);
+        console.log("cruiser strength", _cruiserStrength);
+        console.log("cruiser strength", cruiserStrength);
         uint256 strength = (_corvetteStrength +
             _landingShipStrength +
             _battleshipStrength +
@@ -1327,6 +1361,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
             uint256 shipCount = getShipCount(attackerId);
             strength += (shipCount * navalAcademyCount);
         }
+        console.log("strength att", strength);
         return strength;
     }
 
@@ -1339,8 +1374,16 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
             .landingShipCount * landingShipStrength;
         uint256 _battleshipStrength = idToDefenderNavy[battleId]
             .battleshipCount * battleshipStrength;
+        console.log(
+            "count from getStrenf()",
+            idToDefenderNavy[battleId].battleshipCount
+        );
         uint256 _cruiserStrength = idToDefenderNavy[battleId].cruiserCount *
             cruiserStrength;
+        console.log(
+            "count from getStrenf()",
+            idToDefenderNavy[battleId].cruiserCount
+        );
         uint256 _frigateStrength = idToDefenderNavy[battleId].frigateCount *
             frigateStrength;
         uint256 _destroyerStrength = idToDefenderNavy[battleId].destroyerCount *
@@ -1363,10 +1406,12 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
             uint256 shipCount = getShipCount(defenderId);
             strength += (shipCount * navalAcademyCount);
         }
+        console.log("strength def", strength);
         return strength;
     }
 
     function fulfillRequest(uint256 battleId) public {
+        console.log("arrived at fulfillRequest()");
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
             i_subscriptionId,
@@ -1374,58 +1419,130 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
             i_callbackGasLimit,
             NUM_WORDS
         );
+        console.log("random words requested");
         s_requestIdToRequestIndex[requestId] = battleId;
+    }
+
+    bytes32 navyAttackJobId;
+    address oracleAddress;
+    uint256 fee;
+    // address linkAddress;
+
+    function updateJobId(bytes32 _jobId) public onlyOwner {
+        navyAttackJobId = _jobId;
+    }
+
+    function updateOracleAddress(address _oracleAddress) public onlyOwner {
+        setChainlinkOracle(_oracleAddress);
+        oracleAddress = _oracleAddress;
+    }
+
+    function updateFee(uint256 _fee) public onlyOwner {
+        fee = _fee;
+    }
+
+    function updateLinkAddress(address _linkAddress) public onlyOwner {
+        setChainlinkToken(_linkAddress);
+        // linkAddress = _linkAddress;
     }
 
     function fulfillRandomWords(
         uint256 requestId,
         uint256[] memory randomWords
     ) internal override {
+        Chainlink.Request memory req = buildOperatorRequest(
+            navyAttackJobId,
+            this.completeNavalAttack.selector
+        );
         uint256 requestNumber = s_requestIdToRequestIndex[requestId];
+        console.log(requestNumber, "requestNumber");
+        req.addUint("battleId", requestNumber);
         s_requestIndexToRandomWords[requestNumber] = randomWords;
         s_randomWords = randomWords;
-        uint256 numberBetweenZeroAndTwo = (s_randomWords[0] % 2);
-        uint256 losses = getLosses(requestNumber, numberBetweenZeroAndTwo);
-        uint256 attackerStartingStrength = idToAttackerNavy[requestNumber]
-            .startingStrength;
-        uint256 defenderStartingStrength = idToDefenderNavy[requestNumber]
-            .startingStrength;
-        uint256 totalStrength = (attackerStartingStrength +
-            defenderStartingStrength);
-        for (uint256 i = 1; i < losses + 1; i++) {
-            uint256 randomNumberForTeamSelection = (s_randomWords[i] %
-                totalStrength);
-            uint256 randomNumnerForShipSelection = s_randomWords[i + 8];
-            if (randomNumberForTeamSelection <= attackerStartingStrength) {
-                generateLossForDefender(
-                    requestNumber,
-                    randomNumnerForShipSelection
-                );
-            } else {
-                generateLossForAttacker(
-                    requestNumber,
-                    randomNumnerForShipSelection
-                );
-            }
-        }
-        uint256[] memory defenderLosses = battleIdToDefenderLosses[
+        req.addBytes("randomWords", abi.encode(randomWords));
+        // uint256 numberBetweenZeroAndTwo = (s_randomWords[0] % 2);
+        // uint256 losses = getLosses(requestNumber, numberBetweenZeroAndTwo);
+        // console.log("losses", losses);
+        // req.addUint("losses", losses);
+        uint256[] memory attackerChances = battleIdToAttackerChanceArray[
             requestNumber
         ];
-        uint256[] memory attackerLosses = battleIdToAttackerLosses[
+        uint256[] memory attackerTypes = battleIdToAttackerTypeArray[
             requestNumber
         ];
-        uint256 defenderId = idToDefenderNavy[requestNumber].countryId;
-        uint256 attackerId = idToAttackerNavy[requestNumber].countryId;
-        nav.decrementLosses(
-            defenderLosses,
-            defenderId,
-            attackerLosses,
-            attackerId
-        );
-        uint256 warId = idToAttackerNavy[requestNumber].warId;
-        war.addNavyCasualties(warId, defenderId, defenderLosses.length);
-        war.addNavyCasualties(warId, attackerId, attackerLosses.length);
-        navBlock.checkIfBlockadeCapable(defenderId);
+        uint256[] memory defenderChances = battleIdToDefenderChanceArray[
+            requestNumber
+        ];
+        uint256[] memory defenderTypes = battleIdToDefenderTypeArray[
+            requestNumber
+        ];
+        req.addBytes("attackerChances", abi.encode(attackerChances));
+        req.addBytes("attackerTypes", abi.encode(attackerTypes));
+        req.addBytes("defenderChances", abi.encode(defenderChances));
+        req.addBytes("defenderTypes", abi.encode(defenderTypes));
+        sendOperatorRequest(req, fee);
+        console.log("request sent");
+        // uint256 attackerStartingStrength = idToAttackerNavy[requestNumber]
+        //     .startingStrength;
+        // console.log("attack strength", attackerStartingStrength);
+        // uint256 defenderStartingStrength = idToDefenderNavy[requestNumber]
+        //     .startingStrength;
+        // console.log("def strength", defenderStartingStrength);
+        // uint256 totalStrength = (attackerStartingStrength +
+        //     defenderStartingStrength);
+        // console.log("total strength", totalStrength);
+        // console.log("arrived to for loop");
+    }
+
+    function completeNavalAttack(
+        bytes32 requestId,
+        uint256[] memory _attackerLosses,
+        uint256[] memory _defenderLosses,
+        uint256 battleId
+    ) public {
+        console.log(_defenderLosses[0]);
+        console.log(_defenderLosses[1]);
+        console.log(_defenderLosses[2]);
+        console.log(battleId);
+        // for (uint256 i = 0; i <= losses + 1; i++) {
+        //     console.log("loop", i);
+        //     uint256 randomNumberForTeamSelection = (s_randomWords[i] %
+        //         totalStrength);
+        //     uint256 randomNumnerForShipSelection = s_randomWords[i + 8];
+        //     if (randomNumberForTeamSelection <= attackerStartingStrength) {
+        //         console.log("defender loss");
+        //         generateLossForDefender(
+        //             requestNumber,
+        //             randomNumnerForShipSelection
+        //         );
+        //     } else {
+        //         console.log("attacker loss");
+        //         generateLossForAttacker(
+        //             requestNumber,
+        //             randomNumnerForShipSelection
+        //         );
+        //     }
+        // }
+        // uint256[] memory defenderLosses = battleIdToDefenderLosses[
+        //     requestNumber
+        // ];
+        // uint256[] memory attackerLosses = battleIdToAttackerLosses[
+        //     requestNumber
+        // ];
+        // uint256 defenderId = idToDefenderNavy[requestNumber].countryId;
+        // uint256 attackerId = idToAttackerNavy[requestNumber].countryId;
+        // nav.decrementLosses(
+        //     defenderLosses,
+        //     defenderId,
+        //     attackerLosses,
+        //     attackerId
+        // );
+        // console.log("losses decremented");
+        // uint256 warId = idToAttackerNavy[requestNumber].warId;
+        // war.addNavyCasualties(warId, defenderId, defenderLosses.length);
+        // war.addNavyCasualties(warId, attackerId, attackerLosses.length);
+        // navBlock.checkIfBlockadeCapable(defenderId);
+        // console.log("naval attack complete");
     }
 
     function getLosses(
@@ -1476,87 +1593,87 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2 {
         return count;
     }
 
-    function generateLossForDefender(
-        uint256 battleId,
-        uint256 randomNumberForShipLoss
-    ) public {
-        uint256[] storage chanceArray = battleIdToDefenderChanceArray[battleId];
-        uint256[] storage typeArray = battleIdToDefenderTypeArray[battleId];
-        uint256 cumulativeValue = battleIdToDefenderCumulativeSumOdds[battleId];
-        uint256 randomNumber = (randomNumberForShipLoss % cumulativeValue);
-        uint256 shipType;
-        uint256 amountToDecrease;
-        uint256 j;
-        for (uint256 i; i < chanceArray.length; i++) {
-            if (randomNumber <= chanceArray[i]) {
-                shipType = typeArray[i];
-                amountToDecrease = getAmountToDecrease(shipType);
-                j = i;
-                break;
-            }
-        }
-        for (j; j < chanceArray.length; j++) {
-            if (chanceArray[j] >= randomNumber) {
-                chanceArray[j] -= amountToDecrease;
-            }
-        }
-        battleIdToDefenderCumulativeSumOdds[battleId] -= amountToDecrease;
-        uint256[] storage defenderLosses = battleIdToDefenderLosses[battleId];
-        defenderLosses.push(shipType);
-    }
+    // function generateLossForDefender(
+    //     uint256 battleId,
+    //     uint256 randomNumberForShipLoss
+    // ) public {
+    //     uint256[] storage chanceArray = battleIdToDefenderChanceArray[battleId];
+    //     uint256[] storage typeArray = battleIdToDefenderTypeArray[battleId];
+    //     uint256 cumulativeValue = battleIdToDefenderCumulativeSumOdds[battleId];
+    //     uint256 randomNumber = (randomNumberForShipLoss % cumulativeValue);
+    //     uint256 shipType;
+    //     uint256 amountToDecrease;
+    //     uint256 j;
+    //     for (uint256 i; i < chanceArray.length; i++) {
+    //         if (randomNumber <= chanceArray[i]) {
+    //             shipType = typeArray[i];
+    //             amountToDecrease = getAmountToDecrease(shipType);
+    //             j = i;
+    //             break;
+    //         }
+    //     }
+    //     for (j; j < chanceArray.length; j++) {
+    //         if (chanceArray[j] >= randomNumber) {
+    //             chanceArray[j] -= amountToDecrease;
+    //         }
+    //     }
+    //     battleIdToDefenderCumulativeSumOdds[battleId] -= amountToDecrease;
+    //     uint256[] storage defenderLosses = battleIdToDefenderLosses[battleId];
+    //     defenderLosses.push(shipType);
+    // }
 
-    function generateLossForAttacker(
-        uint256 battleId,
-        uint256 randomNumberForShipLoss
-    ) public {
-        uint256[] storage chanceArray = battleIdToAttackerChanceArray[battleId];
-        uint256[] storage typeArray = battleIdToAttackerTypeArray[battleId];
-        uint256 cumulativeValue = battleIdToAttackerCumulativeSumOdds[battleId];
-        uint256 randomNumber = (randomNumberForShipLoss % cumulativeValue);
-        uint256 shipType;
-        uint256 amountToDecrease;
-        bool ranAlready = false;
-        if (ranAlready == false) {
-            for (uint256 i; i < chanceArray.length; i++) {
-                if (randomNumber <= chanceArray[i]) {
-                    shipType = typeArray[i];
-                    amountToDecrease = getAmountToDecrease(shipType);
-                }
-                uint256 j = i;
-                for (j; j < chanceArray.length; j++) {
-                    if (chanceArray[j] >= randomNumber) {
-                        chanceArray[j] -= amountToDecrease;
-                    }
-                    ranAlready = true;
-                }
-            }
-        }
-        battleIdToAttackerCumulativeSumOdds[battleId] -= amountToDecrease;
-        uint256[] storage defenderLosses = battleIdToAttackerLosses[battleId];
-        defenderLosses.push(shipType);
-    }
+    // function generateLossForAttacker(
+    //     uint256 battleId,
+    //     uint256 randomNumberForShipLoss
+    // ) public {
+    //     uint256[] storage chanceArray = battleIdToAttackerChanceArray[battleId];
+    //     uint256[] storage typeArray = battleIdToAttackerTypeArray[battleId];
+    //     uint256 cumulativeValue = battleIdToAttackerCumulativeSumOdds[battleId];
+    //     uint256 randomNumber = (randomNumberForShipLoss % cumulativeValue);
+    //     uint256 shipType;
+    //     uint256 amountToDecrease;
+    //     bool ranAlready = false;
+    //     if (ranAlready == false) {
+    //         for (uint256 i; i < chanceArray.length; i++) {
+    //             if (randomNumber <= chanceArray[i]) {
+    //                 shipType = typeArray[i];
+    //                 amountToDecrease = getAmountToDecrease(shipType);
+    //             }
+    //             uint256 j = i;
+    //             for (j; j < chanceArray.length; j++) {
+    //                 if (chanceArray[j] >= randomNumber) {
+    //                     chanceArray[j] -= amountToDecrease;
+    //                 }
+    //                 ranAlready = true;
+    //             }
+    //         }
+    //     }
+    //     battleIdToAttackerCumulativeSumOdds[battleId] -= amountToDecrease;
+    //     uint256[] storage defenderLosses = battleIdToAttackerLosses[battleId];
+    //     defenderLosses.push(shipType);
+    // }
 
-    function getAmountToDecrease(
-        uint256 shipType
-    ) internal pure returns (uint256) {
-        uint256 amountToDecrease;
-        if (shipType == 1) {
-            amountToDecrease = 15;
-        } else if (shipType == 2) {
-            amountToDecrease = 13;
-        } else if (shipType == 3) {
-            amountToDecrease = 11;
-        } else if (shipType == 4) {
-            amountToDecrease = 10;
-        } else if (shipType == 5) {
-            amountToDecrease = 8;
-        } else if (shipType == 6) {
-            amountToDecrease = 5;
-        } else if (shipType == 7) {
-            amountToDecrease = 4;
-        } else if (shipType == 8) {
-            amountToDecrease = 1;
-        }
-        return amountToDecrease;
-    }
+    // function getAmountToDecrease(
+    //     uint256 shipType
+    // ) internal pure returns (uint256) {
+    //     uint256 amountToDecrease;
+    //     if (shipType == 1) {
+    //         amountToDecrease = 15;
+    //     } else if (shipType == 2) {
+    //         amountToDecrease = 13;
+    //     } else if (shipType == 3) {
+    //         amountToDecrease = 11;
+    //     } else if (shipType == 4) {
+    //         amountToDecrease = 10;
+    //     } else if (shipType == 5) {
+    //         amountToDecrease = 8;
+    //     } else if (shipType == 6) {
+    //         amountToDecrease = 5;
+    //     } else if (shipType == 7) {
+    //         amountToDecrease = 4;
+    //     } else if (shipType == 8) {
+    //         amountToDecrease = 1;
+    //     }
+    //     return amountToDecrease;
+    // }
 }

@@ -1194,15 +1194,6 @@ describe("Adapter Test", function () {
     await forcescontract.connect(signer1).deployForces(1000, 30, 0, 0)
     await billscontract.connect(signer2).payBills(1)
 
-    // const LinkToken  = await ethers.getContractFactory(
-    //         "LinkToken"
-    // )
-    // let linkToken = await LinkToken.connect(signer0).deploy() as LinkToken
-    // await linkToken.deployed()
-
-    // const linkToken = new ethers.Contract(metadata.linkAddress, linkTokenAbi, signer0) as LinkToken;
-    
-    // console.log("is this the place 0")
 
     const contractABI = LinkTokenArtifact.abi;
 
@@ -1496,7 +1487,6 @@ describe("Adapter Test", function () {
 
             }
         }
-
     });
   });
 });

@@ -68,4 +68,23 @@ contract Test is Ownable, ChainlinkClient {
         console.log(product, "fulfilled product");
         return product;
     }
+
+    struct Army {
+        uint256 troops;
+        uint256 tanks;
+    }
+
+    mapping (uint256 => Army) battleIdToArmy;
+
+    function testStruct(uint256 battleId, uint256 troops, uint256 tanks) public {
+        Army storage newArmy = battleIdToArmy[battleId];
+        newArmy.tanks = tanks;
+        newArmy.troops = troops;
+    }
+
+    function returnArmy(uint256 battleId) public view returns (uint256, uint256) {
+        uint256 tanks = battleIdToArmy[battleId].tanks;
+        uint256 troops = battleIdToArmy[battleId].troops;
+        return(troops, tanks);
+    }
 }

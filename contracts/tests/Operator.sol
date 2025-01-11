@@ -149,6 +149,11 @@ contract Operator is AuthorizedReceiver, ConfirmedOwner, LinkTokenReceiver, Oper
       nonce,
       dataVersion
     );
+    console.log("OPERATOR REQUEST About to be Emitted");
+    console.log(sender);
+    console.log(payment);
+    console.log(expiration);
+    console.log(dataVersion);
     emit OracleRequest(specId, sender, requestId, payment, sender, callbackFunctionId, expiration, dataVersion, data);
     console.log("OPERATOR REQUEST EMITTED");
   }
@@ -468,6 +473,7 @@ contract Operator is AuthorizedReceiver, ConfirmedOwner, LinkTokenReceiver, Oper
     s_commitments[requestId] = Commitment(paramsHash, _safeCastToUint8(dataVersion));
     s_tokensInEscrow = s_tokensInEscrow.add(payment);
     console.log("completed verify");
+    console.log(expiration, "expiration");
     return (requestId, expiration);
   }
 

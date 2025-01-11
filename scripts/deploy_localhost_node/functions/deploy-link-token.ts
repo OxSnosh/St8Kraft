@@ -8,7 +8,7 @@ export const deployLinkToken = async () => {
   const LinkToken = await hre.ethers.getContractFactoryFromArtifact(
     LinkTokenArtifact
   );
-  const linkToken = await LinkToken.deploy();
+  const linkToken = await LinkToken.deploy() as LinkToken;
 
   await linkToken.deployed();
 

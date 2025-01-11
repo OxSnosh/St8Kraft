@@ -185,11 +185,13 @@ export const createJob = async (taskArgs : any) => {
   const airBattleExternalID = uuidv4();
   const senateExternalID = uuidv4();
   const groundBattleExternalID = uuidv4();
+  const navalAttackExternalID = uuidv4();
 
   const jobName = `Get > Uint256: ${new Date().getMilliseconds()}`;
   const jobNameAirBattle = `Get > Uint256: ${new Date().getMilliseconds()}`;
   const jobNameSenate = `Get > Uint256: ${new Date().getMilliseconds()}`;
   const groundBattleName = `Get > Uint256: ${new Date().getMilliseconds()}`;
+  const navalAttackName = `Get > Uint256: ${new Date().getMilliseconds()}`;
   //       const defaultJob = `{    
   //         "operationName":"CreateJob",    
   //         "variables":{      
@@ -206,94 +208,122 @@ export const createJob = async (taskArgs : any) => {
     
   // console.log(defaultJob);
 
-  const outputForConsole = `
-      type = "directrequest"
-      schemaVersion = 1
-      name = "${jobName}"
-      externalJobID = "${externalID}"
-      maxTaskDuration = "0s"
-      contractAddress = "${oracleAddress}"
-      observationSource = """
-          decode_log   [type=ethabidecodelog
-                        abi="OracleRequest(bytes32 indexed specId, address requester, bytes32 requestId, uint256 payment, address callbackAddr, bytes4 callbackFunctionId, uint256 cancelExpiration, uint256 dataVersion, bytes data)"
-                        data="$(jobRun.logData)"
-                        topics="$(jobRun.logTopics)"]
+  // const outputForConsole = `
+  //     type = "directrequest"
+  //     schemaVersion = 1
+  //     name = "${jobName}"
+  //     externalJobID = "${externalID}"
+  //     maxTaskDuration = "0s"
+  //     contractAddress = "${oracleAddress}"
+  //     observationSource = """
+  //         decode_log   [type=ethabidecodelog
+  //                       abi="OracleRequest(bytes32 indexed specId, address requester, bytes32 requestId, uint256 payment, address callbackAddr, bytes4 callbackFunctionId, uint256 cancelExpiration, uint256 dataVersion, bytes data)"
+  //                       data="$(jobRun.logData)"
+  //                       topics="$(jobRun.logTopics)"]
       
-          decode_cbor  [type=cborparse data="$(decode_log.data)"]
-          fetch        [type=bridge name="multiply" requestData="{\\"id\\": $(jobSpec.externalJobID), \\"data\\": { \\"numberToMultiply\\": $(decode_cbor.inputNumber)}}"]
-          parse        [type=jsonparse path="data,product" data="$(fetch)"]
-          encode_data  [type=ethabiencode abi="(bytes32 requestId, uint256 value)" data="{ \\"requestId\\": $(decode_log.requestId), \\"value\\": $(parse) }"]
-          encode_tx    [type=ethabiencode
-                        abi="fulfillOracleRequest2(bytes32 requestId, uint256 payment, address callbackAddress, bytes4 callbackFunctionId, uint256 expiration, bytes calldata data)"
-                        data="{\\"requestId\\": $(decode_log.requestId), \\"payment\\": $(decode_log.payment), \\"callbackAddress\\": $(decode_log.callbackAddr), \\"callbackFunctionId\\": $(decode_log.callbackFunctionId), \\"expiration\\": $(decode_log.cancelExpiration), \\"data\\": $(encode_data)}"
-                      ]
-          submit_tx    [type=ethtx to="${oracleAddress}" data="$(encode_tx)"]
+  //         decode_cbor  [type=cborparse data="$(decode_log.data)"]
+  //         fetch        [type=bridge name="multiply" requestData="{\\"id\\": $(jobSpec.externalJobID), \\"data\\": { \\"numberToMultiply\\": $(decode_cbor.inputNumber)}}"]
+  //         parse        [type=jsonparse path="data,product" data="$(fetch)"]
+  //         encode_data  [type=ethabiencode abi="(bytes32 requestId, uint256 value)" data="{ \\"requestId\\": $(decode_log.requestId), \\"value\\": $(parse) }"]
+  //         encode_tx    [type=ethabiencode
+  //                       abi="fulfillOracleRequest2(bytes32 requestId, uint256 payment, address callbackAddress, bytes4 callbackFunctionId, uint256 expiration, bytes calldata data)"
+  //                       data="{\\"requestId\\": $(decode_log.requestId), \\"payment\\": $(decode_log.payment), \\"callbackAddress\\": $(decode_log.callbackAddr), \\"callbackFunctionId\\": $(decode_log.callbackFunctionId), \\"expiration\\": $(decode_log.cancelExpiration), \\"data\\": $(encode_data)}"
+  //                     ]
+  //         submit_tx    [type=ethtx to="${oracleAddress}" data="$(encode_tx)"]
       
-          decode_log -> decode_cbor -> fetch -> parse -> encode_data -> encode_tx -> submit_tx
-      """
-  `
+  //         decode_log -> decode_cbor -> fetch -> parse -> encode_data -> encode_tx -> submit_tx
+  //     """
+  // `
 
-  const airBattleOutputForConsole = `
-  type = "directrequest"
-  schemaVersion = 1
-  name = "${jobNameAirBattle}"
-  externalJobID = "${airBattleExternalID}"
-  maxTaskDuration = "0s"
-  contractAddress = "${oracleAddress}"
-  observationSource = """
-  decode_log   [type=ethabidecodelog
-    abi="OracleRequest(bytes32 indexed specId, address requester, bytes32 requestId, uint256 payment, address callbackAddr, bytes4 callbackFunctionId, uint256 cancelExpiration, uint256 dataVersion, bytes data)"
-    data="$(jobRun.logData)"
-    topics="$(jobRun.logTopics)"]
-  decode_cbor  [type=cborparse data="$(decode_log.data)"]
-  fetch        [type=bridge name="air-battle" requestData="{\\"id\\": $(jobSpec.externalJobID), \\"data\\": $(decode_cbor)}"]
-  parse       [type=jsonparse path="data" data="$(fetch)"]
-  encode_data  [type=ethabiencode abi="(bytes32 requestId, bytes memory attackerFighterCasualties, bytes memory attackerBomberCasualties, bytes memory defenderFighterCasualties, uint256 attackerId, uint256 defenderId, uint256 infrastructureDamage, uint256 tankDamage, uint256 cruiseMissileDamage, uint256 battleId)" data="{ \\"requestId\\": $(decode_log.requestId), \\"attackerFighterCasualties\\": $(parse.attackerFighterCasualties), \\"attackerBomberCasualties\\": $(parse.attackerBomberCasualties), \\"defenderFighterCasualties\\": $(parse.defenderFighterCasualties), \\"attackerId\\": $(parse.attackerId), \\"defenderId\\": $(parse.defenderId), \\"infrastructureDamage\\": $(parse.infrastructureDamage), \\"tankDamage\\": $(parse.tankDamage), \\"cruiseMissileDamage\\": $(parse.cruiseMissileDamage), \\"battleId\\": $(parse.battleId)}"]
-  encode_tx    [type=ethabiencode
-      abi="fulfillOracleRequest2(bytes32 requestId, uint256 payment, address callbackAddress, bytes4 callbackFunctionId, uint256 expiration, bytes calldata data)"
-      data="{\\"requestId\\": $(decode_log.requestId), \\"payment\\": $(decode_log.payment), \\"callbackAddress\\": $(decode_log.callbackAddr), \\"callbackFunctionId\\": $(decode_log.callbackFunctionId), \\"expiration\\": $(decode_log.cancelExpiration), \\"data\\": $(encode_data)}"
-    ]
-  submit_tx    [type=ethtx to="${oracleAddress}" data="$(encode_tx)"]
+  // const airBattleOutputForConsole = `
+  // type = "directrequest"
+  // schemaVersion = 1
+  // name = "${jobNameAirBattle}"
+  // externalJobID = "${airBattleExternalID}"
+  // maxTaskDuration = "0s"
+  // contractAddress = "${oracleAddress}"
+  // observationSource = """
+  // decode_log   [type=ethabidecodelog
+  //   abi="OracleRequest(bytes32 indexed specId, address requester, bytes32 requestId, uint256 payment, address callbackAddr, bytes4 callbackFunctionId, uint256 cancelExpiration, uint256 dataVersion, bytes data)"
+  //   data="$(jobRun.logData)"
+  //   topics="$(jobRun.logTopics)"]
+  // decode_cbor  [type=cborparse data="$(decode_log.data)"]
+  // fetch        [type=bridge name="air-battle" requestData="{\\"id\\": $(jobSpec.externalJobID), \\"data\\": $(decode_cbor)}"]
+  // parse       [type=jsonparse path="data" data="$(fetch)"]
+  // encode_data  [type=ethabiencode abi="(bytes32 requestId, bytes memory attackerFighterCasualties, bytes memory attackerBomberCasualties, bytes memory defenderFighterCasualties, uint256 attackerId, uint256 defenderId, uint256 infrastructureDamage, uint256 tankDamage, uint256 cruiseMissileDamage, uint256 battleId)" data="{ \\"requestId\\": $(decode_log.requestId), \\"attackerFighterCasualties\\": $(parse.attackerFighterCasualties), \\"attackerBomberCasualties\\": $(parse.attackerBomberCasualties), \\"defenderFighterCasualties\\": $(parse.defenderFighterCasualties), \\"attackerId\\": $(parse.attackerId), \\"defenderId\\": $(parse.defenderId), \\"infrastructureDamage\\": $(parse.infrastructureDamage), \\"tankDamage\\": $(parse.tankDamage), \\"cruiseMissileDamage\\": $(parse.cruiseMissileDamage), \\"battleId\\": $(parse.battleId)}"]
+  // encode_tx    [type=ethabiencode
+  //     abi="fulfillOracleRequest2(bytes32 requestId, uint256 payment, address callbackAddress, bytes4 callbackFunctionId, uint256 expiration, bytes calldata data)"
+  //     data="{\\"requestId\\": $(decode_log.requestId), \\"payment\\": $(decode_log.payment), \\"callbackAddress\\": $(decode_log.callbackAddr), \\"callbackFunctionId\\": $(decode_log.callbackFunctionId), \\"expiration\\": $(decode_log.cancelExpiration), \\"data\\": $(encode_data)}"
+  //   ]
+  // submit_tx    [type=ethtx to="${oracleAddress}" data="$(encode_tx)"]
 
-      decode_log -> decode_cbor -> fetch -> parse -> encode_data -> encode_tx -> submit_tx
-  """
-  `
+  //     decode_log -> decode_cbor -> fetch -> parse -> encode_data -> encode_tx -> submit_tx
+  // """
+  // `
   
-  console.log("AIR BATTLE JOB********", airBattleOutputForConsole);
+  // console.log("AIR BATTLE JOB********", airBattleOutputForConsole);
   
-    const electionOutputForConsole = `
-    type = "directrequest"
-    schemaVersion = 1
-    name = "${jobNameSenate}"
-    externalJobID = "${senateExternalID}"
-    maxTaskDuration = "0s"
-    contractAddress = "${oracleAddress}"
-    observationSource = """
-        decode_log   [type=ethabidecodelog
-          abi="OracleRequest(bytes32 indexed specId, address requester, bytes32 requestId, uint256 payment, address callbackAddr, bytes4 callbackFunctionId, uint256 cancelExpiration, uint256 dataVersion, bytes data)"
-          data="$(jobRun.logData)"
-          topics="$(jobRun.logTopics)"]
-        decode_cbor  [type=cborparse data="$(decode_log.data)"]
-        fetch        [type=bridge name="senate" requestData="{\\"id\\": $(jobSpec.externalJobID), \\"data\\": $(decode_cbor)}"]
-        parse       [type=jsonparse path="data" data="$(fetch)"]
-        encode_data  [type=ethabiencode abi="(bytes memory attackerFighterCasualties, bytes memory attackerBomberCasualties, bytes memory defenderFighterCasualties, uint256 attackerId, uint256 defenderId, uint256 infrastructureDamage, uint256 tankDamage, uint256 cruiseMissileDamage, uint256 battleId)" data="$(parse)"]
-        encode_tx    [type=ethabiencode
-            abi="fulfillOracleRequest2(bytes32 requestId, uint256 payment, address callbackAddress, bytes4 callbackFunctionId, uint256 expiration, bytes calldata data)"
-            data="{\\"requestId\\": $(decode_log.requestId), \\"payment\\": $(decode_log.payment), \\"callbackAddress\\": $(decode_log.callbackAddr), \\"callbackFunctionId\\": $(decode_log.callbackFunctionId), \\"expiration\\": $(decode_log.cancelExpiration), \\"data\\": $(encode_data)}"
-          ]
-        submit_tx    [type=ethtx to="${oracleAddress}" data="$(encode_tx)"]
+    // const electionOutputForConsole = `
+    // type = "directrequest"
+    // schemaVersion = 1
+    // name = "${jobNameSenate}"
+    // externalJobID = "${senateExternalID}"
+    // maxTaskDuration = "0s"
+    // contractAddress = "${oracleAddress}"
+    // observationSource = """
+    //     decode_log   [type=ethabidecodelog
+    //       abi="OracleRequest(bytes32 indexed specId, address requester, bytes32 requestId, uint256 payment, address callbackAddr, bytes4 callbackFunctionId, uint256 cancelExpiration, uint256 dataVersion, bytes data)"
+    //       data="$(jobRun.logData)"
+    //       topics="$(jobRun.logTopics)"]
+    //     decode_cbor  [type=cborparse data="$(decode_log.data)"]
+    //     fetch        [type=bridge name="senate" requestData="{\\"id\\": $(jobSpec.externalJobID), \\"data\\": $(decode_cbor)}"]
+    //     parse       [type=jsonparse path="data" data="$(fetch)"]
+    //     encode_data  [type=ethabiencode abi="(bytes memory attackerFighterCasualties, bytes memory attackerBomberCasualties, bytes memory defenderFighterCasualties, uint256 attackerId, uint256 defenderId, uint256 infrastructureDamage, uint256 tankDamage, uint256 cruiseMissileDamage, uint256 battleId)" data="$(parse)"]
+    //     encode_tx    [type=ethabiencode
+    //         abi="fulfillOracleRequest2(bytes32 requestId, uint256 payment, address callbackAddress, bytes4 callbackFunctionId, uint256 expiration, bytes calldata data)"
+    //         data="{\\"requestId\\": $(decode_log.requestId), \\"payment\\": $(decode_log.payment), \\"callbackAddress\\": $(decode_log.callbackAddr), \\"callbackFunctionId\\": $(decode_log.callbackFunctionId), \\"expiration\\": $(decode_log.cancelExpiration), \\"data\\": $(encode_data)}"
+    //       ]
+    //     submit_tx    [type=ethtx to="${oracleAddress}" data="$(encode_tx)"]
   
-        decode_log -> decode_cbor -> fetch -> parse -> encode_data -> encode_tx -> submit_tx
-    """
-    `
+    //     decode_log -> decode_cbor -> fetch -> parse -> encode_data -> encode_tx -> submit_tx
+    // """
+    // `
     
     // console.log("election job for console", electionOutputForConsole)
     
-    const groundBattleOutputForConsole = `
+    // const groundBattleOutputForConsole = `
+    // type = "directrequest"
+    // schemaVersion = 1
+    // name = "${groundBattleName}"
+    // externalJobID = "${groundBattleExternalID}"
+    // maxTaskDuration = "0s"
+    // contractAddress = "${oracleAddress}"
+    // observationSource = """
+    // decode_log   [type=ethabidecodelog
+    //   abi="OracleRequest(bytes32 indexed specId, address requester, bytes32 requestId, uint256 payment, address callbackAddr, bytes4 callbackFunctionId, uint256 cancelExpiration, uint256 dataVersion, bytes data)"
+    //   data="$(jobRun.logData)"
+    //   topics="$(jobRun.logTopics)"]
+    // decode_cbor  [type=cborparse data="$(decode_log.data)"]
+    // fetch        [type=bridge name="ground-battle" requestData="{\\"id\\": $(jobSpec.externalJobID), \\"data\\": $(decode_cbor)}"]
+    // parse       [type=jsonparse path="data" data="$(fetch)"]
+    // encode_data  [type=ethabiencode abi="(bytes32 requestId, uint256 battleId, uint256 attackerId, uint256 attackerSoldierLosses, uint256 attackerTankLosses, uint256 defenderId, uint256 defenderSoldierLosses, uint256 defenderTankLosses, uint256 warId, bool attackerVictory)" data="{ \\"requestId\\": $(decode_log.requestId), \\"battleId\\": $(parse.attackId), \\"attackerId\\": $(parse.attackerId), \\"attackerSoldierLosses\\": $(parse.attackerSoldierLosses), \\"attackerTankLosses\\": $(parse.attackerTankLosses), \\"defenderId\\": $(parse.defenderId), \\"defenderSoldierLosses\\": $(parse.defenderSoldierLosses), \\"defenderTankLosses\\": $(parse.defenderTankLosses), \\"warId\\": $(parse.warId), \\"attackerVictory\\": $(parse.attackVictory)}"]
+    // encode_tx    [type=ethabiencode
+    //     abi="fulfillOracleRequest2(bytes32 requestId, uint256 payment, address callbackAddress, bytes4 callbackFunctionId, uint256 expiration, bytes calldata data)"
+    //     data="{\\"requestId\\": $(decode_log.requestId), \\"payment\\": $(decode_log.payment), \\"callbackAddress\\": $(decode_log.callbackAddr), \\"callbackFunctionId\\": $(decode_log.callbackFunctionId), \\"expiration\\": $(decode_log.cancelExpiration), \\"data\\": $(encode_data)}"
+    //   ]
+    // submit_tx    [type=ethtx to="${oracleAddress}" data="$(encode_tx)"]
+  
+    //     decode_log -> decode_cbor -> fetch -> parse -> encode_data -> encode_tx -> submit_tx
+    // """
+    // `
+          
+    // console.log("ground battle job", groundBattleOutputForConsole)
+
+    const navalAttackOutputForConsole = `
     type = "directrequest"
     schemaVersion = 1
-    name = "${groundBattleName}"
-    externalJobID = "${groundBattleExternalID}"
+    name = "${navalAttackName}"
+    externalJobID = "${navalAttackExternalID}"
     maxTaskDuration = "0s"
     contractAddress = "${oracleAddress}"
     observationSource = """
@@ -302,9 +332,9 @@ export const createJob = async (taskArgs : any) => {
       data="$(jobRun.logData)"
       topics="$(jobRun.logTopics)"]
     decode_cbor  [type=cborparse data="$(decode_log.data)"]
-    fetch        [type=bridge name="ground-battle" requestData="{\\"id\\": $(jobSpec.externalJobID), \\"data\\": $(decode_cbor)}"]
+    fetch        [type=bridge name="naval-attack" requestData="{\\"id\\": $(jobSpec.externalJobID), \\"data\\": $(decode_cbor)}"]
     parse       [type=jsonparse path="data" data="$(fetch)"]
-    encode_data  [type=ethabiencode abi="(bytes32 requestId, uint256 battleId, uint256 attackerId, uint256 attackerSoldierLosses, uint256 attackerTankLosses, uint256 defenderId, uint256 defenderSoldierLosses, uint256 defenderTankLosses, uint256 warId, bool attackerVictory))" data="{ \\"requestId\\": $(decode_log.requestId), \\"battleId\\": $(parse.attackId), \\"attackerId\\": $(parse.attackerId), \\"attackerSoldierLosses\\": $(parse.attackerSoldierLosses), \\"attackerTankLosses\": $(parse.attackerTankLosses), \\"defenderId\\": $(parse.defenderId), \\"defenderSoldierLosses\\": $(parse.defenderSoldierLosses), \\"defenderTankLosses\\": $(parse.defenderTankLosses), \\"warId\\": $(parse.warId), \\"attackerVictory\\": $(parse.attackVictory)}"]
+    encode_data  [type=ethabiencode abi="(bytes32 requestId, uint256 battleId, uint256 attackerId, uint256 attackerSoldierLosses, uint256 attackerTankLosses, uint256 defenderId, uint256 defenderSoldierLosses, uint256 defenderTankLosses, uint256 warId, bool attackerVictory)" data="{ \\"requestId\\": $(decode_log.requestId), \\"battleId\\": $(parse.attackId), \\"attackerId\\": $(parse.attackerId), \\"attackerSoldierLosses\\": $(parse.attackerSoldierLosses), \\"attackerTankLosses\\": $(parse.attackerTankLosses), \\"defenderId\\": $(parse.defenderId), \\"defenderSoldierLosses\\": $(parse.defenderSoldierLosses), \\"defenderTankLosses\\": $(parse.defenderTankLosses), \\"warId\\": $(parse.warId), \\"attackerVictory\\": $(parse.attackVictory)}"]
     encode_tx    [type=ethabiencode
         abi="fulfillOracleRequest2(bytes32 requestId, uint256 payment, address callbackAddress, bytes4 callbackFunctionId, uint256 expiration, bytes calldata data)"
         data="{\\"requestId\\": $(decode_log.requestId), \\"payment\\": $(decode_log.payment), \\"callbackAddress\\": $(decode_log.callbackAddr), \\"callbackFunctionId\\": $(decode_log.callbackFunctionId), \\"expiration\\": $(decode_log.cancelExpiration), \\"data\\": $(encode_data)}"
@@ -315,7 +345,33 @@ export const createJob = async (taskArgs : any) => {
     """
     `
           
-    console.log("ground battle job", groundBattleOutputForConsole)
+    console.log("naval attack job", navalAttackOutputForConsole)
+
+//    const navybattle =  `
+//     type = "directrequest"
+//     schemaVersion = 1
+//     name = "Get > Uint256: 842"
+//     externalJobID = "f1d9c882-8aa0-4566-a1d3-2bf72f94edff"
+//     maxTaskDuration = "0s"
+//     contractAddress = "0x95cFcD85fE1C3e2B837Fe05ED5cc06e8193E843a"
+//     observationSource = """
+//     decode_log   [type=ethabidecodelog
+//       abi="OracleRequest(bytes32 indexed specId, address requester, bytes32 requestId, uint256 payment, address callbackAddr, bytes4 callbackFunctionId, uint256 cancelExpiration, uint256 dataVersion, bytes data)"
+//       data="$(jobRun.logData)"
+//       topics="$(jobRun.logTopics)"]
+//     decode_cbor  [type=cborparse data="$(decode_log.data)"]
+//     fetch        [type=bridge name="naval-attack" requestData="{\\"id\\": $(jobSpec.externalJobID), \\"data\\": $(decode_cbor)}"]
+//     parse       [type=jsonparse path="data" data="$(fetch)"]
+//     encode_data  [type=ethabiencode abi="(bytes32 requestId, bytes attackerLosses, bytes defenderLosses, uint256 battleId)" data="{ \\"requestId\\": $(decode_log.requestId), \\"attackerLosses\\": $(parse.attackerLosses), \\"defenderLosses\\": $(parse.defenderLosses), \\"battleId\\": $(parse.battleId) }"]
+//     encode_tx    [type=ethabiencode
+//         abi="fulfillOracleRequest2(bytes32 requestId, uint256 payment, address callbackAddress, bytes4 callbackFunctionId, uint256 expiration, bytes calldata data)"
+//         data="{\\"requestId\\": $(decode_log.requestId), \\"payment\\": $(decode_log.payment), \\"callbackAddress\\": $(decode_log.callbackAddr), \\"callbackFunctionId\\": $(decode_log.callbackFunctionId), \\"expiration\\": $(decode_log.cancelExpiration), \\"data\\": $(encode_data)}"
+//       ]
+//     submit_tx    [type=ethtx to="0x95cFcD85fE1C3e2B837Fe05ED5cc06e8193E843a" data="$(encode_tx)"]
+  
+//         decode_log -> decode_cbor -> fetch -> parse -> encode_data -> encode_tx -> submit_tx
+// """
+// `
 
 //   type = "directrequest"
 //   schemaVersion = 1
@@ -506,7 +562,7 @@ export const createJob = async (taskArgs : any) => {
     //   headers: {
     //     "content-type": "application/json",
     //     cookie: `blocalauth=localapibe315fd0c14b5e47:; isNotIncognito=true; _ga=GA1.1.2055974768.1644792885; ${authenticationToken}`,
-    //     Referer: "http://127.0.0.1:6688/jobs/new",
+        // Referer: "http://127.0.0.1:6688/jobs/new",
     //   },
     //   method: "POST",
     //   data: jobDesc,
@@ -515,7 +571,8 @@ export const createJob = async (taskArgs : any) => {
     // const dataToWrite = `export const jobId = "${externalID}";\n`;
     // const dataToWrite = `export const jobId = "${airBattleExternalID}";\n`;
     // const dataToWrite = `export const jobId = "${senateExternalID}";\n`;
-    const dataToWrite = `export const jobId = "${groundBattleExternalID}";\n`;
+    const dataToWrite = `export const jobId = "${navalAttackExternalID}";\n`;
+    // const dataToWrite = `export const jobId = "${groundBattleExternalID}";\n`;
 
     // Define the path
     const outputPath = path.join(__dirname, "..", 'jobMetadata.ts');
