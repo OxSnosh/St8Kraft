@@ -1246,11 +1246,13 @@ describe("Naval Actions", function () {
         const groundBattleContractLinkBalance = await linkToken.balanceOf(groundbattlecontract.address)
         // console.log("Test contract GroundBattle Balance:", Number(groundBattleContractLinkBalance));
 
+        await linkToken.connect(signer0).transfer(breakblockadecontract.address, BigInt(10000000000000000000))
+        const BreakBlockadeContractLinkBalance = await linkToken.balanceOf(breakblockadecontract.address)
+        console.log("Test contract Break Blockade Balance:", Number(BreakBlockadeContractLinkBalance));
+
         await linkToken.connect(signer0).transfer(navalattackcontract.address, BigInt(10000000000000000000))
         const navalAttackContractLinkBalance = await linkToken.balanceOf(navalattackcontract.address)
-        console.log("Test contract Naval Attack Balance:", Number(navalAttackContractLinkBalance));
-
-        
+        // console.log("Test contract Naval Attack Balance:", Number(navalAttackContractLinkBalance));      
         
         await linkToken.connect(signer0).transfer(signer0.address, BigInt(10000000000000000000))
         const linkBalanceSigner0 = await linkToken.balanceOf(signer0.address)
@@ -1262,7 +1264,6 @@ describe("Naval Actions", function () {
 
         const nodeAddress = metadata.nodeAddress;
         console.log("NODE ADDRESS", nodeAddress)
-
 
         await linkToken.connect(signer0).transfer(nodeAddress, BigInt(15000000000000000000))
         const linkBalanceNode = await linkToken.balanceOf(nodeAddress)
@@ -1301,21 +1302,25 @@ describe("Naval Actions", function () {
         await airbattlecontract.updateLinkAddress(metadata.linkAddress)
         await groundbattlecontract.updateLinkAddress(metadata.linkAddress)
         await navalattackcontract.updateLinkAddress(metadata.linkAddress)
+        await breakblockadecontract.updateLinkAddress(metadata.linkAddress)
 
         await testContract.updateOracleAddress(metadata.oracleAddress)
         await airbattlecontract.updateOracleAddress(metadata.oracleAddress)
         await groundbattlecontract.updateOracleAddress(metadata.oracleAddress)
         await navalattackcontract.updateOracleAddress(metadata.oracleAddress)
+        await breakblockadecontract.updateOracleAddress(metadata.oracleAddress)
         
         await testContract.updateJobId(jobIdBytes)
         await airbattlecontract.updateJobId(jobIdBytes)
         await groundbattlecontract.updateJobId(jobIdBytes)
         await navalattackcontract.updateJobId(jobIdBytes)
+        await breakblockadecontract.updateJobId(jobIdBytes)
         
         await testContract.updateFee(BigInt(1000000000000000000))
         await airbattlecontract.updateFee(BigInt(1000000000000000000))
         await groundbattlecontract.updateFee(BigInt(1000000000000000000))
         await navalattackcontract.updateFee(BigInt(1000000000000000000))
+        await breakblockadecontract.updateFee(BigInt(1000000000000000000))
 
     });
 
@@ -1568,24 +1573,16 @@ describe("Naval Actions", function () {
 
         it("tests that a break blockade attack occurs", async function () {
             await navycontract.connect(signer1).buyBattleship(2, 0);
-            await navycontract.connect(signer2).buyBattleship(2, 1);
             await navycontract.connect(signer1).buyCruiser(2, 0);
-            await navycontract.connect(signer2).buyCruiser(2, 1);
             await keepercontract.incrementGameDay();
             await navycontract2.connect(signer1).buyFrigate(2, 0);
-            await navycontract2.connect(signer2).buyFrigate(2, 1);
             await navycontract2.connect(signer1).buySubmarine(2, 0);
-            await navycontract2.connect(signer2).buySubmarine(2, 1);
             await keepercontract.incrementGameDay()
             await navycontract.connect(signer1).buyBattleship(2, 0);
-            await navycontract.connect(signer2).buyBattleship(2, 1);
             await navycontract.connect(signer1).buyCruiser(2, 0);
-            await navycontract.connect(signer2).buyCruiser(2, 1);
             await keepercontract.incrementGameDay();
             await navycontract2.connect(signer1).buyFrigate(2, 0);
-            await navycontract2.connect(signer2).buyFrigate(2, 1);
             await navycontract2.connect(signer1).buySubmarine(2, 0);
-            await navycontract2.connect(signer2).buySubmarine(2, 1);
             await navalblockadecontract.connect(signer1).blockade(0, 1, 0);
             const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
             const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
@@ -1594,16 +1591,26 @@ describe("Naval Actions", function () {
                 console.log(Number(requestIdReturn), "requestIdReturn for Event");
             }
             await vrfCoordinatorV2Mock.fulfillRandomWords(7, navalblockadecontract.address);
-            await keepercontract.incrementGameDay()
+            await navycontract2.connect(signer2).buyFrigate(2, 1);
+            await navycontract2.connect(signer2).buySubmarine(2, 1);
+            await keepercontract.incrementGameDay();
+            await navycontract.connect(signer2).buyBattleship(2, 1);
+            await navycontract.connect(signer2).buyCruiser(2, 1);
+            await keepercontract.incrementGameDay();
+            await navycontract.connect(signer2).buyBattleship(2, 1);
+            await navycontract.connect(signer2).buyCruiser(2, 1);
+            await keepercontract.incrementGameDay();
+            await navycontract2.connect(signer2).buyFrigate(2, 1);
+            await navycontract2.connect(signer2).buySubmarine(2, 1);
             console.log("Naval Attack");
-            await breakblockadecontract.connect(signer1).breakBlockade(0, 0, 1);
+            await breakblockadecontract.connect(signer2).breakBlockade(0, 1, 0);
             // const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
             // const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
             // for (const log of event1Logs) {
             //     const requestIdReturn = log.args.requestId;
             //     // console.log(Number(requestIdReturn), "requestIdReturn for Event");
             // }
-            const tx = await vrfCoordinatorV2Mock.fulfillRandomWords(8,navalattackcontract.address);
+            const tx = await vrfCoordinatorV2Mock.fulfillRandomWords(8,breakblockadecontract.address);
 
             // Wait for the transaction to be mined
             const receipt = await tx.wait();

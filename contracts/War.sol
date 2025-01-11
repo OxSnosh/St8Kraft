@@ -478,6 +478,7 @@ contract WarContract is Ownable {
         } else if (warDoesntExist == false) {
             isActive = false;
         }
+        console.log(isActive, "war active");
         return isActive;
     }
 
