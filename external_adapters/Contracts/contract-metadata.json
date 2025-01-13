@@ -1,7 +1,7 @@
 {
   "HARDHAT": {
     "countryminter": {
-      "address": "0x3E017B45b12348920E3047E2f29fB2FB5c5a0A78",
+      "address": "0x1D8D70AD07C8E7E442AD78E4AC0A16f958Eba7F0",
       "ABI": [
         {
           "inputs": [],
@@ -1056,7 +1056,7 @@
       ]
     },
     "forcescontract": {
-      "address": "0xB2a8217Ee952f478BAf5DCf6cec4cF2c8dE61726",
+      "address": "0x9c65f85425c619A6cB6D29fF8d57ef696323d188",
       "ABI": [
         {
           "anonymous": false,
@@ -2233,7 +2233,7 @@
       ]
     },
     "nationstrengthcontract": {
-      "address": "0x64Bb17662A2d065108091489482d983a9c621eD2",
+      "address": "0x325c8Df4CFb5B068675AFF8f62aA668D1dEc3C4B",
       "ABI": [
         {
           "anonymous": false,
@@ -2565,7 +2565,7 @@
       ]
     },
     "treasurycontract": {
-      "address": "0x98c94eD035cf13A6db68F9A90Bf525a6EB999Ba6",
+      "address": "0x2e8880cAdC08E9B438c6052F5ce3869FBd6cE513",
       "ABI": [
         {
           "anonymous": false,
@@ -5021,7 +5021,7 @@
       ]
     },
     "spyoperationscontract": {
-      "address": "0x8dd5B467EE5e08074A3966aAe56F2424f71a6BBe",
+      "address": "0x06b3244b086cecC40F1e5A826f736Ded68068a0F",
       "ABI": [
         {
           "inputs": [
@@ -5207,7 +5207,7 @@
             },
             {
               "internalType": "uint256",
-              "name": "decryptedAttackerId",
+              "name": "attackerId",
               "type": "uint256"
             },
             {
@@ -5224,11 +5224,6 @@
               "internalType": "uint256",
               "name": "_randomnessRequestId",
               "type": "uint256"
-            },
-            {
-              "internalType": "bool",
-              "name": "valid",
-              "type": "bool"
             }
           ],
           "name": "completeSpyAttack",
@@ -5485,6 +5480,19 @@
           "inputs": [
             {
               "internalType": "address",
+              "name": "_relayer",
+              "type": "address"
+            }
+          ],
+          "name": "setRelayer",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
               "name": "_infrastructure",
               "type": "address"
             },
@@ -5574,6 +5582,24 @@
           "inputs": [
             {
               "internalType": "uint256",
+              "name": "defenderId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bool",
+              "name": "success",
+              "type": "bool"
+            }
+          ],
+          "name": "spyAttack",
+          "outputs": [],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
               "name": "encryptedAttackerId",
               "type": "uint256"
             },
@@ -5649,19 +5675,6 @@
           "inputs": [
             {
               "internalType": "address",
-              "name": "newAddress",
-              "type": "address"
-            }
-          ],
-          "name": "updateInfrastructureContract",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
               "name": "_oracleAddress",
               "type": "address"
             }
@@ -5713,7 +5726,7 @@
       ]
     },
     "groundbattlecontract": {
-      "address": "0xDf263D39EEDf880876c300015411c60081b0df49",
+      "address": "0x33E45b187da34826aBCEDA1039231Be46f1b05Af",
       "ABI": [
         {
           "inputs": [

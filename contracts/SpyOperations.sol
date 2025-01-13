@@ -128,11 +128,6 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         spy = SpyContract(_spies);
     }
 
-    function updateInfrastructureContract(address newAddress) public onlyOwner {
-        infrastructure = newAddress;
-        inf = InfrastructureContract(newAddress);
-    }
-
     bytes32 trainSpyJobId;
     address oracleAddress;
     uint256 fee;
@@ -214,9 +209,9 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256 defenderId,
         uint256 _attackId
     ) public {
-        uint256 gameDay = keep.getGameDay();
-        uint256 trainingDay = attackIdToDayTrained[_attackId];
-        require((gameDay - trainingDay) <= 5, "spy training expired");
+        // uint256 gameDay = keep.getGameDay();
+        // uint256 trainingDay = attackIdToDayTrained[_attackId];
+        // require((gameDay - trainingDay) <= 5, "spy training expired");
         uint256 attackType = attackIdToAttackType[_attackId];
         uint256 infrastructureAmount = inf.getInfrastructureCount(defenderId);
         uint256 techAmount = inf.getTechnologyCount(defenderId);
@@ -382,20 +377,34 @@ contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256 indexed defenderId
     );
 
+    address relayer;
+
+    function setRelayer(address _relayer) public onlyOwner {
+        relayer = _relayer; 
+    }
+
+    modifier onlyRelayer() {
+        require(msg.sender == relayer);
+        _;
+    }
+
+    function spyAttack(uint256 defenderId, bool success) public view onlyRelayer() {
+        console.log(defenderId);
+        console.log(success);
+    }
+
     function completeSpyAttack(
         bool success,
         uint256 _attackId,
-        uint256 decryptedAttackerId,
+        uint256 attackerId,
         uint256 defenderId,
         uint256 attackType,
-        uint256 _randomnessRequestId,
-        bool valid
+        uint256 _randomnessRequestId
     ) public {
-        require (valid, "invalid attack");
         if (!success) {
             emit spyAttackThwart(
                 _attackId,
-                decryptedAttackerId,
+                attackerId,
                 defenderId
             );
         } else if (success) {
