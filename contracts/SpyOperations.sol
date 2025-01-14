@@ -13,13 +13,17 @@ import "./KeeperFile.sol";
 import "./Spies.sol";
 import "./Missiles.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
+import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
 import "hardhat/console.sol";
 
 ///@title SpyOperationsContract
 ///@author OxSnosh
 ///@dev this contact inherits from openzeppelin's ownable contract
 ///@dev this contract inherits from chanlinks VRF contract
-contract SpyOperationsContract is Ownable {
+contract SpyOperationsContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
+    using Chainlink for Chainlink.Request;
 
     uint256 public attackId;
     address public forces;
@@ -34,6 +38,15 @@ contract SpyOperationsContract is Ownable {
     address public wonders2;
     address public countryMinter;
     address public keeper;
+
+    //Chainlik Variables
+    uint256[] private s_randomWords;
+    VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
+    uint64 private immutable i_subscriptionId;
+    bytes32 private immutable i_gasLane;
+    uint32 private immutable i_callbackGasLimit;
+    uint16 private constant REQUEST_CONFIRMATIONS = 3;
+    uint32 private constant NUM_WORDS = 3;
 
     ForcesContract force;
     InfrastructureContract inf;
@@ -61,6 +74,18 @@ contract SpyOperationsContract is Ownable {
     mapping(uint256 => uint256[]) public s_randomnessRequestIdToRandomWords;
 
     event randomNumbersRequested(uint256 indexed requestId);
+
+    constructor(
+        address vrfCoordinatorV2,
+        uint64 subscriptionId,
+        bytes32 gasLane, // keyHash
+        uint32 callbackGasLimit
+    ) VRFConsumerBaseV2(vrfCoordinatorV2) {
+        i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinatorV2);
+        i_gasLane = gasLane;
+        i_subscriptionId = subscriptionId;
+        i_callbackGasLimit = callbackGasLimit;
+    }
 
     function settings(
         address _infrastructure,
@@ -103,14 +128,91 @@ contract SpyOperationsContract is Ownable {
         spy = SpyContract(_spies);
     }
 
+    bytes32 trainSpyJobId;
+    address oracleAddress;
+    uint256 fee;
+    mapping(uint256 => bytes) attackIdToTrainedSpyPayload;
+    mapping(uint256 => uint256) attackIdToDayTrained;
+    mapping(uint256 => uint256) attackIdToAttackType;
+
+    function updateTrainSpyJobId(bytes32 _jobId) public onlyOwner {
+        trainSpyJobId = _jobId;
+    }
+
+    function updateOracleAddress(address _oracleAddress) public onlyOwner {
+        oracleAddress = _oracleAddress;
+    }
+
+    function updateFee(uint256 _fee) public onlyOwner {
+        fee = _fee;
+    }
+
+    /**@param attackType is the type of attack
+     * 1. destroy cruise missiles
+     * 2. destroy defending tanks
+     * 3. capture land
+     * 4. change governemnt
+     * 5. change religion
+     * 6. chenge threat level
+     * 7. change defcon
+     * 8. destroy spies
+     * 9. capture tech
+     * 10. sabatoge taxes
+     * 11. capture money reserves
+     * 12. capture infrastructure
+     * 13. destroy nukes
+     */
+    function trainSpy(
+        uint256 encryptedAttackerId,
+        uint256 encryptedDefenderId,
+        uint256 attackType
+    ) public {
+        require(attackType >= 1, "invalid attack type");
+        require(attackType <= 13, "invalid attack type");
+        attackIdToAttackType[attackId] = attackType;
+        Chainlink.Request memory req = buildChainlinkRequest(
+            trainSpyJobId,
+            address(this),
+            this.completeSpyTraining.selector
+        );
+        req.addUint("attackId", attackId);
+        req.addUint("encryptedAttackerId", encryptedAttackerId);
+        req.addUint("encryptedDefenderId", encryptedDefenderId);
+        req.addUint("attackType", attackType);
+        req.addBytes("msgSender", abi.encodePacked(msg.sender));
+        sendChainlinkRequestTo(oracleAddress, req, fee);
+        attackId++;
+    }
+
+    function completeSpyTraining(
+        uint256 _attackId,
+        bytes memory encryptedPayload
+    ) public {
+        attackIdToTrainedSpyPayload[_attackId] = encryptedPayload;
+        uint256 gameDay = keep.getGameDay();
+        attackIdToDayTrained[_attackId] = gameDay;
+    }
+
+    uint256 randomnessRequestId;
+
+    mapping(uint256 => uint256) randomnessRequestToAttackId;
+    mapping(uint256 => uint256) randomnessRequestToEncryptedAttackerId;
+    mapping(uint256 => uint256) randomnessRequestToDefenderId;
+
     ///@dev this functin is callable only by a nation owner and will allow a naton to conduct a spy operation
     ///@notice this function will allow a nation to conduct a spy operation against another nation
+    ///@param encryptedAttackerId is the id of the attacking nation
     ///@param defenderId is the id of the defending nation
-    ///@param attackType the id of the attack as it is stored on this contract
-    function checkSpyOperation(
+    ///@param _attackId is the id of the attack as it is stored on this contract
+    function conductSpyOperation(
+        uint256 encryptedAttackerId,
         uint256 defenderId,
-        uint256 attackType
-    ) public view returns (bool) {
+        uint256 _attackId
+    ) public {
+        // uint256 gameDay = keep.getGameDay();
+        // uint256 trainingDay = attackIdToDayTrained[_attackId];
+        // require((gameDay - trainingDay) <= 5, "spy training expired");
+        uint256 attackType = attackIdToAttackType[_attackId];
         uint256 infrastructureAmount = inf.getInfrastructureCount(defenderId);
         uint256 techAmount = inf.getTechnologyCount(defenderId);
         uint256 landAmount = inf.getLandCount(defenderId);
@@ -147,9 +249,66 @@ contract SpyOperationsContract is Ownable {
                 );
             }
         }
-        return true;
+        randomnessRequestToAttackId[randomnessRequestId] = _attackId;
+        randomnessRequestToEncryptedAttackerId[
+            randomnessRequestId
+        ] = encryptedAttackerId;
+        randomnessRequestToDefenderId[randomnessRequestId] = defenderId;
+        fulfillRequest(randomnessRequestId);
+        randomnessRequestId++;
     }
 
+    //make internal
+    function fulfillRequest(uint256 _randomnessRequestId) internal {
+        uint256 requestId = i_vrfCoordinator.requestRandomWords(
+            i_gasLane,
+            i_subscriptionId,
+            REQUEST_CONFIRMATIONS,
+            i_callbackGasLimit,
+            NUM_WORDS
+        );
+        s_requestIdToRequestIndex[requestId] = _randomnessRequestId;
+        emit randomNumbersRequested(_randomnessRequestId);
+    }
+
+    bytes32 executeAttackJobId;
+
+    function updateExecuteAttackJobId(bytes32 _jobId) public onlyOwner {
+        executeAttackJobId = _jobId;
+    }
+
+    function fulfillRandomWords(
+        uint256 _randomnessRequestId,
+        uint256[] memory randomWords
+    ) internal override {
+        s_randomnessRequestIdToRandomWords[_randomnessRequestId] = randomWords;
+        uint256 defenderIdOfRequest = randomnessRequestToDefenderId[
+            _randomnessRequestId
+        ];
+        uint256 encryptedAttackerIdOfRequest = randomnessRequestToEncryptedAttackerId[
+                _randomnessRequestId
+            ];
+        uint256 _attackIdOfRequest = randomnessRequestToAttackId[
+            _randomnessRequestId
+        ];
+        bytes memory encryptedPayload = attackIdToTrainedSpyPayload[
+            _attackIdOfRequest
+        ];
+        Chainlink.Request memory req = buildChainlinkRequest(
+            executeAttackJobId,
+            address(this),
+            this.completeSpyAttack.selector
+        );
+        req.addUint("defederIdOfRequest", defenderIdOfRequest);
+        req.addUint(
+            "encryptedAttackerIdOfRequest",
+            encryptedAttackerIdOfRequest
+        );
+        req.addBytes("encryptedPayload", encryptedPayload);
+        req.addBytes("randomNumber", abi.encodePacked(randomWords[0]));
+        req.addUint("randomnessRequestId", _randomnessRequestId);
+        sendChainlinkRequestTo(oracleAddress, req, fee);
+    }
 
     function getAttackerSuccessScore(
         uint256 countryId
@@ -212,16 +371,10 @@ contract SpyOperationsContract is Ownable {
         return defenseSuccessScore;
     }
 
-    event SpyAttackThwart(
+    event spyAttackThwart(
         uint256 indexed attackId,
         uint256 indexed decryptedAttackerId,
         uint256 indexed defenderId
-    );
-
-    event SpyAttackSuccess(
-        uint256 indexed attackId,
-        uint256 indexed defenderId,
-        uint256 indexed attackType
     );
 
     address relayer;
@@ -235,23 +388,9 @@ contract SpyOperationsContract is Ownable {
         _;
     }
 
-    function spyAttack(bool success, uint256 attackType, uint256 defenderId, uint256 attackerId, uint256 cost, uint256 randomNumber) public onlyRelayer() {
-        console.log("success", success);
-        console.log("defenderId", defenderId);
-        console.log("attackerId", attackerId);
-        console.log("attackType", attackType);
-        console.log("cost", cost);
-        console.log("randomNumber", randomNumber);
-        if (success) {
-            tsy.spendBalance(attackerId, cost);
-            emit SpyAttackSuccess (
-                attackId,
-                defenderId,
-                attackType
-            );
-            completeSpyAttack(success, attackId, attackerId, defenderId, attackType, randomNumber);
-        }
-        attackId++;
+    function spyAttack(uint256 defenderId, bool success) public view onlyRelayer() {
+        console.log(defenderId);
+        console.log(success);
     }
 
     function completeSpyAttack(
@@ -260,39 +399,39 @@ contract SpyOperationsContract is Ownable {
         uint256 attackerId,
         uint256 defenderId,
         uint256 attackType,
-        uint256 randomNumber
-    ) internal {
+        uint256 _randomnessRequestId
+    ) public {
         if (!success) {
-            emit SpyAttackThwart(
+            emit spyAttackThwart(
                 _attackId,
                 attackerId,
                 defenderId
             );
         } else if (success) {
             if (attackType == 1) {
-                destroyCruiseMissiles(defenderId, randomNumber);
+                destroyCruiseMissiles(defenderId, _randomnessRequestId);
             } else if (attackType == 2) {
-                destroyDefendingTanks(defenderId, randomNumber);
+                destroyDefendingTanks(defenderId, _randomnessRequestId);
             } else if (attackType == 3) {
-                captureLand(defenderId, randomNumber);
+                captureLand(defenderId, _randomnessRequestId);
             } else if (attackType == 4) {
-                changeDesiredGovernment(defenderId, randomNumber);
+                changeDesiredGovernment(defenderId, _randomnessRequestId);
             } else if (attackType == 5) {
-                changeDesiredReligion(defenderId, randomNumber);
+                changeDesiredReligion(defenderId, _randomnessRequestId);
             } else if (attackType == 6) {
                 changeThreatLevel(defenderId);
             } else if (attackType == 7) {
                 changeDefconLevel(defenderId);
             } else if (attackType == 8) {
-                destroySpies(defenderId, randomNumber);
+                destroySpies(defenderId, _randomnessRequestId);
             } else if (attackType == 9) {
-                captueTechnology(defenderId, randomNumber);
+                captueTechnology(defenderId, _randomnessRequestId);
             } else if (attackType == 10) {
-                sabotogeTaxes(defenderId, randomNumber);
+                sabotogeTaxes(defenderId, _randomnessRequestId);
             } else if (attackType == 11) {
                 destroyMoneyReserves(defenderId);
             } else if (attackType == 12) {
-                captureInfrastructure(defenderId, randomNumber);
+                captureInfrastructure(defenderId, _randomnessRequestId);
             } else {
                 destroyNukes(defenderId);
             }
@@ -301,40 +440,55 @@ contract SpyOperationsContract is Ownable {
 
     function destroyCruiseMissiles(
         uint256 defenderId,
-        uint256 randomNumber
+        uint256 _randomnessRequestId
     ) internal {
-        uint256 randomNumber2 = (randomNumber % 5) + 1;
+        uint256[] memory randomNumbers = s_randomnessRequestIdToRandomWords[
+            _randomnessRequestId
+        ];
+        uint256 randomNumber2 = (randomNumbers[1] % 5) + 1;
         mis.decreaseCruiseMissileCount(randomNumber2, defenderId);
     }
 
     function destroyDefendingTanks(
         uint256 defenderId,
-        uint256 randomNumber
+        uint256 _randomnessRequestId
     ) internal {
-        uint256 randomPercentage = ((randomNumber % 5) + 5);
+        //random number between 5% and 10%
+        uint256[] memory randomNumbers = s_randomnessRequestIdToRandomWords[
+            _randomnessRequestId
+        ];
+        uint256 randomNumber = ((randomNumbers[1] % 5) + 5);
         uint256 defendingTankCount = force.getDefendingTankCount(defenderId);
-        uint256 tankAmountToDecrease = ((defendingTankCount * randomPercentage) /
+        uint256 tankAmountToDecrease = ((defendingTankCount * randomNumber) /
             100);
         force.decreaseDefendingTankCount(tankAmountToDecrease, defenderId);
     }
 
     function captureLand(
         uint256 defenderId,
-        uint256 randomNumber
+        uint256 _randomnessRequestId
     ) internal {
-        uint256 randomNumberToDecreaseFromDefender = ((randomNumber % 10) +
+        //random number between 5 and 15
+        uint256[] memory randomNumbers = s_randomnessRequestIdToRandomWords[
+            _randomnessRequestId
+        ];
+        uint256 randomNumberToDecreaseFromDefender = ((randomNumbers[1] % 10) +
             5);
         inf.decreaseLandCountFromSpyContract(defenderId, randomNumberToDecreaseFromDefender);
     }
 
     function changeDesiredGovernment(
         uint256 defenderId,
-        uint256 randomNumber
+        uint256 _randomnessRequestId
     ) internal {
+        //new government randomly chosen
+        uint256[] memory randomNumbers = s_randomnessRequestIdToRandomWords[
+            _randomnessRequestId
+        ];
         uint256 governmentPreference = params.getGovernmentPreference(
             defenderId
         );
-        uint256 newPreference = ((randomNumber % 10) + 1);
+        uint256 newPreference = ((randomNumbers[1] % 10) + 1);
         if (newPreference == governmentPreference) {
             if (governmentPreference == 1) {
                 newPreference += 1;
@@ -347,10 +501,14 @@ contract SpyOperationsContract is Ownable {
 
     function changeDesiredReligion(
         uint256 defenderId,
-        uint256 randomNumber
+        uint256 _randomnessRequestId
     ) internal {
+        //new religion randomly chosen
+        uint256[] memory randomNumbers = s_randomnessRequestIdToRandomWords[
+            _randomnessRequestId
+        ];
         uint256 religionPreference = params.getReligionPreference(defenderId);
-        uint256 newPreference = ((randomNumber % 14) + 1);
+        uint256 newPreference = ((randomNumbers[1] % 14) + 1);
         if (newPreference == religionPreference) {
             if (religionPreference == 1) {
                 newPreference += 1;
@@ -375,10 +533,14 @@ contract SpyOperationsContract is Ownable {
 
     function destroySpies(
         uint256 defenderId,
-        uint256 randomNumber
+        uint256 _randomnessRequestId
     ) internal {
+        //max 20
+        uint256[] memory randomNumbers = s_randomnessRequestIdToRandomWords[
+            _randomnessRequestId
+        ];
         uint256 spyCount = spy.getSpyCount(defenderId);
-        uint256 spyCountToDestroy = ((randomNumber % 20) + 1);
+        uint256 spyCountToDestroy = ((randomNumbers[1] % 20) + 1);
         if (spyCountToDestroy > spyCount) {
             spyCountToDestroy = spyCount;
         }
@@ -387,18 +549,24 @@ contract SpyOperationsContract is Ownable {
 
     function captueTechnology(
         uint256 defenderId,
-        uint256 randomNumber
+        uint256 _randomnessRequestId
     ) internal {
-        uint256 randomNumberToCapture = ((randomNumber % 10) + 5);
+        //random number between 5 and 15
+        uint256[] memory randomNumbers = s_randomnessRequestIdToRandomWords[
+            _randomnessRequestId
+        ];
+        uint256 randomNumberToCapture = ((randomNumbers[1] % 10) + 5);
         inf.decreaseTechCountFromSpyContract(defenderId, randomNumberToCapture);
     }
 
     function sabotogeTaxes(
         uint256 defenderId,
-        uint256 randomNumber
+        uint256 _randomnessRequestId
     ) internal {
-
-        uint256 randomNumberToSetTaxes = ((randomNumber % 4) + 20);
+        uint256[] memory randomNumbers = s_randomnessRequestIdToRandomWords[
+            _randomnessRequestId
+        ];
+        uint256 randomNumberToSetTaxes = ((randomNumbers[1] % 4) + 20);
         inf.setTaxRateFromSpyContract(defenderId, randomNumberToSetTaxes);
     }
 
@@ -416,9 +584,13 @@ contract SpyOperationsContract is Ownable {
 
     function captureInfrastructure(
         uint256 defenderId,
-        uint256 randomNumber
+        uint256 _randomnessRequestId
     ) internal {
-        uint256 randomNumberToExchange = ((randomNumber % 10) + 5);
+        //random between 5 and 15
+        uint256[] memory randomNumbers = s_randomnessRequestIdToRandomWords[
+            _randomnessRequestId
+        ];
+        uint256 randomNumberToExchange = ((randomNumbers[1] % 10) + 5);
         inf.decreaseInfrastructureCountFromSpyContract(
             defenderId,
             randomNumberToExchange

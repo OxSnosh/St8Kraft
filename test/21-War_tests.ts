@@ -68,7 +68,7 @@ import {
 import LinkTokenArtifact from "../artifacts/@chainlink/contracts/src/v0.4/LinkToken.sol/LinkToken.json";
 import { networkConfig } from "../helper-hardhat-config"
 
-describe("War", function () {
+describe("Adapter Test", function () {
   
   // const oracleAbi = OracleArtifact.abi;
   // const linkTokenAbi = LinkTokenArtifact.abi;
@@ -400,7 +400,7 @@ describe("War", function () {
     // console.log(`SpyContract deployed to ${spycontract.address}`)
     
     const SpyOperationsContract = await ethers.getContractFactory("SpyOperationsContract")
-    spyoperationscontract = await SpyOperationsContract.deploy() as SpyOperationsContract
+    spyoperationscontract = await SpyOperationsContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as SpyOperationsContract
     await spyoperationscontract.deployed()
     // console.log(`SpyOperationsContract deployed to ${spyoperationscontract.address}`)
 

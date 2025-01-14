@@ -1,7 +1,7 @@
 {
   "HARDHAT": {
     "countryminter": {
-      "address": "0x24CF582274bC09531d1e4B7370c2c0106414a57c",
+      "address": "0x1D8D70AD07C8E7E442AD78E4AC0A16f958Eba7F0",
       "ABI": [
         {
           "inputs": [],
@@ -1056,7 +1056,7 @@
       ]
     },
     "forcescontract": {
-      "address": "0x8AF050C126B1EfaCAD71DB8CbB528E48167B714a",
+      "address": "0x9c65f85425c619A6cB6D29fF8d57ef696323d188",
       "ABI": [
         {
           "anonymous": false,
@@ -2233,7 +2233,7 @@
       ]
     },
     "nationstrengthcontract": {
-      "address": "0x49e6bBc93948E1EaeBd5EFE0005213F3D70363c0",
+      "address": "0x325c8Df4CFb5B068675AFF8f62aA668D1dEc3C4B",
       "ABI": [
         {
           "anonymous": false,
@@ -2565,7 +2565,7 @@
       ]
     },
     "treasurycontract": {
-      "address": "0x5829c0ACcB7DB9ED6a22365630F07CE1a9D7485b",
+      "address": "0x2e8880cAdC08E9B438c6052F5ce3869FBd6cE513",
       "ABI": [
         {
           "anonymous": false,
@@ -5021,8 +5021,89 @@
       ]
     },
     "spyoperationscontract": {
-      "address": "0xCBe50Ec327dCefC93d4E0c74103DD3b8851c8758",
+      "address": "0x06b3244b086cecC40F1e5A826f736Ded68068a0F",
       "ABI": [
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "vrfCoordinatorV2",
+              "type": "address"
+            },
+            {
+              "internalType": "uint64",
+              "name": "subscriptionId",
+              "type": "uint64"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "gasLane",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "callbackGasLimit",
+              "type": "uint32"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "have",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "want",
+              "type": "address"
+            }
+          ],
+          "name": "OnlyCoordinatorCanFulfill",
+          "type": "error"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "id",
+              "type": "bytes32"
+            }
+          ],
+          "name": "ChainlinkCancelled",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "id",
+              "type": "bytes32"
+            }
+          ],
+          "name": "ChainlinkFulfilled",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "id",
+              "type": "bytes32"
+            }
+          ],
+          "name": "ChainlinkRequested",
+          "type": "event"
+        },
         {
           "anonymous": false,
           "inputs": [
@@ -5048,23 +5129,11 @@
             {
               "indexed": true,
               "internalType": "uint256",
-              "name": "attackId",
-              "type": "uint256"
-            },
-            {
-              "indexed": true,
-              "internalType": "uint256",
-              "name": "defenderId",
-              "type": "uint256"
-            },
-            {
-              "indexed": true,
-              "internalType": "uint256",
-              "name": "attackType",
+              "name": "requestId",
               "type": "uint256"
             }
           ],
-          "name": "SpyAttackSuccess",
+          "name": "randomNumbersRequested",
           "type": "event"
         },
         {
@@ -5089,20 +5158,7 @@
               "type": "uint256"
             }
           ],
-          "name": "SpyAttackThwart",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "uint256",
-              "name": "requestId",
-              "type": "uint256"
-            }
-          ],
-          "name": "randomNumbersRequested",
+          "name": "spyAttackThwart",
           "type": "event"
         },
         {
@@ -5140,6 +5196,21 @@
         {
           "inputs": [
             {
+              "internalType": "bool",
+              "name": "success",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint256",
+              "name": "_attackId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "attackerId",
+              "type": "uint256"
+            },
+            {
               "internalType": "uint256",
               "name": "defenderId",
               "type": "uint256"
@@ -5148,17 +5219,57 @@
               "internalType": "uint256",
               "name": "attackType",
               "type": "uint256"
-            }
-          ],
-          "name": "checkSpyOperation",
-          "outputs": [
+            },
             {
-              "internalType": "bool",
-              "name": "",
-              "type": "bool"
+              "internalType": "uint256",
+              "name": "_randomnessRequestId",
+              "type": "uint256"
             }
           ],
-          "stateMutability": "view",
+          "name": "completeSpyAttack",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "_attackId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "encryptedPayload",
+              "type": "bytes"
+            }
+          ],
+          "name": "completeSpyTraining",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "encryptedAttackerId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "defenderId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "_attackId",
+              "type": "uint256"
+            }
+          ],
+          "name": "conductSpyOperation",
+          "outputs": [],
+          "stateMutability": "nonpayable",
           "type": "function"
         },
         {
@@ -5317,6 +5428,24 @@
           "type": "function"
         },
         {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "requestId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256[]",
+              "name": "randomWords",
+              "type": "uint256[]"
+            }
+          ],
+          "name": "rawFulfillRandomWords",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
           "inputs": [],
           "name": "renounceOwnership",
           "outputs": [],
@@ -5452,37 +5581,40 @@
         {
           "inputs": [
             {
-              "internalType": "bool",
-              "name": "success",
-              "type": "bool"
-            },
-            {
-              "internalType": "uint256",
-              "name": "attackType",
-              "type": "uint256"
-            },
-            {
               "internalType": "uint256",
               "name": "defenderId",
               "type": "uint256"
             },
             {
-              "internalType": "uint256",
-              "name": "attackerId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "cost",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "randomNumber",
-              "type": "uint256"
+              "internalType": "bool",
+              "name": "success",
+              "type": "bool"
             }
           ],
           "name": "spyAttack",
+          "outputs": [],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "encryptedAttackerId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "encryptedDefenderId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "attackType",
+              "type": "uint256"
+            }
+          ],
+          "name": "trainSpy",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -5514,6 +5646,58 @@
           "type": "function"
         },
         {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "_jobId",
+              "type": "bytes32"
+            }
+          ],
+          "name": "updateExecuteAttackJobId",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "_fee",
+              "type": "uint256"
+            }
+          ],
+          "name": "updateFee",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_oracleAddress",
+              "type": "address"
+            }
+          ],
+          "name": "updateOracleAddress",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes32",
+              "name": "_jobId",
+              "type": "bytes32"
+            }
+          ],
+          "name": "updateTrainSpyJobId",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
           "inputs": [],
           "name": "wonders1",
           "outputs": [
@@ -5542,7 +5726,7 @@
       ]
     },
     "groundbattlecontract": {
-      "address": "0x98072100E4487329144617dEeC1912fdF886F3E1",
+      "address": "0x33E45b187da34826aBCEDA1039231Be46f1b05Af",
       "ABI": [
         {
           "inputs": [

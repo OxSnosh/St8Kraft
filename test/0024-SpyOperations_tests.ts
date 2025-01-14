@@ -69,7 +69,7 @@ import { networkConfig } from "../helper-hardhat-config"
 import { relaySpyOperation } from "../scripts/spy_attack_relayer"
 import fs from "fs"
 
-describe("Spy Relayer Test", function () {
+describe("Adapter Test", function () {
   
   // const oracleAbi = OracleArtifact.abi;
   // const linkTokenAbi = LinkTokenArtifact.abi;
@@ -401,7 +401,7 @@ describe("Spy Relayer Test", function () {
     // console.log(`SpyContract deployed to ${spycontract.address}`)
     
     const SpyOperationsContract = await ethers.getContractFactory("SpyOperationsContract")
-    spyoperationscontract = await SpyOperationsContract.deploy() as SpyOperationsContract
+    spyoperationscontract = await SpyOperationsContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as SpyOperationsContract
     await spyoperationscontract.deployed()
     // console.log(`SpyOperationsContract deployed to ${spyoperationscontract.address}`)
 
@@ -1147,15 +1147,15 @@ describe("Spy Relayer Test", function () {
         const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
         for (const log of event1Logs) {
             const requestIdReturn = log.args.requestId;
-            // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            console.log(Number(requestIdReturn), "requestIdReturn for Event");
             if (requestIdReturn == 2) {
                 await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
                 let resources1 = await resourcescontract.getPlayerResources(0);
-                // console.log("resources 1", resources1[0].toNumber(), resources1[1].toNumber());
+                console.log("resources 1", resources1[0].toNumber(), resources1[1].toNumber());
             } else if (requestIdReturn == 4) {
                 await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
                 let resources2 = await resourcescontract.getPlayerResources(1);
-                // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
+                console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
             }
         }
 
@@ -1352,10 +1352,6 @@ describe("Spy Relayer Test", function () {
                 spyoperationscontract: {
                     address: spyoperationscontract.address,
                     ABI: spyOperationAbi
-                },
-                nationstrengthcontract: {
-                    address: nationstrengthcontract.address,
-                    ABI: nationStrengthAbi
                 }
             };
             fs.writeFileSync(
@@ -1371,11 +1367,11 @@ describe("Spy Relayer Test", function () {
             const signer = signer1;
             const message: string = "Hello Ethereum";
         
-            // console.log("Signer address:", signer.address);
+            console.log("Signer address:", signer.address);
         
             // Sign the message
             const signature = await signer.signMessage(message);
-            // console.log("Signature:", signature);
+            console.log("Signature:", signature);
         
             // Verify signature is a string
             expect(signature).to.be.a("string");
@@ -1388,7 +1384,6 @@ describe("Spy Relayer Test", function () {
                 messageHash : string
                 callerNationId : number
                 defenderNationId : number
-                attackType: number
             } 
 
             // Initialize the payload object
@@ -1396,8 +1391,8 @@ describe("Spy Relayer Test", function () {
                 signature: signature,
                 messageHash: messageHash,
                 callerNationId: 0,
-                defenderNationId: 1,
-                attackType: 1
+                defenderNationId: 1
+
             };
 
             await spyoperationscontract.setRelayer(signer0.address)
