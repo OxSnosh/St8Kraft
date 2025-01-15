@@ -5,11 +5,14 @@ const chai_1 = require("chai");
 const hardhat_1 = require("hardhat");
 const helper_hardhat_config_1 = require("../helper-hardhat-config");
 const helper_hardhat_config_2 = require("../helper-hardhat-config");
-describe("Bomber Contract", function () {
+describe("Bombers", function () {
+    // const oracleAbi = OracleArtifact.abi;
+    // const linkTokenAbi = LinkTokenArtifact.abi;
     let warbucks;
     let metanationsgovtoken;
     let aidcontract;
     let airbattlecontract;
+    let additionalairbattle;
     let billscontract;
     let bombersmarketplace1;
     let bombersmarketplace2;
@@ -69,7 +72,10 @@ describe("Bomber Contract", function () {
     let signers;
     let addrs;
     let vrfCoordinatorV2Mock;
+    let testContract;
+    let linkToken;
     beforeEach(async function () {
+        // console.log("hello world")
         signers = await hardhat_1.ethers.getSigners();
         signer0 = signers[0];
         signer1 = signers[1];
@@ -120,6 +126,10 @@ describe("Bomber Contract", function () {
         const AirBattleContract = await hardhat_1.ethers.getContractFactory("AirBattleContract");
         airbattlecontract = await AirBattleContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit);
         await airbattlecontract.deployed();
+        // console.log(`AirBattleContract deployed tp ${airbattlecontract.address}`)
+        const AdditionalAirBattleContract = await hardhat_1.ethers.getContractFactory("AdditionalAirBattle");
+        additionalairbattle = await AdditionalAirBattleContract.deploy();
+        await additionalairbattle.deployed();
         // console.log(`AirBattleContract deployed tp ${airbattlecontract.address}`)
         const BillsContract = await hardhat_1.ethers.getContractFactory("BillsContract");
         billscontract = await BillsContract.deploy();
@@ -273,7 +283,7 @@ describe("Bomber Contract", function () {
         await spycontract.deployed();
         // console.log(`SpyContract deployed to ${spycontract.address}`)
         const SpyOperationsContract = await hardhat_1.ethers.getContractFactory("SpyOperationsContract");
-        spyoperationscontract = await SpyOperationsContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit);
+        spyoperationscontract = await SpyOperationsContract.deploy();
         await spyoperationscontract.deployed();
         // console.log(`SpyOperationsContract deployed to ${spyoperationscontract.address}`)
         const TaxesContract = await hardhat_1.ethers.getContractFactory("TaxesContract");
@@ -315,7 +325,8 @@ describe("Bomber Contract", function () {
         // console.log("contracts deployed")
         await warbucks.settings(treasurycontract.address, countryminter.address);
         await aidcontract.settings(countryminter.address, treasurycontract.address, forcescontract.address, infrastructurecontract.address, keepercontract.address, wonderscontract1.address, senatecontract.address, countryparameterscontract.address);
-        await airbattlecontract.settings(warcontract.address, fighterscontract.address, bomberscontract.address, infrastructurecontract.address, forcescontract.address, fighterlosses.address, countryminter.address);
+        await airbattlecontract.settings(warcontract.address, fighterscontract.address, bomberscontract.address, infrastructurecontract.address, forcescontract.address, fighterlosses.address, countryminter.address, additionalairbattle.address);
+        await additionalairbattle.settings(warcontract.address, fighterscontract.address, bomberscontract.address, infrastructurecontract.address, forcescontract.address, fighterlosses.address, countryminter.address, airbattlecontract.address);
         await billscontract.settings(countryminter.address, treasurycontract.address, wonderscontract1.address, wonderscontract2.address, wonderscontract3.address, wonderscontract4.address, forcescontract.address, fighterscontract.address, navycontract.address, resourcescontract.address);
         await billscontract.settings2(improvementscontract1.address, improvementscontract2.address, missilescontract.address, wonderscontract4.address, infrastructurecontract.address, bonusresourcescontract.address, navycontract2.address, countryparameterscontract.address);
         await bomberscontract.settings(countryminter.address, bombersmarketplace1.address, bombersmarketplace2.address, airbattlecontract.address, treasurycontract.address, fighterscontract.address, infrastructurecontract.address, warcontract.address);

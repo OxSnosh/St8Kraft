@@ -400,7 +400,7 @@ describe("Naval Actions", function () {
     // console.log(`SpyContract deployed to ${spycontract.address}`)
     
     const SpyOperationsContract = await ethers.getContractFactory("SpyOperationsContract")
-    spyoperationscontract = await SpyOperationsContract.deploy(vrfCoordinatorV2Address, subscriptionId, gasLane, callbackGasLimit) as SpyOperationsContract
+    spyoperationscontract = await SpyOperationsContract.deploy() as SpyOperationsContract
     await spyoperationscontract.deployed()
     // console.log(`SpyOperationsContract deployed to ${spyoperationscontract.address}`)
 

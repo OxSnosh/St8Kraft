@@ -1,11 +1,17 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-//St8kraft © 2022 by OxSnosh is licensed under Attribution-NonCommercial-NoDerivatives 4.0 International
-const chai_1 = require("chai");
 const hardhat_1 = require("hardhat");
 const helper_hardhat_config_1 = require("../helper-hardhat-config");
+const metadata_1 = require("../scripts/deploy_localhost_node/deploy_jobs/metadata");
+const jobMetadata_1 = require("../scripts/deploy_localhost_node/deploy_jobs/jobMetadata");
+// import operatorArtifact from "../artifacts/contracts/tests/Operator.sol/Operator.json";
+// import OracleArtifact from "../artifacts/@chainlink/contracts/src/v0.4/Oracle.sol/Oracle.json";
+const LinkToken_json_1 = __importDefault(require("../artifacts/@chainlink/contracts/src/v0.4/LinkToken.sol/LinkToken.json"));
 const helper_hardhat_config_2 = require("../helper-hardhat-config");
-describe("Military", function () {
+describe("Air Battle Adapter Test", function () {
     // const oracleAbi = OracleArtifact.abi;
     // const linkTokenAbi = LinkTokenArtifact.abi;
     let warbucks;
@@ -396,63 +402,142 @@ describe("Military", function () {
         await wonderscontract3.settings(treasurycontract.address, infrastructurecontract.address, forcescontract.address, wonderscontract1.address, wonderscontract2.address, wonderscontract4.address, countryminter.address);
         await wonderscontract4.settings(treasurycontract.address, improvementscontract2.address, improvementscontract3.address, improvementscontract4.address, infrastructurecontract.address, wonderscontract1.address, wonderscontract3.address, countryminter.address);
         if (chainId == 31337 || chainId == 1337) {
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, cruisemissilecontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, nukecontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, airbattlecontract.address);
         }
+        console.log("hello world 1");
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000));
         await countryminter.connect(signer1).generateCountry("TestRuler", "TestNationName", "TestCapitalCity", "TestNationSlogan");
         await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000));
-        await countryminter.connect(signer2).generateCountry("NextRuler", "NextNationName", "NextCapitalCity", "NextNationSlogan");
+        await countryminter.connect(signer2).generateCountry("TestRuler2", "TestNationName2", "TestCapitalCity2", "TestNationSlogan2");
+        // console.log("hello world 2")
+        const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+        const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+        for (const log of event1Logs) {
+            const requestIdReturn = log.args.requestId;
+            // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            if (requestIdReturn == 2) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources1 = await resourcescontract.getPlayerResources(0);
+                // console.log("resources 1", resources1[0].toNumber(), resources1[1].toNumber());
+            }
+            else if (requestIdReturn == 4) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources2 = await resourcescontract.getPlayerResources(1);
+                // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
+            }
+        }
+        // console.log("hello world 3")
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000 * (10 ** 18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000 * (10 ** 18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(10000000000 * (10 ** 18)), 0);
+        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 2000);
+        await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
+        await forcescontract.connect(signer1).buySoldiers(2000, 0);
+        await forcescontract.connect(signer1).buyTanks(150, 0);
+        // await forcescontract.connect(signer1).buySpies(30, 0)
+        await billscontract.connect(signer1).payBills(0);
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000));
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000 * (10 ** 18)));
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(2000000000 * (10 ** 18)));
+        await treasurycontract.connect(signer2).addFunds(BigInt(2000000000 * (10 ** 18)), 1);
+        await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 2000);
+        await technologymarketcontrat.connect(signer2).buyTech(1, 1000);
+        await forcescontract.connect(signer2).buySoldiers(2000, 1);
+        await forcescontract.connect(signer2).buyTanks(150, 1);
+        await militarycontract.connect(signer1).toggleWarPeacePreference(0);
+        await militarycontract.connect(signer2).toggleWarPeacePreference(1);
+        await warcontract.connect(signer1).declareWar(0, 1);
+        await forcescontract.connect(signer1).deployForces(1000, 30, 0, 0);
+        await billscontract.connect(signer2).payBills(1);
+        // const LinkToken  = await ethers.getContractFactory(
+        //         "LinkToken"
+        // )
+        // let linkToken = await LinkToken.connect(signer0).deploy() as LinkToken
+        // await linkToken.deployed()
+        // const linkToken = new ethers.Contract(metadata.linkAddress, linkTokenAbi, signer0) as LinkToken;
+        // console.log("is this the place 0")
+        const contractABI = LinkToken_json_1.default.abi;
+        // console.log(contractABI)
+        const provider = new hardhat_1.ethers.providers.JsonRpcProvider("http://127.0.0.1:8545/");
+        // const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545/");
+        for (let i = 0; i < 50; i++) {
+            await hardhat_1.network.provider.send("evm_mine");
+        }
+        const contractAddress = metadata_1.metadata.linkAddress;
+        linkToken = new hardhat_1.ethers.Contract(contractAddress, contractABI, provider);
+        // const linkToken = await ethers.getContractAt("LinkToken", metadata.linkAddress) as LinkToken
+        // UNCOMMENT FROM HERE
+        // console.log("is this the place 1")
+        // console.log("address from metadata", metadata.linkAddress)
+        // console.log("address from test", linkToken.address)
+        const TestContract = await hardhat_1.ethers.getContractFactory("Test");
+        testContract = await TestContract.deploy();
+        await testContract.deployed();
+        // console.log("isseus")
+        // console.log(linkToken.address, "LINK token")
+        // console.log(linkToken, "LINK")
+        // console.log("more issues")
+        await linkToken.connect(signer0).transfer(testContract.address, BigInt(10000000000000000000));
+        const linkBalanceTestContract = await linkToken.balanceOf(testContract.address);
+        // console.log("Test contract LINK Balance:", Number(linkBalanceTestContract));
+        await linkToken.connect(signer0).transfer(airbattlecontract.address, BigInt(10000000000000000000));
+        const airBattleContractLinkBalance = await linkToken.balanceOf(airbattlecontract.address);
+        // console.log("Test contract AirBattle Balance:", Number(airBattleContractLinkBalance));
+        await linkToken.connect(signer0).transfer(signer0.address, BigInt(10000000000000000000));
+        const linkBalanceSigner0 = await linkToken.balanceOf(signer0.address);
+        // console.log("Signer1 LINK Balance:", Number(linkBalanceSigner0));
+        await linkToken.connect(signer0).transfer(signer1.address, BigInt(10000000000000000000));
+        const linkBalanceSigner1 = await linkToken.balanceOf(signer1.address);
+        // console.log("Signer0 LINK Balance:", Number(linkBalanceSigner1));
+        const nodeAddress = metadata_1.metadata.nodeAddress;
+        await linkToken.connect(signer0).transfer(nodeAddress, BigInt(15000000000000000000));
+        const linkBalanceNode = await linkToken.balanceOf(nodeAddress);
+        // console.log("Node LINK Balance:", Number(linkBalanceNode));
+        const operatorAddress = metadata_1.metadata.oracleAddress;
+        await linkToken.connect(signer0).transfer(operatorAddress, BigInt(25000000000000000000));
+        const linkBalanceOperator = await linkToken.balanceOf(operatorAddress);
+        // console.log("Operator LINK Balance:", Number(linkBalanceOperator));
+        // await linkToken.transferFrom(signer0.address, testContract.address, BigInt(1000000000000000000000))
+        // console.log("oracle address", metadata.oracleAddress);
+        console.log(jobMetadata_1.jobId, "JOBID");
+        const jobIdToRaw = jobMetadata_1.jobId;
+        const jobIdWithoutHyphens = jobIdToRaw.replace(/-/g, "");
+        // console.log("JobId", jobIdWithoutHyphens);
+        // const jobIdBytes = ethers.utils.toUtf8Bytes(jobIdWithoutHyphens)
+        // console.log(jobIdBytes);
+        const jobIdString = jobIdWithoutHyphens.toString();
+        const jobIdBytes = hardhat_1.ethers.utils.hexlify(hardhat_1.ethers.utils.toUtf8Bytes(jobIdString));
+        console.log(metadata_1.metadata.oracleAddress);
+        await testContract.updateLinkAddress(metadata_1.metadata.linkAddress);
+        await airbattlecontract.updateLinkAddress(metadata_1.metadata.linkAddress);
+        await testContract.updateOracleAddress(metadata_1.metadata.oracleAddress);
+        await airbattlecontract.updateOracleAddress(metadata_1.metadata.oracleAddress);
+        await testContract.updateJobId(jobIdBytes);
+        await airbattlecontract.updateJobId(jobIdBytes);
+        await testContract.updateFee(BigInt(1000000000000000000));
+        await airbattlecontract.updateFee(BigInt(1000000000000000000));
+        // console.log("maybe end of before each")
     });
-    describe("Military Contract", function () {
-        it("military1 tests if country initializes correctly", async function () {
-            var defcon = await militarycontract.getDefconLevel(0);
-            var threatLevel = await militarycontract.getThreatLevel(0);
-            var war = await militarycontract.getWarPeacePreference(0);
-            (0, chai_1.expect)(defcon.toNumber()).to.equal(5);
-            (0, chai_1.expect)(threatLevel.toNumber()).to.equal(1);
-            (0, chai_1.expect)(war).to.equal(false);
-        });
-        it("military1 tests if updateDefconLevel() works correctly", async function () {
-            await militarycontract.connect(signer1).updateDefconLevel(4, 0);
-            var defcon = await militarycontract.getDefconLevel(0);
-            (0, chai_1.expect)(defcon).to.equal(4);
-            await militarycontract.connect(signer1).updateDefconLevel(1, 0);
-            var defconUpdated = await militarycontract.getDefconLevel(0);
-            (0, chai_1.expect)(defconUpdated).to.equal(1);
-            await (0, chai_1.expect)(militarycontract.connect(signer1).updateDefconLevel(0, 0)).to.be.revertedWith("New DEFCON level is not an integer between 1 and 5");
-            await (0, chai_1.expect)(militarycontract.connect(signer1).updateDefconLevel(6, 0)).to.be.revertedWith("New DEFCON level is not an integer between 1 and 5");
-        });
-        it("military1 tests if updateThreatLevel() works correctly", async function () {
-            await militarycontract.connect(signer1).updateThreatLevel(2, 0);
-            var threat = await militarycontract.getThreatLevel(0);
-            (0, chai_1.expect)(threat).to.equal(2);
-            await militarycontract.connect(signer1).updateThreatLevel(5, 0);
-            var threatUpated = await militarycontract.getThreatLevel(0);
-            (0, chai_1.expect)(threatUpated).to.equal(5);
-            await (0, chai_1.expect)(militarycontract.connect(signer1).updateThreatLevel(0, 0)).to.be.revertedWith("Not a valid threat level");
-            await (0, chai_1.expect)(militarycontract.connect(signer1).updateThreatLevel(6, 0)).to.be.revertedWith("Not a valid threat level");
-        });
-        it("military1 tests if toggleWarPeacePreference() works correctly", async function () {
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0);
-            var war = await militarycontract.getWarPeacePreference(0);
-            (0, chai_1.expect)(war).to.equal(true);
-            await (0, chai_1.expect)(militarycontract.connect(signer1).toggleWarPeacePreference(0)).to.be.revertedWith("Must wait 7 days to switch to peace mode");
-            await keepercontract.incrementGameDay();
-            await keepercontract.incrementGameDay();
-            await keepercontract.incrementGameDay();
-            await keepercontract.incrementGameDay();
-            await keepercontract.incrementGameDay();
-            await keepercontract.incrementGameDay();
-            await keepercontract.incrementGameDay();
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0);
-            var war2 = await militarycontract.getWarPeacePreference(0);
-            (0, chai_1.expect)(war2).to.equal(false);
-        });
-        it("return days in pace mode", async function () {
-            var daysInPeace = await militarycontract.getDaysInPeaceMode(0);
-            (0, chai_1.expect)(daysInPeace).to.equal(0);
-            // console.log(daysInPeace.toNumber())
+    describe("Air Battle External Adapter", function () {
+        it("Should send a request to the node", async function () {
+            await fightersmarketplace2.connect(signer1).buyF22Raptor(15, 0);
+            await bombersmarketplace2.connect(signer1).buyTupolevTu160(7, 0);
+            const attackerFighters = [0, 0, 0, 0, 0, 0, 0, 0, 15];
+            const attackerBombers = [0, 0, 0, 0, 0, 0, 0, 0, 7];
+            await airbattlecontract.connect(signer1).airBattle(0, 0, 1, attackerFighters, attackerBombers);
+            const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+            const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+            for (const log of event1Logs) {
+                const requestIdReturn = log.args.requestId;
+                // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+                if (requestIdReturn == 5) {
+                    await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, airbattlecontract.address);
+                }
+            }
         });
     });
 });

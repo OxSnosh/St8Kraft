@@ -1,11 +1,17 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-//St8kraft © 2022 by OxSnosh is licensed under Attribution-NonCommercial-NoDerivatives 4.0 International
-const chai_1 = require("chai");
 const hardhat_1 = require("hardhat");
 const helper_hardhat_config_1 = require("../helper-hardhat-config");
+const metadata_1 = require("../scripts/deploy_localhost_node/deploy_jobs/metadata");
+const jobMetadata_1 = require("../scripts/deploy_localhost_node/deploy_jobs/jobMetadata");
+// import operatorArtifact from "../artifacts/contracts/tests/Operator.sol/Operator.json";
+// import OracleArtifact from "../artifacts/@chainlink/contracts/src/v0.4/Oracle.sol/Oracle.json";
+const LinkToken_json_1 = __importDefault(require("../artifacts/@chainlink/contracts/src/v0.4/LinkToken.sol/LinkToken.json"));
 const helper_hardhat_config_2 = require("../helper-hardhat-config");
-describe("Military", function () {
+describe("Senate Adapter Test", function () {
     // const oracleAbi = OracleArtifact.abi;
     // const linkTokenAbi = LinkTokenArtifact.abi;
     let warbucks;
@@ -69,6 +75,11 @@ describe("Military", function () {
     let signer5;
     let signer6;
     let signer7;
+    let signer8;
+    let signer9;
+    let signer10;
+    let signer11;
+    let signer12;
     let signers;
     let addrs;
     let vrfCoordinatorV2Mock;
@@ -85,6 +96,11 @@ describe("Military", function () {
         signer5 = signers[5];
         signer6 = signers[6];
         signer7 = signers[7];
+        signer8 = signers[8];
+        signer9 = signers[9];
+        signer10 = signers[10];
+        signer11 = signers[11];
+        signer12 = signers[12];
         let chainId;
         chainId = hardhat_1.network.config.chainId;
         let subscriptionId;
@@ -396,63 +412,198 @@ describe("Military", function () {
         await wonderscontract3.settings(treasurycontract.address, infrastructurecontract.address, forcescontract.address, wonderscontract1.address, wonderscontract2.address, wonderscontract4.address, countryminter.address);
         await wonderscontract4.settings(treasurycontract.address, improvementscontract2.address, improvementscontract3.address, improvementscontract4.address, infrastructurecontract.address, wonderscontract1.address, wonderscontract3.address, countryminter.address);
         if (chainId == 31337 || chainId == 1337) {
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, cruisemissilecontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, nukecontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, airbattlecontract.address);
         }
+        console.log("hello world 1");
+        // console.log("hello world 2")
+        // console.log("hello world 3")
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000));
         await countryminter.connect(signer1).generateCountry("TestRuler", "TestNationName", "TestCapitalCity", "TestNationSlogan");
         await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000));
         await countryminter.connect(signer2).generateCountry("NextRuler", "NextNationName", "NextCapitalCity", "NextNationSlogan");
+        await warbucks.connect(signer0).transfer(signer3.address, BigInt(2100000000000000000000000));
+        await countryminter.connect(signer3).generateCountry("NextRuler3", "NextNationName3", "NextCapitalCity3", "NextNationSlogan3");
+        await warbucks.connect(signer0).transfer(signer4.address, BigInt(2100000000000000000000000));
+        await countryminter.connect(signer4).generateCountry("NextRuler4", "NextNationName4", "NextCapitalCity4", "NextNationSlogan4");
+        await warbucks.connect(signer0).transfer(signer5.address, BigInt(2100000000000000000000000));
+        await countryminter.connect(signer5).generateCountry("NextRuler5", "NextNationName5", "NextCapitalCity5", "NextNationSlogan5");
+        await warbucks.connect(signer0).transfer(signer6.address, BigInt(2100000000000000000000000));
+        await countryminter.connect(signer6).generateCountry("NextRuler6", "NextNationName6", "NextCapitalCity6", "NextNationSlogan6");
+        await warbucks.connect(signer0).transfer(signer7.address, BigInt(2100000000000000000000000));
+        await countryminter.connect(signer7).generateCountry("NextRuler7", "NextNationName7", "NextCapitalCity7", "NextNationSlogan7");
+        await warbucks.connect(signer0).transfer(signer8.address, BigInt(2100000000000000000000000));
+        await countryminter.connect(signer8).generateCountry("NextRuler8", "NextNationName8", "NextCapitalCity8", "NextNationSlogan8");
+        await warbucks.connect(signer0).transfer(signer9.address, BigInt(2100000000000000000000000));
+        await countryminter.connect(signer9).generateCountry("NextRuler9", "NextNationName9", "NextCapitalCity9", "NextNationSlogan9");
+        await warbucks.connect(signer0).transfer(signer10.address, BigInt(2100000000000000000000000));
+        await countryminter.connect(signer10).generateCountry("NextRuler10", "NextNationName10", "NextCapitalCity10", "NextNationSlogan10");
+        await warbucks.connect(signer0).transfer(signer11.address, BigInt(2100000000000000000000000));
+        await countryminter.connect(signer11).generateCountry("NextRuler11", "NextNationName11", "NextCapitalCity11", "NextNationSlogan11");
+        await warbucks.connect(signer0).transfer(signer12.address, BigInt(2100000000000000000000000));
+        await countryminter.connect(signer12).generateCountry("NextRuler12", "NextNationName12", "NextCapitalCity12", "NextNationSlogan12");
+        const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+        const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+        for (const log of event1Logs) {
+            const requestIdReturn = log.args.requestId;
+            // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            if (requestIdReturn == 2) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources1 = await resourcescontract.getPlayerResources(0);
+                // console.log("resources 1", resources1[0].toNumber(), resources1[1].toNumber());
+            }
+            else if (requestIdReturn == 4) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources2 = await resourcescontract.getPlayerResources(1);
+                // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
+            }
+        }
+        await countryparameterscontract.connect(signer1).setTeam(0, 7);
+        await countryparameterscontract.connect(signer2).setTeam(1, 7);
+        await countryparameterscontract.connect(signer3).setTeam(2, 7);
+        await countryparameterscontract.connect(signer4).setTeam(3, 7);
+        await countryparameterscontract.connect(signer5).setTeam(4, 7);
+        await countryparameterscontract.connect(signer6).setTeam(5, 7);
+        await countryparameterscontract.connect(signer7).setTeam(6, 7);
+        await countryparameterscontract.connect(signer8).setTeam(7, 7);
+        await countryparameterscontract.connect(signer9).setTeam(8, 7);
+        await countryparameterscontract.connect(signer10).setTeam(9, 7);
+        await countryparameterscontract.connect(signer11).setTeam(10, 7);
+        await countryparameterscontract.connect(signer12).setTeam(11, 7);
+        // const LinkToken  = await ethers.getContractFactory(
+        //         "LinkToken"
+        // )
+        // let linkToken = await LinkToken.connect(signer0).deploy() as LinkToken
+        // await linkToken.deployed()
+        // const linkToken = new ethers.Contract(metadata.linkAddress, linkTokenAbi, signer0) as LinkToken;
+        // console.log("is this the place 0")
+        const contractABI = LinkToken_json_1.default.abi;
+        // console.log(contractABI)
+        const provider = new hardhat_1.ethers.providers.JsonRpcProvider("http://127.0.0.1:8545/");
+        // const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545/");
+        for (let i = 0; i < 50; i++) {
+            await hardhat_1.network.provider.send("evm_mine");
+        }
+        const contractAddress = metadata_1.metadata.linkAddress;
+        linkToken = new hardhat_1.ethers.Contract(contractAddress, contractABI, provider);
+        // const linkToken = await ethers.getContractAt("LinkToken", metadata.linkAddress) as LinkToken
+        // UNCOMMENT FROM HERE
+        // console.log("is this the place 1")
+        // console.log("address from metadata", metadata.linkAddress)
+        // console.log("address from test", linkToken.address)
+        const TestContract = await hardhat_1.ethers.getContractFactory("Test");
+        testContract = await TestContract.deploy();
+        await testContract.deployed();
+        // console.log("isseus")
+        // console.log(linkToken.address, "LINK token")
+        // console.log(linkToken, "LINK")
+        // console.log("more issues")
+        await linkToken.connect(signer0).transfer(testContract.address, BigInt(10000000000000000000));
+        const linkBalanceTestContract = await linkToken.balanceOf(testContract.address);
+        // console.log("Test contract LINK Balance:", Number(linkBalanceTestContract));
+        await linkToken.connect(signer0).transfer(airbattlecontract.address, BigInt(10000000000000000000));
+        const airBattleContractLinkBalance = await linkToken.balanceOf(airbattlecontract.address);
+        // console.log("Test contract AirBattle Balance:", Number(airBattleContractLinkBalance));
+        await linkToken.connect(signer0).transfer(senatecontract.address, BigInt(10000000000000000000));
+        const senateContractLinkBalance = await linkToken.balanceOf(senatecontract.address);
+        console.log("Test contract senate Balance:", Number(senateContractLinkBalance));
+        await linkToken.connect(signer0).transfer(signer0.address, BigInt(10000000000000000000));
+        const linkBalanceSigner0 = await linkToken.balanceOf(signer0.address);
+        // console.log("Signer1 LINK Balance:", Number(linkBalanceSigner0));
+        await linkToken.connect(signer0).transfer(signer1.address, BigInt(10000000000000000000));
+        const linkBalanceSigner1 = await linkToken.balanceOf(signer1.address);
+        // console.log("Signer0 LINK Balance:", Number(linkBalanceSigner1));
+        const nodeAddress = metadata_1.metadata.nodeAddress;
+        await linkToken.connect(signer0).transfer(nodeAddress, BigInt(15000000000000000000));
+        const linkBalanceNode = await linkToken.balanceOf(nodeAddress);
+        // console.log("Node LINK Balance:", Number(linkBalanceNode));
+        const operatorAddress = metadata_1.metadata.oracleAddress;
+        await linkToken.connect(signer0).transfer(operatorAddress, BigInt(25000000000000000000));
+        const linkBalanceOperator = await linkToken.balanceOf(operatorAddress);
+        // console.log("Operator LINK Balance:", Number(linkBalanceOperator));
+        // await linkToken.transferFrom(signer0.address, testContract.address, BigInt(1000000000000000000000))
+        // console.log("oracle address", metadata.oracleAddress);
+        console.log(jobMetadata_1.jobId, "JOBID");
+        const jobIdToRaw = jobMetadata_1.jobId;
+        const jobIdWithoutHyphens = jobIdToRaw.replace(/-/g, "");
+        // console.log("JobId", jobIdWithoutHyphens);
+        // const jobIdBytes = ethers.utils.toUtf8Bytes(jobIdWithoutHyphens)
+        // console.log(jobIdBytes);
+        const jobIdString = jobIdWithoutHyphens.toString();
+        const jobIdBytes = hardhat_1.ethers.utils.hexlify(hardhat_1.ethers.utils.toUtf8Bytes(jobIdString));
+        console.log(metadata_1.metadata.oracleAddress);
+        await testContract.updateLinkAddress(metadata_1.metadata.linkAddress);
+        await airbattlecontract.updateLinkAddress(metadata_1.metadata.linkAddress);
+        await senatecontract.updateLinkAddress(metadata_1.metadata.linkAddress);
+        await testContract.updateOracleAddress(metadata_1.metadata.oracleAddress);
+        await airbattlecontract.updateOracleAddress(metadata_1.metadata.oracleAddress);
+        await senatecontract.updateOracleAddress(metadata_1.metadata.oracleAddress);
+        await testContract.updateJobId(jobIdBytes);
+        await airbattlecontract.updateJobId(jobIdBytes);
+        await senatecontract.updateJobId(jobIdBytes);
+        await testContract.updateFee(BigInt(1000000000000000000));
+        await airbattlecontract.updateFee(BigInt(1000000000000000000));
+        await senatecontract.updateFee(BigInt(1000000000000000000));
+        // console.log("maybe end of before each")
     });
-    describe("Military Contract", function () {
-        it("military1 tests if country initializes correctly", async function () {
-            var defcon = await militarycontract.getDefconLevel(0);
-            var threatLevel = await militarycontract.getThreatLevel(0);
-            var war = await militarycontract.getWarPeacePreference(0);
-            (0, chai_1.expect)(defcon.toNumber()).to.equal(5);
-            (0, chai_1.expect)(threatLevel.toNumber()).to.equal(1);
-            (0, chai_1.expect)(war).to.equal(false);
-        });
-        it("military1 tests if updateDefconLevel() works correctly", async function () {
-            await militarycontract.connect(signer1).updateDefconLevel(4, 0);
-            var defcon = await militarycontract.getDefconLevel(0);
-            (0, chai_1.expect)(defcon).to.equal(4);
-            await militarycontract.connect(signer1).updateDefconLevel(1, 0);
-            var defconUpdated = await militarycontract.getDefconLevel(0);
-            (0, chai_1.expect)(defconUpdated).to.equal(1);
-            await (0, chai_1.expect)(militarycontract.connect(signer1).updateDefconLevel(0, 0)).to.be.revertedWith("New DEFCON level is not an integer between 1 and 5");
-            await (0, chai_1.expect)(militarycontract.connect(signer1).updateDefconLevel(6, 0)).to.be.revertedWith("New DEFCON level is not an integer between 1 and 5");
-        });
-        it("military1 tests if updateThreatLevel() works correctly", async function () {
-            await militarycontract.connect(signer1).updateThreatLevel(2, 0);
-            var threat = await militarycontract.getThreatLevel(0);
-            (0, chai_1.expect)(threat).to.equal(2);
-            await militarycontract.connect(signer1).updateThreatLevel(5, 0);
-            var threatUpated = await militarycontract.getThreatLevel(0);
-            (0, chai_1.expect)(threatUpated).to.equal(5);
-            await (0, chai_1.expect)(militarycontract.connect(signer1).updateThreatLevel(0, 0)).to.be.revertedWith("Not a valid threat level");
-            await (0, chai_1.expect)(militarycontract.connect(signer1).updateThreatLevel(6, 0)).to.be.revertedWith("Not a valid threat level");
-        });
-        it("military1 tests if toggleWarPeacePreference() works correctly", async function () {
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0);
-            var war = await militarycontract.getWarPeacePreference(0);
-            (0, chai_1.expect)(war).to.equal(true);
-            await (0, chai_1.expect)(militarycontract.connect(signer1).toggleWarPeacePreference(0)).to.be.revertedWith("Must wait 7 days to switch to peace mode");
+    describe("Senate Election External Adapter", function () {
+        it("Should send a request to the node", async function () {
+            var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23;
+            await senatecontract.updateInterval(1);
             await keepercontract.incrementGameDay();
             await keepercontract.incrementGameDay();
-            await keepercontract.incrementGameDay();
-            await keepercontract.incrementGameDay();
-            await keepercontract.incrementGameDay();
-            await keepercontract.incrementGameDay();
-            await keepercontract.incrementGameDay();
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0);
-            var war2 = await militarycontract.getWarPeacePreference(0);
-            (0, chai_1.expect)(war2).to.equal(false);
-        });
-        it("return days in pace mode", async function () {
-            var daysInPeace = await militarycontract.getDaysInPeaceMode(0);
-            (0, chai_1.expect)(daysInPeace).to.equal(0);
-            // console.log(daysInPeace.toNumber())
+            const txResponse1 = await senatecontract.connect(signer1).voteForSenator(0, 11);
+            const txReceipt1 = await txResponse1.wait();
+            const signer1Vote = (_b = (_a = txReceipt1 === null || txReceipt1 === void 0 ? void 0 : txReceipt1.events) === null || _a === void 0 ? void 0 : _a[0].args) === null || _b === void 0 ? void 0 : _b.voteCastFor.toNumber();
+            console.log("signer 1 vote", (_d = (_c = txReceipt1 === null || txReceipt1 === void 0 ? void 0 : txReceipt1.events) === null || _c === void 0 ? void 0 : _c[0].args) === null || _d === void 0 ? void 0 : _d.voteCastFor.toNumber());
+            const txResponse2 = await senatecontract.connect(signer2).voteForSenator(1, 11);
+            const txReceipt2 = await txResponse2.wait();
+            const signer2Vote = (_f = (_e = txReceipt2 === null || txReceipt2 === void 0 ? void 0 : txReceipt2.events) === null || _e === void 0 ? void 0 : _e[0].args) === null || _f === void 0 ? void 0 : _f.voteCastFor.toNumber();
+            console.log("signer 2 vote", (_h = (_g = txReceipt2 === null || txReceipt2 === void 0 ? void 0 : txReceipt2.events) === null || _g === void 0 ? void 0 : _g[0].args) === null || _h === void 0 ? void 0 : _h.voteCastFor.toNumber());
+            const txResponse3 = await senatecontract.connect(signer3).voteForSenator(2, 10);
+            const txReceipt3 = await txResponse3.wait();
+            const signer3Vote = (_k = (_j = txReceipt3 === null || txReceipt3 === void 0 ? void 0 : txReceipt3.events) === null || _j === void 0 ? void 0 : _j[0].args) === null || _k === void 0 ? void 0 : _k.voteCastFor.toNumber();
+            console.log("signer 3 vote", (_m = (_l = txReceipt3 === null || txReceipt3 === void 0 ? void 0 : txReceipt3.events) === null || _l === void 0 ? void 0 : _l[0].args) === null || _m === void 0 ? void 0 : _m.voteCastFor.toNumber());
+            const txResponse4 = await senatecontract.connect(signer4).voteForSenator(3, 10);
+            const txReceipt4 = await txResponse4.wait();
+            const signer4Vote = (_p = (_o = txReceipt4 === null || txReceipt4 === void 0 ? void 0 : txReceipt4.events) === null || _o === void 0 ? void 0 : _o[0].args) === null || _p === void 0 ? void 0 : _p.voteCastFor.toNumber();
+            console.log("signer 4 vote", (_r = (_q = txReceipt4 === null || txReceipt4 === void 0 ? void 0 : txReceipt4.events) === null || _q === void 0 ? void 0 : _q[0].args) === null || _r === void 0 ? void 0 : _r.voteCastFor.toNumber());
+            const txResponse5 = await senatecontract.connect(signer5).voteForSenator(4, 9);
+            const txReceipt5 = await txResponse5.wait();
+            const signer5Vote = (_t = (_s = txReceipt5 === null || txReceipt5 === void 0 ? void 0 : txReceipt5.events) === null || _s === void 0 ? void 0 : _s[0].args) === null || _t === void 0 ? void 0 : _t.voteCastFor.toNumber();
+            console.log("signer 5 vote", (_v = (_u = txReceipt5 === null || txReceipt5 === void 0 ? void 0 : txReceipt5.events) === null || _u === void 0 ? void 0 : _u[0].args) === null || _v === void 0 ? void 0 : _v.voteCastFor.toNumber());
+            const txResponse6 = await senatecontract.connect(signer6).voteForSenator(5, 9);
+            const txReceipt6 = await txResponse6.wait();
+            const signer6Vote = (_x = (_w = txReceipt6 === null || txReceipt6 === void 0 ? void 0 : txReceipt6.events) === null || _w === void 0 ? void 0 : _w[0].args) === null || _x === void 0 ? void 0 : _x.voteCastFor.toNumber();
+            console.log("signer 6 vote", (_z = (_y = txReceipt6 === null || txReceipt6 === void 0 ? void 0 : txReceipt6.events) === null || _y === void 0 ? void 0 : _y[0].args) === null || _z === void 0 ? void 0 : _z.voteCastFor.toNumber());
+            const txResponse7 = await senatecontract.connect(signer7).voteForSenator(6, 8);
+            const txReceipt7 = await txResponse7.wait();
+            const signer7Vote = (_1 = (_0 = txReceipt7 === null || txReceipt7 === void 0 ? void 0 : txReceipt7.events) === null || _0 === void 0 ? void 0 : _0[0].args) === null || _1 === void 0 ? void 0 : _1.voteCastFor.toNumber();
+            console.log("signer 7 vote", (_3 = (_2 = txReceipt7 === null || txReceipt7 === void 0 ? void 0 : txReceipt7.events) === null || _2 === void 0 ? void 0 : _2[0].args) === null || _3 === void 0 ? void 0 : _3.voteCastFor.toNumber());
+            const txResponse8 = await senatecontract.connect(signer8).voteForSenator(7, 8);
+            const txReceipt8 = await txResponse8.wait();
+            const signer8Vote = (_5 = (_4 = txReceipt8 === null || txReceipt8 === void 0 ? void 0 : txReceipt8.events) === null || _4 === void 0 ? void 0 : _4[0].args) === null || _5 === void 0 ? void 0 : _5.voteCastFor.toNumber();
+            console.log("signer 8 vote", (_7 = (_6 = txReceipt8 === null || txReceipt8 === void 0 ? void 0 : txReceipt8.events) === null || _6 === void 0 ? void 0 : _6[0].args) === null || _7 === void 0 ? void 0 : _7.voteCastFor.toNumber());
+            const txResponse9 = await senatecontract.connect(signer9).voteForSenator(8, 7);
+            const txReceipt9 = await txResponse9.wait();
+            const signer9Vote = (_9 = (_8 = txReceipt9 === null || txReceipt9 === void 0 ? void 0 : txReceipt9.events) === null || _8 === void 0 ? void 0 : _8[0].args) === null || _9 === void 0 ? void 0 : _9.voteCastFor.toNumber();
+            console.log("signer 9 vote", (_11 = (_10 = txReceipt9 === null || txReceipt9 === void 0 ? void 0 : txReceipt9.events) === null || _10 === void 0 ? void 0 : _10[0].args) === null || _11 === void 0 ? void 0 : _11.voteCastFor.toNumber());
+            const txResponse10 = await senatecontract.connect(signer10).voteForSenator(9, 7);
+            const txReceipt10 = await txResponse10.wait();
+            const signer10Vote = (_13 = (_12 = txReceipt10 === null || txReceipt10 === void 0 ? void 0 : txReceipt10.events) === null || _12 === void 0 ? void 0 : _12[0].args) === null || _13 === void 0 ? void 0 : _13.voteCastFor.toNumber();
+            console.log("signer 10 vote", (_15 = (_14 = txReceipt10 === null || txReceipt10 === void 0 ? void 0 : txReceipt10.events) === null || _14 === void 0 ? void 0 : _14[0].args) === null || _15 === void 0 ? void 0 : _15.voteCastFor.toNumber());
+            const txResponse11 = await senatecontract.connect(signer11).voteForSenator(10, 7);
+            const txReceipt11 = await txResponse11.wait();
+            const signer11Vote = (_17 = (_16 = txReceipt11 === null || txReceipt11 === void 0 ? void 0 : txReceipt11.events) === null || _16 === void 0 ? void 0 : _16[0].args) === null || _17 === void 0 ? void 0 : _17.voteCastFor.toNumber();
+            console.log("signer 11 vote", (_19 = (_18 = txReceipt11 === null || txReceipt11 === void 0 ? void 0 : txReceipt11.events) === null || _18 === void 0 ? void 0 : _18[0].args) === null || _19 === void 0 ? void 0 : _19.voteCastFor.toNumber());
+            const txResponse12 = await senatecontract.connect(signer12).voteForSenator(11, 6);
+            const txReceipt12 = await txResponse12.wait();
+            const signer12Vote = (_21 = (_20 = txReceipt12 === null || txReceipt12 === void 0 ? void 0 : txReceipt12.events) === null || _20 === void 0 ? void 0 : _20[0].args) === null || _21 === void 0 ? void 0 : _21.voteCastFor.toNumber();
+            console.log("signer 12 vote", (_23 = (_22 = txReceipt12 === null || txReceipt12 === void 0 ? void 0 : txReceipt12.events) === null || _22 === void 0 ? void 0 : _22[0].args) === null || _23 === void 0 ? void 0 : _23.voteCastFor.toNumber());
+            await senatecontract.performUpkeep('0x');
         });
     });
 });

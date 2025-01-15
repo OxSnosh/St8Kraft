@@ -1,11 +1,16 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 //St8kraft © 2022 by OxSnosh is licensed under Attribution-NonCommercial-NoDerivatives 4.0 International
 const chai_1 = require("chai");
 const hardhat_1 = require("hardhat");
 const helper_hardhat_config_1 = require("../helper-hardhat-config");
 const helper_hardhat_config_2 = require("../helper-hardhat-config");
-describe("Military", function () {
+const spy_attack_relayer_1 = require("../scripts/spy_attack_relayer");
+const fs_1 = __importDefault(require("fs"));
+describe("Spy Relayer Test", function () {
     // const oracleAbi = OracleArtifact.abi;
     // const linkTokenAbi = LinkTokenArtifact.abi;
     let warbucks;
@@ -396,63 +401,234 @@ describe("Military", function () {
         await wonderscontract3.settings(treasurycontract.address, infrastructurecontract.address, forcescontract.address, wonderscontract1.address, wonderscontract2.address, wonderscontract4.address, countryminter.address);
         await wonderscontract4.settings(treasurycontract.address, improvementscontract2.address, improvementscontract3.address, improvementscontract4.address, infrastructurecontract.address, wonderscontract1.address, wonderscontract3.address, countryminter.address);
         if (chainId == 31337 || chainId == 1337) {
-            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, spyoperationscontract.address);
             await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
+            await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
         }
         await warbucks.connect(signer0).transfer(signer1.address, BigInt(2100000000000000000000000));
         await countryminter.connect(signer1).generateCountry("TestRuler", "TestNationName", "TestCapitalCity", "TestNationSlogan");
         await warbucks.connect(signer0).transfer(signer2.address, BigInt(2100000000000000000000000));
-        await countryminter.connect(signer2).generateCountry("NextRuler", "NextNationName", "NextCapitalCity", "NextNationSlogan");
+        await countryminter.connect(signer2).generateCountry("TestRuler2", "TestNationName2", "TestCapitalCity2", "TestNationSlogan2");
+        const eventFilter1 = vrfCoordinatorV2Mock.filters.RandomWordsRequested();
+        const event1Logs = await vrfCoordinatorV2Mock.queryFilter(eventFilter1);
+        for (const log of event1Logs) {
+            const requestIdReturn = log.args.requestId;
+            // console.log(Number(requestIdReturn), "requestIdReturn for Event");
+            if (requestIdReturn == 2) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources1 = await resourcescontract.getPlayerResources(0);
+                // console.log("resources 1", resources1[0].toNumber(), resources1[1].toNumber());
+            }
+            else if (requestIdReturn == 4) {
+                await vrfCoordinatorV2Mock.fulfillRandomWords(requestIdReturn, resourcescontract.address);
+                let resources2 = await resourcescontract.getPlayerResources(1);
+                // console.log("resources 2", resources2[0].toNumber(), resources2[1].toNumber());
+            }
+        }
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(10000000000 * (10 ** 18)));
+        await warbucks.connect(signer0).transfer(signer1.address, BigInt(10000000000 * (10 ** 18)));
+        await treasurycontract.connect(signer1).addFunds(BigInt(10000000000 * (10 ** 18)), 0);
+        await infrastructuremarketplace.connect(signer1).buyInfrastructure(0, 5000);
+        await technologymarketcontrat.connect(signer1).buyTech(0, 1000);
+        await forcescontract.connect(signer1).buySoldiers(2000, 0);
+        await forcescontract.connect(signer1).buyTanks(40, 0);
+        await spycontract.connect(signer1).buySpies(30, 0);
+        // const tx2 = await countryparameterscontract.fulfillRequest(1);
+        // let txReceipt2 = await tx2.wait(1);
+        // let requestId2 = txReceipt2?.events?.[1].args?.requestId;
+        // await vrfCoordinatorV2Mock.fulfillRandomWords(requestId2, countryparameterscontract.address);
+        await warbucks.connect(signer0).approve(warbucks.address, BigInt(2000000000 * (10 ** 18)));
+        await warbucks.connect(signer0).transfer(signer2.address, BigInt(2000000000 * (10 ** 18)));
+        await treasurycontract.connect(signer2).addFunds(BigInt(2000000000 * (10 ** 18)), 1);
+        await infrastructuremarketplace.connect(signer2).buyInfrastructure(1, 5000);
+        await technologymarketcontrat.connect(signer2).buyTech(1, 300);
+        await forcescontract.connect(signer2).buySoldiers(1000, 1);
+        await forcescontract.connect(signer2).buyTanks(20, 1);
+        await militarycontract.connect(signer1).toggleWarPeacePreference(0);
+        await militarycontract.connect(signer2).toggleWarPeacePreference(1);
+        await warcontract.connect(signer1).declareWar(0, 1);
+        await forcescontract.connect(signer1).deployForces(1000, 30, 0, 0);
+        // await forcescontract.connect(signer2).buySpies(40, 1)
+        const eaPath = "external_adapters/Contracts";
+        if (chainId == 31337) {
+            const contractMetadataLocation = `${eaPath}/contract-metadata.json`;
+            let contractMetadata;
+            let countryMinterArtifact = await hardhat_1.artifacts.readArtifact("CountryMinter");
+            let countryMinterAbi = countryMinterArtifact.abi;
+            let forcesArtifact = await hardhat_1.artifacts.readArtifact("ForcesContract");
+            let forcesAbi = forcesArtifact.abi;
+            let warbucksArtifact = await hardhat_1.artifacts.readArtifact("WarBucks");
+            let warbucksAbi = warbucksArtifact.abi;
+            let treasuryArtifact = await hardhat_1.artifacts.readArtifact("TreasuryContract");
+            let treasuryAbi = treasuryArtifact.abi;
+            let infrastructureArtifact = await hardhat_1.artifacts.readArtifact("InfrastructureMarketContract");
+            let infrastructureAbi = infrastructureArtifact.abi;
+            let technologyArtifact = await hardhat_1.artifacts.readArtifact("TechnologyMarketContract");
+            let technologyAbi = technologyArtifact.abi;
+            let militaryArtifact = await hardhat_1.artifacts.readArtifact("MilitaryContract");
+            let militaryAbi = militaryArtifact.abi;
+            let warArtifact = await hardhat_1.artifacts.readArtifact("WarContract");
+            let warAbi = warArtifact.abi;
+            let nationStrengthArtifact = await hardhat_1.artifacts.readArtifact("NationStrengthContract");
+            let nationStrengthAbi = nationStrengthArtifact.abi;
+            let spyOperationArtifact = await hardhat_1.artifacts.readArtifact("SpyOperationsContract");
+            let spyOperationAbi = spyOperationArtifact.abi;
+            let groundBattleArtifact = await hardhat_1.artifacts.readArtifact("GroundBattleContract");
+            let groundBattleAbi = groundBattleArtifact.abi;
+            let spyoperationsartifact = await hardhat_1.artifacts.readArtifact("SpyOperationsContract");
+            let spyOperationsAbi = spyOperationArtifact.abi;
+            // Read Contract Metadata
+            try {
+                if (fs_1.default.existsSync(contractMetadataLocation)) {
+                    contractMetadata = fs_1.default.readFileSync(contractMetadataLocation).toString();
+                }
+                else {
+                    contractMetadata = "{}";
+                }
+            }
+            catch (e) {
+                console.log(e);
+            }
+            contractMetadata = JSON.parse(contractMetadata);
+            if (chainId == 31337) {
+                contractMetadata.HARDHAT = {
+                    ...contractMetadata.HARDHAT,
+                    countryminter: {
+                        address: countryminter.address,
+                        ABI: countryMinterAbi,
+                    },
+                    forcescontract: {
+                        address: forcescontract.address,
+                        ABI: forcesAbi,
+                    },
+                    nationstrengthcontract: {
+                        address: nationstrengthcontract.address,
+                        ABI: nationStrengthAbi,
+                    },
+                    treasurycontract: {
+                        address: treasurycontract.address,
+                        ABI: treasuryAbi,
+                    },
+                    spyoperationscontract: {
+                        address: spyoperationscontract.address,
+                        ABI: spyOperationAbi,
+                    },
+                    groundbattlecontract: {
+                        address: groundbattlecontract.address,
+                        ABI: groundBattleAbi,
+                    }
+                };
+            }
+            else if (chainId == 4002) {
+                contractMetadata.TESTNET = {
+                    ...contractMetadata.TESTNET,
+                    countryminter: {
+                        address: countryminter.address,
+                        ABI: countryMinterAbi,
+                    },
+                    forcescontract: {
+                        address: forcescontract.address,
+                        ABI: forcesAbi,
+                    },
+                    nationstrengthcontract: {
+                        address: nationstrengthcontract.address,
+                        ABI: nationStrengthAbi,
+                    },
+                    treasurycontract: {
+                        address: treasurycontract.address,
+                        ABI: treasuryAbi,
+                    },
+                    spyoperationscontract: {
+                        address: spyoperationscontract.address,
+                        ABI: spyOperationAbi,
+                    }
+                };
+            }
+            // if(chainId == fantomTestnetChainId) {
+            // }
+            fs_1.default.writeFileSync(contractMetadataLocation, JSON.stringify(contractMetadata, null, 2));
+            const scriptMetadataLocation = `script-metadata.json`;
+            let scriptMetadata;
+            try {
+                if (fs_1.default.existsSync(scriptMetadataLocation)) {
+                    scriptMetadata = fs_1.default.readFileSync(scriptMetadataLocation).toString();
+                }
+                else {
+                    scriptMetadata = "{}";
+                }
+            }
+            catch (e) {
+                console.log(e);
+            }
+            scriptMetadata = JSON.parse(scriptMetadata);
+            scriptMetadata.HARDHAT = {
+                ...scriptMetadata.HARDHAT,
+                countryminter: {
+                    address: countryminter.address,
+                    ABI: countryMinterAbi,
+                },
+                forcescontract: {
+                    address: forcescontract.address,
+                    ABI: forcesAbi,
+                },
+                warbucks: {
+                    address: warbucks.address,
+                    ABI: warbucksAbi,
+                },
+                treasurycontract: {
+                    address: treasurycontract.address,
+                    ABI: treasuryAbi,
+                },
+                infrastructurecontract: {
+                    address: infrastructuremarketplace.address,
+                    ABI: infrastructureAbi,
+                },
+                technologymarketcontract: {
+                    address: technologymarketcontrat.address,
+                    ABI: technologyAbi,
+                },
+                militarycontract: {
+                    address: militarycontract.address,
+                    ABI: militaryAbi,
+                },
+                warcontract: {
+                    address: warcontract.address,
+                    ABI: warAbi,
+                },
+                spyoperationscontract: {
+                    address: spyoperationscontract.address,
+                    ABI: spyOperationAbi
+                },
+                nationstrengthcontract: {
+                    address: nationstrengthcontract.address,
+                    ABI: nationStrengthAbi
+                }
+            };
+            fs_1.default.writeFileSync(scriptMetadataLocation, JSON.stringify(scriptMetadata, null, 2));
+        }
     });
-    describe("Military Contract", function () {
-        it("military1 tests if country initializes correctly", async function () {
-            var defcon = await militarycontract.getDefconLevel(0);
-            var threatLevel = await militarycontract.getThreatLevel(0);
-            var war = await militarycontract.getWarPeacePreference(0);
-            (0, chai_1.expect)(defcon.toNumber()).to.equal(5);
-            (0, chai_1.expect)(threatLevel.toNumber()).to.equal(1);
-            (0, chai_1.expect)(war).to.equal(false);
-        });
-        it("military1 tests if updateDefconLevel() works correctly", async function () {
-            await militarycontract.connect(signer1).updateDefconLevel(4, 0);
-            var defcon = await militarycontract.getDefconLevel(0);
-            (0, chai_1.expect)(defcon).to.equal(4);
-            await militarycontract.connect(signer1).updateDefconLevel(1, 0);
-            var defconUpdated = await militarycontract.getDefconLevel(0);
-            (0, chai_1.expect)(defconUpdated).to.equal(1);
-            await (0, chai_1.expect)(militarycontract.connect(signer1).updateDefconLevel(0, 0)).to.be.revertedWith("New DEFCON level is not an integer between 1 and 5");
-            await (0, chai_1.expect)(militarycontract.connect(signer1).updateDefconLevel(6, 0)).to.be.revertedWith("New DEFCON level is not an integer between 1 and 5");
-        });
-        it("military1 tests if updateThreatLevel() works correctly", async function () {
-            await militarycontract.connect(signer1).updateThreatLevel(2, 0);
-            var threat = await militarycontract.getThreatLevel(0);
-            (0, chai_1.expect)(threat).to.equal(2);
-            await militarycontract.connect(signer1).updateThreatLevel(5, 0);
-            var threatUpated = await militarycontract.getThreatLevel(0);
-            (0, chai_1.expect)(threatUpated).to.equal(5);
-            await (0, chai_1.expect)(militarycontract.connect(signer1).updateThreatLevel(0, 0)).to.be.revertedWith("Not a valid threat level");
-            await (0, chai_1.expect)(militarycontract.connect(signer1).updateThreatLevel(6, 0)).to.be.revertedWith("Not a valid threat level");
-        });
-        it("military1 tests if toggleWarPeacePreference() works correctly", async function () {
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0);
-            var war = await militarycontract.getWarPeacePreference(0);
-            (0, chai_1.expect)(war).to.equal(true);
-            await (0, chai_1.expect)(militarycontract.connect(signer1).toggleWarPeacePreference(0)).to.be.revertedWith("Must wait 7 days to switch to peace mode");
-            await keepercontract.incrementGameDay();
-            await keepercontract.incrementGameDay();
-            await keepercontract.incrementGameDay();
-            await keepercontract.incrementGameDay();
-            await keepercontract.incrementGameDay();
-            await keepercontract.incrementGameDay();
-            await keepercontract.incrementGameDay();
-            await militarycontract.connect(signer1).toggleWarPeacePreference(0);
-            var war2 = await militarycontract.getWarPeacePreference(0);
-            (0, chai_1.expect)(war2).to.equal(false);
-        });
-        it("return days in pace mode", async function () {
-            var daysInPeace = await militarycontract.getDaysInPeaceMode(0);
-            (0, chai_1.expect)(daysInPeace).to.equal(0);
-            // console.log(daysInPeace.toNumber())
+    describe("Spy Operations", function () {
+        it("spy operations relayer test", async function () {
+            const signer = signer1;
+            const message = "Hello Ethereum";
+            // console.log("Signer address:", signer.address);
+            // Sign the message
+            const signature = await signer.signMessage(message);
+            // console.log("Signature:", signature);
+            // Verify signature is a string
+            (0, chai_1.expect)(signature).to.be.a("string");
+            // Hash the message using ethers' utility
+            const messageHash = await hardhat_1.ethers.utils.hashMessage(message);
+            // Initialize the payload object
+            let payload = {
+                signature: signature,
+                messageHash: messageHash,
+                callerNationId: 0,
+                defenderNationId: 1,
+                attackType: 1
+            };
+            await spyoperationscontract.setRelayer(signer0.address);
+            await (0, spy_attack_relayer_1.relaySpyOperation)(payload);
         });
     });
 });

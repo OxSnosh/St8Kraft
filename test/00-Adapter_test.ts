@@ -136,7 +136,7 @@ describe("Adapter Test", function () {
   }
 
   const eventPromise = new Promise((resolve, reject) => {
-    testContract.once("CallbackCompleted", (product) => {
+    testContract.once("CallbackCompleted", (product : any) => {
       try {
         expect(product).to.equal(5000);
         resolve(product);

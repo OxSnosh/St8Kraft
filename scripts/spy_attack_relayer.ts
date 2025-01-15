@@ -1,6 +1,6 @@
 import { ethers, artifacts } from "hardhat";
 import { Defender } from "@openzeppelin/defender-sdk"
-import { CountryMinter, SpyOperationsContract } from "../typechain-types";
+import { CountryMinter, NationStrengthContract, SpyOperationsContract } from "../typechain-types";
 import { HARDHAT } from "../script-metadata.json"
 
 import * as dotenv from 'dotenv';
@@ -14,12 +14,11 @@ type Input = {
     signature: string,
     messageHash: string,
     callerNationId: number,
-    defenderNationId: number
+    defenderNationId: number,
+    attackType: number
 }
 
 export async function relaySpyOperation( data : Input ) {
-    
-    console.log("arrived in relayer")
 
     const signers = await ethers.getSigners();
     const recoveredAddress = await ethers.utils.recoverAddress(data.messageHash, data.signature);
@@ -73,37 +72,84 @@ export async function relaySpyOperation( data : Input ) {
 
     const spyoperations = new ethers.Contract(spyOperationsAddress, spyOperationsAbi, signer) as SpyOperationsContract
 
-    console.log()
-
     var attackerSuccessScore = await spyoperations.getAttackerSuccessScore(data.callerNationId)
     var defenderSuccessScore = await spyoperations.getDefenseSuccessScore(data.defenderNationId)
 
     var strengthTotal = (attackerSuccessScore.toNumber() + defenderSuccessScore.toNumber())
-    console.log(attackerSuccessScore.toNumber())
-    console.log(defenderSuccessScore.toNumber())
-    console.log(strengthTotal)
-
-    console.log("did we arrive here?");
+    // console.log(attackerSuccessScore.toNumber())
+    // console.log(defenderSuccessScore.toNumber())
+    // console.log(strengthTotal)
 
     const randomNumber = Math.floor(Math.random() * strengthTotal);
 
     console.log(randomNumber)
 
     let success: boolean
-    let attackType: number
+    let attackType: number = data.attackType
     let attackerId: number
-    
+    let defenderId: number = data.defenderNationId
+    let cost: number = 0
+ 
+    const nationStrengthAddress = HARDHAT.nationtrengthcontract.address;
+    const nationsStrengthAbi = HARDHAT.nationtrengthcontract.ABI;
+    const nationStrengthContract = new ethers.Contract(nationStrengthAddress, nationsStrengthAbi, provider) as NationStrengthContract
 
+    let defenderStrengthRaw = await nationStrengthContract.getNationStrength(defenderId)    
+    let defenderStrength = defenderStrengthRaw.toNumber()
 
-    if( randomNumber < attackerSuccessScore.toNumber()) {
-        console.log("attackSuccess")
-
+    if (attackType > 13 || attackType < 1) {
+        throw new Error("attack type must be integer between 1 and 13")
     }
 
-    await spyoperations.spyAttack(1, true)
+    if (attackType == 1) {
+        cost = (100000 + defenderStrength)
+    } else if (attackType == 2) {
+        cost = (100000 + (defenderStrength * 2))
+    } else if (attackType == 3) {
+        cost = (100000 + (defenderStrength * 3))
+    } else if (attackType == 4) {
+        cost = (100000 + (defenderStrength * 3))
+    } else if (attackType == 5) {
+        cost = (100000 + (defenderStrength * 3))
+    } else if (attackType == 6) {
+        cost = (150000 + defenderStrength)
+    } else if (attackType == 7) {
+        cost = (150000 + (defenderStrength * 5))
+    } else if (attackType == 8) {
+        cost = (250000 + (defenderStrength * 2))
+    } else if (attackType == 9) {
+        cost = (300000 + (defenderStrength * 2))
+    } else if (attackType == 10) {
+        cost = (100000 + (defenderStrength * 20))
+    } else if (attackType == 11) {
+        cost = (300000 + (defenderStrength * 15))
+    } else if (attackType == 12) {
+        cost = (500000 + (defenderStrength * 5))
+    } else if (attackType == 13) {
+        cost = (500000 + (defenderStrength * 15))
+    }
+    
+    if( randomNumber < attackerSuccessScore.toNumber()) {
+        console.log("attackSuccess")
+        success = true
+        attackerId = 0
+        defenderId = data.defenderNationId
+    } else {
+        console.log("spy attack thwarted")
+        success = false
+        attackerId = data.callerNationId
+        defenderId = data.defenderNationId
+    }
+    const randomNumberForDamages : number = Math.floor(Math.random() * 9e13) + 1e13;
 
+    // console.log("randomNumberForDamages", randomNumberForDamages)
 
+    let defenderCheck = spyoperations.checkSpyOperation(defenderId, attackType)
 
+    if (!defenderCheck) {
+        throw new Error("cannot conduct spy operation of this type at this time");
+    }
 
+    await spyoperations.spyAttack(success, attackType, defenderId, attackerId, cost, randomNumberForDamages)
     
 }

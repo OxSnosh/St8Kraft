@@ -38,6 +38,7 @@ async function main() {
     let metanationsgovtoken;
     let aidcontract;
     let airbattlecontract;
+    let additionalairbattle;
     let billscontract;
     let bombersmarketplace1;
     let bombersmarketplace2;
@@ -127,6 +128,10 @@ async function main() {
     //subscriptionId
     //gasLAne
     //callbackGasLimit
+    const AdditionalAirBattleContract = await hardhat_1.ethers.getContractFactory("AdditionalAirBattle");
+    additionalairbattle = await AdditionalAirBattleContract.deploy();
+    await additionalairbattle.deployed();
+    // console.log(`AirBattleContract deployed tp ${airbattlecontract.address}`)
     const BillsContract = await hardhat_1.ethers.getContractFactory("BillsContract");
     billscontract = await BillsContract.deploy();
     await billscontract.deployed();
@@ -647,7 +652,8 @@ async function main() {
     console.log("contracts deployed");
     await warbucks.settings(treasurycontract.address, countryminter.address);
     await aidcontract.settings(countryminter.address, treasurycontract.address, forcescontract.address, infrastructurecontract.address, keepercontract.address, wonderscontract1.address, senatecontract.address, countryparameterscontract.address);
-    await airbattlecontract.settings(warcontract.address, fighterscontract.address, bomberscontract.address, infrastructurecontract.address, forcescontract.address, fighterlosses.address, countryminter.address);
+    await airbattlecontract.settings(warcontract.address, fighterscontract.address, bomberscontract.address, infrastructurecontract.address, forcescontract.address, fighterlosses.address, countryminter.address, additionalairbattle.address);
+    await additionalairbattle.settings(warcontract.address, fighterscontract.address, bomberscontract.address, infrastructurecontract.address, forcescontract.address, fighterlosses.address, countryminter.address, airbattlecontract.address);
     await billscontract.settings(countryminter.address, treasurycontract.address, wonderscontract1.address, wonderscontract2.address, wonderscontract3.address, wonderscontract4.address, forcescontract.address, fighterscontract.address, navycontract.address, resourcescontract.address);
     await billscontract.settings2(improvementscontract1.address, improvementscontract2.address, missilescontract.address, wonderscontract4.address, infrastructurecontract.address, bonusresourcescontract.address, navycontract2.address, countryparameterscontract.address);
     await bomberscontract.settings(countryminter.address, bombersmarketplace1.address, bombersmarketplace2.address, airbattlecontract.address, treasurycontract.address, fighterscontract.address, infrastructurecontract.address, warcontract.address);

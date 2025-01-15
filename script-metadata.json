@@ -1,7 +1,7 @@
 {
   "HARDHAT": {
     "countryminter": {
-      "address": "0x1D8D70AD07C8E7E442AD78E4AC0A16f958Eba7F0",
+      "address": "0x262e2b50219620226C5fB5956432A88fffd94Ba7",
       "ABI": [
         {
           "inputs": [],
@@ -1056,7 +1056,7 @@
       ]
     },
     "forcescontract": {
-      "address": "0x9c65f85425c619A6cB6D29fF8d57ef696323d188",
+      "address": "0x2e8880cAdC08E9B438c6052F5ce3869FBd6cE513",
       "ABI": [
         {
           "anonymous": false,
@@ -2233,7 +2233,7 @@
       ]
     },
     "warbucks": {
-      "address": "0x8ac87219a0F5639BC01b470F87BA2b26356CB2B9",
+      "address": "0x8ac5eE52F70AE01dB914bE459D8B3d50126fd6aE",
       "ABI": [
         {
           "inputs": [
@@ -2679,7 +2679,7 @@
       ]
     },
     "treasurycontract": {
-      "address": "0x2e8880cAdC08E9B438c6052F5ce3869FBd6cE513",
+      "address": "0xFC4EE541377F3b6641c23CBE82F6f04388290421",
       "ABI": [
         {
           "anonymous": false,
@@ -3978,7 +3978,7 @@
       ]
     },
     "infrastructurecontract": {
-      "address": "0xF342E904702b1D021F03f519D6D9614916b03f37",
+      "address": "0x1D13fF25b10C9a6741DFdce229073bed652197c7",
       "ABI": [
         {
           "anonymous": false,
@@ -4404,7 +4404,7 @@
       ]
     },
     "technologymarketcontract": {
-      "address": "0x4951A1C579039EbfCBA0BE33D2cd3A6D30b0f802",
+      "address": "0xF66CfDf074D2FFD6A4037be3A669Ed04380Aef2B",
       "ABI": [
         {
           "anonymous": false,
@@ -4791,7 +4791,7 @@
       ]
     },
     "militarycontract": {
-      "address": "0x8ac5eE52F70AE01dB914bE459D8B3d50126fd6aE",
+      "address": "0x618fB9dbd2BD6eb968B4c1af36af6CB0b45310Ec",
       "ABI": [
         {
           "anonymous": false,
@@ -5175,7 +5175,7 @@
       ]
     },
     "warcontract": {
-      "address": "0xb007167714e2940013EC3bb551584130B7497E22",
+      "address": "0x20d7B364E8Ed1F4260b5B90C41c2deC3C1F6D367",
       "ABI": [
         {
           "anonymous": false,
@@ -6330,89 +6330,8 @@
       ]
     },
     "spyoperationscontract": {
-      "address": "0x06b3244b086cecC40F1e5A826f736Ded68068a0F",
+      "address": "0x24432a08869578aAf4d1eadA12e1e78f171b1a2b",
       "ABI": [
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "vrfCoordinatorV2",
-              "type": "address"
-            },
-            {
-              "internalType": "uint64",
-              "name": "subscriptionId",
-              "type": "uint64"
-            },
-            {
-              "internalType": "bytes32",
-              "name": "gasLane",
-              "type": "bytes32"
-            },
-            {
-              "internalType": "uint32",
-              "name": "callbackGasLimit",
-              "type": "uint32"
-            }
-          ],
-          "stateMutability": "nonpayable",
-          "type": "constructor"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "have",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "want",
-              "type": "address"
-            }
-          ],
-          "name": "OnlyCoordinatorCanFulfill",
-          "type": "error"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "bytes32",
-              "name": "id",
-              "type": "bytes32"
-            }
-          ],
-          "name": "ChainlinkCancelled",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "bytes32",
-              "name": "id",
-              "type": "bytes32"
-            }
-          ],
-          "name": "ChainlinkFulfilled",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "bytes32",
-              "name": "id",
-              "type": "bytes32"
-            }
-          ],
-          "name": "ChainlinkRequested",
-          "type": "event"
-        },
         {
           "anonymous": false,
           "inputs": [
@@ -6438,11 +6357,23 @@
             {
               "indexed": true,
               "internalType": "uint256",
-              "name": "requestId",
+              "name": "attackId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "defenderId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "attackType",
               "type": "uint256"
             }
           ],
-          "name": "randomNumbersRequested",
+          "name": "SpyAttackSuccess",
           "type": "event"
         },
         {
@@ -6467,7 +6398,20 @@
               "type": "uint256"
             }
           ],
-          "name": "spyAttackThwart",
+          "name": "SpyAttackThwart",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "requestId",
+              "type": "uint256"
+            }
+          ],
+          "name": "randomNumbersRequested",
           "type": "event"
         },
         {
@@ -6505,21 +6449,6 @@
         {
           "inputs": [
             {
-              "internalType": "bool",
-              "name": "success",
-              "type": "bool"
-            },
-            {
-              "internalType": "uint256",
-              "name": "_attackId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "attackerId",
-              "type": "uint256"
-            },
-            {
               "internalType": "uint256",
               "name": "defenderId",
               "type": "uint256"
@@ -6528,57 +6457,17 @@
               "internalType": "uint256",
               "name": "attackType",
               "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "_randomnessRequestId",
-              "type": "uint256"
             }
           ],
-          "name": "completeSpyAttack",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
+          "name": "checkSpyOperation",
+          "outputs": [
             {
-              "internalType": "uint256",
-              "name": "_attackId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "bytes",
-              "name": "encryptedPayload",
-              "type": "bytes"
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
             }
           ],
-          "name": "completeSpyTraining",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "encryptedAttackerId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "defenderId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "_attackId",
-              "type": "uint256"
-            }
-          ],
-          "name": "conductSpyOperation",
-          "outputs": [],
-          "stateMutability": "nonpayable",
+          "stateMutability": "view",
           "type": "function"
         },
         {
@@ -6737,24 +6626,6 @@
           "type": "function"
         },
         {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "requestId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256[]",
-              "name": "randomWords",
-              "type": "uint256[]"
-            }
-          ],
-          "name": "rawFulfillRandomWords",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
           "inputs": [],
           "name": "renounceOwnership",
           "outputs": [],
@@ -6890,40 +6761,37 @@
         {
           "inputs": [
             {
-              "internalType": "uint256",
-              "name": "defenderId",
-              "type": "uint256"
-            },
-            {
               "internalType": "bool",
               "name": "success",
               "type": "bool"
-            }
-          ],
-          "name": "spyAttack",
-          "outputs": [],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "encryptedAttackerId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "encryptedDefenderId",
-              "type": "uint256"
             },
             {
               "internalType": "uint256",
               "name": "attackType",
               "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "defenderId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "attackerId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "cost",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "randomNumber",
+              "type": "uint256"
             }
           ],
-          "name": "trainSpy",
+          "name": "spyAttack",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -6955,58 +6823,6 @@
           "type": "function"
         },
         {
-          "inputs": [
-            {
-              "internalType": "bytes32",
-              "name": "_jobId",
-              "type": "bytes32"
-            }
-          ],
-          "name": "updateExecuteAttackJobId",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "_fee",
-              "type": "uint256"
-            }
-          ],
-          "name": "updateFee",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "_oracleAddress",
-              "type": "address"
-            }
-          ],
-          "name": "updateOracleAddress",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "bytes32",
-              "name": "_jobId",
-              "type": "bytes32"
-            }
-          ],
-          "name": "updateTrainSpyJobId",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
           "inputs": [],
           "name": "wonders1",
           "outputs": [
@@ -7030,6 +6846,670 @@
             }
           ],
           "stateMutability": "view",
+          "type": "function"
+        }
+      ]
+    },
+    "nationstrengthcontract": {
+      "address": "0xa779C1D17bC5230c07afdC51376CAC1cb3Dd5314",
+      "ABI": [
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        {
+          "inputs": [],
+          "name": "bombers",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "fighters",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "forces",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            }
+          ],
+          "name": "getAdditionalStrengthFromFighters",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            }
+          ],
+          "name": "getAdditionalStrengthFromMiliary",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            }
+          ],
+          "name": "getNationStrength",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            }
+          ],
+          "name": "getNationStrengthFromCommodities",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "infrastructure",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "missiles",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "navy",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "navy2",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "owner",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "renounceOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_infrastructure",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_forces",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_fighters",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_bombers",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_navy",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_missiles",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_navy2",
+              "type": "address"
+            }
+          ],
+          "name": "settings",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "transferOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newAddress",
+              "type": "address"
+            }
+          ],
+          "name": "updateBombersContract",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newAddress",
+              "type": "address"
+            }
+          ],
+          "name": "updateFightersContract",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newAddress",
+              "type": "address"
+            }
+          ],
+          "name": "updateForcesContract",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newAddress",
+              "type": "address"
+            }
+          ],
+          "name": "updateInfrastructureContract",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newAddress",
+              "type": "address"
+            }
+          ],
+          "name": "updateNavyContract",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        }
+      ]
+    },
+    "nationtrengthcontract": {
+      "address": "0x8013Dd64084e9c9122567563AA86981F4C20576B",
+      "ABI": [
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        {
+          "inputs": [],
+          "name": "bombers",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "fighters",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "forces",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            }
+          ],
+          "name": "getAdditionalStrengthFromFighters",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            }
+          ],
+          "name": "getAdditionalStrengthFromMiliary",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            }
+          ],
+          "name": "getNationStrength",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            }
+          ],
+          "name": "getNationStrengthFromCommodities",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "infrastructure",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "missiles",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "navy",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "navy2",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "owner",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "renounceOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_infrastructure",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_forces",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_fighters",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_bombers",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_navy",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_missiles",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "_navy2",
+              "type": "address"
+            }
+          ],
+          "name": "settings",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "transferOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newAddress",
+              "type": "address"
+            }
+          ],
+          "name": "updateBombersContract",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newAddress",
+              "type": "address"
+            }
+          ],
+          "name": "updateFightersContract",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newAddress",
+              "type": "address"
+            }
+          ],
+          "name": "updateForcesContract",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newAddress",
+              "type": "address"
+            }
+          ],
+          "name": "updateInfrastructureContract",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newAddress",
+              "type": "address"
+            }
+          ],
+          "name": "updateNavyContract",
+          "outputs": [],
+          "stateMutability": "nonpayable",
           "type": "function"
         }
       ]
