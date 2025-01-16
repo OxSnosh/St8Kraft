@@ -1,7 +1,7 @@
 {
   "HARDHAT": {
     "countryminter": {
-      "address": "0x262e2b50219620226C5fB5956432A88fffd94Ba7",
+      "address": "0xc351628EB244ec633d5f21fBD6621e1a683B1181",
       "ABI": [
         {
           "inputs": [],
@@ -1056,7 +1056,7 @@
       ]
     },
     "forcescontract": {
-      "address": "0x2e8880cAdC08E9B438c6052F5ce3869FBd6cE513",
+      "address": "0xdbC43Ba45381e02825b14322cDdd15eC4B3164E6",
       "ABI": [
         {
           "anonymous": false,
@@ -2233,7 +2233,7 @@
       ]
     },
     "nationstrengthcontract": {
-      "address": "0xa779C1D17bC5230c07afdC51376CAC1cb3Dd5314",
+      "address": "0x172076E0166D1F9Cc711C77Adf8488051744980C",
       "ABI": [
         {
           "anonymous": false,
@@ -2565,7 +2565,7 @@
       ]
     },
     "treasurycontract": {
-      "address": "0xFC4EE541377F3b6641c23CBE82F6f04388290421",
+      "address": "0xf953b3A269d80e3eB0F2947630Da976B896A8C5b",
       "ABI": [
         {
           "anonymous": false,
@@ -5021,7 +5021,7 @@
       ]
     },
     "spyoperationscontract": {
-      "address": "0x24432a08869578aAf4d1eadA12e1e78f171b1a2b",
+      "address": "0x49fd2BE640DB2910c2fAb69bB8531Ab6E76127ff",
       "ABI": [
         {
           "anonymous": false,
@@ -5542,7 +5542,7 @@
       ]
     },
     "groundbattlecontract": {
-      "address": "0x6b39b761b1b64C8C095BF0e3Bb0c6a74705b4788",
+      "address": "0x21dF544947ba3E8b3c32561399E88B52Dc8b2823",
       "ABI": [
         {
           "inputs": [

@@ -1,7 +1,7 @@
 {
   "HARDHAT": {
     "countryminter": {
-      "address": "0x262e2b50219620226C5fB5956432A88fffd94Ba7",
+      "address": "0xc351628EB244ec633d5f21fBD6621e1a683B1181",
       "ABI": [
         {
           "inputs": [],
@@ -1056,7 +1056,7 @@
       ]
     },
     "forcescontract": {
-      "address": "0x2e8880cAdC08E9B438c6052F5ce3869FBd6cE513",
+      "address": "0xdbC43Ba45381e02825b14322cDdd15eC4B3164E6",
       "ABI": [
         {
           "anonymous": false,
@@ -2233,7 +2233,7 @@
       ]
     },
     "warbucks": {
-      "address": "0x8ac5eE52F70AE01dB914bE459D8B3d50126fd6aE",
+      "address": "0x4c5859f0F772848b2D91F1D83E2Fe57935348029",
       "ABI": [
         {
           "inputs": [
@@ -2679,7 +2679,7 @@
       ]
     },
     "treasurycontract": {
-      "address": "0xFC4EE541377F3b6641c23CBE82F6f04388290421",
+      "address": "0xf953b3A269d80e3eB0F2947630Da976B896A8C5b",
       "ABI": [
         {
           "anonymous": false,
@@ -3978,7 +3978,7 @@
       ]
     },
     "infrastructurecontract": {
-      "address": "0x1D13fF25b10C9a6741DFdce229073bed652197c7",
+      "address": "0x8198f5d8F8CfFE8f9C413d98a0A55aEB8ab9FbB7",
       "ABI": [
         {
           "anonymous": false,
@@ -4404,7 +4404,7 @@
       ]
     },
     "technologymarketcontract": {
-      "address": "0xF66CfDf074D2FFD6A4037be3A669Ed04380Aef2B",
+      "address": "0xA4899D35897033b927acFCf422bc745916139776",
       "ABI": [
         {
           "anonymous": false,
@@ -4791,7 +4791,7 @@
       ]
     },
     "militarycontract": {
-      "address": "0x618fB9dbd2BD6eb968B4c1af36af6CB0b45310Ec",
+      "address": "0xf4B146FbA71F41E0592668ffbF264F1D186b2Ca8",
       "ABI": [
         {
           "anonymous": false,
@@ -5175,7 +5175,7 @@
       ]
     },
     "warcontract": {
-      "address": "0x20d7B364E8Ed1F4260b5B90C41c2deC3C1F6D367",
+      "address": "0xAA292E8611aDF267e563f334Ee42320aC96D0463",
       "ABI": [
         {
           "anonymous": false,
@@ -6330,7 +6330,7 @@
       ]
     },
     "spyoperationscontract": {
-      "address": "0x24432a08869578aAf4d1eadA12e1e78f171b1a2b",
+      "address": "0x97C7e58E526b85714a8F386F0A2BAe8Ab6626a97",
       "ABI": [
         {
           "anonymous": false,
@@ -6851,7 +6851,7 @@
       ]
     },
     "nationstrengthcontract": {
-      "address": "0xa779C1D17bC5230c07afdC51376CAC1cb3Dd5314",
+      "address": "0x6C0B4923B0188eb4095a174137E77523a068735F",
       "ABI": [
         {
           "anonymous": false,

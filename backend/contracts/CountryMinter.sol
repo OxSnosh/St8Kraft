@@ -155,7 +155,7 @@ contract CountryMinter is ERC721, Ownable {
             ruler,
             nationName,
             capitalCity,
-            nationSlogan
+            nationSlogan 
         );
         FightersContract(fighters).generateFighters(countryId);
         ForcesContract(forces).generateForces(countryId);
