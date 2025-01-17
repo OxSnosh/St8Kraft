@@ -1,8 +1,8 @@
 {
   "HARDHAT": {
     "countryminter": {
-      "address": "0xc351628EB244ec633d5f21fBD6621e1a683B1181",
-      "ABI": [
+      "address": "0xaC47e91215fb80462139756f43438402998E4A3a",
+      "Abi": [
         {
           "inputs": [],
           "stateMutability": "nonpayable",
@@ -1056,7 +1056,7 @@
       ]
     },
     "forcescontract": {
-      "address": "0xdbC43Ba45381e02825b14322cDdd15eC4B3164E6",
+      "address": "0x56D13Eb21a625EdA8438F55DF2C31dC3632034f5",
       "ABI": [
         {
           "anonymous": false,
@@ -2233,7 +2233,7 @@
       ]
     },
     "warbucks": {
-      "address": "0x4c5859f0F772848b2D91F1D83E2Fe57935348029",
+      "address": "0x02df3a3F960393F5B349E40A599FEda91a7cc1A7",
       "ABI": [
         {
           "inputs": [
@@ -2679,7 +2679,7 @@
       ]
     },
     "treasurycontract": {
-      "address": "0xf953b3A269d80e3eB0F2947630Da976B896A8C5b",
+      "address": "0x162700d1613DfEC978032A909DE02643bC55df1A",
       "ABI": [
         {
           "anonymous": false,
@@ -3978,7 +3978,7 @@
       ]
     },
     "infrastructurecontract": {
-      "address": "0x8198f5d8F8CfFE8f9C413d98a0A55aEB8ab9FbB7",
+      "address": "0x56fC17a65ccFEC6B7ad0aDe9BD9416CB365B9BE8",
       "ABI": [
         {
           "anonymous": false,
@@ -4404,7 +4404,7 @@
       ]
     },
     "technologymarketcontract": {
-      "address": "0xA4899D35897033b927acFCf422bc745916139776",
+      "address": "0x9385556B571ab92bf6dC9a0DbD75429Dd4d56F91",
       "ABI": [
         {
           "anonymous": false,
@@ -4791,7 +4791,7 @@
       ]
     },
     "militarycontract": {
-      "address": "0xf4B146FbA71F41E0592668ffbF264F1D186b2Ca8",
+      "address": "0xD6b040736e948621c5b6E0a494473c47a6113eA8",
       "ABI": [
         {
           "anonymous": false,
@@ -5175,7 +5175,7 @@
       ]
     },
     "warcontract": {
-      "address": "0xAA292E8611aDF267e563f334Ee42320aC96D0463",
+      "address": "0x67aD6EA566BA6B0fC52e97Bc25CE46120fdAc04c",
       "ABI": [
         {
           "anonymous": false,
