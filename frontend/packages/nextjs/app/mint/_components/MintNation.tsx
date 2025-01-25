@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useReadContract, useWaitForTransactionReceipt, useWriteContract, useAccount } from "wagmi";
+import React, { useEffect, useState } from "react";
+import { useWaitForTransactionReceipt, useWriteContract, useAccount, usePublicClient } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 
 export function MintNation() {
@@ -14,25 +14,95 @@ export function MintNation() {
 
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>();
   const [isPending, setIsPending] = useState(false);
+  const [nations, setNations] = useState<Array<any>>([]);
 
-  const { address: walletAddress } = useAccount(); // Get connected wallet address
-  const contractsData = useAllContracts(); // Retrieve all contracts
-  const countryMinterContract = contractsData?.CountryMinter; // Access the CountryMinter contract
+  const { address: walletAddress } = useAccount();
+  const contractsData = useAllContracts();
+  const countryMinterContract = contractsData?.CountryMinter;
+  const countryParametersContract = contractsData?.CountryParametersContract;
 
   const { writeContractAsync } = useWriteContract();
-
-  // Explicitly define the type for `ownedTokenIds`
-  const { data: ownedTokenIds } = useReadContract<string[]>({
-    abi: countryMinterContract?.abi,
-    address: countryMinterContract?.address,
-    functionName: "tokensOfOwner",
-    args: walletAddress ? [walletAddress] : undefined, // Ensure `args` is passed as an array
-    enabled: !!walletAddress, // Ensure the query only runs when a wallet is connected
-  });
+  const publicClient = usePublicClient();
 
   const { data: txReceipt } = useWaitForTransactionReceipt({
     hash: txHash,
   });
+
+  useEffect(() => {
+    const fetchNationDetails = async () => {
+      if (!countryMinterContract || !walletAddress || !publicClient || !countryParametersContract) {
+        console.error("Missing required data: countryMinterContract, walletAddress, or publicClient.");
+        return;
+      }
+
+      try {
+        // Fetch token IDs owned by the wallet
+        const tokenIds = await publicClient.readContract({
+          abi: countryMinterContract.abi,
+          address: countryMinterContract.address,
+          functionName: "tokensOfOwner",
+          args: [walletAddress],
+        });
+
+        if (!Array.isArray(tokenIds) || tokenIds.length === 0) {
+          console.warn("No tokens found for this wallet.");
+          setNations([]);
+          return;
+        }
+
+        console.log("Fetched Token IDs:", tokenIds);
+
+        // Fetch nation details for each tokenId
+        const details = await Promise.all(
+          tokenIds.map(async (tokenId) => {
+            const tokenIdString = tokenId.toString(); // Convert BigInt to string
+
+            try {
+              const nationName = await publicClient.readContract({
+                abi: countryParametersContract.abi,
+                address: countryParametersContract.address,
+                functionName: "getNationName",
+                args: [tokenIdString],
+              });
+
+              const rulerName = await publicClient.readContract({
+                abi: countryParametersContract.abi,
+                address: countryParametersContract.address,
+                functionName: "getRulerName",
+                args: [tokenIdString],
+              });
+
+              const capitalCity = await publicClient.readContract({
+                abi: countryParametersContract.abi,
+                address: countryParametersContract.address,
+                functionName: "getCapital",
+                args: [tokenIdString],
+              });
+
+              const nationSlogan = await publicClient.readContract({
+                abi: countryParametersContract.abi,
+                address: countryParametersContract.address,
+                functionName: "getSlogan",
+                args: [tokenIdString],
+              });
+
+              return { tokenId: tokenIdString, nationName, rulerName, capitalCity, nationSlogan };
+            } catch (err) {
+              console.error(`Error fetching details for token ${tokenIdString}:`, err);
+              return { tokenId: tokenIdString, nationName: null, rulerName: null, capitalCity: null, nationSlogan: null };
+            }
+          })
+        );
+
+        console.log("Fetched Nation Details:", details);
+        setNations(details);
+      } catch (error) {
+        console.error("Error fetching token IDs or nation details:", error);
+      }
+    };
+
+    fetchNationDetails();
+  }, [walletAddress, countryMinterContract, countryParametersContract, publicClient]);
 
   const handleWrite = async () => {
     if (!writeContractAsync || !countryMinterContract?.abi || !countryMinterContract?.address) {
@@ -48,8 +118,8 @@ export function MintNation() {
         address: countryMinterContract.address,
         functionName: "generateCountry",
         args: [
-          form.nationName,
           form.rulerName,
+          form.nationName,
           form.capitalCity,
           form.nationSlogan,
         ],
@@ -72,17 +142,17 @@ export function MintNation() {
       <div className="flex flex-col gap-4">
         <input
           type="text"
-          placeholder="Nation Name"
-          className="input input-primary"
-          value={form.nationName}
-          onChange={(e) => setForm((prev) => ({ ...prev, nationName: e.target.value }))}
-        />
-        <input
-          type="text"
           placeholder="Ruler Name"
           className="input input-primary"
           value={form.rulerName}
           onChange={(e) => setForm((prev) => ({ ...prev, rulerName: e.target.value }))}
+        />
+        <input
+          type="text"
+          placeholder="Nation Name"
+          className="input input-primary"
+          value={form.nationName}
+          onChange={(e) => setForm((prev) => ({ ...prev, nationName: e.target.value }))}
         />
         <input
           type="text"
@@ -128,12 +198,15 @@ export function MintNation() {
 
       <div className="mt-8">
         <h2 className="text-2xl">Your Minted Nations</h2>
-        {ownedTokenIds?.length ? (
+        {nations.length > 0 ? (
           <div className="grid grid-cols-3 gap-4 mt-4">
-            {ownedTokenIds.map((tokenId : any) => (
+            {nations.map(({ tokenId, nationName, rulerName, capitalCity, nationSlogan }) => (
               <div key={tokenId} className="card bg-base-100 shadow-md p-4">
-                <p className="text-lg font-bold">Nation #{tokenId}</p>
-                <p>Details will be fetched from metadata...</p>
+                <p className="text-lg font-bold">Nation ID: {tokenId}</p>
+                <p>Nation Name: {nationName}</p>
+                <p>Ruler: {rulerName}</p>
+                <p>Capital: {capitalCity}</p>
+                <p>Slogan: {nationSlogan}</p>
               </div>
             ))}
           </div>
@@ -144,3 +217,5 @@ export function MintNation() {
     </div>
   );
 }
+
+
