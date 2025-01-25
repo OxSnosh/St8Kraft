@@ -18,7 +18,6 @@ import "hardhat/console.sol";
 ///@title SpyOperationsContract
 ///@author OxSnosh
 ///@dev this contact inherits from openzeppelin's ownable contract
-///@dev this contract inherits from chanlinks VRF contract
 contract SpyOperationsContract is Ownable {
 
     uint256 public attackId;

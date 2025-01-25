@@ -1455,6 +1455,23 @@ async function main() {
 
     console.log("settings initiated");
 
+    if(chainId == 31337 || chainId == 1337) {
+        if (!vrfCoordinatorV2Mock) {
+            throw new Error("vrfCoordinatorV2Mock is undefined.");
+        }
+        await vrfCoordinatorV2Mock.addConsumer(subscriptionId, resourcescontract.address);
+        await vrfCoordinatorV2Mock.addConsumer(subscriptionId, countryparameterscontract.address);
+        await vrfCoordinatorV2Mock.addConsumer(subscriptionId, spyoperationscontract.address);
+        await vrfCoordinatorV2Mock.addConsumer(subscriptionId, cruisemissilecontract.address);
+        await vrfCoordinatorV2Mock.addConsumer(subscriptionId, nukecontract.address);
+        await vrfCoordinatorV2Mock.addConsumer(subscriptionId, airbattlecontract.address);
+        await vrfCoordinatorV2Mock.addConsumer(subscriptionId, groundbattlecontract.address);
+        await vrfCoordinatorV2Mock.addConsumer(subscriptionId, navalattackcontract.address);
+        await vrfCoordinatorV2Mock.addConsumer(subscriptionId, navalblockadecontract.address);
+        await vrfCoordinatorV2Mock.addConsumer(subscriptionId, breakblockadecontract.address);
+
+    }
+
     const eaPath = "external_adapters/Contracts";
 
     if(chainId == 31337) {
@@ -1464,35 +1481,161 @@ async function main() {
         let countryMinterArtifact = await artifacts.readArtifact("CountryMinter");
         let countryMinterAbi = countryMinterArtifact.abi;
 
+        let warbucksArtifact = await artifacts.readArtifact("WarBucks");
+        let warbucksAbi = warbucksArtifact.abi;
+
+        let MetaNationsGovTokenArtifact = await artifacts.readArtifact("MetaNationsGovToken")
+        let MetaNationsGovTokenAbi = MetaNationsGovTokenArtifact.abi
+
+        let AidContractArtifact = await artifacts.readArtifact("AidContract")
+        let AidContractAbi = AidContractArtifact.abi
+
+        let AirBattleArtifact = await artifacts.readArtifact("AirBattleContract")
+        let airbattleAbi = AirBattleArtifact.abi
+
+        let AdditionalAirBattleArtifact = await artifacts.readArtifact("AdditionalAirBattle")
+        let additionalairbattleAbi = AdditionalAirBattleArtifact.abi
+
+        let BillsContractArtifact = await artifacts.readArtifact("BillsContract")
+        let billsAbi = BillsContractArtifact.abi
+
+        let BombersContractArtifact = await artifacts.readArtifact("BombersContract")
+        let bombersAbi = BombersContractArtifact.abi
+
+        let BombersMarketplace1Artifact = await artifacts.readArtifact("BombersMarketplace1")
+        let bombersmarketplace1Abi = BombersMarketplace1Artifact.abi
+
+        let BombersMarketplace2Artifact = await artifacts.readArtifact("BombersMarketplace2")
+        let bombersmarketplace2Abi = BombersMarketplace2Artifact.abi
+
+        let CountryParametersContractArtifact = await artifacts.readArtifact("CountryParametersContract")
+        let countryParametersAbi = CountryParametersContractArtifact.abi
+
+        let CrimeContractArtifact = await artifacts.readArtifact("CrimeContract")
+        let crimeAbi = CrimeContractArtifact.abi
+
+        let CruiseMissileContractArtifact = await artifacts.readArtifact("CruiseMissileContract")
+        let cruiseMissileAbi = CruiseMissileContractArtifact.abi
+
+        let EnvironmentContractArtifact = await artifacts.readArtifact("EnvironmentContract")
+        let environmentAbi = EnvironmentContractArtifact.abi
+
+        let FightersContractArtifact = await artifacts.readArtifact("FightersContract")
+        let fightersAbi = FightersContractArtifact.abi
+
+        let FighterLossesArtifact = await artifacts.readArtifact("FighterLosses")
+        let fighterLossesAbi = FighterLossesArtifact.abi
+
+        let FightersMarketplace1Artifact = await artifacts.readArtifact("FightersMarketplace1")
+        let fightersmarketplace1Abi = FightersMarketplace1Artifact.abi
+
+        let FightersMarketplace2Artifact = await artifacts.readArtifact("FightersMarketplace2")
+        let fightersmarketplace2Abi = FightersMarketplace2Artifact.abi
+
         let forcesArtifact = await artifacts.readArtifact("ForcesContract");
         let forcesAbi = forcesArtifact.abi;
 
-        let warbucksArtifact = await artifacts.readArtifact("WarBucks");
-        let warbucksAbi = warbucksArtifact.abi;
+        let MissilesContractArtifact = await artifacts.readArtifact("MissilesContract");
+        let missilesAbi = MissilesContractArtifact.abi;
+
+        let GroundBattleArtifact = await artifacts.readArtifact("GroundBattleContract");
+        let groundBattleAbi = GroundBattleArtifact.abi;
+
+        let ImprovementsContract1Artifact = await artifacts.readArtifact("ImprovementsContract1");
+        let improvements1Abi = ImprovementsContract1Artifact.abi;
+
+        let ImprovementsContract2Artifact = await artifacts.readArtifact("ImprovementsContract2");
+        let improvements2Abi = ImprovementsContract2Artifact.abi;
+
+        let ImprovementsContract3Artifact = await artifacts.readArtifact("ImprovementsContract3");
+        let improvements3Abi = ImprovementsContract3Artifact.abi;
+
+        let ImprovementsContract4Artifact = await artifacts.readArtifact("ImprovementsContract4");
+        let improvements4Abi = ImprovementsContract4Artifact.abi;
+
+        let InfrastructureContractArtifact = await artifacts.readArtifact("InfrastructureContract");
+        let infrastructureAbi = InfrastructureContractArtifact.abi;
+
+        let InfrastructureMarketplaceArtifact = await artifacts.readArtifact("InfrastructureMarketContract");
+        let infrastructureMarketAbi = InfrastructureMarketplaceArtifact.abi;
+
+        let KeeperContractArtifact = await artifacts.readArtifact("KeeperContract");
+        let keeperAbi = KeeperContractArtifact.abi;
+
+        let LandMarketContractArtifact = await artifacts.readArtifact("LandMarketContract");
+        let landMarketAbi = LandMarketContractArtifact.abi;
+
+        let MilitaryContractArtifact = await artifacts.readArtifact("MilitaryContract");
+        let militaryAbi = MilitaryContractArtifact.abi;
+
+        let NationStrengthContractArtifact = await artifacts.readArtifact("NationStrengthContract");
+        let nationStrengthAbi = NationStrengthContractArtifact.abi;
+
+        let NavyContractArtifact = await artifacts.readArtifact("NavyContract");
+        let navyAbi = NavyContractArtifact.abi;
+
+        let NavyContract2Artifact = await artifacts.readArtifact("NavyContract2");
+        let navy2Abi = NavyContract2Artifact.abi;
+
+        let NavalActionsContractArtifact = await artifacts.readArtifact("NavalActionsContract");
+        let navalActionsAbi = NavalActionsContractArtifact.abi;
+
+        let AdditionalNavyContractArtifact = await artifacts.readArtifact("AdditionalNavyContract");
+        let additionalNavyAbi = AdditionalNavyContractArtifact.abi;
+
+        let NavalBlockadeContractArtifact = await artifacts.readArtifact("NavalBlockadeContract");
+        let navalBlockadeAbi = NavalBlockadeContractArtifact.abi;
+
+        let BreakBlocadeContractArtifact = await artifacts.readArtifact("BreakBlocadeContract");
+        let breakBlockadeAbi = BreakBlocadeContractArtifact.abi;
+
+        let NavalAttackContractArtifact = await artifacts.readArtifact("NavalAttackContract");
+        let navalAttackAbi = NavalAttackContractArtifact.abi;
+
+        let NukeContractArtifact = await artifacts.readArtifact("NukeContract");
+        let nukeAbi = NukeContractArtifact.abi;
+
+        let ResourcesContractArtifact = await artifacts.readArtifact("ResourcesContract");
+        let resourcesAbi = ResourcesContractArtifact.abi;
+
+        let BonusResourcesContractArtifact = await artifacts.readArtifact("BonusResourcesContract");
+        let bonusResourcesAbi = BonusResourcesContractArtifact.abi;
+
+        let SenateContractArtifact = await artifacts.readArtifact("SenateContract");
+        let senateAbi = SenateContractArtifact.abi;
+
+        let SpyContractArtifact = await artifacts.readArtifact("SpyContract");
+        let spycontractAbi = SpyContractArtifact.abi;
+
+        let SpyOperationsContractArtifact = await artifacts.readArtifact("SpyOperationsContract");
+        let spyOperationAbi = SpyOperationsContractArtifact.abi;
+
+        let TaxesContractArtifact = await artifacts.readArtifact("TaxesContract");
+        let taxesAbi = TaxesContractArtifact.abi;
+
+        let AdditionalTaxesContractArtifact = await artifacts.readArtifact("AdditionalTaxesContract");
+        let additionalTaxesAbi = AdditionalTaxesContractArtifact.abi;
+
+        let TechnologyMarketContractArtifact = await artifacts.readArtifact("TechnologyMarketContract");
+        let technologyAbi = TechnologyMarketContractArtifact.abi;
 
         let treasuryArtifact = await artifacts.readArtifact("TreasuryContract");
         let treasuryAbi = treasuryArtifact.abi;
 
-        let infrastructureArtifact = await artifacts.readArtifact("InfrastructureMarketContract");
-        let infrastructureAbi = infrastructureArtifact.abi;
-
-        let technologyArtifact = await artifacts.readArtifact("TechnologyMarketContract");
-        let technologyAbi = technologyArtifact.abi;
-
-        let militaryArtifact = await artifacts.readArtifact("MilitaryContract");
-        let militaryAbi = militaryArtifact.abi;
-
         let warArtifact = await artifacts.readArtifact("WarContract");
         let warAbi = warArtifact.abi;
 
-        let nationStrengthArtifact = await artifacts.readArtifact("NationStrengthContract")
-        let nationStrengthAbi = nationStrengthArtifact.abi;
+        let Wonders1Artifact = await artifacts.readArtifact("WondersContract1");
+        let wonders1Abi = Wonders1Artifact.abi;
 
-        let spyOperationArtifact = await artifacts.readArtifact("SpyOperationsContract")
-        let spyOperationAbi = spyOperationArtifact.abi
+        let Wonders2Artifact = await artifacts.readArtifact("WondersContract2");
+        let wonders2Abi = Wonders2Artifact.abi;
 
-        let groundBattleArtifact = await artifacts.readArtifact("GroundBattleContract")
-        let groundBattleAbi = groundBattleArtifact.abi
+        let Wonders3Artifact = await artifacts.readArtifact("WondersContract3");
+        let wonders3Abi = Wonders3Artifact.abi;
+
+        let Wonders4Artifact = await artifacts.readArtifact("WondersContract4");
+        let wonders4Abi = Wonders4Artifact.abi;
 
         // Read Contract Metadata
         try {
@@ -1585,36 +1728,216 @@ async function main() {
         scriptMetadata.HARDHAT = {
             ...scriptMetadata.HARDHAT,
             countryminter: {
-            address: countryminter.address,
-            ABI: countryMinterAbi,
-            },
-            forcescontract: {
-            address: forcescontract.address,
-            ABI: forcesAbi,
+                address: countryminter.address,
+                ABI: countryMinterAbi,
             },
             warbucks: {
                 address: warbucks.address,
                 ABI: warbucksAbi,
             },
-            treasurycontract: {
-                address: treasurycontract.address,
-                ABI: treasuryAbi,
+            metanationsgovtoken: {
+                address: metanationsgovtoken.address,
+                ABI: MetaNationsGovTokenAbi
+            },
+            aidcontract: {
+                address: aidcontract.address,
+                ABI: AidContractAbi
+            },
+            airbattlecontract: {
+                address: airbattlecontract.address,
+                ABI: airbattleAbi
+            },
+            additionalairbattle: {
+                address: additionalairbattle.address,
+                ABI: additionalairbattleAbi
+            },
+            billscontract: {
+                address: billscontract.address,
+                ABI: billsAbi
+            },
+            bomberscontract: {
+                address: bomberscontract.address,
+                ABI: bombersAbi
+            },
+            bombersmarketplace1: {
+                address: bombersmarketplace1.address,
+                ABI: bombersmarketplace1Abi
+            },
+            bombersmarketplace2: {
+                address: bombersmarketplace2.address,
+                ABI: bombersmarketplace2Abi
+            },
+            countryparameterscontract: {
+                address: countryparameterscontract.address,
+                ABI: countryParametersAbi
+            },
+            crimecontract: {
+                address: crimecontract.address,
+                ABI: crimeAbi
+            },
+            cruisemissilecontract: {
+                address: cruisemissilecontract.address,
+                ABI: cruiseMissileAbi
+            },
+            environmentcontract: {
+                address: environmentcontract.address,
+                ABI: environmentAbi
+            },
+            fighterscontract: {
+                address: fighterscontract.address,
+                ABI: fightersAbi
+            },
+            fighterlosses: {
+                address: fighterlosses.address,
+                ABI: fighterLossesAbi
+            },
+            fightersmarketplace1: {
+                address: fightersmarketplace1.address,
+                ABI: fightersmarketplace1Abi
+            },
+            fightersmarketplace2: {
+                address: fightersmarketplace2.address,
+                ABI: fightersmarketplace2Abi
+            },
+            forcescontract: {
+                address: forcescontract.address,
+                ABI: forcesAbi,
+            },
+            missilescontract: {
+                address: missilescontract.address,
+                ABI: missilesAbi,
+            },
+            groundbattlecontract: {
+                address: groundbattlecontract.address,
+                ABI: groundBattleAbi,
+            },
+            improvementscontract1: {
+                address: improvementscontract1.address,
+                ABI: improvements1Abi,
+            },
+            improvementscontract2: {
+                address: improvementscontract2.address,
+                ABI: improvements2Abi,
+            },
+            improvementscontract3: {
+                address: improvementscontract3.address,
+                ABI: improvements3Abi,
+            },
+            improvementscontract4: {
+                address: improvementscontract4.address,
+                ABI: improvements4Abi,
             },
             infrastructurecontract: {
-                address: infrastructuremarketplace.address,
+                address: infrastructurecontract.address,
                 ABI: infrastructureAbi,
             },
-            technologymarketcontract: {
-                address: technologymarketcontrat.address,
-                ABI: technologyAbi,
+            infrastructuremarketplace: {
+                address: infrastructuremarketplace.address,
+                ABI: infrastructureMarketAbi,
+            },
+            keepercontract: {
+                address: keepercontract.address,
+                ABI: keeperAbi,
+            },
+            landmarketcontract: {
+                address: landmarketcontract.address,
+                ABI: landMarketAbi,
             },
             militarycontract: {
                 address: militarycontract.address,
                 ABI: militaryAbi,
             },
+            nationstrengthcontract: {
+                address: nationstrengthcontract.address,
+                ABI: nationStrengthAbi,
+            },
+            navycontract: {
+                address: navycontract.address,
+                ABI: navyAbi,
+            },
+            navycontract2: {
+                address: navycontract2.address,
+                ABI: navy2Abi,
+            },
+            navalactionscontract: {
+                address: navalactionscontract.address,
+                ABI: navalActionsAbi,
+            },
+            additionalnavycontract: {
+                address: additionalnavycontract.address,
+                ABI: additionalNavyAbi,
+            },
+            navalblockadecontract: {
+                address: navalblockadecontract.address,
+                ABI: navalBlockadeAbi,
+            },
+            breakblockadecontract: {
+                address: breakblockadecontract.address,
+                ABI: breakBlockadeAbi,
+            },
+            navalattackcontract: {
+                address: navalattackcontract.address,
+                ABI: navalAttackAbi,
+            },
+            nukecontract: {
+                address: nukecontract.address,
+                ABI: nukeAbi,
+            },
+            resourcescontract: {
+                address: resourcescontract.address,
+                ABI: resourcesAbi,
+            },
+            bonusresourcescontract: {
+                address: bonusresourcescontract.address,
+                ABI: bonusResourcesAbi,
+            },
+            senatecontract: {
+                address: senatecontract.address,
+                ABI: senateAbi,
+            },
+            spycontract: {
+                address: spycontract.address,
+                ABI: spycontractAbi,
+            },
+            spyoperationscontract: {
+                address: spyoperationscontract.address,
+                ABI: spyOperationAbi,
+            },
+            taxescontract: {
+                address: taxescontract.address,
+                ABI: taxesAbi,
+            },
+            additionaltaxescontract: {
+                address: additionaltaxescontract.address,
+                ABI: additionalTaxesAbi,
+            },
+            technologymarketcontract: {
+                address: technologymarketcontrat.address,
+                ABI: technologyAbi,
+            },
+            treasurycontract: {
+                address: treasurycontract.address,
+                ABI: treasuryAbi,
+            },
             warcontract: {
                 address: warcontract.address,
                 ABI: warAbi,
+            },
+            wonderscontract1: {
+                address: wonderscontract1.address,
+                ABI: wonders1Abi,
+            },
+            wonderscontract2: {
+                address: wonderscontract2.address,
+                ABI: wonders2Abi,
+            },
+            wonderscontract3: {
+                address: wonderscontract3.address,
+                ABI: wonders3Abi,
+            },
+            wonderscontract4: {
+                address: wonderscontract4.address,
+                ABI: wonders4Abi,
             }
         };
         fs.writeFileSync(

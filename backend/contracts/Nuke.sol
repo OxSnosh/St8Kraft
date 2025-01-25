@@ -444,6 +444,9 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
     ///@return uint256 is the global radiation level
     function getGlobalRadiation() public view returns (uint256) {
         uint256 countries = mint.getCountryCount();
+        if (countries == 0) {
+            countries = 1;
+        }
         uint256 nukesLanded = calculateNukesLandedLastSevenDays();
         uint256 globalRadiation = ((nukesLanded * mod) / countries);
         return globalRadiation;

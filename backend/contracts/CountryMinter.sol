@@ -40,15 +40,10 @@ contract CountryMinter is ERC721, Ownable {
     address public military;
     address public forces;
     address public treasury;
-    address public aid;
     address public navy;
     address public navy2;
     address public navalActions;
     address public fighters;
-    address public fightersMarket1;
-    address public fightersMarket2;
-    address public bombersMarket1;
-    address public bombersMarket2;
     address public bombers;
     address public missiles;
     address public senate;
@@ -66,7 +61,7 @@ contract CountryMinter is ERC721, Ownable {
     );
 
     constructor (
-    ) ERC721 ("MetaNations NFTs", "MNFT") {
+    ) ERC721 ("St8craft", "ST8") {
     }
 
     ///@dev this function is only callable by the contract owner
