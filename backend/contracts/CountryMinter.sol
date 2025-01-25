@@ -52,6 +52,7 @@ contract CountryMinter is ERC721, Ownable {
 
     mapping(uint256 => address) public idToOwner;
     mapping(address => uint256) public ownerCountryCount;
+    mapping(address => uint256[]) public ownerCountryIds;
 
     event NationCreated(
         string indexed nationName,
@@ -144,6 +145,9 @@ contract CountryMinter is ERC721, Ownable {
         uint256 seedMoney = TreasuryContract(treasury).getSeedMoney();
         IWarBucks(warbucks).burnFromMint(msg.sender, seedMoney);
         _safeMint(msg.sender, countryId);
+        idToOwner[countryId] = msg.sender;
+        ownerCountryCount[msg.sender]++;
+        ownerCountryIds[msg.sender].push(countryId);
         BombersContract(bombers).generateBombers(countryId);
         CountryParametersContract(countryParameters).generateCountryParameters(
             countryId,
@@ -189,5 +193,9 @@ contract CountryMinter is ERC721, Ownable {
         } else {
             return false;
         }
+    }
+
+    function tokensOfOwner(address owner) public view returns (uint256[] memory) {
+        return ownerCountryIds[owner];
     }
 }
