@@ -3,11 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { useWaitForTransactionReceipt, useWriteContract, useAccount, usePublicClient } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
+import { keccak256 } from "viem";
 
 export function MintNation() {
   const [form, setForm] = useState({
-    nationName: "",
     rulerName: "",
+    nationName: "",
     capitalCity: "",
     nationSlogan: "",
   });
@@ -109,10 +110,15 @@ export function MintNation() {
       alert("Contract or connection is not ready. Please check your setup.");
       return;
     }
-
+  
+    if (!publicClient) {
+      console.error("Public client is not initialized.");
+      return;
+    }
+  
     try {
       setIsPending(true);
-
+  
       const tx = await writeContractAsync({
         abi: countryMinterContract.abi,
         address: countryMinterContract.address,
@@ -124,9 +130,62 @@ export function MintNation() {
           form.nationSlogan,
         ],
       });
-
+  
       setTxHash(tx); // Save the transaction hash
       alert("Transaction submitted!");
+  
+      // Wait for the transaction receipt
+      const receipt = await publicClient.waitForTransactionReceipt({ hash: tx });
+      console.log("Transaction receipt:", receipt);
+  
+      // Manually encode the Transfer event signature
+      const transferEventSignature = keccak256(
+        Buffer.from("Transfer(address,address,uint256)")
+      );
+  
+      // Get the new token ID from the event logs
+      const newTokenId = receipt.logs.find(
+        (log) => log.topics[0] === transferEventSignature
+      )?.topics[3]; // Topics[3] contains the token ID in Transfer events
+  
+      if (newTokenId) {
+        const tokenIdString = BigInt(newTokenId).toString(); // Convert token ID from hex to string
+  
+        // Fetch details for the newly minted token
+        const nationName = await publicClient.readContract({
+          abi: countryParametersContract.abi,
+          address: countryParametersContract.address,
+          functionName: "getNationName",
+          args: [tokenIdString],
+        });
+  
+        const rulerName = await publicClient.readContract({
+          abi: countryParametersContract.abi,
+          address: countryParametersContract.address,
+          functionName: "getRulerName",
+          args: [tokenIdString],
+        });
+  
+        const capitalCity = await publicClient.readContract({
+          abi: countryParametersContract.abi,
+          address: countryParametersContract.address,
+          functionName: "getCapital",
+          args: [tokenIdString],
+        });
+  
+        const nationSlogan = await publicClient.readContract({
+          abi: countryParametersContract.abi,
+          address: countryParametersContract.address,
+          functionName: "getSlogan",
+          args: [tokenIdString],
+        });
+  
+        // Add the new nation to the state
+        setNations((prev) => [
+          ...prev,
+          { tokenId: tokenIdString, nationName, rulerName, capitalCity, nationSlogan },
+        ]);
+      }
     } catch (error) {
       console.error("Error while minting the nation:", error);
       alert("An error occurred while minting the nation.");
@@ -134,6 +193,8 @@ export function MintNation() {
       setIsPending(false);
     }
   };
+  
+  
 
   return (
     <div className="text-center mt-8 bg-secondary p-10">
@@ -202,9 +263,9 @@ export function MintNation() {
           <div className="grid grid-cols-3 gap-4 mt-4">
             {nations.map(({ tokenId, nationName, rulerName, capitalCity, nationSlogan }) => (
               <div key={tokenId} className="card bg-base-100 shadow-md p-4">
-                <p className="text-lg font-bold">Nation ID: {tokenId}</p>
-                <p>Nation Name: {nationName}</p>
+                <p className="text-lg font-bold">Nation {tokenId}</p>
                 <p>Ruler: {rulerName}</p>
+                <p>Nation Name: {nationName}</p>
                 <p>Capital: {capitalCity}</p>
                 <p>Slogan: {nationSlogan}</p>
               </div>

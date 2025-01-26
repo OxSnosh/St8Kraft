@@ -172,8 +172,8 @@ contract TaxesContract is Ownable {
         );
         (uint256 citizenCount, ) = inf.getTaxablePopulationCount(0);
         uint256 taxRate = inf.getTaxRate(id);
-        uint256 dailyTaxesCollectiblePerCitizen = ((dailyIncomePerCitizen *
-            taxRate) / 100);
+        uint256 dailyTaxesCollectiblePerCitizen = (dailyIncomePerCitizen *
+            taxRate);
         uint256 taxesCollectible = (dailyTaxesCollectiblePerCitizen *
             daysSinceLastTaxCollection *
             citizenCount) * (10 ** 18);
