@@ -80,8 +80,12 @@ export const Header = () => {
   // Fetch minted nations when the wallet connects
   useEffect(() => {
     const fetchMintedNations = async () => {
-      if (!countryMinterContract || !walletAddress || !publicClient) {
-        console.error("Missing required data: countryMinterContract, walletAddress, or publicClient.");
+      if (!walletAddress) {
+        console.log("Waiting for walletAddress to be defined.");
+        return;
+      }
+      if (!countryMinterContract || !publicClient) {
+        console.error("Missing required data: countryMinterContract or publicClient.");
         return;
       }
 
