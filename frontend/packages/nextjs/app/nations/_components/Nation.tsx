@@ -5,6 +5,22 @@ import { useSearchParams } from "next/navigation";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 import { usePublicClient } from "wagmi";
 import { getResources, getBonusResources, getTradingPartners } from '../../../utils/resources';
+import { getImprovements } from '../../../utils/improvements';
+import { getWonders } from '../../../utils/wonders';
+import { getEnvironmentScore } from "../../../utils/environment"
+import { getNationStrength } from "../../../utils/strength";
+import { getDefconLevel, getThreatLevel, getWarPeacePreference } from "~~/utils/military";
+import { 
+  getSoldierCount, 
+  getTankCount, 
+  getDefendingSoldierCount, 
+  getDeployedSoldierCount,
+  getDefendingSoldierEfficiencyModifier,
+  getDeployedSoldierEfficiencyModifier, 
+  getDefendingTankCount, 
+  getDeployedTankCount
+} from "../../../utils/forces"
+import { getFighters } from "../../../utils/fighters"
 
 type NationDetails = {
   nationName: string | null;
@@ -40,6 +56,21 @@ type NationDetails = {
   rehabilitatedCitizens: string | null;
   incarceratedCitizens: string | null;
   populationDensity: string | null;
+  improvements: { improvementCount: any; name: string }[];
+  wonders: { wonderCount: any; name: string }[];
+  environmentScore: string | null;
+  strength: string | null;
+  warPeacePreference: string | null;
+  defconLevel: string | null;
+  threatLevel: string | null;
+  soldierCount: string | null;
+  defendingSoldierCount: string | null;
+  getDefendingSoldierEfficiencyModifier: string | null;
+  deployedSoldierCount: string | null;
+  tankCount: string | null;
+  defendingTankCount: string | null;
+  deployedTankCount: string | null;
+  fighters: { fighterCount: any; name: string }[];
 };
 
 const NationDetailsPage = () => {
@@ -55,6 +86,19 @@ const NationDetailsPage = () => {
   const crimeContract = contractsData?.CrimeContract;
   const resourcesContract = contractsData?.ResourcesContract;
   const bonusResourcesContract = contractsData?.BonusResourcesContract;
+  const improvementsContract1 = contractsData?.ImprovementsContract1;
+  const improvementsContract2 = contractsData?.ImprovementsContract2;
+  const improvementsContract3 = contractsData?.ImprovementsContract3;
+  const improvementsContract4 = contractsData?.ImprovementsContract4;
+  const wondersContract1 = contractsData?.WondersContract1;
+  const wondersContract2 = contractsData?.WondersContract2;
+  const wondersContract3 = contractsData?.WondersContract3;
+  const wondersContract4 = contractsData?.WondersContract4;
+  const environmentContract = contractsData?.EnvironmentContract;
+  const strenghtContract = contractsData?.NationStrengthContract;
+  const militaryContract = contractsData?.MilitaryContract;
+  const forcesContract = contractsData?.ForcesContract;
+  const fightersContract = contractsData?.FightersContract;
 
   const [nationDetails, setNationDetails] = useState<NationDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -140,7 +184,44 @@ const NationDetailsPage = () => {
         const resources = await getResources(tokenIdString, resourcesContract, publicClient);
         const bonusResources = await getBonusResources(tokenIdString, bonusResourcesContract, publicClient);
         const tradingPartners = await getTradingPartners(tokenIdString, resourcesContract, publicClient);
-      
+
+        const improvements = await getImprovements(tokenIdString, improvementsContract1, improvementsContract2, improvementsContract3, improvementsContract4, publicClient);
+
+        const wonders = await getWonders(tokenIdString, wondersContract1, wondersContract2, wondersContract3, wondersContract4, publicClient)
+        
+        const environmentScore = await getEnvironmentScore(tokenIdString, publicClient, environmentContract)
+
+        const strength = await getNationStrength(tokenIdString, publicClient, strenghtContract);
+
+        const warPeacePreferenceBool = await getWarPeacePreference(tokenIdString, publicClient, militaryContract);
+
+        let warPeacePreference : string
+        if (warPeacePreferenceBool) {
+          warPeacePreference = "Nation is ready for war!"
+        } else {
+          warPeacePreference = "Nation is in peace mode"
+        }
+
+        const defconLevel = await getDefconLevel(tokenIdString, publicClient, militaryContract);
+
+        const threatLevel = await getThreatLevel(tokenIdString, publicClient, militaryContract);
+
+        const soldierCount = await getSoldierCount(tokenIdString, publicClient, forcesContract);
+
+        const defendingSoldierCount = await getDefendingSoldierCount(tokenIdString, publicClient, forcesContract);
+
+        const deployedSoldierCount = await getDeployedSoldierCount(tokenIdString, publicClient, forcesContract);
+
+        const defendingSoldierEfficiencyModifier = await getDefendingSoldierEfficiencyModifier(tokenIdString, publicClient, forcesContract);
+
+        const tankCount = await getTankCount(tokenIdString, publicClient, forcesContract);
+
+        const defendingTankCount = await getDefendingTankCount(tokenIdString, publicClient, forcesContract);
+
+        const deployedTankCount = await getDeployedTankCount(tokenIdString, publicClient, forcesContract);
+
+        const fighterCount = await getFighters(tokenIdString, publicClient, fightersContract);
+
         const details: NationDetails = {
           nationName: (await publicClient.readContract({
             abi: countryParametersContract.abi,
@@ -344,7 +425,40 @@ const NationDetailsPage = () => {
               args: [tokenIdString],
             })
           ),
+
+          improvements: improvements || [],
+
+          wonders: wonders || [],
+
+          environmentScore: environmentScore.toString() || null,
+
+          strength: strength.toString() || null,
+
+          warPeacePreference: warPeacePreference || null,
+
+          defconLevel: defconLevel.toString() || null,
+
+          threatLevel: threatLevel.toString() || null,
+
+          soldierCount: soldierCount.toString() || null,
+
+          defendingSoldierCount: defendingSoldierCount.toString() || null,
+
+          getDefendingSoldierEfficiencyModifier: defendingSoldierEfficiencyModifier.toString() || null,
+
+          deployedSoldierCount: deployedSoldierCount.toString() || null,
+
+          tankCount: tankCount.toString() || null,
+
+          defendingTankCount: defendingTankCount.toString() || null,
+
+          deployedTankCount: deployedTankCount.toString() || null,
+
+          fighters: fighterCount || [],
+
         };
+
+        console.log("Nation details:", details);
 
         setNationDetails(details);
       } catch (err) {
@@ -383,6 +497,21 @@ const NationDetailsPage = () => {
           rehabilitatedCitizens: null,
           incarceratedCitizens: null,
           populationDensity: null,
+          improvements: [],
+          wonders: [],
+          environmentScore: null,
+          strength: null,
+          warPeacePreference: null,
+          defconLevel: null,
+          threatLevel: null,
+          soldierCount: null,
+          defendingSoldierCount: null,
+          getDefendingSoldierEfficiencyModifier: null,
+          deployedSoldierCount: null,
+          tankCount: null,
+          defendingTankCount: null,
+          deployedTankCount: null,
+          fighters: [],
         });
       } finally {
         setLoading(false);
@@ -453,7 +582,7 @@ const NationDetailsPage = () => {
           </tr>
           <tr>
             <td className="border border-gray-300 px-4 py-2 font-semibold">Trading Partners:</td>
-            <td className="border border-gray-300 px-4 py-2">{nationDetails.tradingPartners?.join(", ") || "Unknown"}</td>
+            <td className="border border-gray-300 px-4 py-2">{nationDetails.tradingPartners?.join(", ") || "None"}</td>
           </tr>
           <tr>
             <td className="border border-gray-300 px-4 py-2 font-semibold">Government Type:</td>
@@ -475,7 +604,7 @@ const NationDetailsPage = () => {
         <tbody>
           <tr>
             <td className="border border-gray-300 px-4 py-2 font-semibold">Nation Balance:</td>
-            <td className="border border-gray-300 px-4 py-2">{nationDetails.balance || "Unknown"}</td>
+            <td className="border border-gray-300 px-4 py-2">{nationDetails.balance ? Math.floor(Number(nationDetails.balance)) : "Unknown"}</td>
           </tr>
           <tr>
             <td className="border border-gray-300 px-4 py-2 font-semibold">Happiness:</td>
@@ -570,6 +699,93 @@ const NationDetailsPage = () => {
           <tr>
             <td className="border border-gray-300 px-4 py-2 font-semibold">Incarcerated Citizens:</td>
             <td className="border border-gray-300 px-4 py-2">{nationDetails.incarceratedCitizens || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Improvements:</td>
+            <td className="border border-gray-300 px-4 py-2">
+              {nationDetails.improvements.map((improvement) => (
+                <div key={improvement.name}>
+                  {improvement.improvementCount.toString()} {improvement.name}, 
+                </div>
+              ))}
+            </td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Wonders:</td>
+            <td className="border border-gray-300 px-4 py-2">
+              {nationDetails.wonders.map((wonder) => (
+                <div key={wonder.name}>
+                  {wonder.name},
+                </div>
+              ))}
+            </td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Environment Score:</td>
+            <td className="border border-gray-300 px-4 py-2">{nationDetails.environmentScore || "Unknown"}</td>
+          </tr>
+        </tbody>
+      </table>
+      <h2 className="txt-lg font-semibold mb-4">Military</h2>
+      <table className="table-auto border-collapse border border-gray-300 w-full text-sm mb-6 table-fixed">
+        <colgroup>
+          <col style={{ width: "50%" }} />
+          <col style={{ width: "50%" }} />
+        </colgroup>
+        <tbody>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Nation Strenght:</td>
+            <td className="border border-gray-300 px-4 py-2">{nationDetails.strength || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">War/Peace Preference:</td>
+            <td className="border border-gray-300 px-4 py-2">{nationDetails.warPeacePreference || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Defcon Level:</td>
+            <td className="border border-gray-300 px-4 py-2">{nationDetails.defconLevel || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Threat Level:</td>
+            <td className="border border-gray-300 px-4 py-2">{nationDetails.threatLevel || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Soldier Count:</td>
+            <td className="border border-gray-300 px-4 py-2">{nationDetails.soldierCount || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Defending Soldier Count:</td>
+            <td className="border border-gray-300 px-4 py-2">{nationDetails.defendingSoldierCount || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Defending Soldier Efficiency Modifier:</td>
+            <td className="border border-gray-300 px-4 py-2">{nationDetails.getDefendingSoldierEfficiencyModifier ? `${nationDetails.getDefendingSoldierEfficiencyModifier}%` : "Unknown"}</td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Deployed Soldier Count:</td>
+            <td className="border border-gray-300 px-4 py-2">{nationDetails.deployedSoldierCount || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Tank Count:</td>
+            <td className="border border-gray-300 px-4 py-2">{nationDetails.tankCount || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Defending Tank Count:</td>
+            <td className="border border-gray-300 px-4 py-2">{nationDetails.defendingTankCount || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Deployed Tank Count:</td>
+            <td className="border border-gray-300 px-4 py-2">{nationDetails.deployedTankCount || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Fighters:</td>
+            <td className="border border-gray-300 px-4 py-2">
+              {nationDetails.fighters.map((fighter) => (
+                <div key={fighter.name}>
+                  {fighter.fighterCount.toString()} {fighter.name},
+                </div>
+              ))}
+            </td>
           </tr>
         </tbody>
       </table>

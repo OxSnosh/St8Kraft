@@ -1,6 +1,3 @@
-type Resources = string[]
-type BonusResources = string[]
-type TradingPartners = string[]
 
 export const getResources = async (
     nationId: string,
@@ -63,7 +60,7 @@ export const getBonusResources = async (
     bonusResourcesContract: any,
     publicClient: any
 ) => {
-    const bonusResources: BonusResources = [];
+    const bonusResources: string[] = [];
 
     if (!publicClient || !bonusResourcesContract || !nationId) {
         console.error("Missing required data: publicClient, bonusResourcesContract, or nationId.");
