@@ -167,5 +167,26 @@ export const getDeployedTankCount = async (
     });
 }
 
+export const getCasualties = async (
+    nationId: string,
+    publicClient: any,
+    forcesContracat: any
+) => {
+    if (!publicClient || !forcesContracat || !nationId) {
+        console.log(publicClient, "publicClient")
+        console.log(forcesContracat, "forcesContracat")
+        console.log(nationId, "nationId")
+        console.error("Missing required data: publicClient, forcesContracat, or nationId.");
+        return;
+    }
+
+    return await publicClient.readContract({
+        abi: forcesContracat.abi,
+        address: forcesContracat.address,
+        functionName: "getCasualties",
+        args: [nationId],
+    });
+}
+
 
 

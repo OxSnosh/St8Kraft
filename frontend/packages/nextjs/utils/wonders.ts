@@ -118,8 +118,6 @@ export const getWonders = async (
             });
 
             if (wonderCount > 0) {
-                console.log(wonderCount, "wonderCount")
-                console.log(name, "name")
                 wonders.push({ wonderCount, name });
             }
         }

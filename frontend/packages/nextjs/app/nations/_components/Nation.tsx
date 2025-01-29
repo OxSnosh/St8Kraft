@@ -16,11 +16,15 @@ import {
   getDefendingSoldierCount, 
   getDeployedSoldierCount,
   getDefendingSoldierEfficiencyModifier,
-  getDeployedSoldierEfficiencyModifier, 
   getDefendingTankCount, 
-  getDeployedTankCount
+  getDeployedTankCount,
+  getCasualties
 } from "../../../utils/forces"
 import { getFighters } from "../../../utils/fighters"
+import { getBombers } from "../../../utils/bombers"
+import { getNavy } from "../../../utils/navy"
+import { getCruiseMissileCount, getNukeCount } from "~~/utils/missiles";
+import { getSpyCount } from "~~/utils/spies";
 
 type NationDetails = {
   nationName: string | null;
@@ -71,6 +75,13 @@ type NationDetails = {
   defendingTankCount: string | null;
   deployedTankCount: string | null;
   fighters: { fighterCount: any; name: string }[];
+  bombers: { bomberCount: any; name: string }[];
+  navy: { navyCount: any; name: string }[];
+  cruiseMissiles: string | null;
+  nukes: string | null;
+  spies: string | null;
+  soldierCasualties: string | null;
+  tankCasualties: string | null;
 };
 
 const NationDetailsPage = () => {
@@ -99,6 +110,11 @@ const NationDetailsPage = () => {
   const militaryContract = contractsData?.MilitaryContract;
   const forcesContract = contractsData?.ForcesContract;
   const fightersContract = contractsData?.FightersContract;
+  const bombersContract = contractsData?.BombersContract;
+  const navyContract = contractsData?.NavyContract;
+  const navyContract2 = contractsData?.NavyContract2;
+  const missilesContract = contractsData?.MissilesContract;
+  const spiesContract = contractsData?.SpyContract;
 
   const [nationDetails, setNationDetails] = useState<NationDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -221,6 +237,18 @@ const NationDetailsPage = () => {
         const deployedTankCount = await getDeployedTankCount(tokenIdString, publicClient, forcesContract);
 
         const fighterCount = await getFighters(tokenIdString, publicClient, fightersContract);
+
+        const bomberCount = await getBombers(tokenIdString, publicClient, bombersContract)
+
+        const navy = await getNavy(tokenIdString, publicClient, navyContract, navyContract2)
+
+        const cruiseMissiles = await getCruiseMissileCount(tokenIdString, publicClient, missilesContract)
+
+        const nukes = await getNukeCount(tokenIdString, publicClient, missilesContract)
+
+        const spies = await getSpyCount(tokenIdString, publicClient, spiesContract)
+
+        const casualties = await getCasualties(tokenIdString, publicClient, forcesContract)
 
         const details: NationDetails = {
           nationName: (await publicClient.readContract({
@@ -456,6 +484,19 @@ const NationDetailsPage = () => {
 
           fighters: fighterCount || [],
 
+          bombers: bomberCount || [],
+
+          navy: navy || [],
+
+          cruiseMissiles: cruiseMissiles.toString() || null,
+
+          nukes: nukes.toString() || null,
+
+          spies: spies.toString() || null,
+
+          soldierCasualties: casualties[0]?.toString() || null,
+
+          tankCasualties: casualties[1]?.toString() || null,
         };
 
         console.log("Nation details:", details);
@@ -512,6 +553,13 @@ const NationDetailsPage = () => {
           defendingTankCount: null,
           deployedTankCount: null,
           fighters: [],
+          bombers: [],
+          navy: [],
+          cruiseMissiles: null,
+          nukes: null,
+          spies: null,
+          soldierCasualties: null,
+          tankCasualties: null,
         });
       } finally {
         setLoading(false);
@@ -786,6 +834,46 @@ const NationDetailsPage = () => {
                 </div>
               ))}
             </td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Bombers:</td>
+            <td className="border border-gray-300 px-4 py-2">
+              {nationDetails.bombers.map((bomber) => (
+                <div key={bomber.name}>
+                  {bomber.bomberCount.toString()} {bomber.name},
+                </div>
+              ))}
+            </td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Navy:</td>
+            <td className="border border-gray-300 px-4 py-2">
+              {nationDetails.navy.map((navy) => (
+                <div key={navy.name}>
+                  {navy.navyCount.toString()} {navy.name},
+                </div>
+              ))}
+            </td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Cruise Missiles:</td>
+            <td className="border border-gray-300 px-4 py-2">{nationDetails.cruiseMissiles || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Nukes:</td>
+            <td className="border border-gray-300 px-4 py-2">{nationDetails.nukes || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Spies:</td>
+            <td className="border border-gray-300 px-4 py-2">{nationDetails.spies || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Soldier Casualties:</td>
+            <td className="border border-gray-300 px-4 py-2">{nationDetails.soldierCasualties || "Unknown"}</td>
+          </tr>
+          <tr>
+            <td className="border border-gray-300 px-4 py-2 font-semibold">Tank Casualties:</td>
+            <td className="border border-gray-300 px-4 py-2">{nationDetails.tankCasualties || "Unknown"}</td>
           </tr>
         </tbody>
       </table>
