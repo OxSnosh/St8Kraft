@@ -1,4 +1,4 @@
-import NationDetailsPage from "./_components/Nation";
+import Nation from "./_components/Nation";
 import type { NextPage } from "next";
 import { getMetadata } from "~~/utils/scaffold-eth/getMetadata";
 
@@ -10,7 +10,7 @@ export const metadata = getMetadata({
 const Debug: NextPage = () => {
   return (
     <>
-      <NationDetailsPage />
+      <Nation />
 
     </>
   );
