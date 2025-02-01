@@ -8,6 +8,7 @@ import { useSearchParams } from "next/navigation";
 import { payBills, getBillsPayable, calculateDailyBillsFromInfrastructure, calculateDailyBillsFromMilitary, calculateDailyBillsFromImprovements } from "~~/utils/bills"
 import { checkOwnership } from "~~/utils/countryMinter";
 import { useTheme } from "next-themes";
+import { getDaysSinceLastBillsPaid } from "~~/utils/treasury";
 
 
 const PayBills = () => {
@@ -18,72 +19,78 @@ const PayBills = () => {
     const searchParams = useSearchParams();
     const nationId = searchParams.get("id");
     const BillsContract = contractsData?.BillsContract;
-    const InfrastructureContract = contractsData?.InfrastructureContract;
     const CountryMinterContract = contractsData?.CountryMinter;
-    const MilitaryContract = contractsData?.MilitaryContract;
+    const TreasuryContract = contractsData?.TreasuryContract;
     
     const { writeContractAsync } = useWriteContract();
 
     const [taxDetails, setTaxDetails] = useState({
         billsPayable: "",
-        billsFromInfrastructure: "",
-        billsFromMilitary: "",
-        billsFromImprovements: "",
+        daysSinceLastBillPayment: "",
+        dailyBillsFromInfrastructure: "",
+        dailyBillsFromMilitary: "",
+        dailyBillsFromImprovements: "",
     });
     const [errorMessage, setErrorMessage] = useState("");
 
+    const [refreshTrigger, setRefreshTrigger] = useState(false);
+
     useEffect(() => {
-        const fetchTaxDetails = async () => {
-            if (!nationId || !publicClient || !BillsContract || !InfrastructureContract) return;
+        const fetchBillsDetails = async () => {
+            if (!nationId || !publicClient || !BillsContract || !TreasuryContract) return;
 
             try {
                 const billsPayable = await getBillsPayable(nationId, publicClient, BillsContract);
                 const billsFromInfrastructure = await calculateDailyBillsFromInfrastructure(nationId, publicClient, BillsContract);
                 const billsFromMilitary = await calculateDailyBillsFromMilitary(nationId, publicClient, BillsContract);
                 const billsFromImprovements = await calculateDailyBillsFromImprovements(nationId, publicClient, BillsContract);
-
-                console.log("billsPayable", billsPayable);
-                console.log("billsFromInfrastructure", billsFromInfrastructure);
-                console.log("billsFromMilitary", billsFromMilitary);
-                console.log("billsFromImprovements", billsFromImprovements);
+                const daysSinceLastBillPayment = await getDaysSinceLastBillsPaid(nationId, publicClient, TreasuryContract);
 
                 setTaxDetails({
                     billsPayable: (Number(billsPayable) / 10 ** 18).toLocaleString(),
-                    billsFromInfrastructure: (Number(billsFromInfrastructure).toLocaleString()),
-                    billsFromMilitary: (Number(billsFromMilitary).toLocaleString()),
-                    billsFromImprovements: (Number(billsFromImprovements).toLocaleString()),
+                    daysSinceLastBillPayment: daysSinceLastBillPayment.toString(),
+                    dailyBillsFromInfrastructure: (Number(billsFromInfrastructure) / 10** 18).toLocaleString(),
+                    dailyBillsFromMilitary: (Number(billsFromMilitary) / 10**18).toLocaleString(),
+                    dailyBillsFromImprovements: (Number(billsFromImprovements) / 10**18).toLocaleString(),
                 });
             } catch (error) {
                 console.error("Error fetching tax details:", error);
             }
         };
 
-        fetchTaxDetails();
-    }, [nationId, publicClient, BillsContract, InfrastructureContract]);
+        fetchBillsDetails();
+    }, [nationId, publicClient, BillsContract, TreasuryContract, refreshTrigger]);
 
     const handlePayBills = async () => {
         if (!nationId || !publicClient || !BillsContract || !writeContractAsync) {
-            console.error("Missing required parameters for collectTaxes");
+            console.error("Missing required parameters for payBills");
             setErrorMessage("Missing required parameters.");
             return;
         }
-    
+
         try {
+            const oldBillsPayable = await getBillsPayable(nationId, publicClient, BillsContract);
+
             await payBills(nationId, publicClient, BillsContract, writeContractAsync);
+
+            const newBillsPayable = await getBillsPayable(nationId, publicClient, BillsContract);
+
+            if (oldBillsPayable.toString() !== newBillsPayable.toString()) {
+                setRefreshTrigger(prev => !prev);
+            }
 
             setErrorMessage("");
         } catch (error) {
-    
             if (!nationId) {
                 throw new Error("Nation ID is undefined");
             }
             if (!walletAddress) {
-                throw new Error("Waller Address is undefined");
+                throw new Error("Wallet Address is undefined");
             }
             let owner = await checkOwnership(nationId, walletAddress, publicClient, CountryMinterContract);
             if (!owner) {
                 setErrorMessage("You are not the ruler of this nation");
-            } else {    
+            } else {
                 setErrorMessage("Error paying bills");
             }
 
@@ -125,7 +132,7 @@ const PayBills = () => {
                 onClick={handlePayBills} 
                 className={`mt-4 px-4 py-2 rounded hover:opacity-80 ${theme === 'dark' ? 'bg-blue-500 text-white' : 'bg-blue-600 text-white'}`}
             >
-                Collect Now
+                Pay Bills
             </button>
         </div>
     );

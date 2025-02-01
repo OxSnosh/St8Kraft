@@ -8,12 +8,13 @@ import GovernmentDetails from "./GovernmentDetails";
 import NationDetailsPage from "./NationDetailsPage";
 import MilitarySettings from "./MilitarySettings";
 import PayBills from "./PayBills";
+import DepositWithdraw from "./DepositWithdraw";
 import { useAccount, usePublicClient } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 
 const menuItems = [
   { category: "NATION SETTINGS", options: ["Government Details", "Military Settings"] },
-  { category: "TREASURY", options: ["Collect Taxes", "Pay Bills"] },
+  { category: "TREASURY", options: ["Collect Taxes", "Pay Bills", "Deposit and Withdraw"] },
   { category: "MUNICIPAL PURCHASES", options: ["Infrastructure", "Technology", "Land"] },
   { category: "NATION UPGRADES", options: ["Improvements", "Wonders"] },
   {
@@ -90,6 +91,8 @@ const Nation = () => {
         setSelectedComponent(<MilitarySettings />);
       } else if (savedMenuItem === "Pay Bills") {
         setSelectedComponent(<PayBills />);
+      } else if (savedMenuItem === "Deposit and Withdraw") {
+        setSelectedComponent(<DepositWithdraw />);
       } else {
         setSelectedComponent(<div className="p-6">Coming Soon...</div>);
       }
@@ -114,6 +117,8 @@ const Nation = () => {
       setSelectedComponent(<MilitarySettings />);
     } else if (option === "Pay Bills") {
       setSelectedComponent(<PayBills />);
+    } else if (option === "Deposit and Withdraw") {
+      setSelectedComponent(<DepositWithdraw />);
     } else {
       setSelectedComponent(<div className="p-6">Coming Soon...</div>);
     }

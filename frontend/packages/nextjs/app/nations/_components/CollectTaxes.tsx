@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { usePublicClient, useWriteContract } from "wagmi";
 import { useAccount } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
@@ -17,8 +17,7 @@ import { checkOwnership } from "~~/utils/countryMinter";
 import { getWarPeacePreference } from "~~/utils/military";
 import { useTheme } from "next-themes";
 
-
-const PayBills = () => {
+const CollectTaxes = () => {
     const { theme } = useTheme();
     const publicClient = usePublicClient();
     const contractsData = useAllContracts();
@@ -29,7 +28,7 @@ const PayBills = () => {
     const InfrastructureContract = contractsData?.InfrastructureContract;
     const CountryMinterContract = contractsData?.CountryMinter;
     const MilitaryContract = contractsData?.MilitaryContract;
-    
+
     const { writeContractAsync } = useWriteContract();
 
     const [taxDetails, setTaxDetails] = useState({
@@ -40,65 +39,62 @@ const PayBills = () => {
         taxablePopulationCount: "",
     });
     const [errorMessage, setErrorMessage] = useState("");
+    const [prevTaxesCollectible, setPrevTaxesCollectible] = useState("");
+
+    const fetchTaxDetails = useCallback(async () => {
+        if (!nationId || !publicClient || !TaxesContract || !InfrastructureContract) return;
+
+        try {
+            const taxesRaw = await getTaxesCollectible(nationId, publicClient, TaxesContract);
+            const dailyIncomeRaw = await getDailyIncome(nationId, publicClient, TaxesContract);
+            const happinessRaw = await getHappiness(nationId, publicClient, TaxesContract);
+            const taxRateRaw = await getTaxRate(nationId, publicClient, InfrastructureContract);
+            const taxablePopulationCountRaw = await getTaxablePopulationCount(nationId, publicClient, InfrastructureContract);
+
+            const taxesCollectible = (Number(taxesRaw[1]) / 10 ** 18).toLocaleString();
+
+            setTaxDetails(prevDetails => ({
+                ...prevDetails,
+                taxesCollectible,
+                dailyIncome: Number(dailyIncomeRaw).toLocaleString(),
+                happiness: happinessRaw.toString(),
+                taxRate: `${taxRateRaw}%`,
+                taxablePopulationCount: taxablePopulationCountRaw[0].toString(),
+            }));
+
+            setPrevTaxesCollectible(taxesCollectible);
+        } catch (error) {
+            console.error("Error fetching tax details:", error);
+        }
+    }, [nationId, publicClient, TaxesContract, InfrastructureContract, prevTaxesCollectible]);
 
     useEffect(() => {
-        const fetchTaxDetails = async () => {
-            if (!nationId || !publicClient || !TaxesContract || !InfrastructureContract) return;
-
-            try {
-                const taxesRaw = await getTaxesCollectible(nationId, publicClient, TaxesContract);
-                const dailyIncomeRaw = await getDailyIncome(nationId, publicClient, TaxesContract);
-                const happinessRaw = await getHappiness(nationId, publicClient, TaxesContract);
-                const taxRateRaw = await getTaxRate(nationId, publicClient, InfrastructureContract);
-                const taxablePopulationCountRaw = await getTaxablePopulationCount(nationId, publicClient, InfrastructureContract);
-
-                setTaxDetails({
-                    taxesCollectible: (Number(taxesRaw[1]) / 10 ** 18).toLocaleString(),
-                    dailyIncome: (Number(dailyIncomeRaw).toLocaleString()),
-                    happiness: happinessRaw.toString(),
-                    taxRate: taxRateRaw.toString() + "%",
-                    taxablePopulationCount: taxablePopulationCountRaw[0].toString(),
-                });
-            } catch (error) {
-                console.error("Error fetching tax details:", error);
-            }
-        };
-
         fetchTaxDetails();
-    }, [nationId, publicClient, TaxesContract, InfrastructureContract]);
+    }, [fetchTaxDetails]);
 
     const handleCollectTaxes = async () => {
         if (!nationId || !publicClient || !TaxesContract || !writeContractAsync) {
-            console.error("Missing required parameters for collectTaxes");
             setErrorMessage("Missing required parameters.");
             return;
         }
-    
+
         try {
             await collectTaxes(nationId, publicClient, TaxesContract, writeContractAsync);
-
             setErrorMessage("");
+            fetchTaxDetails();
         } catch (error) {
-    
-            if (!nationId) {
-                throw new Error("Nation ID is undefined");
-            }
-            if (!walletAddress) {
-                throw new Error("Waller Address is undefined");
-            }
-            let owner = await checkOwnership(nationId, walletAddress, publicClient, CountryMinterContract);
+            let owner = walletAddress ? await checkOwnership(nationId, walletAddress, publicClient, CountryMinterContract) : false;
             let war = await getWarPeacePreference(nationId, publicClient, MilitaryContract);
+
             if (!owner) {
                 setErrorMessage("You are not the ruler of this nation");
             } else if (!war) {
                 setErrorMessage("You cannot collect taxes in peace mode");
-            } else {    
-                setErrorMessage("Error collectin taxes");
+            } else {
+                setErrorMessage("Error collecting taxes");
             }
 
-            setTimeout(() => {
-                setErrorMessage("");
-            }, 6000);
+            setTimeout(() => setErrorMessage(""), 6000);
         }
     };
 
@@ -106,13 +102,13 @@ const PayBills = () => {
         <div className={`p-6 border-l-4 ${theme === 'dark' ? 'bg-gray-800 text-white border-green-400' : 'bg-gray-100 text-black border-green-500'}`}>
             <h3 className="text-lg font-semibold">Collect Taxes</h3>
             <p className="text-sm">Collect taxes from your citizens.</p>
-            
+
             {errorMessage && (
                 <div className="mt-4 p-4 bg-red-500 text-white rounded">
                     {errorMessage}
                 </div>
             )}
-            
+
             <table className="w-full mt-4 border-collapse border border-gray-300">
                 <thead>
                     <tr className={`${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-black'}` }>
@@ -124,7 +120,7 @@ const PayBills = () => {
                     {Object.entries(taxDetails).map(([key, value]) => (
                         <tr key={key} className="text-center">
                             <td className="border border-gray-300 px-4 py-2 capitalize">{key.replace(/([A-Z])/g, ' $1')}</td>
-                            <td className="border border-gray-300 px-4 py-2">{value !== null ? value : "Loading..."}</td>
+                            <td className="border border-gray-300 px-4 py-2">{value || "Loading..."}</td>
                         </tr>
                     ))}
                 </tbody>
@@ -140,4 +136,4 @@ const PayBills = () => {
     );
 };
 
-export default PayBills;
+export default CollectTaxes;
