@@ -10,11 +10,13 @@ import MilitarySettings from "./MilitarySettings";
 import PayBills from "./PayBills";
 import DepositWithdraw from "./DepositWithdraw";
 import BuyInfrastructure from "./BuyInfrastructure";
+import BuyLand from "./BuyLand";
 import { useAccount, usePublicClient } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
+import BuyTechnology from "./BuyTechnology";
 
 const menuItems = [
-  { category: "NATION SETTINGS", options: ["Government Details", "Military Settings"] },
+  { category: "NATION SETTINGS", options: ["Government Settings", "Military Settings"] },
   { category: "TREASURY", options: ["Collect Taxes", "Pay Bills", "Deposit and Withdraw"] },
   { category: "MUNICIPAL PURCHASES", options: ["Infrastructure", "Technology", "Land"] },
   { category: "NATION UPGRADES", options: ["Improvements", "Wonders"] },
@@ -86,7 +88,7 @@ const Nation = () => {
       } else if (savedMenuItem.startsWith("Nation")) {
         const nationIdFromStorage = savedMenuItem.split(" ")[1]; // Extract ID
         setSelectedComponent(<NationDetailsPage nationId={nationIdFromStorage} />);
-      } else if (savedMenuItem === "Government Details") {
+      } else if (savedMenuItem === "Government Settings") {
         setSelectedComponent(<GovernmentDetails />);
       } else if (savedMenuItem === "Military Settings") {
         setSelectedComponent(<MilitarySettings />);
@@ -96,6 +98,10 @@ const Nation = () => {
         setSelectedComponent(<DepositWithdraw />);
       } else if (savedMenuItem === "Infrastructure") {
         setSelectedComponent(<BuyInfrastructure />);
+      } else if (savedMenuItem === "Technology") {
+        setSelectedComponent(<BuyTechnology />);
+      } else if (savedMenuItem === "Land") {
+        setSelectedComponent(<BuyLand />);
       } else {
         setSelectedComponent(<div className="p-6">Coming Soon...</div>);
       }
@@ -108,13 +114,12 @@ const Nation = () => {
 
   // Handle menu clicks and save the selection in localStorage
   const handleMenuClick = (option: string) => {
-    console.log("Menu Clicked:", option);
     setSelectedMenuItem(option);
     localStorage.setItem("selectedMenuItem", option); // Save selected menu item
   
     if (option === "Collect Taxes") {
       setSelectedComponent(<CollectTaxes />);
-    } else if (option === "Government Details") {
+    } else if (option === "Government Settings") {
       setSelectedComponent(<GovernmentDetails />);
     } else if (option === "Military Settings") {
       setSelectedComponent(<MilitarySettings />);
@@ -124,6 +129,10 @@ const Nation = () => {
       setSelectedComponent(<DepositWithdraw />);
     } else if (option === "Infrastructure") {
       setSelectedComponent(<BuyInfrastructure />);
+    } else if (option === "Technology") {
+      setSelectedComponent(<BuyTechnology />);
+    } else if (option === "Land") {
+      setSelectedComponent(<BuyLand />);
     } else {
       setSelectedComponent(<div className="p-6">Coming Soon...</div>);
     }

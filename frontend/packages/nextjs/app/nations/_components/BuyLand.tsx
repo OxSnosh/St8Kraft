@@ -7,16 +7,17 @@ import { useAccount } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 import { useSearchParams } from "next/navigation";
 import { 
-    getTechnologyCount,
-    buyTechnology,
-    getTechnologyCost,
-    getTechnologyCostPerLevel
-} from "~~/utils/technology";
+    getLandCount,
+    getAreaOfInfluence,
+    buyLand,
+    getLandCost,
+    getLandCostPerMile
+} from "~~/utils/land";
 import { checkBalance } from "~~/utils/treasury";
 import { checkOwnership } from "~~/utils/countryMinter";
 import { useTheme } from "next-themes";
 
-const BuyTechnology = () => {
+const BuyLand = () => {
     const { theme } = useTheme();
     const publicClient = usePublicClient();
     const contractsData = useAllContracts();
@@ -24,14 +25,15 @@ const BuyTechnology = () => {
     const searchParams = useSearchParams();
     const nationId = searchParams.get("id");
     const InfrastructureContract = contractsData?.InfrastructureContract;
-    const TechnologyMarketContract = contractsData?.TechnologyMarketContract;
+    const LandMarketContract = contractsData?.LandMarketContract;
     const CountryMinterContract = contractsData?.CountryMinter;
     const TreasuryContract = contractsData?.TreasuryContract;
 
     const { writeContractAsync } = useWriteContract();
 
-    const [infrastructureDetails, setInfrastructureDetails] = useState({
-        currentTechnologyLevel: "",
+    const [landDetails, setInfrastructureDetails] = useState({
+        currentLandMiles: "",
+        getAreaOfInfluence: "",
         currentWarBucksBalance: "",
     });
     const [errorMessage, setErrorMessage] = useState("");
@@ -39,7 +41,6 @@ const BuyTechnology = () => {
 
     const [levelInput, setLevelInput] = useState("");
     const [costPerLevel, setCostPerLevel] = useState<string | null>(null);
-    const [totalCost, setTotalCost] = useState<string | null>(null);
     const [totalCostFromContract, setTotalCostFromContract] = useState<string | null>(null);
 
     useEffect(() => {
@@ -47,11 +48,13 @@ const BuyTechnology = () => {
             if (!nationId || !publicClient || !InfrastructureContract) return;
 
             try {
-                const techAmount = await getTechnologyCount(nationId, publicClient, InfrastructureContract);
+                const landAmount = await getLandCount(nationId, publicClient, InfrastructureContract);
+                const areaOfInfluence = await getAreaOfInfluence(nationId, publicClient, InfrastructureContract);
                 const warBuckBalance = await checkBalance(nationId, publicClient, TreasuryContract);
 
                 setInfrastructureDetails({
-                    currentTechnologyLevel: techAmount.toString(),
+                    currentLandMiles: landAmount.toString(),
+                    getAreaOfInfluence: areaOfInfluence.toString(),
                     currentWarBucksBalance: (warBuckBalance / BigInt(10 ** 18)).toLocaleString(),
                 });
             } catch (error) {
@@ -63,14 +66,14 @@ const BuyTechnology = () => {
     }, [nationId, publicClient, InfrastructureContract, TreasuryContract, refreshTrigger]);
 
     const handleCalculateCost = async () => {
-        if (!levelInput || !nationId || !publicClient || !TechnologyMarketContract) {
+        if (!levelInput || !nationId || !publicClient || !LandMarketContract) {
             setErrorMessage("Please enter a valid level.");
             return;
         }
 
         try {
-            const costPerLevel = await getTechnologyCostPerLevel(nationId, publicClient, TechnologyMarketContract);
-            const totalCostFromContract = await getTechnologyCost(nationId, Number(levelInput), publicClient, TechnologyMarketContract);
+            const costPerLevel = await getLandCostPerMile(nationId, publicClient, LandMarketContract);
+            const totalCostFromContract = await getLandCost(nationId, Number(levelInput), publicClient, LandMarketContract);
 
             setCostPerLevel((costPerLevel / BigInt(10 ** 18)).toString());
             setTotalCostFromContract((totalCostFromContract / BigInt(10 ** 18)).toString());
@@ -83,25 +86,25 @@ const BuyTechnology = () => {
     };
 
     const handleBuyTechnology = async () => {
-        if (!nationId || !publicClient || !TechnologyMarketContract || !walletAddress || !totalCostFromContract) {
+        if (!nationId || !publicClient || !LandMarketContract || !walletAddress || !totalCostFromContract) {
             setErrorMessage("Missing required information to proceed with the purchase.");
             return;
         }
 
         try {
-            await buyTechnology(nationId, Number(levelInput), publicClient, TechnologyMarketContract, writeContractAsync);
+            await buyLand(nationId, Number(levelInput), publicClient, LandMarketContract, writeContractAsync);
             setRefreshTrigger(!refreshTrigger);
             setErrorMessage("");
-            alert("Technology purchased successfully!");
+            alert("Land purchased successfully!");
         } catch (error) {
-            console.error("Error buying technology:", error);
+            console.error("Error buying land:", error);
             setErrorMessage("Failed to complete the purchase. Please try again.");
         }
     };
 
     return (
         <div className={`p-6 border-l-4 ${theme === 'dark' ? 'bg-gray-800 text-white border-green-400' : 'bg-gray-100 text-black border-green-500'}`}>
-            <h3 className="text-lg font-semibold">Buy Technology</h3>
+            <h3 className="text-lg font-semibold">Buy Land</h3>
 
             {errorMessage && (
                 <div className="mt-4 p-4 bg-red-500 text-white rounded">
@@ -117,7 +120,7 @@ const BuyTechnology = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {Object.entries(infrastructureDetails).map(([key, value]) => (
+                    {Object.entries(landDetails).map(([key, value]) => (
                         <tr key={key} className="text-center">
                             <td className="border border-gray-300 px-4 py-2 capitalize">{key.replace(/([A-Z])/g, ' $1')}</td>
                             <td className="border border-gray-300 px-4 py-2">{value !== null ? value : "Loading..."}</td>
@@ -139,7 +142,7 @@ const BuyTechnology = () => {
                     onClick={handleCalculateCost}
                     className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600"
                 >
-                    Calculate Tech Cost Per Level
+                    Calculate Land Cost Per Level
                 </button>
 
                 {costPerLevel !== null && (
@@ -157,7 +160,7 @@ const BuyTechnology = () => {
                         onClick={handleBuyTechnology}
                         className="w-full bg-purple-500 text-white p-2 rounded hover:bg-purple-600 mt-4"
                     >
-                        Buy {levelInput} Tech
+                        Buy {levelInput} Land Miles
                     </button>
                 )}
             </div>
@@ -165,4 +168,4 @@ const BuyTechnology = () => {
     );
 };
 
-export default BuyTechnology;
+export default BuyLand;
