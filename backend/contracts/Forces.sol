@@ -11,9 +11,6 @@ import "./GroundBattle.sol";
 import "./CountryParameters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
-// import "./Treasury.sol";
-// import "./NationStrength.sol";
-// import "./KeeperFile.sol";
 
 ///@title ForcesContract
 ///@author OxSnosh
