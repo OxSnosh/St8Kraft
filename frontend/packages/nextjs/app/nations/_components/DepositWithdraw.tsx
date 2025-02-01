@@ -32,16 +32,16 @@ const DepositWithdraw = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [balances, setBalances] = useState({ balance: "0", warBucksBalance: "0" });
 
-  const updateFunctions = {
+  const updateFunctions: { [key: string]: (nationId: string, publicClient: any, treasuryContract: any, amount: number, writeContractAsync: (args: any) => Promise<any>) => Promise<any> } = {
     withdrawFunds: withdrawFunds,
     depositFunds: addFunds,
   };
 
-  const handleInputChange = (field : any, value : any) => {
+  const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async (field: keyof typeof updateFunctions, value: any) => {
+  const handleSubmit = async (field: string, value: string) => {
     setLoading(true);
     setSuccessMessage("");
     setErrorMessage("");
@@ -53,21 +53,30 @@ const DepositWithdraw = () => {
       const owner = await checkOwnership(nationId, walletAddress, publicClient, CountryMinterContract);
       if (!owner) throw new Error("You do not own this nation.");
 
-      const updateFunction = updateFunctions[field];
+      const updateFunction = updateFunctions[field as keyof typeof updateFunctions];
       if (!updateFunction) throw new Error(`Update function not found for ${field}`);
 
       const scaledValue = BigInt(value) * BigInt(10 ** 18);
 
-      await updateFunction(nationId, publicClient, TreasuryContract, scaledValue, writeContractAsync);
+      await updateFunction(nationId, publicClient, TreasuryContract, Number(scaledValue), writeContractAsync);
 
-      setSuccessMessage(`${field.replace(/([A-Z])/g, " $1")} updated successfully to: ${value}`);
+      setSuccessMessage(`${field.replace(/([A-Z])/g, " $1")}: ${value}`);
       setFormData((prev) => ({ ...prev, [field]: "" }));
       fetchValues();
     } catch (error) {
-      setErrorMessage(error.message || `Failed to update ${field}.`);
+      if (error instanceof Error) {
+        setErrorMessage(error.message || `Failed to update ${field}.`);
+      } else {
+        setErrorMessage(`Failed to update ${field}.`);
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatBalance = (balance: string) => {
+    const formatted = (BigInt(balance) / BigInt(10 ** 18)).toLocaleString();
+    return formatted;
   };
 
   const fetchValues = async () => {
@@ -77,7 +86,7 @@ const DepositWithdraw = () => {
       const balance = await checkBalance(nationId, publicClient, TreasuryContract);
       const warBucksBalance = await balanceOf(walletAddress, publicClient, WarBucks);
 
-      setBalances({ balance, warBucksBalance });
+      setBalances({ balance: balance.toString(), warBucksBalance: warBucksBalance.toString() });
     } catch (error) {
       console.error("Error fetching values:", error);
     }
@@ -101,14 +110,14 @@ const DepositWithdraw = () => {
       <table className="w-full mb-4 border">
         <thead>
           <tr>
-            <th className="border px-4 py-2">Balance</th>
-            <th className="border px-4 py-2">WarBucks Balance</th>
+            <th className="border px-4 py-2">Nation Balance</th>
+            <th className="border px-4 py-2">WarBucks Balance in Wallet</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td className="border px-4 py-2">{balances.balance}</td>
-            <td className="border px-4 py-2">{balances.warBucksBalance}</td>
+            <td className="border px-4 py-2">{formatBalance(balances.balance) || "0"}</td>
+            <td className="border px-4 py-2">{formatBalance(balances.warBucksBalance) || "0"}</td>
           </tr>
         </tbody>
       </table>

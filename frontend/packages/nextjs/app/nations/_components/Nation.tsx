@@ -9,6 +9,7 @@ import NationDetailsPage from "./NationDetailsPage";
 import MilitarySettings from "./MilitarySettings";
 import PayBills from "./PayBills";
 import DepositWithdraw from "./DepositWithdraw";
+import BuyInfrastructure from "./BuyInfrastructure";
 import { useAccount, usePublicClient } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 
@@ -93,6 +94,8 @@ const Nation = () => {
         setSelectedComponent(<PayBills />);
       } else if (savedMenuItem === "Deposit and Withdraw") {
         setSelectedComponent(<DepositWithdraw />);
+      } else if (savedMenuItem === "Infrastructure") {
+        setSelectedComponent(<BuyInfrastructure />);
       } else {
         setSelectedComponent(<div className="p-6">Coming Soon...</div>);
       }
@@ -119,6 +122,8 @@ const Nation = () => {
       setSelectedComponent(<PayBills />);
     } else if (option === "Deposit and Withdraw") {
       setSelectedComponent(<DepositWithdraw />);
+    } else if (option === "Infrastructure") {
+      setSelectedComponent(<BuyInfrastructure />);
     } else {
       setSelectedComponent(<div className="p-6">Coming Soon...</div>);
     }
