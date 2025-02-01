@@ -129,7 +129,7 @@ const NationDetailsPage = (nationId: any) => {
 
   useEffect(() => {
     const fetchNationDetails = async () => {
-      if (!publicClient || !countryParametersContract || !nationId) {
+      if (!publicClient || !countryParametersContract) {
         console.error("Missing required data: publicClient, countryParametersContract, or nationId.");
         setLoading(false);
         return;

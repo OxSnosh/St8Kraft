@@ -241,9 +241,9 @@ contract WarContract is Ownable {
         uint256 defenseId
     ) internal view returns (bool) {
         bool warCheckReturn = false;
-        bool isWarOkOffense = mil.getWarPeacePreference(offenseId);
+        (bool isWarOkOffense,) = mil.getWarPeacePreference(offenseId);
         require(isWarOkOffense == true, "you are in peace mode");
-        bool isWarOkDefense = mil.getWarPeacePreference(defenseId);
+        (bool isWarOkDefense,) = mil.getWarPeacePreference(defenseId);
         require(isWarOkDefense == true, "nation in peace mode");
         bool isStrengthWithinRange = checkStrength(offenseId, defenseId);
         require(

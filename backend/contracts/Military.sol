@@ -167,9 +167,17 @@ contract MilitaryContract is Ownable {
     ///@dev this is a public view function that will return a nations preference for war
     ///@param id is the nation id of the nation being queried
     ///@return bool is true if war is possible
-    function getWarPeacePreference(uint256 id) public view returns (bool) {
+    function getWarPeacePreference(uint256 id) public view returns (bool, uint256) {
         bool war = idToMilitary[id].warPeacePreference;
-        return war;
+        uint256 daysPeaceToggled = idToMilitary[id].dayPeaceToggled;
+        uint256 gameDay = keep.getGameDay();
+        uint256 daysReamaining;
+        if (war == true) {
+            daysReamaining = 7 - (gameDay - daysPeaceToggled);
+        } else {
+            daysReamaining = 0;
+        }
+        return (war, daysReamaining);
     }
 
     function getDaysInPeaceMode(uint256 id) public view returns (uint256) {

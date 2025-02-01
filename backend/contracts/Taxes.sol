@@ -149,7 +149,7 @@ contract TaxesContract is Ownable {
     function collectTaxes(uint256 id) public {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
-        bool war = mil.getWarPeacePreference(id);
+        (bool war, ) = mil.getWarPeacePreference(id);
         require(war, "must be ready for war to collct taxes");
         (, uint256 taxesCollectible) = getTaxesCollectible(id);
         inf.toggleCollectionNeededToChangeRate(id);

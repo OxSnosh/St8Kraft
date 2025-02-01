@@ -1365,7 +1365,7 @@ contract AdditionalNavyContract is Ownable {
     ) public view returns (uint256, uint256) {
         uint256 purchasesToday = navAct.getPurchasesToday(id);
         uint256 maxDailyPurchases;
-        bool isWar = mil.getWarPeacePreference(id);
+        (bool isWar,) = mil.getWarPeacePreference(id);
         bool foreignNavalBase = won1.getForeignNavalBase(id);
         if (isWar) {
             if (foreignNavalBase) {

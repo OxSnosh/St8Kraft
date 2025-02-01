@@ -191,9 +191,10 @@ contract TreasuryContract is Ownable {
     ///@notice this function will be called when a nation is minted and will allow a nation to undergo treasury operations
     ///@param id is the nation id of the nation being minted
     function generateTreasury(uint256 id) public onlyCountryMinter {
+        uint256 gameDay = keep.getGameDay();
         Treasury memory newTreasury = Treasury(
-            0,
-            0,
+            gameDay,
+            gameDay,
             0,
             false
         );

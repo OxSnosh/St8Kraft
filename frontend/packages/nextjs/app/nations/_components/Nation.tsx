@@ -1,18 +1,25 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { usePublicClient, useAccount } from "wagmi";
-import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
-import NationDetailsPage from "./NationDetailsPage";
 import CollectTaxes from "./CollectTaxes";
+import GovernmentDetails from "./GovernmentDetails";
+import NationDetailsPage from "./NationDetailsPage";
+import MilitarySettings from "./MilitarySettings";
+import PayBills from "./PayBills";
+import { useAccount, usePublicClient } from "wagmi";
+import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 
 const menuItems = [
+  { category: "NATION SETTINGS", options: ["Government Details", "Military Settings"] },
   { category: "TREASURY", options: ["Collect Taxes", "Pay Bills"] },
   { category: "MUNICIPAL PURCHASES", options: ["Infrastructure", "Technology", "Land"] },
   { category: "NATION UPGRADES", options: ["Improvements", "Wonders"] },
-  { category: "TRAIN MILITARY", options: ["Soldiers", "Tanks", "Fighters", "Bombers", "Navy", "Cruise Missiles", "Nukes", "Spies"] }
+  {
+    category: "TRAIN MILITARY",
+    options: ["Soldiers", "Tanks", "Fighters", "Bombers", "Navy", "Cruise Missiles", "Nukes", "Spies"],
+  },
 ];
 
 const Nation = () => {
@@ -21,11 +28,12 @@ const Nation = () => {
   const contractsData = useAllContracts();
   const { address: walletAddress } = useAccount();
   const countryMinterContract = contractsData?.CountryMinter;
-  
+
   const [selectedComponent, setSelectedComponent] = useState<JSX.Element | null>(null);
   const [selectedMenuItem, setSelectedMenuItem] = useState<string | null>(null);
   const [mintedNations, setMintedNations] = useState<{ name: string; href: string }[]>([]);
-  
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Track dropdown state
+
   const nationId = searchParams.get("id");
 
   // Fetch user's nations from contract
@@ -76,6 +84,12 @@ const Nation = () => {
       } else if (savedMenuItem.startsWith("Nation")) {
         const nationIdFromStorage = savedMenuItem.split(" ")[1]; // Extract ID
         setSelectedComponent(<NationDetailsPage nationId={nationIdFromStorage} />);
+      } else if (savedMenuItem === "Government Details") {
+        setSelectedComponent(<GovernmentDetails />);
+      } else if (savedMenuItem === "Military Settings") {
+        setSelectedComponent(<MilitarySettings />);
+      } else if (savedMenuItem === "Pay Bills") {
+        setSelectedComponent(<PayBills />);
       } else {
         setSelectedComponent(<div className="p-6">Coming Soon...</div>);
       }
@@ -91,9 +105,15 @@ const Nation = () => {
     console.log("Menu Clicked:", option);
     setSelectedMenuItem(option);
     localStorage.setItem("selectedMenuItem", option); // Save selected menu item
-
+  
     if (option === "Collect Taxes") {
       setSelectedComponent(<CollectTaxes />);
+    } else if (option === "Government Details") {
+      setSelectedComponent(<GovernmentDetails />);
+    } else if (option === "Military Settings") {
+      setSelectedComponent(<MilitarySettings />);
+    } else if (option === "Pay Bills") {
+      setSelectedComponent(<PayBills />);
     } else {
       setSelectedComponent(<div className="p-6">Coming Soon...</div>);
     }
@@ -107,30 +127,42 @@ const Nation = () => {
 
         {/* My Nations Dropdown */}
         {walletAddress && mintedNations.length > 0 && (
-          <div className="relative dropdown">
-            <button className="btn btn-primary btn-sm">My Nations</button>
-            <ul className="dropdown-content menu mt-3 p-2 shadow bg-base-100 rounded-box w-52">
-              {mintedNations.map((nation) => (
-                <li key={nation.href} onClick={() => {
-                  setSelectedMenuItem(nation.name);
-                  localStorage.setItem("selectedMenuItem", nation.name); // Save nation selection
-                  setSelectedComponent(<NationDetailsPage nationId={nation.href.split("=")[1]} />);
-                }}>
-                  <Link href={nation.href}>
-                    <span>{nation.name}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <div className="relative">
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)} // Toggle dropdown
+            >
+              My Nations
+            </button>
+
+            {isDropdownOpen && (
+              <ul className="absolute left-0 mt-2 p-2 shadow bg-base-100 rounded-box w-52">
+                {mintedNations.map(nation => (
+                  <li
+                    key={nation.href}
+                    onClick={() => {
+                      setSelectedMenuItem(nation.name);
+                      localStorage.setItem("selectedMenuItem", nation.name); // Save nation selection
+                      setSelectedComponent(<NationDetailsPage nationId={nation.href.split("=")[1]} />);
+                      setIsDropdownOpen(false); // Close dropdown on selection
+                    }}
+                  >
+                    <Link href={nation.href}>
+                      <span>{nation.name}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
 
         {/* Other Menu Items */}
-        {menuItems.map((section) => (
+        {menuItems.map(section => (
           <div key={section.category} className="mt-4">
             <h3 className="font-semibold">{section.category}</h3>
             <ul className="pl-2 mt-2">
-              {section.options.map((option) => (
+              {section.options.map(option => (
                 <li
                   key={option}
                   className={`cursor-pointer py-1 hover:text-yellow-400 ${
@@ -147,9 +179,7 @@ const Nation = () => {
       </div>
 
       {/* Main Content - Right 85% */}
-      <div className="w-5/6 p-1">
-        {selectedComponent}
-      </div>
+      <div className="w-5/6 p-1">{selectedComponent}</div>
     </div>
   );
 };
