@@ -155,28 +155,28 @@ export const buyImprovement = async (
                 functionName: "buyImprovement1",
                 args: [amount, nationId, 1]
             });
-        } else if (improvementKey === "buyBarracks") {
+        } else if (improvementKey === "buyBank") {
             await writeContractAsync({
                 abi: improvementContract1.abi,
                 address: improvementContract1.address,
                 functionName: "buyImprovement1",
                 args: [amount, nationId, 2]
-            });
-        } else if (improvementKey === "buyBorderFortification") {
+            })
+        } else if (improvementKey === "buyBarracks") {
             await writeContractAsync({
                 abi: improvementContract1.abi,
                 address: improvementContract1.address,
                 functionName: "buyImprovement1",
                 args: [amount, nationId, 3]
             });
-        } else if (improvementKey === "buyBorderWall") {
+        } else if (improvementKey === "buyBorderFortification") {
             await writeContractAsync({
                 abi: improvementContract1.abi,
                 address: improvementContract1.address,
                 functionName: "buyImprovement1",
                 args: [amount, nationId, 4]
             });
-        } else if (improvementKey === "buyBank") {
+        } else if (improvementKey === "buyBorderWall") {
             await writeContractAsync({
                 abi: improvementContract1.abi,
                 address: improvementContract1.address,
@@ -204,14 +204,14 @@ export const buyImprovement = async (
                 functionName: "buyImprovement1",
                 args: [amount, nationId, 8]
             });
-        } else if (improvementKey === "buyDrydock") {
+        } else if (improvementKey === "buyClinic") {
             await writeContractAsync({
                 abi: improvementContract1.abi,
                 address: improvementContract1.address,
                 functionName: "buyImprovement1",
                 args: [amount, nationId, 9]
             });
-        } else if (improvementKey === "buyClinic") {
+        } else if (improvementKey === "buyDrydock") {
             await writeContractAsync({
                 abi: improvementContract1.abi,
                 address: improvementContract1.address,
@@ -389,7 +389,6 @@ export const buyImprovement = async (
         } else {
             console.error("Improvement key not recognized.");
         }
-
     } catch (error) {
         console.error("Error buying improvement:", error);
     }

@@ -25,8 +25,6 @@ import {
     getAircraftCarrierCount,
 } from '../../../utils/navy';
 import { useTheme } from "next-themes";
-import { NavyContract } from '../../../../../../backend/typechain-types/contracts/Navy.sol/NavyContract';
-
 
 const BuyNavy = () => {
     const { theme } = useTheme();

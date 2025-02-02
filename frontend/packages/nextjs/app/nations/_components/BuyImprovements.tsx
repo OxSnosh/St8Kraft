@@ -79,6 +79,7 @@ const BuyImprovement = () => {
         const amount = purchaseAmounts[key] || 1;
         const improvementKey = improvementKeyMapping[key] || key;
 
+        console.log(improvementKey)
         if (nationId) {
             try {
                 await buyImprovement(

@@ -22,11 +22,12 @@ import BuyFighters from "./BuyFighters";
 import BuyBombers from "./BuyBombers";
 import BuyNavy from "./BuyNavy";
 import PayBills from "./PayBills";
+import ManageTrades from "./ManageTrades";
 import { useAccount, usePublicClient } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 
 const menuItems = [
-  { category: "NATION SETTINGS", options: ["Government Settings", "Military Settings"] },
+  { category: "NATION SETTINGS", options: ["Government Settings", "Military Settings", "Manage Trades"] },
   { category: "TREASURY", options: ["Collect Taxes", "Pay Bills", "Deposit and Withdraw"] },
   { category: "MUNICIPAL PURCHASES", options: ["Infrastructure", "Technology", "Land"] },
   { category: "NATION UPGRADES", options: ["Improvements", "Wonders"] },
@@ -46,7 +47,8 @@ const Nation = () => {
   const [selectedComponent, setSelectedComponent] = useState<JSX.Element | null>(null);
   const [selectedMenuItem, setSelectedMenuItem] = useState<string | null>(null);
   const [mintedNations, setMintedNations] = useState<{ name: string; href: string }[]>([]);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Track dropdown state
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isManageTradesOpen, setIsManageTradesOpen] = useState(false);
 
   const nationId = searchParams.get("id");
 
@@ -86,6 +88,12 @@ const Nation = () => {
     fetchMyNations();
   }, [walletAddress, countryMinterContract, publicClient]);
 
+  // Function to handle trade proposals
+  const handlePropeseTrade = () => {
+    setSelectedMenuItem("Manage Trades")
+    setSelectedComponent(<ManageTrades />)
+  };
+
   // Load last selected menu item from localStorage when the page loads
   useEffect(() => {
     const savedMenuItem = localStorage.getItem("selectedMenuItem");
@@ -97,7 +105,7 @@ const Nation = () => {
         setSelectedComponent(<CollectTaxes />);
       } else if (savedMenuItem.startsWith("Nation")) {
         const nationIdFromStorage = savedMenuItem.split(" ")[1]; // Extract ID
-        setSelectedComponent(<NationDetailsPage nationId={nationIdFromStorage} />);
+        setSelectedComponent(<NationDetailsPage nationId={nationIdFromStorage} onPropeseTrade={handlePropeseTrade} />);
       } else if (savedMenuItem === "Government Settings") {
         setSelectedComponent(<GovernmentDetails />);
       } else if (savedMenuItem === "Military Settings") {
@@ -132,13 +140,14 @@ const Nation = () => {
         setSelectedComponent(<BuyBombers />);
       } else if (savedMenuItem === "Navy") {
         setSelectedComponent(<BuyNavy />);
+      } else if (savedMenuItem === "Manage Trades") {
+        setSelectedComponent(<ManageTrades/>)
       } else {
         setSelectedComponent(<div className="p-6">Coming Soon...</div>);
       }
     } else if (nationId) {
       // If there is a nation ID, default to loading that nation's details
       setSelectedMenuItem(`Nation ${nationId}`);
-      setSelectedComponent(<NationDetailsPage nationId={nationId} />);
     }
   }, [nationId]);
 
@@ -183,6 +192,8 @@ const Nation = () => {
       setSelectedComponent(<BuyBombers />)
     } else if (option === "Navy") {
       setSelectedComponent(<BuyNavy />)
+    } else if (option === "Manage Trades") {
+      setSelectedComponent(<ManageTrades/>)
     } else {
       setSelectedComponent(<div className="p-6">Coming Soon...</div>);
     }
@@ -212,12 +223,12 @@ const Nation = () => {
                     onClick={() => {
                       setSelectedMenuItem(nation.name);
                       localStorage.setItem("selectedMenuItem", nation.name); // Save nation selection
-                      setSelectedComponent(<NationDetailsPage nationId={nation.href.split("=")[1]} />);
+                      setSelectedComponent(<NationDetailsPage nationId={nation.href.split("=")[1]} onPropeseTrade={handlePropeseTrade} />);
                       setIsDropdownOpen(false); // Close dropdown on selection
                     }}
                   >
                     <Link href={nation.href}>
-                      <span>{nation.name}</span>
+                      <>{nation.name}</>
                     </Link>
                   </li>
                 ))}

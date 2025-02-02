@@ -22,8 +22,9 @@ task("set-resources", "Sets mock resources for testing")
     // Check if arguments are valid numbers
     const resource1 = ethers.BigNumber.from(taskArgs.resource1);
     const resource2 = ethers.BigNumber.from(taskArgs.resource2);
+    const nationId = ethers.BigNumber.from(taskArgs.nationid);
 
-    await resources.mockResourcesForTesting(0, resource1, resource2);
+    await resources.mockResourcesForTesting(nationId, resource1, resource2);
 
-    console.log(`Resources set to: ${resource1}, ${resource2}`);
+    console.log(`Resources for nation ${nationId} set to: ${resource1}, ${resource2}`);
   });

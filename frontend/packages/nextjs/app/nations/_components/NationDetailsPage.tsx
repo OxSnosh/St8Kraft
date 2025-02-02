@@ -27,14 +27,6 @@ import { getNavy } from "../../../utils/navy"
 import { getCruiseMissileCount, getNukeCount } from "~~/utils/missiles";
 import { getSpyCount } from "~~/utils/spies";
 
-const menuItems = [
-  { category: "MY NATIONS", options: ["My Nation"] },
-  { category: "TREASURY", options: ["Collect Taxes", "Pay Bills"] },
-  { category: "MUNICIPAL PURCHASES", options: ["Infrastructure", "Technology", "Land"] },
-  { category: "NATION UPGRADES", options: ["Improvements", "Wonders"] },
-  { category: "TRAIN MILITARY", options: ["Soldiers", "Tanks", "Fighters", "Bombers", "Navy", "Cruise Missiles", "Nukes", "Spies"] }
-];
-
 type NationDetails = {
   nationName: string | null;
   rulerName: string | null;
@@ -93,7 +85,12 @@ type NationDetails = {
   tankCasualties: string | null;
 };
 
-const NationDetailsPage = (nationId: any) => {
+type NationDetailsPageProps = {
+  nationId: string;
+  onPropeseTrade: () => void;
+};
+
+const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps) => {
   const searchParams = useSearchParams();
   const publicClient = usePublicClient();
   const contractsData = useAllContracts();
@@ -126,6 +123,14 @@ const NationDetailsPage = (nationId: any) => {
 
   const [nationDetails, setNationDetails] = useState<NationDetails | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showManageTrades, setShowManageTrades] = useState(false);
+
+  const handleProposeTradeClick = () => {
+    setShowManageTrades(true);
+    if (onPropeseTrade) {
+      onPropeseTrade();
+    }
+  };
 
   useEffect(() => {
     const fetchNationDetails = async () => {
@@ -136,7 +141,7 @@ const NationDetailsPage = (nationId: any) => {
       }
 
       try {
-        const tokenIdString = nationId.nationId.toString();
+        const tokenIdString = nationId.toString();
 
         const balanceRaw = await publicClient.readContract({
           abi: treasuryContract.abi,
@@ -207,7 +212,9 @@ const NationDetailsPage = (nationId: any) => {
         const lastBillPayment = `${lastBillPaymentDays} days ago`;
 
         const resources = await getResources(tokenIdString, resourcesContract, publicClient);
+
         const bonusResources = await getBonusResources(tokenIdString, bonusResourcesContract, publicClient);
+
         const tradingPartners = await getTradingPartners(tokenIdString, resourcesContract, publicClient);
 
         const improvements = await getImprovements(tokenIdString, improvementsContract1, improvementsContract2, improvementsContract3, improvementsContract4, publicClient);
@@ -221,10 +228,10 @@ const NationDetailsPage = (nationId: any) => {
         const warPeacePreferenceBool = await getWarPeacePreference(tokenIdString, publicClient, militaryContract);
 
         let warPeacePreference : string
-        if (warPeacePreferenceBool) {
-          warPeacePreference = "Nation is ready for war!"
-        } else {
+        if (!warPeacePreferenceBool[0]) {
           warPeacePreference = "Nation is in peace mode"
+        } else {
+          warPeacePreference = "Nation is ready for war!"
         }
 
         const defconLevel = await getDefconLevel(tokenIdString, publicClient, militaryContract);
@@ -586,7 +593,19 @@ const NationDetailsPage = (nationId: any) => {
 
   return (
       <div className="w-5/6 p-6">
-        <h1 className="text-2xl font-bold mb-4">{nationDetails.nationName}</h1>
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-2xl font-bold">{nationDetails.nationName}</h1>
+            <div className="space-x-2">
+              <button
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
+              onClick={handleProposeTradeClick} // Trigger the parent's handler
+              >
+                Propose Trade
+              </button>
+              <button className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600">Send Aid</button>
+              <button className="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600">Declare War</button>
+            </div>
+        </div>
         <table className="table-auto border-collapse border border-gray-300 w-full text-sm mb-6 table-fixed">
           <colgroup>
             <col style={{ width: "40%" }} />
