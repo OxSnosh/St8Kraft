@@ -8,9 +8,9 @@ import { useSearchParams } from "next/navigation";
 import { checkBalance } from "~~/utils/treasury";
 import { 
     buyYak9,
-    buyP51Mustang, 
-    buyF86Sabre, 
-    buyMig15, 
+    buyP51Mustang,
+    buyF86Sabre,
+    buyMig15,
     buyF100SuperSabre,
     buyF35Lightning,
     buyF15Eagle,
@@ -25,7 +25,7 @@ import {
     getF15EagleCount,
     getSu30MkiCount,
     getF22RaptorCount,
-} from '~~/utils/fighters';
+} from '../../../utils/fighters';
 import { useTheme } from "next-themes";
 
 

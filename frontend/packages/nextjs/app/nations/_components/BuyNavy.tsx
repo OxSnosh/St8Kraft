@@ -1,0 +1,186 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { usePublicClient, useWriteContract } from "wagmi";
+import { useAccount } from "wagmi";
+import { useAllContracts } from "../../../utils/scaffold-eth/contractsData";
+import { useSearchParams } from "next/navigation";
+import { checkBalance } from "../../../utils/treasury";
+import {
+    buyCorvette,
+    buyLandingShip,
+    buyBattleship,
+    buyCruiser,
+    buyFrigate,
+    buyDestroyer,
+    buySubmarine,
+    buyAircraftCarrier,
+    getCorvetteCount,
+    getLandingShipCount,
+    getBattleshipCount,
+    getCruiserCount,
+    getFrigateCount,
+    getDestroyerCount,
+    getSubmarineCount,
+    getAircraftCarrierCount,
+} from '../../../utils/navy';
+import { useTheme } from "next-themes";
+import { NavyContract } from '../../../../../../backend/typechain-types/contracts/Navy.sol/NavyContract';
+
+
+const BuyNavy = () => {
+    const { theme } = useTheme();
+    const publicClient = usePublicClient();
+    const contractsData = useAllContracts();
+    const { address: walletAddress } = useAccount();
+    const searchParams = useSearchParams();
+    const nationId = searchParams.get("id");
+    const NavyContract1 = contractsData?.NavyContract;
+    const NavyContract2 = contractsData?.NavyContract2;
+    const TreasuryContract = contractsData?.TreasuryContract;
+    const { writeContractAsync } = useWriteContract();
+
+    interface NavyDetails {
+        [key: string]: string;
+    }
+
+    const navyKeyMapping: { [key: string]: string } = {
+        corvette: "buyCorvette",
+        landingShip: "buyLandingShip",
+        battleship: "buyBattleship",
+        cruiser: "buyCruiser",
+        frigate: "buyFrigate",
+        destroyer: "buyDestroyer",
+        submarine: "buySubmarine",
+        aircraftCarrier: "buyAircraftCarrier",
+    };
+
+    const allNavy = Object.keys(navyKeyMapping);
+
+    const defaultNavyDetails: NavyDetails = { 
+        corvette: "0",
+        landingShip: "0",
+        battleship: "0",
+        cruiser: "0",
+        frigate: "0",
+        destroyer: "0",
+        submarine: "0",
+        aircraftCarrier: "0",
+    };
+
+    const [navyDetails, setNavyDetails] = useState<NavyDetails>({ ...defaultNavyDetails });
+    const [refreshTrigger, setRefreshTrigger] = useState(false);
+    const [purchaseAmounts, setPurchaseAmounts] = useState<{ [key: string]: number }>({});
+
+    const handleBuyNavy = async (key: string) => {
+        const amount = purchaseAmounts[key] || 1;
+        const navyKey = navyKeyMapping[key] || key;
+
+        if (!nationId) {
+            console.error("Nation ID is null");
+            return;
+        }
+
+        console.log("Buying bombers:", navyKey, amount);
+
+        if (navyKey == "buyCorvette") {
+            await buyCorvette(nationId, amount, publicClient, NavyContract1, writeContractAsync);
+        } else if (navyKey == "buyLandingShip") {
+            await buyLandingShip(nationId, amount, publicClient, NavyContract1, writeContractAsync);
+        } else if (navyKey == "buyBattleship") {
+            await buyBattleship(nationId, amount, publicClient, NavyContract1, writeContractAsync);
+        } else if (navyKey == "buyCruiser") {
+            await buyCruiser(nationId, amount, publicClient, NavyContract1, writeContractAsync);
+        } else if (navyKey == "buyFrigate") {
+            await buyFrigate(nationId, amount, publicClient, NavyContract2, writeContractAsync);
+        } else if (navyKey == "buyDestroyer") {
+            await buyDestroyer(nationId, amount, publicClient, NavyContract2, writeContractAsync);
+        } else if (navyKey == "buySubmarine") {
+            await buySubmarine(nationId, amount, publicClient, NavyContract2, writeContractAsync);
+        } else if (navyKey == "buyAircraftCarrier") {
+            await buyAircraftCarrier(nationId, amount, publicClient, NavyContract2, writeContractAsync);
+        } else {
+            console.error("Invalid fighter key");
+        }
+    }
+
+    const fetchNavyDetails = async () => {
+        if (!nationId || !publicClient || !NavyContract1 || !NavyContract2) return;
+
+        try {
+
+            const corvetteCount = await getCorvetteCount(nationId, publicClient, NavyContract1);
+            const landingShipCount = await getLandingShipCount(nationId, publicClient, NavyContract1);
+            const battleshipCount = await getBattleshipCount(nationId, publicClient, NavyContract1);
+            const cruiserCount = await getCruiserCount(nationId, publicClient, NavyContract1);
+            const frigateCount = await getFrigateCount(nationId, publicClient, NavyContract2);
+            const destroyerCount = await getDestroyerCount(nationId, publicClient, NavyContract2);
+            const submarineCount = await getSubmarineCount(nationId, publicClient, NavyContract2);
+            const aircraftCarrierCount = await getAircraftCarrierCount(nationId, publicClient, NavyContract2);
+
+            const navyDetails: NavyDetails = {
+                corvette: corvetteCount.toString(),
+                landingShip: landingShipCount.toString(),
+                battleship: battleshipCount.toString(),
+                cruiser: cruiserCount.toString(),
+                frigate: frigateCount.toString(),
+                destroyer: destroyerCount.toString(),
+                submarine: submarineCount.toString(),
+                aircraftCarrier: aircraftCarrierCount.toString(),
+            };
+
+            setNavyDetails(navyDetails);
+        } catch (error) {
+            console.error("Error fetching fighter details:", error);
+        }
+    }
+
+    useEffect(() => {
+        fetchNavyDetails();
+    }, [nationId, publicClient, NavyContract1, NavyContract2, refreshTrigger]);
+
+    return (
+        <div className={`p-6 border-l-4 ${theme === 'dark' ? 'bg-gray-800 text-white border-green-400' : 'bg-gray-100 text-black border-green-500'}`}>
+            <h3 className="text-lg font-semibold">Navy Details</h3>
+
+            <table className="w-full mt-4 border-collapse border border-gray-300">
+                <thead>
+                    <tr className={`${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-black'}`}>
+                        <th className="border border-gray-300 px-4 py-2">Category</th>
+                        <th className="border border-gray-300 px-4 py-2">Value</th>
+                        <th className="border border-gray-300 px-4 py-2">Amount to Buy</th>
+                        <th className="border border-gray-300 px-4 py-2">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {Object.entries(navyDetails).filter(([key]) => key !== "warBucksBalance").map(([key, value]) => (
+                        <tr key={key} className="text-center">
+                            <td className="border border-gray-300 px-4 py-2 capitalize">{key.replace(/([A-Z])/g, ' $1')}</td>
+                            <td className="border border-gray-300 px-4 py-2">{value}</td>
+                            <td className="border border-gray-300 px-4 py-2">
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="5"
+                                    value={purchaseAmounts[key] || 1}
+                                    onChange={(e) => setPurchaseAmounts({ ...purchaseAmounts, [key]: Number(e.target.value) })}
+                                    className="w-16 p-1 border rounded"
+                                />
+                            </td>
+                            <td className="border border-gray-300 px-4 py-2">
+                                <button
+                                    onClick={() => handleBuyNavy(key)}
+                                    className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                                >
+                                    Buy
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+};
+
+export default BuyNavy;

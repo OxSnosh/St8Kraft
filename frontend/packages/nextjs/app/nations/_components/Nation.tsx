@@ -19,6 +19,8 @@ import GovernmentDetails from "./GovernmentDetails";
 import MilitarySettings from "./MilitarySettings";
 import NationDetailsPage from "./NationDetailsPage";
 import BuyFighters from "./BuyFighters";
+import BuyBombers from "./BuyBombers";
+import BuyNavy from "./BuyNavy";
 import PayBills from "./PayBills";
 import { useAccount, usePublicClient } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
@@ -126,6 +128,10 @@ const Nation = () => {
         setSelectedComponent(<BuySpies />);
       } else if (savedMenuItem === "Fighters") {
         setSelectedComponent(<BuyFighters />);
+      } else if (savedMenuItem === "Bombers") {
+        setSelectedComponent(<BuyBombers />);
+      } else if (savedMenuItem === "Navy") {
+        setSelectedComponent(<BuyNavy />);
       } else {
         setSelectedComponent(<div className="p-6">Coming Soon...</div>);
       }
@@ -173,6 +179,10 @@ const Nation = () => {
       setSelectedComponent(<BuySpies />);
     } else if (option === "Fighters") {
       setSelectedComponent(<BuyFighters />)
+    } else if (option === "Bombers") {
+      setSelectedComponent(<BuyBombers />)
+    } else if (option === "Navy") {
+      setSelectedComponent(<BuyNavy />)
     } else {
       setSelectedComponent(<div className="p-6">Coming Soon...</div>);
     }
