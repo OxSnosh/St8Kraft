@@ -18,6 +18,7 @@ import DepositWithdraw from "./DepositWithdraw";
 import GovernmentDetails from "./GovernmentDetails";
 import MilitarySettings from "./MilitarySettings";
 import NationDetailsPage from "./NationDetailsPage";
+import BuyFighters from "./BuyFighters";
 import PayBills from "./PayBills";
 import { useAccount, usePublicClient } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
@@ -123,6 +124,8 @@ const Nation = () => {
         setSelectedComponent(<BuyNukes />);
       } else if (savedMenuItem === "Spies") {
         setSelectedComponent(<BuySpies />);
+      } else if (savedMenuItem === "Fighters") {
+        setSelectedComponent(<BuyFighters />);
       } else {
         setSelectedComponent(<div className="p-6">Coming Soon...</div>);
       }
@@ -168,6 +171,8 @@ const Nation = () => {
       setSelectedComponent(<BuyNukes />);
     } else if (option === "Spies") {
       setSelectedComponent(<BuySpies />);
+    } else if (option === "Fighters") {
+      setSelectedComponent(<BuyFighters />)
     } else {
       setSelectedComponent(<div className="p-6">Coming Soon...</div>);
     }

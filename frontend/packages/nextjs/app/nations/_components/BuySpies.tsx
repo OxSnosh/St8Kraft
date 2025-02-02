@@ -19,8 +19,6 @@ const BuySpies = () => {
   const nationId = searchParams.get("id");
   const SpyContract = contractsData?.SpyContract;
   const TreasuryContract = contractsData?.TreasuryContract;
-  // const CountryMinterContract = contractsData?.CountryMinter;
-  // const InfrastructureContract = contractsData?.InfrastructureContract;
 
   const { writeContractAsync } = useWriteContract();
 
