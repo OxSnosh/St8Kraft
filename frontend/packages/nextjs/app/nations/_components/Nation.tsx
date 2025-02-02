@@ -3,17 +3,24 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import CollectTaxes from "./CollectTaxes";
-import GovernmentDetails from "./GovernmentDetails";
-import NationDetailsPage from "./NationDetailsPage";
-import MilitarySettings from "./MilitarySettings";
-import PayBills from "./PayBills";
-import DepositWithdraw from "./DepositWithdraw";
+import BuyCruiseMissiles from "./BuyCruiseMissiles";
+import BuyImprovement from "./BuyImprovements";
 import BuyInfrastructure from "./BuyInfrastructure";
 import BuyLand from "./BuyLand";
+import BuyNukes from "./BuyNukes";
+import BuySoldiers from "./BuySoldiers";
+import BuySpies from "./BuySpies";
+import BuyTanks from "./BuyTanks";
+import BuyTechnology from "./BuyTechnology";
+import BuyWonder from "./BuyWonder";
+import CollectTaxes from "./CollectTaxes";
+import DepositWithdraw from "./DepositWithdraw";
+import GovernmentDetails from "./GovernmentDetails";
+import MilitarySettings from "./MilitarySettings";
+import NationDetailsPage from "./NationDetailsPage";
+import PayBills from "./PayBills";
 import { useAccount, usePublicClient } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
-import BuyTechnology from "./BuyTechnology";
 
 const menuItems = [
   { category: "NATION SETTINGS", options: ["Government Settings", "Military Settings"] },
@@ -102,6 +109,20 @@ const Nation = () => {
         setSelectedComponent(<BuyTechnology />);
       } else if (savedMenuItem === "Land") {
         setSelectedComponent(<BuyLand />);
+      } else if (savedMenuItem === "Improvements") {
+        setSelectedComponent(<BuyImprovement />);
+      } else if (savedMenuItem === "Wonders") {
+        setSelectedComponent(<BuyWonder />);
+      } else if (savedMenuItem === "Soldiers") {
+        setSelectedComponent(<BuySoldiers />);
+      } else if (savedMenuItem === "Tanks") {
+        setSelectedComponent(<BuyTanks />);
+      } else if (savedMenuItem === "Cruise Missiles") {
+        setSelectedComponent(<BuyCruiseMissiles />);
+      } else if (savedMenuItem === "Nukes") {
+        setSelectedComponent(<BuyNukes />);
+      } else if (savedMenuItem === "Spies") {
+        setSelectedComponent(<BuySpies />);
       } else {
         setSelectedComponent(<div className="p-6">Coming Soon...</div>);
       }
@@ -116,7 +137,7 @@ const Nation = () => {
   const handleMenuClick = (option: string) => {
     setSelectedMenuItem(option);
     localStorage.setItem("selectedMenuItem", option); // Save selected menu item
-  
+
     if (option === "Collect Taxes") {
       setSelectedComponent(<CollectTaxes />);
     } else if (option === "Government Settings") {
@@ -133,6 +154,20 @@ const Nation = () => {
       setSelectedComponent(<BuyTechnology />);
     } else if (option === "Land") {
       setSelectedComponent(<BuyLand />);
+    } else if (option === "Improvements") {
+      setSelectedComponent(<BuyImprovement />);
+    } else if (option === "Wonders") {
+      setSelectedComponent(<BuyWonder />);
+    } else if (option === "Soldiers") {
+      setSelectedComponent(<BuySoldiers />);
+    } else if (option === "Tanks") {
+      setSelectedComponent(<BuyTanks />);
+    } else if (option === "Cruise Missiles") {
+      setSelectedComponent(<BuyCruiseMissiles />);
+    } else if (option === "Nukes") {
+      setSelectedComponent(<BuyNukes />);
+    } else if (option === "Spies") {
+      setSelectedComponent(<BuySpies />);
     } else {
       setSelectedComponent(<div className="p-6">Coming Soon...</div>);
     }

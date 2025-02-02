@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -6,159 +5,175 @@ import { usePublicClient, useWriteContract } from "wagmi";
 import { useAccount } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 import { useSearchParams } from "next/navigation";
+import { buyImprovement } from "~~/utils/improvements";
+import { getImprovements } from "~~/utils/improvements";
 import { checkBalance } from "~~/utils/treasury";
-import { checkOwnership } from "~~/utils/countryMinter";
 import { useTheme } from "next-themes";
 
-const BuyLand = () => {
+const BuyImprovement = () => {
     const { theme } = useTheme();
     const publicClient = usePublicClient();
     const contractsData = useAllContracts();
     const { address: walletAddress } = useAccount();
     const searchParams = useSearchParams();
     const nationId = searchParams.get("id");
-    const InfrastructureContract = contractsData?.InfrastructureContract;
-    const LandMarketContract = contractsData?.LandMarketContract;
-    const CountryMinterContract = contractsData?.CountryMinter;
+    const ImprovementContract1 = contractsData?.ImprovementsContract1;
+    const ImprovementContract2 = contractsData?.ImprovementsContract2;
+    const ImprovementContract3 = contractsData?.ImprovementsContract3;
+    const ImprovementContract4 = contractsData?.ImprovementsContract4;
     const TreasuryContract = contractsData?.TreasuryContract;
-
     const { writeContractAsync } = useWriteContract();
 
-    const [landDetails, setInfrastructureDetails] = useState({
-        currentLandMiles: "",
-        getAreaOfInfluence: "",
-        currentWarBucksBalance: "",
-    });
-    const [errorMessage, setErrorMessage] = useState("");
-    const [refreshTrigger, setRefreshTrigger] = useState(false);
+    interface ImprovementDetails {
+        [key: string]: string;
+    }
 
-    const [levelInput, setLevelInput] = useState("");
-    const [costPerLevel, setCostPerLevel] = useState<string | null>(null);
-    const [totalCostFromContract, setTotalCostFromContract] = useState<string | null>(null);
+    const improvementKeyMapping: { [key: string]: string } = {
+        airports: "buyAirport",
+        barracks: "buyBarracks",
+        borderFortifications: "buyBorderFortification",
+        borderWalls: "buyBorderWall",
+        banks: "buyBank",
+        casinos: "buyCasino",
+        churches: "buyChurch",
+        drydocks: "buyDrydock",
+        clinics: "buyClinic",
+        factories: "buyFactory",
+        foreignMinistries: "buyForeignMinistry",
+        forwardOperatingBases: "buyForwardOperatingBase",
+        guerillaCamps: "buyGuerillaCamp",
+        harbors: "buyHarbor",
+        hospitals: "buyHospital",
+        intelAgencies: "buyIntelAgency",
+        jails: "buyJail",
+        laborCamps: "buyLaborCamp",
+        prisons: "buyPrison",
+        radiationContainmentChambers: "buyRadiationContainmentChamber",
+        redLightDistricts: "buyRedLightDistrict",
+        rehabilitationFacilities: "buyRehabilitationFacility",
+        satellites: "buySatellite",
+        schools: "buySchool",
+        shipyards: "buyShipyard",
+        stadiums: "buyStadium",
+        universities: "buyUniversity",
+        missileDefenseSystems: "buyMissileDefense",
+        munitionsFactories: "buyMunitionsFactory",
+        navalAcademies: "buyNavalAcademy",
+        navalConstructionYards: "buyNavalConstructionYard",
+        officesOfPropaganda: "buyOfficeOfPropaganda",
+        policeHeadquarters: "buyPoliceHeadquarters"
+    };
+
+    const allImprovements = Object.keys(improvementKeyMapping);
+
+    const defaultImprovementDetails: ImprovementDetails = allImprovements.reduce((acc: ImprovementDetails, key) => {
+        acc[key] = "0";
+        return acc;
+    }, {});
+
+    const [improvementDetails, setImprovementDetails] = useState<ImprovementDetails>({ ...defaultImprovementDetails });
+    const [refreshTrigger, setRefreshTrigger] = useState(false);
+    const [purchaseAmounts, setPurchaseAmounts] = useState<{ [key: string]: number }>({});
+
+    const handleBuyImprovement = async (key: string) => {
+        const amount = purchaseAmounts[key] || 1;
+        const improvementKey = improvementKeyMapping[key] || key;
+
+        if (nationId) {
+            try {
+                await buyImprovement(
+                    nationId,
+                    improvementKey,
+                    amount,
+                    publicClient,
+                    ImprovementContract1,
+                    ImprovementContract2,
+                    ImprovementContract3,
+                    ImprovementContract4,
+                    writeContractAsync
+                );
+
+                window.location.reload();
+            } catch (error) {
+                console.error("Error purchasing improvement:", error);
+            }
+        } else {
+            console.error("Nation ID is null");
+        }
+    };
+
+    const fetchImprovementDetails = async () => {
+        if (!nationId || !publicClient || !ImprovementContract1 || !ImprovementContract2 || !ImprovementContract3 || !ImprovementContract4 || !TreasuryContract) return;
+
+        try {
+            const improvements = await getImprovements(nationId, ImprovementContract1, ImprovementContract2, ImprovementContract3, ImprovementContract4, publicClient) || [];
+            const warBuckBalance = await checkBalance(nationId, publicClient, TreasuryContract);
+
+            const improvementDetails: ImprovementDetails = { ...defaultImprovementDetails };
+
+            improvements.forEach(improvement => {
+                const key = improvement.name.charAt(0).toLowerCase() + improvement.name.slice(1).replace(/\s+/g, '');
+                improvementDetails[key] = improvement.improvementCount.toString();
+            });
+
+            improvementDetails["warBucksBalance"] = (warBuckBalance / BigInt(10 ** 18)).toLocaleString();
+
+            setImprovementDetails(improvementDetails);
+        } catch (error) {
+            console.error("Error fetching infrastructure details:", error);
+        }
+    };
 
     useEffect(() => {
-        const fetchInfrastructureDetails = async () => {
-            if (!nationId || !publicClient || !InfrastructureContract) return;
-
-            try {
-                const landAmount = await getLandCount(nationId, publicClient, InfrastructureContract);
-                const areaOfInfluence = await getAreaOfInfluence(nationId, publicClient, InfrastructureContract);
-                const warBuckBalance = await checkBalance(nationId, publicClient, TreasuryContract);
-
-                setInfrastructureDetails({
-                    currentLandMiles: landAmount.toString(),
-                    getAreaOfInfluence: areaOfInfluence.toString(),
-                    currentWarBucksBalance: (warBuckBalance / BigInt(10 ** 18)).toLocaleString(),
-                });
-            } catch (error) {
-                console.error("Error fetching infrastructure details:", error);
-            }
-        };
-
-        fetchInfrastructureDetails();
-    }, [nationId, publicClient, InfrastructureContract, TreasuryContract, refreshTrigger]);
-
-    const handleCalculateCost = async () => {
-        if (!levelInput || !nationId || !publicClient || !LandMarketContract) {
-            setErrorMessage("Please enter a valid level.");
-            return;
-        }
-
-        try {
-            const costPerLevel = await getLandCostPerMile(nationId, publicClient, LandMarketContract);
-            const totalCostFromContract = await getLandCost(nationId, Number(levelInput), publicClient, LandMarketContract);
-
-            setCostPerLevel((costPerLevel / BigInt(10 ** 18)).toString());
-            setTotalCostFromContract((totalCostFromContract / BigInt(10 ** 18)).toString());
-
-            setErrorMessage("");
-        } catch (error) {
-            console.error("Error calculating cost per level:", error);
-            setErrorMessage("Failed to calculate cost. Please try again.");
-        }
-    };
-
-    const handleBuyTechnology = async () => {
-        if (!nationId || !publicClient || !LandMarketContract || !walletAddress || !totalCostFromContract) {
-            setErrorMessage("Missing required information to proceed with the purchase.");
-            return;
-        }
-
-        try {
-            await buyLand(nationId, Number(levelInput), publicClient, LandMarketContract, writeContractAsync);
-            setRefreshTrigger(!refreshTrigger);
-            setErrorMessage("");
-            alert("Land purchased successfully!");
-        } catch (error) {
-            console.error("Error buying land:", error);
-            setErrorMessage("Failed to complete the purchase. Please try again.");
-        }
-    };
+        fetchImprovementDetails();
+    }, [nationId, publicClient, ImprovementContract1, ImprovementContract2, ImprovementContract3, ImprovementContract4, TreasuryContract, refreshTrigger]);
 
     return (
         <div className={`p-6 border-l-4 ${theme === 'dark' ? 'bg-gray-800 text-white border-green-400' : 'bg-gray-100 text-black border-green-500'}`}>
-            <h3 className="text-lg font-semibold">Buy Land</h3>
+            <h3 className="text-lg font-semibold">Improvement Details</h3>
 
-            {errorMessage && (
-                <div className="mt-4 p-4 bg-red-500 text-white rounded">
-                    {errorMessage}
-                </div>
-            )}
+            <div className="mb-4">
+                <strong>Warbucks Balance:</strong> {improvementDetails["warBucksBalance"] || "0"}
+            </div>
 
             <table className="w-full mt-4 border-collapse border border-gray-300">
                 <thead>
                     <tr className={`${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-black'}`}>
                         <th className="border border-gray-300 px-4 py-2">Category</th>
                         <th className="border border-gray-300 px-4 py-2">Value</th>
+                        <th className="border border-gray-300 px-4 py-2">Amount to Buy (1-5)</th>
+                        <th className="border border-gray-300 px-4 py-2">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {Object.entries(landDetails).map(([key, value]) => (
+                    {Object.entries(improvementDetails).filter(([key]) => key !== "warBucksBalance").map(([key, value]) => (
                         <tr key={key} className="text-center">
                             <td className="border border-gray-300 px-4 py-2 capitalize">{key.replace(/([A-Z])/g, ' $1')}</td>
-                            <td className="border border-gray-300 px-4 py-2">{value !== null ? value : "Loading..."}</td>
+                            <td className="border border-gray-300 px-4 py-2">{value}</td>
+                            <td className="border border-gray-300 px-4 py-2">
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="5"
+                                    value={purchaseAmounts[key] || 1}
+                                    onChange={(e) => setPurchaseAmounts({ ...purchaseAmounts, [key]: Number(e.target.value) })}
+                                    className="w-16 p-1 border rounded"
+                                />
+                            </td>
+                            <td className="border border-gray-300 px-4 py-2">
+                                <button
+                                    onClick={() => handleBuyImprovement(key)}
+                                    className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                                >
+                                    Buy
+                                </button>
+                            </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
-
-            <div className="mt-4">
-                <label className="block text-sm font-medium mb-2">Enter Level:</label>
-                <input
-                    type="number"
-                    value={levelInput}
-                    onChange={(e) => setLevelInput(e.target.value)}
-                    className="w-full p-2 border rounded mb-2"
-                    placeholder="Enter level number"
-                />
-                <button
-                    onClick={handleCalculateCost}
-                    className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600"
-                >
-                    Calculate Land Cost Per Level
-                </button>
-
-                {costPerLevel !== null && (
-                    <div className="mt-4 p-4 bg-blue-500 text-white rounded">
-                        Cost per Level: {costPerLevel}
-                    </div>
-                )}
-                {totalCostFromContract !== null && (
-                    <div className="mt-4 p-4 bg-blue-500 text-white rounded">
-                        Total Cost from Contract: {totalCostFromContract}
-                    </div>
-                )}
-                {totalCostFromContract !== null && (
-                    <button
-                        onClick={handleBuyTechnology}
-                        className="w-full bg-purple-500 text-white p-2 rounded hover:bg-purple-600 mt-4"
-                    >
-                        Buy {levelInput} Land Miles
-                    </button>
-                )}
-            </div>
         </div>
     );
 };
 
-export default BuyLand;
+export default BuyImprovement;

@@ -20,6 +20,27 @@ export const getSoldierCount = async (
     });
 }
 
+export const getSoldierCost = async (
+    nationId: string,
+    publicClient: any,
+    forcesContracat: any
+) => {
+    if (!publicClient || !forcesContracat || !nationId) {
+        console.log(publicClient, "publicClient")
+        console.log(forcesContracat, "forcesContracat")
+        console.log(nationId, "nationId")
+        console.error("Missing required data: publicClient, forcesContracat, or nationId.");
+        return;
+    }
+
+    return await publicClient.readContract({
+        abi: forcesContracat.abi,
+        address: forcesContracat.address,
+        functionName: "getSoldierCost",
+        args: [nationId],
+    });
+}
+
 export const getDefendingSoldierCount = async (
     nationId: string,
     publicClient: any,
@@ -125,6 +146,48 @@ export const getTankCount = async (
     });
 }
 
+export const getTankCost = async (
+    nationId: string,
+    publicClient: any,
+    forcesContracat: any
+) => {
+    if (!publicClient || !forcesContracat || !nationId) {
+        console.log(publicClient, "publicClient")
+        console.log(forcesContracat, "forcesContracat")
+        console.log(nationId, "nationId")
+        console.error("Missing required data: publicClient, forcesContracat, or nationId.");
+        return;
+    }
+
+    return await publicClient.readContract({
+        abi: forcesContracat.abi,
+        address: forcesContracat.address,
+        functionName: "getTankCost",
+        args: [nationId],
+    });
+}
+
+export const getMaxTankCount = async (
+    nationId: string,
+    publicClient: any,
+    forcesContracat: any
+) => {
+    if (!publicClient || !forcesContracat || !nationId) {
+        console.log(publicClient, "publicClient")
+        console.log(forcesContracat, "forcesContracat")
+        console.log(nationId, "nationId")
+        console.error("Missing required data: publicClient, forcesContracat, or nationId.");
+        return;
+    }
+
+    return await publicClient.readContract({
+        abi: forcesContracat.abi,
+        address: forcesContracat.address,
+        functionName: "getMaxTankCount",
+        args: [nationId],
+    });
+}
+
 export const getDefendingTankCount = async (
     nationId: string,
     publicClient: any,
@@ -186,6 +249,54 @@ export const getCasualties = async (
         functionName: "getCasualties",
         args: [nationId],
     });
+}
+
+export const buySoldiers = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    forcesContracat: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !forcesContracat || !nationId) {
+        console.error("Missing required data: publicClient, forcesContracat, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: forcesContracat.abi,
+            address: forcesContracat.address,
+            functionName: "buySoldiers",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error buying soldiers:", error);
+    }
+}
+
+export const buyTanks = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    forcesContracat: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !forcesContracat || !nationId) {
+        console.error("Missing required data: publicClient, forcesContracat, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: forcesContracat.abi,
+            address: forcesContracat.address,
+            functionName: "buyTanks",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error buying tanks:", error);
+    }
 }
 
 

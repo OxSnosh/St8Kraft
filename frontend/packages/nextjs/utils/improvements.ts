@@ -127,3 +127,270 @@ export const getImprovements = async (
         return [];
     }
 }
+
+export const buyImprovement = async (
+    nationId: string,
+    improvementKey: string,
+    amount: number,
+    publicClient: any,
+    improvementContract1: any,
+    improvementContract2: any,
+    improvementContract3: any,
+    improvementContract4: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !improvementContract1 || !improvementContract2 || !improvementContract3 || !improvementContract4 || !nationId) {
+        console.error("Missing required data: publicClient, improvementContract1, improvementContract2, improvementContract3, improvementContract4, or nationId.");
+        return;
+    }
+
+    console.log(improvementKey, "improvementKey")
+    console.log(amount, "amount")
+    
+    try {
+        if (improvementKey === "buyAirport") {
+            await writeContractAsync({
+                abi: improvementContract1.abi,
+                address: improvementContract1.address,
+                functionName: "buyImprovement1",
+                args: [amount, nationId, 1]
+            });
+        } else if (improvementKey === "buyBarracks") {
+            await writeContractAsync({
+                abi: improvementContract1.abi,
+                address: improvementContract1.address,
+                functionName: "buyImprovement1",
+                args: [amount, nationId, 2]
+            });
+        } else if (improvementKey === "buyBorderFortification") {
+            await writeContractAsync({
+                abi: improvementContract1.abi,
+                address: improvementContract1.address,
+                functionName: "buyImprovement1",
+                args: [amount, nationId, 3]
+            });
+        } else if (improvementKey === "buyBorderWall") {
+            await writeContractAsync({
+                abi: improvementContract1.abi,
+                address: improvementContract1.address,
+                functionName: "buyImprovement1",
+                args: [amount, nationId, 4]
+            });
+        } else if (improvementKey === "buyBank") {
+            await writeContractAsync({
+                abi: improvementContract1.abi,
+                address: improvementContract1.address,
+                functionName: "buyImprovement1",
+                args: [amount, nationId, 5]
+            });
+        } else if (improvementKey === "buyBunker") {
+            await writeContractAsync({
+                abi: improvementContract1.abi,
+                address: improvementContract1.address,
+                functionName: "buyImprovement1",
+                args: [amount, nationId, 6]
+            });
+        } else if (improvementKey === "buyCasino") {
+            await writeContractAsync({
+                abi: improvementContract1.abi,
+                address: improvementContract1.address,
+                functionName: "buyImprovement1",
+                args: [amount, nationId, 7]
+            });
+        } else if (improvementKey === "buyChurch") {
+            await writeContractAsync({
+                abi: improvementContract1.abi,
+                address: improvementContract1.address,
+                functionName: "buyImprovement1",
+                args: [amount, nationId, 8]
+            });
+        } else if (improvementKey === "buyDrydock") {
+            await writeContractAsync({
+                abi: improvementContract1.abi,
+                address: improvementContract1.address,
+                functionName: "buyImprovement1",
+                args: [amount, nationId, 9]
+            });
+        } else if (improvementKey === "buyClinic") {
+            await writeContractAsync({
+                abi: improvementContract1.abi,
+                address: improvementContract1.address,
+                functionName: "buyImprovement1",
+                args: [amount, nationId, 10]
+            });
+        } else if (improvementKey === "buyFactory") {
+            await writeContractAsync({
+                abi: improvementContract1.abi,
+                address: improvementContract1.address,
+                functionName: "buyImprovement1",
+                args: [amount, nationId, 11]
+            });
+        } else if (improvementKey === "buyForeignMinistry") {
+            await writeContractAsync({
+                abi: improvementContract2.abi,
+                address: improvementContract2.address,
+                functionName: "buyImprovement2",
+                args: [amount, nationId, 1]
+            });
+        } else if (improvementKey === "buyForwardOperatingBase") {
+            await writeContractAsync({
+                abi: improvementContract2.abi,
+                address: improvementContract2.address,
+                functionName: "buyImprovement2",
+                args: [amount, nationId, 2]
+            });
+        } else if (improvementKey === "buyGuerillaCamp") {
+            await writeContractAsync({
+                abi: improvementContract2.abi,
+                address: improvementContract2.address,
+                functionName: "buyImprovement2",
+                args: [amount, nationId, 3]
+            });
+        } else if (improvementKey === "buyHarbor") {
+            await writeContractAsync({
+                abi: improvementContract2.abi,
+                address: improvementContract2.address,
+                functionName: "buyImprovement2",
+                args: [amount, nationId, 4]
+            });
+        } else if (improvementKey === "buyHospital") {
+            await writeContractAsync({
+                abi: improvementContract2.abi,
+                address: improvementContract2.address,
+                functionName: "buyImprovement2",
+                args: [amount, nationId, 5]
+            });
+        } else if (improvementKey === "buyIntelAgency") {
+            await writeContractAsync({
+                abi: improvementContract2.abi,
+                address: improvementContract2.address,
+                functionName: "buyImprovement2",
+                args: [amount, nationId, 6]
+            });
+        } else if (improvementKey === "buyJail") {
+            await writeContractAsync({
+                abi: improvementContract2.abi,
+                address: improvementContract2.address,
+                functionName: "buyImprovement2",
+                args: [amount, nationId, 7]
+            });
+        } else if (improvementKey === "buyLaborCamp") {
+            await writeContractAsync({
+                abi: improvementContract2.abi,
+                address: improvementContract2.address,
+                functionName: "buyImprovement2",
+                args: [amount, nationId, 8]
+            });
+        } else if (improvementKey === "buyPrison") {
+            await writeContractAsync({
+                abi: improvementContract3.abi,
+                address: improvementContract3.address,
+                functionName: "buyImprovement3",
+                args: [amount, nationId, 1]
+            });
+        } else if (improvementKey === "buyRadiationContainmentChamber") {
+            await writeContractAsync({
+                abi: improvementContract3.abi,
+                address: improvementContract3.address,
+                functionName: "buyImprovement3",
+                args: [amount, nationId, 2]
+            });
+        } else if (improvementKey === "buyRedLightDistrict") {
+            await writeContractAsync({
+                abi: improvementContract3.abi,
+                address: improvementContract3.address,
+                functionName: "buyImprovement3",
+                args: [amount, nationId, 3]
+            });
+        } else if (improvementKey === "buyRehabilitationFacility") {
+            await writeContractAsync({
+                abi: improvementContract3.abi,
+                address: improvementContract3.address,
+                functionName: "buyImprovement3",
+                args: [amount, nationId, 4]
+            });
+        } else if (improvementKey === "buySatellite") {
+            await writeContractAsync({
+                abi: improvementContract3.abi,
+                address: improvementContract3.address,
+                functionName: "buyImprovement3",
+                args: [amount, nationId, 5]
+            });
+        } else if (improvementKey === "buySchool") {
+            await writeContractAsync({
+                abi: improvementContract3.abi,
+                address: improvementContract3.address,
+                functionName: "buyImprovement3",
+                args: [amount, nationId, 6]
+            });
+        } else if (improvementKey === "buyShipyard") {
+            await writeContractAsync({
+                abi: improvementContract3.abi,
+                address: improvementContract3.address,
+                functionName: "buyImprovement3",
+                args: [amount, nationId, 7]
+            });
+        } else if (improvementKey === "buyStadium") {
+            await writeContractAsync({
+                abi: improvementContract3.abi,
+                address: improvementContract3.address,
+                functionName: "buyImprovement3",
+                args: [amount, nationId, 8]
+            });
+        } else if (improvementKey === "buyUniversity") {
+            await writeContractAsync({
+                abi: improvementContract3.abi,
+                address: improvementContract3.address,
+                functionName: "buyImprovement3",
+                args: [amount, nationId, 9]
+            });
+        } else if (improvementKey === "buyMissileDefense") {
+            await writeContractAsync({
+                abi: improvementContract4.abi,
+                address: improvementContract4.address,
+                functionName: "buyImprovement4",
+                args: [amount, nationId, 1]
+            });
+        } else if (improvementKey === "buyMunitionsFactory") {
+            await writeContractAsync({
+                abi: improvementContract4.abi,
+                address: improvementContract4.address,
+                functionName: "buyImprovement4",
+                args: [amount, nationId, 2]
+            });
+        } else if (improvementKey === "buyNavalAcademy") {
+            await writeContractAsync({
+                abi: improvementContract4.abi,
+                address: improvementContract4.address,
+                functionName: "buyImprovement4",
+                args: [amount, nationId, 3]
+            });
+        } else if (improvementKey === "buyNavalConstructionYard") {
+            await writeContractAsync({
+                abi: improvementContract4.abi,
+                address: improvementContract4.address,
+                functionName: "buyImprovement4",
+                args: [amount, nationId, 4]
+            });
+        } else if (improvementKey === "buyOfficeOfPropaganda") {
+            await writeContractAsync({
+                abi: improvementContract4.abi,
+                address: improvementContract4.address,
+                functionName: "buyImprovement4",
+                args: [amount, nationId, 5]
+            });
+        } else if (improvementKey === "buyPoliceHeadquarters") {
+            await writeContractAsync({
+                abi: improvementContract4.abi,
+                address: improvementContract4.address,
+                functionName: "buyImprovement4",
+                args: [amount, nationId, 6]
+            });
+        } else {
+            console.error("Improvement key not recognized.");
+        }
+
+    } catch (error) {
+        console.error("Error buying improvement:", error);
+    }
+}

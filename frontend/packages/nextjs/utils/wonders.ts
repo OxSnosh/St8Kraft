@@ -128,6 +128,97 @@ export const getWonders = async (
         console.error("An error occurred while fetching wonders:", error);
     }
 }
+
+export const buyWonder = async (
+    nationId: string, 
+    wonderKey: string, 
+    publicClient: any, 
+    wondersContract1: any, 
+    wondersContract2: any, 
+    wondersContract3: any, 
+    wondersContract4: any, 
+    writeContractAsync: any
+) => {
+    if (!publicClient || !wondersContract1 || !wondersContract2 || !wondersContract3 || !wondersContract4 || !nationId) {
+        console.error("Missing required data: publicClient, wondersContract1, wondersContract2, wondersContract3, wondersContract4, or nationId.");
+        return;
+    }
+
+    console.log(wonderKey, "wonderKey");
+
+    try {
+        const wonderMappings = {
+            wondersContract1: [
+                "buyAgriculturalDevelopmentProgram",
+                "buyAntiAirDefenseNetwork",
+                "buyCentralIntelligenceAgency",
+                "buyDisasterReliefAgency",
+                "buyEmpWeaponization",
+                "buyFalloutShelterSystem",
+                "buyFederalAidCommission",
+                "buyFederalReserve",
+                "buyForeignAirforceBase",
+                "buyForeignArmyBase",
+                "buyForeignNavalBase"
+            ],
+            wondersContract2: [
+                "buyGreatMonument",
+                "buyGreatTemple",
+                "buyGreatUniversity",
+                "buyHiddenNuclearMissileSilo",
+                "buyInterceptorMissileSystem",
+                "buyInternet",
+                "buyInterstateSystem",
+                "buyManhattanProject",
+                "buyMiningIndustryConsortium"
+            ],
+            wondersContract3: [
+                "buyMovieIndustry",
+                "buyNationalCemetery",
+                "buyNationalEnvironmentalOffice",
+                "buyNationalResearchLab",
+                "buyNationalWarMemorial",
+                "buyNuclearPowerPlant",
+                "buyPentagon",
+                "buyPoliticalLobbyists",
+                "buyScientificDevelopmentCenter"
+            ],
+            wondersContract4: [
+                "buySocialSecuritySystem",
+                "buySpaceProgram",
+                "buyStockMarket",
+                "buyStrategicDefenseInitiative",
+                "buySuperiorLogisticalSupport",
+                "buyUniversalHealthcare",
+                "buyWeaponsResearchCenter"
+            ]
+        };
+
+        for (const [contractKey, wonderKeys] of Object.entries(wonderMappings)) {
+            const contract = eval(contractKey);
+            const contractNumber = contractKey.charAt(contractKey.length - 1); // Extracting the contract number
+
+            const index = wonderKeys.indexOf(wonderKey);
+
+            if (index !== -1) {
+                await writeContractAsync({
+                    abi: contract.abi,
+                    address: contract.address,
+                    functionName: `buyWonder${contractNumber}`, // Adjusted function name based on contract number
+                    args: [nationId, index + 1] // Index + 1 for 1-based indexing
+                });
+                return;
+            }
+        }
+
+        console.error("Wonder key not recognized.");
+    } catch (error) {
+        console.error("Error buying wonder:", error);
+    }
+};
+
+
+
 // { key: "getGreatPyramidCount", name: "Great Pyramids" },
 // { key: "getHangingGardensCount", name: "Hanging Gardens" },
 // { key: "getColossusCount", name: "Colossi" },
