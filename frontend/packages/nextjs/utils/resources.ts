@@ -1,3 +1,4 @@
+import { LinkToken__factory } from '../../../../backend/typechain-types/factories/@chainlink/contracts/src/v0.4/LinkToken__factory';
 
 export const getResources = async (
     nationId: string,
@@ -185,3 +186,124 @@ export const getPlayerResources = async (
 
   return playerResources.slice(0, 2);
 };
+
+export const proposeTrade = async (
+  nationId : any, 
+  partnerId : any,
+  ResourcesContract: any, 
+  writeContractAsync: any
+) => {
+  if (!ResourcesContract?.abi || !ResourcesContract?.address) {
+      console.error("ResourcesContract ABI or address is missing.");
+      return;
+  }
+
+  console.log("Proposing trade with:", nationId, partnerId); // Debug logs
+
+  try {
+      await writeContractAsync({
+          address: ResourcesContract.address,
+          abi: ResourcesContract.abi,
+          functionName: "proposeTrade",  // Ensure this matches exactly with your contract
+          args: [nationId, partnerId],   // Ensure this matches the function signature
+      });
+  } catch (error) {
+      console.error("Error inside proposeTrade:", error);
+  }
+};
+
+export const acceptTrade = async (
+  proposingNationId: string,
+  proposedNationId: string,
+  resourcesContract: any,
+  writeContractAsync: any
+) => {
+  console.log("Accepting trade with:", proposingNationId, proposedNationId);
+  if ( !resourcesContract || !proposingNationId || !proposedNationId) {
+    console.log(resourcesContract, "resourcesContract")
+    console.log(proposingNationId, "proposingNationId")
+    console.log(proposedNationId, "proposedNationId")
+    console.error("Missing required data: publicClient, resourcesContract, proposingNationId, or proposedNationId.");
+    return;
+  }
+
+  return await writeContractAsync({
+    abi: resourcesContract.abi,
+    address: resourcesContract.address,
+    functionName: "fulfillTradingPartner",
+    args: [proposedNationId, proposingNationId],
+  });
+}
+
+export const cancelTrade = async (
+  nationId: string,
+  partnerId: string,
+  resourcesContract: any,
+  writeContractAsync: any
+) => {
+  console.log("Cancelling trade with:", nationId, partnerId);
+  if ( !resourcesContract || !nationId || !partnerId) {
+    console.log(resourcesContract, "resourcesContract")
+    console.log(partnerId, "partnerId")
+    console.log(nationId, "nationId")
+    console.error("Missing required data: publicClient, resourcesContract, nationId, or partnerId.");
+    return;
+  }
+
+  return await writeContractAsync({
+    abi: resourcesContract.abi,
+    address: resourcesContract.address,
+    functionName: "cancelProposedTrade",
+    args: [nationId, partnerId],
+  });
+}
+
+export const getProposedTradingPartners = async (
+  nationId: string,
+  publicClient: any,
+  resourcesContract: any,
+) => {
+  if (!publicClient || !resourcesContract || !nationId) {
+    console.log(publicClient, "publicClient")
+    console.log(resourcesContract, "resourcesContract")
+    console.log(nationId, "nationId")
+    console.error("Missing required data: publicClient, resourcesContract, or nationId.");
+    return [];
+  }
+  console.log(publicClient, "publicClient")
+  console.log(resourcesContract, "resourcesContract")
+  console.log(nationId, "nationId")
+  try {
+    const tradingPartners = await publicClient.readContract({
+      abi: resourcesContract.abi,
+      address: resourcesContract.address,
+      functionName: "getProposedTradingPartners",
+      args: [nationId],
+    });
+    return tradingPartners || [];
+  } catch (error) {
+    console.error("Error fetching proposed trading partners:", error);
+    return [];
+  }
+}
+
+export const removeTradingPartner = async (
+  nationId: string,
+  partnerId: string,
+  resourcesContract: any,
+  writeContractAsync: any
+) => {
+  if (!resourcesContract || !nationId || !partnerId) {
+    console.error("Missing required data: resourcesContract, nationId, or partnerId.");
+    return;
+  }
+
+  return await writeContractAsync({
+    abi: resourcesContract.abi,
+    address: resourcesContract.address,
+    functionName: "removeTradingPartner",
+    args: [nationId, partnerId],
+  });
+}
+
+

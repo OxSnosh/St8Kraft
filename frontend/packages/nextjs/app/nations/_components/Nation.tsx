@@ -23,11 +23,12 @@ import BuyBombers from "./BuyBombers";
 import BuyNavy from "./BuyNavy";
 import PayBills from "./PayBills";
 import ManageTrades from "./ManageTrades";
+import SendAid from "./SendAid";
 import { useAccount, usePublicClient } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 
 const menuItems = [
-  { category: "NATION SETTINGS", options: ["Government Settings", "Military Settings", "Manage Trades"] },
+  { category: "NATION SETTINGS", options: ["Government Settings", "Military Settings", "Manage Trades", "Send Aid"] },
   { category: "TREASURY", options: ["Collect Taxes", "Pay Bills", "Deposit and Withdraw"] },
   { category: "MUNICIPAL PURCHASES", options: ["Infrastructure", "Technology", "Land"] },
   { category: "NATION UPGRADES", options: ["Improvements", "Wonders"] },
@@ -142,6 +143,8 @@ const Nation = () => {
         setSelectedComponent(<BuyNavy />);
       } else if (savedMenuItem === "Manage Trades") {
         setSelectedComponent(<ManageTrades/>)
+      } else if (savedMenuItem === "Send Aid") {
+        setSelectedComponent(<SendAid />);
       } else {
         setSelectedComponent(<div className="p-6">Coming Soon...</div>);
       }
@@ -194,6 +197,8 @@ const Nation = () => {
       setSelectedComponent(<BuyNavy />)
     } else if (option === "Manage Trades") {
       setSelectedComponent(<ManageTrades/>)
+    } else if (option === "Send Aid") {
+      setSelectedComponent(<SendAid />);
     } else {
       setSelectedComponent(<div className="p-6">Coming Soon...</div>);
     }

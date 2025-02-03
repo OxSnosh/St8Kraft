@@ -92,8 +92,7 @@ contract AidContract is Ownable {
     event ProposalCancelled(
         uint256 indexed proposalId,
         uint256 indexed idSender,
-        uint256 indexed idRecipient,
-        uint256 nationCancelling
+        uint256 indexed idRecipient
     );
 
     mapping(uint256 => Proposal) public idToProposal;
@@ -101,7 +100,6 @@ contract AidContract is Ownable {
     mapping(uint256 => uint256[]) public idToAidProposalsReceived;
     mapping(uint256 => mapping(uint256 => uint256[]))
         public idToAidProposalsLast10Days;
-
 
     /// @dev this is the function a nations owner will call to initiate an aid proposal
     /// @param idSender is the country ID of the aid sender (caller of the function)
@@ -191,6 +189,8 @@ contract AidContract is Ownable {
             false
         );
         idToProposal[aidProposalId] = newProposal;
+        idToAidProposalsSent[idSender].push(aidProposalId);
+        idToAidProposalsReceived[idRecipient].push(aidProposalId);
         emit AidProposed(
             proposalId,
             idSender,
@@ -373,6 +373,53 @@ contract AidContract is Ownable {
         );
         ForcesContract(forces).sendSoldiers(idSender, idRecipient, soldiers);
         idToProposal[proposalId].accepted = true;
+        finishAcceptProposal(
+            proposalId,
+            idSender,
+            idRecipient,
+            tech,
+            balance,
+            soldiers
+        );
+    }
+
+    function finishAcceptProposal(
+        uint256 proposalId,
+        uint256 idSender,
+        uint256 idRecipient,
+        uint256 tech,
+        uint256 balance,
+        uint256 soldiers
+    ) internal {
+        uint256[] storage senderProposals = idToAidProposalsSent[idSender];
+        uint256[] storage recipientProposals = idToAidProposalsReceived[
+            idRecipient
+        ];
+        uint256 day = keep.getGameDay();
+        for (uint256 i = 0; i < senderProposals.length; i++) {
+            if (senderProposals[i] == proposalId) {
+                senderProposals[i] = senderProposals[senderProposals.length - 1];
+                senderProposals.pop();
+            }
+            Proposal memory proposal = idToProposal[proposalId];
+            if (day - proposal.dayProposed > 10) {
+                senderProposals[i] = senderProposals[senderProposals.length - 1];
+                senderProposals.pop();                    
+            }
+        }
+        for (uint256 i = 0; i < recipientProposals.length; i++) {
+            if (recipientProposals[i] == proposalId) {
+                recipientProposals[i] = recipientProposals[recipientProposals
+                    .length - 1];
+                recipientProposals.pop();
+            }
+            Proposal memory proposal = idToProposal[proposalId];
+            if (day - proposal.dayProposed > 10) {
+                recipientProposals[i] = recipientProposals[recipientProposals
+                    .length - 1];
+                recipientProposals.pop();                    
+            }
+        }
         emit AidAccepted(
             proposalId,
             idSender,
@@ -408,12 +455,49 @@ contract AidContract is Ownable {
         } else if (addressRecipient == msg.sender) {
             nationCancelling = idRecipient;
         }
+        completeCancelAid(proposalId, idSender, idRecipient);
+    }
+
+    function completeCancelAid(
+        uint256 proposalId,
+        uint256 idSender,
+        uint256 idRecipient
+    ) internal {
+        uint256[] storage senderProposals = idToAidProposalsSent[idSender];
+        uint256[] storage recipientProposals = idToAidProposalsReceived[
+            idRecipient
+        ];
+        uint256 day = keep.getGameDay();
+        for (uint256 i = 0; i < senderProposals.length; i++) {
+            if (senderProposals[i] == proposalId) {
+                senderProposals[i] = senderProposals[senderProposals.length - 1];
+                senderProposals.pop();
+            }
+            Proposal memory proposal = idToProposal[proposalId];
+            if (day - proposal.dayProposed > 10) {
+                senderProposals[i] = senderProposals[senderProposals.length - 1];
+                senderProposals.pop();                    
+            }
+        }
+        for (uint256 i = 0; i < recipientProposals.length; i++) {
+            if (recipientProposals[i] == proposalId) {
+                recipientProposals[i] = recipientProposals[recipientProposals
+                    .length - 1];
+                recipientProposals.pop();
+            }
+            Proposal memory proposal = idToProposal[proposalId];
+            if (day - proposal.dayProposed > 10) {
+                recipientProposals[i] = recipientProposals[recipientProposals
+                    .length - 1];
+                recipientProposals.pop();                    
+            }
+        }
         emit ProposalCancelled(
             proposalId,
             idSender,
-            idRecipient,
-            nationCancelling
+            idRecipient
         );
+
     }
 
     ///@dev this is public view function that allows a caller to return the items in a proposal struct
@@ -445,5 +529,21 @@ contract AidContract is Ownable {
             idToProposal[proposalId].accepted,
             idToProposal[proposalId].cancelled
         );
+    }
+
+    function getProposalsSent(uint256 id)
+        public
+        view
+        returns (uint256[] memory)
+    {
+        return idToAidProposalsSent[id];
+    }
+
+    function getProposalsReceived(uint256 id)
+        public
+        view
+        returns (uint256[] memory)
+    {
+        return idToAidProposalsReceived[id];
     }
 }
