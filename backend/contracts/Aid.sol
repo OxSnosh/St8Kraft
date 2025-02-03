@@ -97,6 +97,8 @@ contract AidContract is Ownable {
     );
 
     mapping(uint256 => Proposal) public idToProposal;
+    mapping(uint256 => uint256[]) public idToAidProposalsSent;
+    mapping(uint256 => uint256[]) public idToAidProposalsReceived;
     mapping(uint256 => mapping(uint256 => uint256[]))
         public idToAidProposalsLast10Days;
 
