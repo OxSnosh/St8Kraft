@@ -3,6 +3,7 @@ import { usePublicClient, useAccount, useWriteContract } from 'wagmi';
 import { getNationStrength } from "~~/utils/strength";
 import { checkBalance } from "~~/utils/treasury";
 import { getTechnologyCount } from "~~/utils/technology";
+import { useSignMessage } from 'wagmi';
 import { getDefendingSoldierCount, getDefendingTankCount } from "~~/utils/forces";
 import { 
     getYak9Count,
@@ -43,7 +44,9 @@ import { tokensOfOwner } from "~~/utils/countryMinter";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 import { declareWar, nationActiveWars } from "~~/utils/wars";
 import { returnWarDetails } from "~~/utils/wars";
-import { isWarActive } from "~~/utils/wars";
+import { isWarActive, offerPeace, deployForcesToWar } from "~~/utils/wars";
+import { groundAttack, blockade } from "~~/utils/attacks"
+import { relaySpyOperation } from "../../../../../../backend/scripts/spy_attack_relayer";
 
 interface Nation {
     id: string;
@@ -141,6 +144,7 @@ const ManageWars = () => {
     const { address: walletAddress } = useAccount();
     const contractsData = useAllContracts();
     const {writeContractAsync} = useWriteContract();
+    const {signMessageAsync} = useSignMessage();
 
     const [mintedNations, setMintedNations] = useState<Nation[]>([]);
     const [selectedNationForces, setSelectedNationForces] = useState<Record<string, any>>({});
@@ -149,6 +153,10 @@ const ManageWars = () => {
     const [defendingNationId, setDefendingNationId] = useState<string>("");
     const [activeWars, setActiveWars] = useState<string[]>([]);
     const [warDetails, setWarDetails] = useState<Record<string, any>>({});
+    const [selectedWar, setSelectedWar] = useState<string>("");
+    const [soldiersToDeploy, setSoldiersToDeploy] = useState<number>(0);
+    const [tanksToDeploy, setTanksToDeploy] = useState<number>(0);
+    const [attackType, setAttackType] = useState<number>(0);
 
 
     useEffect(() => {
@@ -167,9 +175,10 @@ const ManageWars = () => {
         setActiveWars(Array.isArray(wars) ? wars : []);
     };
 
-    const handleWarClick = (offenseId: string, defenseId: string) => {
+    const handleWarClick = (offenseId: string, defenseId: string, warId: string) => {
         setSelectedNationId(offenseId);
         setDefendingNationId(defenseId);
+        setSelectedWar(warId);
     };
 
     useEffect(() => {
@@ -356,7 +365,41 @@ const ManageWars = () => {
         });
     };
 
+    const handleDeployForces = async () => {
+        await deployForcesToWar(selectedNationId, selectedWar.toString(), soldiersToDeploy, tanksToDeploy, contractsData.WarContract, writeContractAsync);
+    };
 
+    const handleGroundAttack = async (warId: string, offenseId: string, defenseId: string, attackType: string) => {
+        await groundAttack(warId.toString(), offenseId, defenseId, attackType, contractsData.GroundBattleContract, writeContractAsync);
+    };
+
+    const handleBlockade = async (offenseId: string, defenseId: string, warId: string, blockadeContract: any) => {
+        await blockade(offenseId, defenseId, warId.toString(), blockadeContract, writeContractAsync);
+    }
+
+    const handleBreakBlockade = async (warId: string, offenseId: string, defenseId: string, breakBlockadeContract: any) => {
+        await writeContractAsync({
+            abi: breakBlockadeContract.abi,
+            address: breakBlockadeContract.address,
+            functionName: "breakBlockade",
+            args: [warId, offenseId, defenseId],
+        });
+    }
+
+    const handleNavalAttack = async (warId: string, offenseId: string, defenseId: string, navalAttackContract: any) => {
+        await writeContractAsync({
+            abi: navalAttackContract.abi,
+            address: navalAttackContract.address,
+            functionName: "navalAttack",
+            args: [warId, offenseId, defenseId],
+        });
+    }
+
+    const handleSpyAttack = async (offenseId: string, defenseId: string, warContract: any, writeContractAsync: any) => {
+        
+        
+        await relaySpyOperation(inputData)
+    }
 
     return (
         <div>
@@ -367,14 +410,14 @@ const ManageWars = () => {
                     <h2>Active Wars:</h2>
                     <ul>
                         {activeWars.map((warId) => (
-                            <li key={warId} onClick={() => handleWarClick(warDetails[warId][0], warDetails[warId][1])} style={{ cursor: 'pointer' }}>
-                                War ID: {warId.toString()}
+                            <li key={warId} onClick={() => handleWarClick(warDetails[warId][0], warDetails[warId][1], warId)} style={{ cursor: 'pointer' }}>
+                                War ID: {warId}
                                 {warDetails[warId] && (
                                     <div>
-                                        <p>Offense Nation: Nation {warDetails[warId][0].toString()}</p>
-                                        <p>Defense Nation: Nation {warDetails[warId][1].toString()}</p>
+                                        <p>Offense Nation: Nation {warDetails[warId][0]}</p>
+                                        <p>Defense Nation: Nation {warDetails[warId][1]}</p>
                                         <p>War Active: {warDetails[warId][2] ? "Yes" : "No"}</p>
-                                        <p>Day Started: {warDetails[warId][3].toString()}</p>
+                                        <p>Day Started: {warDetails[warId][3]}</p>
                                         <p>Offense Peace Offered: {warDetails[warId][5] ? "Yes" : "No"}</p>
                                         <p>Defense Peace Offered: {warDetails[warId][6] ? "Yes" : "No"}</p>
                                     </div>
@@ -387,15 +430,39 @@ const ManageWars = () => {
 
             {selectedNationId && defendingNationId && (
                 <div>
-                    <button onClick={() => declarePeace(selectedNationId, defendingNationId, contractsData.WarContract, writeContractAsync)}>Offer Peace</button>
-                    <button onClick={() => deployForces(selectedNationId, defendingNationId, contractsData.WarContract, writeContractAsync)}>Deploy Forces</button>
-                    <button onClick={() => groundAttack(selectedNationId, defendingNationId, contractsData.WarContract, writeContractAsync)}>Ground Attack</button>
-                    <button onClick={() => airStrike(selectedNationId, defendingNationId, contractsData.WarContract, writeContractAsync)}>Air Strike</button>
-                    <button onClick={() => navalAttack(selectedNationId, defendingNationId, contractsData.WarContract, writeContractAsync)}>Naval Attack</button>
-                    <button onClick={() => blockade(selectedNationId, defendingNationId, contractsData.WarContract, writeContractAsync)}>Blockade</button>
-                    <button onClick={() => breakBlockade(selectedNationId, defendingNationId, contractsData.WarContract, writeContractAsync)}>Break Blockade</button>
-                    <button onClick={() => launchCruiseMissile(selectedNationId, defendingNationId, contractsData.WarContract, writeContractAsync)}>Launch Cruise Missile</button>
-                    <button onClick={() => launchNuke(selectedNationId, defendingNationId, contractsData.WarContract, writeContractAsync)}>Nuke</button>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
+                        <button onClick={() => offerPeace(selectedNationId, selectedWar, contractsData.WarContract, writeContractAsync)}>Declare Peace</button>
+
+                        <div>
+                            <label>Soldiers to Deploy:</label>
+                            <input type="number" value={soldiersToDeploy} onChange={(e) => setSoldiersToDeploy(Number(e.target.value))} />
+                        </div>
+                        <div>
+                            <label>Tanks to Deploy:</label>
+                            <input type="number" value={tanksToDeploy} onChange={(e) => setTanksToDeploy(Number(e.target.value))} />
+                        </div>
+                        <button onClick={handleDeployForces}>Deploy Forces</button>
+                        <div>
+                            <label>Attack Type</label>
+                            <input type="number" value={attackType} onChange={(e) => setAttackType(Number(e.target.value))}/>
+                        </div>
+                        <button onClick={() => handleGroundAttack(selectedWar, selectedNationId, defendingNationId, attackType.toString())}>Ground Attack</button>
+                        <button onClick={() => airStrike(selectedNationId, defendingNationId, contractsData.WarContract, writeContractAsync)}>Air Strike</button>
+                        <button onClick={() => handleNavalAttack(selectedWar, selectedNationId, defendingNationId, contractsData.NavalAttackContract)}>Naval Attack</button>
+                        <button onClick={() => handleBlockade(selectedNationId, defendingNationId, selectedWar, contractsData.NavalBlockadeContract)}>Blockade</button>
+                        <button onClick={() => handleBreakBlockade(selectedWar.toString(), selectedNationId, defendingNationId, contractsData.BreakBlocadeContract)}>Break Blockade</button>
+                        <button onClick={() => launchCruiseMissile(selectedNationId, defendingNationId, contractsData.WarContract, writeContractAsync)}>Launch Cruise Missile</button>
+                        <button onClick={() => launchNuke(selectedNationId, defendingNationId, contractsData.WarContract, writeContractAsync)}>Nuke</button>
+                        <div>
+                            <label>Attack Type</label>
+                            <input type="number" value={attackType} onChange={(e) => setAttackType(Number(e.target.value))}/>
+                        </div>
+                        <button onClick={() => handleSpyAttack(selectedNationId, defendingNationId, contractsData.WarContract, writeContractAsync)}>Spy Attack</button>
+                    </div>
+
+                    <h3>Nation Details</h3>
+                    <p>Selected Nation ID: {selectedNationId}</p>
+                    <p>Defending Nation ID: {defendingNationId}</p>
                 </div>
             )}
 
@@ -421,3 +488,4 @@ const ManageWars = () => {
 };
 
 export default ManageWars;
+

@@ -194,6 +194,7 @@ export const deployForcesToWar = async (
         return;
     }
 
+    console.log("are we here")
     try {
         await writeContractAsync({
             abi: warContract.abi,
