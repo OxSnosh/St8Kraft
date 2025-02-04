@@ -1,4 +1,5 @@
 import React, { use, useEffect, useState } from "react";
+import { ethers, utils } from "ethers";
 import { usePublicClient, useAccount, useWriteContract } from 'wagmi';
 import { getNationStrength } from "~~/utils/strength";
 import { checkBalance } from "~~/utils/treasury";
@@ -46,7 +47,8 @@ import { declareWar, nationActiveWars } from "~~/utils/wars";
 import { returnWarDetails } from "~~/utils/wars";
 import { isWarActive, offerPeace, deployForcesToWar } from "~~/utils/wars";
 import { groundAttack, blockade } from "~~/utils/attacks"
-import { relaySpyOperation } from "../../../../../../backend/scripts/spy_attack_relayer";
+// import { relaySpyOperation } from "../../../../../../backend/scripts/spy_attack_relayer";
+
 
 interface Nation {
     id: string;
@@ -157,6 +159,7 @@ const ManageWars = () => {
     const [soldiersToDeploy, setSoldiersToDeploy] = useState<number>(0);
     const [tanksToDeploy, setTanksToDeploy] = useState<number>(0);
     const [attackType, setAttackType] = useState<number>(0);
+    const [spyAttackType, setSpyAttackType] = useState<number>(0);
 
 
     useEffect(() => {
@@ -395,9 +398,16 @@ const ManageWars = () => {
         });
     }
 
-    const handleSpyAttack = async (offenseId: string, defenseId: string, warContract: any, writeContractAsync: any) => {
-        
-        
+    const handleSpyAttack = async (offenseId: string, defenseId: string, attackType: any) => {
+        const signature = await signMessageAsync({ message: "Spy Attack" });
+        const hash = utils.hashMessage("Spy Attack")
+        const inputData = {
+            signature,
+            messageHash: hash,
+            callerNationId: Number(offenseId),
+            defenderNationId: Number(defenseId),
+            attackType: attackType
+        }
         await relaySpyOperation(inputData)
     }
 
@@ -455,9 +465,9 @@ const ManageWars = () => {
                         <button onClick={() => launchNuke(selectedNationId, defendingNationId, contractsData.WarContract, writeContractAsync)}>Nuke</button>
                         <div>
                             <label>Attack Type</label>
-                            <input type="number" value={attackType} onChange={(e) => setAttackType(Number(e.target.value))}/>
+                            <input type="number" value={spyAttackType} onChange={(e) => setSpyAttackType(Number(e.target.value))}/>
                         </div>
-                        <button onClick={() => handleSpyAttack(selectedNationId, defendingNationId, contractsData.WarContract, writeContractAsync)}>Spy Attack</button>
+                        <button onClick={() => handleSpyAttack(selectedNationId, defendingNationId, spyAttackType)}>Spy Attack</button>
                     </div>
 
                     <h3>Nation Details</h3>
