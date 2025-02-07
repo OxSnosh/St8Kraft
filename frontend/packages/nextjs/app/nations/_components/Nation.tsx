@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+
 import BuyCruiseMissiles from "./BuyCruiseMissiles";
 import BuyImprovement from "./BuyImprovements";
 import BuyInfrastructure from "./BuyInfrastructure";
@@ -24,12 +25,15 @@ import BuyNavy from "./BuyNavy";
 import PayBills from "./PayBills";
 import ManageTrades from "./ManageTrades";
 import SendAid from "./SendAid";
-import ManageWars from "./ManageWars";
+import ManageWars from "./DeclareWar";
+import ActiveWars from "./ActiveWars";
 import { useAccount, usePublicClient } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 
+
 const menuItems = [
-  { category: "NATION SETTINGS", options: ["Government Settings", "Military Settings", "Manage Trades", "Send Aid", "Manage Wars"] },
+  { category: "NATION SETTINGS", options: ["Government Settings", "Military Settings", "Manage Trades", "Send Aid"] },
+  { category: "MANAGE WARS", options: ["Declare War", "Active Wars"] },
   { category: "TREASURY", options: ["Collect Taxes", "Pay Bills", "Deposit and Withdraw"] },
   { category: "MUNICIPAL PURCHASES", options: ["Infrastructure", "Technology", "Land"] },
   { category: "NATION UPGRADES", options: ["Improvements", "Wonders"] },
@@ -45,6 +49,7 @@ const Nation = () => {
   const contractsData = useAllContracts();
   const { address: walletAddress } = useAccount();
   const countryMinterContract = contractsData?.CountryMinter;
+  const router = useRouter();
 
   const [selectedComponent, setSelectedComponent] = useState<JSX.Element | null>(null);
   const [selectedMenuItem, setSelectedMenuItem] = useState<string | null>(null);
@@ -89,6 +94,16 @@ const Nation = () => {
 
     fetchMyNations();
   }, [walletAddress, countryMinterContract, publicClient]);
+
+  const handleNationSelect = (nationId: string, nationName: string) => {
+    setSelectedMenuItem(nationName);
+    localStorage.setItem("selectedMenuItem", nationName); // Save selection
+    setSelectedComponent(<NationDetailsPage nationId={nationId} onPropeseTrade={handlePropeseTrade} />);
+    setIsDropdownOpen(false); // Close dropdown
+  
+    // Update the query string in the URL
+    router.push(`/nations?id=${nationId}`, { scroll: false });
+  };
 
   // Function to handle trade proposals
   const handlePropeseTrade = () => {
@@ -146,8 +161,10 @@ const Nation = () => {
         setSelectedComponent(<ManageTrades/>)
       } else if (savedMenuItem === "Send Aid") {
         setSelectedComponent(<SendAid />);
-      } else if (savedMenuItem === "Manage Wars") {
+      } else if (savedMenuItem === "Declare War") {
         setSelectedComponent(<ManageWars />);
+      } else if (savedMenuItem === "Active Wars") {
+        setSelectedComponent(<ActiveWars />)
       } else {
         setSelectedComponent(<div className="p-6">Coming Soon...</div>);
       }
@@ -202,8 +219,10 @@ const Nation = () => {
       setSelectedComponent(<ManageTrades/>)
     } else if (option === "Send Aid") {
       setSelectedComponent(<SendAid />);
-    } else if (option === "Manage Wars") {
+    } else if (option === "Declare War") {
       setSelectedComponent(<ManageWars />);
+    } else if (option === "Active Wars") {
+      setSelectedComponent(<ActiveWars />)
     } else {
       setSelectedComponent(<div className="p-6">Coming Soon...</div>);
     }
@@ -228,18 +247,8 @@ const Nation = () => {
             {isDropdownOpen && (
               <ul className="absolute left-0 mt-2 p-2 shadow bg-base-100 rounded-box w-52">
                 {mintedNations.map(nation => (
-                  <li
-                    key={nation.href}
-                    onClick={() => {
-                      setSelectedMenuItem(nation.name);
-                      localStorage.setItem("selectedMenuItem", nation.name); // Save nation selection
-                      setSelectedComponent(<NationDetailsPage nationId={nation.href.split("=")[1]} onPropeseTrade={handlePropeseTrade} />);
-                      setIsDropdownOpen(false); // Close dropdown on selection
-                    }}
-                  >
-                    <Link href={nation.href}>
-                      <>{nation.name}</>
-                    </Link>
+                  <li key={nation.href} onClick={() => handleNationSelect(nation.href.split("=")[1], nation.name)}>
+                    <Link href={nation.href}>{nation.name}</Link>
                   </li>
                 ))}
               </ul>

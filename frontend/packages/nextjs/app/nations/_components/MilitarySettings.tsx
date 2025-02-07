@@ -34,9 +34,11 @@ const MilitarySettings = () => {
 
   useEffect(() => {
     const fetchWarPeaceStatus = async () => {
+      console.log(nationId, MilitaryContract)
       if (nationId && MilitaryContract) {
         try {
           status = await getWarPeacePreference(nationId, publicClient, MilitaryContract);
+          console.log("W/P STATUS", status)
           setWarPeaceStatus(status[0]);
         } catch (error) {
           console.error("Failed to fetch war/peace status", error);
