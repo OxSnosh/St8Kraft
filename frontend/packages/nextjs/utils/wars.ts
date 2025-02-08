@@ -96,10 +96,7 @@ export const returnWarDetails = async (warId : string, warContract: any, publicC
         console.error("Missing required data: warContract or warId.");
         return;
     }
-    console.log(warId, "warId")
-    console.log(warContract, "warContract")
-    console.log(publicClient, "publicClient")
-
+    
     try {
         console.log("TRYING")
         const data = await publicClient.readContract({

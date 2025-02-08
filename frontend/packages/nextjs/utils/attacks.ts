@@ -28,7 +28,7 @@ export const blockade = async (
     nationId: string,
     defenderId: string,
     warId: string,
-    blockadeContract: any,
+    navalBlockadeContract: any,
     writeContractAsync: any,
 ) => {
     if (!nationId || !defenderId || !warId) {
@@ -38,12 +38,86 @@ export const blockade = async (
 
     try {
         return await writeContractAsync({
-            abi: blockadeContract.abi,
-            address: blockadeContract.address,
+            abi: navalBlockadeContract.abi,
+            address: navalBlockadeContract.address,
             functionName: "blockade",
             args: [nationId, defenderId, warId],
         });
     } catch (error) {
         console.error("Error blockading:", error);
+    }
+}
+
+export const breakBlockade = async (
+    warId: string,
+    nationId: string,
+    blockaderId: string,
+    breakBlockadeContract: any,
+    writeContractAsync: any,
+) => {
+    if (!nationId || !blockaderId || !warId) {
+        console.error("Missing required data: nationId, defenderId, or warId.");
+        return;
+    }
+
+    try {
+        return await writeContractAsync({
+            abi: breakBlockadeContract.abi,
+            address: breakBlockadeContract.address,
+            functionName: "breakBlockade",
+            args: [nationId, blockaderId, warId],
+        });
+    } catch (error) {
+        console.error("Error breaking blockade:", error);
+    }
+}
+
+export const navalAttack = async (
+    warId: string,
+    nationId: string,
+    defenderId: string,
+    navalAttackContract: any,
+    writeContractAsync: any,
+) => {
+    if (!warId || !nationId || !defenderId) {
+        console.error("Missing required data: warId, nationId, or defenderId.");
+        return;
+    }
+
+    try {
+        return await writeContractAsync({
+            abi: navalAttackContract.abi,
+            address: navalAttackContract.address,
+            functionName: "navalAttack",
+            args: [warId, nationId, defenderId],
+        });
+    } catch (error) {
+        console.error("Error launching naval attack:", error);
+    }
+}
+
+export const launchAirBattle = async (
+    warId: string,
+    nationId: string,
+    defenderId: string,
+    attackingFighters: number[],
+    attackingBombers: number[],
+    airBattleContract: any,
+    writeContractAsync: any,
+) => {
+    if (!warId || !nationId || !defenderId || !attackingFighters || !attackingBombers) {
+        console.error("Missing required data: warId, nationId, defenderId, attackingFighters, or attackingBombers.");
+        return;
+    }
+
+    try {
+        return await writeContractAsync({
+            abi: airBattleContract.abi,
+            address: airBattleContract.address,
+            functionName: "airBattle",
+            args: [warId, nationId, defenderId, attackingFighters, attackingBombers],
+        });
+    } catch (error) {
+        console.error("Error launching air battle:", error);
     }
 }

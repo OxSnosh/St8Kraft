@@ -58,3 +58,27 @@ export const buyCruiseMissiles = async (
         console.error("Error buying cruise missiles:", error);
     }
 }
+
+export const launchCruiseMissileAttack = async (
+    nationId: string,
+    targetId: string,
+    warId: string,
+    missilesContract: any,
+    writeContractAsync: any
+) => {
+    if (!nationId || !targetId || !missilesContract) {
+        console.error("Missing required data: nationId, targetId, or missilesContract.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: missilesContract.abi,
+            address: missilesContract.address,
+            functionName: "launchCruiseMissileAttack",
+            args: [nationId, targetId, warId],
+        });
+    } catch (error) {
+        console.error("Error launching cruise missile:", error);
+    }
+}

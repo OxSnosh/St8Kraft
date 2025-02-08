@@ -56,20 +56,6 @@ contract WarContract is Ownable {
         mapping(uint256 => uint256) defenseIdToCruiseMissileLaunchesToday;
     }
 
-    function returnWarDetails(uint256 _warId) public view returns (uint256, uint256, bool, uint256, bool, bool, bool, uint256, uint256) {
-        War storage war = warIdToWar[_warId];
-        return (
-            war.offenseId,
-            war.defenseId,
-            war.active,
-            war.dayStarted,
-            war.peaceDeclared,
-            war.offensePeaceOffered,
-            war.defensePeaceOffered,
-            war.offenseBlockades,
-            war.defenseBlockades
-        );
-    }
 
     struct OffenseDeployed1 {
         mapping(uint256 => bool) offenseDeployedToday;
@@ -386,6 +372,21 @@ contract WarContract is Ownable {
             defensePeaceOffered,
             warActive,
             peaceDeclared
+        );
+    }
+
+    function returnWarDetails(uint256 _warId) public view returns (uint256, uint256, bool, uint256, bool, bool, bool, uint256, uint256) {
+        War storage war = warIdToWar[_warId];
+        return (
+            war.offenseId,
+            war.defenseId,
+            war.active,
+            war.dayStarted,
+            war.peaceDeclared,
+            war.offensePeaceOffered,
+            war.defensePeaceOffered,
+            war.offenseBlockades,
+            war.defenseBlockades
         );
     }
 

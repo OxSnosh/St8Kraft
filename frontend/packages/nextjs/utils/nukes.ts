@@ -65,4 +65,29 @@ export const getNukeCount = async (
         functionName: "getNukeCount",
         args: [nationId],
     });
+}   
+
+export const launchNuke = async (
+    warId: string,
+    nationId: string,
+    targetNationId: string,
+    attackType: string,
+    nukeContract: any,
+    writeContractAsync: any
+) => {
+    if (!nukeContract || !nationId || !targetNationId) {
+        console.error("Missing required data: missileContract, nationId, or targetNationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: nukeContract.abi,
+            address: nukeContract.address,
+            functionName: "launchNuke",
+            args: [warId, nationId, targetNationId, attackType],
+        });
+    } catch (error) {
+        console.error("Error launching nuke:", error);
+    }
 }
