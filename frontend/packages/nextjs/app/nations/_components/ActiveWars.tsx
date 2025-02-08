@@ -49,17 +49,18 @@ const ActiveWars = () => {
 
     const handleWarClick = (warId: string) => {
         console.log("Selected War:", warId);
-        console.log("Offense Nation:", warDetails[warId][0]);
-        console.log("Defense Nation:", warDetails[warId][1]);
+        console.log("WAr details", warDetails)
+        // console.log("Offense Nation:", warDetails[warId][0]);
+        // console.log("Defense Nation:", warDetails[warId][1]);
         if (!warDetails[warId]) return;
 
         setSelectedWar(warId);
         setOffenseNationId(warDetails[warId][0]);
         setDefenseNationId(warDetails[warId][1]);
 
-        console.log("Selected War:", warId);
-        console.log("Offense Nation:", warDetails[warId][0]);
-        console.log("Defense Nation:", warDetails[warId][1]);
+        // console.log("Selected War:", warId);
+        // console.log("Offense Nation:", warDetails[warId][0]);
+        // console.log("Defense Nation:", warDetails[warId][1]);
     };
 
     return (
