@@ -27,12 +27,13 @@ import ManageTrades from "./ManageTrades";
 import SendAid from "./SendAid";
 import ManageWars from "./DeclareWar";
 import ActiveWars from "./ActiveWars";
+import Senate from "./Senate";
 import { useAccount, usePublicClient } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 
 
 const menuItems = [
-  { category: "NATION SETTINGS", options: ["Government Settings", "Military Settings", "Manage Trades", "Send Aid"] },
+  { category: "NATION SETTINGS", options: ["Government Settings", "Military Settings", "Manage Trades", "Send Aid", "Senate"] },
   { category: "MANAGE WARS", options: ["Declare War", "Active Wars"] },
   { category: "TREASURY", options: ["Collect Taxes", "Pay Bills", "Deposit and Withdraw"] },
   { category: "MUNICIPAL PURCHASES", options: ["Infrastructure", "Technology", "Land"] },
@@ -165,6 +166,8 @@ const Nation = () => {
         setSelectedComponent(<ManageWars />);
       } else if (savedMenuItem === "Active Wars") {
         setSelectedComponent(<ActiveWars />)
+      } else if (savedMenuItem === "Senate") {
+        setSelectedComponent(<Senate />);
       } else {
         setSelectedComponent(<div className="p-6">Coming Soon...</div>);
       }
@@ -223,6 +226,8 @@ const Nation = () => {
       setSelectedComponent(<ManageWars />);
     } else if (option === "Active Wars") {
       setSelectedComponent(<ActiveWars />)
+    } else if (option === "Senate") {
+      setSelectedComponent(<Senate />);
     } else {
       setSelectedComponent(<div className="p-6">Coming Soon...</div>);
     }
