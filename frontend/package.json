@@ -44,7 +44,16 @@
     "vercel": "yarn workspace @se-2/nextjs vercel",
     "vercel:login": "yarn workspace @se-2/nextjs vercel:login",
     "vercel:yolo": "yarn workspace @se-2/nextjs vercel:yolo",
-    "verify": "yarn hardhat:verify"
+    "verify": "yarn hardhat:verify",
+    "subgraph:test": "yarn workspace @se-2/subgraph test",
+    "stop-node": "yarn workspace @se-2/subgraph stop-node",
+    "clean-node": "yarn workspace @se-2/subgraph clean-node",
+    "run-node": "yarn workspace @se-2/subgraph run-node",
+    "local-create": "yarn workspace @se-2/subgraph local-create",
+    "local-ship": "yarn workspace @se-2/subgraph local-ship",
+    "abi-copy": "yarn workspace @se-2/subgraph abi-copy",
+    "codegen": "yarn workspace @se-2/subgraph codegen",
+    "graphclient:build": "yarn workspace @se-2/nextjs client"
   },
   "devDependencies": {
     "husky": "~8.0.3",
