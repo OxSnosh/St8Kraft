@@ -62,13 +62,13 @@
           "anonymous": false,
           "inputs": [
             {
-              "indexed": true,
+              "indexed": false,
               "internalType": "string",
               "name": "nationName",
               "type": "string"
             },
             {
-              "indexed": true,
+              "indexed": false,
               "internalType": "string",
               "name": "ruler",
               "type": "string"

@@ -1,26 +1,25 @@
 specVersion: 0.0.4
-description: Greetings
+description: CountryMinter
 repository: https://github.com/scaffold-eth/se-2/packages/subgraph/
 schema:
   file: ./src/schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: YourContract
+    name: CountryMinter
     network: localhost
     source:
-      abi: YourContract
-      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+      abi: CountryMinter
+      address: "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0"
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - Greeting
-        - Sender
+        - Nation
       abis:
-        - name: YourContract
-          file: ./abis/localhost_YourContract.json
+        - name: CountryMinter
+          file: ./abis/localhost_CountryMinter.json
       eventHandlers:
-        - event: GreetingChange(indexed address,string,bool,uint256)
-          handler: handleGreetingChange
+        - event: NationCreated(string,string,indexed uint256,address)
+          handler: handleNationCreated
       file: ./src/mapping.ts

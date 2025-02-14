@@ -1,0 +1,11 @@
+query GetNations {
+  nations {
+    id
+    nationId
+    ruler
+    owner
+    name
+    createdAt
+    transactionHash
+  }
+}

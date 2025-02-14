@@ -1,0 +1,1211 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "warId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "offenseId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "defenseId",
+        "type": "uint256"
+      }
+    ],
+    "name": "PeaceDeclared",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "warId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "offeredBy",
+        "type": "uint256"
+      }
+    ],
+    "name": "PeaceOffered",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "warId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "offenseId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "defenseId",
+        "type": "uint256"
+      }
+    ],
+    "name": "WarDeclared",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_warId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nationId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "battleCausalties",
+        "type": "uint256"
+      }
+    ],
+    "name": "addAirBattleCasualties",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_warId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nationId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "navyCasualties",
+        "type": "uint256"
+      }
+    ],
+    "name": "addNavyCasualties",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "airBattle",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "blockade",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "breakBlockade",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_warId",
+        "type": "uint256"
+      }
+    ],
+    "name": "cancelPeaceOffersUponAttack",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "offenseId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "defenseId",
+        "type": "uint256"
+      }
+    ],
+    "name": "checkStrength",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "countryMinter",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "cruiseMissile",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "offenseId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "defenseId",
+        "type": "uint256"
+      }
+    ],
+    "name": "declareWar",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "soldierLosses",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tankLosses",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "attackerId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_warId",
+        "type": "uint256"
+      }
+    ],
+    "name": "decreaseGroundBattleLosses",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "nationId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_warId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "soldiersToDeploy",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tanksToDeploy",
+        "type": "uint256"
+      }
+    ],
+    "name": "deployForcesToWar",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "forces",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_warId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      }
+    ],
+    "name": "getCruiseMissileLaunchesToday",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_warId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getDaysLeft",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_warId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "attackerId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getDeployedGroundForces",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_warId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getInvolvedParties",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "groundBattle",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "idToActiveWars",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "idToDeactivatedWars",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "idToOffensiveWars",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_warId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nationId",
+        "type": "uint256"
+      }
+    ],
+    "name": "incrementCruiseMissileAttack",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_warId",
+        "type": "uint256"
+      }
+    ],
+    "name": "isPeaceOffered",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_warId",
+        "type": "uint256"
+      }
+    ],
+    "name": "isWarActive",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "keeper",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "military",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "offenseId",
+        "type": "uint256"
+      }
+    ],
+    "name": "nationActiveWarsReturn",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nationStrength",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "navalAttack",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nuke",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "offenseId",
+        "type": "uint256"
+      }
+    ],
+    "name": "offensiveWarLength",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "offenseId",
+        "type": "uint256"
+      }
+    ],
+    "name": "offensiveWarReturn",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "offerId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_warId",
+        "type": "uint256"
+      }
+    ],
+    "name": "offerPeace",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      }
+    ],
+    "name": "recallTroopsFromDeactivatedWars",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_warId",
+        "type": "uint256"
+      }
+    ],
+    "name": "returnWar",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_warId",
+        "type": "uint256"
+      }
+    ],
+    "name": "returnWarDetails",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_countryMinter",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_nationStrength",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_military",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_breakBlockadeAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_navalAttackAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_airBattleAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_groundBattle",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_cruiseMissile",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_forces",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_wonders1",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_keeper",
+        "type": "address"
+      }
+    ],
+    "name": "settings",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_treasury",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_forces",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_blockade",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_nuke",
+        "type": "address"
+      }
+    ],
+    "name": "settings2",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "treasury",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "warId",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "warIdToDefenseDeployed1",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "soldiersDeployed",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tanksDeployed",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "warIdToDefenseLosses",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "warId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nationId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "soldiersLost",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tanksLost",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "cruiseMissilesLost",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "aircraftLost",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "navyStrengthLost",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "infrastructureLost",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "technologyLost",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "landLost",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "warIdToOffenseDeployed1",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "soldiersDeployed",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tanksDeployed",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "warIdToOffenseLosses",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "warId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nationId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "soldiersLost",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tanksLost",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "cruiseMissilesLost",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "aircraftLost",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "navyStrengthLost",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "infrastructureLost",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "technologyLost",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "landLost",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "warIdToWar",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "offenseId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "defenseId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "active",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "dayStarted",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "peaceDeclared",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "offensePeaceOffered",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "defensePeaceOffered",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "offenseBlockades",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "defenseBlockades",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "wonders1",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

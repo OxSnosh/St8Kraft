@@ -1,21 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GetGreetingsDocument, execute } from "~~/.graphclient";
+import { GetNationsDocument, execute } from "~~/.graphclient";
 import { Address } from "~~/components/scaffold-eth";
 
-const GreetingsTable = () => {
-  const [greetingsData, setGreetingsData] = useState<any>(null);
+const NationsTable = () => {
+  const [nationsMinted, setNationsData] = useState<any>(null);
   const [error, setError] = useState<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!execute || !GetGreetingsDocument) {
+      if (!execute || !GetNationsDocument) {
         return;
       }
       try {
-        const { data: result } = await execute(GetGreetingsDocument, {});
-        setGreetingsData(result);
+        const { data: result } = await execute(GetNationsDocument, {});
+        console.log(result.nations);
+        setNationsData(result);
         console.log(result);
       } catch (err) {
         setError(err);
@@ -36,19 +37,21 @@ const GreetingsTable = () => {
         <table className="table bg-base-100 table-zebra">
           <thead>
             <tr className="rounded-xl">
-              <th className="bg-primary"></th>
-              <th className="bg-primary">Sender</th>
-              <th className="bg-primary">Greetings</th>
+              <th className="bg-primary">Nation ID</th>
+              <th className="bg-primary">Owner</th>
+              <th className="bg-primary">Nation Name</th>
+              <th className="bg-primary">Ruler</th>
             </tr>
           </thead>
           <tbody>
-            {greetingsData?.greetings?.map((greeting: any, index: number) => (
-              <tr key={greeting.id}>
+            {nationsMinted?.nations?.map((nation: any, index: number) => (
+              <tr key={nation.nationId}>
                 <th>{index + 1}</th>
                 <td>
-                  <Address address={greeting?.sender?.address} />
+                  <Address address={nation.owner} />
                 </td>
-                <td>{greeting.greeting}</td>
+                <td>{nation.name}</td>
+                <td>{nation.ruler}</td>
               </tr>
             ))}
           </tbody>
@@ -58,4 +61,4 @@ const GreetingsTable = () => {
   );
 };
 
-export default GreetingsTable;
+export default NationsTable;

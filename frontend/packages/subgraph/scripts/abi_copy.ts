@@ -2,7 +2,7 @@ import * as fs from "fs";
 import chalk from "chalk";
 
 const graphDir = "./";
-const deploymentsDir = "../hardhat/deployments";
+const deploymentsDir = "../../../backend/deployments";
 
 function publishContract(contractName: string, networkName: string) {
   try {

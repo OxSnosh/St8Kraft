@@ -34,17 +34,17 @@ export type Block_height = {
   number_gte?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export type Greeting = {
+export type Nation = {
   id: Scalars['ID']['output'];
-  sender: Sender;
-  greeting: Scalars['String']['output'];
-  premium?: Maybe<Scalars['Boolean']['output']>;
-  value?: Maybe<Scalars['BigInt']['output']>;
+  nationId: Scalars['BigInt']['output'];
+  ruler: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  owner: Scalars['Bytes']['output'];
   createdAt: Scalars['BigInt']['output'];
   transactionHash: Scalars['String']['output'];
 };
 
-export type Greeting_filter = {
+export type Nation_filter = {
   id?: InputMaybe<Scalars['ID']['input']>;
   id_not?: InputMaybe<Scalars['ID']['input']>;
   id_gt?: InputMaybe<Scalars['ID']['input']>;
@@ -53,59 +53,64 @@ export type Greeting_filter = {
   id_lte?: InputMaybe<Scalars['ID']['input']>;
   id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
-  sender?: InputMaybe<Scalars['String']['input']>;
-  sender_not?: InputMaybe<Scalars['String']['input']>;
-  sender_gt?: InputMaybe<Scalars['String']['input']>;
-  sender_lt?: InputMaybe<Scalars['String']['input']>;
-  sender_gte?: InputMaybe<Scalars['String']['input']>;
-  sender_lte?: InputMaybe<Scalars['String']['input']>;
-  sender_in?: InputMaybe<Array<Scalars['String']['input']>>;
-  sender_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
-  sender_contains?: InputMaybe<Scalars['String']['input']>;
-  sender_contains_nocase?: InputMaybe<Scalars['String']['input']>;
-  sender_not_contains?: InputMaybe<Scalars['String']['input']>;
-  sender_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
-  sender_starts_with?: InputMaybe<Scalars['String']['input']>;
-  sender_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  sender_not_starts_with?: InputMaybe<Scalars['String']['input']>;
-  sender_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  sender_ends_with?: InputMaybe<Scalars['String']['input']>;
-  sender_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  sender_not_ends_with?: InputMaybe<Scalars['String']['input']>;
-  sender_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  sender_?: InputMaybe<Sender_filter>;
-  greeting?: InputMaybe<Scalars['String']['input']>;
-  greeting_not?: InputMaybe<Scalars['String']['input']>;
-  greeting_gt?: InputMaybe<Scalars['String']['input']>;
-  greeting_lt?: InputMaybe<Scalars['String']['input']>;
-  greeting_gte?: InputMaybe<Scalars['String']['input']>;
-  greeting_lte?: InputMaybe<Scalars['String']['input']>;
-  greeting_in?: InputMaybe<Array<Scalars['String']['input']>>;
-  greeting_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
-  greeting_contains?: InputMaybe<Scalars['String']['input']>;
-  greeting_contains_nocase?: InputMaybe<Scalars['String']['input']>;
-  greeting_not_contains?: InputMaybe<Scalars['String']['input']>;
-  greeting_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
-  greeting_starts_with?: InputMaybe<Scalars['String']['input']>;
-  greeting_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  greeting_not_starts_with?: InputMaybe<Scalars['String']['input']>;
-  greeting_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  greeting_ends_with?: InputMaybe<Scalars['String']['input']>;
-  greeting_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  greeting_not_ends_with?: InputMaybe<Scalars['String']['input']>;
-  greeting_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  premium?: InputMaybe<Scalars['Boolean']['input']>;
-  premium_not?: InputMaybe<Scalars['Boolean']['input']>;
-  premium_in?: InputMaybe<Array<Scalars['Boolean']['input']>>;
-  premium_not_in?: InputMaybe<Array<Scalars['Boolean']['input']>>;
-  value?: InputMaybe<Scalars['BigInt']['input']>;
-  value_not?: InputMaybe<Scalars['BigInt']['input']>;
-  value_gt?: InputMaybe<Scalars['BigInt']['input']>;
-  value_lt?: InputMaybe<Scalars['BigInt']['input']>;
-  value_gte?: InputMaybe<Scalars['BigInt']['input']>;
-  value_lte?: InputMaybe<Scalars['BigInt']['input']>;
-  value_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  value_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  nationId?: InputMaybe<Scalars['BigInt']['input']>;
+  nationId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  nationId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  nationId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  nationId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  nationId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  nationId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  nationId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  ruler?: InputMaybe<Scalars['String']['input']>;
+  ruler_not?: InputMaybe<Scalars['String']['input']>;
+  ruler_gt?: InputMaybe<Scalars['String']['input']>;
+  ruler_lt?: InputMaybe<Scalars['String']['input']>;
+  ruler_gte?: InputMaybe<Scalars['String']['input']>;
+  ruler_lte?: InputMaybe<Scalars['String']['input']>;
+  ruler_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  ruler_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  ruler_contains?: InputMaybe<Scalars['String']['input']>;
+  ruler_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  ruler_not_contains?: InputMaybe<Scalars['String']['input']>;
+  ruler_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  ruler_starts_with?: InputMaybe<Scalars['String']['input']>;
+  ruler_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  ruler_not_starts_with?: InputMaybe<Scalars['String']['input']>;
+  ruler_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  ruler_ends_with?: InputMaybe<Scalars['String']['input']>;
+  ruler_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  ruler_not_ends_with?: InputMaybe<Scalars['String']['input']>;
+  ruler_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  name_not?: InputMaybe<Scalars['String']['input']>;
+  name_gt?: InputMaybe<Scalars['String']['input']>;
+  name_lt?: InputMaybe<Scalars['String']['input']>;
+  name_gte?: InputMaybe<Scalars['String']['input']>;
+  name_lte?: InputMaybe<Scalars['String']['input']>;
+  name_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  name_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  name_contains?: InputMaybe<Scalars['String']['input']>;
+  name_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  name_not_contains?: InputMaybe<Scalars['String']['input']>;
+  name_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  name_starts_with?: InputMaybe<Scalars['String']['input']>;
+  name_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  name_not_starts_with?: InputMaybe<Scalars['String']['input']>;
+  name_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  name_ends_with?: InputMaybe<Scalars['String']['input']>;
+  name_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  name_not_ends_with?: InputMaybe<Scalars['String']['input']>;
+  name_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  owner?: InputMaybe<Scalars['Bytes']['input']>;
+  owner_not?: InputMaybe<Scalars['Bytes']['input']>;
+  owner_gt?: InputMaybe<Scalars['Bytes']['input']>;
+  owner_lt?: InputMaybe<Scalars['Bytes']['input']>;
+  owner_gte?: InputMaybe<Scalars['Bytes']['input']>;
+  owner_lte?: InputMaybe<Scalars['Bytes']['input']>;
+  owner_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  owner_not_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  owner_contains?: InputMaybe<Scalars['Bytes']['input']>;
+  owner_not_contains?: InputMaybe<Scalars['Bytes']['input']>;
   createdAt?: InputMaybe<Scalars['BigInt']['input']>;
   createdAt_not?: InputMaybe<Scalars['BigInt']['input']>;
   createdAt_gt?: InputMaybe<Scalars['BigInt']['input']>;
@@ -136,20 +141,16 @@ export type Greeting_filter = {
   transactionHash_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
-  and?: InputMaybe<Array<InputMaybe<Greeting_filter>>>;
-  or?: InputMaybe<Array<InputMaybe<Greeting_filter>>>;
+  and?: InputMaybe<Array<InputMaybe<Nation_filter>>>;
+  or?: InputMaybe<Array<InputMaybe<Nation_filter>>>;
 };
 
-export type Greeting_orderBy =
+export type Nation_orderBy =
   | 'id'
-  | 'sender'
-  | 'sender__id'
-  | 'sender__address'
-  | 'sender__createdAt'
-  | 'sender__greetingCount'
-  | 'greeting'
-  | 'premium'
-  | 'value'
+  | 'nationId'
+  | 'ruler'
+  | 'name'
+  | 'owner'
   | 'createdAt'
   | 'transactionHash';
 
@@ -159,46 +160,26 @@ export type OrderDirection =
   | 'desc';
 
 export type Query = {
-  greeting?: Maybe<Greeting>;
-  greetings: Array<Greeting>;
-  sender?: Maybe<Sender>;
-  senders: Array<Sender>;
+  nation?: Maybe<Nation>;
+  nations: Array<Nation>;
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
 };
 
 
-export type QuerygreetingArgs = {
+export type QuerynationArgs = {
   id: Scalars['ID']['input'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
 
-export type QuerygreetingsArgs = {
+export type QuerynationsArgs = {
   skip?: InputMaybe<Scalars['Int']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<Greeting_orderBy>;
+  orderBy?: InputMaybe<Nation_orderBy>;
   orderDirection?: InputMaybe<OrderDirection>;
-  where?: InputMaybe<Greeting_filter>;
-  block?: InputMaybe<Block_height>;
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type QuerysenderArgs = {
-  id: Scalars['ID']['input'];
-  block?: InputMaybe<Block_height>;
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type QuerysendersArgs = {
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<Sender_orderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  where?: InputMaybe<Sender_filter>;
+  where?: InputMaybe<Nation_filter>;
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
@@ -208,113 +189,27 @@ export type Query_metaArgs = {
   block?: InputMaybe<Block_height>;
 };
 
-export type Sender = {
-  id: Scalars['ID']['output'];
-  address: Scalars['Bytes']['output'];
-  greetings?: Maybe<Array<Greeting>>;
-  createdAt: Scalars['BigInt']['output'];
-  greetingCount: Scalars['BigInt']['output'];
-};
-
-
-export type SendergreetingsArgs = {
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<Greeting_orderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  where?: InputMaybe<Greeting_filter>;
-};
-
-export type Sender_filter = {
-  id?: InputMaybe<Scalars['ID']['input']>;
-  id_not?: InputMaybe<Scalars['ID']['input']>;
-  id_gt?: InputMaybe<Scalars['ID']['input']>;
-  id_lt?: InputMaybe<Scalars['ID']['input']>;
-  id_gte?: InputMaybe<Scalars['ID']['input']>;
-  id_lte?: InputMaybe<Scalars['ID']['input']>;
-  id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
-  address?: InputMaybe<Scalars['Bytes']['input']>;
-  address_not?: InputMaybe<Scalars['Bytes']['input']>;
-  address_gt?: InputMaybe<Scalars['Bytes']['input']>;
-  address_lt?: InputMaybe<Scalars['Bytes']['input']>;
-  address_gte?: InputMaybe<Scalars['Bytes']['input']>;
-  address_lte?: InputMaybe<Scalars['Bytes']['input']>;
-  address_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  address_not_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  address_contains?: InputMaybe<Scalars['Bytes']['input']>;
-  address_not_contains?: InputMaybe<Scalars['Bytes']['input']>;
-  greetings_?: InputMaybe<Greeting_filter>;
-  createdAt?: InputMaybe<Scalars['BigInt']['input']>;
-  createdAt_not?: InputMaybe<Scalars['BigInt']['input']>;
-  createdAt_gt?: InputMaybe<Scalars['BigInt']['input']>;
-  createdAt_lt?: InputMaybe<Scalars['BigInt']['input']>;
-  createdAt_gte?: InputMaybe<Scalars['BigInt']['input']>;
-  createdAt_lte?: InputMaybe<Scalars['BigInt']['input']>;
-  createdAt_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  createdAt_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  greetingCount?: InputMaybe<Scalars['BigInt']['input']>;
-  greetingCount_not?: InputMaybe<Scalars['BigInt']['input']>;
-  greetingCount_gt?: InputMaybe<Scalars['BigInt']['input']>;
-  greetingCount_lt?: InputMaybe<Scalars['BigInt']['input']>;
-  greetingCount_gte?: InputMaybe<Scalars['BigInt']['input']>;
-  greetingCount_lte?: InputMaybe<Scalars['BigInt']['input']>;
-  greetingCount_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  greetingCount_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  and?: InputMaybe<Array<InputMaybe<Sender_filter>>>;
-  or?: InputMaybe<Array<InputMaybe<Sender_filter>>>;
-};
-
-export type Sender_orderBy =
-  | 'id'
-  | 'address'
-  | 'greetings'
-  | 'createdAt'
-  | 'greetingCount';
-
 export type Subscription = {
-  greeting?: Maybe<Greeting>;
-  greetings: Array<Greeting>;
-  sender?: Maybe<Sender>;
-  senders: Array<Sender>;
+  nation?: Maybe<Nation>;
+  nations: Array<Nation>;
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
 };
 
 
-export type SubscriptiongreetingArgs = {
+export type SubscriptionnationArgs = {
   id: Scalars['ID']['input'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
 
-export type SubscriptiongreetingsArgs = {
+export type SubscriptionnationsArgs = {
   skip?: InputMaybe<Scalars['Int']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<Greeting_orderBy>;
+  orderBy?: InputMaybe<Nation_orderBy>;
   orderDirection?: InputMaybe<OrderDirection>;
-  where?: InputMaybe<Greeting_filter>;
-  block?: InputMaybe<Block_height>;
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type SubscriptionsenderArgs = {
-  id: Scalars['ID']['input'];
-  block?: InputMaybe<Block_height>;
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type SubscriptionsendersArgs = {
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<Sender_orderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  where?: InputMaybe<Sender_filter>;
+  where?: InputMaybe<Nation_filter>;
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
@@ -357,13 +252,9 @@ export type _SubgraphErrorPolicy_ =
 
   export type QuerySdk = {
       /** null **/
-  greeting: InContextSdkMethod<Query['greeting'], QuerygreetingArgs, MeshContext>,
+  nation: InContextSdkMethod<Query['nation'], QuerynationArgs, MeshContext>,
   /** null **/
-  greetings: InContextSdkMethod<Query['greetings'], QuerygreetingsArgs, MeshContext>,
-  /** null **/
-  sender: InContextSdkMethod<Query['sender'], QuerysenderArgs, MeshContext>,
-  /** null **/
-  senders: InContextSdkMethod<Query['senders'], QuerysendersArgs, MeshContext>,
+  nations: InContextSdkMethod<Query['nations'], QuerynationsArgs, MeshContext>,
   /** Access to subgraph metadata **/
   _meta: InContextSdkMethod<Query['_meta'], Query_metaArgs, MeshContext>
   };
@@ -374,13 +265,9 @@ export type _SubgraphErrorPolicy_ =
 
   export type SubscriptionSdk = {
       /** null **/
-  greeting: InContextSdkMethod<Subscription['greeting'], SubscriptiongreetingArgs, MeshContext>,
+  nation: InContextSdkMethod<Subscription['nation'], SubscriptionnationArgs, MeshContext>,
   /** null **/
-  greetings: InContextSdkMethod<Subscription['greetings'], SubscriptiongreetingsArgs, MeshContext>,
-  /** null **/
-  sender: InContextSdkMethod<Subscription['sender'], SubscriptionsenderArgs, MeshContext>,
-  /** null **/
-  senders: InContextSdkMethod<Subscription['senders'], SubscriptionsendersArgs, MeshContext>,
+  nations: InContextSdkMethod<Subscription['nations'], SubscriptionnationsArgs, MeshContext>,
   /** Access to subgraph metadata **/
   _meta: InContextSdkMethod<Subscription['_meta'], Subscription_metaArgs, MeshContext>
   };

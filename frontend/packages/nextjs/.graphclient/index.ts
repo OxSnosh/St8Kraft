@@ -57,17 +57,17 @@ export type Block_height = {
   number_gte?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export type Greeting = {
+export type Nation = {
   id: Scalars['ID']['output'];
-  sender: Sender;
-  greeting: Scalars['String']['output'];
-  premium?: Maybe<Scalars['Boolean']['output']>;
-  value?: Maybe<Scalars['BigInt']['output']>;
+  nationId: Scalars['BigInt']['output'];
+  ruler: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  owner: Scalars['Bytes']['output'];
   createdAt: Scalars['BigInt']['output'];
   transactionHash: Scalars['String']['output'];
 };
 
-export type Greeting_filter = {
+export type Nation_filter = {
   id?: InputMaybe<Scalars['ID']['input']>;
   id_not?: InputMaybe<Scalars['ID']['input']>;
   id_gt?: InputMaybe<Scalars['ID']['input']>;
@@ -76,59 +76,64 @@ export type Greeting_filter = {
   id_lte?: InputMaybe<Scalars['ID']['input']>;
   id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
-  sender?: InputMaybe<Scalars['String']['input']>;
-  sender_not?: InputMaybe<Scalars['String']['input']>;
-  sender_gt?: InputMaybe<Scalars['String']['input']>;
-  sender_lt?: InputMaybe<Scalars['String']['input']>;
-  sender_gte?: InputMaybe<Scalars['String']['input']>;
-  sender_lte?: InputMaybe<Scalars['String']['input']>;
-  sender_in?: InputMaybe<Array<Scalars['String']['input']>>;
-  sender_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
-  sender_contains?: InputMaybe<Scalars['String']['input']>;
-  sender_contains_nocase?: InputMaybe<Scalars['String']['input']>;
-  sender_not_contains?: InputMaybe<Scalars['String']['input']>;
-  sender_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
-  sender_starts_with?: InputMaybe<Scalars['String']['input']>;
-  sender_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  sender_not_starts_with?: InputMaybe<Scalars['String']['input']>;
-  sender_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  sender_ends_with?: InputMaybe<Scalars['String']['input']>;
-  sender_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  sender_not_ends_with?: InputMaybe<Scalars['String']['input']>;
-  sender_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  sender_?: InputMaybe<Sender_filter>;
-  greeting?: InputMaybe<Scalars['String']['input']>;
-  greeting_not?: InputMaybe<Scalars['String']['input']>;
-  greeting_gt?: InputMaybe<Scalars['String']['input']>;
-  greeting_lt?: InputMaybe<Scalars['String']['input']>;
-  greeting_gte?: InputMaybe<Scalars['String']['input']>;
-  greeting_lte?: InputMaybe<Scalars['String']['input']>;
-  greeting_in?: InputMaybe<Array<Scalars['String']['input']>>;
-  greeting_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
-  greeting_contains?: InputMaybe<Scalars['String']['input']>;
-  greeting_contains_nocase?: InputMaybe<Scalars['String']['input']>;
-  greeting_not_contains?: InputMaybe<Scalars['String']['input']>;
-  greeting_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
-  greeting_starts_with?: InputMaybe<Scalars['String']['input']>;
-  greeting_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  greeting_not_starts_with?: InputMaybe<Scalars['String']['input']>;
-  greeting_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  greeting_ends_with?: InputMaybe<Scalars['String']['input']>;
-  greeting_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  greeting_not_ends_with?: InputMaybe<Scalars['String']['input']>;
-  greeting_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  premium?: InputMaybe<Scalars['Boolean']['input']>;
-  premium_not?: InputMaybe<Scalars['Boolean']['input']>;
-  premium_in?: InputMaybe<Array<Scalars['Boolean']['input']>>;
-  premium_not_in?: InputMaybe<Array<Scalars['Boolean']['input']>>;
-  value?: InputMaybe<Scalars['BigInt']['input']>;
-  value_not?: InputMaybe<Scalars['BigInt']['input']>;
-  value_gt?: InputMaybe<Scalars['BigInt']['input']>;
-  value_lt?: InputMaybe<Scalars['BigInt']['input']>;
-  value_gte?: InputMaybe<Scalars['BigInt']['input']>;
-  value_lte?: InputMaybe<Scalars['BigInt']['input']>;
-  value_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  value_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  nationId?: InputMaybe<Scalars['BigInt']['input']>;
+  nationId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  nationId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  nationId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  nationId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  nationId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  nationId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  nationId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  ruler?: InputMaybe<Scalars['String']['input']>;
+  ruler_not?: InputMaybe<Scalars['String']['input']>;
+  ruler_gt?: InputMaybe<Scalars['String']['input']>;
+  ruler_lt?: InputMaybe<Scalars['String']['input']>;
+  ruler_gte?: InputMaybe<Scalars['String']['input']>;
+  ruler_lte?: InputMaybe<Scalars['String']['input']>;
+  ruler_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  ruler_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  ruler_contains?: InputMaybe<Scalars['String']['input']>;
+  ruler_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  ruler_not_contains?: InputMaybe<Scalars['String']['input']>;
+  ruler_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  ruler_starts_with?: InputMaybe<Scalars['String']['input']>;
+  ruler_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  ruler_not_starts_with?: InputMaybe<Scalars['String']['input']>;
+  ruler_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  ruler_ends_with?: InputMaybe<Scalars['String']['input']>;
+  ruler_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  ruler_not_ends_with?: InputMaybe<Scalars['String']['input']>;
+  ruler_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  name_not?: InputMaybe<Scalars['String']['input']>;
+  name_gt?: InputMaybe<Scalars['String']['input']>;
+  name_lt?: InputMaybe<Scalars['String']['input']>;
+  name_gte?: InputMaybe<Scalars['String']['input']>;
+  name_lte?: InputMaybe<Scalars['String']['input']>;
+  name_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  name_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  name_contains?: InputMaybe<Scalars['String']['input']>;
+  name_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  name_not_contains?: InputMaybe<Scalars['String']['input']>;
+  name_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  name_starts_with?: InputMaybe<Scalars['String']['input']>;
+  name_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  name_not_starts_with?: InputMaybe<Scalars['String']['input']>;
+  name_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  name_ends_with?: InputMaybe<Scalars['String']['input']>;
+  name_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  name_not_ends_with?: InputMaybe<Scalars['String']['input']>;
+  name_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  owner?: InputMaybe<Scalars['Bytes']['input']>;
+  owner_not?: InputMaybe<Scalars['Bytes']['input']>;
+  owner_gt?: InputMaybe<Scalars['Bytes']['input']>;
+  owner_lt?: InputMaybe<Scalars['Bytes']['input']>;
+  owner_gte?: InputMaybe<Scalars['Bytes']['input']>;
+  owner_lte?: InputMaybe<Scalars['Bytes']['input']>;
+  owner_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  owner_not_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  owner_contains?: InputMaybe<Scalars['Bytes']['input']>;
+  owner_not_contains?: InputMaybe<Scalars['Bytes']['input']>;
   createdAt?: InputMaybe<Scalars['BigInt']['input']>;
   createdAt_not?: InputMaybe<Scalars['BigInt']['input']>;
   createdAt_gt?: InputMaybe<Scalars['BigInt']['input']>;
@@ -159,20 +164,16 @@ export type Greeting_filter = {
   transactionHash_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
-  and?: InputMaybe<Array<InputMaybe<Greeting_filter>>>;
-  or?: InputMaybe<Array<InputMaybe<Greeting_filter>>>;
+  and?: InputMaybe<Array<InputMaybe<Nation_filter>>>;
+  or?: InputMaybe<Array<InputMaybe<Nation_filter>>>;
 };
 
-export type Greeting_orderBy =
+export type Nation_orderBy =
   | 'id'
-  | 'sender'
-  | 'sender__id'
-  | 'sender__address'
-  | 'sender__createdAt'
-  | 'sender__greetingCount'
-  | 'greeting'
-  | 'premium'
-  | 'value'
+  | 'nationId'
+  | 'ruler'
+  | 'name'
+  | 'owner'
   | 'createdAt'
   | 'transactionHash';
 
@@ -182,46 +183,26 @@ export type OrderDirection =
   | 'desc';
 
 export type Query = {
-  greeting?: Maybe<Greeting>;
-  greetings: Array<Greeting>;
-  sender?: Maybe<Sender>;
-  senders: Array<Sender>;
+  nation?: Maybe<Nation>;
+  nations: Array<Nation>;
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
 };
 
 
-export type QuerygreetingArgs = {
+export type QuerynationArgs = {
   id: Scalars['ID']['input'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
 
-export type QuerygreetingsArgs = {
+export type QuerynationsArgs = {
   skip?: InputMaybe<Scalars['Int']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<Greeting_orderBy>;
+  orderBy?: InputMaybe<Nation_orderBy>;
   orderDirection?: InputMaybe<OrderDirection>;
-  where?: InputMaybe<Greeting_filter>;
-  block?: InputMaybe<Block_height>;
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type QuerysenderArgs = {
-  id: Scalars['ID']['input'];
-  block?: InputMaybe<Block_height>;
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type QuerysendersArgs = {
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<Sender_orderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  where?: InputMaybe<Sender_filter>;
+  where?: InputMaybe<Nation_filter>;
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
@@ -231,113 +212,27 @@ export type Query_metaArgs = {
   block?: InputMaybe<Block_height>;
 };
 
-export type Sender = {
-  id: Scalars['ID']['output'];
-  address: Scalars['Bytes']['output'];
-  greetings?: Maybe<Array<Greeting>>;
-  createdAt: Scalars['BigInt']['output'];
-  greetingCount: Scalars['BigInt']['output'];
-};
-
-
-export type SendergreetingsArgs = {
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<Greeting_orderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  where?: InputMaybe<Greeting_filter>;
-};
-
-export type Sender_filter = {
-  id?: InputMaybe<Scalars['ID']['input']>;
-  id_not?: InputMaybe<Scalars['ID']['input']>;
-  id_gt?: InputMaybe<Scalars['ID']['input']>;
-  id_lt?: InputMaybe<Scalars['ID']['input']>;
-  id_gte?: InputMaybe<Scalars['ID']['input']>;
-  id_lte?: InputMaybe<Scalars['ID']['input']>;
-  id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
-  address?: InputMaybe<Scalars['Bytes']['input']>;
-  address_not?: InputMaybe<Scalars['Bytes']['input']>;
-  address_gt?: InputMaybe<Scalars['Bytes']['input']>;
-  address_lt?: InputMaybe<Scalars['Bytes']['input']>;
-  address_gte?: InputMaybe<Scalars['Bytes']['input']>;
-  address_lte?: InputMaybe<Scalars['Bytes']['input']>;
-  address_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  address_not_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  address_contains?: InputMaybe<Scalars['Bytes']['input']>;
-  address_not_contains?: InputMaybe<Scalars['Bytes']['input']>;
-  greetings_?: InputMaybe<Greeting_filter>;
-  createdAt?: InputMaybe<Scalars['BigInt']['input']>;
-  createdAt_not?: InputMaybe<Scalars['BigInt']['input']>;
-  createdAt_gt?: InputMaybe<Scalars['BigInt']['input']>;
-  createdAt_lt?: InputMaybe<Scalars['BigInt']['input']>;
-  createdAt_gte?: InputMaybe<Scalars['BigInt']['input']>;
-  createdAt_lte?: InputMaybe<Scalars['BigInt']['input']>;
-  createdAt_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  createdAt_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  greetingCount?: InputMaybe<Scalars['BigInt']['input']>;
-  greetingCount_not?: InputMaybe<Scalars['BigInt']['input']>;
-  greetingCount_gt?: InputMaybe<Scalars['BigInt']['input']>;
-  greetingCount_lt?: InputMaybe<Scalars['BigInt']['input']>;
-  greetingCount_gte?: InputMaybe<Scalars['BigInt']['input']>;
-  greetingCount_lte?: InputMaybe<Scalars['BigInt']['input']>;
-  greetingCount_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  greetingCount_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  and?: InputMaybe<Array<InputMaybe<Sender_filter>>>;
-  or?: InputMaybe<Array<InputMaybe<Sender_filter>>>;
-};
-
-export type Sender_orderBy =
-  | 'id'
-  | 'address'
-  | 'greetings'
-  | 'createdAt'
-  | 'greetingCount';
-
 export type Subscription = {
-  greeting?: Maybe<Greeting>;
-  greetings: Array<Greeting>;
-  sender?: Maybe<Sender>;
-  senders: Array<Sender>;
+  nation?: Maybe<Nation>;
+  nations: Array<Nation>;
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
 };
 
 
-export type SubscriptiongreetingArgs = {
+export type SubscriptionnationArgs = {
   id: Scalars['ID']['input'];
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
 
 
-export type SubscriptiongreetingsArgs = {
+export type SubscriptionnationsArgs = {
   skip?: InputMaybe<Scalars['Int']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<Greeting_orderBy>;
+  orderBy?: InputMaybe<Nation_orderBy>;
   orderDirection?: InputMaybe<OrderDirection>;
-  where?: InputMaybe<Greeting_filter>;
-  block?: InputMaybe<Block_height>;
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type SubscriptionsenderArgs = {
-  id: Scalars['ID']['input'];
-  block?: InputMaybe<Block_height>;
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type SubscriptionsendersArgs = {
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<Sender_orderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  where?: InputMaybe<Sender_filter>;
+  where?: InputMaybe<Nation_filter>;
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
@@ -471,17 +366,14 @@ export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Bytes: ResolverTypeWrapper<Scalars['Bytes']['output']>;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
-  Greeting: ResolverTypeWrapper<Greeting>;
-  Greeting_filter: Greeting_filter;
-  Greeting_orderBy: Greeting_orderBy;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Int8: ResolverTypeWrapper<Scalars['Int8']['output']>;
+  Nation: ResolverTypeWrapper<Nation>;
+  Nation_filter: Nation_filter;
+  Nation_orderBy: Nation_orderBy;
   OrderDirection: OrderDirection;
   Query: ResolverTypeWrapper<{}>;
-  Sender: ResolverTypeWrapper<Sender>;
-  Sender_filter: Sender_filter;
-  Sender_orderBy: Sender_orderBy;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Subscription: ResolverTypeWrapper<{}>;
   _Block_: ResolverTypeWrapper<_Block_>;
@@ -498,14 +390,12 @@ export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']['output'];
   Bytes: Scalars['Bytes']['output'];
   Float: Scalars['Float']['output'];
-  Greeting: Greeting;
-  Greeting_filter: Greeting_filter;
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
   Int8: Scalars['Int8']['output'];
+  Nation: Nation;
+  Nation_filter: Nation_filter;
   Query: {};
-  Sender: Sender;
-  Sender_filter: Sender_filter;
   String: Scalars['String']['output'];
   Subscription: {};
   _Block_: _Block_;
@@ -540,43 +430,30 @@ export interface BytesScalarConfig extends GraphQLScalarTypeConfig<ResolversType
   name: 'Bytes';
 }
 
-export type GreetingResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Greeting'] = ResolversParentTypes['Greeting']> = ResolversObject<{
+export interface Int8ScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Int8'], any> {
+  name: 'Int8';
+}
+
+export type NationResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Nation'] = ResolversParentTypes['Nation']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  sender?: Resolver<ResolversTypes['Sender'], ParentType, ContextType>;
-  greeting?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  premium?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
-  value?: Resolver<Maybe<ResolversTypes['BigInt']>, ParentType, ContextType>;
+  nationId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  ruler?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  owner?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   transactionHash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export interface Int8ScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Int8'], any> {
-  name: 'Int8';
-}
-
 export type QueryResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  greeting?: Resolver<Maybe<ResolversTypes['Greeting']>, ParentType, ContextType, RequireFields<QuerygreetingArgs, 'id' | 'subgraphError'>>;
-  greetings?: Resolver<Array<ResolversTypes['Greeting']>, ParentType, ContextType, RequireFields<QuerygreetingsArgs, 'skip' | 'first' | 'subgraphError'>>;
-  sender?: Resolver<Maybe<ResolversTypes['Sender']>, ParentType, ContextType, RequireFields<QuerysenderArgs, 'id' | 'subgraphError'>>;
-  senders?: Resolver<Array<ResolversTypes['Sender']>, ParentType, ContextType, RequireFields<QuerysendersArgs, 'skip' | 'first' | 'subgraphError'>>;
+  nation?: Resolver<Maybe<ResolversTypes['Nation']>, ParentType, ContextType, RequireFields<QuerynationArgs, 'id' | 'subgraphError'>>;
+  nations?: Resolver<Array<ResolversTypes['Nation']>, ParentType, ContextType, RequireFields<QuerynationsArgs, 'skip' | 'first' | 'subgraphError'>>;
   _meta?: Resolver<Maybe<ResolversTypes['_Meta_']>, ParentType, ContextType, Partial<Query_metaArgs>>;
 }>;
 
-export type SenderResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Sender'] = ResolversParentTypes['Sender']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  address?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  greetings?: Resolver<Maybe<Array<ResolversTypes['Greeting']>>, ParentType, ContextType, RequireFields<SendergreetingsArgs, 'skip' | 'first'>>;
-  createdAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  greetingCount?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
 export type SubscriptionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = ResolversObject<{
-  greeting?: SubscriptionResolver<Maybe<ResolversTypes['Greeting']>, "greeting", ParentType, ContextType, RequireFields<SubscriptiongreetingArgs, 'id' | 'subgraphError'>>;
-  greetings?: SubscriptionResolver<Array<ResolversTypes['Greeting']>, "greetings", ParentType, ContextType, RequireFields<SubscriptiongreetingsArgs, 'skip' | 'first' | 'subgraphError'>>;
-  sender?: SubscriptionResolver<Maybe<ResolversTypes['Sender']>, "sender", ParentType, ContextType, RequireFields<SubscriptionsenderArgs, 'id' | 'subgraphError'>>;
-  senders?: SubscriptionResolver<Array<ResolversTypes['Sender']>, "senders", ParentType, ContextType, RequireFields<SubscriptionsendersArgs, 'skip' | 'first' | 'subgraphError'>>;
+  nation?: SubscriptionResolver<Maybe<ResolversTypes['Nation']>, "nation", ParentType, ContextType, RequireFields<SubscriptionnationArgs, 'id' | 'subgraphError'>>;
+  nations?: SubscriptionResolver<Array<ResolversTypes['Nation']>, "nations", ParentType, ContextType, RequireFields<SubscriptionnationsArgs, 'skip' | 'first' | 'subgraphError'>>;
   _meta?: SubscriptionResolver<Maybe<ResolversTypes['_Meta_']>, "_meta", ParentType, ContextType, Partial<Subscription_metaArgs>>;
 }>;
 
@@ -598,10 +475,9 @@ export type Resolvers<ContextType = MeshContext> = ResolversObject<{
   BigDecimal?: GraphQLScalarType;
   BigInt?: GraphQLScalarType;
   Bytes?: GraphQLScalarType;
-  Greeting?: GreetingResolvers<ContextType>;
   Int8?: GraphQLScalarType;
+  Nation?: NationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
-  Sender?: SenderResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;
   _Block_?: _Block_Resolvers<ContextType>;
   _Meta_?: _Meta_Resolvers<ContextType>;
@@ -680,7 +556,7 @@ const merger = new(BareMerger as any)({
         store: rootStore.child('bareMerger')
       })
 const documentHashMap = {
-        "0f297a8d2a5ec4bc2a5724a8582baf2b6027a6394dc10901d073d4602d66e9d4": GetGreetingsDocument
+        "c4a7d92b1cb19f98f9229255a515f33ade7b7514955fa3fee6e8e58df5bfd2e6": GetNationsDocument
       }
 additionalEnvelopPlugins.push(usePersistedOperations({
         getPersistedOperation(key) {
@@ -702,12 +578,12 @@ additionalEnvelopPlugins.push(usePersistedOperations({
     get documents() {
       return [
       {
-        document: GetGreetingsDocument,
+        document: GetNationsDocument,
         get rawSDL() {
-          return printWithCache(GetGreetingsDocument);
+          return printWithCache(GetNationsDocument);
         },
-        location: 'GetGreetingsDocument.graphql',
-        sha256Hash: '0f297a8d2a5ec4bc2a5724a8582baf2b6027a6394dc10901d073d4602d66e9d4'
+        location: 'GetNationsDocument.graphql',
+        sha256Hash: 'c4a7d92b1cb19f98f9229255a515f33ade7b7514955fa3fee6e8e58df5bfd2e6'
       }
     ];
     },
@@ -762,37 +638,32 @@ export function getBuiltGraphSDK<TGlobalContext = any, TOperationContext = any>(
   const sdkRequester$ = getBuiltGraphClient().then(({ sdkRequesterFactory }) => sdkRequesterFactory(globalContext));
   return getSdk<TOperationContext, TGlobalContext>((...args) => sdkRequester$.then(sdkRequester => sdkRequester(...args)));
 }
-export type GetGreetingsQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetNationsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetGreetingsQuery = { greetings: Array<(
-    Pick<Greeting, 'id' | 'greeting' | 'premium' | 'value' | 'createdAt'>
-    & { sender: Pick<Sender, 'address' | 'greetingCount'> }
-  )> };
+export type GetNationsQuery = { nations: Array<Pick<Nation, 'id' | 'nationId' | 'ruler' | 'owner' | 'name' | 'createdAt' | 'transactionHash'>> };
 
 
-export const GetGreetingsDocument = gql`
-    query GetGreetings {
-  greetings(first: 25, orderBy: createdAt, orderDirection: desc) {
+export const GetNationsDocument = gql`
+    query GetNations {
+  nations {
     id
-    greeting
-    premium
-    value
+    nationId
+    ruler
+    owner
+    name
     createdAt
-    sender {
-      address
-      greetingCount
-    }
+    transactionHash
   }
 }
-    ` as unknown as DocumentNode<GetGreetingsQuery, GetGreetingsQueryVariables>;
+    ` as unknown as DocumentNode<GetNationsQuery, GetNationsQueryVariables>;
 
 
 export type Requester<C = {}, E = unknown> = <R, V>(doc: DocumentNode, vars?: V, options?: C) => Promise<R> | AsyncIterable<R>
 export function getSdk<C, E>(requester: Requester<C, E>) {
   return {
-    GetGreetings(variables?: GetGreetingsQueryVariables, options?: C): Promise<GetGreetingsQuery> {
-      return requester<GetGreetingsQuery, GetGreetingsQueryVariables>(GetGreetingsDocument, variables, options) as Promise<GetGreetingsQuery>;
+    GetNations(variables?: GetNationsQueryVariables, options?: C): Promise<GetNationsQuery> {
+      return requester<GetNationsQuery, GetNationsQueryVariables>(GetNationsDocument, variables, options) as Promise<GetNationsQuery>;
     }
   };
 }

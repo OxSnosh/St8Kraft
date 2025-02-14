@@ -55,8 +55,8 @@ contract CountryMinter is ERC721, Ownable {
     mapping(address => uint256[]) public ownerCountryIds;
 
     event NationCreated(
-        string indexed nationName,
-        string indexed ruler,
+        string nationName,
+        string ruler,
         uint256 indexed countryId,
         address owner
     );
