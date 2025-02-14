@@ -1,8 +1,9 @@
 import React from "react";
 import Link from "next/link";
-import GreetingsTable from "./_components/NationsTable";
+import NationsTable from "./_components/NationsTable";
 import type { NextPage } from "next";
 import { MagnifyingGlassIcon, PlusIcon, PowerIcon, RocketLaunchIcon } from "@heroicons/react/24/outline";
+import WarsTable from "./_components/WarsTable";
 
 const Subgraph: NextPage = () => {
   return (
@@ -93,7 +94,8 @@ const Subgraph: NextPage = () => {
             </div>
           </div>
         </div>
-        <GreetingsTable />
+        <NationsTable />
+        <WarsTable />
       </div>
     </>
   );

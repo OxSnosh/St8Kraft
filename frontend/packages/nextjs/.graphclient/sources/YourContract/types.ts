@@ -162,6 +162,8 @@ export type OrderDirection =
 export type Query = {
   nation?: Maybe<Nation>;
   nations: Array<Nation>;
+  war?: Maybe<War>;
+  wars: Array<War>;
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
 };
@@ -185,6 +187,24 @@ export type QuerynationsArgs = {
 };
 
 
+export type QuerywarArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QuerywarsArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<War_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<War_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
 export type Query_metaArgs = {
   block?: InputMaybe<Block_height>;
 };
@@ -192,6 +212,8 @@ export type Query_metaArgs = {
 export type Subscription = {
   nation?: Maybe<Nation>;
   nations: Array<Nation>;
+  war?: Maybe<War>;
+  wars: Array<War>;
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
 };
@@ -215,9 +237,101 @@ export type SubscriptionnationsArgs = {
 };
 
 
+export type SubscriptionwarArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionwarsArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<War_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<War_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
 export type Subscription_metaArgs = {
   block?: InputMaybe<Block_height>;
 };
+
+export type War = {
+  id: Scalars['ID']['output'];
+  warId: Scalars['BigInt']['output'];
+  offenseId: Scalars['BigInt']['output'];
+  defenseId: Scalars['BigInt']['output'];
+  transactionHash: Scalars['String']['output'];
+};
+
+export type War_filter = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_not?: InputMaybe<Scalars['ID']['input']>;
+  id_gt?: InputMaybe<Scalars['ID']['input']>;
+  id_lt?: InputMaybe<Scalars['ID']['input']>;
+  id_gte?: InputMaybe<Scalars['ID']['input']>;
+  id_lte?: InputMaybe<Scalars['ID']['input']>;
+  id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  warId?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  warId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  offenseId?: InputMaybe<Scalars['BigInt']['input']>;
+  offenseId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  offenseId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  offenseId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  offenseId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  offenseId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  offenseId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  offenseId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  defenseId?: InputMaybe<Scalars['BigInt']['input']>;
+  defenseId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  defenseId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  defenseId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  defenseId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  defenseId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  defenseId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  defenseId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  transactionHash?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<War_filter>>>;
+  or?: InputMaybe<Array<InputMaybe<War_filter>>>;
+};
+
+export type War_orderBy =
+  | 'id'
+  | 'warId'
+  | 'offenseId'
+  | 'defenseId'
+  | 'transactionHash';
 
 export type _Block_ = {
   /** The hash of the block */
@@ -255,6 +369,10 @@ export type _SubgraphErrorPolicy_ =
   nation: InContextSdkMethod<Query['nation'], QuerynationArgs, MeshContext>,
   /** null **/
   nations: InContextSdkMethod<Query['nations'], QuerynationsArgs, MeshContext>,
+  /** null **/
+  war: InContextSdkMethod<Query['war'], QuerywarArgs, MeshContext>,
+  /** null **/
+  wars: InContextSdkMethod<Query['wars'], QuerywarsArgs, MeshContext>,
   /** Access to subgraph metadata **/
   _meta: InContextSdkMethod<Query['_meta'], Query_metaArgs, MeshContext>
   };
@@ -268,6 +386,10 @@ export type _SubgraphErrorPolicy_ =
   nation: InContextSdkMethod<Subscription['nation'], SubscriptionnationArgs, MeshContext>,
   /** null **/
   nations: InContextSdkMethod<Subscription['nations'], SubscriptionnationsArgs, MeshContext>,
+  /** null **/
+  war: InContextSdkMethod<Subscription['war'], SubscriptionwarArgs, MeshContext>,
+  /** null **/
+  wars: InContextSdkMethod<Subscription['wars'], SubscriptionwarsArgs, MeshContext>,
   /** Access to subgraph metadata **/
   _meta: InContextSdkMethod<Subscription['_meta'], Subscription_metaArgs, MeshContext>
   };

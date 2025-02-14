@@ -23,3 +23,22 @@ dataSources:
         - event: NationCreated(string,string,indexed uint256,address)
           handler: handleNationCreated
       file: ./src/mapping.ts
+  - kind: ethereum/contract
+    name: WarContract
+    network: localhost
+    source:
+      abi: WarContract
+      address: "0x5f3f1dBD7B74C6B46e8c44f98792A1dAf8d69154"
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - War
+      abis:
+        - name: WarContract
+          file: ./abis/localhost_WarContract.json
+      eventHandlers:
+        - event: WarDeclared(indexed uint256,indexed uint256,indexed uint256)
+          handler: handleWarDeclared
+      file: ./src/warMapping.ts

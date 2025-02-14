@@ -9,3 +9,13 @@ query GetNations {
     transactionHash
   }
 }
+
+query GetWars {
+  wars {
+    id
+    warId
+    offenseId
+    defenseId
+    transactionHash
+  }
+}

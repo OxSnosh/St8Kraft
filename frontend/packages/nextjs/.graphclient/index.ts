@@ -185,6 +185,8 @@ export type OrderDirection =
 export type Query = {
   nation?: Maybe<Nation>;
   nations: Array<Nation>;
+  war?: Maybe<War>;
+  wars: Array<War>;
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
 };
@@ -208,6 +210,24 @@ export type QuerynationsArgs = {
 };
 
 
+export type QuerywarArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QuerywarsArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<War_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<War_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
 export type Query_metaArgs = {
   block?: InputMaybe<Block_height>;
 };
@@ -215,6 +235,8 @@ export type Query_metaArgs = {
 export type Subscription = {
   nation?: Maybe<Nation>;
   nations: Array<Nation>;
+  war?: Maybe<War>;
+  wars: Array<War>;
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
 };
@@ -238,9 +260,101 @@ export type SubscriptionnationsArgs = {
 };
 
 
+export type SubscriptionwarArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionwarsArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<War_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<War_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
 export type Subscription_metaArgs = {
   block?: InputMaybe<Block_height>;
 };
+
+export type War = {
+  id: Scalars['ID']['output'];
+  warId: Scalars['BigInt']['output'];
+  offenseId: Scalars['BigInt']['output'];
+  defenseId: Scalars['BigInt']['output'];
+  transactionHash: Scalars['String']['output'];
+};
+
+export type War_filter = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_not?: InputMaybe<Scalars['ID']['input']>;
+  id_gt?: InputMaybe<Scalars['ID']['input']>;
+  id_lt?: InputMaybe<Scalars['ID']['input']>;
+  id_gte?: InputMaybe<Scalars['ID']['input']>;
+  id_lte?: InputMaybe<Scalars['ID']['input']>;
+  id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  warId?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  warId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  offenseId?: InputMaybe<Scalars['BigInt']['input']>;
+  offenseId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  offenseId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  offenseId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  offenseId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  offenseId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  offenseId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  offenseId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  defenseId?: InputMaybe<Scalars['BigInt']['input']>;
+  defenseId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  defenseId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  defenseId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  defenseId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  defenseId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  defenseId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  defenseId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  transactionHash?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<War_filter>>>;
+  or?: InputMaybe<Array<InputMaybe<War_filter>>>;
+};
+
+export type War_orderBy =
+  | 'id'
+  | 'warId'
+  | 'offenseId'
+  | 'defenseId'
+  | 'transactionHash';
 
 export type _Block_ = {
   /** The hash of the block */
@@ -376,6 +490,9 @@ export type ResolversTypes = ResolversObject<{
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Subscription: ResolverTypeWrapper<{}>;
+  War: ResolverTypeWrapper<War>;
+  War_filter: War_filter;
+  War_orderBy: War_orderBy;
   _Block_: ResolverTypeWrapper<_Block_>;
   _Meta_: ResolverTypeWrapper<_Meta_>;
   _SubgraphErrorPolicy_: _SubgraphErrorPolicy_;
@@ -398,6 +515,8 @@ export type ResolversParentTypes = ResolversObject<{
   Query: {};
   String: Scalars['String']['output'];
   Subscription: {};
+  War: War;
+  War_filter: War_filter;
   _Block_: _Block_;
   _Meta_: _Meta_;
 }>;
@@ -448,13 +567,26 @@ export type NationResolvers<ContextType = MeshContext, ParentType extends Resolv
 export type QueryResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   nation?: Resolver<Maybe<ResolversTypes['Nation']>, ParentType, ContextType, RequireFields<QuerynationArgs, 'id' | 'subgraphError'>>;
   nations?: Resolver<Array<ResolversTypes['Nation']>, ParentType, ContextType, RequireFields<QuerynationsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  war?: Resolver<Maybe<ResolversTypes['War']>, ParentType, ContextType, RequireFields<QuerywarArgs, 'id' | 'subgraphError'>>;
+  wars?: Resolver<Array<ResolversTypes['War']>, ParentType, ContextType, RequireFields<QuerywarsArgs, 'skip' | 'first' | 'subgraphError'>>;
   _meta?: Resolver<Maybe<ResolversTypes['_Meta_']>, ParentType, ContextType, Partial<Query_metaArgs>>;
 }>;
 
 export type SubscriptionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = ResolversObject<{
   nation?: SubscriptionResolver<Maybe<ResolversTypes['Nation']>, "nation", ParentType, ContextType, RequireFields<SubscriptionnationArgs, 'id' | 'subgraphError'>>;
   nations?: SubscriptionResolver<Array<ResolversTypes['Nation']>, "nations", ParentType, ContextType, RequireFields<SubscriptionnationsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  war?: SubscriptionResolver<Maybe<ResolversTypes['War']>, "war", ParentType, ContextType, RequireFields<SubscriptionwarArgs, 'id' | 'subgraphError'>>;
+  wars?: SubscriptionResolver<Array<ResolversTypes['War']>, "wars", ParentType, ContextType, RequireFields<SubscriptionwarsArgs, 'skip' | 'first' | 'subgraphError'>>;
   _meta?: SubscriptionResolver<Maybe<ResolversTypes['_Meta_']>, "_meta", ParentType, ContextType, Partial<Subscription_metaArgs>>;
+}>;
+
+export type WarResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['War'] = ResolversParentTypes['War']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  warId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  offenseId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  defenseId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  transactionHash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type _Block_Resolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['_Block_'] = ResolversParentTypes['_Block_']> = ResolversObject<{
@@ -479,6 +611,7 @@ export type Resolvers<ContextType = MeshContext> = ResolversObject<{
   Nation?: NationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;
+  War?: WarResolvers<ContextType>;
   _Block_?: _Block_Resolvers<ContextType>;
   _Meta_?: _Meta_Resolvers<ContextType>;
 }>;
@@ -556,7 +689,8 @@ const merger = new(BareMerger as any)({
         store: rootStore.child('bareMerger')
       })
 const documentHashMap = {
-        "c4a7d92b1cb19f98f9229255a515f33ade7b7514955fa3fee6e8e58df5bfd2e6": GetNationsDocument
+        "9018b15b61a9e1ef4ba7fa21108a473a393c40f78ac22322d20e5b63a49067a5": GetNationsDocument,
+"9018b15b61a9e1ef4ba7fa21108a473a393c40f78ac22322d20e5b63a49067a5": GetWarsDocument
       }
 additionalEnvelopPlugins.push(usePersistedOperations({
         getPersistedOperation(key) {
@@ -583,7 +717,14 @@ additionalEnvelopPlugins.push(usePersistedOperations({
           return printWithCache(GetNationsDocument);
         },
         location: 'GetNationsDocument.graphql',
-        sha256Hash: 'c4a7d92b1cb19f98f9229255a515f33ade7b7514955fa3fee6e8e58df5bfd2e6'
+        sha256Hash: '9018b15b61a9e1ef4ba7fa21108a473a393c40f78ac22322d20e5b63a49067a5'
+      },{
+        document: GetWarsDocument,
+        get rawSDL() {
+          return printWithCache(GetWarsDocument);
+        },
+        location: 'GetWarsDocument.graphql',
+        sha256Hash: '9018b15b61a9e1ef4ba7fa21108a473a393c40f78ac22322d20e5b63a49067a5'
       }
     ];
     },
@@ -643,6 +784,11 @@ export type GetNationsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetNationsQuery = { nations: Array<Pick<Nation, 'id' | 'nationId' | 'ruler' | 'owner' | 'name' | 'createdAt' | 'transactionHash'>> };
 
+export type GetWarsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetWarsQuery = { wars: Array<Pick<War, 'id' | 'warId' | 'offenseId' | 'defenseId' | 'transactionHash'>> };
+
 
 export const GetNationsDocument = gql`
     query GetNations {
@@ -657,6 +803,18 @@ export const GetNationsDocument = gql`
   }
 }
     ` as unknown as DocumentNode<GetNationsQuery, GetNationsQueryVariables>;
+export const GetWarsDocument = gql`
+    query GetWars {
+  wars {
+    id
+    warId
+    offenseId
+    defenseId
+    transactionHash
+  }
+}
+    ` as unknown as DocumentNode<GetWarsQuery, GetWarsQueryVariables>;
+
 
 
 export type Requester<C = {}, E = unknown> = <R, V>(doc: DocumentNode, vars?: V, options?: C) => Promise<R> | AsyncIterable<R>
@@ -664,6 +822,9 @@ export function getSdk<C, E>(requester: Requester<C, E>) {
   return {
     GetNations(variables?: GetNationsQueryVariables, options?: C): Promise<GetNationsQuery> {
       return requester<GetNationsQuery, GetNationsQueryVariables>(GetNationsDocument, variables, options) as Promise<GetNationsQuery>;
+    },
+    GetWars(variables?: GetWarsQueryVariables, options?: C): Promise<GetWarsQuery> {
+      return requester<GetWarsQuery, GetWarsQueryVariables>(GetWarsDocument, variables, options) as Promise<GetWarsQuery>;
     }
   };
 }

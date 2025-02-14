@@ -8,6 +8,13 @@ type Nation @entity {
   transactionHash: String!
 }
 
+type War @entity {
+  id: ID!
+  warId: BigInt!
+  offenseId: BigInt!
+  defenseId: BigInt!
+  transactionHash: String!
+}
 
 
 
