@@ -1,3 +1,3 @@
 {
-  "9018b15b61a9e1ef4ba7fa21108a473a393c40f78ac22322d20e5b63a49067a5": "query GetNations {\n  nations {\n    id\n    nationId\n    ruler\n    owner\n    name\n    createdAt\n    transactionHash\n  }\n}\n\nquery GetWars {\n  wars {\n    id\n    warId\n    offenseId\n    defenseId\n    transactionHash\n  }\n}"
+  "4149efc8fea21ad44c32b83ab22baf32a1d005ae6f46b6ac01ec07409db64448": "query GetNations {\n  nations(first: 5, orderBy: createdAt, orderDirection: desc) {\n    nationId\n    name\n    ruler\n    owner\n    createdAt\n  }\n}\n\nquery GetWars {\n  wars {\n    id\n    warId\n    offenseId\n    defenseId\n    transactionHash\n  }\n}"
 }

@@ -689,8 +689,8 @@ const merger = new(BareMerger as any)({
         store: rootStore.child('bareMerger')
       })
 const documentHashMap = {
-        "9018b15b61a9e1ef4ba7fa21108a473a393c40f78ac22322d20e5b63a49067a5": GetNationsDocument,
-"9018b15b61a9e1ef4ba7fa21108a473a393c40f78ac22322d20e5b63a49067a5": GetWarsDocument
+        "4149efc8fea21ad44c32b83ab22baf32a1d005ae6f46b6ac01ec07409db64448": GetNationsDocument,
+"4149efc8fea21ad44c32b83ab22baf32a1d005ae6f46b6ac01ec07409db64448": GetWarsDocument
       }
 additionalEnvelopPlugins.push(usePersistedOperations({
         getPersistedOperation(key) {
@@ -717,14 +717,14 @@ additionalEnvelopPlugins.push(usePersistedOperations({
           return printWithCache(GetNationsDocument);
         },
         location: 'GetNationsDocument.graphql',
-        sha256Hash: '9018b15b61a9e1ef4ba7fa21108a473a393c40f78ac22322d20e5b63a49067a5'
+        sha256Hash: '4149efc8fea21ad44c32b83ab22baf32a1d005ae6f46b6ac01ec07409db64448'
       },{
         document: GetWarsDocument,
         get rawSDL() {
           return printWithCache(GetWarsDocument);
         },
         location: 'GetWarsDocument.graphql',
-        sha256Hash: '9018b15b61a9e1ef4ba7fa21108a473a393c40f78ac22322d20e5b63a49067a5'
+        sha256Hash: '4149efc8fea21ad44c32b83ab22baf32a1d005ae6f46b6ac01ec07409db64448'
       }
     ];
     },
@@ -782,7 +782,7 @@ export function getBuiltGraphSDK<TGlobalContext = any, TOperationContext = any>(
 export type GetNationsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetNationsQuery = { nations: Array<Pick<Nation, 'id' | 'nationId' | 'ruler' | 'owner' | 'name' | 'createdAt' | 'transactionHash'>> };
+export type GetNationsQuery = { nations: Array<Pick<Nation, 'nationId' | 'name' | 'ruler' | 'owner' | 'createdAt'>> };
 
 export type GetWarsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -792,14 +792,12 @@ export type GetWarsQuery = { wars: Array<Pick<War, 'id' | 'warId' | 'offenseId' 
 
 export const GetNationsDocument = gql`
     query GetNations {
-  nations {
-    id
+  nations(first: 5, orderBy: createdAt, orderDirection: desc) {
     nationId
+    name
     ruler
     owner
-    name
     createdAt
-    transactionHash
   }
 }
     ` as unknown as DocumentNode<GetNationsQuery, GetNationsQueryVariables>;

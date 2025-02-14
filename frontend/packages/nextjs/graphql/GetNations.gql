@@ -1,12 +1,10 @@
 query GetNations {
-  nations {
-    id
+  nations(first: 5, orderBy: createdAt, orderDirection: desc) {
     nationId
+    name
     ruler
     owner
-    name
     createdAt
-    transactionHash
   }
 }
 

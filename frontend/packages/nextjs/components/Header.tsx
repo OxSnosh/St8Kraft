@@ -3,12 +3,13 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Bars3Icon, BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick } from "~~/hooks/scaffold-eth";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 import { useAccount, usePublicClient } from "wagmi";
+import { CountryParametersContract } from '../../../../backend/typechain-types/contracts/CountryParameters.sol/CountryParametersContract';
 
 type HeaderMenuLink = {
   label: string;
@@ -39,6 +40,7 @@ export const menuLinks: HeaderMenuLink[] = [
 
 export const HeaderMenuLinks = () => {
   const pathname = usePathname();
+  
 
   return (
     <>
@@ -76,13 +78,28 @@ export const Header = () => {
   const contractsData = useAllContracts();
   const publicClient = usePublicClient();
   const countryMinterContract = contractsData?.CountryMinter;
+  const countryParametersContract = contractsData?.CountryParametersContract;
+
+  const router = useRouter();
 
   useOutsideClick(
     burgerMenuRef,
     useCallback(() => setIsDrawerOpen(false), []),
   );
 
-  // Fetch minted nations when the wallet connects
+  const getNationName = async (tokenIdString: string) => {
+    if (!publicClient) {
+      throw new Error("publicClient is not defined");
+    }
+    let nationName = await publicClient.readContract({
+      abi: countryParametersContract.abi,
+      address: countryParametersContract.address,
+      functionName: "getNationName",
+      args: [tokenIdString],
+    });
+    return nationName;
+  }
+
   useEffect(() => {
     const fetchMintedNations = async () => {
       if (!walletAddress) {
@@ -109,11 +126,16 @@ export const Header = () => {
           return;
         }
 
-        // Map token IDs to nation data with query parameter links
-        const nations = tokenIds.map((tokenId: string) => ({
-          name: `Nation ${tokenId}`, // Replace with actual nation name if available
-          href: `/nations?id=${tokenId}`, // Dynamic link to the nation's page using query parameters
-        }));
+        const nations: { name: string; href: string; onClick: () => void }[] = await Promise.all(
+          tokenIds.map(async (tokenId: string) => ({
+            name: `${tokenId}: ${await getNationName(tokenId)}`,
+            href: `/nations?id=${tokenId}`,
+            onClick: () => {
+              localStorage.setItem("selectedMenuItem", `Nation ${tokenId}`);
+              router.push(`/nations?id=${tokenId}`);
+            },
+          }))
+        );
 
         setMintedNations(nations);
       } catch (error) {
@@ -123,7 +145,7 @@ export const Header = () => {
     };
 
     fetchMintedNations();
-  }, [walletAddress, countryMinterContract, publicClient]);
+  }, [walletAddress, countryMinterContract, publicClient, router]);
 
   return (
     <div className="sticky lg:static top-0 navbar bg-base-100 min-h-0 flex-shrink-0 justify-between z-20 shadow-md shadow-secondary px-0 sm:px-2">
@@ -151,12 +173,14 @@ export const Header = () => {
           )}
         </div>
         <Link href="/" passHref className="hidden lg:flex items-center gap-2 ml-4 mr-6 shrink-0">
-          <div className="flex relative w-10 h-10">
-            <Image alt="SE2 logo" className="cursor-pointer" fill src="/logo.svg" />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-bold leading-tight">Scaffold-ETH</span>
-            <span className="text-xs">Ethereum dev stack</span>
+          <div className="flex relative w-[200px] h-[40px]">
+            <Image 
+              alt="St8Craft Logo" 
+              className="cursor-pointer w-[200px] h-[40px] object-contain"
+              src="/logo_resized.png" 
+              width={100} 
+              height={100}
+            />
           </div>
         </Link>
         <ul className="hidden lg:flex lg:flex-nowrap menu menu-horizontal px-1 gap-2">
