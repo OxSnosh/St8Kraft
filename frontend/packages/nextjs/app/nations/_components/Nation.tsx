@@ -96,7 +96,13 @@ const Nation = () => {
     fetchMyNations();
   }, [walletAddress, countryMinterContract, publicClient]);
 
+  const playClickSound = () => {
+    const audio = new Audio("/pageturn.wav");
+    audio.play().catch(error => console.error("Audio playback failed:", error));
+  };
+
   const handleNationSelect = (nationId: string, nationName: string) => {
+    playClickSound()
     setSelectedMenuItem(nationName);
     localStorage.setItem("selectedMenuItem", nationName); // Save selection
     setSelectedComponent(<NationDetailsPage nationId={nationId} onPropeseTrade={handlePropeseTrade} />);
@@ -181,7 +187,7 @@ const Nation = () => {
   const handleMenuClick = (option: string) => {
     setSelectedMenuItem(option);
     localStorage.setItem("selectedMenuItem", option); // Save selected menu item
-
+    playClickSound()
     if (option === "Collect Taxes") {
       setSelectedComponent(<CollectTaxes />);
     } else if (option === "Government Settings") {

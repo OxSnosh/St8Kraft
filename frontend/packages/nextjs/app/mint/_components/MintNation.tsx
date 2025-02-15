@@ -193,14 +193,20 @@ export function MintNation() {
       setIsPending(false);
     }
   };
-  
-  
 
   return (
-    <div className="text-center mt-8 bg-secondary p-10">
-      <h1 className="text-4xl my-0">Mint A Nation</h1>
-
-      <div className="flex flex-col gap-4">
+    <div className="text-center bg-secondary p-10 flex flex-col items-center justify-center"
+      style={{
+        backgroundImage: "url('/mintnationspage.jpg')",
+        backgroundSize: "2000px 2000px",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center -330px",
+        width: "100vw",
+        height: "2000px",
+        position: "relative"
+      }}>
+      
+      <div className="flex flex-col gap-4 w-full max-w-md" style={{ position: "absolute", top: "270px", left: "50%", transform: "translateX(-50%)" }}>
         <input
           type="text"
           placeholder="Ruler Name"
@@ -229,54 +235,46 @@ export function MintNation() {
           value={form.nationSlogan}
           onChange={(e) => setForm((prev) => ({ ...prev, nationSlogan: e.target.value }))}
         />
-      </div>
-
-      <div className="flex justify-between gap-2 mt-4">
         <button
-          className="btn btn-primary"
+          className="btn btn-primary mt-6"
           disabled={isPending || !writeContractAsync}
-          onClick={handleWrite}
-        >
-          {isPending ? (
-            <span className="loading loading-spinner loading-xs"></span>
-          ) : (
-            "Mint Nation"
-          )}
+          onClick={() => {}}
+          style={{ alignSelf: "center" }}>
+          {isPending ? <span className="loading loading-spinner loading-xs"></span> : <span style={{ fontSize: "24px", fontWeight: "bold" }}>Mint Nation</span>}
         </button>
       </div>
-
-      {txHash && (
-        <div className="mt-4 text-left">
-          <p className="font-medium">Transaction Hash:</p>
-          <p>{txHash}</p>
-          {txReceipt ? (
-            <p className="text-green-500">Transaction confirmed in block: {txReceipt.blockNumber}</p>
-          ) : (
-            <p className="text-yellow-500">Waiting for confirmation...</p>
-          )}
-        </div>
-      )}
-
-      <div className="mt-8">
-        <h2 className="text-2xl">Your Minted Nations</h2>
-        {nations.length > 0 ? (
-          <div className="grid grid-cols-3 gap-4 mt-4">
-            {nations.map(({ tokenId, nationName, rulerName, capitalCity, nationSlogan }) => (
-              <div key={tokenId} className="card bg-base-100 shadow-md p-4">
-                <p className="text-lg font-bold">Nation {tokenId}</p>
-                <p>Ruler: {rulerName}</p>
-                <p>Nation Name: {nationName}</p>
-                <p>Capital: {capitalCity}</p>
-                <p>Slogan: {nationSlogan}</p>
+      
+      <div className="w-full text-center text-white" style={{ marginTop: "2400px", paddingBottom: "100px" }}>
+        {nations.length === 0 ? (
+          <p>You do not have any minted nations yet.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
+            {nations.map((nation, index) => (
+              <div key={index} className="p-4 border rounded-lg font-orbitron"
+                style={{
+                  backgroundImage: "url('/minted_nation_card.jpg')",
+                  backgroundSize: "contain",
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "center",
+                  width: "300px", /* Adjust to match the image dimensions */
+                  height: "300px", /* Adjust to match the image dimensions */
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  color: "white",
+                  textAlign: "center",
+                  padding: "20px",
+                }}>
+                <p><strong>Nation {nation.tokenId}:</strong> {nation.nationName}</p>
+                <p><strong>Ruler:</strong> {nation.rulerName}</p>
+                <p><strong>Capital:</strong> {nation.capitalCity}</p>
+                <p><strong>Slogan:</strong> {nation.nationSlogan}</p>
               </div>
             ))}
           </div>
-        ) : (
-          <p className="mt-4">No nations minted yet.</p>
         )}
       </div>
     </div>
   );
 }
-
-

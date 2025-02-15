@@ -41,6 +41,10 @@ export const menuLinks: HeaderMenuLink[] = [
 export const HeaderMenuLinks = () => {
   const pathname = usePathname();
   
+  const playClickSound = () => {
+    const audio = new Audio("/pageturn.wav");
+    audio.play().catch(error => console.error("Audio playback failed:", error));
+  };
 
   return (
     <>
@@ -51,6 +55,7 @@ export const HeaderMenuLinks = () => {
             <Link
               href={href}
               passHref
+              onClick={playClickSound}
               className={`${
                 isActive ? "bg-secondary shadow-md" : ""
               } hover:bg-secondary hover:shadow-md focus:!bg-secondary active:!text-neutral py-1.5 px-3 text-sm rounded-full gap-2 grid grid-flow-col`}
@@ -126,11 +131,17 @@ export const Header = () => {
           return;
         }
 
+        const playClickSound = () => {
+          const audio = new Audio("/pageturn.wav");
+          audio.play().catch(error => console.error("Audio playback failed:", error));
+        };
+
         const nations: { name: string; href: string; onClick: () => void }[] = await Promise.all(
           tokenIds.map(async (tokenId: string) => ({
             name: `${tokenId}: ${await getNationName(tokenId)}`,
             href: `/nations?id=${tokenId}`,
             onClick: () => {
+              playClickSound();
               localStorage.setItem("selectedMenuItem", `Nation ${tokenId}`);
               router.push(`/nations?id=${tokenId}`);
             },
@@ -177,7 +188,7 @@ export const Header = () => {
             <Image 
               alt="St8Craft Logo" 
               className="cursor-pointer w-[200px] h-[40px] object-contain"
-              src="/logo_resized.png" 
+              src="/Logo_Full.png" 
               width={100} 
               height={100}
             />

@@ -30,3 +30,11 @@ p {
 .btn.btn-ghost {
   @apply shadow-none;
 }
+
+@font-face {
+  font-family: 'Orbitron';
+  src: url('/fonts/orbitron.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
