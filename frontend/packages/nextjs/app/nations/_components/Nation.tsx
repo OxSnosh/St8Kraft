@@ -242,23 +242,34 @@ const Nation = () => {
   return (
     <div className="flex h-screen">
       {/* Sidebar - Left 15% */}
-      <div className="w-1/6 bg-gray-800 text-white p-4">
-        <h2 className="text-lg font-bold mb-4">Menu</h2>
-
+      <div
+        className="w-1/6 text-white p-4"
+        style={{
+          backgroundImage: "url('/aged_paper.jpg')",
+          backgroundSize: "100% calc(100% + 10px)",
+          backgroundPosition: "center top",
+        }}
+      >
+        <h2 className="font-special text-lg text-black mb-4">Menu</h2>
+    
         {/* My Nations Dropdown */}
         {walletAddress && mintedNations.length > 0 && (
           <div className="relative">
             <button
-              className="btn btn-primary btn-sm"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)} // Toggle dropdown
+              className="btn btn-sm bg-secondary text-white hover:bg-secondary-dark"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
               My Nations
             </button>
-
+    
             {isDropdownOpen && (
-              <ul className="absolute left-0 mt-2 p-2 shadow bg-base-100 rounded-box w-52">
+              <ul className="absolute left-0 mt-2 p-2 shadow bg-primary text-white rounded-box w-52">
                 {mintedNations.map(nation => (
-                  <li key={nation.href} onClick={() => handleNationSelect(nation.href.split("=")[1], nation.name)}>
+                  <li
+                    key={nation.href}
+                    onClick={() => handleNationSelect(nation.href.split("=")[1], nation.name)}
+                    className="hover:bg-secondary p-2 rounded cursor-pointer"
+                  >
                     <Link href={nation.href}>{nation.name}</Link>
                   </li>
                 ))}
@@ -266,17 +277,18 @@ const Nation = () => {
             )}
           </div>
         )}
-
+    
         {/* Other Menu Items */}
         {menuItems.map(section => (
           <div key={section.category} className="mt-4">
-            <h3 className="font-semibold">{section.category}</h3>
+            {/* Menu Headers - Special Font & Black */}
+            <h3 className="font-special font-bold text-black">{section.category}</h3>
             <ul className="pl-2 mt-2">
               {section.options.map(option => (
                 <li
                   key={option}
-                  className={`cursor-pointer py-1 hover:text-yellow-400 ${
-                    selectedMenuItem === option ? "text-yellow-400" : ""
+                  className={`cursor-pointer py-1 font-special text-black hover:text-yellow-400 ${
+                    selectedMenuItem === option ? "text-yellow-400" : "text-black"
                   }`}
                   onClick={() => handleMenuClick(option)}
                 >
@@ -287,7 +299,7 @@ const Nation = () => {
           </div>
         ))}
       </div>
-
+    
       {/* Main Content - Right 85% */}
       <div className="w-5/6 p-1">{selectedComponent}</div>
     </div>

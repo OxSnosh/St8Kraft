@@ -42,10 +42,10 @@ const Home: NextPage = () => {
   return (
     <>
       {/* Centered Background Wrapper with Fixed Size and Aligned to Top */}
-      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-[2000px] h-[1500px] bg-black overflow-hidden">
+      <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-[4300px] h-[1500px] bg-black overflow-hidden">
         <div 
           className="relative w-full h-full bg-no-repeat bg-contain bg-top"
-          style={{ backgroundImage: "url('/background.jpg')" }}
+          style={{ backgroundImage: "url('/background_expanded.jpg')" }}
         >
           {/* Fixed overlay text box */}
           <div 

@@ -132,11 +132,9 @@ export function MintNation() {
       });
   
       setTxHash(tx); // Save the transaction hash
-      alert("Transaction submitted!");
   
       // Wait for the transaction receipt
       const receipt = await publicClient.waitForTransactionReceipt({ hash: tx });
-      console.log("Transaction receipt:", receipt);
   
       // Manually encode the Transfer event signature
       const transferEventSignature = keccak256(
@@ -197,16 +195,19 @@ export function MintNation() {
   return (
     <div className="text-center bg-secondary p-10 flex flex-col items-center justify-center"
       style={{
-        backgroundImage: "url('/mintnationspage.jpg')",
-        backgroundSize: "2000px 2000px",
+        backgroundImage: "url('/mintnationspage_expanded.jpg')",
+        backgroundSize: "5440px 3300px",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center -330px",
         width: "100vw",
-        height: "2000px",
-        position: "relative"
+        height: "3300px",
+        position: "absolute",
+        top: "0",
+        left: "0",
+        zIndex: "-2"
       }}>
       
-      <div className="flex flex-col gap-4 w-full max-w-md" style={{ position: "absolute", top: "270px", left: "50%", transform: "translateX(-50%)" }}>
+      <div className="flex flex-col gap-4 w-full max-w-md" style={{ position: "absolute", top: "270px", left: "47%", transform: "translateX(-50%)" }}>
         <input
           type="text"
           placeholder="Ruler Name"
@@ -238,43 +239,63 @@ export function MintNation() {
         <button
           className="btn btn-primary mt-6"
           disabled={isPending || !writeContractAsync}
-          onClick={() => {}}
-          style={{ alignSelf: "center" }}>
+          onClick={handleWrite}
+          style={{ alignSelf: "center" } as React.CSSProperties}>
           {isPending ? <span className="loading loading-spinner loading-xs"></span> : <span style={{ fontSize: "24px", fontWeight: "bold" }}>Mint Nation</span>}
         </button>
       </div>
       
-      <div className="w-full text-center text-white" style={{ marginTop: "2400px", paddingBottom: "100px" }}>
+      <div className="w-full text-center text-white" style={{ marginTop: "400px", paddingBottom: "100px" }}>
         {nations.length === 0 ? (
           <p>You do not have any minted nations yet.</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
+            <div
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 p-4"
+              style={{
+                minHeight: "800px",
+                marginTop: "50px", 
+              }}
+            >
             {nations.map((nation, index) => (
-              <div key={index} className="p-4 border rounded-lg font-orbitron"
+              <a
+                key={index}
+                href={`/nations?id=${nation.tokenId}`}
+                className="relative border rounded-lg font-orbitron text-black text-center overflow-hidden"
                 style={{
-                  backgroundImage: "url('/minted_nation_card.jpg')",
-                  backgroundSize: "contain",
-                  backgroundRepeat: "no-repeat",
-                  backgroundPosition: "center",
-                  width: "300px", /* Adjust to match the image dimensions */
-                  height: "300px", /* Adjust to match the image dimensions */
+                  width: "225px",
+                  height: "300px",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
-                  color: "white",
-                  textAlign: "center",
-                  padding: "20px",
-                }}>
-                <p><strong>Nation {nation.tokenId}:</strong> {nation.nationName}</p>
-                <p><strong>Ruler:</strong> {nation.rulerName}</p>
-                <p><strong>Capital:</strong> {nation.capitalCity}</p>
-                <p><strong>Slogan:</strong> {nation.nationSlogan}</p>
-              </div>
+                  position: "relative",
+                }}
+              >
+                <div
+                  className="absolute inset-0 rounded-lg"
+                  style={{
+                    backgroundImage: `url('/aged_paper.jpg')`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat",
+                    width: "100%",
+                    height: "100%",
+                    zIndex: -1,
+                  }}
+                ></div>
+
+                <div className="font-special relative z-10 bg-opacity-90 p-4 rounded-lg">
+                  <h3 className="text-xl font-special">{nation.tokenId} : {nation.nationName}</h3>
+                  <p>Ruler: {nation.rulerName}</p>
+                  <p>Capital: {nation.capitalCity}</p>
+                  <p>Slogan: {nation.nationSlogan}</p>
+                </div>
+              </a>
             ))}
           </div>
         )}
       </div>
+
     </div>
   );
 }

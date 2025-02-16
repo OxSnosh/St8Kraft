@@ -1,5 +1,6 @@
 import React, { use, useEffect, useState } from "react";
-import { ethers, utils } from "ethers";
+import { ethers, utils, ContractInterface as ABI, providers} from "ethers";
+import { AbiCoder } from "ethers/lib/utils";
 import { usePublicClient, useAccount, useWriteContract } from 'wagmi';
 import { getNationStrength } from "~~/utils/strength";
 import { checkBalance } from "~~/utils/treasury";
@@ -47,6 +48,7 @@ import { declareWar, nationActiveWars } from "~~/utils/wars";
 import { returnWarDetails } from "~~/utils/wars";
 import { isWarActive, offerPeace, deployForcesToWar } from "~~/utils/wars";
 import { groundAttack, blockade } from "~~/utils/attacks"
+import { connectorsForWallets } from "@rainbow-me/rainbowkit";
 // import { relaySpyOperation } from "../../../../../../backend/scripts/spy_attack_relayer";
 
 
@@ -317,8 +319,23 @@ const DeclareWar = () => {
         setDefendingNationDetails(details); // Ensure state updates
     };
     
+    function parseRevertReason(error: any): string {
+        if (error?.data) {
+            try {
+                if (error.data.startsWith("0x08c379a0")) {
+                    const decoded = new AbiCoder().decode(
+                        ["string"],
+                        "0x" + error.data.slice(10)
+                    );
+                    return decoded[0]; // Extract revert message
+                }
+            } catch (decodeError) {
+                return "Unknown revert reason";
+            }
+        }
+        return error?.message || "Transaction failed";
+    }
     
-
     const handleDeclareWar = async () => {
         if (!selectedNation || !defendingNation) {
             alert("Please select both an attacking and defending nation.");
@@ -326,16 +343,71 @@ const DeclareWar = () => {
         }
     
         try {
-            await declareWar(selectedNation, defendingNation, contractsData.WarContract, writeContractAsync);
-            const wars = await nationActiveWars(selectedNation, publicClient, contractsData.WarContract);
-            setActiveWars(Array.isArray(wars) ? wars : []);
+            const contractData = contractsData.WarContract;
+            const abi = contractData.abi;
+    
+            if (!contractData.address || !abi) {
+                console.error("Contract address or ABI is missing");
+                return;
+            }
+    
+            // ✅ Use Web3Provider to get the connected wallet
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []); // Prompt user to connect MetaMask
+            const signer = provider.getSigner();
+            const userAddress = await signer.getAddress(); // Get connected wallet address
+    
+            const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+    
+            console.log("Connected Wallet Address:", userAddress);
+    
+            // ✅ Encode function call
+            const data = contract.interface.encodeFunctionData("declareWar", [
+                selectedNation,
+                defendingNation,
+            ]);
+    
+            console.log("Encoded Call Data:", data);
+    
+            // ✅ Simulate the transaction using `eth_call` with `from`
+            try {
+                const result = await provider.call({
+                    to: contract.address,
+                    data: data,
+                    from: userAddress, // ✅ Specify the connected wallet address
+                });
+    
+                console.log("Transaction Simulation Result:", result);
+    
+                if (result.startsWith("0x08c379a0")) {
+                    const errorMessage = parseRevertReason({ data: result });
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;
+                }
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Transaction simulation failed:", errorMessage);
+                alert(`Transaction failed: ${errorMessage}`);
+                return; // ⛔ Stop execution if simulation fails
+            }
+    
+            // ✅ If the simulation passes, send the real transaction
+            console.log("Simulation successful, proceeding with the actual transaction...");
+    
+            const tx = await contract.declareWar(selectedNation, defendingNation);
+            await tx.wait(); // ✅ Wait for transaction confirmation
+    
+            console.log("Transaction sent successfully.");
+    
             alert(`War declared between Nation ${selectedNation} and Nation ${defendingNation}`);
-        } catch (error) {
-            console.error("Error declaring war:", error);
-            alert("Failed to declare war. Please check the contract interaction.");
+    
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error);
+            console.error("Error declaring war:", errorMessage);
+            alert(`Failed to declare war: ${errorMessage}`);
         }
     };
-    
+        
 
     // const handleWarClick = (offenseId: string, defenseId: string, warId: string) => {
     //     setSelectedNationId(offenseId);

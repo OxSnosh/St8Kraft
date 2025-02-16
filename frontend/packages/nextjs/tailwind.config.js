@@ -1,67 +1,51 @@
 /** @type {import('tailwindcss').Config} */
+const plugin = require('tailwindcss/plugin');
+
 module.exports = {
   content: ["./app/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}", "./utils/**/*.{js,ts,jsx,tsx}"],
-  plugins: [require("daisyui")],
-  darkTheme: "dark",
-  darkMode: ["selector", "[data-theme='dark']"],
+  darkMode: ["class", "[data-theme='dark']"], // Ensure compatibility
   daisyui: {
     themes: [
       {
         light: {
-          primary: "#4CAF50", // Vibrant Forest Green
-          "primary-content": "#1B3D1B", // Dark Green for readability
-  
-          secondary: "#A5D6A7", // Light Green for accents
-          "secondary-content": "#1B3D1B", // Dark Green for contrast
-  
-          accent: "#81C784", // Soft Green Accent
-          "accent-content": "#1B3D1B", // Dark Green for clarity
-  
-          neutral: "#2E7D32", // Medium Dark Green
-          "neutral-content": "#FFFFFF", // White for text readability
-  
-          "base-100": "#F1F8E9", // Very Light Green (almost white)
-          "base-200": "#E8F5E9", // Slightly Deeper Light Green
-          "base-300": "#C8E6C9", // Soft Green for depth
-          "base-content": "#1B3D1B", // Dark Green for text
-  
-          info: "#4CAF50", // Bright Green Info
-          success: "#34EEB6", // Bright success green
-          warning: "#FFCF72", // Muted warm yellow for warnings
-          error: "#FF8863", // Soft reddish-orange for errors
-
+          primary: "#4CAF50",
+          "primary-content": "#1B3D1B",
+          secondary: "#A5D6A7",
+          "secondary-content": "#1B3D1B",
+          accent: "#81C784",
+          "accent-content": "#1B3D1B",
+          neutral: "#2E7D32",
+          "neutral-content": "#FFFFFF",
+          "base-100": "#F1F8E9",
+          "base-200": "#E8F5E9",
+          "base-300": "#C8E6C9",
+          "base-content": "#1B3D1B",
+          info: "#4CAF50",
+          success: "#34EEB6",
+          warning: "#FFCF72",
+          error: "#FF8863",
           "--rounded-btn": "9999rem",
-          ".tooltip": { "--tooltip-tail": "6px" },
-          ".link": { textUnderlineOffset: "2px" },
-          ".link:hover": { opacity: "80%" },
         },
       },
       {
         dark: {
-          primary: "#228B22", // Forest Green
-          secondary: "#1B5E20", // Darker Forest Green
-          accent: "#A5D6A7", // Light Green Accent
-          background: "#0E3B0E", // Deep Green for Background
-  
-          "primary-content": "#E8F5E9", // Soft Green-White for readability
-          "secondary-content": "#C8E6C9", // Light Green for contrast
-          "accent-content": "#F1F8E9", // Very light green for highlights
-          "neutral-content": "#1B3D1B", // Dark forest green for contrast
-  
-          "base-100": "#0E3B0E", // Deepest Forest Green for backgrounds
-          "base-200": "#1B5E20", // Darker Forest Green (lighter than base-100)
-          "base-300": "#2E7D32", // Medium Dark Green
-          "base-content": "#E8F5E9", // Light green for text
-  
-          info: "#4CAF50", // Vibrant Green for info highlights
-          success: "#34EEB6", // Bright success green
-          warning: "#FFCF72", // Muted warm yellow for warnings
-          error: "#FF8863", // Soft reddish-orange for errors
-
+          primary: "#228B22",
+          secondary: "#1B5E20",
+          accent: "#A5D6A7",
+          background: "#0E3B0E",
+          "primary-content": "#E8F5E9",
+          "secondary-content": "#C8E6C9",
+          "accent-content": "#F1F8E9",
+          "neutral-content": "#1B3D1B",
+          "base-100": "#0E3B0E",
+          "base-200": "#1B5E20",
+          "base-300": "#2E7D32",
+          "base-content": "#E8F5E9",
+          info: "#4CAF50",
+          success: "#34EEB6",
+          warning: "#FFCF72",
+          error: "#FF8863",
           "--rounded-btn": "9999rem",
-          ".tooltip": { "--tooltip-tail": "6px", "--tooltip-color": "oklch(var(--p))" },
-          ".link": { textUnderlineOffset: "2px" },
-          ".link:hover": { opacity: "80%" },
         },
       },
     ],
@@ -72,7 +56,25 @@ module.exports = {
       animation: { "pulse-fast": "pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite" },
       fontFamily: {
         orbitron: ["Orbitron", "sans-serif"],
+        special: ["SpecialElite", "sans-serif"],
+      },
+      colors: {
+        agedPaper: '#b1986b',
+      },
+      backgroundImage: {
+        'aged-paper': 'linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.05))',
       },
     },
   },
+  plugins: [
+    require("daisyui"),
+    plugin(function ({ addUtilities }) {
+      addUtilities({
+        '.bg-aged-paper': {
+          backgroundColor: '#b1986b',
+          backgroundImage: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.05))',
+        },
+      });
+    }),
+  ],
 };
