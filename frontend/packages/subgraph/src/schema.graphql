@@ -81,3 +81,11 @@ type NavalAttack @entity {
   attackId: BigInt!
   transactionHash: String!
 }
+
+type BreakBlockade @entity {
+  id: ID!
+  battleId: BigInt!
+  attackerLosses: [BigInt!]!
+  defenderLosses: [BigInt!]!
+  transactionHash: String!
+}

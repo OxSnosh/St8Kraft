@@ -92,3 +92,11 @@ query GetNavalAttacks {
     attackId
   }
 }
+
+query GetBreakBlockades {
+  breakBlockades {
+    attackerLosses
+    defenderLosses
+    battleId
+  }
+}

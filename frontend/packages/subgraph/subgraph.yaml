@@ -141,3 +141,22 @@ dataSources:
         - event: NavalAttackComplete(uint256[],uint256[],uint256)
           handler: handleNavyAttack
       file: ./src/navyAttackMapping.ts
+  - kind: ethereum/contract
+    name: BreakBlocadeContract
+    network: localhost
+    source:
+      abi: BreakBlocadeContract
+      address: "0x70e0bA845a1A0F2DA3359C97E0285013525FFC49"
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - BreakBlockade
+      abis:
+        - name: BreakBlocadeContract
+          file: ./abis/localhost_BreakBlocadeContract.json
+      eventHandlers:
+        - event: BreakBlockadeComlpete(uint256[],uint256[],uint256)
+          handler: handleBreakBlockade
+      file: ./src/breakBlockadeMapping.ts

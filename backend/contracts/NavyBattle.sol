@@ -774,12 +774,21 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         // );
     }
 
+    event BreakBlockadeComlpete(
+        uint256[] attackerLosses,
+        uint256[] defenderLosses,
+        uint256 battleId
+    );
+
     function completeBattleSequence(
         bytes32 requestId,
         uint256[] memory _attackerLosses,
         uint256[] memory _defenderLosses,
         uint256 battleId
     ) public recordChainlinkFulfillment(requestId) {
+
+        emit BreakBlockadeComlpete(_attackerLosses, _defenderLosses, battleId);
+        
         // console.log(_defenderLosses[0]);
         // console.log(_defenderLosses[1]);
         // console.log(_defenderLosses[2]);
