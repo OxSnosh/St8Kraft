@@ -44,6 +44,12 @@ const Subgraph: NextPage = () => {
             </code>
           </p>
         </div>
+        
+        {/* Video Section */}
+        <div className="flex justify-center mt-8">
+          <video src="/Sonar_radar.mp4" autoPlay loop muted className="w-96 h-auto rounded-lg shadow-lg" />
+        </div>
+
         <div className="flex-grow bg-base-300 w-full mt-16 px-8 py-12">
           <div className="flex justify-center items-center gap-12 flex-col sm:flex-row">
             <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
@@ -73,34 +79,9 @@ const Subgraph: NextPage = () => {
                 </code>
               </p>
             </div>
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <PlusIcon className="h-8 w-8 fill-secondary" />
-              <p className="text-center text-lg">
-                Create Graph Client runtime artifact directory with{" "}
-                <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-                  yarn graphclient:build
-                </code>
-              </p>
-            </div>
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <MagnifyingGlassIcon className="h-8 w-8 fill-secondary" />
-              <p className="mb-0">Explore data using the</p>
-              <Link
-                href="http://localhost:8000/subgraphs/name/scaffold-eth/your-contract/graphql"
-                passHref
-                className="link"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                GraphiQL tool.
-              </Link>{" "}
-              Clean up any stale data using{" "}
-              <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-                yarn clean-node
-              </code>
-            </div>
           </div>
         </div>
+        
         <NationsTable />
         <WarsTable />
         <GroundBattleTable />

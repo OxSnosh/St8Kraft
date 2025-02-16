@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International
+//SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.17;
 
 import "./Infrastructure.sol";

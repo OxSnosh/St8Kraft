@@ -59,7 +59,8 @@ import {
     WondersContract4,
     VRFConsumerBaseV2,
     VRFCoordinatorV2Mock,
-    BonusResourcesContract
+    BonusResourcesContract,
+    Messenger
 } from "../typechain-types"
 // import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
 import { networkConfig } from "../helper-hardhat-config"
@@ -161,6 +162,7 @@ const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     let wonderscontract2: WondersContract2
     let wonderscontract3: WondersContract3
     let wonderscontract4: WondersContract4
+    let messenger: Messenger
 
     console.log("Deploying contracts with account:", deployer);
 
@@ -322,6 +324,9 @@ const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
     wonderscontract4 = await deploy("WondersContract4", { from: deployer, args: [], log: true });
     let deployedWondersContract4 = await ethers.getContractAt("WondersContract4", wonderscontract4.address);
+
+    messenger = await deploy("Messenger", { from: deployer, args: [], log: true });
+    let deployedMessenger = await ethers.getContractAt("Messenger", messenger.address);
 
     console.log("✅ All contracts deployed successfully!");
 
@@ -1179,6 +1184,9 @@ const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         let Wonders4Artifact = await artifacts.readArtifact("WondersContract4");
         let wonders4Abi = Wonders4Artifact.abi;
 
+        let MessengerArtifact = await artifacts.readArtifact("Messenger");
+        let messengerAbi = MessengerArtifact.abi;
+
         // Read Contract Metadata
         try {
           if (fs.existsSync(contractMetadataLocation)) {
@@ -1244,9 +1252,7 @@ const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
                 }
             };
         }
-        // if(chainId == fantomTestnetChainId) {
-        
-        // }
+
         fs.writeFileSync(
           contractMetadataLocation,
           JSON.stringify(contractMetadata, null, 2)
@@ -1480,6 +1486,10 @@ const main: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
             wonderscontract4: {
                 address: wonderscontract4.address,
                 ABI: wonders4Abi,
+            },
+            messenger: {
+                address: messenger.address,
+                ABI: messengerAbi
             }
         };
         fs.writeFileSync(
