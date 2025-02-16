@@ -16,5 +16,46 @@ type War @entity {
   transactionHash: String!
 }
 
+type GroundBattle @entity {
+  id: ID!
+  groundBattleId: BigInt!
+  warId: BigInt!
+  attackerId: BigInt!
+  attackerSoldierLosses: BigInt!
+  attackerTankLosses: BigInt!
+  defenderId: BigInt!
+  defenderSoldierLosses: BigInt!
+  defenderTankLosses: BigInt!
+  transactionHash: String!
+}
 
+type CruiseMissileAttack @entity {
+  id: ID!
+  attackId: BigInt!
+  attackerId: BigInt!
+  defenderId: BigInt!
+  landed: Boolean!
+  warId: BigInt!
+  damageTypeNumber: BigInt!
+  transactionHash: String!
+}
 
+type NukeAttack @entity {
+  id: ID!
+  attackId: BigInt!
+  attackerId: BigInt!
+  defenderId: BigInt!
+  landed: Boolean!
+  warId: BigInt!
+  transactionHash: String!
+}
+
+type SpyOperation @entity {
+  id: ID!
+  attackId: BigInt!
+  attackerId: BigInt!
+  defenderId: BigInt!
+  success: Boolean!
+  attackType: BigInt!
+  transactionHash: String!
+}

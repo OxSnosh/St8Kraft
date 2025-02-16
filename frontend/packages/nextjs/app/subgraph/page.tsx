@@ -4,6 +4,10 @@ import NationsTable from "./_components/NationsTable";
 import type { NextPage } from "next";
 import { MagnifyingGlassIcon, PlusIcon, PowerIcon, RocketLaunchIcon } from "@heroicons/react/24/outline";
 import WarsTable from "./_components/WarsTable";
+import GroundBattleTable from "./_components/GroundBattle";
+import CruiseMissileAttackTable from "./_components/CruiseMissileAttack";
+import NukeAttackTable from "./_components/NukeAttackTable";
+import SpyOperationsTable from "./_components/SpyOperations";
 
 const Subgraph: NextPage = () => {
   return (
@@ -96,6 +100,10 @@ const Subgraph: NextPage = () => {
         </div>
         <NationsTable />
         <WarsTable />
+        <GroundBattleTable />
+        <CruiseMissileAttackTable />
+        <NukeAttackTable />
+        <SpyOperationsTable />
       </div>
     </>
   );

@@ -42,3 +42,63 @@ dataSources:
         - event: WarDeclared(indexed uint256,indexed uint256,indexed uint256)
           handler: handleWarDeclared
       file: ./src/warMapping.ts
+  - kind: ethereum/contract
+    name: CruiseMissileContract
+    network: localhost
+    source:
+      abi: CruiseMissileContract
+      address: "0x0B306BF915C4d645ff596e518fAf3F9669b97016"
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - CruiseMissileAttack
+      abis:
+        - name: CruiseMissileContract
+          file: ./abis/localhost_CruiseMissileContract.json
+      eventHandlers:
+        - event: CruiseMissileAttackResults(indexed uint256,indexed uint256,indexed
+            uint256,bool,uint256,uint256)
+          handler: handleCruiseMissileAttackResults
+      file: ./src/cruiseMissileMapping.ts
+  - kind: ethereum/contract
+    name: NukeContract
+    network: localhost
+    source:
+      abi: NukeContract
+      address: "0x99bbA657f2BbC93c02D617f8bA121cB8Fc104Acf"
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - NukeAttack
+      abis:
+        - name: NukeContract
+          file: ./abis/localhost_NukeContract.json
+      eventHandlers:
+        - event: NukeAttackEvent(indexed uint256,indexed uint256,indexed
+            uint256,uint256,bool)
+          handler: handleNukeAttackResults
+      file: ./src/nukeMapping.ts
+  - kind: ethereum/contract
+    name: SpyOperationsContract
+    network: localhost
+    source:
+      abi: SpyOperationsContract
+      address: "0x5eb3Bc0a489C5A8288765d2336659EbCA68FCd00"
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - SpyOperation
+      abis:
+        - name: SpyOperationsContract
+          file: ./abis/localhost_SpyOperationsContract.json
+      eventHandlers:
+        - event: SpyAttackResults(indexed uint256,indexed uint256,indexed
+            uint256,bool,uint256)
+          handler: handleSpyOperation
+      file: ./src/spyOperationMapping.ts

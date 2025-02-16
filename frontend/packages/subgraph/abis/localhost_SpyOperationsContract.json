@@ -30,42 +30,29 @@
       {
         "indexed": true,
         "internalType": "uint256",
-        "name": "defenderId",
+        "name": "attackerId",
         "type": "uint256"
       },
       {
         "indexed": true,
+        "internalType": "uint256",
+        "name": "defenderId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "success",
+        "type": "bool"
+      },
+      {
+        "indexed": false,
         "internalType": "uint256",
         "name": "attackType",
         "type": "uint256"
       }
     ],
-    "name": "SpyAttackSuccess",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "attackId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "decryptedAttackerId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "defenderId",
-        "type": "uint256"
-      }
-    ],
-    "name": "SpyAttackThwart",
+    "name": "SpyAttackResults",
     "type": "event"
   },
   {

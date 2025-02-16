@@ -57,6 +57,230 @@ export type Block_height = {
   number_gte?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type CruiseMissileAttack = {
+  id: Scalars['ID']['output'];
+  attackId: Scalars['BigInt']['output'];
+  attackerId: Scalars['BigInt']['output'];
+  defenderId: Scalars['BigInt']['output'];
+  landed: Scalars['Boolean']['output'];
+  warId: Scalars['BigInt']['output'];
+  damageTypeNumber: Scalars['BigInt']['output'];
+  transactionHash: Scalars['String']['output'];
+};
+
+export type CruiseMissileAttack_filter = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_not?: InputMaybe<Scalars['ID']['input']>;
+  id_gt?: InputMaybe<Scalars['ID']['input']>;
+  id_lt?: InputMaybe<Scalars['ID']['input']>;
+  id_gte?: InputMaybe<Scalars['ID']['input']>;
+  id_lte?: InputMaybe<Scalars['ID']['input']>;
+  id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  attackId?: InputMaybe<Scalars['BigInt']['input']>;
+  attackId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  attackId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  attackId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  attackerId?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  attackerId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  defenderId?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  defenderId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  landed?: InputMaybe<Scalars['Boolean']['input']>;
+  landed_not?: InputMaybe<Scalars['Boolean']['input']>;
+  landed_in?: InputMaybe<Array<Scalars['Boolean']['input']>>;
+  landed_not_in?: InputMaybe<Array<Scalars['Boolean']['input']>>;
+  warId?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  warId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  damageTypeNumber?: InputMaybe<Scalars['BigInt']['input']>;
+  damageTypeNumber_not?: InputMaybe<Scalars['BigInt']['input']>;
+  damageTypeNumber_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  damageTypeNumber_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  damageTypeNumber_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  damageTypeNumber_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  damageTypeNumber_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  damageTypeNumber_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  transactionHash?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<CruiseMissileAttack_filter>>>;
+  or?: InputMaybe<Array<InputMaybe<CruiseMissileAttack_filter>>>;
+};
+
+export type CruiseMissileAttack_orderBy =
+  | 'id'
+  | 'attackId'
+  | 'attackerId'
+  | 'defenderId'
+  | 'landed'
+  | 'warId'
+  | 'damageTypeNumber'
+  | 'transactionHash';
+
+export type GroundBattle = {
+  id: Scalars['ID']['output'];
+  groundBattleId: Scalars['BigInt']['output'];
+  warId: Scalars['BigInt']['output'];
+  attackerId: Scalars['BigInt']['output'];
+  attackerSoldierLosses: Scalars['BigInt']['output'];
+  attackerTankLosses: Scalars['BigInt']['output'];
+  defenderId: Scalars['BigInt']['output'];
+  defenderSoldierLosses: Scalars['BigInt']['output'];
+  defenderTankLosses: Scalars['BigInt']['output'];
+  transactionHash: Scalars['String']['output'];
+};
+
+export type GroundBattle_filter = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_not?: InputMaybe<Scalars['ID']['input']>;
+  id_gt?: InputMaybe<Scalars['ID']['input']>;
+  id_lt?: InputMaybe<Scalars['ID']['input']>;
+  id_gte?: InputMaybe<Scalars['ID']['input']>;
+  id_lte?: InputMaybe<Scalars['ID']['input']>;
+  id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  groundBattleId?: InputMaybe<Scalars['BigInt']['input']>;
+  groundBattleId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  groundBattleId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  groundBattleId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  groundBattleId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  groundBattleId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  groundBattleId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  groundBattleId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  warId?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  warId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  attackerId?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  attackerId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  attackerSoldierLosses?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerSoldierLosses_not?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerSoldierLosses_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerSoldierLosses_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerSoldierLosses_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerSoldierLosses_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerSoldierLosses_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  attackerSoldierLosses_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  attackerTankLosses?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerTankLosses_not?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerTankLosses_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerTankLosses_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerTankLosses_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerTankLosses_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerTankLosses_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  attackerTankLosses_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  defenderId?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  defenderId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  defenderSoldierLosses?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderSoldierLosses_not?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderSoldierLosses_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderSoldierLosses_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderSoldierLosses_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderSoldierLosses_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderSoldierLosses_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  defenderSoldierLosses_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  defenderTankLosses?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderTankLosses_not?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderTankLosses_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderTankLosses_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderTankLosses_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderTankLosses_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderTankLosses_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  defenderTankLosses_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  transactionHash?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<GroundBattle_filter>>>;
+  or?: InputMaybe<Array<InputMaybe<GroundBattle_filter>>>;
+};
+
+export type GroundBattle_orderBy =
+  | 'id'
+  | 'groundBattleId'
+  | 'warId'
+  | 'attackerId'
+  | 'attackerSoldierLosses'
+  | 'attackerTankLosses'
+  | 'defenderId'
+  | 'defenderSoldierLosses'
+  | 'defenderTankLosses'
+  | 'transactionHash';
+
 export type Nation = {
   id: Scalars['ID']['output'];
   nationId: Scalars['BigInt']['output'];
@@ -177,6 +401,96 @@ export type Nation_orderBy =
   | 'createdAt'
   | 'transactionHash';
 
+export type NukeAttack = {
+  id: Scalars['ID']['output'];
+  attackId: Scalars['BigInt']['output'];
+  attackerId: Scalars['BigInt']['output'];
+  defenderId: Scalars['BigInt']['output'];
+  landed: Scalars['Boolean']['output'];
+  warId: Scalars['BigInt']['output'];
+  transactionHash: Scalars['String']['output'];
+};
+
+export type NukeAttack_filter = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_not?: InputMaybe<Scalars['ID']['input']>;
+  id_gt?: InputMaybe<Scalars['ID']['input']>;
+  id_lt?: InputMaybe<Scalars['ID']['input']>;
+  id_gte?: InputMaybe<Scalars['ID']['input']>;
+  id_lte?: InputMaybe<Scalars['ID']['input']>;
+  id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  attackId?: InputMaybe<Scalars['BigInt']['input']>;
+  attackId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  attackId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  attackId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  attackerId?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  attackerId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  defenderId?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  defenderId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  landed?: InputMaybe<Scalars['Boolean']['input']>;
+  landed_not?: InputMaybe<Scalars['Boolean']['input']>;
+  landed_in?: InputMaybe<Array<Scalars['Boolean']['input']>>;
+  landed_not_in?: InputMaybe<Array<Scalars['Boolean']['input']>>;
+  warId?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  warId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  warId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  transactionHash?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<NukeAttack_filter>>>;
+  or?: InputMaybe<Array<InputMaybe<NukeAttack_filter>>>;
+};
+
+export type NukeAttack_orderBy =
+  | 'id'
+  | 'attackId'
+  | 'attackerId'
+  | 'defenderId'
+  | 'landed'
+  | 'warId'
+  | 'transactionHash';
+
 /** Defines the order direction, either ascending or descending */
 export type OrderDirection =
   | 'asc'
@@ -187,6 +501,14 @@ export type Query = {
   nations: Array<Nation>;
   war?: Maybe<War>;
   wars: Array<War>;
+  groundBattle?: Maybe<GroundBattle>;
+  groundBattles: Array<GroundBattle>;
+  cruiseMissileAttack?: Maybe<CruiseMissileAttack>;
+  cruiseMissileAttacks: Array<CruiseMissileAttack>;
+  nukeAttack?: Maybe<NukeAttack>;
+  nukeAttacks: Array<NukeAttack>;
+  spyOperation?: Maybe<SpyOperation>;
+  spyOperations: Array<SpyOperation>;
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
 };
@@ -228,15 +550,185 @@ export type QuerywarsArgs = {
 };
 
 
+export type QuerygroundBattleArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QuerygroundBattlesArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<GroundBattle_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<GroundBattle_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QuerycruiseMissileAttackArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QuerycruiseMissileAttacksArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<CruiseMissileAttack_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<CruiseMissileAttack_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QuerynukeAttackArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QuerynukeAttacksArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<NukeAttack_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<NukeAttack_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QueryspyOperationArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QueryspyOperationsArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<SpyOperation_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<SpyOperation_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
 export type Query_metaArgs = {
   block?: InputMaybe<Block_height>;
 };
+
+export type SpyOperation = {
+  id: Scalars['ID']['output'];
+  attackId: Scalars['BigInt']['output'];
+  attackerId: Scalars['BigInt']['output'];
+  defenderId: Scalars['BigInt']['output'];
+  success: Scalars['Boolean']['output'];
+  attackType: Scalars['BigInt']['output'];
+  transactionHash: Scalars['String']['output'];
+};
+
+export type SpyOperation_filter = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_not?: InputMaybe<Scalars['ID']['input']>;
+  id_gt?: InputMaybe<Scalars['ID']['input']>;
+  id_lt?: InputMaybe<Scalars['ID']['input']>;
+  id_gte?: InputMaybe<Scalars['ID']['input']>;
+  id_lte?: InputMaybe<Scalars['ID']['input']>;
+  id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  attackId?: InputMaybe<Scalars['BigInt']['input']>;
+  attackId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  attackId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  attackId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  attackerId?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackerId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  attackerId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  defenderId?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_not?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  defenderId_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  defenderId_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  success?: InputMaybe<Scalars['Boolean']['input']>;
+  success_not?: InputMaybe<Scalars['Boolean']['input']>;
+  success_in?: InputMaybe<Array<Scalars['Boolean']['input']>>;
+  success_not_in?: InputMaybe<Array<Scalars['Boolean']['input']>>;
+  attackType?: InputMaybe<Scalars['BigInt']['input']>;
+  attackType_not?: InputMaybe<Scalars['BigInt']['input']>;
+  attackType_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackType_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  attackType_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackType_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  attackType_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  attackType_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  transactionHash?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<SpyOperation_filter>>>;
+  or?: InputMaybe<Array<InputMaybe<SpyOperation_filter>>>;
+};
+
+export type SpyOperation_orderBy =
+  | 'id'
+  | 'attackId'
+  | 'attackerId'
+  | 'defenderId'
+  | 'success'
+  | 'attackType'
+  | 'transactionHash';
 
 export type Subscription = {
   nation?: Maybe<Nation>;
   nations: Array<Nation>;
   war?: Maybe<War>;
   wars: Array<War>;
+  groundBattle?: Maybe<GroundBattle>;
+  groundBattles: Array<GroundBattle>;
+  cruiseMissileAttack?: Maybe<CruiseMissileAttack>;
+  cruiseMissileAttacks: Array<CruiseMissileAttack>;
+  nukeAttack?: Maybe<NukeAttack>;
+  nukeAttacks: Array<NukeAttack>;
+  spyOperation?: Maybe<SpyOperation>;
+  spyOperations: Array<SpyOperation>;
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
 };
@@ -273,6 +765,78 @@ export type SubscriptionwarsArgs = {
   orderBy?: InputMaybe<War_orderBy>;
   orderDirection?: InputMaybe<OrderDirection>;
   where?: InputMaybe<War_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptiongroundBattleArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptiongroundBattlesArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<GroundBattle_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<GroundBattle_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptioncruiseMissileAttackArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptioncruiseMissileAttacksArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<CruiseMissileAttack_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<CruiseMissileAttack_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionnukeAttackArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionnukeAttacksArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<NukeAttack_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<NukeAttack_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionspyOperationArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionspyOperationsArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<SpyOperation_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<SpyOperation_filter>;
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
@@ -479,15 +1043,27 @@ export type ResolversTypes = ResolversObject<{
   Block_height: Block_height;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Bytes: ResolverTypeWrapper<Scalars['Bytes']['output']>;
+  CruiseMissileAttack: ResolverTypeWrapper<CruiseMissileAttack>;
+  CruiseMissileAttack_filter: CruiseMissileAttack_filter;
+  CruiseMissileAttack_orderBy: CruiseMissileAttack_orderBy;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
+  GroundBattle: ResolverTypeWrapper<GroundBattle>;
+  GroundBattle_filter: GroundBattle_filter;
+  GroundBattle_orderBy: GroundBattle_orderBy;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Int8: ResolverTypeWrapper<Scalars['Int8']['output']>;
   Nation: ResolverTypeWrapper<Nation>;
   Nation_filter: Nation_filter;
   Nation_orderBy: Nation_orderBy;
+  NukeAttack: ResolverTypeWrapper<NukeAttack>;
+  NukeAttack_filter: NukeAttack_filter;
+  NukeAttack_orderBy: NukeAttack_orderBy;
   OrderDirection: OrderDirection;
   Query: ResolverTypeWrapper<{}>;
+  SpyOperation: ResolverTypeWrapper<SpyOperation>;
+  SpyOperation_filter: SpyOperation_filter;
+  SpyOperation_orderBy: SpyOperation_orderBy;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Subscription: ResolverTypeWrapper<{}>;
   War: ResolverTypeWrapper<War>;
@@ -506,13 +1082,21 @@ export type ResolversParentTypes = ResolversObject<{
   Block_height: Block_height;
   Boolean: Scalars['Boolean']['output'];
   Bytes: Scalars['Bytes']['output'];
+  CruiseMissileAttack: CruiseMissileAttack;
+  CruiseMissileAttack_filter: CruiseMissileAttack_filter;
   Float: Scalars['Float']['output'];
+  GroundBattle: GroundBattle;
+  GroundBattle_filter: GroundBattle_filter;
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
   Int8: Scalars['Int8']['output'];
   Nation: Nation;
   Nation_filter: Nation_filter;
+  NukeAttack: NukeAttack;
+  NukeAttack_filter: NukeAttack_filter;
   Query: {};
+  SpyOperation: SpyOperation;
+  SpyOperation_filter: SpyOperation_filter;
   String: Scalars['String']['output'];
   Subscription: {};
   War: War;
@@ -549,6 +1133,32 @@ export interface BytesScalarConfig extends GraphQLScalarTypeConfig<ResolversType
   name: 'Bytes';
 }
 
+export type CruiseMissileAttackResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['CruiseMissileAttack'] = ResolversParentTypes['CruiseMissileAttack']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  attackId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  attackerId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  defenderId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  landed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  warId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  damageTypeNumber?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  transactionHash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type GroundBattleResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['GroundBattle'] = ResolversParentTypes['GroundBattle']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  groundBattleId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  warId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  attackerId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  attackerSoldierLosses?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  attackerTankLosses?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  defenderId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  defenderSoldierLosses?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  defenderTankLosses?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  transactionHash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export interface Int8ScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Int8'], any> {
   name: 'Int8';
 }
@@ -564,12 +1174,42 @@ export type NationResolvers<ContextType = MeshContext, ParentType extends Resolv
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type NukeAttackResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['NukeAttack'] = ResolversParentTypes['NukeAttack']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  attackId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  attackerId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  defenderId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  landed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  warId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  transactionHash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type QueryResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   nation?: Resolver<Maybe<ResolversTypes['Nation']>, ParentType, ContextType, RequireFields<QuerynationArgs, 'id' | 'subgraphError'>>;
   nations?: Resolver<Array<ResolversTypes['Nation']>, ParentType, ContextType, RequireFields<QuerynationsArgs, 'skip' | 'first' | 'subgraphError'>>;
   war?: Resolver<Maybe<ResolversTypes['War']>, ParentType, ContextType, RequireFields<QuerywarArgs, 'id' | 'subgraphError'>>;
   wars?: Resolver<Array<ResolversTypes['War']>, ParentType, ContextType, RequireFields<QuerywarsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  groundBattle?: Resolver<Maybe<ResolversTypes['GroundBattle']>, ParentType, ContextType, RequireFields<QuerygroundBattleArgs, 'id' | 'subgraphError'>>;
+  groundBattles?: Resolver<Array<ResolversTypes['GroundBattle']>, ParentType, ContextType, RequireFields<QuerygroundBattlesArgs, 'skip' | 'first' | 'subgraphError'>>;
+  cruiseMissileAttack?: Resolver<Maybe<ResolversTypes['CruiseMissileAttack']>, ParentType, ContextType, RequireFields<QuerycruiseMissileAttackArgs, 'id' | 'subgraphError'>>;
+  cruiseMissileAttacks?: Resolver<Array<ResolversTypes['CruiseMissileAttack']>, ParentType, ContextType, RequireFields<QuerycruiseMissileAttacksArgs, 'skip' | 'first' | 'subgraphError'>>;
+  nukeAttack?: Resolver<Maybe<ResolversTypes['NukeAttack']>, ParentType, ContextType, RequireFields<QuerynukeAttackArgs, 'id' | 'subgraphError'>>;
+  nukeAttacks?: Resolver<Array<ResolversTypes['NukeAttack']>, ParentType, ContextType, RequireFields<QuerynukeAttacksArgs, 'skip' | 'first' | 'subgraphError'>>;
+  spyOperation?: Resolver<Maybe<ResolversTypes['SpyOperation']>, ParentType, ContextType, RequireFields<QueryspyOperationArgs, 'id' | 'subgraphError'>>;
+  spyOperations?: Resolver<Array<ResolversTypes['SpyOperation']>, ParentType, ContextType, RequireFields<QueryspyOperationsArgs, 'skip' | 'first' | 'subgraphError'>>;
   _meta?: Resolver<Maybe<ResolversTypes['_Meta_']>, ParentType, ContextType, Partial<Query_metaArgs>>;
+}>;
+
+export type SpyOperationResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['SpyOperation'] = ResolversParentTypes['SpyOperation']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  attackId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  attackerId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  defenderId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  attackType?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  transactionHash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type SubscriptionResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = ResolversObject<{
@@ -577,6 +1217,14 @@ export type SubscriptionResolvers<ContextType = MeshContext, ParentType extends 
   nations?: SubscriptionResolver<Array<ResolversTypes['Nation']>, "nations", ParentType, ContextType, RequireFields<SubscriptionnationsArgs, 'skip' | 'first' | 'subgraphError'>>;
   war?: SubscriptionResolver<Maybe<ResolversTypes['War']>, "war", ParentType, ContextType, RequireFields<SubscriptionwarArgs, 'id' | 'subgraphError'>>;
   wars?: SubscriptionResolver<Array<ResolversTypes['War']>, "wars", ParentType, ContextType, RequireFields<SubscriptionwarsArgs, 'skip' | 'first' | 'subgraphError'>>;
+  groundBattle?: SubscriptionResolver<Maybe<ResolversTypes['GroundBattle']>, "groundBattle", ParentType, ContextType, RequireFields<SubscriptiongroundBattleArgs, 'id' | 'subgraphError'>>;
+  groundBattles?: SubscriptionResolver<Array<ResolversTypes['GroundBattle']>, "groundBattles", ParentType, ContextType, RequireFields<SubscriptiongroundBattlesArgs, 'skip' | 'first' | 'subgraphError'>>;
+  cruiseMissileAttack?: SubscriptionResolver<Maybe<ResolversTypes['CruiseMissileAttack']>, "cruiseMissileAttack", ParentType, ContextType, RequireFields<SubscriptioncruiseMissileAttackArgs, 'id' | 'subgraphError'>>;
+  cruiseMissileAttacks?: SubscriptionResolver<Array<ResolversTypes['CruiseMissileAttack']>, "cruiseMissileAttacks", ParentType, ContextType, RequireFields<SubscriptioncruiseMissileAttacksArgs, 'skip' | 'first' | 'subgraphError'>>;
+  nukeAttack?: SubscriptionResolver<Maybe<ResolversTypes['NukeAttack']>, "nukeAttack", ParentType, ContextType, RequireFields<SubscriptionnukeAttackArgs, 'id' | 'subgraphError'>>;
+  nukeAttacks?: SubscriptionResolver<Array<ResolversTypes['NukeAttack']>, "nukeAttacks", ParentType, ContextType, RequireFields<SubscriptionnukeAttacksArgs, 'skip' | 'first' | 'subgraphError'>>;
+  spyOperation?: SubscriptionResolver<Maybe<ResolversTypes['SpyOperation']>, "spyOperation", ParentType, ContextType, RequireFields<SubscriptionspyOperationArgs, 'id' | 'subgraphError'>>;
+  spyOperations?: SubscriptionResolver<Array<ResolversTypes['SpyOperation']>, "spyOperations", ParentType, ContextType, RequireFields<SubscriptionspyOperationsArgs, 'skip' | 'first' | 'subgraphError'>>;
   _meta?: SubscriptionResolver<Maybe<ResolversTypes['_Meta_']>, "_meta", ParentType, ContextType, Partial<Subscription_metaArgs>>;
 }>;
 
@@ -607,9 +1255,13 @@ export type Resolvers<ContextType = MeshContext> = ResolversObject<{
   BigDecimal?: GraphQLScalarType;
   BigInt?: GraphQLScalarType;
   Bytes?: GraphQLScalarType;
+  CruiseMissileAttack?: CruiseMissileAttackResolvers<ContextType>;
+  GroundBattle?: GroundBattleResolvers<ContextType>;
   Int8?: GraphQLScalarType;
   Nation?: NationResolvers<ContextType>;
+  NukeAttack?: NukeAttackResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  SpyOperation?: SpyOperationResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;
   War?: WarResolvers<ContextType>;
   _Block_?: _Block_Resolvers<ContextType>;
@@ -689,8 +1341,12 @@ const merger = new(BareMerger as any)({
         store: rootStore.child('bareMerger')
       })
 const documentHashMap = {
-        "4149efc8fea21ad44c32b83ab22baf32a1d005ae6f46b6ac01ec07409db64448": GetNationsDocument,
-"4149efc8fea21ad44c32b83ab22baf32a1d005ae6f46b6ac01ec07409db64448": GetWarsDocument
+        "8db72f79f317867d8171bed166047e7fdb5f2d400c73693525712ade959e6ecb": GetNationsDocument,
+"8db72f79f317867d8171bed166047e7fdb5f2d400c73693525712ade959e6ecb": GetWarsDocument,
+"8db72f79f317867d8171bed166047e7fdb5f2d400c73693525712ade959e6ecb": GetGroundBattlesDocument,
+"8db72f79f317867d8171bed166047e7fdb5f2d400c73693525712ade959e6ecb": GetCruiseMissileAttacksDocument,
+"8db72f79f317867d8171bed166047e7fdb5f2d400c73693525712ade959e6ecb": GetNukeAttacksDocument,
+"8db72f79f317867d8171bed166047e7fdb5f2d400c73693525712ade959e6ecb": GetSpyOperationsDocument
       }
 additionalEnvelopPlugins.push(usePersistedOperations({
         getPersistedOperation(key) {
@@ -717,14 +1373,42 @@ additionalEnvelopPlugins.push(usePersistedOperations({
           return printWithCache(GetNationsDocument);
         },
         location: 'GetNationsDocument.graphql',
-        sha256Hash: '4149efc8fea21ad44c32b83ab22baf32a1d005ae6f46b6ac01ec07409db64448'
+        sha256Hash: '8db72f79f317867d8171bed166047e7fdb5f2d400c73693525712ade959e6ecb'
       },{
         document: GetWarsDocument,
         get rawSDL() {
           return printWithCache(GetWarsDocument);
         },
         location: 'GetWarsDocument.graphql',
-        sha256Hash: '4149efc8fea21ad44c32b83ab22baf32a1d005ae6f46b6ac01ec07409db64448'
+        sha256Hash: '8db72f79f317867d8171bed166047e7fdb5f2d400c73693525712ade959e6ecb'
+      },{
+        document: GetGroundBattlesDocument,
+        get rawSDL() {
+          return printWithCache(GetGroundBattlesDocument);
+        },
+        location: 'GetGroundBattlesDocument.graphql',
+        sha256Hash: '8db72f79f317867d8171bed166047e7fdb5f2d400c73693525712ade959e6ecb'
+      },{
+        document: GetCruiseMissileAttacksDocument,
+        get rawSDL() {
+          return printWithCache(GetCruiseMissileAttacksDocument);
+        },
+        location: 'GetCruiseMissileAttacksDocument.graphql',
+        sha256Hash: '8db72f79f317867d8171bed166047e7fdb5f2d400c73693525712ade959e6ecb'
+      },{
+        document: GetNukeAttacksDocument,
+        get rawSDL() {
+          return printWithCache(GetNukeAttacksDocument);
+        },
+        location: 'GetNukeAttacksDocument.graphql',
+        sha256Hash: '8db72f79f317867d8171bed166047e7fdb5f2d400c73693525712ade959e6ecb'
+      },{
+        document: GetSpyOperationsDocument,
+        get rawSDL() {
+          return printWithCache(GetSpyOperationsDocument);
+        },
+        location: 'GetSpyOperationsDocument.graphql',
+        sha256Hash: '8db72f79f317867d8171bed166047e7fdb5f2d400c73693525712ade959e6ecb'
       }
     ];
     },
@@ -789,6 +1473,26 @@ export type GetWarsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetWarsQuery = { wars: Array<Pick<War, 'id' | 'warId' | 'offenseId' | 'defenseId' | 'transactionHash'>> };
 
+export type GetGroundBattlesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetGroundBattlesQuery = { groundBattles: Array<Pick<GroundBattle, 'id' | 'groundBattleId' | 'warId' | 'attackerId' | 'attackerSoldierLosses' | 'attackerTankLosses' | 'defenderId' | 'defenderSoldierLosses' | 'defenderTankLosses' | 'transactionHash'>> };
+
+export type GetCruiseMissileAttacksQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCruiseMissileAttacksQuery = { cruiseMissileAttacks: Array<Pick<CruiseMissileAttack, 'id' | 'attackId' | 'attackerId' | 'defenderId' | 'landed' | 'warId' | 'damageTypeNumber' | 'transactionHash'>> };
+
+export type GetNukeAttacksQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetNukeAttacksQuery = { nukeAttacks: Array<Pick<NukeAttack, 'id' | 'attackId' | 'attackerId' | 'defenderId' | 'landed' | 'warId' | 'transactionHash'>> };
+
+export type GetSpyOperationsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetSpyOperationsQuery = { spyOperations: Array<Pick<SpyOperation, 'id' | 'attackId' | 'attackerId' | 'defenderId' | 'success' | 'attackType' | 'transactionHash'>> };
+
 
 export const GetNationsDocument = gql`
     query GetNations {
@@ -812,6 +1516,66 @@ export const GetWarsDocument = gql`
   }
 }
     ` as unknown as DocumentNode<GetWarsQuery, GetWarsQueryVariables>;
+export const GetGroundBattlesDocument = gql`
+    query GetGroundBattles {
+  groundBattles {
+    id
+    groundBattleId
+    warId
+    attackerId
+    attackerSoldierLosses
+    attackerTankLosses
+    defenderId
+    defenderSoldierLosses
+    defenderTankLosses
+    transactionHash
+  }
+}
+    ` as unknown as DocumentNode<GetGroundBattlesQuery, GetGroundBattlesQueryVariables>;
+export const GetCruiseMissileAttacksDocument = gql`
+    query GetCruiseMissileAttacks {
+  cruiseMissileAttacks {
+    id
+    attackId
+    attackerId
+    defenderId
+    landed
+    warId
+    damageTypeNumber
+    transactionHash
+  }
+}
+    ` as unknown as DocumentNode<GetCruiseMissileAttacksQuery, GetCruiseMissileAttacksQueryVariables>;
+export const GetNukeAttacksDocument = gql`
+    query GetNukeAttacks {
+  nukeAttacks {
+    id
+    attackId
+    attackerId
+    defenderId
+    landed
+    warId
+    transactionHash
+  }
+}
+    ` as unknown as DocumentNode<GetNukeAttacksQuery, GetNukeAttacksQueryVariables>;
+export const GetSpyOperationsDocument = gql`
+    query GetSpyOperations {
+  spyOperations {
+    id
+    attackId
+    attackerId
+    defenderId
+    success
+    attackType
+    transactionHash
+  }
+}
+    ` as unknown as DocumentNode<GetSpyOperationsQuery, GetSpyOperationsQueryVariables>;
+
+
+
+
 
 
 
@@ -823,6 +1587,18 @@ export function getSdk<C, E>(requester: Requester<C, E>) {
     },
     GetWars(variables?: GetWarsQueryVariables, options?: C): Promise<GetWarsQuery> {
       return requester<GetWarsQuery, GetWarsQueryVariables>(GetWarsDocument, variables, options) as Promise<GetWarsQuery>;
+    },
+    GetGroundBattles(variables?: GetGroundBattlesQueryVariables, options?: C): Promise<GetGroundBattlesQuery> {
+      return requester<GetGroundBattlesQuery, GetGroundBattlesQueryVariables>(GetGroundBattlesDocument, variables, options) as Promise<GetGroundBattlesQuery>;
+    },
+    GetCruiseMissileAttacks(variables?: GetCruiseMissileAttacksQueryVariables, options?: C): Promise<GetCruiseMissileAttacksQuery> {
+      return requester<GetCruiseMissileAttacksQuery, GetCruiseMissileAttacksQueryVariables>(GetCruiseMissileAttacksDocument, variables, options) as Promise<GetCruiseMissileAttacksQuery>;
+    },
+    GetNukeAttacks(variables?: GetNukeAttacksQueryVariables, options?: C): Promise<GetNukeAttacksQuery> {
+      return requester<GetNukeAttacksQuery, GetNukeAttacksQueryVariables>(GetNukeAttacksDocument, variables, options) as Promise<GetNukeAttacksQuery>;
+    },
+    GetSpyOperations(variables?: GetSpyOperationsQueryVariables, options?: C): Promise<GetSpyOperationsQuery> {
+      return requester<GetSpyOperationsQuery, GetSpyOperationsQueryVariables>(GetSpyOperationsDocument, variables, options) as Promise<GetSpyOperationsQuery>;
     }
   };
 }

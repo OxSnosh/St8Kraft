@@ -81,20 +81,12 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         uint256 attackType
     );
 
-    event NukeLanded(
+    event NukeAttackEvent(
         uint256 indexed id,
         uint256 indexed attackerId,
         uint256 indexed defenderId,
-        uint256 thwartOdds,
-        uint256 randomNukeSuccessNumber
-    );
-
-    event NukeThwarted(
-        uint256 indexed id,
-        uint256 indexed attackerId,
-        uint256 indexed defenderId,
-        uint256 thwartOdds,
-        uint256 randomNukeSuccessNumber
+        uint256 warId,
+        bool landed
     );
 
     ///@dev this function contains the variable necessary for chainlink randomness
@@ -281,12 +273,12 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
             param.inflictAnarchy(defenderId);
             uint256 gameDay = keep.getGameDay();
             gameDayToNukesLanded[gameDay]++;
-            emit NukeLanded(
+            emit NukeAttackEvent(
                 requestNumber,
                 attackerId,
                 defenderId,
-                thwartOdds,
-                randomNukeSuccessNumber
+                nukeAttackIdToNukeAttack[requestNumber].warId,
+                true
             );
             uint256 day = keep.getGameDay();
             nationIdToDayToNukeLanded[defenderId][day] = true;
@@ -295,12 +287,12 @@ contract NukeContract is Ownable, VRFConsumerBaseV2 {
         } else {
             console.log("Nuke attaq thwarted");
             mis.decreaseNukeCountFromNukeContract(attackerId);
-            emit NukeThwarted(
+            emit NukeAttackEvent(
                 requestNumber,
                 attackerId,
                 defenderId,
-                thwartOdds,
-                randomNukeSuccessNumber
+                nukeAttackIdToNukeAttack[requestNumber].warId,
+                false
             );
         }
     }

@@ -7290,42 +7290,29 @@
             {
               "indexed": true,
               "internalType": "uint256",
-              "name": "defenderId",
+              "name": "attackerId",
               "type": "uint256"
             },
             {
               "indexed": true,
+              "internalType": "uint256",
+              "name": "defenderId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "success",
+              "type": "bool"
+            },
+            {
+              "indexed": false,
               "internalType": "uint256",
               "name": "attackType",
               "type": "uint256"
             }
           ],
-          "name": "SpyAttackSuccess",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "uint256",
-              "name": "attackId",
-              "type": "uint256"
-            },
-            {
-              "indexed": true,
-              "internalType": "uint256",
-              "name": "decryptedAttackerId",
-              "type": "uint256"
-            },
-            {
-              "indexed": true,
-              "internalType": "uint256",
-              "name": "defenderId",
-              "type": "uint256"
-            }
-          ],
-          "name": "SpyAttackThwart",
+          "name": "SpyAttackResults",
           "type": "event"
         },
         {
@@ -20002,6 +19989,61 @@
           "anonymous": false,
           "inputs": [
             {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "battleId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "warId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "attackerId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "attackSoldierLosses",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "attackTankLosses",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "defenderId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "defenderSoldierLosses",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "defenderTankLosses",
+              "type": "uint256"
+            }
+          ],
+          "name": "GroundBattleResultsEvent",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
               "indexed": true,
               "internalType": "address",
               "name": "previousOwner",
@@ -29132,17 +29174,17 @@
             {
               "indexed": false,
               "internalType": "uint256",
-              "name": "thwartOdds",
+              "name": "warId",
               "type": "uint256"
             },
             {
               "indexed": false,
-              "internalType": "uint256",
-              "name": "randomNukeSuccessNumber",
-              "type": "uint256"
+              "internalType": "bool",
+              "name": "landed",
+              "type": "bool"
             }
           ],
-          "name": "NukeLanded",
+          "name": "NukeAttackEvent",
           "type": "event"
         },
         {
@@ -29180,43 +29222,6 @@
             }
           ],
           "name": "NukeLaunched",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "uint256",
-              "name": "id",
-              "type": "uint256"
-            },
-            {
-              "indexed": true,
-              "internalType": "uint256",
-              "name": "attackerId",
-              "type": "uint256"
-            },
-            {
-              "indexed": true,
-              "internalType": "uint256",
-              "name": "defenderId",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "thwartOdds",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "randomNukeSuccessNumber",
-              "type": "uint256"
-            }
-          ],
-          "name": "NukeThwarted",
           "type": "event"
         },
         {

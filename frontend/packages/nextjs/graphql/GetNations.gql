@@ -17,3 +17,55 @@ query GetWars {
     transactionHash
   }
 }
+
+query GetGroundBattles {
+  groundBattles {
+    id
+    groundBattleId
+    warId
+    attackerId
+    attackerSoldierLosses
+    attackerTankLosses
+    defenderId
+    defenderSoldierLosses
+    defenderTankLosses
+    transactionHash
+  }
+}
+
+query GetCruiseMissileAttacks {
+  cruiseMissileAttacks {
+    id
+    attackId
+    attackerId
+    defenderId
+    landed
+    warId
+    damageTypeNumber
+    transactionHash
+  }
+}
+
+query GetNukeAttacks {
+  nukeAttacks {
+    id
+    attackId
+    attackerId
+    defenderId
+    landed
+    warId
+    transactionHash
+  }
+}
+
+query GetSpyOperations {
+  spyOperations {
+    id
+    attackId
+    attackerId
+    defenderId
+    success
+    attackType
+    transactionHash
+  }
+}

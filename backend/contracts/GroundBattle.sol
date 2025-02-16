@@ -535,6 +535,17 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         console.log("request sent");
     }
 
+    event GroundBattleResultsEvent (
+        uint256 battleId,
+        uint256 warId,
+        uint256 attackerId,
+        uint256 attackSoldierLosses,
+        uint256 attackTankLosses,
+        uint256 defenderId,
+        uint256 defenderSoldierLosses,
+        uint256 defenderTankLosses
+    );
+
     function completeBattleSequence(
         bytes32 requestId,
         uint256 battleId, 
@@ -579,6 +590,16 @@ contract GroundBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
             attackerTankLosses,
             attackerId,
             warId
+        );
+        emit GroundBattleResultsEvent (
+            battleId,
+            warId,
+            attackerId,
+            attackerSoldierLosses,
+            attackerTankLosses,
+            defenderId,
+            defenderSoldierLosses,
+            defenderTankLosses
         );
         (, , bool anarchyCheckDefender) = addTax.soldierToPopulationRatio(
             defenderId

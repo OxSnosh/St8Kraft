@@ -32,6 +32,232 @@ input Block_height {
 
 scalar Bytes
 
+type CruiseMissileAttack {
+  id: ID!
+  attackId: BigInt!
+  attackerId: BigInt!
+  defenderId: BigInt!
+  landed: Boolean!
+  warId: BigInt!
+  damageTypeNumber: BigInt!
+  transactionHash: String!
+}
+
+input CruiseMissileAttack_filter {
+  id: ID
+  id_not: ID
+  id_gt: ID
+  id_lt: ID
+  id_gte: ID
+  id_lte: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  attackId: BigInt
+  attackId_not: BigInt
+  attackId_gt: BigInt
+  attackId_lt: BigInt
+  attackId_gte: BigInt
+  attackId_lte: BigInt
+  attackId_in: [BigInt!]
+  attackId_not_in: [BigInt!]
+  attackerId: BigInt
+  attackerId_not: BigInt
+  attackerId_gt: BigInt
+  attackerId_lt: BigInt
+  attackerId_gte: BigInt
+  attackerId_lte: BigInt
+  attackerId_in: [BigInt!]
+  attackerId_not_in: [BigInt!]
+  defenderId: BigInt
+  defenderId_not: BigInt
+  defenderId_gt: BigInt
+  defenderId_lt: BigInt
+  defenderId_gte: BigInt
+  defenderId_lte: BigInt
+  defenderId_in: [BigInt!]
+  defenderId_not_in: [BigInt!]
+  landed: Boolean
+  landed_not: Boolean
+  landed_in: [Boolean!]
+  landed_not_in: [Boolean!]
+  warId: BigInt
+  warId_not: BigInt
+  warId_gt: BigInt
+  warId_lt: BigInt
+  warId_gte: BigInt
+  warId_lte: BigInt
+  warId_in: [BigInt!]
+  warId_not_in: [BigInt!]
+  damageTypeNumber: BigInt
+  damageTypeNumber_not: BigInt
+  damageTypeNumber_gt: BigInt
+  damageTypeNumber_lt: BigInt
+  damageTypeNumber_gte: BigInt
+  damageTypeNumber_lte: BigInt
+  damageTypeNumber_in: [BigInt!]
+  damageTypeNumber_not_in: [BigInt!]
+  transactionHash: String
+  transactionHash_not: String
+  transactionHash_gt: String
+  transactionHash_lt: String
+  transactionHash_gte: String
+  transactionHash_lte: String
+  transactionHash_in: [String!]
+  transactionHash_not_in: [String!]
+  transactionHash_contains: String
+  transactionHash_contains_nocase: String
+  transactionHash_not_contains: String
+  transactionHash_not_contains_nocase: String
+  transactionHash_starts_with: String
+  transactionHash_starts_with_nocase: String
+  transactionHash_not_starts_with: String
+  transactionHash_not_starts_with_nocase: String
+  transactionHash_ends_with: String
+  transactionHash_ends_with_nocase: String
+  transactionHash_not_ends_with: String
+  transactionHash_not_ends_with_nocase: String
+  """Filter for the block changed event."""
+  _change_block: BlockChangedFilter
+  and: [CruiseMissileAttack_filter]
+  or: [CruiseMissileAttack_filter]
+}
+
+enum CruiseMissileAttack_orderBy {
+  id
+  attackId
+  attackerId
+  defenderId
+  landed
+  warId
+  damageTypeNumber
+  transactionHash
+}
+
+type GroundBattle {
+  id: ID!
+  groundBattleId: BigInt!
+  warId: BigInt!
+  attackerId: BigInt!
+  attackerSoldierLosses: BigInt!
+  attackerTankLosses: BigInt!
+  defenderId: BigInt!
+  defenderSoldierLosses: BigInt!
+  defenderTankLosses: BigInt!
+  transactionHash: String!
+}
+
+input GroundBattle_filter {
+  id: ID
+  id_not: ID
+  id_gt: ID
+  id_lt: ID
+  id_gte: ID
+  id_lte: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  groundBattleId: BigInt
+  groundBattleId_not: BigInt
+  groundBattleId_gt: BigInt
+  groundBattleId_lt: BigInt
+  groundBattleId_gte: BigInt
+  groundBattleId_lte: BigInt
+  groundBattleId_in: [BigInt!]
+  groundBattleId_not_in: [BigInt!]
+  warId: BigInt
+  warId_not: BigInt
+  warId_gt: BigInt
+  warId_lt: BigInt
+  warId_gte: BigInt
+  warId_lte: BigInt
+  warId_in: [BigInt!]
+  warId_not_in: [BigInt!]
+  attackerId: BigInt
+  attackerId_not: BigInt
+  attackerId_gt: BigInt
+  attackerId_lt: BigInt
+  attackerId_gte: BigInt
+  attackerId_lte: BigInt
+  attackerId_in: [BigInt!]
+  attackerId_not_in: [BigInt!]
+  attackerSoldierLosses: BigInt
+  attackerSoldierLosses_not: BigInt
+  attackerSoldierLosses_gt: BigInt
+  attackerSoldierLosses_lt: BigInt
+  attackerSoldierLosses_gte: BigInt
+  attackerSoldierLosses_lte: BigInt
+  attackerSoldierLosses_in: [BigInt!]
+  attackerSoldierLosses_not_in: [BigInt!]
+  attackerTankLosses: BigInt
+  attackerTankLosses_not: BigInt
+  attackerTankLosses_gt: BigInt
+  attackerTankLosses_lt: BigInt
+  attackerTankLosses_gte: BigInt
+  attackerTankLosses_lte: BigInt
+  attackerTankLosses_in: [BigInt!]
+  attackerTankLosses_not_in: [BigInt!]
+  defenderId: BigInt
+  defenderId_not: BigInt
+  defenderId_gt: BigInt
+  defenderId_lt: BigInt
+  defenderId_gte: BigInt
+  defenderId_lte: BigInt
+  defenderId_in: [BigInt!]
+  defenderId_not_in: [BigInt!]
+  defenderSoldierLosses: BigInt
+  defenderSoldierLosses_not: BigInt
+  defenderSoldierLosses_gt: BigInt
+  defenderSoldierLosses_lt: BigInt
+  defenderSoldierLosses_gte: BigInt
+  defenderSoldierLosses_lte: BigInt
+  defenderSoldierLosses_in: [BigInt!]
+  defenderSoldierLosses_not_in: [BigInt!]
+  defenderTankLosses: BigInt
+  defenderTankLosses_not: BigInt
+  defenderTankLosses_gt: BigInt
+  defenderTankLosses_lt: BigInt
+  defenderTankLosses_gte: BigInt
+  defenderTankLosses_lte: BigInt
+  defenderTankLosses_in: [BigInt!]
+  defenderTankLosses_not_in: [BigInt!]
+  transactionHash: String
+  transactionHash_not: String
+  transactionHash_gt: String
+  transactionHash_lt: String
+  transactionHash_gte: String
+  transactionHash_lte: String
+  transactionHash_in: [String!]
+  transactionHash_not_in: [String!]
+  transactionHash_contains: String
+  transactionHash_contains_nocase: String
+  transactionHash_not_contains: String
+  transactionHash_not_contains_nocase: String
+  transactionHash_starts_with: String
+  transactionHash_starts_with_nocase: String
+  transactionHash_not_starts_with: String
+  transactionHash_not_starts_with_nocase: String
+  transactionHash_ends_with: String
+  transactionHash_ends_with_nocase: String
+  transactionHash_not_ends_with: String
+  transactionHash_not_ends_with_nocase: String
+  """Filter for the block changed event."""
+  _change_block: BlockChangedFilter
+  and: [GroundBattle_filter]
+  or: [GroundBattle_filter]
+}
+
+enum GroundBattle_orderBy {
+  id
+  groundBattleId
+  warId
+  attackerId
+  attackerSoldierLosses
+  attackerTankLosses
+  defenderId
+  defenderSoldierLosses
+  defenderTankLosses
+  transactionHash
+}
+
 """
 8 bytes signed integer
 
@@ -159,6 +385,97 @@ enum Nation_orderBy {
   transactionHash
 }
 
+type NukeAttack {
+  id: ID!
+  attackId: BigInt!
+  attackerId: BigInt!
+  defenderId: BigInt!
+  landed: Boolean!
+  warId: BigInt!
+  transactionHash: String!
+}
+
+input NukeAttack_filter {
+  id: ID
+  id_not: ID
+  id_gt: ID
+  id_lt: ID
+  id_gte: ID
+  id_lte: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  attackId: BigInt
+  attackId_not: BigInt
+  attackId_gt: BigInt
+  attackId_lt: BigInt
+  attackId_gte: BigInt
+  attackId_lte: BigInt
+  attackId_in: [BigInt!]
+  attackId_not_in: [BigInt!]
+  attackerId: BigInt
+  attackerId_not: BigInt
+  attackerId_gt: BigInt
+  attackerId_lt: BigInt
+  attackerId_gte: BigInt
+  attackerId_lte: BigInt
+  attackerId_in: [BigInt!]
+  attackerId_not_in: [BigInt!]
+  defenderId: BigInt
+  defenderId_not: BigInt
+  defenderId_gt: BigInt
+  defenderId_lt: BigInt
+  defenderId_gte: BigInt
+  defenderId_lte: BigInt
+  defenderId_in: [BigInt!]
+  defenderId_not_in: [BigInt!]
+  landed: Boolean
+  landed_not: Boolean
+  landed_in: [Boolean!]
+  landed_not_in: [Boolean!]
+  warId: BigInt
+  warId_not: BigInt
+  warId_gt: BigInt
+  warId_lt: BigInt
+  warId_gte: BigInt
+  warId_lte: BigInt
+  warId_in: [BigInt!]
+  warId_not_in: [BigInt!]
+  transactionHash: String
+  transactionHash_not: String
+  transactionHash_gt: String
+  transactionHash_lt: String
+  transactionHash_gte: String
+  transactionHash_lte: String
+  transactionHash_in: [String!]
+  transactionHash_not_in: [String!]
+  transactionHash_contains: String
+  transactionHash_contains_nocase: String
+  transactionHash_not_contains: String
+  transactionHash_not_contains_nocase: String
+  transactionHash_starts_with: String
+  transactionHash_starts_with_nocase: String
+  transactionHash_not_starts_with: String
+  transactionHash_not_starts_with_nocase: String
+  transactionHash_ends_with: String
+  transactionHash_ends_with_nocase: String
+  transactionHash_not_ends_with: String
+  transactionHash_not_ends_with_nocase: String
+  """Filter for the block changed event."""
+  _change_block: BlockChangedFilter
+  and: [NukeAttack_filter]
+  or: [NukeAttack_filter]
+}
+
+enum NukeAttack_orderBy {
+  id
+  attackId
+  attackerId
+  defenderId
+  landed
+  warId
+  transactionHash
+}
+
 """Defines the order direction, either ascending or descending"""
 enum OrderDirection {
   asc
@@ -218,8 +535,203 @@ type Query {
     """
     subgraphError: _SubgraphErrorPolicy_! = deny
   ): [War!]!
+  groundBattle(
+    id: ID!
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): GroundBattle
+  groundBattles(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: GroundBattle_orderBy
+    orderDirection: OrderDirection
+    where: GroundBattle_filter
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [GroundBattle!]!
+  cruiseMissileAttack(
+    id: ID!
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): CruiseMissileAttack
+  cruiseMissileAttacks(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: CruiseMissileAttack_orderBy
+    orderDirection: OrderDirection
+    where: CruiseMissileAttack_filter
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [CruiseMissileAttack!]!
+  nukeAttack(
+    id: ID!
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): NukeAttack
+  nukeAttacks(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: NukeAttack_orderBy
+    orderDirection: OrderDirection
+    where: NukeAttack_filter
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [NukeAttack!]!
+  spyOperation(
+    id: ID!
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): SpyOperation
+  spyOperations(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: SpyOperation_orderBy
+    orderDirection: OrderDirection
+    where: SpyOperation_filter
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [SpyOperation!]!
   """Access to subgraph metadata"""
   _meta(block: Block_height): _Meta_
+}
+
+type SpyOperation {
+  id: ID!
+  attackId: BigInt!
+  attackerId: BigInt!
+  defenderId: BigInt!
+  success: Boolean!
+  attackType: BigInt!
+  transactionHash: String!
+}
+
+input SpyOperation_filter {
+  id: ID
+  id_not: ID
+  id_gt: ID
+  id_lt: ID
+  id_gte: ID
+  id_lte: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  attackId: BigInt
+  attackId_not: BigInt
+  attackId_gt: BigInt
+  attackId_lt: BigInt
+  attackId_gte: BigInt
+  attackId_lte: BigInt
+  attackId_in: [BigInt!]
+  attackId_not_in: [BigInt!]
+  attackerId: BigInt
+  attackerId_not: BigInt
+  attackerId_gt: BigInt
+  attackerId_lt: BigInt
+  attackerId_gte: BigInt
+  attackerId_lte: BigInt
+  attackerId_in: [BigInt!]
+  attackerId_not_in: [BigInt!]
+  defenderId: BigInt
+  defenderId_not: BigInt
+  defenderId_gt: BigInt
+  defenderId_lt: BigInt
+  defenderId_gte: BigInt
+  defenderId_lte: BigInt
+  defenderId_in: [BigInt!]
+  defenderId_not_in: [BigInt!]
+  success: Boolean
+  success_not: Boolean
+  success_in: [Boolean!]
+  success_not_in: [Boolean!]
+  attackType: BigInt
+  attackType_not: BigInt
+  attackType_gt: BigInt
+  attackType_lt: BigInt
+  attackType_gte: BigInt
+  attackType_lte: BigInt
+  attackType_in: [BigInt!]
+  attackType_not_in: [BigInt!]
+  transactionHash: String
+  transactionHash_not: String
+  transactionHash_gt: String
+  transactionHash_lt: String
+  transactionHash_gte: String
+  transactionHash_lte: String
+  transactionHash_in: [String!]
+  transactionHash_not_in: [String!]
+  transactionHash_contains: String
+  transactionHash_contains_nocase: String
+  transactionHash_not_contains: String
+  transactionHash_not_contains_nocase: String
+  transactionHash_starts_with: String
+  transactionHash_starts_with_nocase: String
+  transactionHash_not_starts_with: String
+  transactionHash_not_starts_with_nocase: String
+  transactionHash_ends_with: String
+  transactionHash_ends_with_nocase: String
+  transactionHash_not_ends_with: String
+  transactionHash_not_ends_with_nocase: String
+  """Filter for the block changed event."""
+  _change_block: BlockChangedFilter
+  and: [SpyOperation_filter]
+  or: [SpyOperation_filter]
+}
+
+enum SpyOperation_orderBy {
+  id
+  attackId
+  attackerId
+  defenderId
+  success
+  attackType
+  transactionHash
 }
 
 type Subscription {
@@ -275,6 +787,110 @@ type Subscription {
     """
     subgraphError: _SubgraphErrorPolicy_! = deny
   ): [War!]!
+  groundBattle(
+    id: ID!
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): GroundBattle
+  groundBattles(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: GroundBattle_orderBy
+    orderDirection: OrderDirection
+    where: GroundBattle_filter
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [GroundBattle!]!
+  cruiseMissileAttack(
+    id: ID!
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): CruiseMissileAttack
+  cruiseMissileAttacks(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: CruiseMissileAttack_orderBy
+    orderDirection: OrderDirection
+    where: CruiseMissileAttack_filter
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [CruiseMissileAttack!]!
+  nukeAttack(
+    id: ID!
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): NukeAttack
+  nukeAttacks(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: NukeAttack_orderBy
+    orderDirection: OrderDirection
+    where: NukeAttack_filter
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [NukeAttack!]!
+  spyOperation(
+    id: ID!
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): SpyOperation
+  spyOperations(
+    skip: Int = 0
+    first: Int = 100
+    orderBy: SpyOperation_orderBy
+    orderDirection: OrderDirection
+    where: SpyOperation_filter
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): [SpyOperation!]!
   """Access to subgraph metadata"""
   _meta(block: Block_height): _Meta_
 }

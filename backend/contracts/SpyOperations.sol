@@ -211,16 +211,12 @@ contract SpyOperationsContract is Ownable {
         return defenseSuccessScore;
     }
 
-    event SpyAttackThwart(
+    event SpyAttackResults(
         uint256 indexed attackId,
-        uint256 indexed decryptedAttackerId,
-        uint256 indexed defenderId
-    );
-
-    event SpyAttackSuccess(
-        uint256 indexed attackId,
+        uint256 indexed attackerId,
         uint256 indexed defenderId,
-        uint256 indexed attackType
+        bool success,
+        uint256 attackType
     );
 
     address relayer;
@@ -243,9 +239,11 @@ contract SpyOperationsContract is Ownable {
         console.log("randomNumber", randomNumber);
         if (success) {
             tsy.spendBalance(attackerId, cost);
-            emit SpyAttackSuccess (
+            emit SpyAttackResults (
                 attackId,
+                999999999,
                 defenderId,
+                true,
                 attackType
             );
             completeSpyAttack(success, attackId, attackerId, defenderId, attackType, randomNumber);
@@ -262,10 +260,12 @@ contract SpyOperationsContract is Ownable {
         uint256 randomNumber
     ) internal {
         if (!success) {
-            emit SpyAttackThwart(
+            emit SpyAttackResults(
                 _attackId,
                 attackerId,
-                defenderId
+                defenderId,
+                false,
+                attackType
             );
         } else if (success) {
             if (attackType == 1) {
