@@ -10025,21 +10025,39 @@
             },
             {
               "indexed": false,
-              "internalType": "uint256[]",
+              "internalType": "bytes",
               "name": "attackerFighterCasualties",
-              "type": "uint256[]"
+              "type": "bytes"
             },
             {
               "indexed": false,
-              "internalType": "uint256[]",
+              "internalType": "bytes",
               "name": "attackerBomberCasualties",
-              "type": "uint256[]"
+              "type": "bytes"
             },
             {
               "indexed": false,
-              "internalType": "uint256[]",
+              "internalType": "bytes",
               "name": "defenderFighterCasualties",
-              "type": "uint256[]"
+              "type": "bytes"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "infrastructureDamage",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "tankDamage",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "cruiseMissileDamage",
+              "type": "uint256"
             }
           ],
           "name": "AirAssaultCasualties",
@@ -10113,44 +10131,6 @@
             }
           ],
           "name": "completeAirBattle",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "battleId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "bytes",
-              "name": "attackerFighterCasualtiesBytes",
-              "type": "bytes"
-            },
-            {
-              "internalType": "bytes",
-              "name": "attackerBomberCasualtiesBytes",
-              "type": "bytes"
-            },
-            {
-              "internalType": "bytes",
-              "name": "defenderFighterCasualtiesBytes",
-              "type": "bytes"
-            },
-            {
-              "internalType": "uint256",
-              "name": "defenderId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "attackerId",
-              "type": "uint256"
-            }
-          ],
-          "name": "completeAirBattleCont",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -28711,6 +28691,31 @@
           "anonymous": false,
           "inputs": [
             {
+              "indexed": false,
+              "internalType": "uint256[]",
+              "name": "attackerLosses",
+              "type": "uint256[]"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256[]",
+              "name": "defenderLosses",
+              "type": "uint256[]"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "battleId",
+              "type": "uint256"
+            }
+          ],
+          "name": "NavalAttackComplete",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
               "indexed": true,
               "internalType": "address",
               "name": "previousOwner",
@@ -28751,7 +28756,7 @@
           ],
           "name": "completeNavalAttack",
           "outputs": [],
-          "stateMutability": "pure",
+          "stateMutability": "nonpayable",
           "type": "function"
         },
         {

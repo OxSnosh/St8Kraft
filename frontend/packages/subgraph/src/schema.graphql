@@ -59,3 +59,25 @@ type SpyOperation @entity {
   attackType: BigInt!
   transactionHash: String!
 }
+
+type AirBattle @entity {
+  id: ID!
+  battleId: BigInt!
+  attackerId: BigInt!
+  defenderId: BigInt!
+  attackerFighterLosses: Bytes!
+  attackerBomberLosses: Bytes!
+  defenderFighterLosses: Bytes!
+  infrastructureDamage: BigInt!
+  tankDamage: BigInt!
+  cruiseMissileDamage: BigInt!
+  transactionHash: String!
+}
+
+type NavalAttack @entity {
+  id: ID!
+  attackerLosses: [BigInt!]!
+  defenderLosses: [BigInt!]!
+  attackId: BigInt!
+  transactionHash: String!
+}

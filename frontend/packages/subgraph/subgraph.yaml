@@ -102,3 +102,42 @@ dataSources:
             uint256,bool,uint256)
           handler: handleSpyOperation
       file: ./src/spyOperationMapping.ts
+  - kind: ethereum/contract
+    name: AdditionalAirBattle
+    network: localhost
+    source:
+      abi: AdditionalAirBattle
+      address: "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853"
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - SpyOperation
+      abis:
+        - name: AdditionalAirBattle
+          file: ./abis/localhost_AdditionalAirBattle.json
+      eventHandlers:
+        - event: AirAssaultCasualties(indexed uint256,indexed uint256,indexed
+            uint256,bytes,bytes,bytes,uint256,uint256,uint256)
+          handler: handleAirBattle
+      file: ./src/airBattleMapping.ts
+  - kind: ethereum/contract
+    name: NavalAttackContract
+    network: localhost
+    source:
+      abi: NavalAttackContract
+      address: "0x4826533B4897376654Bb4d4AD88B7faFD0C98528"
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - NavyAttack
+      abis:
+        - name: NavalAttackContract
+          file: ./abis/localhost_NavalAttackContract.json
+      eventHandlers:
+        - event: NavalAttackComplete(uint256[],uint256[],uint256)
+          handler: handleNavyAttack
+      file: ./src/navyAttackMapping.ts

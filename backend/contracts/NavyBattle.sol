@@ -490,7 +490,9 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256 cruisers = nav.getCruiserCount(attackerId);
         uint256 frigates = nav2.getFrigateCount(attackerId);
         uint256 destroyers = nav2.getDestroyerCount(attackerId);
-        BreakBlockade storage newBreakBlockade = breakBlockadeIdToBreakBlockade[breakBlockId];
+        BreakBlockade storage newBreakBlockade = breakBlockadeIdToBreakBlockade[
+            breakBlockId
+        ];
         newBreakBlockade.battleshipCount = battleships;
         newBreakBlockade.cruiserCount = cruisers;
         newBreakBlockade.frigateCount = frigates;
@@ -510,7 +512,10 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256 cruisers = nav.getCruiserCount(defenderId);
         uint256 frigates = nav2.getFrigateCount(defenderId);
         uint256 submarines = nav2.getSubmarineCount(defenderId);
-        DefendBlockade storage newDefendBlockade = breakBlockadeIdToDefendBlockade[breakBlockId];
+        DefendBlockade
+            storage newDefendBlockade = breakBlockadeIdToDefendBlockade[
+                breakBlockId
+            ];
         newDefendBlockade.battleshipCount = battleships;
         newDefendBlockade.cruiserCount = cruisers;
         newDefendBlockade.frigateCount = frigates;
@@ -694,6 +699,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     bytes32 navyAttackJobId;
     address oracleAddress;
     uint256 fee;
+
     // address linkAddress;
 
     function updateJobId(bytes32 _jobId) public onlyOwner {
@@ -1487,6 +1493,7 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     bytes32 navyAttackJobId;
     address oracleAddress;
     uint256 fee;
+
     // address linkAddress;
 
     function updateJobId(bytes32 _jobId) public onlyOwner {
@@ -1555,16 +1562,25 @@ contract NavalAttackContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         // console.log("arrived to for loop");
     }
 
+    event NavalAttackComplete(
+        uint256[] attackerLosses,
+        uint256[] defenderLosses,
+        uint256 battleId
+    );
+
     function completeNavalAttack(
         bytes32 requestId,
         uint256[] memory _attackerLosses,
         uint256[] memory _defenderLosses,
         uint256 battleId
-    ) public pure {
+    ) public {
         console.log(_defenderLosses[0]);
         console.log(_defenderLosses[1]);
         console.log(_defenderLosses[2]);
         console.log(battleId);
+
+        emit NavalAttackComplete(_attackerLosses, _defenderLosses, battleId);
+
         // for (uint256 i = 0; i <= losses + 1; i++) {
         //     console.log("loop", i);
         //     uint256 randomNumberForTeamSelection = (s_randomWords[i] %

@@ -571,9 +571,12 @@ contract AdditionalAirBattle is Ownable {
         uint256 indexed battleId,
         uint256 indexed attackerId,
         uint256 indexed defenderId,
-        uint256[] attackerFighterCasualties,
-        uint256[] attackerBomberCasualties,
-        uint256[] defenderFighterCasualties
+        bytes attackerFighterCasualties,
+        bytes attackerBomberCasualties,
+        bytes defenderFighterCasualties,
+        uint256 infrastructureDamage,
+        uint256 tankDamage,
+        uint256 cruiseMissileDamage
     );
 
     //@dev this function is only callable by the owner
@@ -617,6 +620,38 @@ contract AdditionalAirBattle is Ownable {
         uint256 cruiseMissileDamage,
         uint256 battleId
     ) public {
+        handleDamage(
+            defenderId,
+            infrastructureDamage,
+            tankDamage,
+            cruiseMissileDamage
+        );
+        handleCasualties(
+            attackerFighterCasualtiesBytes,
+            attackerBomberCasualtiesBytes,
+            defenderFighterCasualtiesBytes,
+            defenderId,
+            attackerId
+        );
+        emit AirAssaultCasualties(
+            battleId,
+            attackerId,
+            defenderId,
+            attackerFighterCasualtiesBytes,
+            attackerBomberCasualtiesBytes,
+            defenderFighterCasualtiesBytes,
+            infrastructureDamage,
+            tankDamage,
+            cruiseMissileDamage
+        );
+    }
+
+    function handleDamage(
+        uint256 defenderId,
+        uint256 infrastructureDamage,
+        uint256 tankDamage,
+        uint256 cruiseMissileDamage
+    ) internal {
         bool antiAir = won1.getAntiAirDefenseNewtwork(defenderId);
         if (antiAir) {
             infrastructureDamage = ((infrastructureDamage * 60) / 100);
@@ -635,30 +670,15 @@ contract AdditionalAirBattle is Ownable {
             defenderId,
             cruiseMissileDamage
         );
-        completeAirBattleCont(
-            // infrastructureDamage,
-            // tankDamage,
-            // cruiseMissileDamage,
-            battleId,
-            attackerFighterCasualtiesBytes,
-            attackerBomberCasualtiesBytes,
-            defenderFighterCasualtiesBytes,
-            defenderId,
-            attackerId
-        );
     }
 
-    function completeAirBattleCont(
-        // uint256 infrastructureDamage,
-        // uint256 tankDamage,
-        // uint256 cruiseMissileDamage,
-        uint256 battleId,
+    function handleCasualties(
         bytes memory attackerFighterCasualtiesBytes,
         bytes memory attackerBomberCasualtiesBytes,
         bytes memory defenderFighterCasualtiesBytes,
         uint256 defenderId,
         uint256 attackerId
-    ) public {
+    ) internal {
         uint256[] memory attackerFighterCasualties = abi.decode(
             attackerFighterCasualtiesBytes,
             (uint256[])
@@ -674,17 +694,5 @@ contract AdditionalAirBattle is Ownable {
         fighterLoss.decrementLosses(attackerFighterCasualties, attackerId);
         bomber.decrementBomberLosses(attackerBomberCasualties, attackerId);
         fighterLoss.decrementLosses(defenderFighterCasualties, defenderId);
-        AirBattleCasualties storage newAirBattle = airBattleIdToAirBattleCasualties[battleId];
-        newAirBattle.attackerFighterCasualties = attackerFighterCasualties;
-        newAirBattle.attackerBomberCasualties = attackerBomberCasualties;
-        newAirBattle.defenderFighterCasualties = defenderFighterCasualties;
-        emit AirAssaultCasualties(
-            battleId,
-            attackerId,
-            defenderId,
-            attackerFighterCasualties,
-            attackerBomberCasualties,
-            defenderFighterCasualties
-        );
     }
 }

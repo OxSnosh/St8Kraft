@@ -69,3 +69,26 @@ query GetSpyOperations {
     transactionHash
   }
 }
+
+query GetAirBattles {
+  airBattles {
+    id
+    battleId
+    attackerId
+    defenderId
+    attackerFighterLosses
+    attackerBomberLosses
+    defenderFighterLosses
+    infrastructureDamage
+    tankDamage
+    cruiseMissileDamage
+  }
+}
+
+query GetNavalAttacks {
+  navalAttacks {
+    attackerLosses
+    defenderLosses
+    attackId
+  }
+}

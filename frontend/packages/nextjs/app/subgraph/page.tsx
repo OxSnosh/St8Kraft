@@ -8,6 +8,7 @@ import GroundBattleTable from "./_components/GroundBattle";
 import CruiseMissileAttackTable from "./_components/CruiseMissileAttack";
 import NukeAttackTable from "./_components/NukeAttackTable";
 import SpyOperationsTable from "./_components/SpyOperations";
+import AirBattleTable from "./_components/AirBattle";
 
 const Subgraph: NextPage = () => {
   return (
@@ -104,6 +105,7 @@ const Subgraph: NextPage = () => {
         <CruiseMissileAttackTable />
         <NukeAttackTable />
         <SpyOperationsTable />
+        <AirBattleTable />
       </div>
     </>
   );
