@@ -89,3 +89,11 @@ type BreakBlockade @entity {
   defenderLosses: [BigInt!]!
   transactionHash: String!
 }
+
+type Blockade @entity {
+  id: ID!
+  battleId: BigInt!
+  attackerLosses: [BigInt!]!
+  defenderLosses: [BigInt!]!
+  transactionHash: String!
+}

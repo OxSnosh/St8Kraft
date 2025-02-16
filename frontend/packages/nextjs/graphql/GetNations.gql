@@ -100,3 +100,11 @@ query GetBreakBlockades {
     battleId
   }
 }
+
+query GetBlockades {
+  blockades {
+    battleId
+    attackerLosses
+    defenderLosses
+  }
+}

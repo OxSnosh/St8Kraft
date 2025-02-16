@@ -10,6 +10,7 @@ import NukeAttackTable from "./_components/NukeAttackTable";
 import SpyOperationsTable from "./_components/SpyOperations";
 import AirBattleTable from "./_components/AirBattle";
 import BreakBlockadeTable from "./_components/BreakBlockades";
+import BlockadeTable from "./_components/Blockades";
 
 const Subgraph: NextPage = () => {
   return (
@@ -108,6 +109,7 @@ const Subgraph: NextPage = () => {
         <SpyOperationsTable />
         <AirBattleTable />
         <BreakBlockadeTable />
+        <BlockadeTable/>
       </div>
     </>
   );

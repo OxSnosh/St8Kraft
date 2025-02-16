@@ -52,6 +52,8 @@ contract NavalBlockadeContract is Ownable, VRFConsumerBaseV2 {
         bool blockadeActive;
     }
 
+    event BlockadeCompleted(uint256[] attackerLosses, uint256[] defenderLosses, uint256 battleId);
+
     mapping(uint256 => Blockade) public blockadeIdToBlockade;
     // mapping(uint256 => uint256[]) public idDefenderToIdAttackerToActiveBlockadesAgainst;
     // mapping(uint256 => uint256[]) public idAttackerToIdDefenderToActiveBlockadesFor;
@@ -788,7 +790,7 @@ contract BreakBlocadeContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     ) public recordChainlinkFulfillment(requestId) {
 
         emit BreakBlockadeComlpete(_attackerLosses, _defenderLosses, battleId);
-        
+
         // console.log(_defenderLosses[0]);
         // console.log(_defenderLosses[1]);
         // console.log(_defenderLosses[2]);
