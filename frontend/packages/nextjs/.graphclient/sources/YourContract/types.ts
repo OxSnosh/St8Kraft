@@ -538,6 +538,106 @@ export type GroundBattle_orderBy =
   | 'defenderTankLosses'
   | 'transactionHash';
 
+export type Message = {
+  id: Scalars['ID']['output'];
+  sender: Scalars['Bytes']['output'];
+  reciever: Scalars['Bytes']['output'];
+  message: Scalars['String']['output'];
+  createdAt: Scalars['BigInt']['output'];
+  transactionHash: Scalars['String']['output'];
+};
+
+export type Message_filter = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_not?: InputMaybe<Scalars['ID']['input']>;
+  id_gt?: InputMaybe<Scalars['ID']['input']>;
+  id_lt?: InputMaybe<Scalars['ID']['input']>;
+  id_gte?: InputMaybe<Scalars['ID']['input']>;
+  id_lte?: InputMaybe<Scalars['ID']['input']>;
+  id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  sender?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_not?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_gt?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_lt?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_gte?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_lte?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  sender_not_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  sender_contains?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_not_contains?: InputMaybe<Scalars['Bytes']['input']>;
+  reciever?: InputMaybe<Scalars['Bytes']['input']>;
+  reciever_not?: InputMaybe<Scalars['Bytes']['input']>;
+  reciever_gt?: InputMaybe<Scalars['Bytes']['input']>;
+  reciever_lt?: InputMaybe<Scalars['Bytes']['input']>;
+  reciever_gte?: InputMaybe<Scalars['Bytes']['input']>;
+  reciever_lte?: InputMaybe<Scalars['Bytes']['input']>;
+  reciever_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  reciever_not_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  reciever_contains?: InputMaybe<Scalars['Bytes']['input']>;
+  reciever_not_contains?: InputMaybe<Scalars['Bytes']['input']>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  message_not?: InputMaybe<Scalars['String']['input']>;
+  message_gt?: InputMaybe<Scalars['String']['input']>;
+  message_lt?: InputMaybe<Scalars['String']['input']>;
+  message_gte?: InputMaybe<Scalars['String']['input']>;
+  message_lte?: InputMaybe<Scalars['String']['input']>;
+  message_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  message_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  message_contains?: InputMaybe<Scalars['String']['input']>;
+  message_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  message_not_contains?: InputMaybe<Scalars['String']['input']>;
+  message_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  message_starts_with?: InputMaybe<Scalars['String']['input']>;
+  message_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  message_not_starts_with?: InputMaybe<Scalars['String']['input']>;
+  message_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  message_ends_with?: InputMaybe<Scalars['String']['input']>;
+  message_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  message_not_ends_with?: InputMaybe<Scalars['String']['input']>;
+  message_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_not?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  createdAt_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  transactionHash?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<Message_filter>>>;
+  or?: InputMaybe<Array<InputMaybe<Message_filter>>>;
+};
+
+export type Message_orderBy =
+  | 'id'
+  | 'sender'
+  | 'reciever'
+  | 'message'
+  | 'createdAt'
+  | 'transactionHash';
+
 export type Nation = {
   id: Scalars['ID']['output'];
   nationId: Scalars['BigInt']['output'];
@@ -823,6 +923,94 @@ export type OrderDirection =
   | 'asc'
   | 'desc';
 
+export type Post = {
+  id: Scalars['ID']['output'];
+  sender: Scalars['Bytes']['output'];
+  post: Scalars['String']['output'];
+  createdAt: Scalars['BigInt']['output'];
+  transactionHash: Scalars['String']['output'];
+};
+
+export type Post_filter = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_not?: InputMaybe<Scalars['ID']['input']>;
+  id_gt?: InputMaybe<Scalars['ID']['input']>;
+  id_lt?: InputMaybe<Scalars['ID']['input']>;
+  id_gte?: InputMaybe<Scalars['ID']['input']>;
+  id_lte?: InputMaybe<Scalars['ID']['input']>;
+  id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  sender?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_not?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_gt?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_lt?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_gte?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_lte?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  sender_not_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  sender_contains?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_not_contains?: InputMaybe<Scalars['Bytes']['input']>;
+  post?: InputMaybe<Scalars['String']['input']>;
+  post_not?: InputMaybe<Scalars['String']['input']>;
+  post_gt?: InputMaybe<Scalars['String']['input']>;
+  post_lt?: InputMaybe<Scalars['String']['input']>;
+  post_gte?: InputMaybe<Scalars['String']['input']>;
+  post_lte?: InputMaybe<Scalars['String']['input']>;
+  post_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  post_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  post_contains?: InputMaybe<Scalars['String']['input']>;
+  post_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  post_not_contains?: InputMaybe<Scalars['String']['input']>;
+  post_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  post_starts_with?: InputMaybe<Scalars['String']['input']>;
+  post_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  post_not_starts_with?: InputMaybe<Scalars['String']['input']>;
+  post_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  post_ends_with?: InputMaybe<Scalars['String']['input']>;
+  post_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  post_not_ends_with?: InputMaybe<Scalars['String']['input']>;
+  post_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_not?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  createdAt_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  transactionHash?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<Post_filter>>>;
+  or?: InputMaybe<Array<InputMaybe<Post_filter>>>;
+};
+
+export type Post_orderBy =
+  | 'id'
+  | 'sender'
+  | 'post'
+  | 'createdAt'
+  | 'transactionHash';
+
 export type Query = {
   nation?: Maybe<Nation>;
   nations: Array<Nation>;
@@ -844,6 +1032,10 @@ export type Query = {
   breakBlockades: Array<BreakBlockade>;
   blockade?: Maybe<Blockade>;
   blockades: Array<Blockade>;
+  message?: Maybe<Message>;
+  messages: Array<Message>;
+  post?: Maybe<Post>;
+  posts: Array<Post>;
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
 };
@@ -1029,6 +1221,42 @@ export type QueryblockadesArgs = {
 };
 
 
+export type QuerymessageArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QuerymessagesArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Message_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<Message_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QuerypostArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QuerypostsArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Post_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<Post_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
 export type Query_metaArgs = {
   block?: InputMaybe<Block_height>;
 };
@@ -1144,6 +1372,10 @@ export type Subscription = {
   breakBlockades: Array<BreakBlockade>;
   blockade?: Maybe<Blockade>;
   blockades: Array<Blockade>;
+  message?: Maybe<Message>;
+  messages: Array<Message>;
+  post?: Maybe<Post>;
+  posts: Array<Post>;
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
 };
@@ -1329,6 +1561,42 @@ export type SubscriptionblockadesArgs = {
 };
 
 
+export type SubscriptionmessageArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionmessagesArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Message_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<Message_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionpostArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionpostsArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Post_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<Post_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
 export type Subscription_metaArgs = {
   block?: InputMaybe<Block_height>;
 };
@@ -1479,6 +1747,14 @@ export type _SubgraphErrorPolicy_ =
   blockade: InContextSdkMethod<Query['blockade'], QueryblockadeArgs, MeshContext>,
   /** null **/
   blockades: InContextSdkMethod<Query['blockades'], QueryblockadesArgs, MeshContext>,
+  /** null **/
+  message: InContextSdkMethod<Query['message'], QuerymessageArgs, MeshContext>,
+  /** null **/
+  messages: InContextSdkMethod<Query['messages'], QuerymessagesArgs, MeshContext>,
+  /** null **/
+  post: InContextSdkMethod<Query['post'], QuerypostArgs, MeshContext>,
+  /** null **/
+  posts: InContextSdkMethod<Query['posts'], QuerypostsArgs, MeshContext>,
   /** Access to subgraph metadata **/
   _meta: InContextSdkMethod<Query['_meta'], Query_metaArgs, MeshContext>
   };
@@ -1528,6 +1804,14 @@ export type _SubgraphErrorPolicy_ =
   blockade: InContextSdkMethod<Subscription['blockade'], SubscriptionblockadeArgs, MeshContext>,
   /** null **/
   blockades: InContextSdkMethod<Subscription['blockades'], SubscriptionblockadesArgs, MeshContext>,
+  /** null **/
+  message: InContextSdkMethod<Subscription['message'], SubscriptionmessageArgs, MeshContext>,
+  /** null **/
+  messages: InContextSdkMethod<Subscription['messages'], SubscriptionmessagesArgs, MeshContext>,
+  /** null **/
+  post: InContextSdkMethod<Subscription['post'], SubscriptionpostArgs, MeshContext>,
+  /** null **/
+  posts: InContextSdkMethod<Subscription['posts'], SubscriptionpostsArgs, MeshContext>,
   /** Access to subgraph metadata **/
   _meta: InContextSdkMethod<Subscription['_meta'], Subscription_metaArgs, MeshContext>
   };

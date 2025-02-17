@@ -11,6 +11,9 @@ import SpyOperationsTable from "./_components/SpyOperations";
 import AirBattleTable from "./_components/AirBattle";
 import BreakBlockadeTable from "./_components/BreakBlockades";
 import BlockadeTable from "./_components/Blockades";
+import PostTable from "./_components/Posts";
+import {RecievedMessagesTable} from "./_components/Messages";
+import {SentMessagesTable} from "./_components/Messages";
 
 const Subgraph: NextPage = () => {
   return (
@@ -45,10 +48,11 @@ const Subgraph: NextPage = () => {
           </p>
         </div>
         
-        {/* Video Section */}
+        {/* GIF Section */}
         <div className="flex justify-center mt-8">
-          <video src="/Sonar_radar.mp4" autoPlay loop muted className="w-96 h-auto rounded-lg shadow-lg" />
+          <img src="/tenorgif.gif" alt="Animated GIF" className="w-[1500px] h-[1500px] rounded-lg shadow-lg object-cover" />
         </div>
+
 
         <div className="flex-grow bg-base-300 w-full mt-16 px-8 py-12">
           <div className="flex justify-center items-center gap-12 flex-col sm:flex-row">
@@ -91,6 +95,9 @@ const Subgraph: NextPage = () => {
         <AirBattleTable />
         <BreakBlockadeTable />
         <BlockadeTable/>
+        <PostTable />
+        <RecievedMessagesTable />
+        <SentMessagesTable />
       </div>
     </>
   );

@@ -179,3 +179,25 @@ dataSources:
         - event: BlockadeCompleted(uint256[],uint256[],uint256)
           handler: handleBlockade
       file: ./src/blockadeMapping.ts
+  - kind: ethereum/contract
+    name: Messenger
+    network: localhost
+    source:
+      abi: Messenger
+      address: "0x7969c5eD335650692Bc04293B07F5BF2e7A673C0"
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Message
+        - Post
+      abis:
+        - name: Messenger
+          file: ./abis/localhost_Messenger.json
+      eventHandlers:
+        - event: MessageSent(indexed address,indexed address,string)
+          handler: handleMessage
+        - event: PostSent(indexed address,string)
+          handler: handlePost
+      file: ./src/messengerMapping.ts

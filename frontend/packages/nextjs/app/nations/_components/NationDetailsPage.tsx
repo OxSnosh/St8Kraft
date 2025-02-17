@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
-import { usePublicClient } from "wagmi";
+import { usePublicClient, useAccount, useWriteContract } from "wagmi";
 
 import { getResources, getBonusResources, getTradingPartners } from '../../../utils/resources';
 import { getImprovements } from '../../../utils/improvements';
@@ -26,6 +26,9 @@ import { getBombers } from "../../../utils/bombers"
 import { getNavy } from "../../../utils/navy"
 import { getCruiseMissileCount, getNukeCount } from "~~/utils/missiles";
 import { getSpyCount } from "~~/utils/spies";
+import { checkOwnership } from "~~/utils/countryMinter";
+import PostsTable from "../../../app/subgraph/_components/Posts";
+import { handlePost } from '../../../../subgraph/src/messengerMapping';
 
 type NationDetails = {
   nationName: string | null;
@@ -94,6 +97,7 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
   const searchParams = useSearchParams();
   const publicClient = usePublicClient();
   const contractsData = useAllContracts();
+  const { address: walletAddress } = useAccount();
   const countryParametersContract = contractsData?.CountryParametersContract;
   const treasuryContract = contractsData?.TreasuryContract;
   const taxesContract = contractsData?.TaxesContract;
@@ -124,11 +128,56 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
   const [nationDetails, setNationDetails] = useState<NationDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [showManageTrades, setShowManageTrades] = useState(false);
+  const [message, setMessage] = useState("");
+  const [isOwner, setIsOwner] = useState(false);
 
   const handleProposeTradeClick = () => {
     setShowManageTrades(true);
     if (onPropeseTrade) {
       onPropeseTrade();
+    }
+  };
+
+  useEffect(() => {
+    const fetchOwnership = async () => {
+      if (!walletAddress || !publicClient || !contractsData?.CountryMinter) return;
+      const owner = await checkOwnership(nationId, publicClient, contractsData.CountryMinter);
+      setIsOwner(owner);
+    };
+
+    fetchOwnership();
+  }, [walletAddress, nationId, publicClient, contractsData]);
+
+  const checkOwnership = async (tokenId: string, publicClient: any, countryMinterContract: any) => {
+    if (!publicClient || !countryMinterContract || !tokenId) {
+      return;
+    }
+
+    const owner = await publicClient.readContract({
+      abi: countryMinterContract.abi,
+      address: countryMinterContract.address,
+      functionName: "checkOwnership",
+      args: [tokenId, walletAddress],
+    });
+
+    return owner 
+  }
+
+  const { writeContractAsync } = useWriteContract();
+
+  const handlePostMessage = async () => {
+    if (!message) return;
+    try {
+      await writeContractAsync({
+        abi: contractsData.Messenger.abi,
+        address: contractsData.Messenger.address,
+        functionName: "postMessage",
+        args: [message],
+      });
+      setMessage("");
+      window.location.reload();
+    } catch (err) {
+      console.error("Error posting message:", err);
     }
   };
 
@@ -592,317 +641,339 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
   }
 
   return (
-      <div className="w-5/6 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold">{nationDetails.nationName}</h1>
-            <div className="space-x-2">
-              <button
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
-              onClick={handleProposeTradeClick} // Trigger the parent's handler
-              >
-                Propose Trade
-              </button>
-              <button className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600">Send Aid</button>
-              <button className="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600">Declare War</button>
-            </div>
-        </div>
-        <table className="table-auto border-collapse border border-gray-300 w-full text-sm mb-6 table-fixed">
-          <colgroup>
-            <col style={{ width: "40%" }} />
-            <col style={{ width: "60%" }} />
-          </colgroup>
-          <tbody>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Ruler Name:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.rulerName || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Capital City:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.capitalCity || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Slogan:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.nationSlogan || "No slogan available"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Day Created:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.dayCreated || "Unknown"}</td>
-            </tr>
-          </tbody>
-        </table>
+      <div className="flex w-full p-6">
+        <div className="w-9/12 pr-4">
+          <div>
+            <h1 className="text-2xl font-bold">{nationDetails.nationName}</h1>
+              <div className="space-x-2">
+                <button
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
+                onClick={handleProposeTradeClick} // Trigger the parent's handler
+                >
+                  Propose Trade
+                </button>
+                <button className="bg-green-500 text-white px-4 py-2 rounded-lg shadow hover:bg-green-600">Send Aid</button>
+                <button className="bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600">Declare War</button>
+              </div>
+          </div>
+          <table className="table-auto border-collapse border border-gray-300 w-full text-sm mb-6 table-fixed">
+            <colgroup>
+              <col style={{ width: "40%" }} />
+              <col style={{ width: "60%" }} />
+            </colgroup>
+            <tbody>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Ruler Name:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.rulerName || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Capital City:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.capitalCity || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Slogan:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.nationSlogan || "No slogan available"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Day Created:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.dayCreated || "Unknown"}</td>
+              </tr>
+            </tbody>
+          </table>
 
-        <h2 className="text-lg font-semibold mb-4">Government Information</h2>
-        <table className="table-auto border-collapse border border-gray-300 w-full text-sm mb-6 table-fixed">
-          <colgroup>
-            <col style={{ width: "40%" }} />
-            <col style={{ width: "60%" }} />
-          </colgroup>
-          <tbody>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Alliance:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.alliance || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Team:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.team || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Resources:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.resources?.join(", ") || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Bonus Resources:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.bonusResources?.join(", ") || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Trading Partners:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.tradingPartners?.join(", ") || "None"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Government Type:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.government || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">National Religion:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.religion || "Unknown"}</td>
-            </tr>
-          </tbody>
-        </table>
+          <h2 className="text-lg font-semibold mb-4">Government Information</h2>
+          <table className="table-auto border-collapse border border-gray-300 w-full text-sm mb-6 table-fixed">
+            <colgroup>
+              <col style={{ width: "40%" }} />
+              <col style={{ width: "60%" }} />
+            </colgroup>
+            <tbody>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Alliance:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.alliance || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Team:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.team || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Resources:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.resources?.join(", ") || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Bonus Resources:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.bonusResources?.join(", ") || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Trading Partners:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.tradingPartners?.join(", ") || "None"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Government Type:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.government || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">National Religion:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.religion || "Unknown"}</td>
+              </tr>
+            </tbody>
+          </table>
 
-        <h2 className="text-lg font-semibold mb-4">Treasury</h2>
-        <table className="table-auto border-collapse border border-gray-300 w-full text-sm mb-6 table-fixed">
-          <colgroup>
-            <col style={{ width: "40%" }} />
-            <col style={{ width: "60%" }} />
-          </colgroup>
-          <tbody>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Nation Balance:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.balance ? Math.floor(Number(nationDetails.balance)) : "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Happiness:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.happiness || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Daily Income Per Citizen:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.dailyIncome || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Tax Rate:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.taxRate || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Taxable Population:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.taxablePopulation || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Taxes Collectible:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.taxesCollectible || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Last Tax Collection:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.lastTaxCollection || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Bills Payable:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.billsPayable || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Last Bill Payment:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.lastBillPayment || "Unknown"}</td>
-            </tr>
-          </tbody>
-        </table>
+          <h2 className="text-lg font-semibold mb-4">Treasury</h2>
+          <table className="table-auto border-collapse border border-gray-300 w-full text-sm mb-6 table-fixed">
+            <colgroup>
+              <col style={{ width: "40%" }} />
+              <col style={{ width: "60%" }} />
+            </colgroup>
+            <tbody>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Nation Balance:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.balance ? Math.floor(Number(nationDetails.balance)) : "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Happiness:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.happiness || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Daily Income Per Citizen:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.dailyIncome || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Tax Rate:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.taxRate || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Taxable Population:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.taxablePopulation || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Taxes Collectible:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.taxesCollectible || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Last Tax Collection:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.lastTaxCollection || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Bills Payable:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.billsPayable || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Last Bill Payment:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.lastBillPayment || "Unknown"}</td>
+              </tr>
+            </tbody>
+          </table>
 
-        <h2 className="txt-lg font-semibold mb-4">Infrastructure</h2>
-        <table className="table-auto border-collapse border border-gray-300 w-full text-sm mb-6 table-fixed">
-          <colgroup>
-            <col style={{ width: "40%" }} />
-            <col style={{ width: "60%" }} />
-          </colgroup>
-          <tbody>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Technology Count:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.technologyCount || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Infrastructure Count:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.infrastructureCount || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Land Count:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.landCount || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Area of Influence:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.areaOfInfluence || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Total Population:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.totalPopulation || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Population Density:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.populationDensity || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Taxable Population:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.taxablePopulation || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Criminal Count:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.criminalCount || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Crime Prevention Score:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.crimePreventionScore || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Crime Index:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.crimeIndex || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Literacy Rate:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.literacyRate || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Rehabilitated Citizens:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.rehabilitatedCitizens || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Incarcerated Citizens:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.incarceratedCitizens || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Improvements:</td>
-              <td className="border border-gray-300 px-4 py-2">
-                {nationDetails.improvements.map((improvement) => (
-                  <div key={improvement.name}>
-                    {improvement.improvementCount.toString()} {improvement.name}, 
-                  </div>
-                ))}
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Wonders:</td>
-              <td className="border border-gray-300 px-4 py-2">
-                {nationDetails.wonders.map((wonder) => (
-                  <div key={wonder.name}>
-                    {wonder.name},
-                  </div>
-                ))}
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Environment Score:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.environmentScore || "Unknown"}</td>
-            </tr>
-          </tbody>
-        </table>
-        <h2 className="txt-lg font-semibold mb-4">Military</h2>
-        <table className="table-auto border-collapse border border-gray-300 w-full text-sm mb-6 table-fixed">
-          <colgroup>
-            <col style={{ width: "40%" }} />
-            <col style={{ width: "60%" }} />
-          </colgroup>
-          <tbody>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Nation Strenght:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.strength || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">War/Peace Preference:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.warPeacePreference || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Defcon Level:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.defconLevel || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Threat Level:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.threatLevel || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Soldier Count:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.soldierCount || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Defending Soldier Count:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.defendingSoldierCount || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Defending Soldier Efficiency Modifier:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.getDefendingSoldierEfficiencyModifier ? `${nationDetails.getDefendingSoldierEfficiencyModifier}%` : "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Deployed Soldier Count:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.deployedSoldierCount || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Tank Count:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.tankCount || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Defending Tank Count:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.defendingTankCount || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Deployed Tank Count:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.deployedTankCount || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Fighters:</td>
-              <td className="border border-gray-300 px-4 py-2">
-                {nationDetails.fighters.map((fighter) => (
-                  <div key={fighter.name}>
-                    {fighter.fighterCount.toString()} {fighter.name},
-                  </div>
-                ))}
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Bombers:</td>
-              <td className="border border-gray-300 px-4 py-2">
-                {nationDetails.bombers.map((bomber) => (
-                  <div key={bomber.name}>
-                    {bomber.bomberCount.toString()} {bomber.name},
-                  </div>
-                ))}
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Navy:</td>
-              <td className="border border-gray-300 px-4 py-2">
-                {nationDetails.navy.map((navy) => (
-                  <div key={navy.name}>
-                    {navy.navyCount.toString()} {navy.name},
-                  </div>
-                ))}
-              </td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Cruise Missiles:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.cruiseMissiles || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Nukes:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.nukes || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Spies:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.spies || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Soldier Casualties:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.soldierCasualties || "Unknown"}</td>
-            </tr>
-            <tr>
-              <td className="border border-gray-300 px-4 py-2 font-semibold">Tank Casualties:</td>
-              <td className="border border-gray-300 px-4 py-2">{nationDetails.tankCasualties || "Unknown"}</td>
-            </tr>
-          </tbody>
-        </table>
+          <h2 className="txt-lg font-semibold mb-4">Infrastructure</h2>
+          <table className="table-auto border-collapse border border-gray-300 w-full text-sm mb-6 table-fixed">
+            <colgroup>
+              <col style={{ width: "40%" }} />
+              <col style={{ width: "60%" }} />
+            </colgroup>
+            <tbody>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Technology Count:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.technologyCount || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Infrastructure Count:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.infrastructureCount || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Land Count:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.landCount || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Area of Influence:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.areaOfInfluence || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Total Population:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.totalPopulation || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Population Density:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.populationDensity || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Taxable Population:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.taxablePopulation || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Criminal Count:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.criminalCount || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Crime Prevention Score:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.crimePreventionScore || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Crime Index:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.crimeIndex || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Literacy Rate:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.literacyRate || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Rehabilitated Citizens:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.rehabilitatedCitizens || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Incarcerated Citizens:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.incarceratedCitizens || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Improvements:</td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {nationDetails.improvements.map((improvement) => (
+                    <div key={improvement.name}>
+                      {improvement.improvementCount.toString()} {improvement.name}, 
+                    </div>
+                  ))}
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Wonders:</td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {nationDetails.wonders.map((wonder) => (
+                    <div key={wonder.name}>
+                      {wonder.name},
+                    </div>
+                  ))}
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Environment Score:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.environmentScore || "Unknown"}</td>
+              </tr>
+            </tbody>
+          </table>
+          <h2 className="txt-lg font-semibold mb-4">Military</h2>
+          <table className="table-auto border-collapse border border-gray-300 w-full text-sm mb-6 table-fixed">
+            <colgroup>
+              <col style={{ width: "40%" }} />
+              <col style={{ width: "60%" }} />
+            </colgroup>
+            <tbody>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Nation Strenght:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.strength || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">War/Peace Preference:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.warPeacePreference || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Defcon Level:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.defconLevel || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Threat Level:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.threatLevel || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Soldier Count:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.soldierCount || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Defending Soldier Count:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.defendingSoldierCount || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Defending Soldier Efficiency Modifier:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.getDefendingSoldierEfficiencyModifier ? `${nationDetails.getDefendingSoldierEfficiencyModifier}%` : "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Deployed Soldier Count:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.deployedSoldierCount || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Tank Count:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.tankCount || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Defending Tank Count:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.defendingTankCount || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Deployed Tank Count:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.deployedTankCount || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Fighters:</td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {nationDetails.fighters.map((fighter) => (
+                    <div key={fighter.name}>
+                      {fighter.fighterCount.toString()} {fighter.name},
+                    </div>
+                  ))}
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Bombers:</td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {nationDetails.bombers.map((bomber) => (
+                    <div key={bomber.name}>
+                      {bomber.bomberCount.toString()} {bomber.name},
+                    </div>
+                  ))}
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Navy:</td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {nationDetails.navy.map((navy) => (
+                    <div key={navy.name}>
+                      {navy.navyCount.toString()} {navy.name},
+                    </div>
+                  ))}
+                </td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Cruise Missiles:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.cruiseMissiles || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Nukes:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.nukes || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Spies:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.spies || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Soldier Casualties:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.soldierCasualties || "Unknown"}</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 px-4 py-2 font-semibold">Tank Casualties:</td>
+                <td className="border border-gray-300 px-4 py-2">{nationDetails.tankCasualties || "Unknown"}</td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+          <div className="w-3/12 pl-4 border-l border-gray-300">
+            <h2 className="text-lg font-semibold mb-4">Nation Posts</h2>
+            <PostsTable />
+            {isOwner && (
+              <div className="mt-4">
+                <textarea
+                  className="w-full p-2 border rounded-lg"
+                  placeholder="Create post..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                />
+                <button 
+                  className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600"
+                  onClick={handlePostMessage}
+                >
+                  Create Post
+                </button>
+              </div>
+            )}
+          </div>
       </div>
   );
 };

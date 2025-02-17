@@ -229,6 +229,10 @@ const externalContracts: GenericContractsDeclaration = {
       address: metadata.HARDHAT.wonderscontract4.address as Address,
       abi: fixAbi(metadata.HARDHAT.wonderscontract4.ABI)
     },    
+    Messenger : {
+      address: metadata.HARDHAT.messenger.address as Address,
+      abi: fixAbi(metadata.HARDHAT.messenger.ABI)
+    },
   },
 };
 

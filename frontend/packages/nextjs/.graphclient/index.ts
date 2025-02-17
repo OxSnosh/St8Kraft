@@ -561,6 +561,106 @@ export type GroundBattle_orderBy =
   | 'defenderTankLosses'
   | 'transactionHash';
 
+export type Message = {
+  id: Scalars['ID']['output'];
+  sender: Scalars['Bytes']['output'];
+  reciever: Scalars['Bytes']['output'];
+  message: Scalars['String']['output'];
+  createdAt: Scalars['BigInt']['output'];
+  transactionHash: Scalars['String']['output'];
+};
+
+export type Message_filter = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_not?: InputMaybe<Scalars['ID']['input']>;
+  id_gt?: InputMaybe<Scalars['ID']['input']>;
+  id_lt?: InputMaybe<Scalars['ID']['input']>;
+  id_gte?: InputMaybe<Scalars['ID']['input']>;
+  id_lte?: InputMaybe<Scalars['ID']['input']>;
+  id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  sender?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_not?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_gt?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_lt?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_gte?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_lte?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  sender_not_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  sender_contains?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_not_contains?: InputMaybe<Scalars['Bytes']['input']>;
+  reciever?: InputMaybe<Scalars['Bytes']['input']>;
+  reciever_not?: InputMaybe<Scalars['Bytes']['input']>;
+  reciever_gt?: InputMaybe<Scalars['Bytes']['input']>;
+  reciever_lt?: InputMaybe<Scalars['Bytes']['input']>;
+  reciever_gte?: InputMaybe<Scalars['Bytes']['input']>;
+  reciever_lte?: InputMaybe<Scalars['Bytes']['input']>;
+  reciever_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  reciever_not_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  reciever_contains?: InputMaybe<Scalars['Bytes']['input']>;
+  reciever_not_contains?: InputMaybe<Scalars['Bytes']['input']>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  message_not?: InputMaybe<Scalars['String']['input']>;
+  message_gt?: InputMaybe<Scalars['String']['input']>;
+  message_lt?: InputMaybe<Scalars['String']['input']>;
+  message_gte?: InputMaybe<Scalars['String']['input']>;
+  message_lte?: InputMaybe<Scalars['String']['input']>;
+  message_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  message_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  message_contains?: InputMaybe<Scalars['String']['input']>;
+  message_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  message_not_contains?: InputMaybe<Scalars['String']['input']>;
+  message_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  message_starts_with?: InputMaybe<Scalars['String']['input']>;
+  message_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  message_not_starts_with?: InputMaybe<Scalars['String']['input']>;
+  message_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  message_ends_with?: InputMaybe<Scalars['String']['input']>;
+  message_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  message_not_ends_with?: InputMaybe<Scalars['String']['input']>;
+  message_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_not?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  createdAt_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  transactionHash?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<Message_filter>>>;
+  or?: InputMaybe<Array<InputMaybe<Message_filter>>>;
+};
+
+export type Message_orderBy =
+  | 'id'
+  | 'sender'
+  | 'reciever'
+  | 'message'
+  | 'createdAt'
+  | 'transactionHash';
+
 export type Nation = {
   id: Scalars['ID']['output'];
   nationId: Scalars['BigInt']['output'];
@@ -846,6 +946,94 @@ export type OrderDirection =
   | 'asc'
   | 'desc';
 
+export type Post = {
+  id: Scalars['ID']['output'];
+  sender: Scalars['Bytes']['output'];
+  post: Scalars['String']['output'];
+  createdAt: Scalars['BigInt']['output'];
+  transactionHash: Scalars['String']['output'];
+};
+
+export type Post_filter = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_not?: InputMaybe<Scalars['ID']['input']>;
+  id_gt?: InputMaybe<Scalars['ID']['input']>;
+  id_lt?: InputMaybe<Scalars['ID']['input']>;
+  id_gte?: InputMaybe<Scalars['ID']['input']>;
+  id_lte?: InputMaybe<Scalars['ID']['input']>;
+  id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  sender?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_not?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_gt?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_lt?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_gte?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_lte?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  sender_not_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
+  sender_contains?: InputMaybe<Scalars['Bytes']['input']>;
+  sender_not_contains?: InputMaybe<Scalars['Bytes']['input']>;
+  post?: InputMaybe<Scalars['String']['input']>;
+  post_not?: InputMaybe<Scalars['String']['input']>;
+  post_gt?: InputMaybe<Scalars['String']['input']>;
+  post_lt?: InputMaybe<Scalars['String']['input']>;
+  post_gte?: InputMaybe<Scalars['String']['input']>;
+  post_lte?: InputMaybe<Scalars['String']['input']>;
+  post_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  post_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  post_contains?: InputMaybe<Scalars['String']['input']>;
+  post_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  post_not_contains?: InputMaybe<Scalars['String']['input']>;
+  post_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  post_starts_with?: InputMaybe<Scalars['String']['input']>;
+  post_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  post_not_starts_with?: InputMaybe<Scalars['String']['input']>;
+  post_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  post_ends_with?: InputMaybe<Scalars['String']['input']>;
+  post_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  post_not_ends_with?: InputMaybe<Scalars['String']['input']>;
+  post_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_not?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  createdAt_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  createdAt_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  transactionHash?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lt?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_gte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_lte?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_not_in?: InputMaybe<Array<Scalars['String']['input']>>;
+  transactionHash_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_contains_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with?: InputMaybe<Scalars['String']['input']>;
+  transactionHash_not_ends_with_nocase?: InputMaybe<Scalars['String']['input']>;
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<Post_filter>>>;
+  or?: InputMaybe<Array<InputMaybe<Post_filter>>>;
+};
+
+export type Post_orderBy =
+  | 'id'
+  | 'sender'
+  | 'post'
+  | 'createdAt'
+  | 'transactionHash';
+
 export type Query = {
   nation?: Maybe<Nation>;
   nations: Array<Nation>;
@@ -867,6 +1055,10 @@ export type Query = {
   breakBlockades: Array<BreakBlockade>;
   blockade?: Maybe<Blockade>;
   blockades: Array<Blockade>;
+  message?: Maybe<Message>;
+  messages: Array<Message>;
+  post?: Maybe<Post>;
+  posts: Array<Post>;
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
 };
@@ -1052,6 +1244,42 @@ export type QueryblockadesArgs = {
 };
 
 
+export type QuerymessageArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QuerymessagesArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Message_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<Message_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QuerypostArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QuerypostsArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Post_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<Post_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
 export type Query_metaArgs = {
   block?: InputMaybe<Block_height>;
 };
@@ -1167,6 +1395,10 @@ export type Subscription = {
   breakBlockades: Array<BreakBlockade>;
   blockade?: Maybe<Blockade>;
   blockades: Array<Blockade>;
+  message?: Maybe<Message>;
+  messages: Array<Message>;
+  post?: Maybe<Post>;
+  posts: Array<Post>;
   /** Access to subgraph metadata */
   _meta?: Maybe<_Meta_>;
 };
@@ -1347,6 +1579,42 @@ export type SubscriptionblockadesArgs = {
   orderBy?: InputMaybe<Blockade_orderBy>;
   orderDirection?: InputMaybe<OrderDirection>;
   where?: InputMaybe<Blockade_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionmessageArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionmessagesArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Message_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<Message_filter>;
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionpostArgs = {
+  id: Scalars['ID']['input'];
+  block?: InputMaybe<Block_height>;
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionpostsArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Post_orderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<Post_filter>;
   block?: InputMaybe<Block_height>;
   subgraphError?: _SubgraphErrorPolicy_;
 };
@@ -1572,6 +1840,9 @@ export type ResolversTypes = ResolversObject<{
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Int8: ResolverTypeWrapper<Scalars['Int8']['output']>;
+  Message: ResolverTypeWrapper<Message>;
+  Message_filter: Message_filter;
+  Message_orderBy: Message_orderBy;
   Nation: ResolverTypeWrapper<Nation>;
   Nation_filter: Nation_filter;
   Nation_orderBy: Nation_orderBy;
@@ -1582,6 +1853,9 @@ export type ResolversTypes = ResolversObject<{
   NukeAttack_filter: NukeAttack_filter;
   NukeAttack_orderBy: NukeAttack_orderBy;
   OrderDirection: OrderDirection;
+  Post: ResolverTypeWrapper<Post>;
+  Post_filter: Post_filter;
+  Post_orderBy: Post_orderBy;
   Query: ResolverTypeWrapper<{}>;
   SpyOperation: ResolverTypeWrapper<SpyOperation>;
   SpyOperation_filter: SpyOperation_filter;
@@ -1618,12 +1892,16 @@ export type ResolversParentTypes = ResolversObject<{
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
   Int8: Scalars['Int8']['output'];
+  Message: Message;
+  Message_filter: Message_filter;
   Nation: Nation;
   Nation_filter: Nation_filter;
   NavalAttack: NavalAttack;
   NavalAttack_filter: NavalAttack_filter;
   NukeAttack: NukeAttack;
   NukeAttack_filter: NukeAttack_filter;
+  Post: Post;
+  Post_filter: Post_filter;
   Query: {};
   SpyOperation: SpyOperation;
   SpyOperation_filter: SpyOperation_filter;
@@ -1726,6 +2004,16 @@ export interface Int8ScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
   name: 'Int8';
 }
 
+export type MessageResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Message'] = ResolversParentTypes['Message']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  sender?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  reciever?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  transactionHash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type NationResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Nation'] = ResolversParentTypes['Nation']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   nationId?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
@@ -1757,6 +2045,15 @@ export type NukeAttackResolvers<ContextType = MeshContext, ParentType extends Re
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type PostResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  sender?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  post?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  transactionHash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type QueryResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   nation?: Resolver<Maybe<ResolversTypes['Nation']>, ParentType, ContextType, RequireFields<QuerynationArgs, 'id' | 'subgraphError'>>;
   nations?: Resolver<Array<ResolversTypes['Nation']>, ParentType, ContextType, RequireFields<QuerynationsArgs, 'skip' | 'first' | 'subgraphError'>>;
@@ -1778,6 +2075,10 @@ export type QueryResolvers<ContextType = MeshContext, ParentType extends Resolve
   breakBlockades?: Resolver<Array<ResolversTypes['BreakBlockade']>, ParentType, ContextType, RequireFields<QuerybreakBlockadesArgs, 'skip' | 'first' | 'subgraphError'>>;
   blockade?: Resolver<Maybe<ResolversTypes['Blockade']>, ParentType, ContextType, RequireFields<QueryblockadeArgs, 'id' | 'subgraphError'>>;
   blockades?: Resolver<Array<ResolversTypes['Blockade']>, ParentType, ContextType, RequireFields<QueryblockadesArgs, 'skip' | 'first' | 'subgraphError'>>;
+  message?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<QuerymessageArgs, 'id' | 'subgraphError'>>;
+  messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<QuerymessagesArgs, 'skip' | 'first' | 'subgraphError'>>;
+  post?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType, RequireFields<QuerypostArgs, 'id' | 'subgraphError'>>;
+  posts?: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType, RequireFields<QuerypostsArgs, 'skip' | 'first' | 'subgraphError'>>;
   _meta?: Resolver<Maybe<ResolversTypes['_Meta_']>, ParentType, ContextType, Partial<Query_metaArgs>>;
 }>;
 
@@ -1813,6 +2114,10 @@ export type SubscriptionResolvers<ContextType = MeshContext, ParentType extends 
   breakBlockades?: SubscriptionResolver<Array<ResolversTypes['BreakBlockade']>, "breakBlockades", ParentType, ContextType, RequireFields<SubscriptionbreakBlockadesArgs, 'skip' | 'first' | 'subgraphError'>>;
   blockade?: SubscriptionResolver<Maybe<ResolversTypes['Blockade']>, "blockade", ParentType, ContextType, RequireFields<SubscriptionblockadeArgs, 'id' | 'subgraphError'>>;
   blockades?: SubscriptionResolver<Array<ResolversTypes['Blockade']>, "blockades", ParentType, ContextType, RequireFields<SubscriptionblockadesArgs, 'skip' | 'first' | 'subgraphError'>>;
+  message?: SubscriptionResolver<Maybe<ResolversTypes['Message']>, "message", ParentType, ContextType, RequireFields<SubscriptionmessageArgs, 'id' | 'subgraphError'>>;
+  messages?: SubscriptionResolver<Array<ResolversTypes['Message']>, "messages", ParentType, ContextType, RequireFields<SubscriptionmessagesArgs, 'skip' | 'first' | 'subgraphError'>>;
+  post?: SubscriptionResolver<Maybe<ResolversTypes['Post']>, "post", ParentType, ContextType, RequireFields<SubscriptionpostArgs, 'id' | 'subgraphError'>>;
+  posts?: SubscriptionResolver<Array<ResolversTypes['Post']>, "posts", ParentType, ContextType, RequireFields<SubscriptionpostsArgs, 'skip' | 'first' | 'subgraphError'>>;
   _meta?: SubscriptionResolver<Maybe<ResolversTypes['_Meta_']>, "_meta", ParentType, ContextType, Partial<Subscription_metaArgs>>;
 }>;
 
@@ -1849,9 +2154,11 @@ export type Resolvers<ContextType = MeshContext> = ResolversObject<{
   CruiseMissileAttack?: CruiseMissileAttackResolvers<ContextType>;
   GroundBattle?: GroundBattleResolvers<ContextType>;
   Int8?: GraphQLScalarType;
+  Message?: MessageResolvers<ContextType>;
   Nation?: NationResolvers<ContextType>;
   NavalAttack?: NavalAttackResolvers<ContextType>;
   NukeAttack?: NukeAttackResolvers<ContextType>;
+  Post?: PostResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   SpyOperation?: SpyOperationResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;
@@ -1933,16 +2240,19 @@ const merger = new(BareMerger as any)({
         store: rootStore.child('bareMerger')
       })
 const documentHashMap = {
-        "c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1": GetNationsDocument,
-"c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1": GetWarsDocument,
-"c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1": GetGroundBattlesDocument,
-"c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1": GetCruiseMissileAttacksDocument,
-"c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1": GetNukeAttacksDocument,
-"c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1": GetSpyOperationsDocument,
-"c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1": GetAirBattlesDocument,
-"c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1": GetNavalAttacksDocument,
-"c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1": GetBreakBlockadesDocument,
-"c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1": GetBlockadesDocument
+        "f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetNationsDocument,
+"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetWarsDocument,
+"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetGroundBattlesDocument,
+"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetCruiseMissileAttacksDocument,
+"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetNukeAttacksDocument,
+"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetSpyOperationsDocument,
+"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetAirBattlesDocument,
+"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetNavalAttacksDocument,
+"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetBreakBlockadesDocument,
+"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetBlockadesDocument,
+"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetPostsDocument,
+"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetRecievedMessagesDocument,
+"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetSentMessagesDocument
       }
 additionalEnvelopPlugins.push(usePersistedOperations({
         getPersistedOperation(key) {
@@ -1969,70 +2279,91 @@ additionalEnvelopPlugins.push(usePersistedOperations({
           return printWithCache(GetNationsDocument);
         },
         location: 'GetNationsDocument.graphql',
-        sha256Hash: 'c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1'
+        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
       },{
         document: GetWarsDocument,
         get rawSDL() {
           return printWithCache(GetWarsDocument);
         },
         location: 'GetWarsDocument.graphql',
-        sha256Hash: 'c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1'
+        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
       },{
         document: GetGroundBattlesDocument,
         get rawSDL() {
           return printWithCache(GetGroundBattlesDocument);
         },
         location: 'GetGroundBattlesDocument.graphql',
-        sha256Hash: 'c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1'
+        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
       },{
         document: GetCruiseMissileAttacksDocument,
         get rawSDL() {
           return printWithCache(GetCruiseMissileAttacksDocument);
         },
         location: 'GetCruiseMissileAttacksDocument.graphql',
-        sha256Hash: 'c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1'
+        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
       },{
         document: GetNukeAttacksDocument,
         get rawSDL() {
           return printWithCache(GetNukeAttacksDocument);
         },
         location: 'GetNukeAttacksDocument.graphql',
-        sha256Hash: 'c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1'
+        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
       },{
         document: GetSpyOperationsDocument,
         get rawSDL() {
           return printWithCache(GetSpyOperationsDocument);
         },
         location: 'GetSpyOperationsDocument.graphql',
-        sha256Hash: 'c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1'
+        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
       },{
         document: GetAirBattlesDocument,
         get rawSDL() {
           return printWithCache(GetAirBattlesDocument);
         },
         location: 'GetAirBattlesDocument.graphql',
-        sha256Hash: 'c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1'
+        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
       },{
         document: GetNavalAttacksDocument,
         get rawSDL() {
           return printWithCache(GetNavalAttacksDocument);
         },
         location: 'GetNavalAttacksDocument.graphql',
-        sha256Hash: 'c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1'
+        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
       },{
         document: GetBreakBlockadesDocument,
         get rawSDL() {
           return printWithCache(GetBreakBlockadesDocument);
         },
         location: 'GetBreakBlockadesDocument.graphql',
-        sha256Hash: 'c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1'
+        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
       },{
         document: GetBlockadesDocument,
         get rawSDL() {
           return printWithCache(GetBlockadesDocument);
         },
         location: 'GetBlockadesDocument.graphql',
-        sha256Hash: 'c8212e5f593c3260a01e285ebc4a26bd5fcea0d287eb866afb0bca779d8871a1'
+        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
+      },{
+        document: GetPostsDocument,
+        get rawSDL() {
+          return printWithCache(GetPostsDocument);
+        },
+        location: 'GetPostsDocument.graphql',
+        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
+      },{
+        document: GetRecievedMessagesDocument,
+        get rawSDL() {
+          return printWithCache(GetRecievedMessagesDocument);
+        },
+        location: 'GetRecievedMessagesDocument.graphql',
+        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
+      },{
+        document: GetSentMessagesDocument,
+        get rawSDL() {
+          return printWithCache(GetSentMessagesDocument);
+        },
+        location: 'GetSentMessagesDocument.graphql',
+        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
       }
     ];
     },
@@ -2136,6 +2467,27 @@ export type GetBlockadesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetBlockadesQuery = { blockades: Array<Pick<Blockade, 'battleId' | 'attackerLosses' | 'defenderLosses'>> };
+
+export type GetPostsQueryVariables = Exact<{
+  sender: Scalars['Bytes']['input'];
+}>;
+
+
+export type GetPostsQuery = { posts: Array<Pick<Post, 'id' | 'sender' | 'post' | 'createdAt' | 'transactionHash'>> };
+
+export type GetRecievedMessagesQueryVariables = Exact<{
+  reciever: Scalars['Bytes']['input'];
+}>;
+
+
+export type GetRecievedMessagesQuery = { messages: Array<Pick<Message, 'id' | 'sender' | 'reciever' | 'message' | 'createdAt' | 'transactionHash'>> };
+
+export type GetSentMessagesQueryVariables = Exact<{
+  sender: Scalars['Bytes']['input'];
+}>;
+
+
+export type GetSentMessagesQuery = { messages: Array<Pick<Message, 'id' | 'sender' | 'reciever' | 'message' | 'createdAt' | 'transactionHash'>> };
 
 
 export const GetNationsDocument = gql`
@@ -2259,6 +2611,44 @@ export const GetBlockadesDocument = gql`
   }
 }
     ` as unknown as DocumentNode<GetBlockadesQuery, GetBlockadesQueryVariables>;
+export const GetPostsDocument = gql`
+    query GetPosts($sender: Bytes!) {
+  posts(where: {sender: $sender}) {
+    id
+    sender
+    post
+    createdAt
+    transactionHash
+  }
+}
+    ` as unknown as DocumentNode<GetPostsQuery, GetPostsQueryVariables>;
+export const GetRecievedMessagesDocument = gql`
+    query GetRecievedMessages($reciever: Bytes!) {
+  messages(where: {reciever: $reciever}) {
+    id
+    sender
+    reciever
+    message
+    createdAt
+    transactionHash
+  }
+}
+    ` as unknown as DocumentNode<GetRecievedMessagesQuery, GetRecievedMessagesQueryVariables>;
+export const GetSentMessagesDocument = gql`
+    query GetSentMessages($sender: Bytes!) {
+  messages(where: {sender: $sender}) {
+    id
+    sender
+    reciever
+    message
+    createdAt
+    transactionHash
+  }
+}
+    ` as unknown as DocumentNode<GetSentMessagesQuery, GetSentMessagesQueryVariables>;
+
+
+
 
 
 
@@ -2302,6 +2692,15 @@ export function getSdk<C, E>(requester: Requester<C, E>) {
     },
     GetBlockades(variables?: GetBlockadesQueryVariables, options?: C): Promise<GetBlockadesQuery> {
       return requester<GetBlockadesQuery, GetBlockadesQueryVariables>(GetBlockadesDocument, variables, options) as Promise<GetBlockadesQuery>;
+    },
+    GetPosts(variables: GetPostsQueryVariables, options?: C): Promise<GetPostsQuery> {
+      return requester<GetPostsQuery, GetPostsQueryVariables>(GetPostsDocument, variables, options) as Promise<GetPostsQuery>;
+    },
+    GetRecievedMessages(variables: GetRecievedMessagesQueryVariables, options?: C): Promise<GetRecievedMessagesQuery> {
+      return requester<GetRecievedMessagesQuery, GetRecievedMessagesQueryVariables>(GetRecievedMessagesDocument, variables, options) as Promise<GetRecievedMessagesQuery>;
+    },
+    GetSentMessages(variables: GetSentMessagesQueryVariables, options?: C): Promise<GetSentMessagesQuery> {
+      return requester<GetSentMessagesQuery, GetSentMessagesQueryVariables>(GetSentMessagesDocument, variables, options) as Promise<GetSentMessagesQuery>;
     }
   };
 }

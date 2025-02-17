@@ -97,3 +97,20 @@ type Blockade @entity {
   defenderLosses: [BigInt!]!
   transactionHash: String!
 }
+
+type Message @entity {
+  id: ID!
+  sender: Bytes!
+  reciever: Bytes!
+  message: String!
+  createdAt: BigInt!
+  transactionHash: String!
+}
+
+type Post @entity {
+  id: ID!
+  sender: Bytes!
+  post: String!
+  createdAt: BigInt!
+  transactionHash: String!
+}

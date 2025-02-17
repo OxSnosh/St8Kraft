@@ -108,3 +108,35 @@ query GetBlockades {
     defenderLosses
   }
 }
+
+query GetPosts($sender: Bytes!) {
+  posts(where: { sender: $sender }) {
+    id
+    sender
+    post
+    createdAt
+    transactionHash
+  }
+}
+
+query GetRecievedMessages($reciever: Bytes!) {
+  messages(where: { reciever: $reciever }) {
+    id
+    sender
+    reciever
+    message
+    createdAt
+    transactionHash
+  }
+}
+
+query GetSentMessages($sender: Bytes!) {
+  messages(where: { sender: $sender }) {
+    id
+    sender
+    reciever
+    message
+    createdAt
+    transactionHash
+  }
+}

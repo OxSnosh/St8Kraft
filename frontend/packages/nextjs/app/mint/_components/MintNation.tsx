@@ -203,12 +203,11 @@ export function MintNation() {
         height: "3300px",
         position: "absolute",
         top: "0",
-        left: "0",
-        zIndex: "-2"
+        left: "0"
       }}>
       
       <div className="flex flex-col gap-4 w-full max-w-md" style={{ position: "absolute", top: "270px", left: "47%", transform: "translateX(-50%)" }}>
-        <input
+      <input
           type="text"
           placeholder="Ruler Name"
           className="input input-primary"
@@ -279,8 +278,7 @@ export function MintNation() {
                     backgroundPosition: "center",
                     backgroundRepeat: "no-repeat",
                     width: "100%",
-                    height: "100%",
-                    zIndex: -1,
+                    height: "100%"
                   }}
                 ></div>
 
