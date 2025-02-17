@@ -1,5 +1,5 @@
 
-export const proposeAid = (
+export const proposeAid = async (
     idSender: string,
     idReceiver: string,
     techAid: any,
@@ -14,12 +14,13 @@ export const proposeAid = (
     }
 
     try {
-        writeContractAsync({
+        const tx = await writeContractAsync({
             abi: aidContract.abi,
             address: aidContract.address,
             functionName: "proposeAid",
             args: [idSender, idReceiver, techAid, balanceAid, soldierAid],
         });
+        return tx
     } catch (error) {
         console.error("Error proposing aid:", error);
     }

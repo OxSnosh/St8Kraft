@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { usePublicClient, useAccount, useWriteContract } from 'wagmi';
+import { ethers } from "ethers";
+import { AbiCoder } from "ethers/lib/utils";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 import { nationActiveWars, returnWarDetails, offerPeace, deployForcesToWar } from "~~/utils/wars";
 import { groundAttack } from "~~/utils/attacks";
@@ -127,7 +129,6 @@ const ActiveWars = () => {
     };
 
     const returnPeaceOffered = async (warId: string) => {
-        if (!contractsData?.WarContract) return;
         console.log("offense peace offered", warDetails[warId][5]);
         console.log("defense peace offered", warDetails[warId][6]);
         return warDetails[warId][5], warDetails[warId][6];
@@ -206,6 +207,60 @@ const ActiveWars = () => {
             peaceMessage = "Opponent has offered peace. Do you want to declare peace?";
             buttonText = "Declare Peace";
         }
+
+        const handleOfferPeace = async () => {
+            if (!selectedWar || !selectedNation || !defendingNationId) return;
+
+            const contractData = contractsData.WarContract;
+            const abi = contractData.abi;
+
+            if (!contractData.address || !abi) {
+                console.error("Contract address or ABI is missing");
+                return;
+            }
+
+            try {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+                const userAddress = await signer.getAddress();
+
+                const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+
+                const data = contract.interface.encodeFunctionData("offerPeace", [
+                    selectedNation,
+                    selectedWar
+                ]);
+
+                try {
+                    const result = await provider.call({
+                        to: contract.address,
+                        data: data,
+                        from: userAddress,
+                    });
+        
+                    console.log("Transaction Simulation Result:", result);
+        
+                    if (result.startsWith("0x08c379a0")) {
+                        const errorMessage = parseRevertReason({ data: result });
+                        alert(`Transaction failed: ${errorMessage}`);
+                        return;
+                    }
+                } catch (error: any) {
+                    const errorMessage = parseRevertReason(error);
+                    console.error("Transaction simulation failed:", errorMessage);
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;            
+                }
+        
+                const tx = await offerPeace(selectedNation, selectedWar, contractsData.WarContract, writeContractAsync);
+
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Transaction failed:", errorMessage);
+                alert(`Transaction failed: ${errorMessage}`);
+            }
+        }
     
         if (!selectedWar || !selectedNation || !defendingNationId) return null;
         return (
@@ -214,7 +269,7 @@ const ActiveWars = () => {
                 <p>{peaceMessage}</p>
                 {showButton && (
                     <button
-                        onClick={() => offerPeace(selectedNation, selectedWar, contractsData.WarContract, writeContractAsync)}
+                        onClick={() => handleOfferPeace()}
                         className="bg-blue-500 text-white p-2 rounded mt-2"
                     >
                         {buttonText}
@@ -223,6 +278,23 @@ const ActiveWars = () => {
             </div>
         );
     };
+
+    function parseRevertReason(error: any): string {
+        if (error?.data) {
+            try {
+                if (error.data.startsWith("0x08c379a0")) {
+                    const decoded = new AbiCoder().decode(
+                        ["string"],
+                        "0x" + error.data.slice(10)
+                    );
+                    return decoded[0]; // Extract revert message
+                }
+            } catch (decodeError) {
+                return "Unknown revert reason";
+            }
+        }
+        return error?.message || "Transaction failed";
+    }
 
     const DeployForcesCard = () => {
         const [attackerSoldiers, setAttackerSoldiers] = useState<number>(0);
@@ -257,19 +329,68 @@ const ActiveWars = () => {
             fetchForces();
         }, [selectedWar, selectedNation, defendingNationId]);
     
+
         const handleDeployForces = async () => {
             if (deploySoldiers <= 0 && deployTanks <= 0) return;
             if(!selectedWar || !selectedNation) return;
-    
-            await deployForcesToWar(selectedNation, selectedWar, deploySoldiers, deployTanks, contractsData.WarContract, writeContractAsync);
-    
-            // Refresh deployed forces after deployment
-            const deployedForces = await getDeployedGroundForces(selectedWar, selectedNation, contractsData.WarContract, publicClient);
-            setDeployedSoldiers(deployedForces[0]);
-            setDeployedTanks(deployedForces[1]);
-    
-            setDeploySoldiers(0);
-            setDeployTanks(0);
+
+            const contractData = contractsData.WarContract;
+            const abi = contractData.abi;
+
+            if (!contractData.address || !abi) {
+                console.error("Contract address or ABI is missing");
+                return;
+            }
+
+            try {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+                const userAddress = await signer.getAddress();
+
+                const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+
+                const data = contract.interface.encodeFunctionData("deployForcesToWar", [
+                    selectedNation,
+                    selectedWar,
+                    deploySoldiers,
+                    deployTanks
+                ]);
+
+                try {
+                    const result = await provider.call({
+                        to: contract.address,
+                        data: data,
+                        from: userAddress,
+                    });
+        
+                    console.log("Transaction Simulation Result:", result);
+        
+                    if (result.startsWith("0x08c379a0")) {
+                        const errorMessage = parseRevertReason({ data: result });
+                        alert(`Transaction failed: ${errorMessage}`);
+                        return;
+                    }
+                } catch (error: any) {
+                    const errorMessage = parseRevertReason(error);
+                    console.error("Transaction simulation failed:", errorMessage);
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;            
+                }
+        
+                const tx = await deployForcesToWar(selectedNation, selectedWar, deploySoldiers, deployTanks, contractsData.WarContract, writeContractAsync);
+                
+                const deployedForces = await getDeployedGroundForces(selectedWar, selectedNation, contractsData.WarContract, publicClient);
+                setDeployedSoldiers(deployedForces[0]);
+                setDeployedTanks(deployedForces[1]);
+        
+                setDeploySoldiers(0);
+                setDeployTanks(0);
+            } catch (error : any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Transaction failed:", errorMessage);
+                alert(`Transaction failed: ${errorMessage}`);
+            }
         };
     
         if (!selectedWar || !selectedNation || !defendingNationId) return null;
@@ -328,19 +449,84 @@ const ActiveWars = () => {
     const GroundAttackCard = () => {
         const [attackType, setAttackType] = useState<number>(1);
     
+
+        // const handleGroundAttack = async () => {
+        //     if (!selectedWar || !selectedNation || !defendingNationId) return;
+        //     if (attackType < 1 || attackType > 4) {
+        //         alert("Please enter a valid attack type (1-4).");
+        //         return;
+        //     }
+    
+        //     await groundAttack(selectedWar, selectedNation, defendingNationId, attackType.toString(), contractsData.GroundBattleContract, writeContractAsync);
+            
+        //     alert(`Ground attack executed with attack type ${attackType}!`);
+        // };
+    
+        // if (!selectedWar || !selectedNation || !defendingNationId) return null;
+
         const handleGroundAttack = async () => {
-            if (!selectedWar || !selectedNation || !defendingNationId) return;
+            if (!selectedNation || !defendingNationId || !selectedWar) {
+                alert("Please select both an attacking and defending nation.");
+                return;
+            }
+
             if (attackType < 1 || attackType > 4) {
                 alert("Please enter a valid attack type (1-4).");
                 return;
             }
-    
-            await groundAttack(selectedWar, selectedNation, defendingNationId, attackType.toString(), contractsData.GroundBattleContract, writeContractAsync);
-            
-            alert(`Ground attack executed with attack type ${attackType}!`);
+        
+            try {
+                const contractData = contractsData.GroundBattleContract;
+                const abi = contractData.abi;
+        
+                if (!contractData.address || !abi) {
+                    console.error("Contract address or ABI is missing");
+                    return;
+                }
+        
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+                const userAddress = await signer.getAddress();
+        
+                const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+        
+                const data = contract.interface.encodeFunctionData("groundAttack", [
+                    selectedWar,
+                    selectedNation,
+                    defendingNationId,
+                    attackType.toString(),
+                ]);
+        
+                try {
+                    const result = await provider.call({
+                        to: contract.address,
+                        data: data,
+                        from: userAddress,
+                    });
+        
+                    console.log("Transaction Simulation Result:", result);
+        
+                    if (result.startsWith("0x08c379a0")) {
+                        const errorMessage = parseRevertReason({ data: result });
+                        alert(`Transaction failed: ${errorMessage}`);
+                        return;
+                    }
+                } catch (error: any) {
+                    const errorMessage = parseRevertReason(error);
+                    console.error("Transaction simulation failed:", errorMessage);
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;            
+                }
+        
+                const tx = await groundAttack(selectedWar, selectedNation, defendingNationId, attackType.toString(), contractsData.GroundBattleContract, writeContractAsync);
+        
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Error declaring war:", errorMessage);
+                alert(`Failed to declare war: ${errorMessage}`);
+            }
         };
-    
-        if (!selectedWar || !selectedNation || !defendingNationId) return null;
     
         return (
             <div className="border border-red-400 p-4 rounded-lg shadow-md mt-4">
@@ -388,16 +574,80 @@ const ActiveWars = () => {
             fetchCruiseMissiles();
         }, [selectedNation, contractsData]);
     
+        // const handleLaunchCruiseMissile = async () => {
+        //     if (!selectedWar || !selectedNation || !defendingNationId || cruiseMissileCount <= 0) return;
+    
+        //     await launchCruiseMissileAttack(selectedNation, defendingNationId, selectedWar, contractsData.CruiseMissileContract, writeContractAsync);
+    
+        //     alert(`Cruise missile launched at ${defendingNationId}!`);
+    
+        //     // Refresh the missile count after launch
+        //     const updatedMissileCount = await getCruiseMissileCount(selectedNation, publicClient, contractsData.MissilesContract);
+        //     setCruiseMissileCount(updatedMissileCount);
+        // };
+
         const handleLaunchCruiseMissile = async () => {
-            if (!selectedWar || !selectedNation || !defendingNationId || cruiseMissileCount <= 0) return;
+            if (!selectedNation || !defendingNationId || !selectedWar || cruiseMissileCount <= 0) { // Check if all required fields are filled
+                alert("Please select both an attacking and defending nation.");
+                return;
+            }
+        
+            try {
+                const contractData = contractsData.CruiseMissileContract; // Update Contract
+                const abi = contractData.abi;
+        
+                if (!contractData.address || !abi) {
+                    console.error("Contract address or ABI is missing");
+                    return;
+                }
+        
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+                const userAddress = await signer.getAddress();
+        
+                const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+        
+                const data = contract.interface.encodeFunctionData("launchCruiseMissileAttack", [ //// update function and args
+                    selectedNation,
+                    defendingNationId,
+                    selectedWar
+                ]);
+        
+                try {
+                    const result = await provider.call({
+                        to: contract.address,
+                        data: data,
+                        from: userAddress,
+                    });
+        
+                    console.log("Transaction Simulation Result:", result);
+        
+                    if (result.startsWith("0x08c379a0")) {
+                        const errorMessage = parseRevertReason({ data: result });
+                        alert(`Transaction failed: ${errorMessage}`);
+                        return;
+                    }
+                } catch (error: any) {
+                    const errorMessage = parseRevertReason(error);
+                    console.error("Transaction simulation failed:", errorMessage);
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;            
+                }
+        
+                const tx = await await launchCruiseMissileAttack(selectedNation, defendingNationId, selectedWar, contractsData.CruiseMissileContract, writeContractAsync); //// update function call
+        
+                alert(`Cruise missile launched at ${defendingNationId}!`);
     
-            await launchCruiseMissileAttack(selectedNation, defendingNationId, selectedWar, contractsData.CruiseMissileContract, writeContractAsync);
-    
-            alert(`Cruise missile launched at ${defendingNationId}!`);
-    
-            // Refresh the missile count after launch
-            const updatedMissileCount = await getCruiseMissileCount(selectedNation, publicClient, contractsData.MissilesContract);
-            setCruiseMissileCount(updatedMissileCount);
+                // Refresh the missile count after launch
+                const updatedMissileCount = await getCruiseMissileCount(selectedNation, publicClient, contractsData.MissilesContract);
+                setCruiseMissileCount(updatedMissileCount);
+
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Error declaring war:", errorMessage);
+                alert(`Failed to declare war: ${errorMessage}`);
+            }
         };
     
         if (!selectedWar || !selectedNation || !defendingNationId) return null;
@@ -435,20 +685,85 @@ const ActiveWars = () => {
             fetchNukeCount();
         }, [selectedNation, contractsData]);
     
-        const handleLaunchNuke = async () => {
-            if (!selectedWar || !selectedNation || !defendingNationId || nukeCount <= 0) return;
-            if (attackType < 1 || attackType > 4) {
-                alert("Please enter a valid attack type (1-4).");
+        // const handleLaunchNuke = async () => {
+        //     if (!selectedWar || !selectedNation || !defendingNationId || nukeCount <= 0) return;
+        //     if (attackType < 1 || attackType > 4) {
+        //         alert("Please enter a valid attack type (1-4).");
+        //         return;
+        //     }
+    
+        //     await launchNuke(selectedWar, selectedNation, defendingNationId, attackType.toString(), contractsData.NukesContract, writeContractAsync);
+    
+        //     alert(`Nuclear missile launched at ${defendingNationId} with attack type ${attackType}!`);
+    
+        //     // Refresh the nuke count after launch
+        //     const updatedNukeCount = await getNukeCount(selectedNation, publicClient, contractsData.MissilesContract);
+        //     setNukeCount(updatedNukeCount);
+        // };
+
+        const handleLaunchNuke = async () => { ////update function name
+            if (!selectedNation || !defendingNationId || !selectedWar || nukeCount <= 0) { // Check if all required fields are filled
+                alert("Please select both an attacking and defending nation.");
                 return;
             }
+        
+            try {
+                const contractData = contractsData.NukeContract; // Update Contract
+                const abi = contractData.abi;
+        
+                if (!contractData.address || !abi) {
+                    console.error("Contract address or ABI is missing");
+                    return;
+                }
+        
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+                const userAddress = await signer.getAddress();
+        
+                const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+        
+                const data = contract.interface.encodeFunctionData("launchNuke", [ //// update function and args
+                    selectedWar,
+                    selectedNation,
+                    defendingNationId,
+                    attackType.toString()
+                ]);
+        
+                try {
+                    const result = await provider.call({
+                        to: contract.address,
+                        data: data,
+                        from: userAddress,
+                    });
+        
+                    console.log("Transaction Simulation Result:", result);
+        
+                    if (result.startsWith("0x08c379a0")) {
+                        const errorMessage = parseRevertReason({ data: result });
+                        alert(`Transaction failed: ${errorMessage}`);
+                        return;
+                    }
+                } catch (error: any) {
+                    const errorMessage = parseRevertReason(error);
+                    console.error("Transaction simulation failed:", errorMessage);
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;            
+                }
+        
+                const tx = await launchNuke(selectedWar, selectedNation, defendingNationId, attackType.toString(), contractsData.NukesContract, writeContractAsync); //// update function call
+        
+                alert(`Nuclear missile launched at ${defendingNationId} with attack type ${attackType}!`);
     
-            await launchNuke(selectedWar, selectedNation, defendingNationId, attackType.toString(), contractsData.NukesContract, writeContractAsync);
-    
-            alert(`Nuclear missile launched at ${defendingNationId} with attack type ${attackType}!`);
-    
-            // Refresh the nuke count after launch
-            const updatedNukeCount = await getNukeCount(selectedNation, publicClient, contractsData.MissilesContract);
-            setNukeCount(updatedNukeCount);
+                // Refresh the nuke count after launch
+                const updatedNukeCount = await getNukeCount(selectedNation, publicClient, contractsData.MissilesContract);
+                setNukeCount(updatedNukeCount);
+
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Error declaring war:", errorMessage);
+                alert(`Failed to declare war: ${errorMessage}`);
+            }
         };
     
         if (!selectedWar || !selectedNation || !defendingNationId) return null;
@@ -564,20 +879,90 @@ const ActiveWars = () => {
             setTotalSelected(newTotal);
         };
     
-        const handleLaunchAirstrike = async () => {
-            if (!selectedWar || !selectedNation || !defendingNationId || totalSelected === 0) return;
+        // const handleLaunchAirstrike = async () => {
+        //     if (!selectedWar || !selectedNation || !defendingNationId || totalSelected === 0) return;
     
-            await launchAirBattle(
-                selectedWar,
-                selectedNation,
-                defendingNationId,
-                attackingFighters,
-                attackingBombers,
-                contractsData.AirBattleContract,
-                writeContractAsync
-            );
+        //     await launchAirBattle(
+        //         selectedWar,
+        //         selectedNation,
+        //         defendingNationId,
+        //         attackingFighters,
+        //         attackingBombers,
+        //         contractsData.AirBattleContract,
+        //         writeContractAsync
+        //     );
     
-            alert(`Airstrike launched against ${defendingNationId} with ${totalSelected} aircraft!`);
+        //     alert(`Airstrike launched against ${defendingNationId} with ${totalSelected} aircraft!`);
+        // };
+
+        const handleLaunchAirstrike = async () => { ////update function name
+            if (!selectedNation || !defendingNationId || !selectedWar || totalSelected === 0) { // Check if all required fields are filled
+                alert("Please select both an attacking and defending nation.");
+                return;
+            }
+        
+            try {
+                const contractData = contractsData.AirBattleContract; // Update Contract
+                const abi = contractData.abi;
+        
+                if (!contractData.address || !abi) {
+                    console.error("Contract address or ABI is missing");
+                    return;
+                }
+        
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+                const userAddress = await signer.getAddress();
+        
+                const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+        
+                const data = contract.interface.encodeFunctionData("airBattle", [ //// update function and args
+                    selectedWar,
+                    selectedNation,
+                    defendingNationId,
+                    attackingFighters,
+                    attackingBombers
+                ]);
+        
+                try {
+                    const result = await provider.call({
+                        to: contract.address,
+                        data: data,
+                        from: userAddress,
+                    });
+        
+                    console.log("Transaction Simulation Result:", result);
+        
+                    if (result.startsWith("0x08c379a0")) {
+                        const errorMessage = parseRevertReason({ data: result });
+                        alert(`Transaction failed: ${errorMessage}`);
+                        return;
+                    }
+                } catch (error: any) {
+                    const errorMessage = parseRevertReason(error);
+                    console.error("Transaction simulation failed:", errorMessage);
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;            
+                }
+        
+                const tx = await launchAirBattle(
+                    selectedWar,
+                    selectedNation,
+                    defendingNationId,
+                    attackingFighters,
+                    attackingBombers,
+                    contractsData.AirBattleContract,
+                    writeContractAsync
+                ); //// update function call
+        
+                alert(`Air Strike launched at ${defendingNationId}!`);
+
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Error declaring war:", errorMessage);
+                alert(`Failed to declare war: ${errorMessage}`);
+            }
         };
     
         if (!selectedWar || !selectedNation || !defendingNationId) return null;
@@ -673,22 +1058,202 @@ const ActiveWars = () => {
             fetchNavalForces();
         }, [selectedNation, defendingNationId, contractsData]);
     
-        const handleNavalAttack = async () => {
-            if (!selectedWar || !selectedNation || !defendingNationId) return;
-            await navalAttack(selectedWar, selectedNation, defendingNationId, contractsData.NavalAttackContract, writeContractAsync);
-            alert(`Naval attack launched against ${defendingNationId}!`);
+        // const handleNavalAttack = async () => {
+        //     if (!selectedWar || !selectedNation || !defendingNationId) return;
+        //     await navalAttack(selectedWar, selectedNation, defendingNationId, contractsData.NavalAttackContract, writeContractAsync);
+        //     alert(`Naval attack launched against ${defendingNationId}!`);
+        // };
+
+        const handleNavalAttack = async () => { ////update function name
+            if (!selectedNation || !defendingNationId || !selectedWar) { // Check if all required fields are filled
+                alert("Please select both an attacking and defending nation.");
+                return;
+            }
+        
+            try {
+                const contractData = contractsData.NavalAttackContract; // Update Contract
+                const abi = contractData.abi;
+        
+                if (!contractData.address || !abi) {
+                    console.error("Contract address or ABI is missing");
+                    return;
+                }
+        
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+                const userAddress = await signer.getAddress();
+        
+                const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+        
+                const data = contract.interface.encodeFunctionData("navalAttack", [ //// update function and args
+                    selectedWar,
+                    selectedNation,
+                    defendingNationId,
+                ]);
+        
+                try {
+                    const result = await provider.call({
+                        to: contract.address,
+                        data: data,
+                        from: userAddress,
+                    });
+        
+                    console.log("Transaction Simulation Result:", result);
+        
+                    if (result.startsWith("0x08c379a0")) {
+                        const errorMessage = parseRevertReason({ data: result });
+                        alert(`Transaction failed: ${errorMessage}`);
+                        return;
+                    }
+                } catch (error: any) {
+                    const errorMessage = parseRevertReason(error);
+                    console.error("Transaction simulation failed:", errorMessage);
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;            
+                }
+        
+                const tx = await navalAttack(selectedWar, selectedNation, defendingNationId, contractsData.NavalAttackContract, writeContractAsync); //// update function call
+        
+                alert(`Naval attack launched against ${defendingNationId}!`);
+
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Error declaring war:", errorMessage);
+                alert(`Failed to declare war: ${errorMessage}`);
+            }
         };
     
-        const handleBlockade = async () => {
-            if (!selectedWar || !selectedNation || !defendingNationId) return;
-            await blockade(selectedNation, defendingNationId, selectedWar, contractsData.NavalBlockadeContract, writeContractAsync);
-            alert(`Blockade initiated against ${defendingNationId}!`);
+        // const handleBlockade = async () => {
+        //     if (!selectedWar || !selectedNation || !defendingNationId) return;
+        //     await blockade(selectedNation, defendingNationId, selectedWar, contractsData.NavalBlockadeContract, writeContractAsync);
+        //     alert(`Blockade initiated against ${defendingNationId}!`);
+        // };
+
+        const handleBlockade = async () => { ////update function name
+            if (!selectedNation || !defendingNationId || !selectedWar) { // Check if all required fields are filled
+                alert("Please select both an attacking and defending nation.");
+                return;
+            }
+        
+            try {
+                const contractData = contractsData.NavalBlockadeContract; // Update Contract
+                const abi = contractData.abi;
+        
+                if (!contractData.address || !abi) {
+                    console.error("Contract address or ABI is missing");
+                    return;
+                }
+        
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+                const userAddress = await signer.getAddress();
+        
+                const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+        
+                const data = contract.interface.encodeFunctionData("blockade", [ //// update function and args
+                    selectedNation,
+                    defendingNationId,
+                    selectedWar,
+                ]);
+        
+                try {
+                    const result = await provider.call({
+                        to: contract.address,
+                        data: data,
+                        from: userAddress,
+                    });
+        
+                    console.log("Transaction Simulation Result:", result);
+        
+                    if (result.startsWith("0x08c379a0")) {
+                        const errorMessage = parseRevertReason({ data: result });
+                        alert(`Transaction failed: ${errorMessage}`);
+                        return;
+                    }
+                } catch (error: any) {
+                    const errorMessage = parseRevertReason(error);
+                    console.error("Transaction simulation failed:", errorMessage);
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;            
+                }
+        
+                const tx = await blockade(selectedNation, defendingNationId, selectedWar, contractsData.NavalBlockadeContract, writeContractAsync); //// update function call
+        
+                alert(`Blockade launched against ${defendingNationId}!`);
+
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Error declaring war:", errorMessage);
+                alert(`Failed to declare war: ${errorMessage}`);
+            }
         };
     
-        const handleBreakBlockade = async () => {
-            if (!selectedWar || !selectedNation || !defendingNationId) return;
-            await breakBlockade(selectedWar, selectedNation, defendingNationId, contractsData.BreakBlockadeContract, writeContractAsync);
-            alert(`Attempting to break blockade from ${defendingNationId}!`);
+        // const handleBreakBlockade = async () => {
+        //     if (!selectedWar || !selectedNation || !defendingNationId) return;
+        //     await breakBlockade(selectedWar, selectedNation, defendingNationId, contractsData.BreakBlockadeContract, writeContractAsync);
+        //     alert(`Attempting to break blockade from ${defendingNationId}!`);
+        // };
+
+        const handleBreakBlockade = async () => { ////update function name
+            if (!selectedNation || !defendingNationId || !selectedWar) { // Check if all required fields are filled
+                alert("Please select both an attacking and defending nation.");
+                return;
+            }
+        
+            try {
+                const contractData = contractsData.BreakBlockadeContract; // Update Contract
+                const abi = contractData.abi;
+        
+                if (!contractData.address || !abi) {
+                    console.error("Contract address or ABI is missing");
+                    return;
+                }
+        
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await provider.send("eth_requestAccounts", []);
+                const signer = provider.getSigner();
+                const userAddress = await signer.getAddress();
+        
+                const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+        
+                const data = contract.interface.encodeFunctionData("breakBlockade", [ //// update function and args
+                    selectedWar,
+                    selectedNation,
+                    defendingNationId,
+                ]);
+        
+                try {
+                    const result = await provider.call({
+                        to: contract.address,
+                        data: data,
+                        from: userAddress,
+                    });
+        
+                    console.log("Transaction Simulation Result:", result);
+        
+                    if (result.startsWith("0x08c379a0")) {
+                        const errorMessage = parseRevertReason({ data: result });
+                        alert(`Transaction failed: ${errorMessage}`);
+                        return;
+                    }
+                } catch (error: any) {
+                    const errorMessage = parseRevertReason(error);
+                    console.error("Transaction simulation failed:", errorMessage);
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;            
+                }
+        
+                const tx = await breakBlockade(selectedWar, selectedNation, defendingNationId, contractsData.BreakBlockadeContract, writeContractAsync); //// update function call
+        
+                alert(`Break Blockade attack launched against ${defendingNationId}!`);
+
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Error declaring war:", errorMessage);
+                alert(`Failed to declare war: ${errorMessage}`);
+            }
         };
     
         if (!selectedWar || !selectedNation || !defendingNationId) return null;

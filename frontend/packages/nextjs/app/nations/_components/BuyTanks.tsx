@@ -16,6 +16,8 @@ import { checkBalance } from "~~/utils/treasury";
 import { checkOwnership } from "~~/utils/countryMinter";
 import { getTotalPopulationCount } from "~~/utils/infrastructure";
 import { useTheme } from "next-themes";
+import { ethers } from "ethers";
+import { parseRevertReason } from '../../../utils/errorHandling';
 
 const BuyTanks = () => {
     const { theme } = useTheme();
@@ -53,11 +55,6 @@ const BuyTanks = () => {
                 const tankCost = await getTankCost(nationId, publicClient, ForcesContract);
                 const maxTankCount = await getMaxTankCount(nationId, publicClient, ForcesContract);
 
-                console.log("War Buck Balance:", warBuckBalance);
-                console.log("Soldier Amount:", tankAmount);
-                console.log("Soldier Cost:", tankCost);
-                console.log("Max Tank Count:", maxTankCount);
-
                 setTankDetails({
                     warBucksBalance: (warBuckBalance / BigInt(10 ** 18)).toLocaleString(),
                     tanks: tankAmount.toString(),
@@ -83,9 +80,6 @@ const BuyTanks = () => {
             const costPerTank = BigInt(tankDetails.costPerTank.replace(/,/g, ''));
             const cost = (BigInt(amount) * costPerTank).toString();
 
-            console.log("Cost per tank:", costPerTank);
-            console.log("Total cost:", cost);
-
             setCost((BigInt(costPerTank)).toString());
 
             setErrorMessage("");
@@ -95,23 +89,84 @@ const BuyTanks = () => {
         }
     };
 
-    const handleBuyTanks = async (amount : any) => {
+    // const handleBuyTanks = async (amount : any) => {
         
+    //     if (!nationId || !publicClient || !ForcesContract || !walletAddress || !cost) {
+    //         setErrorMessage("Missing required information to proceed with the purchase.");
+    //         return;
+    //     }
+
+    //     try {
+    //         await buyTanks(nationId, Number(amount), publicClient, ForcesContract, writeContractAsync);
+    //         setRefreshTrigger(!refreshTrigger);
+    //         setErrorMessage("");
+    //         alert("Tanks purchased successfully!");
+    //     } catch (error) {
+    //         console.error("Error buying land:", error);
+    //         setErrorMessage("Failed to complete the purchase. Please try again.");
+    //     }
+    // };
+
+    const handleBuyTanks = async (amount : any) => {
         if (!nationId || !publicClient || !ForcesContract || !walletAddress || !cost) {
             setErrorMessage("Missing required information to proceed with the purchase.");
             return;
         }
 
+        const contractData = contractsData.ForcesContract;
+        const abi = contractData.abi;
+        
+        if (!contractData.address || !abi) {
+            console.error("Contract address or ABI is missing");
+            return;
+        }
+        
         try {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = provider.getSigner();
+            const userAddress = await signer.getAddress();
+
+            const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+
+            const data = contract.interface.encodeFunctionData("buyTanks", [
+                Number(amount),
+                nationId,
+            ]);
+
+            try {
+                const result = await provider.call({
+                    to: contract.address,
+                    data: data,
+                    from: userAddress,
+                });
+    
+                console.log("Transaction Simulation Result:", result);
+    
+                if (result.startsWith("0x08c379a0")) {
+                    const errorMessage = parseRevertReason({ data: result });
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;
+                }
+
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Transaction simulation failed:", errorMessage);
+                alert(`Transaction failed: ${errorMessage}`);
+                return;            
+            }
+    
             await buyTanks(nationId, Number(amount), publicClient, ForcesContract, writeContractAsync);
             setRefreshTrigger(!refreshTrigger);
             setErrorMessage("");
-            alert("Land purchased successfully!");
-        } catch (error) {
-            console.error("Error buying land:", error);
-            setErrorMessage("Failed to complete the purchase. Please try again.");
+            alert("Tanks purchased successfully!");
+
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error);
+            console.error("Transaction failed:", errorMessage);
+            alert(`Transaction failed: ${errorMessage}`);
         }
-    };
+    }
 
     return (
         <div className={`p-6 border-l-4 ${theme === 'dark' ? 'bg-gray-800 text-white border-green-400' : 'bg-gray-100 text-black border-green-500'}`}>

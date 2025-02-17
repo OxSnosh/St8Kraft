@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { usePublicClient, useWriteContract } from "wagmi";
 import { useAccount } from "wagmi";
+import { ethers } from "ethers";
+import { parseRevertReason } from '../../../utils/errorHandling';
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 import { useSearchParams } from "next/navigation";
 import { 
@@ -87,22 +89,85 @@ const BuyInfrastructure = () => {
         }
     };
 
+    // const handleBuyInfrastructure = async () => {
+    //     if (!nationId || !publicClient || !InfrastructureMarketContract || !walletAddress || !totalCost) {
+    //         setErrorMessage("Missing required information to proceed with the purchase.");
+    //         return;
+    //     }
+
+    //     try {
+    //         await buyInfrastructure(nationId, Number(levelInput), publicClient, InfrastructureMarketContract, writeContractAsync);
+    //         setRefreshTrigger(!refreshTrigger);
+    //         setErrorMessage("");
+    //         alert("Infrastructure purchased successfully!");
+    //     } catch (error) {
+    //         console.error("Error buying infrastructure:", error);
+    //         setErrorMessage("Failed to complete the purchase. Please try again.");
+    //     }
+    // };
+
     const handleBuyInfrastructure = async () => {
         if (!nationId || !publicClient || !InfrastructureMarketContract || !walletAddress || !totalCost) {
-            setErrorMessage("Missing required information to proceed with the purchase.");
+            console.error("Missing required parameters for buyInf");
+            setErrorMessage("Missing required parameters.");
             return;
         }
 
+        const contractData = contractsData.InfrastructureMarketContract;
+        const abi = contractData.abi;
+
+        
+        if (!contractData.address || !abi) {
+            console.error("Contract address or ABI is missing");
+            return;
+        }
+        
         try {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = provider.getSigner();
+            const userAddress = await signer.getAddress();
+
+            const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+
+            const data = contract.interface.encodeFunctionData("buyInfrastructure", [
+                nationId,
+                Number(levelInput)
+            ]);
+
+            try {
+                const result = await provider.call({
+                    to: contract.address,
+                    data: data,
+                    from: userAddress,
+                });
+    
+                console.log("Transaction Simulation Result:", result);
+    
+                if (result.startsWith("0x08c379a0")) {
+                    const errorMessage = parseRevertReason({ data: result });
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;
+                }
+
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Transaction simulation failed:", errorMessage);
+                alert(`Transaction failed: ${errorMessage}`);
+                return;            
+            }
+    
             await buyInfrastructure(nationId, Number(levelInput), publicClient, InfrastructureMarketContract, writeContractAsync);
             setRefreshTrigger(!refreshTrigger);
             setErrorMessage("");
             alert("Infrastructure purchased successfully!");
-        } catch (error) {
-            console.error("Error buying infrastructure:", error);
-            setErrorMessage("Failed to complete the purchase. Please try again.");
+
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error);
+            console.error("Transaction failed:", errorMessage);
+            alert(`Transaction failed: ${errorMessage}`);
         }
-    };
+    }
 
     return (
         <div className={`p-6 border-l-4 ${theme === 'dark' ? 'bg-gray-800 text-white border-green-400' : 'bg-gray-100 text-black border-green-500'}`}>

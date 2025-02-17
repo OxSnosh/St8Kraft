@@ -14,7 +14,8 @@ import {
     getLandCostPerMile
 } from "~~/utils/land";
 import { checkBalance } from "~~/utils/treasury";
-import { checkOwnership } from "~~/utils/countryMinter";
+import { ethers } from "ethers";
+import { parseRevertReason } from '../../../utils/errorHandling';
 import { useTheme } from "next-themes";
 
 const BuyLand = () => {
@@ -44,7 +45,7 @@ const BuyLand = () => {
     const [totalCostFromContract, setTotalCostFromContract] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchInfrastructureDetails = async () => {
+        const fetchLandDetails = async () => {
             if (!nationId || !publicClient || !InfrastructureContract) return;
 
             try {
@@ -62,7 +63,7 @@ const BuyLand = () => {
             }
         };
 
-        fetchInfrastructureDetails();
+        fetchLandDetails();
     }, [nationId, publicClient, InfrastructureContract, TreasuryContract, refreshTrigger]);
 
     const handleCalculateCost = async () => {
@@ -85,22 +86,85 @@ const BuyLand = () => {
         }
     };
 
-    const handleBuyTechnology = async () => {
+    // const handleBuyLand = async () => {
+    //     if (!nationId || !publicClient || !LandMarketContract || !walletAddress || !totalCostFromContract) {
+    //         setErrorMessage("Missing required information to proceed with the purchase.");
+    //         return;
+    //     }
+
+    //     try {
+    //         await buyLand(nationId, Number(levelInput), publicClient, LandMarketContract, writeContractAsync);
+    //         setRefreshTrigger(!refreshTrigger);
+    //         setErrorMessage("");
+    //         alert("Land purchased successfully!");
+    //     } catch (error) {
+    //         console.error("Error buying land:", error);
+    //         setErrorMessage("Failed to complete the purchase. Please try again.");
+    //     }
+    // };
+
+    const handleBuyLand = async () => {
         if (!nationId || !publicClient || !LandMarketContract || !walletAddress || !totalCostFromContract) {
-            setErrorMessage("Missing required information to proceed with the purchase.");
+            console.error("Missing required parameters for buy Land");
+            setErrorMessage("Missing required parameters.");
             return;
         }
 
+        const contractData = contractsData.LandMarketContract;
+        const abi = contractData.abi;
+
+        
+        if (!contractData.address || !abi) {
+            console.error("Contract address or ABI is missing");
+            return;
+        }
+        
         try {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = provider.getSigner();
+            const userAddress = await signer.getAddress();
+
+            const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+
+            const data = contract.interface.encodeFunctionData("buyLand", [
+                nationId,
+                Number(levelInput)
+            ]);
+
+            try {
+                const result = await provider.call({
+                    to: contract.address,
+                    data: data,
+                    from: userAddress,
+                });
+    
+                console.log("Transaction Simulation Result:", result);
+    
+                if (result.startsWith("0x08c379a0")) {
+                    const errorMessage = parseRevertReason({ data: result });
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;
+                }
+
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Transaction simulation failed:", errorMessage);
+                alert(`Transaction failed: ${errorMessage}`);
+                return;            
+            }
+    
             await buyLand(nationId, Number(levelInput), publicClient, LandMarketContract, writeContractAsync);
             setRefreshTrigger(!refreshTrigger);
             setErrorMessage("");
             alert("Land purchased successfully!");
-        } catch (error) {
-            console.error("Error buying land:", error);
-            setErrorMessage("Failed to complete the purchase. Please try again.");
+
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error);
+            console.error("Transaction failed:", errorMessage);
+            alert(`Transaction failed: ${errorMessage}`);
         }
-    };
+    }
 
     return (
         <div className={`p-6 border-l-4 ${theme === 'dark' ? 'bg-gray-800 text-white border-green-400' : 'bg-gray-100 text-black border-green-500'}`}>
@@ -157,7 +221,7 @@ const BuyLand = () => {
                 )}
                 {totalCostFromContract !== null && (
                     <button
-                        onClick={handleBuyTechnology}
+                        onClick={handleBuyLand}
                         className="w-full bg-purple-500 text-white p-2 rounded hover:bg-purple-600 mt-4"
                     >
                         Buy {levelInput} Land Miles

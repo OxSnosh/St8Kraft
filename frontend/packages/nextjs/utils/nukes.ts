@@ -81,12 +81,13 @@ export const launchNuke = async (
     }
 
     try {
-        await writeContractAsync({
+        const tx = await writeContractAsync({
             abi: nukeContract.abi,
             address: nukeContract.address,
             functionName: "launchNuke",
             args: [warId, nationId, targetNationId, attackType],
         });
+        return tx
     } catch (error) {
         console.error("Error launching nuke:", error);
     }

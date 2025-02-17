@@ -72,12 +72,13 @@ export const launchCruiseMissileAttack = async (
     }
 
     try {
-        await writeContractAsync({
+        const tx = await writeContractAsync({
             abi: missilesContract.abi,
             address: missilesContract.address,
             functionName: "launchCruiseMissileAttack",
             args: [nationId, targetId, warId],
         });
+        return tx
     } catch (error) {
         console.error("Error launching cruise missile:", error);
     }

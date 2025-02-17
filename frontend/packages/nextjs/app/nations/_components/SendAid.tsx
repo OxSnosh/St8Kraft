@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { usePublicClient, useAccount, useWriteContract } from 'wagmi';
+import { ethers } from "ethers";
+import { AbiCoder } from "ethers/lib/utils";
 import {
     proposeAid,
     acceptProposal,
@@ -73,23 +75,193 @@ const ManageAid = () => {
         setAidPartnerSlots(availableSlots);
     };
 
-    const handleProposeAid = async () => {
-        if (selectedNationId && aidPartnerId) {
-            const adjustedBalanceAid = BigInt(balanceAid) * WEI_IN_ETH;
-            await proposeAid(selectedNationId, aidPartnerId, techAid, adjustedBalanceAid, soldierAid, AidContract, writeContractAsync);
-            handleNationChange(selectedNationId);
+    function parseRevertReason(error: any): string {
+        if (error?.data) {
+            try {
+                if (error.data.startsWith("0x08c379a0")) {
+                    const decoded = new AbiCoder().decode(
+                        ["string"],
+                        "0x" + error.data.slice(10)
+                    );
+                    return decoded[0]; // Extract revert message
+                }
+            } catch (decodeError) {
+                return "Unknown revert reason";
+            }
         }
-    };
+        return error?.message || "Transaction failed";
+    }
+
+    const handleProposeAid = async () => {
+        if (!selectedNationId || !aidPartnerId) return;
+
+        const contractData = contractsData.AidContract;
+        const abi = contractData.abi;
+
+        
+        if (!contractData.address || !abi) {
+            console.error("Contract address or ABI is missing");
+            return;
+        }
+        
+        const adjustedBalanceAid = BigInt(balanceAid) * WEI_IN_ETH;
+        
+        try {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = provider.getSigner();
+            const userAddress = await signer.getAddress();
+
+            const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+
+            const data = contract.interface.encodeFunctionData("proposeAid", [
+                selectedNationId,
+                aidPartnerId,
+                techAid,
+                adjustedBalanceAid,
+                soldierAid,
+            ]);
+
+            try {
+                const result = await provider.call({
+                    to: contract.address,
+                    data: data,
+                    from: userAddress,
+                });
+    
+                console.log("Transaction Simulation Result:", result);
+    
+                if (result.startsWith("0x08c379a0")) {
+                    const errorMessage = parseRevertReason({ data: result });
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;
+                }
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Transaction simulation failed:", errorMessage);
+                alert(`Transaction failed: ${errorMessage}`);
+                return;            
+            }
+    
+            const tx = await proposeAid(selectedNationId, aidPartnerId, techAid, adjustedBalanceAid, soldierAid, AidContract, writeContractAsync);
+
+            handleNationChange(selectedNationId);
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error);
+            console.error("Transaction failed:", errorMessage);
+            alert(`Transaction failed: ${errorMessage}`);
+        }
+    }
 
     const handleAcceptAid = async (proposalId: string) => {
-        await acceptProposal(proposalId, AidContract, writeContractAsync);
-        handleNationChange(selectedNationId);
-    };
+        if (!selectedNationId || !aidPartnerId) return;
+
+        const contractData = contractsData.AidContract;
+        const abi = contractData.abi;
+
+        
+        if (!contractData.address || !abi) {
+            console.error("Contract address or ABI is missing");
+            return;
+        }
+        
+        try {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = provider.getSigner();
+            const userAddress = await signer.getAddress();
+
+            const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+
+            const data = contract.interface.encodeFunctionData("acceptProposal", [
+                proposalId,
+            ]);
+
+            try {
+                const result = await provider.call({
+                    to: contract.address,
+                    data: data,
+                    from: userAddress,
+                });
+    
+                console.log("Transaction Simulation Result:", result);
+    
+                if (result.startsWith("0x08c379a0")) {
+                    const errorMessage = parseRevertReason({ data: result });
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;
+                }
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Transaction simulation failed:", errorMessage);
+                alert(`Transaction failed: ${errorMessage}`);
+                return;            
+            }
+    
+            const tx = await acceptProposal(proposalId, AidContract, writeContractAsync);
+
+            handleNationChange(selectedNationId);
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error);
+            console.error("Transaction failed:", errorMessage);
+            alert(`Transaction failed: ${errorMessage}`);
+        }
+    }
 
     const handleCancelAid = async (proposalId: string) => {
-        await cancelAid(proposalId, AidContract, writeContractAsync);
-        handleNationChange(selectedNationId);
-    };
+        if (!selectedNationId || !aidPartnerId) return;
+
+        const contractData = contractsData.AidContract;
+        const abi = contractData.abi;
+
+        
+        if (!contractData.address || !abi) {
+            console.error("Contract address or ABI is missing");
+            return;
+        }
+        
+        try {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = provider.getSigner();
+            const userAddress = await signer.getAddress();
+
+            const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+
+            const data = contract.interface.encodeFunctionData("cancelAid", [
+                proposalId,
+            ]);
+
+            try {
+                const result = await provider.call({
+                    to: contract.address,
+                    data: data,
+                    from: userAddress,
+                });
+    
+                console.log("Transaction Simulation Result:", result);
+    
+                if (result.startsWith("0x08c379a0")) {
+                    const errorMessage = parseRevertReason({ data: result });
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;
+                }
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Transaction simulation failed:", errorMessage);
+                alert(`Transaction failed: ${errorMessage}`);
+                return;            
+            }
+    
+            const tx = await cancelAid(proposalId, AidContract, writeContractAsync);
+
+            handleNationChange(selectedNationId);
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error);
+            console.error("Transaction failed:", errorMessage);
+            alert(`Transaction failed: ${errorMessage}`);
+        }
+    }
 
     return (
         <div>

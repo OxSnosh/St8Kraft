@@ -351,30 +351,23 @@ const DeclareWar = () => {
                 return;
             }
     
-            // ✅ Use Web3Provider to get the connected wallet
             const provider = new ethers.providers.Web3Provider(window.ethereum);
-            await provider.send("eth_requestAccounts", []); // Prompt user to connect MetaMask
+            await provider.send("eth_requestAccounts", []);
             const signer = provider.getSigner();
-            const userAddress = await signer.getAddress(); // Get connected wallet address
+            const userAddress = await signer.getAddress();
     
             const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
     
-            console.log("Connected Wallet Address:", userAddress);
-    
-            // ✅ Encode function call
             const data = contract.interface.encodeFunctionData("declareWar", [
                 selectedNation,
                 defendingNation,
             ]);
     
-            console.log("Encoded Call Data:", data);
-    
-            // ✅ Simulate the transaction using `eth_call` with `from`
             try {
                 const result = await provider.call({
                     to: contract.address,
                     data: data,
-                    from: userAddress, // ✅ Specify the connected wallet address
+                    from: userAddress,
                 });
     
                 console.log("Transaction Simulation Result:", result);
@@ -388,16 +381,11 @@ const DeclareWar = () => {
                 const errorMessage = parseRevertReason(error);
                 console.error("Transaction simulation failed:", errorMessage);
                 alert(`Transaction failed: ${errorMessage}`);
-                return; // ⛔ Stop execution if simulation fails
+                return;            
             }
     
-            // ✅ If the simulation passes, send the real transaction
-            console.log("Simulation successful, proceeding with the actual transaction...");
     
             const tx = await contract.declareWar(selectedNation, defendingNation);
-            await tx.wait(); // ✅ Wait for transaction confirmation
-    
-            console.log("Transaction sent successfully.");
     
             alert(`War declared between Nation ${selectedNation} and Nation ${defendingNation}`);
     
@@ -407,240 +395,6 @@ const DeclareWar = () => {
             alert(`Failed to declare war: ${errorMessage}`);
         }
     };
-        
-
-    // const handleWarClick = (offenseId: string, defenseId: string, warId: string) => {
-    //     setSelectedNationId(offenseId);
-    //     setDefendingNationId(defenseId);
-    //     setSelectedWar(warId);
-    // };
-
-    // useEffect(() => {
-    //     const fetchActiveWars = async () => {
-    //         if (selectedNationId) {
-    //             const wars = await nationActiveWars(selectedNationId, contractsData.WarContract, publicClient);
-    //             console.log("Active wars", wars);
-    //             setActiveWars(wars);
-            
-    //             const details: Record<string, any> = {};
-    //             for (const warIdRaw of wars) {
-    //                 console.log("War ID", warIdRaw);
-    //                 let warId = warIdRaw.toString();
-    //                 console.log("War ID", warId);   
-    //                 console.log(contractsData.WarContract);
-    //                 console.log(publicClient);
-    //                 const warDetail = await returnWarDetails(warId, contractsData.WarContract, publicClient);
-    //                 console.log("War detail", warDetail);
-    //                 details[warId] = warDetail;
-    //             }
-    //             console.log("War details", details);
-    //             setWarDetails(details);
-    //         }
-    //     };
-    //     fetchActiveWars();
-    // }, [selectedNationId, contractsData, publicClient]);
-
-    // const fetchIsWarActive = async (warId: string) => {
-    //     const active = await isWarActive(warId, contractsData.WarContract, publicClient);
-    //     return active;
-    // }
-
-    // const handleNationChange = async (nationId: string) => {
-    //     const nationStrength = await getNationStrength(nationId, publicClient, contractsData.NationStrengthContract);
-    //     const nationBalance = await checkBalance(nationId, publicClient, contractsData.TreasuryContract);
-    //     const technologyCount = await getTechnologyCount(nationId, publicClient, contractsData.InfrastructureContract);
-    //     const defendingSoldierCount = await getDefendingSoldierCount(nationId, publicClient, contractsData.ForcesContract);
-    //     const defendingTankCount = await getDefendingTankCount(nationId, publicClient, contractsData.ForcesContract);
-    //     const yak9count = await getYak9Count(nationId, publicClient, contractsData.FightersContract);
-    //     const p51MustangCount = await getP51MustangCount(nationId, publicClient, contractsData.FightersContract);
-    //     const f86SabreCount = await getF86SabreCount(nationId, publicClient, contractsData.FightersContract);
-    //     const mig15Count = await getMig15Count(nationId, publicClient, contractsData.FightersContract);
-    //     const f100SuperSabreCount = await getF100SuperSabreCount(nationId, publicClient, contractsData.FightersContract);
-    //     const f35LightningCount = await getF35LightningCount(nationId, publicClient, contractsData.FightersContract);
-    //     const f15EagleCount = await getF15EagleCount(nationId, publicClient, contractsData.FightersContract);
-    //     const su30MkiCount = await getSu30MkiCount(nationId, publicClient, contractsData.FightersContract);
-    //     const f22RaptorCount = await getF22RaptorCount(nationId, publicClient, contractsData.FightersContract);
-    //     const ah1CobraCount = await getAh1CobraCount(nationId, publicClient, contractsData.BombersContract);
-    //     const ah64ApacheCount = await getAh64ApacheCount(nationId, publicClient, contractsData.BombersContract);
-    //     const bristolBlenheimCount = await getBristolBlenheimCount(nationId, publicClient, contractsData.BombersContract);
-    //     const b52MitchellCount = await getB52MitchellCount(nationId, publicClient, contractsData.BombersContract);
-    //     const b17gFlyingFortressCount = await getB17gFlyingFortressCount(nationId, publicClient, contractsData.BombersContract);
-    //     const b52StratofortressCount = await getB52StratofortressCount(nationId, publicClient, contractsData.BombersContract);
-    //     const b2SpiritCount = await getB2SpiritCount(nationId, publicClient, contractsData.BombersContract);
-    //     const b1bLancerCount = await getB1bLancerCount(nationId, publicClient, contractsData.BombersContract);
-    //     const tupolevTu160Count = await getTupolevTu160Count(nationId, publicClient, contractsData.BombersContract);
-    //     const corvetteCount = await getCorvetteCount(nationId, publicClient, contractsData.NavyContract);
-    //     const landingShipCount = await getLandingShipCount(nationId, publicClient, contractsData.NavyContract);
-    //     const battleshipCount = await getBattleshipCount(nationId, publicClient, contractsData.NavyContract);
-    //     const cruiserCount = await getCruiserCount(nationId, publicClient, contractsData.NavyContract);
-    //     const frigateCount = await getFrigateCount(nationId, publicClient, contractsData.NavyContract2);
-    //     const destroyerCount = await getDestroyerCount(nationId, publicClient, contractsData.NavyContract2);
-    //     const submarineCount = await getSubmarineCount(nationId, publicClient, contractsData.NavyContract2);
-    //     const aircraftCarrierCount = await getAircraftCarrierCount(nationId, publicClient, contractsData.NavyContract2);
-    //     const cruiseMissileCount = await getCruiseMissileCount(nationId, publicClient, contractsData.MissilesContract);
-    //     const spyCount = await getSpyCount(nationId, publicClient, contractsData.SpyContract);
-    //     const nukeCount = await getNukeCount(nationId, publicClient, contractsData.MissilesContract);
-
-    //     console.log("Selected nation", nationId);
-    //     setSelectedNationId(nationId);
-
-    //     setSelectedNationForces({
-    //         strength: nationStrength.toString(),
-    //         balance: Math.floor((Number(nationBalance)/10**18)),
-    //         technology: technologyCount.toString(),
-    //         defendingSoldiers: defendingSoldierCount.toString(),
-    //         defendingTanks: defendingTankCount.toString(),
-    //         yak9: yak9count.toString(),
-    //         p51Mustang: p51MustangCount.toString(),
-    //         f86Sabre: f86SabreCount.toString(),
-    //         mig15: mig15Count.toString(),
-    //         f100SuperSabre: f100SuperSabreCount.toString(),
-    //         f35Lightning: f35LightningCount.toString(),
-    //         f15Eagle: f15EagleCount.toString(),
-    //         su30Mki: su30MkiCount.toString(),
-    //         f22Raptor: f22RaptorCount.toString(),
-    //         ah1Cobra: ah1CobraCount.toString(),
-    //         ah64Apache: ah64ApacheCount.toString(),
-    //         bristolBlenheim: bristolBlenheimCount.toString(),
-    //         b52Mitchell: b52MitchellCount.toString(),
-    //         b17gFlyingFortress: b17gFlyingFortressCount.toString(),
-    //         b52Stratofortress: b52StratofortressCount.toString(),
-    //         b2Spirit: b2SpiritCount.toString(),
-    //         b1bLancer: b1bLancerCount.toString(),
-    //         tupolevTu160: tupolevTu160Count.toString(),
-    //         corvette: corvetteCount.toString(),
-    //         landingShip: landingShipCount.toString(),
-    //         battleship: battleshipCount.toString(),
-    //         cruiser: cruiserCount.toString(),
-    //         frigate: frigateCount.toString(),
-    //         destroyer: destroyerCount.toString(),
-    //         submarine: submarineCount.toString(),
-    //         aircraftCarrier: aircraftCarrierCount.toString(),
-    //         cruiseMissiles: cruiseMissileCount.toString(),
-    //         spies: spyCount.toString(),
-    //         nukes: nukeCount.toString()
-    //     });
-    // };
-
-    // const setDefendingNationDetails = async (nationId: string) => {
-    //     const nationStrength = await getNationStrength(nationId, publicClient, contractsData.NationStrengthContract);
-    //     const nationBalance = await checkBalance(nationId, publicClient, contractsData.TreasuryContract);
-    //     const technologyCount = await getTechnologyCount(nationId, publicClient, contractsData.InfrastructureContract);
-    //     const defendingSoldierCount = await getDefendingSoldierCount(nationId, publicClient, contractsData.ForcesContract);
-    //     const defendingTankCount = await getDefendingTankCount(nationId, publicClient, contractsData.ForcesContract);
-    //     const yak9Count = await getYak9Count(nationId, publicClient, contractsData.FightersContract);
-    //     const p51MustangCount = await getP51MustangCount(nationId, publicClient, contractsData.FightersContract);
-    //     const f86SabreCount = await getF86SabreCount(nationId, publicClient, contractsData.FightersContract);
-    //     const mig15Count = await getMig15Count(nationId, publicClient, contractsData.FightersContract);
-    //     const f100SuperSabreCount = await getF100SuperSabreCount(nationId, publicClient, contractsData.FightersContract);
-    //     const f35LightningCount = await getF35LightningCount(nationId, publicClient, contractsData.FightersContract);
-    //     const f15EagleCount = await getF15EagleCount(nationId, publicClient, contractsData.FightersContract);
-    //     const su30MkiCount = await getSu30MkiCount(nationId, publicClient, contractsData.FightersContract);
-    //     const f22RaptorCount = await getF22RaptorCount(nationId, publicClient, contractsData.FightersContract);
-    //     const ah1CobraCount = await getAh1CobraCount(nationId, publicClient, contractsData.BombersContract);
-    //     const ah64ApacheCount = await getAh64ApacheCount(nationId, publicClient, contractsData.BombersContract);
-    //     const bristolBlenheimCount = await getBristolBlenheimCount(nationId, publicClient, contractsData.BombersContract);
-    //     const b52MitchellCount = await getB52MitchellCount(nationId, publicClient, contractsData.BombersContract);
-    //     const b17gFlyingFortressCount = await getB17gFlyingFortressCount(nationId, publicClient, contractsData.BombersContract);
-    //     const b52StratofortressCount = await getB52StratofortressCount(nationId, publicClient, contractsData.BombersContract);
-    //     const b2SpiritCount = await getB2SpiritCount(nationId, publicClient, contractsData.BombersContract);
-    //     const b1bLancerCount = await getB1bLancerCount(nationId, publicClient, contractsData.BombersContract);
-    //     const tupolevTu160Count = await getTupolevTu160Count(nationId, publicClient, contractsData.BombersContract);
-    //     const corvetteCount = await getCorvetteCount(nationId, publicClient, contractsData.NavyContract);
-    //     const landingShipCount = await getLandingShipCount(nationId, publicClient, contractsData.NavyContract);
-    //     const battleshipCount = await getBattleshipCount(nationId, publicClient, contractsData.NavyContract);
-    //     const cruiserCount = await getCruiserCount(nationId, publicClient, contractsData.NavyContract);
-    //     const frigateCount = await getFrigateCount(nationId, publicClient, contractsData.NavyContract2);
-    //     const destroyerCount = await getDestroyerCount(nationId, publicClient, contractsData.NavyContract2);
-    //     const submarineCount = await getSubmarineCount(nationId, publicClient, contractsData.NavyContract2);
-    //     const aircraftCarrierCount = await getAircraftCarrierCount(nationId, publicClient, contractsData.NavyContract2);
-    //     const cruiseMissileCount = await getCruiseMissileCount(nationId, publicClient, contractsData.MissilesContract);
-    //     const spyCount = await getSpyCount(nationId, publicClient, contractsData.SpyContract);
-    //     const nukeCount = await getNukeCount(nationId, publicClient, contractsData.MissilesContract);
-
-    //     console.log("Defending nation", nationId);
-    //     setDefendingNationId(nationId);
-
-    //     setDefendingNationForces({
-    //         strength: nationStrength.toString(),
-    //         balance: Math.floor((Number(nationBalance)/10**18)),
-    //         technology: technologyCount.toString(),
-    //         defendingSoldiers: defendingSoldierCount.toString(),
-    //         defendingTanks: defendingTankCount.toString(),
-    //         yak9: yak9Count.toString(),
-    //         p51Mustang: p51MustangCount.toString(),
-    //         f86Sabre: f86SabreCount.toString(),
-    //         mig15: mig15Count.toString(),
-    //         f100SuperSabre: f100SuperSabreCount.toString(),
-    //         f35Lightning: f35LightningCount.toString(),
-    //         f15Eagle: f15EagleCount.toString(),
-    //         su30Mki: su30MkiCount.toString(),
-    //         f22Raptor: f22RaptorCount.toString(),
-    //         ah1Cobra: ah1CobraCount.toString(),
-    //         ah64Apache: ah64ApacheCount.toString(),
-    //         bristolBlenheim: bristolBlenheimCount.toString(),
-    //         b52Mitchell: b52MitchellCount.toString(),
-    //         b17gFlyingFortress: b17gFlyingFortressCount.toString(),
-    //         b52Stratofortress: b52StratofortressCount.toString(),
-    //         b2Spirit: b2SpiritCount.toString(),
-    //         b1bLancer: b1bLancerCount.toString(),
-    //         tupolevTu160: tupolevTu160Count.toString(),
-    //         corvette: corvetteCount.toString(),
-    //         landingShip: landingShipCount.toString(),
-    //         battleship: battleshipCount.toString(),
-    //         cruiser: cruiserCount.toString(),
-    //         frigate: frigateCount.toString(),
-    //         destroyer: destroyerCount.toString(),
-    //         submarine: submarineCount.toString(),
-    //         aircraftCarrier: aircraftCarrierCount.toString(),
-    //         cruiseMissiles: cruiseMissileCount.toString(),
-    //         spies: spyCount.toString(),
-    //         nukes: nukeCount.toString()
-    //     });
-    // };
-
-    // const handleDeployForces = async () => {
-    //     await deployForcesToWar(selectedNationId, selectedWar.toString(), soldiersToDeploy, tanksToDeploy, contractsData.WarContract, writeContractAsync);
-    // };
-
-    // const handleGroundAttack = async (warId: string, offenseId: string, defenseId: string, attackType: string) => {
-    //     await groundAttack(warId.toString(), offenseId, defenseId, attackType, contractsData.GroundBattleContract, writeContractAsync);
-    // };
-
-    // const handleBlockade = async (offenseId: string, defenseId: string, warId: string, blockadeContract: any) => {
-    //     await blockade(offenseId, defenseId, warId.toString(), blockadeContract, writeContractAsync);
-    // }
-
-    // const handleBreakBlockade = async (warId: string, offenseId: string, defenseId: string, breakBlockadeContract: any) => {
-    //     await writeContractAsync({
-    //         abi: breakBlockadeContract.abi,
-    //         address: breakBlockadeContract.address,
-    //         functionName: "breakBlockade",
-    //         args: [warId, offenseId, defenseId],
-    //     });
-    // }
-
-    // const handleNavalAttack = async (warId: string, offenseId: string, defenseId: string, navalAttackContract: any) => {
-    //     await writeContractAsync({
-    //         abi: navalAttackContract.abi,
-    //         address: navalAttackContract.address,
-    //         functionName: "navalAttack",
-    //         args: [warId, offenseId, defenseId],
-    //     });
-    // }
-
-    // const handleSpyAttack = async (offenseId: string, defenseId: string, attackType: any) => {
-    //     const signature = await signMessageAsync({ message: "Spy Attack" });
-    //     const hash = utils.hashMessage("Spy Attack")
-    //     const inputData = {
-    //         signature,
-    //         messageHash: hash,
-    //         callerNationId: Number(offenseId),
-    //         defenderNationId: Number(defenseId),
-    //         attackType: attackType
-    //     }
-    //     // await relaySpyOperation(inputData)
-    // }
 
     return (
         <div>

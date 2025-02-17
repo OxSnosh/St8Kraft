@@ -79,12 +79,13 @@ export const offerPeace = async (
     }
 
     try {
-        await writeContractAsync({
+        const tx = await writeContractAsync({
             abi: warContract.abi,
             address: warContract.address,
             functionName: "offerPeace",
             args: [offererId, warId],
         });
+        return tx
     } catch (error) {
         console.error("Error offering peace:", error);
     }
@@ -193,12 +194,16 @@ export const deployForcesToWar = async (
 
     console.log("are we here")
     try {
-        await writeContractAsync({
+
+        const tx = await writeContractAsync({
             abi: warContract.abi,
             address: warContract.address,
             functionName: "deployForcesToWar",
             args: [nationId, warId, soldiers, tanks],
         });
+
+        return tx
+
     } catch (error) {
         console.error("Error deploying forces to war:", error);
     }

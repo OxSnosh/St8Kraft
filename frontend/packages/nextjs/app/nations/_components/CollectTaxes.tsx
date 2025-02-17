@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from "react";
 import { usePublicClient, useWriteContract } from "wagmi";
 import { useAccount } from "wagmi";
+import { AbiCoder } from "ethers/lib/utils";
+import { ethers } from "ethers";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 import { useSearchParams } from "next/navigation";
 import { 
@@ -72,31 +74,111 @@ const CollectTaxes = () => {
         fetchTaxDetails();
     }, [fetchTaxDetails]);
 
+    function parseRevertReason(error: any): string {
+        if (error?.data) {
+            try {
+                if (error.data.startsWith("0x08c379a0")) {
+                    const decoded = new AbiCoder().decode(
+                        ["string"],
+                        "0x" + error.data.slice(10)
+                    );
+                    return decoded[0]; // Extract revert message
+                }
+            } catch (decodeError) {
+                return "Unknown revert reason";
+            }
+        }
+        return error?.message || "Transaction failed";
+    }
+
+    // const handleCollectTaxes = async () => {
+    //     if (!nationId || !publicClient || !TaxesContract || !writeContractAsync) {
+    //         setErrorMessage("Missing required parameters.");
+    //         return;
+    //     }
+
+    //     try {
+    //         await collectTaxes(nationId, publicClient, TaxesContract, writeContractAsync);
+    //         setErrorMessage("");
+    //         fetchTaxDetails();
+    //     } catch (error) {
+    //         let owner = walletAddress ? await checkOwnership(nationId, walletAddress, publicClient, CountryMinterContract) : false;
+    //         let war = await getWarPeacePreference(nationId, publicClient, MilitaryContract);
+
+    //         if (!owner) {
+    //             setErrorMessage("You are not the ruler of this nation");
+    //         } else if (!war) {
+    //             setErrorMessage("You cannot collect taxes in peace mode");
+    //         } else {
+    //             setErrorMessage("Error collecting taxes");
+    //         }
+
+    //         setTimeout(() => setErrorMessage(""), 6000);
+    //     }
+    // };
+
     const handleCollectTaxes = async () => {
         if (!nationId || !publicClient || !TaxesContract || !writeContractAsync) {
+            console.error("Missing required parameters for collectTaxes");
             setErrorMessage("Missing required parameters.");
             return;
         }
 
-        try {
-            await collectTaxes(nationId, publicClient, TaxesContract, writeContractAsync);
-            setErrorMessage("");
-            fetchTaxDetails();
-        } catch (error) {
-            let owner = walletAddress ? await checkOwnership(nationId, walletAddress, publicClient, CountryMinterContract) : false;
-            let war = await getWarPeacePreference(nationId, publicClient, MilitaryContract);
+        const contractData = contractsData.TaxesContract;
+        const abi = contractData.abi;
 
-            if (!owner) {
-                setErrorMessage("You are not the ruler of this nation");
-            } else if (!war) {
-                setErrorMessage("You cannot collect taxes in peace mode");
-            } else {
-                setErrorMessage("Error collecting taxes");
-            }
-
-            setTimeout(() => setErrorMessage(""), 6000);
+        
+        if (!contractData.address || !abi) {
+            console.error("Contract address or ABI is missing");
+            return;
         }
-    };
+        
+        try {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = provider.getSigner();
+            const userAddress = await signer.getAddress();
+
+            const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+
+            const data = contract.interface.encodeFunctionData("collectTaxes", [
+                nationId
+            ]);
+
+            try {
+                const result = await provider.call({
+                    to: contract.address,
+                    data: data,
+                    from: userAddress,
+                });
+    
+                console.log("Transaction Simulation Result:", result);
+    
+                if (result.startsWith("0x08c379a0")) {
+                    const errorMessage = parseRevertReason({ data: result });
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;
+                }
+
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Transaction simulation failed:", errorMessage);
+                alert(`Transaction failed: ${errorMessage}`);
+                return;            
+            }
+    
+            await collectTaxes(nationId, publicClient, TaxesContract, writeContractAsync);
+
+            fetchTaxDetails();
+
+            alert("Taxes Collected!");
+
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error);
+            console.error("Transaction failed:", errorMessage);
+            alert(`Transaction failed: ${errorMessage}`);
+        }
+    }
 
     return (
         <div className={`p-6 border-l-4 ${theme === 'dark' ? 'bg-gray-800 text-white border-green-400' : 'bg-gray-100 text-black border-green-500'}`}>

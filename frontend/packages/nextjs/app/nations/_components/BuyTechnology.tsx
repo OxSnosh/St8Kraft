@@ -4,6 +4,8 @@
 import { useEffect, useState } from "react";
 import { usePublicClient, useWriteContract } from "wagmi";
 import { useAccount } from "wagmi";
+import { AbiCoder } from "ethers/lib/utils";
+import { ethers } from "ethers";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 import { useSearchParams } from "next/navigation";
 import { 
@@ -62,6 +64,23 @@ const BuyTechnology = () => {
         fetchInfrastructureDetails();
     }, [nationId, publicClient, InfrastructureContract, TreasuryContract, refreshTrigger]);
 
+    function parseRevertReason(error: any): string {
+        if (error?.data) {
+            try {
+                if (error.data.startsWith("0x08c379a0")) {
+                    const decoded = new AbiCoder().decode(
+                        ["string"],
+                        "0x" + error.data.slice(10)
+                    );
+                    return decoded[0]; // Extract revert message
+                }
+            } catch (decodeError) {
+                return "Unknown revert reason";
+            }
+        }
+        return error?.message || "Transaction failed";
+    }
+
     const handleCalculateCost = async () => {
         if (!levelInput || !nationId || !publicClient || !TechnologyMarketContract) {
             setErrorMessage("Please enter a valid level.");
@@ -82,22 +101,86 @@ const BuyTechnology = () => {
         }
     };
 
+    // const handleBuyTechnology = async () => {
+    //     if (!nationId || !publicClient || !TechnologyMarketContract || !walletAddress || !totalCostFromContract) {
+    //         setErrorMessage("Missing required information to proceed with the purchase.");
+    //         return;
+    //     }
+
+    //     try {
+    //         await buyTechnology(nationId, Number(levelInput), publicClient, TechnologyMarketContract, writeContractAsync);
+    //         setRefreshTrigger(!refreshTrigger);
+    //         setErrorMessage("");
+    //         alert("Technology purchased successfully!");
+    //     } catch (error) {
+    //         console.error("Error buying technology:", error);
+    //         setErrorMessage("Failed to complete the purchase. Please try again.");
+    //     }
+    // };
+
     const handleBuyTechnology = async () => {
         if (!nationId || !publicClient || !TechnologyMarketContract || !walletAddress || !totalCostFromContract) {
-            setErrorMessage("Missing required information to proceed with the purchase.");
+            console.error("Missing required parameters for buyTech");
+            setErrorMessage("Missing required parameters.");
             return;
         }
 
-        try {
-            await buyTechnology(nationId, Number(levelInput), publicClient, TechnologyMarketContract, writeContractAsync);
-            setRefreshTrigger(!refreshTrigger);
-            setErrorMessage("");
-            alert("Technology purchased successfully!");
-        } catch (error) {
-            console.error("Error buying technology:", error);
-            setErrorMessage("Failed to complete the purchase. Please try again.");
+        const contractData = contractsData.TechnologyMarketContract;
+        const abi = contractData.abi;
+
+        
+        if (!contractData.address || !abi) {
+            console.error("Contract address or ABI is missing");
+            return;
         }
-    };
+        
+        try {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = provider.getSigner();
+            const userAddress = await signer.getAddress();
+
+            const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+
+            const data = contract.interface.encodeFunctionData("buyTech", [
+                nationId,
+                Number(levelInput)
+            ]);
+
+            try {
+                const result = await provider.call({
+                    to: contract.address,
+                    data: data,
+                    from: userAddress,
+                });
+    
+                console.log("Transaction Simulation Result:", result);
+    
+                if (result.startsWith("0x08c379a0")) {
+                    const errorMessage = parseRevertReason({ data: result });
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;
+                }
+
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Transaction simulation failed:", errorMessage);
+                alert(`Transaction failed: ${errorMessage}`);
+                return;            
+            }
+    
+            await buyTechnology(nationId, Number(levelInput), publicClient, TechnologyMarketContract, writeContractAsync);
+            
+            setRefreshTrigger(!refreshTrigger);
+
+            alert("Technology purchased successfully!");
+
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error);
+            console.error("Transaction failed:", errorMessage);
+            alert(`Transaction failed: ${errorMessage}`);
+        }
+    }
 
     return (
         <div className={`p-6 border-l-4 ${theme === 'dark' ? 'bg-gray-800 text-white border-green-400' : 'bg-gray-100 text-black border-green-500'}`}>

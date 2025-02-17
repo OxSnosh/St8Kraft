@@ -1,7 +1,3 @@
-import { useWriteContract } from 'wagmi';
-
-
-
 
 export const getTaxesCollectible = async (
     nationId: string,

@@ -13,12 +13,14 @@ export const groundAttack = async (
     }
 
     try {
-        return await writeContractAsync({
+        const tx = await writeContractAsync({
             abi: groundBattleContract.abi,
             address: groundBattleContract.address,
             functionName: "groundAttack",
             args: [warId, nationId, defenderId, attackType],
         });
+
+        return tx
     } catch (error) {
         console.error("Error attacking:", error);
     }
@@ -65,7 +67,7 @@ export const breakBlockade = async (
             abi: breakBlockadeContract.abi,
             address: breakBlockadeContract.address,
             functionName: "breakBlockade",
-            args: [nationId, blockaderId, warId],
+            args: [warId, nationId, blockaderId],
         });
     } catch (error) {
         console.error("Error breaking blockade:", error);
@@ -85,12 +87,13 @@ export const navalAttack = async (
     }
 
     try {
-        return await writeContractAsync({
+        const tx = await writeContractAsync({
             abi: navalAttackContract.abi,
             address: navalAttackContract.address,
             functionName: "navalAttack",
             args: [warId, nationId, defenderId],
         });
+        return tx
     } catch (error) {
         console.error("Error launching naval attack:", error);
     }
@@ -111,12 +114,13 @@ export const launchAirBattle = async (
     }
 
     try {
-        return await writeContractAsync({
+        const tx = await writeContractAsync({
             abi: airBattleContract.abi,
             address: airBattleContract.address,
             functionName: "airBattle",
             args: [warId, nationId, defenderId, attackingFighters, attackingBombers],
         });
+        return tx
     } catch (error) {
         console.error("Error launching air battle:", error);
     }

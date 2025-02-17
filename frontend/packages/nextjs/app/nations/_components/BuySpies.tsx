@@ -9,6 +9,8 @@ import { checkOwnership } from "~~/utils/countryMinter";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 import { buySpies, getMaxSpyCount, getSpyCount, getSpyPrice } from "~~/utils/spies";
 import { checkBalance } from "~~/utils/treasury";
+import { ethers } from "ethers";
+import { parseRevertReason } from '../../../utils/errorHandling';
 
 const BuySpies = () => {
   const { theme } = useTheme();
@@ -78,22 +80,84 @@ const BuySpies = () => {
     }
   };
 
-  const handleBuySpies = async (amount: any) => {
+  // const handleBuySpies = async (amount: any) => {
+  //   if (!nationId || !publicClient || !SpyContract || !walletAddress || !cost) {
+  //     setErrorMessage("Missing required information to proceed with the purchase.");
+  //     return;
+  //   }
+
+  //   try {
+  //     await buySpies(Number(amount), nationId, publicClient, SpyContract, writeContractAsync);
+  //     setRefreshTrigger(!refreshTrigger);
+  //     setErrorMessage("");
+  //     alert("Spies purchased successfully!");
+  //   } catch (error) {
+  //     console.error("Error buying Spies:", error);
+  //     setErrorMessage("Failed to complete the purchase. Please try again.");
+  //   }
+  // };
+
+  const handleBuySpies = async (amount : any) => {
+          
     if (!nationId || !publicClient || !SpyContract || !walletAddress || !cost) {
       setErrorMessage("Missing required information to proceed with the purchase.");
       return;
     }
 
-    try {
-      await buySpies(Number(amount), nationId, publicClient, SpyContract, writeContractAsync);
-      setRefreshTrigger(!refreshTrigger);
-      setErrorMessage("");
-      alert("Spies purchased successfully!");
-    } catch (error) {
-      console.error("Error buying Spies:", error);
-      setErrorMessage("Failed to complete the purchase. Please try again.");
+    const contractData = contractsData.SpyContract;
+    const abi = contractData.abi;
+    
+    if (!contractData.address || !abi) {
+        console.error("Contract address or ABI is missing");
+        return;
     }
-  };
+    
+    try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        const signer = provider.getSigner();
+        const userAddress = await signer.getAddress();
+
+        const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+
+        const data = contract.interface.encodeFunctionData("buySpies", [
+            Number(amount),
+            nationId,
+        ]);
+
+        try {
+            const result = await provider.call({
+                to: contract.address,
+                data: data,
+                from: userAddress,
+            });
+
+            console.log("Transaction Simulation Result:", result);
+
+            if (result.startsWith("0x08c379a0")) {
+                const errorMessage = parseRevertReason({ data: result });
+                alert(`Transaction failed: ${errorMessage}`);
+                return;
+            }
+
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error);
+            console.error("Transaction simulation failed:", errorMessage);
+            alert(`Transaction failed: ${errorMessage}`);
+            return;            
+        }
+
+        await buySpies(Number(amount), nationId, publicClient, SpyContract, writeContractAsync);
+        setRefreshTrigger(!refreshTrigger);
+        setErrorMessage("");
+        alert("Spies purchased successfully!");
+
+      } catch (error: any) {
+        const errorMessage = parseRevertReason(error);
+        console.error("Transaction failed:", errorMessage);
+        alert(`Transaction failed: ${errorMessage}`);
+      }
+  }
 
   return (
     <div
