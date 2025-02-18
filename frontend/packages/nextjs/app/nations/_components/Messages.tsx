@@ -38,8 +38,8 @@ const MessagesComponent = () => {
 
     const fetchMessages = async () => {
         try {
-            const { data: receivedData } = await execute(GetReceivedMessagesDocument, { receiver: address });
-            const { data: sentData } = await execute(GetSentMessagesDocument, { sender: address });
+            const { data: receivedData } = await execute(GetReceivedMessagesDocument, { receiver: nationId });
+            const { data: sentData } = await execute(GetSentMessagesDocument, { sender: nationId });
             setReceivedMessages(receivedData?.messages || []);
             setSentMessages(sentData?.messages || []);
         } catch (error) {

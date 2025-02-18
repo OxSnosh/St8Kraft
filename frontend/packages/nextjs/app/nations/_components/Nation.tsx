@@ -30,12 +30,13 @@ import ActiveWars from "./ActiveWars";
 import Senate from "./Senate";
 import TransferDeleteNation from "./DeleteTransfer";
 import Messages from "./Messages";
+import AllianceManagement from "./AllianceManagement";
 import { useAccount, usePublicClient } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 
 
 const menuItems = [
-  { category: "NATION SETTINGS", options: ["Government Settings", "Military Settings", "Manage Trades", "Send Aid", "Senate"] },
+  { category: "NATION SETTINGS", options: ["Government Settings", "Military Settings", "Manage Trades", "Send Aid", "Senate", "Alliance"] },
   { category: "MANAGE WARS", options: ["Declare War", "Active Wars"] },
   { category: "TREASURY", options: ["Collect Taxes", "Pay Bills", "Deposit and Withdraw"] },
   { category: "MUNICIPAL PURCHASES", options: ["Infrastructure", "Technology", "Land"] },
@@ -177,6 +178,8 @@ const Nation = () => {
         setSelectedComponent(<ActiveWars />)
       } else if (savedMenuItem === "Senate") {
         setSelectedComponent(<Senate />);
+      } else if (savedMenuItem === "Alliance") {
+        setSelectedComponent(<AllianceManagement />);
       } else if (savedMenuItem === "Transfer or Delete") {
         setSelectedComponent(<TransferDeleteNation />);
       }else if (savedMenuItem === "Messages") {
@@ -241,6 +244,8 @@ const Nation = () => {
       setSelectedComponent(<ActiveWars />)
     } else if (option === "Senate") {
       setSelectedComponent(<Senate />);
+    } else if (option === "Alliance") {
+      setSelectedComponent(<AllianceManagement />);
     } else if (option === "Transfer or Delete") {
       setSelectedComponent(<TransferDeleteNation />);
     } else if (option === "Messages") {

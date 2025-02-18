@@ -510,4 +510,148 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         uint256 daysSinceReligionChange = gameDay - dayReligionChanged;
         return (daysSinceGovChange, daysSinceReligionChange);
     }
+
+    uint256 public allianceCounter; // Unique ID counter for alliances
+
+    struct Alliance {
+        uint256 id;
+        string name;
+        uint256 founderNationId;
+        mapping(uint256 => bool) admins; // Stores nationIds as admins
+        mapping(uint256 => uint256) nationToPlatoon; // Maps nation ID to sub-platoon ID
+        uint256[] members;
+        uint256[] joinRequests;
+    }
+
+    mapping(uint256 => Alliance) public alliances;
+    mapping(uint256 => uint256) public nationToAlliance; // Maps nation ID to alliance ID
+    mapping(uint256 => bool) public allianceExists; // Tracks if an alliance exists
+
+    event AllianceCreated(uint256 indexed allianceId, string name, uint256 founderNationId);
+    event AllianceAdminAdded(uint256 indexed allianceId, uint256 indexed adminNationId);
+    event AllianceAdminRemoved(uint256 indexed allianceId, uint256 indexed adminNationId);
+    event NationRequestedToJoin(uint256 indexed allianceId, uint256 indexed nationId);
+    event NationApprovedToJoin(uint256 indexed allianceId, uint256 indexed nationId);
+    event NationRemovedFromAlliance(uint256 indexed allianceId, uint256 indexed nationId);
+    event NationAssignedToPlatoon(uint256 indexed allianceId, uint256 indexed nationId, uint256 platoonId);
+
+    modifier onlyAllianceFounderOrAdmin(uint256 allianceId, uint256 nationId) {
+        require(
+            nationId == alliances[allianceId].founderNationId || alliances[allianceId].admins[nationId],
+            "Not authorized"
+        );
+        _;
+    }
+
+    function getNationAllianceAndPlatoon(uint256 nationId) external view returns (uint256 allianceId, uint256 platoonId) {
+        uint256 alliance = nationToAlliance[nationId];
+        uint256 platoon = alliance > 0 ? alliances[alliance].nationToPlatoon[nationId] : 0;
+        return (alliance, platoon);
+    }
+
+    function createAlliance(string memory name, uint256 founderNationId) external {
+        require(nationToAlliance[founderNationId] == 0, "Nation already in an alliance");
+        allianceCounter++;
+
+        Alliance storage newAlliance = alliances[allianceCounter];
+        newAlliance.id = allianceCounter;
+        newAlliance.name = name;
+        newAlliance.founderNationId = founderNationId;
+        newAlliance.admins[founderNationId] = true;
+        newAlliance.members.push(founderNationId);
+        nationToAlliance[founderNationId] = allianceCounter;
+        allianceExists[allianceCounter] = true;
+
+        emit AllianceCreated(allianceCounter, name, founderNationId);
+    }
+
+    function addAdmin(uint256 allianceId, uint256 adminNationId, uint256 callerNationId)
+        external
+        onlyAllianceFounderOrAdmin(allianceId, callerNationId)
+    {
+        alliances[allianceId].admins[adminNationId] = true;
+        emit AllianceAdminAdded(allianceId, adminNationId);
+    }
+
+    function removeAdmin(uint256 allianceId, uint256 adminNationId, uint256 callerNationId)
+        external
+        onlyAllianceFounderOrAdmin(allianceId, callerNationId)
+    {
+        require(adminNationId != alliances[allianceId].founderNationId, "Cannot remove founder");
+        alliances[allianceId].admins[adminNationId] = false;
+        emit AllianceAdminRemoved(allianceId, adminNationId);
+    }
+
+    function requestToJoinAlliance(uint256 allianceId, uint256 nationId) external {
+        require(nationToAlliance[nationId] == 0, "Nation already in an alliance");
+        alliances[allianceId].joinRequests.push(nationId);
+        emit NationRequestedToJoin(allianceId, nationId);
+    }
+
+    function approveNationJoin(uint256 allianceId, uint256 nationId, uint256 callerNationId)
+        external
+        onlyAllianceFounderOrAdmin(allianceId, callerNationId)
+    {
+        require(nationToAlliance[nationId] == 0, "Nation already in an alliance");
+
+        uint256[] storage requests = alliances[allianceId].joinRequests;
+        bool found = false;
+
+        for (uint256 i = 0; i < requests.length; i++) {
+            if (requests[i] == nationId) {
+                found = true;
+                requests[i] = requests[requests.length - 1];
+                requests.pop();
+                break;
+            }
+        }
+
+        require(found, "Nation did not request to join");
+
+        alliances[allianceId].members.push(nationId);
+        nationToAlliance[nationId] = allianceId;
+
+        emit NationApprovedToJoin(allianceId, nationId);
+    }
+
+    function removeNationFromAlliance(uint256 allianceId, uint256 nationId, uint256 callerNationId)
+        external
+        onlyAllianceFounderOrAdmin(allianceId, callerNationId)
+    {
+        require(nationToAlliance[nationId] == allianceId, "Nation not in this alliance");
+
+        delete nationToAlliance[nationId];
+
+        uint256[] storage members = alliances[allianceId].members;
+        for (uint256 i = 0; i < members.length; i++) {
+            if (members[i] == nationId) {
+                members[i] = members[members.length - 1];
+                members.pop();
+                break;
+            }
+        }
+
+        emit NationRemovedFromAlliance(allianceId, nationId);
+    }
+
+    function assignNationToPlatoon(uint256 allianceId, uint256 nationId, uint256 platoonId, uint256 callerNationId)
+        external
+        onlyAllianceFounderOrAdmin(allianceId, callerNationId)
+    {
+        require(nationToAlliance[nationId] == allianceId, "Nation not in this alliance");
+        alliances[allianceId].nationToPlatoon[nationId] = platoonId;
+        emit NationAssignedToPlatoon(allianceId, nationId, platoonId);
+    }
+
+    function getAllianceMembers(uint256 allianceId) external view returns (uint256[] memory) {
+        return alliances[allianceId].members;
+    }
+
+    function getJoinRequests(uint256 allianceId) external view returns (uint256[] memory) {
+        return alliances[allianceId].joinRequests;
+    }
+
+    function getNationAlliance(uint256 nationId) external view returns (uint256) {
+        return nationToAlliance[nationId];
+    }
 }
