@@ -14,6 +14,8 @@ import {
 import { checkBalance } from "~~/utils/treasury";
 import { checkOwnership } from "~~/utils/countryMinter";
 import { useTheme } from "next-themes";
+import { ethers } from "ethers";
+import { parseRevertReason } from '../../../utils/errorHandling';
 
 const BuyCruiseMissiles = () => {
     const { theme } = useTheme();
@@ -89,23 +91,85 @@ const BuyCruiseMissiles = () => {
         }
     };
 
-    const handleBuyTanks = async (amount : any) => {
+    // const handleBuyCruiseMissiles = async (amount : any) => {
         
+    //     if (!nationId || !publicClient || !MissilesContract || !walletAddress || !cost) {
+    //         setErrorMessage("Missing required information to proceed with the purchase.");
+    //         return;
+    //     }
+
+    //     try {
+    //         await buyCruiseMissiles(Number(amount), nationId, publicClient, MissilesContract, writeContractAsync);
+    //         setRefreshTrigger(!refreshTrigger);
+    //         setErrorMessage("");
+    //         alert("Cruise Missiles purchased successfully!");
+    //     } catch (error) {
+    //         console.error("Error buying Cruise Missiles:", error);
+    //         setErrorMessage("Failed to complete the purchase. Please try again.");
+    //     }
+    // };
+
+    const handleBuyCruiseMissiles = async (amount : any) => {
+                
         if (!nationId || !publicClient || !MissilesContract || !walletAddress || !cost) {
             setErrorMessage("Missing required information to proceed with the purchase.");
             return;
         }
 
+        const contractData = contractsData.MissilesContract;
+        const abi = contractData.abi;
+        
+        if (!contractData.address || !abi) {
+            console.error("Contract address or ABI is missing");
+            return;
+        }
+        
         try {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = provider.getSigner();
+            const userAddress = await signer.getAddress();
+
+            const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+
+            const data = contract.interface.encodeFunctionData("buyCruiseMissiles", [
+                Number(amount),
+                nationId,
+            ]);
+
+            try {
+                const result = await provider.call({
+                    to: contract.address,
+                    data: data,
+                    from: userAddress,
+                });
+
+                console.log("Transaction Simulation Result:", result);
+
+                if (result.startsWith("0x08c379a0")) {
+                    const errorMessage = parseRevertReason({ data: result });
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;
+                }
+
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Transaction simulation failed:", errorMessage);
+                alert(`Transaction failed: ${errorMessage}`);
+                return;            
+            }
+
             await buyCruiseMissiles(Number(amount), nationId, publicClient, MissilesContract, writeContractAsync);
             setRefreshTrigger(!refreshTrigger);
             setErrorMessage("");
             alert("Cruise Missiles purchased successfully!");
-        } catch (error) {
-            console.error("Error buying Cruise Missiles:", error);
-            setErrorMessage("Failed to complete the purchase. Please try again.");
+            
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error);
+            console.error("Transaction failed:", errorMessage);
+            alert(`Transaction failed: ${errorMessage}`);
         }
-    };
+    }
 
     return (
         <div className={`p-6 border-l-4 ${theme === 'dark' ? 'bg-gray-800 text-white border-green-400' : 'bg-gray-100 text-black border-green-500'}`}>
@@ -157,7 +221,7 @@ const BuyCruiseMissiles = () => {
                 )}
                 {cost !== null && (
                     <button
-                        onClick={() => handleBuyTanks(amountInput)}
+                        onClick={() => handleBuyCruiseMissiles(amountInput)}
                         className="w-full bg-purple-500 text-white p-2 rounded hover:bg-purple-600 mt-4"
                     >
                         Buy {amountInput} Crise Missiles for {Number(amountInput) * Number(cost)} War Bucks

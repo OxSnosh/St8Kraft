@@ -27,6 +27,8 @@ import {
     getTupolevTu160Count
 } from '../../../utils/bombers';
 import { useTheme } from "next-themes";
+import { ethers } from "ethers";
+import { parseRevertReason } from '../../../utils/errorHandling';
 
 
 const BuyBombers = () => {
@@ -76,7 +78,42 @@ const BuyBombers = () => {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [purchaseAmounts, setPurchaseAmounts] = useState<{ [key: string]: number }>({});
 
-    const handleBuyBombers = async (key: string) => {
+    // const handleBuyBombers = async (key: string) => {
+    //     const amount = purchaseAmounts[key] || 1;
+    //     const bomberKey = bomberKeyMapping[key] || key;
+
+    //     if (!nationId) {
+    //         console.error("Nation ID is null");
+    //         return;
+    //     }
+
+    //     console.log("Buying bombers:", bomberKey, amount);
+
+    //     if (bomberKey == "buyAh1Cobra") {
+    //         await buyAh1Cobra(nationId, amount, publicClient, BombersMarketplace1, writeContractAsync);  
+    //     } else if (bomberKey == "buyAh64Apache") {
+    //         await buyAh64Apache(nationId, amount, publicClient, BombersMarketplace1, writeContractAsync);  
+    //     } else if (bomberKey == "buyBristolBlenheim") {
+    //         await buyBristolBlenheim(nationId, amount, publicClient, BombersMarketplace1, writeContractAsync);  
+    //     } else if (bomberKey == "buyB52Mitchell") {
+    //         await buyB52Mitchell(nationId, amount, publicClient, BombersMarketplace1, writeContractAsync);  
+    //     } else if (bomberKey == "buyB17gFlyingFortress") {
+    //         await buyB17gFlyingFortress(nationId, amount, publicClient, BombersMarketplace1, writeContractAsync);  
+    //     } else if (bomberKey == "buyB52Stratofortress") {
+    //         await buyB52Stratofortress(nationId, amount, publicClient, BombersMarketplace2, writeContractAsync);  
+    //     } else if (bomberKey == "buyB2Spirit") {
+    //         await buyB2Spirit(nationId, amount, publicClient, BombersMarketplace2, writeContractAsync);  
+    //     } else if (bomberKey == "buyB1bLancer") {
+    //         await buyB1bLancer(nationId, amount, publicClient, BombersMarketplace2, writeContractAsync);  
+    //     } else if (bomberKey == "buyTupolevTu160") {
+    //         await buyTupolevTu160(nationId, amount, publicClient, BombersMarketplace2, writeContractAsync);  
+    //     } else {
+    //         console.error("Invalid fighter key");
+    //     }
+    // }
+
+    const handleBuyBombers = async (key : string) => {
+                        
         const amount = purchaseAmounts[key] || 1;
         const bomberKey = bomberKeyMapping[key] || key;
 
@@ -87,26 +124,104 @@ const BuyBombers = () => {
 
         console.log("Buying bombers:", bomberKey, amount);
 
-        if (bomberKey == "buyAh1Cobra") {
-            await buyAh1Cobra(nationId, amount, publicClient, BombersMarketplace1, writeContractAsync);  
-        } else if (bomberKey == "buyAh64Apache") {
-            await buyAh64Apache(nationId, amount, publicClient, BombersMarketplace1, writeContractAsync);  
-        } else if (bomberKey == "buyBristolBlenheim") {
-            await buyBristolBlenheim(nationId, amount, publicClient, BombersMarketplace1, writeContractAsync);  
-        } else if (bomberKey == "buyB52Mitchell") {
-            await buyB52Mitchell(nationId, amount, publicClient, BombersMarketplace1, writeContractAsync);  
-        } else if (bomberKey == "buyB17gFlyingFortress") {
-            await buyB17gFlyingFortress(nationId, amount, publicClient, BombersMarketplace1, writeContractAsync);  
-        } else if (bomberKey == "buyB52Stratofortress") {
-            await buyB52Stratofortress(nationId, amount, publicClient, BombersMarketplace2, writeContractAsync);  
-        } else if (bomberKey == "buyB2Spirit") {
-            await buyB2Spirit(nationId, amount, publicClient, BombersMarketplace2, writeContractAsync);  
-        } else if (bomberKey == "buyB1bLancer") {
-            await buyB1bLancer(nationId, amount, publicClient, BombersMarketplace2, writeContractAsync);  
-        } else if (bomberKey == "buyTupolevTu160") {
-            await buyTupolevTu160(nationId, amount, publicClient, BombersMarketplace2, writeContractAsync);  
-        } else {
-            console.error("Invalid fighter key");
+        const contractData1 = contractsData.BombersMarketplace1;
+        const abi1 = contractData1.abi;
+        
+        if (!contractData1.address || !abi1) {
+            console.error("Contract address or ABI is missing");
+            return;
+        }
+
+        const contractData2 = contractsData.BombersMarketplace1;
+        const abi2 = contractData2.abi;
+
+        if (!contractData2.address || !abi2) {
+            console.error("Contract address or ABI is missing");
+            return;
+        }
+        
+        try {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = provider.getSigner();
+            const userAddress = await signer.getAddress();
+
+            const contract1 = new ethers.Contract(contractData1.address, abi1 as ethers.ContractInterface, signer);
+            const contract2 = new ethers.Contract(contractData2.address, abi2 as ethers.ContractInterface, signer);
+
+            let data;
+
+            if (bomberKey == "buyAh1Cobra" || bomberKey == "buyAh64Apache" || bomberKey == "buyBristolBlenheim" || bomberKey == "buyB52Mitchell" || bomberKey == "buyB17gFlyingFortress") {
+                data = contract1.interface.encodeFunctionData(bomberKey, [nationId, amount]);
+            } else {
+                data = contract2.interface.encodeFunctionData(bomberKey, [nationId, amount]);
+            }
+
+            try {
+
+                let result 
+
+                if (bomberKey == "buyAh1Cobra" || bomberKey == "buyAh64Apache" || bomberKey == "buyBristolBlenheim" || bomberKey == "buyB52Mitchell" || bomberKey == "buyB17gFlyingFortress") {
+
+                    result = await provider.call({
+                        to: contract1.address,
+                        data: data,
+                        from: userAddress,
+                    });
+
+                } else {
+                    
+                    result = await provider.call({
+                        to: contract2.address,
+                        data: data,
+                        from: userAddress,
+                    });
+
+                }
+
+                console.log("Transaction Simulation Result:", result);
+
+                if (result.startsWith("0x08c379a0")) {
+                    const errorMessage = parseRevertReason({ data: result });
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;
+                }
+
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Transaction simulation failed:", errorMessage);
+                alert(`Transaction failed: ${errorMessage}`);
+                return;            
+            }
+
+            if (bomberKey == "buyAh1Cobra") {
+                await buyAh1Cobra(nationId, amount, publicClient, BombersMarketplace1, writeContractAsync);  
+            } else if (bomberKey == "buyAh64Apache") {
+                await buyAh64Apache(nationId, amount, publicClient, BombersMarketplace1, writeContractAsync);  
+            } else if (bomberKey == "buyBristolBlenheim") {
+                await buyBristolBlenheim(nationId, amount, publicClient, BombersMarketplace1, writeContractAsync);  
+            } else if (bomberKey == "buyB52Mitchell") {
+                await buyB52Mitchell(nationId, amount, publicClient, BombersMarketplace1, writeContractAsync);  
+            } else if (bomberKey == "buyB17gFlyingFortress") {
+                await buyB17gFlyingFortress(nationId, amount, publicClient, BombersMarketplace1, writeContractAsync);  
+            } else if (bomberKey == "buyB52Stratofortress") {
+                await buyB52Stratofortress(nationId, amount, publicClient, BombersMarketplace2, writeContractAsync);  
+            } else if (bomberKey == "buyB2Spirit") {
+                await buyB2Spirit(nationId, amount, publicClient, BombersMarketplace2, writeContractAsync);  
+            } else if (bomberKey == "buyB1bLancer") {
+                await buyB1bLancer(nationId, amount, publicClient, BombersMarketplace2, writeContractAsync);  
+            } else if (bomberKey == "buyTupolevTu160") {
+                await buyTupolevTu160(nationId, amount, publicClient, BombersMarketplace2, writeContractAsync);  
+            } else {
+                console.error("Invalid Bomber key");
+            }
+
+            alert("Bombers purchased successfully!");
+            
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error);
+            console.error("Transaction failed:", errorMessage);
+            alert(`Transaction failed: ${errorMessage}`);
         }
     }
 

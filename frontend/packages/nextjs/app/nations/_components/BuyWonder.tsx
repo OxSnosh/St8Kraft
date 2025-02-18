@@ -8,6 +8,8 @@ import { useSearchParams } from "next/navigation";
 import { getWonders, buyWonder } from "~~/utils/wonders";
 import { checkBalance } from "~~/utils/treasury";
 import { useTheme } from "next-themes";
+import { ethers } from "ethers";
+import { parseRevertReason } from '../../../utils/errorHandling';
 
 const BuyWonder = () => {
     const { theme } = useTheme();
@@ -64,29 +66,151 @@ const BuyWonder = () => {
 
     const [wonderDetails, setWonderDetails] = useState<{ [key: string]: any }>({});
 
+    // const handleBuyWonder = async (key: keyof typeof wonderKeyMapping) => {
+    //     const wonderKey = wonderKeyMapping[key] || key;
+
+    //     if (nationId) {
+    //         try {
+    //             await buyWonder(
+    //                 nationId,
+    //                 wonderKey,
+    //                 publicClient,
+    //                 WondersContract1,
+    //                 WondersContract2,
+    //                 WondersContract3,
+    //                 WondersContract4,
+    //                 writeContractAsync
+    //             );
+    //             window.location.reload();
+    //         } catch (error) {
+    //             console.error("Error purchasing wonder:", error);
+    //         }
+    //     } else {
+    //         console.error("Nation ID is null");
+    //     }
+    // };
+
     const handleBuyWonder = async (key: keyof typeof wonderKeyMapping) => {
         const wonderKey = wonderKeyMapping[key] || key;
-
-        if (nationId) {
-            try {
-                await buyWonder(
-                    nationId,
-                    wonderKey,
-                    publicClient,
-                    WondersContract1,
-                    WondersContract2,
-                    WondersContract3,
-                    WondersContract4,
-                    writeContractAsync
-                );
-                window.location.reload();
-            } catch (error) {
-                console.error("Error purchasing wonder:", error);
+    
+        // Mapping of contracts to their respective wonder-buying functions
+        const wonderMappings = {
+            WonderContract1: [
+                "buyAgriculturalDevelopmentProgram", "buyAntiAirDefenseNetwork",
+                "buyCentralIntelligenceAgency", "buyDisasterReliefAgency",
+                "buyEmpWeaponization", "buyFalloutShelterSystem", "buyFederalAidCommission",
+                "buyFederalReserve", "buyForeignAirforceBase", "buyForeignArmyBase",
+                "buyForeignNavalBase"
+            ],
+            WonderContract2: [
+                "buyGreatMonument", "buyGreatTemple", "buyGreatUniversity",
+                "buyHiddenNuclearMissileSilo", "buyInterceptorMissileSystem",
+                "buyInternet", "buyInterstateSystem", "buyManhattanProject",
+                "buyMiningIndustryConsortium"
+            ],
+            WonderContract3: [
+                "buyMovieIndustry", "buyNationalCemetery", "buyNationalEnvironmentalOffice",
+                "buyNationalResearchLab", "buyNationalWarMemorial", "buyNuclearPowerPlant",
+                "buyPentagon", "buyPoliticalLobbyists", "buyScientificDevelopmentCenter"
+            ],
+            WonderContract4: [
+                "buySocialSecuritySystem", "buySpaceProgram", "buyStockMarket",
+                "buyStrategicDefenseInitiative", "buySuperiorLogisticalSupport",
+                "buyUniversalHealthcare", "buyWeaponsResearchCenter"
+            ]
+        };
+    
+        // Identify which contract and function to use
+        let selectedContractKey = null;
+        let wonderIndex = -1;
+        
+        for (const [contractKey, wonders] of Object.entries(wonderMappings)) {
+            const index = wonders.indexOf(wonderKey);
+            if (index !== -1) {
+                selectedContractKey = contractKey;
+                wonderIndex = index + 1; // Contract functions typically start at ID 1
+                break;
             }
-        } else {
-            console.error("Nation ID is null");
+        }
+    
+        if (!selectedContractKey || wonderIndex === -1) {
+            console.error(`Wonder key "${wonderKey}" not found in any contract mapping.`);
+            alert("Invalid wonder selection.");
+            return;
+        }
+    
+        // Get the corresponding contract data
+        const contractData = contractsData[selectedContractKey];
+        if (!contractData || !contractData.address || !contractData.abi) {
+            console.error(`Contract data missing for ${selectedContractKey}`);
+            return;
+        }
+    
+        try {
+            // Initialize Web3 Provider
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = provider.getSigner();
+            const userAddress = await signer.getAddress();
+    
+            // Initialize the correct contract
+            const contract = new ethers.Contract(contractData.address, contractData.abi as ethers.ContractInterface, signer);
+    
+            // Encode function call data
+            const data = contract.interface.encodeFunctionData(`buyWonder${selectedContractKey.slice(-1)}`, [nationId, wonderIndex]);
+    
+            // Simulate the transaction before sending
+            try {
+                const result = await provider.call({
+                    to: contract.address,
+                    data: data,
+                    from: userAddress,
+                });
+    
+                console.log("Transaction Simulation Result:", result);
+    
+                if (result.startsWith("0x08c379a0")) {
+                    const errorMessage = parseRevertReason({ data: result });
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;
+                }
+            } catch (simulationError: any) {
+                const errorMessage = parseRevertReason(simulationError);
+                console.error("Transaction simulation failed:", errorMessage);
+                alert(`Transaction failed: ${errorMessage}`);
+                return;
+            }
+    
+            // If the transaction simulation passes, proceed with the actual transaction
+            if (nationId) {
+                try {
+                    await buyWonder(
+                        nationId,
+                        wonderKey,
+                        publicClient,
+                        contractsData.WonderContract1,
+                        contractsData.WonderContract2,
+                        contractsData.WonderContract3,
+                        contractsData.WonderContract4,
+                        writeContractAsync
+                    );
+                    alert("Wonder purchased successfully!");
+                    window.location.reload();
+                } catch (txError) {
+                    console.error("Error purchasing wonder:", txError);
+                    alert(`Transaction failed: ${(txError as any).message || "Unknown error"}`);
+                }
+            } else {
+                console.error("Nation ID is null");
+                alert("Nation ID is missing.");
+            }
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error);
+            console.error("Transaction failed:", errorMessage);
+            alert(`Transaction failed: ${errorMessage}`);
         }
     };
+    
 
     const fetchWonderDetails = async () => {
         if (!nationId || !publicClient || !WondersContract1 || !WondersContract2 || !WondersContract3 || !WondersContract4 || !TreasuryContract) return;

@@ -9,6 +9,8 @@ import { buyImprovement } from "~~/utils/improvements";
 import { getImprovements } from "~~/utils/improvements";
 import { checkBalance } from "~~/utils/treasury";
 import { useTheme } from "next-themes";
+import { ethers } from "ethers";
+import { parseRevertReason } from '../../../utils/errorHandling';
 
 const BuyImprovement = () => {
     const { theme } = useTheme();
@@ -75,33 +77,157 @@ const BuyImprovement = () => {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [purchaseAmounts, setPurchaseAmounts] = useState<{ [key: string]: number }>({});
 
+    // const handleBuyImprovement = async (key: string) => {
+    //     const amount = purchaseAmounts[key] || 1;
+    //     const improvementKey = improvementKeyMapping[key] || key;
+
+    //     console.log(improvementKey)
+    //     if (nationId) {
+    //         try {
+    //             await buyImprovement(
+    //                 nationId,
+    //                 improvementKey,
+    //                 amount,
+    //                 publicClient,
+    //                 ImprovementContract1,
+    //                 ImprovementContract2,
+    //                 ImprovementContract3,
+    //                 ImprovementContract4,
+    //                 writeContractAsync
+    //             );
+
+    //             window.location.reload();
+    //         } catch (error) {
+    //             console.error("Error purchasing improvement:", error);
+    //         }
+    //     } else {
+    //         console.error("Nation ID is null");
+    //     }
+    // };
+
     const handleBuyImprovement = async (key: string) => {
         const amount = purchaseAmounts[key] || 1;
-        const improvementKey = improvementKeyMapping[key] || key;
-
-        console.log(improvementKey)
-        if (nationId) {
-            try {
-                await buyImprovement(
-                    nationId,
-                    improvementKey,
-                    amount,
-                    publicClient,
-                    ImprovementContract1,
-                    ImprovementContract2,
-                    ImprovementContract3,
-                    ImprovementContract4,
-                    writeContractAsync
-                );
-
-                window.location.reload();
-            } catch (error) {
-                console.error("Error purchasing improvement:", error);
+        const improvementKey: string = improvementKeyMapping[key] || key;
+    
+        // Mapping of improvements to their respective contract and function
+        const improvementMappings = {
+            ImprovementsContract1: [
+                "buyAirport", "buyBarracks", "buyBorderFortification", "buyBorderWall",
+                "buyBank", "buyBunker", "buyCasino", "buyChurch", "buyDrydock", "buyClinic", "buyFactory"
+            ],
+            ImprovementsContract2: [
+                "buyForeignMinistry", "buyForwardOperatingBase", "buyGuerillaCamp", "buyHarbor",
+                "buyHospital", "buyIntelAgency", "buyJail", "buyLaborCamp"
+            ],
+            ImprovementsContract3: [
+                "buyPrison", "buyRadiationContainmentChamber", "buyRedLightDistrict",
+                "buyRehabilitationFacility", "buySatellite", "buySchool", "buyShipyard",
+                "buyStadium", "buyUniversity"
+            ],
+            ImprovementsContract4: [
+                "buyMissileDefense", "buyMunitionsFactory", "buyNavalAcademy",
+                "buyNavalConstructionYard", "buyOfficeOfPropaganda", "buyPoliceHeadquarters"
+            ]
+        };
+    
+        // Identify the correct contract and improvement index
+        let selectedContractKey: keyof typeof contractsData | null = null;
+        let improvementIndex = -1;
+    
+        for (const [contractKey, improvements] of Object.entries(improvementMappings)) {
+            const index = improvements.indexOf(improvementKey as string);
+            if (index !== -1) {
+                selectedContractKey = contractKey as keyof typeof contractsData;
+                improvementIndex = index + 1; // Improvement IDs start at 1
+                break;
             }
-        } else {
-            console.error("Nation ID is null");
+        }
+    
+        if (!selectedContractKey || improvementIndex === -1) {
+            console.error(`Improvement "${improvementKey}" not found in any contract mapping.`);
+            alert("Invalid improvement selection.");
+            return;
+        }
+    
+        // Retrieve contract data
+        const contractData = contractsData[selectedContractKey];
+        if (!contractData || !contractData.address || !contractData.abi) {
+            console.error(`Contract data missing for ${selectedContractKey}`);
+            return;
+        }
+    
+        try {
+            // Initialize Web3 provider
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = provider.getSigner();
+            const userAddress = await signer.getAddress();
+    
+            // Initialize contract instance
+            const contract = new ethers.Contract(contractData.address, contractData.abi as ethers.ContractInterface, signer);
+    
+            // Encode function call data
+            const functionName = `buyImprovement${(selectedContractKey as string).slice(-1)}`;
+            const data = contract.interface.encodeFunctionData(functionName, [nationId, improvementIndex, amount]);
+    
+            // Simulate the transaction
+            try {
+                const result = await provider.call({
+                    to: contract.address,
+                    data: data,
+                    from: userAddress,
+                });
+    
+                console.log("Transaction Simulation Result:", result);
+    
+                if (result.startsWith("0x08c379a0")) {
+                    const errorMessage = parseRevertReason({ data: result });
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;
+                }
+            } catch (simulationError: any) {
+                const errorMessage = parseRevertReason(simulationError);
+                console.error("Transaction simulation failed:", errorMessage);
+                alert(`Transaction failed: ${errorMessage}`);
+                return;
+            }
+    
+            // If the transaction simulation passes, proceed with the actual transaction
+            if (nationId) {
+                try {
+                    await buyImprovement(
+                        nationId,
+                        improvementKey,
+                        amount,
+                        publicClient,
+                        contractsData.ImprovementsContract1,
+                        contractsData.ImprovementsContract2,
+                        contractsData.ImprovementsContract3,
+                        contractsData.ImprovementsContract4,
+                        writeContractAsync
+                    );
+                    alert("Improvement purchased successfully!");
+                    window.location.reload();
+
+                } catch (txError) {
+                    console.error("Error purchasing improvement:", txError);
+                    if (txError instanceof Error) {
+                        alert(`Transaction failed: ${txError.message}`);
+                    } else {
+                        alert("Transaction failed: Unknown error");
+                    }
+                }
+            } else {
+                console.error("Nation ID is null");
+                alert("Nation ID is missing.");
+            }
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error);
+            console.error("Transaction failed:", errorMessage);
+            alert(`Transaction failed: ${errorMessage}`);
         }
     };
+    
 
     const fetchImprovementDetails = async () => {
         if (!nationId || !publicClient || !ImprovementContract1 || !ImprovementContract2 || !ImprovementContract3 || !ImprovementContract4 || !TreasuryContract) return;

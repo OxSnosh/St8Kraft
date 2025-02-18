@@ -25,6 +25,8 @@ import {
     getAircraftCarrierCount,
 } from '../../../utils/navy';
 import { useTheme } from "next-themes";
+import { ethers } from "ethers";
+import { parseRevertReason } from '../../../utils/errorHandling';
 
 const BuyNavy = () => {
     const { theme } = useTheme();
@@ -70,7 +72,40 @@ const BuyNavy = () => {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [purchaseAmounts, setPurchaseAmounts] = useState<{ [key: string]: number }>({});
 
-    const handleBuyNavy = async (key: string) => {
+    // const handleBuyNavy = async (key: string) => {
+    //     const amount = purchaseAmounts[key] || 1;
+    //     const navyKey = navyKeyMapping[key] || key;
+
+    //     if (!nationId) {
+    //         console.error("Nation ID is null");
+    //         return;
+    //     }
+
+    //     console.log("Buying navy:", navyKey, amount);
+
+    //     if (navyKey == "buyCorvette") {
+    //         await buyCorvette(nationId, amount, publicClient, NavyContract1, writeContractAsync);
+    //     } else if (navyKey == "buyLandingShip") {
+    //         await buyLandingShip(nationId, amount, publicClient, NavyContract1, writeContractAsync);
+    //     } else if (navyKey == "buyBattleship") {
+    //         await buyBattleship(nationId, amount, publicClient, NavyContract1, writeContractAsync);
+    //     } else if (navyKey == "buyCruiser") {
+    //         await buyCruiser(nationId, amount, publicClient, NavyContract1, writeContractAsync);
+    //     } else if (navyKey == "buyFrigate") {
+    //         await buyFrigate(nationId, amount, publicClient, NavyContract2, writeContractAsync);
+    //     } else if (navyKey == "buyDestroyer") {
+    //         await buyDestroyer(nationId, amount, publicClient, NavyContract2, writeContractAsync);
+    //     } else if (navyKey == "buySubmarine") {
+    //         await buySubmarine(nationId, amount, publicClient, NavyContract2, writeContractAsync);
+    //     } else if (navyKey == "buyAircraftCarrier") {
+    //         await buyAircraftCarrier(nationId, amount, publicClient, NavyContract2, writeContractAsync);
+    //     } else {
+    //         console.error("Invalid navy key");
+    //     }
+    // }
+
+    const handleBuyNavy = async (key : string) => {
+                    
         const amount = purchaseAmounts[key] || 1;
         const navyKey = navyKeyMapping[key] || key;
 
@@ -79,26 +114,141 @@ const BuyNavy = () => {
             return;
         }
 
-        console.log("Buying bombers:", navyKey, amount);
+        console.log("Buying navy:", navyKey, amount);
 
-        if (navyKey == "buyCorvette") {
-            await buyCorvette(nationId, amount, publicClient, NavyContract1, writeContractAsync);
-        } else if (navyKey == "buyLandingShip") {
-            await buyLandingShip(nationId, amount, publicClient, NavyContract1, writeContractAsync);
-        } else if (navyKey == "buyBattleship") {
-            await buyBattleship(nationId, amount, publicClient, NavyContract1, writeContractAsync);
-        } else if (navyKey == "buyCruiser") {
-            await buyCruiser(nationId, amount, publicClient, NavyContract1, writeContractAsync);
-        } else if (navyKey == "buyFrigate") {
-            await buyFrigate(nationId, amount, publicClient, NavyContract2, writeContractAsync);
-        } else if (navyKey == "buyDestroyer") {
-            await buyDestroyer(nationId, amount, publicClient, NavyContract2, writeContractAsync);
-        } else if (navyKey == "buySubmarine") {
-            await buySubmarine(nationId, amount, publicClient, NavyContract2, writeContractAsync);
-        } else if (navyKey == "buyAircraftCarrier") {
-            await buyAircraftCarrier(nationId, amount, publicClient, NavyContract2, writeContractAsync);
-        } else {
-            console.error("Invalid fighter key");
+        const contractData1 = contractsData.NavyContract;
+        const abi1 = contractData1.abi;
+        
+        if (!contractData1.address || !abi1) {
+            console.error("Contract address or ABI is missing");
+            return;
+        }
+
+        const contractData2 = contractsData.NavyContract2;
+        const abi2 = contractData2.abi;
+
+        if (!contractData2.address || !abi2) {
+            console.error("Contract address or ABI is missing");
+            return;
+        }
+        
+        try {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = provider.getSigner();
+            const userAddress = await signer.getAddress();
+
+            const contract1 = new ethers.Contract(contractData1.address, abi1 as ethers.ContractInterface, signer);
+            const contract2 = new ethers.Contract(contractData2.address, abi2 as ethers.ContractInterface, signer);
+
+            let data;
+
+            if (navyKey == "buyCorvette") {
+                data = contract1.interface.encodeFunctionData("buyCorvette", [
+                    Number(amount),
+                    nationId,
+                ]);
+            } else if (navyKey == "buyLandingShip") {
+                data = contract1.interface.encodeFunctionData("buyLandingShip", [
+                    Number(amount),
+                    nationId,
+                ]);
+            } else if (navyKey == "buyBattleship") {
+                data = contract1.interface.encodeFunctionData("buyBattleship", [
+                    Number(amount),
+                    nationId,
+                ]);
+            } else if (navyKey == "buyCruiser") {
+                data = contract1.interface.encodeFunctionData("buyCruiser", [
+                    Number(amount),
+                    nationId,
+                ]);
+            } else if (navyKey == "buyFrigate") {
+                data = contract2.interface.encodeFunctionData("buyFrigate", [
+                    Number(amount),
+                    nationId,
+                ]);
+            } else if (navyKey == "buyDestroyer") {
+                data = contract2.interface.encodeFunctionData("buyDestroyer", [
+                    Number(amount),
+                    nationId,
+                ]);
+            } else if (navyKey == "buySubmarine") {
+                data = contract2.interface.encodeFunctionData("buySubmarine", [
+                    Number(amount),
+                    nationId,
+                ]);
+            } else if (navyKey == "buyAircraftCarrier") {
+                data = contract2.interface.encodeFunctionData("buyAircraftCarrier", [
+                    Number(amount),
+                    nationId,
+                ]);
+            } else {
+                console.error("Invalid navy key");
+            }
+
+            try {
+
+                let result 
+
+                if (navyKey == "buyCorvette" || navyKey == "buyLandingShip" || navyKey == "buyBattleship" || navyKey == "buyCruiser") {
+
+                    result = await provider.call({
+                        to: contract1.address,
+                        data: data,
+                        from: userAddress,
+                    });
+
+                } else {
+                    
+                    result = await provider.call({
+                        to: contract2.address,
+                        data: data,
+                        from: userAddress,
+                    });
+
+                }
+
+                console.log("Transaction Simulation Result:", result);
+
+                if (result.startsWith("0x08c379a0")) {
+                    const errorMessage = parseRevertReason({ data: result });
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;
+                }
+
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Transaction simulation failed:", errorMessage);
+                alert(`Transaction failed: ${errorMessage}`);
+                return;            
+            }
+
+            if (navyKey == "buyCorvette") {
+                await buyCorvette(nationId, amount, publicClient, NavyContract1, writeContractAsync);
+            } else if (navyKey == "buyLandingShip") {
+                await buyLandingShip(nationId, amount, publicClient, NavyContract1, writeContractAsync);
+            } else if (navyKey == "buyBattleship") {
+                await buyBattleship(nationId, amount, publicClient, NavyContract1, writeContractAsync);
+            } else if (navyKey == "buyCruiser") {
+                await buyCruiser(nationId, amount, publicClient, NavyContract1, writeContractAsync);
+            } else if (navyKey == "buyFrigate") {
+                await buyFrigate(nationId, amount, publicClient, NavyContract2, writeContractAsync);
+            } else if (navyKey == "buyDestroyer") {
+                await buyDestroyer(nationId, amount, publicClient, NavyContract2, writeContractAsync);
+            } else if (navyKey == "buySubmarine") {
+                await buySubmarine(nationId, amount, publicClient, NavyContract2, writeContractAsync);
+            } else if (navyKey == "buyAircraftCarrier") {
+                await buyAircraftCarrier(nationId, amount, publicClient, NavyContract2, writeContractAsync);
+            } else {
+                console.error("Invalid navy key");
+            }
+            alert("Navy purchased successfully!");
+            
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error);
+            console.error("Transaction failed:", errorMessage);
+            alert(`Transaction failed: ${errorMessage}`);
         }
     }
 

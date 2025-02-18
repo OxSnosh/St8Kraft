@@ -27,7 +27,8 @@ import {
     getF22RaptorCount,
 } from '../../../utils/fighters';
 import { useTheme } from "next-themes";
-
+import { ethers } from "ethers";
+import { parseRevertReason } from '../../../utils/errorHandling';
 
 const BuyFighters = () => {
     const { theme } = useTheme();
@@ -76,7 +77,141 @@ const BuyFighters = () => {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [purchaseAmounts, setPurchaseAmounts] = useState<{ [key: string]: number }>({});
 
-    const handleBuyFighters = async (key: string) => {
+    // const handleBuyFighters = async (key: string) => {
+    //     const amount = purchaseAmounts[key] || 1;
+    //     const fighterKey = fighterKeyMapping[key] || key;
+
+    //     if (!nationId) {
+    //         console.error("Nation ID is null");
+    //         return;
+    //     }
+
+    //     console.log("Buying fighters:", fighterKey, amount);
+
+    //     if (fighterKey == "buyYak9") {
+    //         try {
+    //             await buyYak9(
+    //                 nationId,
+    //                 amount,
+    //                 publicClient,
+    //                 FightersMarketplace1,
+    //                 writeContractAsync
+    //             );
+    //             window.location.reload();
+    //         } catch (error) {
+    //             console.error("Error purchasing fighter:", error);
+    //         }
+    //     } else if (fighterKey == "buyP51Mustang") {
+    //         try {
+    //             await buyP51Mustang(
+    //                 nationId,
+    //                 amount,
+    //                 publicClient,
+    //                 FightersMarketplace1,
+    //                 writeContractAsync
+    //             );
+    //             window.location.reload();
+    //         } catch (error) {
+    //             console.error("Error purchasing fighter:", error);
+    //         }
+    //     } else if (fighterKey == "buyF86Sabre") {
+    //         try {
+    //             await buyF86Sabre(
+    //                 nationId,
+    //                 amount,
+    //                 publicClient,
+    //                 FightersMarketplace1,
+    //                 writeContractAsync
+    //             );
+    //             window.location.reload();
+    //         } catch (error) {
+    //             console.error("Error purchasing fighter:", error);
+    //         }
+    //     } else if (fighterKey == "buyMig15") {
+    //         try {
+    //             await buyMig15(
+    //                 nationId,
+    //                 amount,
+    //                 publicClient,
+    //                 FightersMarketplace1,
+    //                 writeContractAsync
+    //             );
+    //             window.location.reload();
+    //         } catch (error) {
+    //             console.error("Error purchasing fighter:", error);
+    //         }
+    //     } else if (fighterKey == "buyF100SuperSabre") {
+    //         try {
+    //             await buyF100SuperSabre(
+    //                 nationId,
+    //                 amount,
+    //                 publicClient,
+    //                 FightersMarketplace1,
+    //                 writeContractAsync
+    //             );
+    //             window.location.reload();
+    //         } catch (error) {
+    //             console.error("Error purchasing fighter:", error);
+    //         }
+    //     } else if (fighterKey == "buyF35Lightning") {
+    //         try {
+    //             await buyF35Lightning(
+    //                 nationId,
+    //                 amount,
+    //                 publicClient,
+    //                 FightersMarketplace2,
+    //                 writeContractAsync
+    //             );
+    //             window.location.reload();
+    //         } catch (error) {
+    //             console.error("Error purchasing fighter:", error);
+    //         }
+    //     } else if (fighterKey == "buyF15Eagle") {
+    //         try {
+    //             await buyF15Eagle(
+    //                 nationId,
+    //                 amount,
+    //                 publicClient,
+    //                 FightersMarketplace2,
+    //                 writeContractAsync
+    //             );
+    //             window.location.reload();
+    //         } catch (error) {
+    //             console.error("Error purchasing fighter:", error);
+    //         }
+    //     } else if (fighterKey == "buySu30Mki") {
+    //         try {
+    //             await buySu30Mki(
+    //                 nationId,
+    //                 amount,
+    //                 publicClient,
+    //                 FightersMarketplace2,
+    //                 writeContractAsync
+    //             );
+    //             window.location.reload();
+    //         } catch (error) {
+    //             console.error("Error purchasing fighter:", error);
+    //         }
+    //     } else if (fighterKey == "buyF22Raptor") {
+    //         try {
+    //             await buyF22Raptor(
+    //                 nationId,
+    //                 amount,
+    //                 publicClient,
+    //                 FightersMarketplace2,
+    //                 writeContractAsync
+    //             );
+    //             window.location.reload();
+    //         } catch (error) {
+    //             console.error("Error purchasing fighter:", error);
+    //         }
+    //     } else {
+    //         console.error("Invalid fighter key");
+    //     }
+    // }
+
+    const handleBuyFighters = async (key : string) => {
+                    
         const amount = purchaseAmounts[key] || 1;
         const fighterKey = fighterKeyMapping[key] || key;
 
@@ -87,125 +222,203 @@ const BuyFighters = () => {
 
         console.log("Buying fighters:", fighterKey, amount);
 
-        if (fighterKey == "buyYak9") {
-            try {
-                await buyYak9(
-                    nationId,
-                    amount,
-                    publicClient,
-                    FightersMarketplace1,
-                    writeContractAsync
-                );
-                window.location.reload();
-            } catch (error) {
-                console.error("Error purchasing fighter:", error);
+        const contractData1 = contractsData.FightersMarketplace1;
+        const abi1 = contractData1.abi;
+        
+        if (!contractData1.address || !abi1) {
+            console.error("Contract address or ABI is missing");
+            return;
+        }
+
+        const contractData2 = contractsData.FightersMarketplace2;
+        const abi2 = contractData2.abi;
+
+        if (!contractData2.address || !abi2) {
+            console.error("Contract address or ABI is missing");
+            return;
+        }
+        
+        try {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = provider.getSigner();
+            const userAddress = await signer.getAddress();
+
+            const contract1 = new ethers.Contract(contractData1.address, abi1 as ethers.ContractInterface, signer);
+            const contract2 = new ethers.Contract(contractData2.address, abi2 as ethers.ContractInterface, signer);
+
+            let data;
+
+            if (fighterKey == "buyYak9" || fighterKey == "buyP51Mustang" || fighterKey == "buyF86Sabre" || fighterKey == "buyMig15" || fighterKey == "buyF100SuperSabre") {
+                data = contract1.interface.encodeFunctionData(fighterKey, [nationId, amount]);
+            } else {
+                data = contract2.interface.encodeFunctionData(fighterKey, [nationId, amount]);
             }
-        } else if (fighterKey == "buyP51Mustang") {
+
             try {
-                await buyP51Mustang(
-                    nationId,
-                    amount,
-                    publicClient,
-                    FightersMarketplace1,
-                    writeContractAsync
-                );
-                window.location.reload();
-            } catch (error) {
-                console.error("Error purchasing fighter:", error);
+
+                let result 
+
+                if (fighterKey == "buyYak9" || fighterKey == "buyP51Mustang" || fighterKey == "buyF86Sabre" || fighterKey == "buyMig15" || fighterKey == "buyF100SuperSabre") {
+
+                    result = await provider.call({
+                        to: contract1.address,
+                        data: data,
+                        from: userAddress,
+                    });
+
+                } else {
+                    
+                    result = await provider.call({
+                        to: contract2.address,
+                        data: data,
+                        from: userAddress,
+                    });
+
+                }
+
+                console.log("Transaction Simulation Result:", result);
+
+                if (result.startsWith("0x08c379a0")) {
+                    const errorMessage = parseRevertReason({ data: result });
+                    alert(`Transaction failed: ${errorMessage}`);
+                    return;
+                }
+
+            } catch (error: any) {
+                const errorMessage = parseRevertReason(error);
+                console.error("Transaction simulation failed:", errorMessage);
+                alert(`Transaction failed: ${errorMessage}`);
+                return;            
             }
-        } else if (fighterKey == "buyF86Sabre") {
-            try {
-                await buyF86Sabre(
-                    nationId,
-                    amount,
-                    publicClient,
-                    FightersMarketplace1,
-                    writeContractAsync
-                );
-                window.location.reload();
-            } catch (error) {
-                console.error("Error purchasing fighter:", error);
+
+            if (fighterKey == "buyYak9") {
+                try {
+                    await buyYak9(
+                        nationId,
+                        amount,
+                        publicClient,
+                        FightersMarketplace1,
+                        writeContractAsync
+                    );
+                    window.location.reload();
+                } catch (error) {
+                    console.error("Error purchasing fighter:", error);
+                }
+            } else if (fighterKey == "buyP51Mustang") {
+                try {
+                    await buyP51Mustang(
+                        nationId,
+                        amount,
+                        publicClient,
+                        FightersMarketplace1,
+                        writeContractAsync
+                    );
+                    window.location.reload();
+                } catch (error) {
+                    console.error("Error purchasing fighter:", error);
+                }
+            } else if (fighterKey == "buyF86Sabre") {
+                try {
+                    await buyF86Sabre(
+                        nationId,
+                        amount,
+                        publicClient,
+                        FightersMarketplace1,
+                        writeContractAsync
+                    );
+                    window.location.reload();
+                } catch (error) {
+                    console.error("Error purchasing fighter:", error);
+                }
+            } else if (fighterKey == "buyMig15") {
+                try {
+                    await buyMig15(
+                        nationId,
+                        amount,
+                        publicClient,
+                        FightersMarketplace1,
+                        writeContractAsync
+                    );
+                    window.location.reload();
+                } catch (error) {
+                    console.error("Error purchasing fighter:", error);
+                }
+            } else if (fighterKey == "buyF100SuperSabre") {
+                try {
+                    await buyF100SuperSabre(
+                        nationId,
+                        amount,
+                        publicClient,
+                        FightersMarketplace1,
+                        writeContractAsync
+                    );
+                    window.location.reload();
+                } catch (error) {
+                    console.error("Error purchasing fighter:", error);
+                }
+            } else if (fighterKey == "buyF35Lightning") {
+                try {
+                    await buyF35Lightning(
+                        nationId,
+                        amount,
+                        publicClient,
+                        FightersMarketplace2,
+                        writeContractAsync
+                    );
+                    window.location.reload();
+                } catch (error) {
+                    console.error("Error purchasing fighter:", error);
+                }
+            } else if (fighterKey == "buyF15Eagle") {
+                try {
+                    await buyF15Eagle(
+                        nationId,
+                        amount,
+                        publicClient,
+                        FightersMarketplace2,
+                        writeContractAsync
+                    );
+                    window.location.reload();
+                } catch (error) {
+                    console.error("Error purchasing fighter:", error);
+                }
+            } else if (fighterKey == "buySu30Mki") {
+                try {
+                    await buySu30Mki(
+                        nationId,
+                        amount,
+                        publicClient,
+                        FightersMarketplace2,
+                        writeContractAsync
+                    );
+                    window.location.reload();
+                } catch (error) {
+                    console.error("Error purchasing fighter:", error);
+                }
+            } else if (fighterKey == "buyF22Raptor") {
+                try {
+                    await buyF22Raptor(
+                        nationId,
+                        amount,
+                        publicClient,
+                        FightersMarketplace2,
+                        writeContractAsync
+                    );
+                    window.location.reload();
+                } catch (error) {
+                    console.error("Error purchasing fighter:", error);
+                }
+            } else {
+                console.error("Invalid fighter key");
             }
-        } else if (fighterKey == "buyMig15") {
-            try {
-                await buyMig15(
-                    nationId,
-                    amount,
-                    publicClient,
-                    FightersMarketplace1,
-                    writeContractAsync
-                );
-                window.location.reload();
-            } catch (error) {
-                console.error("Error purchasing fighter:", error);
-            }
-        } else if (fighterKey == "buyF100SuperSabre") {
-            try {
-                await buyF100SuperSabre(
-                    nationId,
-                    amount,
-                    publicClient,
-                    FightersMarketplace1,
-                    writeContractAsync
-                );
-                window.location.reload();
-            } catch (error) {
-                console.error("Error purchasing fighter:", error);
-            }
-        } else if (fighterKey == "buyF35Lightning") {
-            try {
-                await buyF35Lightning(
-                    nationId,
-                    amount,
-                    publicClient,
-                    FightersMarketplace2,
-                    writeContractAsync
-                );
-                window.location.reload();
-            } catch (error) {
-                console.error("Error purchasing fighter:", error);
-            }
-        } else if (fighterKey == "buyF15Eagle") {
-            try {
-                await buyF15Eagle(
-                    nationId,
-                    amount,
-                    publicClient,
-                    FightersMarketplace2,
-                    writeContractAsync
-                );
-                window.location.reload();
-            } catch (error) {
-                console.error("Error purchasing fighter:", error);
-            }
-        } else if (fighterKey == "buySu30Mki") {
-            try {
-                await buySu30Mki(
-                    nationId,
-                    amount,
-                    publicClient,
-                    FightersMarketplace2,
-                    writeContractAsync
-                );
-                window.location.reload();
-            } catch (error) {
-                console.error("Error purchasing fighter:", error);
-            }
-        } else if (fighterKey == "buyF22Raptor") {
-            try {
-                await buyF22Raptor(
-                    nationId,
-                    amount,
-                    publicClient,
-                    FightersMarketplace2,
-                    writeContractAsync
-                );
-                window.location.reload();
-            } catch (error) {
-                console.error("Error purchasing fighter:", error);
-            }
-        } else {
-            console.error("Invalid fighter key");
+
+            alert("Fighters purchased successfully!");
+            
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error);
+            console.error("Transaction failed:", errorMessage);
+            alert(`Transaction failed: ${errorMessage}`);
         }
     }
 

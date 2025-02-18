@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useWaitForTransactionReceipt, useWriteContract, useAccount, usePublicClient } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 import { keccak256 } from "viem";
+import { ethers } from "ethers";
+import { parseRevertReason } from '../../../utils/errorHandling';
 
 export function MintNation() {
   const [form, setForm] = useState({
@@ -106,6 +108,7 @@ export function MintNation() {
   }, [walletAddress, countryMinterContract, countryParametersContract, publicClient]);
 
   const handleWrite = async () => {
+
     if (!writeContractAsync || !countryMinterContract?.abi || !countryMinterContract?.address) {
       alert("Contract or connection is not ready. Please check your setup.");
       return;
@@ -115,82 +118,211 @@ export function MintNation() {
       console.error("Public client is not initialized.");
       return;
     }
-  
-    try {
-      setIsPending(true);
-  
-      const tx = await writeContractAsync({
-        abi: countryMinterContract.abi,
-        address: countryMinterContract.address,
-        functionName: "generateCountry",
-        args: [
-          form.rulerName,
-          form.nationName,
-          form.capitalCity,
-          form.nationSlogan,
-        ],
-      });
-  
-      setTxHash(tx); // Save the transaction hash
-  
-      // Wait for the transaction receipt
-      const receipt = await publicClient.waitForTransactionReceipt({ hash: tx });
-  
-      // Manually encode the Transfer event signature
-      const transferEventSignature = keccak256(
-        Buffer.from("Transfer(address,address,uint256)")
-      );
-  
-      // Get the new token ID from the event logs
-      const newTokenId = receipt.logs.find(
-        (log) => log.topics[0] === transferEventSignature
-      )?.topics[3]; // Topics[3] contains the token ID in Transfer events
-  
-      if (newTokenId) {
-        const tokenIdString = BigInt(newTokenId).toString(); // Convert token ID from hex to string
-  
-        // Fetch details for the newly minted token
-        const nationName = await publicClient.readContract({
-          abi: countryParametersContract.abi,
-          address: countryParametersContract.address,
-          functionName: "getNationName",
-          args: [tokenIdString],
-        });
-  
-        const rulerName = await publicClient.readContract({
-          abi: countryParametersContract.abi,
-          address: countryParametersContract.address,
-          functionName: "getRulerName",
-          args: [tokenIdString],
-        });
-  
-        const capitalCity = await publicClient.readContract({
-          abi: countryParametersContract.abi,
-          address: countryParametersContract.address,
-          functionName: "getCapital",
-          args: [tokenIdString],
-        });
-  
-        const nationSlogan = await publicClient.readContract({
-          abi: countryParametersContract.abi,
-          address: countryParametersContract.address,
-          functionName: "getSlogan",
-          args: [tokenIdString],
-        });
-  
-        // Add the new nation to the state
-        setNations((prev) => [
-          ...prev,
-          { tokenId: tokenIdString, nationName, rulerName, capitalCity, nationSlogan },
-        ]);
+
+      const contractData = contractsData.CountryMinter;
+      const abi = contractData.abi;
+      
+      if (!contractData.address || !abi) {
+          console.error("Contract address or ABI is missing");
+          return;
       }
-    } catch (error) {
-      console.error("Error while minting the nation:", error);
-      alert("An error occurred while minting the nation.");
-    } finally {
-      setIsPending(false);
-    }
-  };
+      
+      try {
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          await provider.send("eth_requestAccounts", []);
+          const signer = provider.getSigner();
+          const userAddress = await signer.getAddress();
+
+          const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+
+          const data = contract.interface.encodeFunctionData("generateCountry", [
+              form.rulerName,
+              form.nationName,
+              form.capitalCity,
+              form.nationSlogan,
+          ]);
+
+          try {
+              const result = await provider.call({
+                  to: contract.address,
+                  data: data,
+                  from: userAddress,
+              });
+
+              console.log("Transaction Simulation Result:", result);
+
+              if (result.startsWith("0x08c379a0")) {
+                  const errorMessage = parseRevertReason({ data: result });
+                  alert(`Transaction failed: ${errorMessage}`);
+                  return;
+              }
+
+          } catch (error: any) {
+              const errorMessage = parseRevertReason(error);
+              console.error("Transaction simulation failed:", errorMessage);
+              alert(`Transaction failed: ${errorMessage}`);
+              return;            
+          }
+
+          const tx = await writeContractAsync({
+            abi: countryMinterContract.abi,
+            address: countryMinterContract.address,
+            functionName: "generateCountry",
+            args: [
+              form.rulerName,
+              form.nationName,
+              form.capitalCity,
+              form.nationSlogan,
+            ],
+          });
+      
+          setTxHash(tx); // Save the transaction hash
+      
+          // Wait for the transaction receipt
+          const receipt = await publicClient.waitForTransactionReceipt({ hash: tx });
+      
+          // Manually encode the Transfer event signature
+          const transferEventSignature = keccak256(
+            Buffer.from("Transfer(address,address,uint256)")
+          );
+      
+          // Get the new token ID from the event logs
+          const newTokenId = receipt.logs.find(
+            (log) => log.topics[0] === transferEventSignature
+          )?.topics[3]; // Topics[3] contains the token ID in Transfer events
+      
+          if (newTokenId) {
+            const tokenIdString = BigInt(newTokenId).toString(); // Convert token ID from hex to string
+      
+            // Fetch details for the newly minted token
+            const nationName = await publicClient.readContract({
+              abi: countryParametersContract.abi,
+              address: countryParametersContract.address,
+              functionName: "getNationName",
+              args: [tokenIdString],
+            });
+      
+            const rulerName = await publicClient.readContract({
+              abi: countryParametersContract.abi,
+              address: countryParametersContract.address,
+              functionName: "getRulerName",
+              args: [tokenIdString],
+            });
+      
+            const capitalCity = await publicClient.readContract({
+              abi: countryParametersContract.abi,
+              address: countryParametersContract.address,
+              functionName: "getCapital",
+              args: [tokenIdString],
+            });
+      
+            const nationSlogan = await publicClient.readContract({
+              abi: countryParametersContract.abi,
+              address: countryParametersContract.address,
+              functionName: "getSlogan",
+              args: [tokenIdString],
+            });
+      
+            // Add the new nation to the state
+            setNations((prev) => [
+              ...prev,
+              { tokenId: tokenIdString, nationName, rulerName, capitalCity, nationSlogan },
+            ]);
+          }          
+          alert("Nation minted successfully!");
+      } catch (error: any) {
+          const errorMessage = parseRevertReason(error);
+          console.error("Transaction failed:", errorMessage);
+          alert(`Transaction failed: ${errorMessage}`);
+      }
+  }
+
+  // const handleWrite = async () => {
+  //   if (!writeContractAsync || !countryMinterContract?.abi || !countryMinterContract?.address) {
+  //     alert("Contract or connection is not ready. Please check your setup.");
+  //     return;
+  //   }
+  
+  //   if (!publicClient) {
+  //     console.error("Public client is not initialized.");
+  //     return;
+  //   }
+  
+  //   try {
+  //     setIsPending(true);
+  
+  //     const tx = await writeContractAsync({
+  //       abi: countryMinterContract.abi,
+  //       address: countryMinterContract.address,
+  //       functionName: "generateCountry",
+  //       args: [
+  //         form.rulerName,
+  //         form.nationName,
+  //         form.capitalCity,
+  //         form.nationSlogan,
+  //       ],
+  //     });
+  
+  //     setTxHash(tx); // Save the transaction hash
+  
+  //     // Wait for the transaction receipt
+  //     const receipt = await publicClient.waitForTransactionReceipt({ hash: tx });
+  
+  //     // Manually encode the Transfer event signature
+  //     const transferEventSignature = keccak256(
+  //       Buffer.from("Transfer(address,address,uint256)")
+  //     );
+  
+  //     // Get the new token ID from the event logs
+  //     const newTokenId = receipt.logs.find(
+  //       (log) => log.topics[0] === transferEventSignature
+  //     )?.topics[3]; // Topics[3] contains the token ID in Transfer events
+  
+  //     if (newTokenId) {
+  //       const tokenIdString = BigInt(newTokenId).toString(); // Convert token ID from hex to string
+  
+  //       // Fetch details for the newly minted token
+  //       const nationName = await publicClient.readContract({
+  //         abi: countryParametersContract.abi,
+  //         address: countryParametersContract.address,
+  //         functionName: "getNationName",
+  //         args: [tokenIdString],
+  //       });
+  
+  //       const rulerName = await publicClient.readContract({
+  //         abi: countryParametersContract.abi,
+  //         address: countryParametersContract.address,
+  //         functionName: "getRulerName",
+  //         args: [tokenIdString],
+  //       });
+  
+  //       const capitalCity = await publicClient.readContract({
+  //         abi: countryParametersContract.abi,
+  //         address: countryParametersContract.address,
+  //         functionName: "getCapital",
+  //         args: [tokenIdString],
+  //       });
+  
+  //       const nationSlogan = await publicClient.readContract({
+  //         abi: countryParametersContract.abi,
+  //         address: countryParametersContract.address,
+  //         functionName: "getSlogan",
+  //         args: [tokenIdString],
+  //       });
+  
+  //       // Add the new nation to the state
+  //       setNations((prev) => [
+  //         ...prev,
+  //         { tokenId: tokenIdString, nationName, rulerName, capitalCity, nationSlogan },
+  //       ]);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error while minting the nation:", error);
+  //     alert("An error occurred while minting the nation.");
+  //   } finally {
+  //     setIsPending(false);
+  //   }
+  // };
 
   return (
     <div className="text-center bg-secondary p-10 flex flex-col items-center justify-center"
