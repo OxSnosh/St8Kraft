@@ -7,6 +7,8 @@ import { usePublicClient, useAccount, useWriteContract } from 'wagmi';
 
 import { getResources, getBonusResources, getTradingPartners, getPlayerResources, proposeTrade, acceptTrade, cancelTrade, getProposedTradingPartners, removeTradingPartner } from '../../../utils/resources';
 import { tokensOfOwner } from "~~/utils/countryMinter";
+import { ethers } from "ethers";
+import { parseRevertReason } from '../../../utils/errorHandling';
 
 const ManageTrades = () => {
     const searchParams = useSearchParams();
@@ -26,6 +28,9 @@ const ManageTrades = () => {
     const [tradingPartnerResources, setTradingPartnerResources] = useState<any>(null);
     const [proposedTrades, setProposedTrades] = useState<any[]>([]);
     const [tradingPartners, setTradingPartners] = useState<any[]>([]);
+
+
+
 
     useEffect(() => {
         const fetchMintedNations = async () => {
@@ -89,70 +94,225 @@ const ManageTrades = () => {
         return individualResources;    
     };
 
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+ 
     const handleProposeTrade = async () => {
-        console.log("Proposing trade...");
-        console.log("Selected nation ID:", selectedNationId);
-        console.log("Trading partner ID:", tradingPartnerId);
-        console.log("Resources contract:", ResourcesContract);
+        setLoading(true);
+        setErrorMessage("");
+        setSuccessMessage("");
+    
+        // Early validation checks
+        if (!selectedNationId) {
+            setErrorMessage("Selected nation ID is missing.");
+            setLoading(false);
+            return;
+        }
+        if (!tradingPartnerId) {
+            setErrorMessage("Trading partner ID is missing.");
+            setLoading(false);
+            return;
+        }
+        if (!ResourcesContract || !ResourcesContract.address || !ResourcesContract.abi) {
+            setErrorMessage("Resources contract is not available.");
+            setLoading(false);
+            return;
+        }
+        if (!writeContractAsync) {
+            setErrorMessage("Missing writeContractAsync function.");
+            setLoading(false);
+            return;
+        }
+    
         try {
-            if (selectedNationId) {
-                console.log("Selected nation ID:", selectedNationId);
-                await proposeTrade(selectedNationId, tradingPartnerId, ResourcesContract, writeContractAsync);
-            } else {
-                console.error("Selected nation ID is null.");
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = provider.getSigner();
+            const contract = new ethers.Contract(ResourcesContract.address, ResourcesContract.abi as ethers.ContractInterface, signer);
+    
+            // Encode transaction data
+            const data = contract.interface.encodeFunctionData("proposeTrade", [selectedNationId, tradingPartnerId]);
+    
+            // Simulate transaction
+            try {
+                const result = await provider.call({
+                    to: ResourcesContract.address,
+                    data: data,
+                    from: await signer.getAddress(),
+                });
+    
+                console.log("Transaction Simulation Result:", result);
+    
+                if (result.startsWith("0x08c379a0")) {
+                    const errorMessage = parseRevertReason({ data: result });
+                    setErrorMessage(`Transaction failed: ${errorMessage}`);
+                    setLoading(false);
+                    return;
+                }
+            } catch (simulationError: any) {
+                const errorMessage = parseRevertReason(simulationError);
+                setErrorMessage(`Transaction simulation failed: ${errorMessage}`);
+                setLoading(false);
+                return;
             }
+    
+            // Execute transaction if simulation passes
+            await proposeTrade(selectedNationId, tradingPartnerId, ResourcesContract, writeContractAsync);
             fetchProposedTrades();
-        } catch (error) {
-            console.error("Failed to propose trade:", error);
+            setSuccessMessage("Trade proposal sent successfully.");
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error) || error.message || "Failed to propose trade.";
+            setErrorMessage(errorMessage);
+        } finally {
+            setLoading(false);
         }
     };
+    
 
     const handleAcceptTrade = async () => {
+        setLoading(true);
+        setErrorMessage("");
+        setSuccessMessage("");
+    
+        // Early validation checks
+        if (!selectedNationId) {
+            setErrorMessage("Selected nation ID is missing.");
+            setLoading(false);
+            return;
+        }
+        if (!tradingPartnerId) {
+            setErrorMessage("Trading partner ID is missing.");
+            setLoading(false);
+            return;
+        }
+        if (!ResourcesContract || !ResourcesContract.address || !ResourcesContract.abi) {
+            setErrorMessage("Resources contract is not available.");
+            setLoading(false);
+            return;
+        }
+        if (!writeContractAsync) {
+            setErrorMessage("Missing writeContractAsync function.");
+            setLoading(false);
+            return;
+        }
+    
         try {
-            console.log("Accepting trade");
-            if (!ResourcesContract?.abi || !ResourcesContract?.address) {
-                console.error("Missing contract ABI or address.");
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = provider.getSigner();
+            const contract = new ethers.Contract(ResourcesContract.address, ResourcesContract.abi as ethers.ContractInterface, signer);
+    
+            // Encode transaction data
+            const data = contract.interface.encodeFunctionData("acceptTrade", [selectedNationId, tradingPartnerId]);
+    
+            // Simulate transaction
+            try {
+                const result = await provider.call({
+                    to: ResourcesContract.address,
+                    data: data,
+                    from: await signer.getAddress(),
+                });
+    
+                console.log("Transaction Simulation Result:", result);
+    
+                if (result.startsWith("0x08c379a0")) {
+                    const errorMessage = parseRevertReason({ data: result });
+                    setErrorMessage(`Transaction failed: ${errorMessage}`);
+                    setLoading(false);
+                    return;
+                }
+            } catch (simulationError: any) {
+                const errorMessage = parseRevertReason(simulationError);
+                setErrorMessage(`Transaction simulation failed: ${errorMessage}`);
+                setLoading(false);
                 return;
             }
-
-            console.log("Selected nation ID:", selectedNationId);
-            console.log("Trading partner ID:", tradingPartnerId);
-        
-            await acceptTrade(
-                selectedNationId!,
-                tradingPartnerId,
-                ResourcesContract,
-                writeContractAsync
-            );
+    
+            // Execute transaction if simulation passes
+            await acceptTrade(selectedNationId, tradingPartnerId, ResourcesContract, writeContractAsync);
             fetchProposedTrades();
             fetchTradingPartners();
-        } catch (error) {
-            console.error("Failed to accept trade:", error);
+            setSuccessMessage("Trade accepted successfully.");
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error) || error.message || "Failed to accept trade.";
+            setErrorMessage(errorMessage);
+        } finally {
+            setLoading(false);
         }
     };
+    
 
     const handleCancelTrade = async () => {
+        setLoading(true);
+        setErrorMessage("");
+        setSuccessMessage("");
+    
+        // Early validation checks
+        if (!selectedNationId) {
+            setErrorMessage("Selected nation ID is missing.");
+            setLoading(false);
+            return;
+        }
+        if (!tradingPartnerId) {
+            setErrorMessage("Trading partner ID is missing.");
+            setLoading(false);
+            return;
+        }
+        if (!ResourcesContract || !ResourcesContract.address || !ResourcesContract.abi) {
+            setErrorMessage("Resources contract is not available.");
+            setLoading(false);
+            return;
+        }
+        if (!writeContractAsync) {
+            setErrorMessage("Missing writeContractAsync function.");
+            setLoading(false);
+            return;
+        }
+    
         try {
-            console.log("Cancelling trade");
-            if (!ResourcesContract?.abi || !ResourcesContract?.address) {
-                console.error("Missing contract ABI or address.");
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            await provider.send("eth_requestAccounts", []);
+            const signer = provider.getSigner();
+            const contract = new ethers.Contract(ResourcesContract.address, ResourcesContract.abi as ethers.ContractInterface, signer);
+    
+            // Encode transaction data
+            const data = contract.interface.encodeFunctionData("cancelTrade", [selectedNationId, tradingPartnerId]);
+    
+            // Simulate transaction
+            try {
+                const result = await provider.call({
+                    to: ResourcesContract.address,
+                    data: data,
+                    from: await signer.getAddress(),
+                });
+    
+                console.log("Transaction Simulation Result:", result);
+    
+                if (result.startsWith("0x08c379a0")) {
+                    const errorMessage = parseRevertReason({ data: result });
+                    setErrorMessage(`Transaction failed: ${errorMessage}`);
+                    setLoading(false);
+                    return;
+                }
+            } catch (simulationError: any) {
+                const errorMessage = parseRevertReason(simulationError);
+                setErrorMessage(`Transaction simulation failed: ${errorMessage}`);
+                setLoading(false);
                 return;
             }
-
-            console.log("Selected nation ID:", selectedNationId);
-            console.log("Trading partner ID:", tradingPartnerId);
-
-            await cancelTrade(
-                selectedNationId!,
-                tradingPartnerId,
-                ResourcesContract,
-                writeContractAsync
-            );
+    
+            // Execute transaction if simulation passes
+            await cancelTrade(selectedNationId, tradingPartnerId, ResourcesContract, writeContractAsync);
             fetchProposedTrades();
-        } catch (error) {
-            console.error("Failed to cancel trade:", error);
+            setSuccessMessage("Trade canceled successfully.");
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error) || error.message || "Failed to cancel trade.";
+            setErrorMessage(errorMessage);
+        } finally {
+            setLoading(false);
         }
     };
+    
 
     const fetchProposedTrades = async () => {
         console.log("Fetching proposed trades...");
@@ -178,17 +338,44 @@ const ManageTrades = () => {
     };
 
     const handleRemoveTradingPartner = async () => {
+        setLoading(true);
+        setErrorMessage("");
+        setSuccessMessage("");
+    
+        // Early validation checks
+        if (!selectedNationId) {
+            setErrorMessage("Selected nation ID is missing.");
+            setLoading(false);
+            return;
+        }
+        if (!tradingPartnerId) {
+            setErrorMessage("Trading partner ID is missing.");
+            setLoading(false);
+            return;
+        }
+        if (!ResourcesContract || !ResourcesContract.address || !ResourcesContract.abi) {
+            setErrorMessage("Resources contract is not available.");
+            setLoading(false);
+            return;
+        }
+        if (!writeContractAsync) {
+            setErrorMessage("Missing writeContractAsync function.");
+            setLoading(false);
+            return;
+        }
+    
         try {
-            if (selectedNationId) {
-                await removeTradingPartner(selectedNationId, tradingPartnerId, ResourcesContract, writeContractAsync);
-                fetchTradingPartners();
-            } else {
-                console.error("Selected nation ID is null.");
-            }
-        } catch (error) {
-            console.error("Failed to remove trading partner:", error);
+            await removeTradingPartner(selectedNationId, tradingPartnerId, ResourcesContract, writeContractAsync);
+            fetchTradingPartners();
+            setSuccessMessage("Trading partner removed successfully.");
+        } catch (error: any) {
+            const errorMessage = parseRevertReason(error) || error.message || "Failed to remove trading partner.";
+            setErrorMessage(errorMessage);
+        } finally {
+            setLoading(false);
         }
     };
+    
 
     return (
         <div className="w-5/6 p-6">

@@ -8,6 +8,8 @@ import { useTheme } from "next-themes";
 import { toggleWarPeacePreference, updateDefconLevel, updateThreatLevel, getWarPeacePreference } from "~~/utils/military";
 import { checkBalance } from "~~/utils/treasury";
 import { checkOwnership } from "~~/utils/countryMinter";
+import { ethers } from "ethers";
+import { parseRevertReason } from '../../../utils/errorHandling';
 
 const MilitarySettings = () => {
   const { theme } = useTheme();
@@ -62,48 +64,162 @@ const MilitarySettings = () => {
     setSuccessMessage("");
     setErrorMessage("");
 
-    try {
-      if (!nationId) throw new Error("Nation ID not found.");
-      if (!walletAddress) throw new Error("Wallet not connected.");
-
-      let owner = await checkOwnership(nationId, walletAddress, publicClient, CountryMinterContract);
-      if (!owner) throw new Error("You do not own this nation.");
-
-      const updateFunction = updateFunctions[field];
-      if (!updateFunction) throw new Error(`Update function not found for ${field}`);
-
-      await updateFunction(nationId, publicClient, MilitaryContract, value, writeContractAsync);
-
-      setSuccessMessage(`${field.replace(/([A-Z])/g, " $1")} updated successfully to: ${value}`);
-      setFormData((prev) => ({ ...prev, [field]: "" }));
-    } catch (error: any) {
-      setErrorMessage(error.message || `Failed to update ${field}.`);
-    } finally {
-      setLoading(false);
+    // Early validation checks
+    if (!nationId) {
+        setErrorMessage("Nation ID not found.");
+        setLoading(false);
+        return;
     }
-  };
+    if (!walletAddress) {
+        setErrorMessage("Wallet not connected.");
+        setLoading(false);
+        return;
+    }
+    if (!publicClient || !MilitaryContract || !CountryMinterContract || !writeContractAsync) {
+        setErrorMessage("Missing required dependencies to process the update.");
+        setLoading(false);
+        return;
+    }
 
-  const handleToggleWarPeace = async () => {
     try {
-      if (!nationId) throw new Error("Nation ID not found.");
-  
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        const signer = provider.getSigner();
+        const userAddress = await signer.getAddress();
+
+        // Check ownership
+        const owner = await checkOwnership(nationId, walletAddress, publicClient, CountryMinterContract);
+        if (!owner) {
+            throw new Error("You do not own this nation.");
+        }
+
+        // Determine the update function
+        const updateFunction = updateFunctions[field];
+        if (!updateFunction) {
+            throw new Error(`Update function not found for ${field}`);
+        }
+
+        // Simulate transaction before execution
+        const contract = new ethers.Contract(MilitaryContract.address, MilitaryContract.abi as ethers.ContractInterface, signer);
+        const data = contract.interface.encodeFunctionData(field, [nationId, value]);
+
+        try {
+            const result = await provider.call({
+                to: MilitaryContract.address,
+                data: data,
+                from: userAddress,
+            });
+
+            console.log("Transaction Simulation Result:", result);
+
+            if (result.startsWith("0x08c379a0")) {
+                const errorMessage = parseRevertReason({ data: result });
+                setErrorMessage(`Transaction failed: ${errorMessage}`);
+                setLoading(false);
+                return;
+            }
+        } catch (simulationError: any) {
+            const errorMessage = parseRevertReason(simulationError);
+            console.error("Transaction simulation failed:", errorMessage);
+            setErrorMessage(`Transaction failed: ${errorMessage}`);
+            setLoading(false);
+            return;
+        }
+
+        // Execute transaction if simulation passes
+        await updateFunction(nationId, publicClient, MilitaryContract, value, writeContractAsync);
+
+        setSuccessMessage(`${field.replace(/([A-Z])/g, " $1")} updated successfully to: ${value}`);
+        setFormData((prev) => ({ ...prev, [field]: "" }));
+        setErrorMessage(""); // Clear error message on success
+
+    } catch (error: any) {
+        const errorMessage = parseRevertReason(error) || error.message || `Failed to update ${field}.`;
+        console.error("Transaction failed:", errorMessage);
+        setErrorMessage(`Transaction failed: ${errorMessage}`);
+    } finally {
+        setLoading(false);
+    }
+};
+
+
+const handleToggleWarPeace = async () => {
+  setLoading(true);
+  setErrorMessage("");
+
+  // Early validation checks
+  if (!nationId) {
+      setErrorMessage("Nation ID not found.");
+      setLoading(false);
+      return;
+  }
+  if (!publicClient || !MilitaryContract || !writeContractAsync) {
+      setErrorMessage("Missing required dependencies to toggle war/peace preference.");
+      setLoading(false);
+      return;
+  }
+
+  try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const signer = provider.getSigner();
+      const userAddress = await signer.getAddress();
+
+      // Simulate transaction before execution
+      const contract = new ethers.Contract(MilitaryContract.address, MilitaryContract.abi as ethers.ContractInterface, signer);
+      const data = contract.interface.encodeFunctionData("toggleWarPeacePreference", [nationId]);
+
+      try {
+          const result = await provider.call({
+              to: MilitaryContract.address,
+              data: data,
+              from: userAddress,
+          });
+
+          console.log("Transaction Simulation Result:", result);
+
+          if (result.startsWith("0x08c379a0")) {
+              const errorMessage = parseRevertReason({ data: result });
+              setErrorMessage(`Transaction failed: ${errorMessage}`);
+              setLoading(false);
+              return;
+          }
+      } catch (simulationError: any) {
+          const errorMessage = parseRevertReason(simulationError);
+          console.error("Transaction simulation failed:", errorMessage);
+          setErrorMessage(`Transaction failed: ${errorMessage}`);
+          setLoading(false);
+          return;
+      }
+
+      // Execute transaction if simulation passes
       await toggleWarPeacePreference(nationId, publicClient, MilitaryContract, writeContractAsync);
-      
+
+      // Fetch updated war/peace status
       const [isAtWar, daysLeft] = await getWarPeacePreference(nationId, publicClient, MilitaryContract);
       setWarPeaceStatus(isAtWar);
-  
-    } catch (error) {
+
+      setSuccessMessage(`War/peace preference updated successfully. ${isAtWar ? "Your nation is now at war." : "Your nation is now at peace."}`);
+  } catch (error: any) {
+      let errorMessage = parseRevertReason(error) || error.message || "Failed to toggle war/peace preference.";
+      console.error("Transaction failed:", errorMessage);
+      
+      // Attempt to fetch cooldown period in case of error
       try {
-        let daysLeft;
-        if (nationId) {
-          [, daysLeft] = await getWarPeacePreference(nationId, publicClient, MilitaryContract);
-        }
-        setErrorMessage(`Failed to toggle war/peace preference. You need to wait 7 days before switching back to peace mode. You have ${daysLeft} days remaining.`);
+          let daysLeft = "";
+          if (nationId) {
+              [, daysLeft] = await getWarPeacePreference(nationId, publicClient, MilitaryContract);
+          }
+          setErrorMessage(`Failed to toggle war/peace preference. You need to wait 7 days before switching back to peace mode. You have ${daysLeft} days remaining.`);
       } catch (innerError) {
-        console.error("Failed to fetch cooldown period after error:", innerError);
+          console.error("Failed to fetch cooldown period after error:", innerError);
+          setErrorMessage(errorMessage); // Fallback to initial error message
       }
-    }
-  };
+  } finally {
+      setLoading(false);
+  }
+};
+
 
   return (
     <div

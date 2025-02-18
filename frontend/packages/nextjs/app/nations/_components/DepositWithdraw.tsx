@@ -8,6 +8,8 @@ import { useTheme } from "next-themes";
 import { checkBalance, addFunds, withdrawFunds } from "~~/utils/treasury";
 import { checkOwnership } from "~~/utils/countryMinter";
 import { balanceOf } from "~~/utils/warbucks";
+import { ethers } from "ethers";
+import { parseRevertReason } from '../../../utils/errorHandling';
 
 const DepositWithdraw = () => {
   const { theme } = useTheme();
@@ -46,33 +48,83 @@ const DepositWithdraw = () => {
     setSuccessMessage("");
     setErrorMessage("");
 
-    try {
-      if (!nationId) throw new Error("Nation ID not found.");
-      if (!walletAddress) throw new Error("Wallet not connected.");
-
-      const owner = await checkOwnership(nationId, walletAddress, publicClient, CountryMinterContract);
-      if (!owner) throw new Error("You do not own this nation.");
-
-      const updateFunction = updateFunctions[field as keyof typeof updateFunctions];
-      if (!updateFunction) throw new Error(`Update function not found for ${field}`);
-
-      const scaledValue = BigInt(value) * BigInt(10 ** 18);
-
-      await updateFunction(nationId, publicClient, TreasuryContract, Number(scaledValue), writeContractAsync);
-
-      setSuccessMessage(`${field.replace(/([A-Z])/g, " $1")}: ${value}`);
-      setFormData((prev) => ({ ...prev, [field]: "" }));
-      fetchValues();
-    } catch (error) {
-      if (error instanceof Error) {
-        setErrorMessage(error.message || `Failed to update ${field}.`);
-      } else {
-        setErrorMessage(`Failed to update ${field}.`);
-      }
-    } finally {
-      setLoading(false);
+    // Early validation checks
+    if (!nationId) {
+        setErrorMessage("Nation ID not found.");
+        setLoading(false);
+        return;
     }
-  };
+    if (!walletAddress) {
+        setErrorMessage("Wallet not connected.");
+        setLoading(false);
+        return;
+    }
+    if (!publicClient || !TreasuryContract || !CountryMinterContract || !writeContractAsync) {
+        setErrorMessage("Missing required dependencies to process the update.");
+        setLoading(false);
+        return;
+    }
+
+    try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        const signer = provider.getSigner();
+        const userAddress = await signer.getAddress();
+
+        // Check ownership
+        const owner = await checkOwnership(nationId, walletAddress, publicClient, CountryMinterContract);
+        if (!owner) throw new Error("You do not own this nation.");
+
+        // Determine the update function
+        const updateFunction = updateFunctions[field as keyof typeof updateFunctions];
+        if (!updateFunction) throw new Error(`Update function not found for ${field}`);
+
+        const scaledValue = BigInt(value) * BigInt(10 ** 18);
+
+        // Simulate transaction before execution
+        const contract = new ethers.Contract(TreasuryContract.address, TreasuryContract.abi as ethers.ContractInterface, signer);
+        const data = contract.interface.encodeFunctionData(field, [nationId, Number(scaledValue)]);
+
+        try {
+            const result = await provider.call({
+                to: TreasuryContract.address,
+                data: data,
+                from: userAddress,
+            });
+
+            console.log("Transaction Simulation Result:", result);
+
+            if (result.startsWith("0x08c379a0")) {
+                const errorMessage = parseRevertReason({ data: result });
+                setErrorMessage(`Transaction failed: ${errorMessage}`);
+                setLoading(false);
+                return;
+            }
+        } catch (simulationError: any) {
+            const errorMessage = parseRevertReason(simulationError);
+            console.error("Transaction simulation failed:", errorMessage);
+            setErrorMessage(`Transaction failed: ${errorMessage}`);
+            setLoading(false);
+            return;
+        }
+
+        // Execute transaction if simulation passes
+        await updateFunction(nationId, publicClient, TreasuryContract, Number(scaledValue), writeContractAsync);
+
+        setSuccessMessage(`${field.replace(/([A-Z])/g, " $1")}: ${value}`);
+        setFormData((prev) => ({ ...prev, [field]: "" }));
+        fetchValues();
+        setErrorMessage(""); // Clear error message on success
+
+    } catch (error: any) {
+        const errorMessage = parseRevertReason(error) || error.message || `Failed to update ${field}.`;
+        console.error("Transaction failed:", errorMessage);
+        setErrorMessage(`Transaction failed: ${errorMessage}`);
+    } finally {
+        setLoading(false);
+    }
+};
+
 
   const formatBalance = (balance: string) => {
     const formatted = (BigInt(balance) / BigInt(10 ** 18)).toLocaleString();
