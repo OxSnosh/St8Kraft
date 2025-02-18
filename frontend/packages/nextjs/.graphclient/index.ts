@@ -563,8 +563,8 @@ export type GroundBattle_orderBy =
 
 export type Message = {
   id: Scalars['ID']['output'];
-  sender: Scalars['Bytes']['output'];
-  reciever: Scalars['Bytes']['output'];
+  sender: Scalars['BigInt']['output'];
+  receiver: Scalars['BigInt']['output'];
   message: Scalars['String']['output'];
   createdAt: Scalars['BigInt']['output'];
   transactionHash: Scalars['String']['output'];
@@ -579,26 +579,22 @@ export type Message_filter = {
   id_lte?: InputMaybe<Scalars['ID']['input']>;
   id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
-  sender?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_not?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_gt?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_lt?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_gte?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_lte?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  sender_not_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  sender_contains?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_not_contains?: InputMaybe<Scalars['Bytes']['input']>;
-  reciever?: InputMaybe<Scalars['Bytes']['input']>;
-  reciever_not?: InputMaybe<Scalars['Bytes']['input']>;
-  reciever_gt?: InputMaybe<Scalars['Bytes']['input']>;
-  reciever_lt?: InputMaybe<Scalars['Bytes']['input']>;
-  reciever_gte?: InputMaybe<Scalars['Bytes']['input']>;
-  reciever_lte?: InputMaybe<Scalars['Bytes']['input']>;
-  reciever_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  reciever_not_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  reciever_contains?: InputMaybe<Scalars['Bytes']['input']>;
-  reciever_not_contains?: InputMaybe<Scalars['Bytes']['input']>;
+  sender?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_not?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  sender_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  receiver?: InputMaybe<Scalars['BigInt']['input']>;
+  receiver_not?: InputMaybe<Scalars['BigInt']['input']>;
+  receiver_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  receiver_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  receiver_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  receiver_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  receiver_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  receiver_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
   message?: InputMaybe<Scalars['String']['input']>;
   message_not?: InputMaybe<Scalars['String']['input']>;
   message_gt?: InputMaybe<Scalars['String']['input']>;
@@ -656,7 +652,7 @@ export type Message_filter = {
 export type Message_orderBy =
   | 'id'
   | 'sender'
-  | 'reciever'
+  | 'receiver'
   | 'message'
   | 'createdAt'
   | 'transactionHash';
@@ -948,7 +944,7 @@ export type OrderDirection =
 
 export type Post = {
   id: Scalars['ID']['output'];
-  sender: Scalars['Bytes']['output'];
+  sender: Scalars['BigInt']['output'];
   post: Scalars['String']['output'];
   createdAt: Scalars['BigInt']['output'];
   transactionHash: Scalars['String']['output'];
@@ -963,16 +959,14 @@ export type Post_filter = {
   id_lte?: InputMaybe<Scalars['ID']['input']>;
   id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
-  sender?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_not?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_gt?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_lt?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_gte?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_lte?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  sender_not_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  sender_contains?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_not_contains?: InputMaybe<Scalars['Bytes']['input']>;
+  sender?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_not?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  sender_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
   post?: InputMaybe<Scalars['String']['input']>;
   post_not?: InputMaybe<Scalars['String']['input']>;
   post_gt?: InputMaybe<Scalars['String']['input']>;
@@ -2006,8 +2000,8 @@ export interface Int8ScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
 
 export type MessageResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Message'] = ResolversParentTypes['Message']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  sender?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
-  reciever?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  sender?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
+  receiver?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   transactionHash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -2047,7 +2041,7 @@ export type NukeAttackResolvers<ContextType = MeshContext, ParentType extends Re
 
 export type PostResolvers<ContextType = MeshContext, ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']> = ResolversObject<{
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  sender?: Resolver<ResolversTypes['Bytes'], ParentType, ContextType>;
+  sender?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   post?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['BigInt'], ParentType, ContextType>;
   transactionHash?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -2240,19 +2234,19 @@ const merger = new(BareMerger as any)({
         store: rootStore.child('bareMerger')
       })
 const documentHashMap = {
-        "f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetNationsDocument,
-"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetWarsDocument,
-"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetGroundBattlesDocument,
-"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetCruiseMissileAttacksDocument,
-"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetNukeAttacksDocument,
-"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetSpyOperationsDocument,
-"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetAirBattlesDocument,
-"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetNavalAttacksDocument,
-"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetBreakBlockadesDocument,
-"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetBlockadesDocument,
-"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetPostsDocument,
-"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetRecievedMessagesDocument,
-"f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b": GetSentMessagesDocument
+        "143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848": GetNationsDocument,
+"143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848": GetWarsDocument,
+"143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848": GetGroundBattlesDocument,
+"143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848": GetCruiseMissileAttacksDocument,
+"143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848": GetNukeAttacksDocument,
+"143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848": GetSpyOperationsDocument,
+"143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848": GetAirBattlesDocument,
+"143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848": GetNavalAttacksDocument,
+"143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848": GetBreakBlockadesDocument,
+"143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848": GetBlockadesDocument,
+"143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848": GetPostsDocument,
+"143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848": GetReceivedMessagesDocument,
+"143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848": GetSentMessagesDocument
       }
 additionalEnvelopPlugins.push(usePersistedOperations({
         getPersistedOperation(key) {
@@ -2279,91 +2273,91 @@ additionalEnvelopPlugins.push(usePersistedOperations({
           return printWithCache(GetNationsDocument);
         },
         location: 'GetNationsDocument.graphql',
-        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
+        sha256Hash: '143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848'
       },{
         document: GetWarsDocument,
         get rawSDL() {
           return printWithCache(GetWarsDocument);
         },
         location: 'GetWarsDocument.graphql',
-        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
+        sha256Hash: '143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848'
       },{
         document: GetGroundBattlesDocument,
         get rawSDL() {
           return printWithCache(GetGroundBattlesDocument);
         },
         location: 'GetGroundBattlesDocument.graphql',
-        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
+        sha256Hash: '143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848'
       },{
         document: GetCruiseMissileAttacksDocument,
         get rawSDL() {
           return printWithCache(GetCruiseMissileAttacksDocument);
         },
         location: 'GetCruiseMissileAttacksDocument.graphql',
-        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
+        sha256Hash: '143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848'
       },{
         document: GetNukeAttacksDocument,
         get rawSDL() {
           return printWithCache(GetNukeAttacksDocument);
         },
         location: 'GetNukeAttacksDocument.graphql',
-        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
+        sha256Hash: '143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848'
       },{
         document: GetSpyOperationsDocument,
         get rawSDL() {
           return printWithCache(GetSpyOperationsDocument);
         },
         location: 'GetSpyOperationsDocument.graphql',
-        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
+        sha256Hash: '143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848'
       },{
         document: GetAirBattlesDocument,
         get rawSDL() {
           return printWithCache(GetAirBattlesDocument);
         },
         location: 'GetAirBattlesDocument.graphql',
-        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
+        sha256Hash: '143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848'
       },{
         document: GetNavalAttacksDocument,
         get rawSDL() {
           return printWithCache(GetNavalAttacksDocument);
         },
         location: 'GetNavalAttacksDocument.graphql',
-        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
+        sha256Hash: '143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848'
       },{
         document: GetBreakBlockadesDocument,
         get rawSDL() {
           return printWithCache(GetBreakBlockadesDocument);
         },
         location: 'GetBreakBlockadesDocument.graphql',
-        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
+        sha256Hash: '143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848'
       },{
         document: GetBlockadesDocument,
         get rawSDL() {
           return printWithCache(GetBlockadesDocument);
         },
         location: 'GetBlockadesDocument.graphql',
-        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
+        sha256Hash: '143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848'
       },{
         document: GetPostsDocument,
         get rawSDL() {
           return printWithCache(GetPostsDocument);
         },
         location: 'GetPostsDocument.graphql',
-        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
+        sha256Hash: '143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848'
       },{
-        document: GetRecievedMessagesDocument,
+        document: GetReceivedMessagesDocument,
         get rawSDL() {
-          return printWithCache(GetRecievedMessagesDocument);
+          return printWithCache(GetReceivedMessagesDocument);
         },
-        location: 'GetRecievedMessagesDocument.graphql',
-        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
+        location: 'GetReceivedMessagesDocument.graphql',
+        sha256Hash: '143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848'
       },{
         document: GetSentMessagesDocument,
         get rawSDL() {
           return printWithCache(GetSentMessagesDocument);
         },
         location: 'GetSentMessagesDocument.graphql',
-        sha256Hash: 'f41e429b2182cfd049debdb1718a96ede30754a5bf23b21dfc53770e881eea8b'
+        sha256Hash: '143f3939942b3ab12f095e95c8d27897cf1f39b6e0d9cb1a6a450500989a5848'
       }
     ];
     },
@@ -2469,25 +2463,25 @@ export type GetBlockadesQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetBlockadesQuery = { blockades: Array<Pick<Blockade, 'battleId' | 'attackerLosses' | 'defenderLosses'>> };
 
 export type GetPostsQueryVariables = Exact<{
-  sender: Scalars['Bytes']['input'];
+  sender?: InputMaybe<Scalars['BigInt']['input']>;
 }>;
 
 
 export type GetPostsQuery = { posts: Array<Pick<Post, 'id' | 'sender' | 'post' | 'createdAt' | 'transactionHash'>> };
 
-export type GetRecievedMessagesQueryVariables = Exact<{
-  reciever: Scalars['Bytes']['input'];
+export type GetReceivedMessagesQueryVariables = Exact<{
+  receiver: Scalars['BigInt']['input'];
 }>;
 
 
-export type GetRecievedMessagesQuery = { messages: Array<Pick<Message, 'id' | 'sender' | 'reciever' | 'message' | 'createdAt' | 'transactionHash'>> };
+export type GetReceivedMessagesQuery = { messages: Array<Pick<Message, 'id' | 'sender' | 'receiver' | 'message' | 'createdAt' | 'transactionHash'>> };
 
 export type GetSentMessagesQueryVariables = Exact<{
-  sender: Scalars['Bytes']['input'];
+  sender: Scalars['BigInt']['input'];
 }>;
 
 
-export type GetSentMessagesQuery = { messages: Array<Pick<Message, 'id' | 'sender' | 'reciever' | 'message' | 'createdAt' | 'transactionHash'>> };
+export type GetSentMessagesQuery = { messages: Array<Pick<Message, 'id' | 'sender' | 'receiver' | 'message' | 'createdAt' | 'transactionHash'>> };
 
 
 export const GetNationsDocument = gql`
@@ -2612,7 +2606,7 @@ export const GetBlockadesDocument = gql`
 }
     ` as unknown as DocumentNode<GetBlockadesQuery, GetBlockadesQueryVariables>;
 export const GetPostsDocument = gql`
-    query GetPosts($sender: Bytes!) {
+    query GetPosts($sender: BigInt) {
   posts(where: {sender: $sender}) {
     id
     sender
@@ -2622,24 +2616,24 @@ export const GetPostsDocument = gql`
   }
 }
     ` as unknown as DocumentNode<GetPostsQuery, GetPostsQueryVariables>;
-export const GetRecievedMessagesDocument = gql`
-    query GetRecievedMessages($reciever: Bytes!) {
-  messages(where: {reciever: $reciever}) {
+export const GetReceivedMessagesDocument = gql`
+    query GetReceivedMessages($receiver: BigInt!) {
+  messages(where: {receiver: $receiver}) {
     id
     sender
-    reciever
+    receiver
     message
     createdAt
     transactionHash
   }
 }
-    ` as unknown as DocumentNode<GetRecievedMessagesQuery, GetRecievedMessagesQueryVariables>;
+    ` as unknown as DocumentNode<GetReceivedMessagesQuery, GetReceivedMessagesQueryVariables>;
 export const GetSentMessagesDocument = gql`
-    query GetSentMessages($sender: Bytes!) {
+    query GetSentMessages($sender: BigInt!) {
   messages(where: {sender: $sender}) {
     id
     sender
-    reciever
+    receiver
     message
     createdAt
     transactionHash
@@ -2693,11 +2687,11 @@ export function getSdk<C, E>(requester: Requester<C, E>) {
     GetBlockades(variables?: GetBlockadesQueryVariables, options?: C): Promise<GetBlockadesQuery> {
       return requester<GetBlockadesQuery, GetBlockadesQueryVariables>(GetBlockadesDocument, variables, options) as Promise<GetBlockadesQuery>;
     },
-    GetPosts(variables: GetPostsQueryVariables, options?: C): Promise<GetPostsQuery> {
+    GetPosts(variables?: GetPostsQueryVariables, options?: C): Promise<GetPostsQuery> {
       return requester<GetPostsQuery, GetPostsQueryVariables>(GetPostsDocument, variables, options) as Promise<GetPostsQuery>;
     },
-    GetRecievedMessages(variables: GetRecievedMessagesQueryVariables, options?: C): Promise<GetRecievedMessagesQuery> {
-      return requester<GetRecievedMessagesQuery, GetRecievedMessagesQueryVariables>(GetRecievedMessagesDocument, variables, options) as Promise<GetRecievedMessagesQuery>;
+    GetReceivedMessages(variables: GetReceivedMessagesQueryVariables, options?: C): Promise<GetReceivedMessagesQuery> {
+      return requester<GetReceivedMessagesQuery, GetReceivedMessagesQueryVariables>(GetReceivedMessagesDocument, variables, options) as Promise<GetReceivedMessagesQuery>;
     },
     GetSentMessages(variables: GetSentMessagesQueryVariables, options?: C): Promise<GetSentMessagesQuery> {
       return requester<GetSentMessagesQuery, GetSentMessagesQueryVariables>(GetSentMessagesDocument, variables, options) as Promise<GetSentMessagesQuery>;

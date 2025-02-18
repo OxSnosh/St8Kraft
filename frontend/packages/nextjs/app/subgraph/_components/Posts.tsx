@@ -1,76 +1,161 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { GetPostsDocument, execute } from "~~/.graphclient";
-import { useAccount } from "wagmi";
+import { useAccount, useWriteContract, usePublicClient } from 'wagmi';
+import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
+
+interface Post {
+  id: string;
+  post: string;
+}
 
 const PostsTable = () => {
-    const [postData, setPostData] = useState<any>([]);
-    const [error, setError] = useState<any>(null);
-    const { address: walletAddress } = useAccount();
+  const [postData, setPostData] = useState<Post[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const { address: walletAddress } = useAccount();
+  const searchParams = useSearchParams();
+  const nationId = searchParams.get("id");
+  const [isOwner, setIsOwner] = useState(false);
+  const [newPost, setNewPost] = useState("");
+
+  const contractsData = useAllContracts();
+  const { writeContractAsync } = useWriteContract();
+  const publicClient = usePublicClient();
+
+  const countryMinter = contractsData?.CountryMinter;
+  const messenger = contractsData?.Messenger;
+
+  useEffect(() => {
+    const fetchAllPosts = async () => {
+      if (!execute || !GetPostsDocument) {
+        console.warn("Missing dependencies: execute or GetPostsDocument");
+        return;
+      }
   
-    useEffect(() => {
-      const fetchData = async () => {
-        console.log("Fetching posts for sender:", walletAddress);
+      try {
+        console.log("Fetching all posts...");
   
-        if (!walletAddress || !execute || !GetPostsDocument) {
-          console.warn("Missing dependencies: walletAddress, execute, or GetPostsDocument");
-          return;
+        const { data: result, errors } = await execute(GetPostsDocument, {}, { fetchPolicy: "network-only" });
+  
+        console.log("Raw API Response:", result);
+        console.log("GraphQL Errors (if any):", errors);
+  
+        if (errors) {
+          console.error("GraphQL Error:", errors);
         }
   
-        try {
-          const { data: result } = await execute(GetPostsDocument, {
-            sender: walletAddress, // Ensure this matches your schema
-          });
-  
-          console.log("Full GraphQL Response:", result);
-  
-          if (!result || !result.posts) {
-            console.error("No posts found.");
-            return;
-          }
-  
+        if (result?.posts?.length > 0) {
           setPostData(result.posts);
-        } catch (err) {
-          console.error("Error fetching posts:", err);
-          setError(err);
+        } else {
+          console.warn("No posts found.");
+          setPostData([]);
         }
-      };
+      } catch (err) {
+        console.error("Error fetching posts:", err);
+        setError(String(err));
+      }
+    };
   
-      if (walletAddress) fetchData();
-    }, [walletAddress]);
-  
-    if (error) {
-      return <p className="text-red-500">Error fetching posts</p>;
+
+      fetchAllPosts();
+    
+  }, [execute]);
+
+  /** ✅ Check if the connected wallet owns the nation */
+  useEffect(() => {
+    const checkOwnership = async () => {
+      if (!walletAddress || !nationId || !countryMinter || !publicClient) return;
+
+      try {
+        const isOwnerResponse = await publicClient.readContract({
+          address: countryMinter.address,
+          abi: countryMinter.abi,
+          functionName: "checkOwnership",
+          args: [nationId, walletAddress],
+        });
+
+        setIsOwner(Boolean(isOwnerResponse));
+      } catch (err) {
+        console.error("Error checking ownership:", err);
+        setIsOwner(false);
+      }
+    };
+
+    checkOwnership();
+  }, [walletAddress, nationId, countryMinter, publicClient]);
+
+
+  /** ✅ Handle post submission (FIXED) */
+  const handlePostSubmit = async () => {
+    if (!newPost.trim() || !nationId || !messenger) return;
+
+    try {
+      await writeContractAsync({
+        abi: messenger.abi,
+        address: messenger.address,
+        functionName: "post",
+        args: [nationId, newPost],
+      });
+
+      alert("Post submitted successfully!");
+      setNewPost("");
+
+    } catch (error) {
+      console.error("Error submitting post:", error);
+      setError("Failed to submit post.");
     }
-  
-    return (
-      <div className="flex justify-center items-center mt-10">
-        <div className="overflow-x-auto shadow-2xl rounded-xl">
-          <table className="table bg-base-100 table-zebra">
-            <thead>
-              <tr className="rounded-xl">
-                <th className="bg-primary">Last 5 Posts from {walletAddress ? `${walletAddress.slice(0, 3)}...${walletAddress.slice(-5)}` : "N/A"}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {postData.length > 0 ? (
-                postData.slice(0, 5).map((post: any) => (
-                  <tr key={post.id}>
-                    <td>{post.post}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td className="text-center text-gray-500">No posts found</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    );
   };
-  
-  export default PostsTable;
+
+  if (error) {
+    return <p className="text-red-500">{error}</p>;
+  }
+
+  return (
+    <div className="flex flex-col items-center mt-10">
+      <div className="overflow-x-auto shadow-2xl rounded-xl w-full max-w-2xl">
+        <table className="table bg-base-100 table-zebra w-full">
+          <thead>
+            <tr className="rounded-xl">
+              <th className="bg-primary">All Posts</th>
+            </tr>
+          </thead>
+          <tbody>
+            {postData.length > 0 ? (
+              postData.map((post) => (
+                <tr key={post.id}>
+                  <td>{post.post}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td className="text-center text-gray-500">No posts found</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* ✅ Show the post form only if the user is the owner */}
+      {isOwner && (
+        <div className="mt-4 w-full max-w-2xl">
+          <textarea
+            className="w-full p-2 border rounded"
+            placeholder="Write a new post..."
+            value={newPost}
+            onChange={(e) => setNewPost(e.target.value)}
+          />
+          <button
+            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
+            onClick={handlePostSubmit}
+          >
+            Post
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default PostsTable;

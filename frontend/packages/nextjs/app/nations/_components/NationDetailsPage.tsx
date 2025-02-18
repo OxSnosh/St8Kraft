@@ -28,7 +28,8 @@ import { getCruiseMissileCount, getNukeCount } from "~~/utils/missiles";
 import { getSpyCount } from "~~/utils/spies";
 import { checkOwnership } from "~~/utils/countryMinter";
 import PostsTable from "../../../app/subgraph/_components/Posts";
-import { handlePost } from '../../../../subgraph/src/messengerMapping';
+import { parseRevertReason } from '../../../utils/errorHandling';
+import { ethers } from "ethers";
 
 type NationDetails = {
   nationName: string | null;
@@ -166,21 +167,75 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
   const { writeContractAsync } = useWriteContract();
 
   const handlePostMessage = async () => {
-    if (!message) return;
+    if (!nationId || !message || !contractsData?.Messenger || !walletAddress) {
+      console.error("Missing required parameters for posting message.");
+      alert("Missing required parameters.");
+      return;
+    }
+  
+    const contractData = contractsData.Messenger;
+    const abi = contractData.abi;
+  
+    if (!contractData.address || !abi) {
+      console.error("Contract address or ABI is missing.");
+      alert("Contract configuration is missing.");
+      return;
+    }
+  
     try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const signer = provider.getSigner();
+      const userAddress = await signer.getAddress();
+  
+      const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
+  
+      const data = contract.interface.encodeFunctionData("postMessage", [
+        nationId,
+        message,
+      ]);
+  
+      try {
+        // Simulating the transaction call
+        const result = await provider.call({
+          to: contract.address,
+          data: data,
+          from: userAddress,
+        });
+  
+        console.log("Transaction Simulation Result:", result);
+  
+        if (result.startsWith("0x08c379a0")) {
+          const errorMessage = parseRevertReason({ data: result });
+          alert(`Transaction failed: ${errorMessage}`);
+          return;
+        }
+  
+      } catch (error: any) {
+        const errorMessage = parseRevertReason(error);
+        console.error("Transaction simulation failed:", errorMessage);
+        alert(`Transaction failed: ${errorMessage}`);
+        return;
+      }
+  
+      // Sending the actual transaction
       await writeContractAsync({
-        abi: contractsData.Messenger.abi,
-        address: contractsData.Messenger.address,
+        abi: contractData.abi,
+        address: contractData.address,
         functionName: "postMessage",
-        args: [message],
+        args: [nationId, message],
       });
-      setMessage("");
-      window.location.reload();
-    } catch (err) {
-      console.error("Error posting message:", err);
+  
+      alert("Message posted successfully!");
+      setMessage(""); // Clear message input
+  
+    } catch (error: any) {
+      const errorMessage = parseRevertReason(error);
+      console.error("Transaction failed:", errorMessage);
+      alert(`Transaction failed: ${errorMessage}`);
     }
   };
-
+  
   useEffect(() => {
     const fetchNationDetails = async () => {
       if (!publicClient || !countryParametersContract) {
@@ -957,6 +1012,7 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
           <div className="w-3/12 pl-4 border-l border-gray-300">
             <h2 className="text-lg font-semibold mb-4">Nation Posts</h2>
             <PostsTable />
+            
             {isOwner && (
               <div className="mt-4">
                 <textarea

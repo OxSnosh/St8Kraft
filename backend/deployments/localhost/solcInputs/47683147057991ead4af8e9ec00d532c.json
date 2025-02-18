@@ -1,0 +1,35 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/Messenger.sol": {
+      "content": "// SPDX-License-Identifier: BUSL-1.1\npragma solidity 0.8.17;\n\ninterface ICountryMinter {\n    function checkOwnership(uint256 nationId, address caller) external view returns (bool);\n}\n\n/// @title Messenger\n/// @author OxSnosh\n/// @notice This contract allows a nation's ruler to send messages or post updates\ncontract Messenger {\n    ICountryMinter public countryMinter;\n\n    mapping(uint256 => string) public messages; // Messages are now mapped by nationId\n    mapping(uint256 => string) public posts; // Posts are now mapped by nationId\n\n    event MessageSent(uint256 indexed nationId, uint256 indexed receiver, string message);\n    event PostSent(uint256 indexed nationId, string post);\n\n    uint256 public constant MAX_MESSAGE_LENGTH = 1500;\n    uint256 public constant MAX_POST_LENGTH = 500;\n\n    /// @notice Initializes the contract with the address of the CountryMinter contract\n    /// @param _countryMinter The address of the CountryMinter contract\n    constructor(address _countryMinter) {\n        countryMinter = ICountryMinter(_countryMinter);\n    }\n\n    /// @dev Allows the ruler of a nation to send a message to another user\n    /// @param nationId The ID of the nation sending the message\n    /// @param _receiver The address of the message recipient\n    /// @param _message The message being sent\n    function sendMessage(uint256 nationId, uint256 _receiver, string memory _message) public {\n        require(countryMinter.checkOwnership(nationId, msg.sender), \"Caller does not own this nation\");\n        require(bytes(_message).length <= MAX_MESSAGE_LENGTH, \"Message exceeds 1500 characters\");\n        \n        messages[nationId] = _message;\n        emit MessageSent(nationId, _receiver, _message);\n    }\n\n    /// @dev Allows the ruler of a nation to post a public message\n    /// @param nationId The ID of the nation posting the message\n    /// @param _post The message being posted\n    function postMessage(uint256 nationId, string memory _post) public {\n        require(countryMinter.checkOwnership(nationId, msg.sender), \"Caller does not own this nation\");\n        require(bytes(_post).length <= MAX_POST_LENGTH, \"Post exceeds 500 characters\");\n        \n        posts[nationId] = _post;\n        emit PostSent(nationId, _post);\n    }\n}\n\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}

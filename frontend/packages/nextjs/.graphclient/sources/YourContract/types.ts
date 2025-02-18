@@ -540,8 +540,8 @@ export type GroundBattle_orderBy =
 
 export type Message = {
   id: Scalars['ID']['output'];
-  sender: Scalars['Bytes']['output'];
-  reciever: Scalars['Bytes']['output'];
+  sender: Scalars['BigInt']['output'];
+  receiver: Scalars['BigInt']['output'];
   message: Scalars['String']['output'];
   createdAt: Scalars['BigInt']['output'];
   transactionHash: Scalars['String']['output'];
@@ -556,26 +556,22 @@ export type Message_filter = {
   id_lte?: InputMaybe<Scalars['ID']['input']>;
   id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
-  sender?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_not?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_gt?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_lt?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_gte?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_lte?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  sender_not_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  sender_contains?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_not_contains?: InputMaybe<Scalars['Bytes']['input']>;
-  reciever?: InputMaybe<Scalars['Bytes']['input']>;
-  reciever_not?: InputMaybe<Scalars['Bytes']['input']>;
-  reciever_gt?: InputMaybe<Scalars['Bytes']['input']>;
-  reciever_lt?: InputMaybe<Scalars['Bytes']['input']>;
-  reciever_gte?: InputMaybe<Scalars['Bytes']['input']>;
-  reciever_lte?: InputMaybe<Scalars['Bytes']['input']>;
-  reciever_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  reciever_not_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  reciever_contains?: InputMaybe<Scalars['Bytes']['input']>;
-  reciever_not_contains?: InputMaybe<Scalars['Bytes']['input']>;
+  sender?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_not?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  sender_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  receiver?: InputMaybe<Scalars['BigInt']['input']>;
+  receiver_not?: InputMaybe<Scalars['BigInt']['input']>;
+  receiver_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  receiver_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  receiver_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  receiver_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  receiver_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  receiver_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
   message?: InputMaybe<Scalars['String']['input']>;
   message_not?: InputMaybe<Scalars['String']['input']>;
   message_gt?: InputMaybe<Scalars['String']['input']>;
@@ -633,7 +629,7 @@ export type Message_filter = {
 export type Message_orderBy =
   | 'id'
   | 'sender'
-  | 'reciever'
+  | 'receiver'
   | 'message'
   | 'createdAt'
   | 'transactionHash';
@@ -925,7 +921,7 @@ export type OrderDirection =
 
 export type Post = {
   id: Scalars['ID']['output'];
-  sender: Scalars['Bytes']['output'];
+  sender: Scalars['BigInt']['output'];
   post: Scalars['String']['output'];
   createdAt: Scalars['BigInt']['output'];
   transactionHash: Scalars['String']['output'];
@@ -940,16 +936,14 @@ export type Post_filter = {
   id_lte?: InputMaybe<Scalars['ID']['input']>;
   id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
-  sender?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_not?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_gt?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_lt?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_gte?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_lte?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  sender_not_in?: InputMaybe<Array<Scalars['Bytes']['input']>>;
-  sender_contains?: InputMaybe<Scalars['Bytes']['input']>;
-  sender_not_contains?: InputMaybe<Scalars['Bytes']['input']>;
+  sender?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_not?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  sender_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  sender_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
   post?: InputMaybe<Scalars['String']['input']>;
   post_not?: InputMaybe<Scalars['String']['input']>;
   post_gt?: InputMaybe<Scalars['String']['input']>;

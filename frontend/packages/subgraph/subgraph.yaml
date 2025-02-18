@@ -196,8 +196,8 @@ dataSources:
         - name: Messenger
           file: ./abis/localhost_Messenger.json
       eventHandlers:
-        - event: MessageSent(indexed address,indexed address,string)
+        - event: MessageSent(indexed uint256,indexed uint256,string)
           handler: handleMessage
-        - event: PostSent(indexed address,string)
+        - event: PostSent(indexed uint256,string)
           handler: handlePost
       file: ./src/messengerMapping.ts

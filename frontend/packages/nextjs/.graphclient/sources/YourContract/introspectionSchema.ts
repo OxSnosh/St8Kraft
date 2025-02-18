@@ -7855,7 +7855,7 @@ const schemaAST = {
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "Bytes"
+                "value": "BigInt"
               }
             }
           },
@@ -7865,7 +7865,7 @@ const schemaAST = {
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "reciever"
+            "value": "receiver"
           },
           "arguments": [],
           "type": {
@@ -7874,7 +7874,7 @@ const schemaAST = {
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "Bytes"
+                "value": "BigInt"
               }
             }
           },
@@ -8090,7 +8090,7 @@ const schemaAST = {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "Bytes"
+              "value": "BigInt"
             }
           },
           "directives": []
@@ -8105,7 +8105,7 @@ const schemaAST = {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "Bytes"
+              "value": "BigInt"
             }
           },
           "directives": []
@@ -8120,7 +8120,7 @@ const schemaAST = {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "Bytes"
+              "value": "BigInt"
             }
           },
           "directives": []
@@ -8135,7 +8135,7 @@ const schemaAST = {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "Bytes"
+              "value": "BigInt"
             }
           },
           "directives": []
@@ -8150,7 +8150,7 @@ const schemaAST = {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "Bytes"
+              "value": "BigInt"
             }
           },
           "directives": []
@@ -8165,7 +8165,7 @@ const schemaAST = {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "Bytes"
+              "value": "BigInt"
             }
           },
           "directives": []
@@ -8184,7 +8184,7 @@ const schemaAST = {
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Bytes"
+                  "value": "BigInt"
                 }
               }
             }
@@ -8205,7 +8205,7 @@ const schemaAST = {
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Bytes"
+                  "value": "BigInt"
                 }
               }
             }
@@ -8216,13 +8216,13 @@ const schemaAST = {
           "kind": "InputValueDefinition",
           "name": {
             "kind": "Name",
-            "value": "sender_contains"
+            "value": "receiver"
           },
           "type": {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "Bytes"
+              "value": "BigInt"
             }
           },
           "directives": []
@@ -8231,13 +8231,13 @@ const schemaAST = {
           "kind": "InputValueDefinition",
           "name": {
             "kind": "Name",
-            "value": "sender_not_contains"
+            "value": "receiver_not"
           },
           "type": {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "Bytes"
+              "value": "BigInt"
             }
           },
           "directives": []
@@ -8246,13 +8246,13 @@ const schemaAST = {
           "kind": "InputValueDefinition",
           "name": {
             "kind": "Name",
-            "value": "reciever"
+            "value": "receiver_gt"
           },
           "type": {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "Bytes"
+              "value": "BigInt"
             }
           },
           "directives": []
@@ -8261,13 +8261,13 @@ const schemaAST = {
           "kind": "InputValueDefinition",
           "name": {
             "kind": "Name",
-            "value": "reciever_not"
+            "value": "receiver_lt"
           },
           "type": {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "Bytes"
+              "value": "BigInt"
             }
           },
           "directives": []
@@ -8276,13 +8276,13 @@ const schemaAST = {
           "kind": "InputValueDefinition",
           "name": {
             "kind": "Name",
-            "value": "reciever_gt"
+            "value": "receiver_gte"
           },
           "type": {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "Bytes"
+              "value": "BigInt"
             }
           },
           "directives": []
@@ -8291,13 +8291,13 @@ const schemaAST = {
           "kind": "InputValueDefinition",
           "name": {
             "kind": "Name",
-            "value": "reciever_lt"
+            "value": "receiver_lte"
           },
           "type": {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "Bytes"
+              "value": "BigInt"
             }
           },
           "directives": []
@@ -8306,37 +8306,7 @@ const schemaAST = {
           "kind": "InputValueDefinition",
           "name": {
             "kind": "Name",
-            "value": "reciever_gte"
-          },
-          "type": {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "Bytes"
-            }
-          },
-          "directives": []
-        },
-        {
-          "kind": "InputValueDefinition",
-          "name": {
-            "kind": "Name",
-            "value": "reciever_lte"
-          },
-          "type": {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "Bytes"
-            }
-          },
-          "directives": []
-        },
-        {
-          "kind": "InputValueDefinition",
-          "name": {
-            "kind": "Name",
-            "value": "reciever_in"
+            "value": "receiver_in"
           },
           "type": {
             "kind": "ListType",
@@ -8346,7 +8316,7 @@ const schemaAST = {
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Bytes"
+                  "value": "BigInt"
                 }
               }
             }
@@ -8357,7 +8327,7 @@ const schemaAST = {
           "kind": "InputValueDefinition",
           "name": {
             "kind": "Name",
-            "value": "reciever_not_in"
+            "value": "receiver_not_in"
           },
           "type": {
             "kind": "ListType",
@@ -8367,39 +8337,9 @@ const schemaAST = {
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Bytes"
+                  "value": "BigInt"
                 }
               }
-            }
-          },
-          "directives": []
-        },
-        {
-          "kind": "InputValueDefinition",
-          "name": {
-            "kind": "Name",
-            "value": "reciever_contains"
-          },
-          "type": {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "Bytes"
-            }
-          },
-          "directives": []
-        },
-        {
-          "kind": "InputValueDefinition",
-          "name": {
-            "kind": "Name",
-            "value": "reciever_not_contains"
-          },
-          "type": {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "Bytes"
             }
           },
           "directives": []
@@ -9246,7 +9186,7 @@ const schemaAST = {
           "kind": "EnumValueDefinition",
           "name": {
             "kind": "Name",
-            "value": "reciever"
+            "value": "receiver"
           },
           "directives": []
         },
@@ -13499,7 +13439,7 @@ const schemaAST = {
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "Bytes"
+                "value": "BigInt"
               }
             }
           },
@@ -13715,7 +13655,7 @@ const schemaAST = {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "Bytes"
+              "value": "BigInt"
             }
           },
           "directives": []
@@ -13730,7 +13670,7 @@ const schemaAST = {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "Bytes"
+              "value": "BigInt"
             }
           },
           "directives": []
@@ -13745,7 +13685,7 @@ const schemaAST = {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "Bytes"
+              "value": "BigInt"
             }
           },
           "directives": []
@@ -13760,7 +13700,7 @@ const schemaAST = {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "Bytes"
+              "value": "BigInt"
             }
           },
           "directives": []
@@ -13775,7 +13715,7 @@ const schemaAST = {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "Bytes"
+              "value": "BigInt"
             }
           },
           "directives": []
@@ -13790,7 +13730,7 @@ const schemaAST = {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "Bytes"
+              "value": "BigInt"
             }
           },
           "directives": []
@@ -13809,7 +13749,7 @@ const schemaAST = {
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Bytes"
+                  "value": "BigInt"
                 }
               }
             }
@@ -13830,39 +13770,9 @@ const schemaAST = {
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Bytes"
+                  "value": "BigInt"
                 }
               }
-            }
-          },
-          "directives": []
-        },
-        {
-          "kind": "InputValueDefinition",
-          "name": {
-            "kind": "Name",
-            "value": "sender_contains"
-          },
-          "type": {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "Bytes"
-            }
-          },
-          "directives": []
-        },
-        {
-          "kind": "InputValueDefinition",
-          "name": {
-            "kind": "Name",
-            "value": "sender_not_contains"
-          },
-          "type": {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "Bytes"
             }
           },
           "directives": []

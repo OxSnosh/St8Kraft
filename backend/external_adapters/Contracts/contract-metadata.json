@@ -247,6 +247,19 @@
           "type": "function"
         },
         {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "nationId",
+              "type": "uint256"
+            }
+          ],
+          "name": "deleteNation",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
           "inputs": [],
           "name": "fighters",
           "outputs": [
@@ -923,6 +936,24 @@
             }
           ],
           "name": "transferFrom",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "nationId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "transferNation",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"

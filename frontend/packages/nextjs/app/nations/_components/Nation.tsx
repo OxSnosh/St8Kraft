@@ -28,6 +28,8 @@ import SendAid from "./SendAid";
 import ManageWars from "./DeclareWar";
 import ActiveWars from "./ActiveWars";
 import Senate from "./Senate";
+import TransferDeleteNation from "./DeleteTransfer";
+import Messages from "./Messages";
 import { useAccount, usePublicClient } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 
@@ -42,6 +44,7 @@ const menuItems = [
     category: "TRAIN MILITARY",
     options: ["Soldiers", "Tanks", "Fighters", "Bombers", "Navy", "Cruise Missiles", "Nukes", "Spies"],
   },
+  { category: "ADMIN", options: ["Messages", "Transfer or Delete"] },
 ];
 
 const Nation = () => {
@@ -174,6 +177,10 @@ const Nation = () => {
         setSelectedComponent(<ActiveWars />)
       } else if (savedMenuItem === "Senate") {
         setSelectedComponent(<Senate />);
+      } else if (savedMenuItem === "Transfer or Delete") {
+        setSelectedComponent(<TransferDeleteNation />);
+      }else if (savedMenuItem === "Messages") {
+        setSelectedComponent(<Messages />);
       } else {
         setSelectedComponent(<div className="p-6">Coming Soon...</div>);
       }
@@ -234,6 +241,10 @@ const Nation = () => {
       setSelectedComponent(<ActiveWars />)
     } else if (option === "Senate") {
       setSelectedComponent(<Senate />);
+    } else if (option === "Transfer or Delete") {
+      setSelectedComponent(<TransferDeleteNation />);
+    } else if (option === "Messages") {
+      setSelectedComponent(<Messages />);
     } else {
       setSelectedComponent(<div className="p-6">Coming Soon...</div>);
     }
@@ -243,15 +254,16 @@ const Nation = () => {
     <div className="flex h-screen">
       {/* Sidebar - Left 15% */}
       <div
-        className="w-1/6 text-white p-4"
+        className="w-1/6 text-white p-4 flex flex-col h-full min-h-screen overflow-y-auto" // Ensures full height & scrolling if needed
         style={{
           backgroundImage: "url('/aged_paper.jpg')",
-          backgroundSize: "100% calc(100% + 10px)",
+          backgroundSize: "cover", // Ensures background covers the entire sidebar
+          backgroundRepeat: "no-repeat",
           backgroundPosition: "center top",
         }}
       >
         <h2 className="font-special text-lg text-black mb-4">Menu</h2>
-    
+  
         {/* My Nations Dropdown */}
         {walletAddress && mintedNations.length > 0 && (
           <div className="relative">
@@ -261,7 +273,7 @@ const Nation = () => {
             >
               My Nations
             </button>
-    
+  
             {isDropdownOpen && (
               <ul className="absolute left-0 mt-2 p-2 shadow bg-primary text-white rounded-box w-52">
                 {mintedNations.map(nation => (
@@ -277,7 +289,7 @@ const Nation = () => {
             )}
           </div>
         )}
-    
+  
         {/* Other Menu Items */}
         {menuItems.map(section => (
           <div key={section.category} className="mt-4">
@@ -299,11 +311,13 @@ const Nation = () => {
           </div>
         ))}
       </div>
-    
+  
       {/* Main Content - Right 85% */}
       <div className="w-5/6 p-1">{selectedComponent}</div>
     </div>
   );
-};
-
-export default Nation;
+  };
+  
+  export default Nation;
+  
+  

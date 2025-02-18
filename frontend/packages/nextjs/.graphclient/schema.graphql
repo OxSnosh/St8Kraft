@@ -549,8 +549,8 @@ scalar Int8
 
 type Message {
   id: ID!
-  sender: Bytes!
-  reciever: Bytes!
+  sender: BigInt!
+  receiver: BigInt!
   message: String!
   createdAt: BigInt!
   transactionHash: String!
@@ -565,26 +565,22 @@ input Message_filter {
   id_lte: ID
   id_in: [ID!]
   id_not_in: [ID!]
-  sender: Bytes
-  sender_not: Bytes
-  sender_gt: Bytes
-  sender_lt: Bytes
-  sender_gte: Bytes
-  sender_lte: Bytes
-  sender_in: [Bytes!]
-  sender_not_in: [Bytes!]
-  sender_contains: Bytes
-  sender_not_contains: Bytes
-  reciever: Bytes
-  reciever_not: Bytes
-  reciever_gt: Bytes
-  reciever_lt: Bytes
-  reciever_gte: Bytes
-  reciever_lte: Bytes
-  reciever_in: [Bytes!]
-  reciever_not_in: [Bytes!]
-  reciever_contains: Bytes
-  reciever_not_contains: Bytes
+  sender: BigInt
+  sender_not: BigInt
+  sender_gt: BigInt
+  sender_lt: BigInt
+  sender_gte: BigInt
+  sender_lte: BigInt
+  sender_in: [BigInt!]
+  sender_not_in: [BigInt!]
+  receiver: BigInt
+  receiver_not: BigInt
+  receiver_gt: BigInt
+  receiver_lt: BigInt
+  receiver_gte: BigInt
+  receiver_lte: BigInt
+  receiver_in: [BigInt!]
+  receiver_not_in: [BigInt!]
   message: String
   message_not: String
   message_gt: String
@@ -642,7 +638,7 @@ input Message_filter {
 enum Message_orderBy {
   id
   sender
-  reciever
+  receiver
   message
   createdAt
   transactionHash
@@ -939,7 +935,7 @@ enum OrderDirection {
 
 type Post {
   id: ID!
-  sender: Bytes!
+  sender: BigInt!
   post: String!
   createdAt: BigInt!
   transactionHash: String!
@@ -954,16 +950,14 @@ input Post_filter {
   id_lte: ID
   id_in: [ID!]
   id_not_in: [ID!]
-  sender: Bytes
-  sender_not: Bytes
-  sender_gt: Bytes
-  sender_lt: Bytes
-  sender_gte: Bytes
-  sender_lte: Bytes
-  sender_in: [Bytes!]
-  sender_not_in: [Bytes!]
-  sender_contains: Bytes
-  sender_not_contains: Bytes
+  sender: BigInt
+  sender_not: BigInt
+  sender_gt: BigInt
+  sender_lt: BigInt
+  sender_gte: BigInt
+  sender_lte: BigInt
+  sender_in: [BigInt!]
+  sender_not_in: [BigInt!]
   post: String
   post_not: String
   post_gt: String

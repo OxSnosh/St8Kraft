@@ -3,6 +3,7 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./IWarBucks.sol";
 import "./CountryParameters.sol";
 import "./Infrastructure.sol";
@@ -22,7 +23,7 @@ import "hardhat/console.sol";
 ///@title CountryMinter
 ///@author OxSnosh
 ///@notice this is the contract that will allow the user to mint a nation!
-contract CountryMinter is ERC721, Ownable {
+contract CountryMinter is ERC721, Ownable, ReentrancyGuard {
     uint256 public countryId;
 
     address public countryParameters;
@@ -198,4 +199,56 @@ contract CountryMinter is ERC721, Ownable {
     function tokensOfOwner(address owner) public view returns (uint256[] memory) {
         return ownerCountryIds[owner];
     }
+
+    function deleteNation(uint256 nationId) public nonReentrant {
+        require(_isApprovedOrOwner(msg.sender, nationId), "Not authorized");
+
+        address owner = ownerOf(nationId);
+
+        // Update storage first
+        uint256[] storage ownedIds = ownerCountryIds[owner];
+        for (uint256 i = 0; i < ownedIds.length; i++) {
+            if (ownedIds[i] == nationId) {
+                ownedIds[i] = ownedIds[ownedIds.length - 1];
+                ownedIds.pop();
+                break;
+            }
+        }
+
+        ownerCountryCount[owner]--;
+        delete idToOwner[nationId];
+
+        // Now burn the NFT
+        _burn(nationId);
+    }
+
+
+    function transferNation(uint256 nationId, address newOwner) public {
+        require(newOwner != address(0), "Cannot transfer to zero address");
+        require(newOwner != msg.sender, "Cannot transfer to yourself");
+        require(_isApprovedOrOwner(msg.sender, nationId), "Not authorized");
+
+        address previousOwner = ownerOf(nationId);
+
+        // Transfer ownership via ERC721
+        _transfer(previousOwner, newOwner, nationId);
+
+        // Update country count mappings
+        ownerCountryCount[previousOwner]--;
+        ownerCountryCount[newOwner]++;
+
+        // Remove from old owner's list
+        uint256[] storage ownedIds = ownerCountryIds[previousOwner];
+        for (uint256 i = 0; i < ownedIds.length; i++) {
+            if (ownedIds[i] == nationId) {
+                ownedIds[i] = ownedIds[ownedIds.length - 1];
+                ownedIds.pop();
+                break;
+            }
+        }
+
+        // Add to new owner's list
+        ownerCountryIds[newOwner].push(nationId);
+    }
+
 }

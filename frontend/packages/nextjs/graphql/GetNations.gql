@@ -109,7 +109,7 @@ query GetBlockades {
   }
 }
 
-query GetPosts($sender: Bytes!) {
+query GetPosts($sender: BigInt) {
   posts(where: { sender: $sender }) {
     id
     sender
@@ -119,22 +119,23 @@ query GetPosts($sender: Bytes!) {
   }
 }
 
-query GetRecievedMessages($reciever: Bytes!) {
-  messages(where: { reciever: $reciever }) {
+query GetReceivedMessages($receiver: BigInt!) {
+  messages(where: { receiver: $receiver }) {
     id
     sender
-    reciever
+    receiver
     message
     createdAt
     transactionHash
   }
 }
 
-query GetSentMessages($sender: Bytes!) {
+
+query GetSentMessages($sender: BigInt!) {
   messages(where: { sender: $sender }) {
     id
     sender
-    reciever
+    receiver
     message
     createdAt
     transactionHash

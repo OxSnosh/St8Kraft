@@ -247,6 +247,19 @@
           "type": "function"
         },
         {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "nationId",
+              "type": "uint256"
+            }
+          ],
+          "name": "deleteNation",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
           "inputs": [],
           "name": "fighters",
           "outputs": [
@@ -923,6 +936,24 @@
             }
           ],
           "name": "transferFrom",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "nationId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "transferNation",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -37583,19 +37614,30 @@
       "address": "0x7969c5eD335650692Bc04293B07F5BF2e7A673C0",
       "ABI": [
         {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_countryMinter",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
           "anonymous": false,
           "inputs": [
             {
               "indexed": true,
-              "internalType": "address",
-              "name": "sender",
-              "type": "address"
+              "internalType": "uint256",
+              "name": "nationId",
+              "type": "uint256"
             },
             {
               "indexed": true,
-              "internalType": "address",
+              "internalType": "uint256",
               "name": "receiver",
-              "type": "address"
+              "type": "uint256"
             },
             {
               "indexed": false,
@@ -37612,9 +37654,9 @@
           "inputs": [
             {
               "indexed": true,
-              "internalType": "address",
-              "name": "sender",
-              "type": "address"
+              "internalType": "uint256",
+              "name": "nationId",
+              "type": "uint256"
             },
             {
               "indexed": false,
@@ -37627,11 +37669,50 @@
           "type": "event"
         },
         {
-          "inputs": [
+          "inputs": [],
+          "name": "MAX_MESSAGE_LENGTH",
+          "outputs": [
             {
-              "internalType": "address",
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "MAX_POST_LENGTH",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "countryMinter",
+          "outputs": [
+            {
+              "internalType": "contract ICountryMinter",
               "name": "",
               "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
             }
           ],
           "name": "messages",
@@ -37648,6 +37729,11 @@
         {
           "inputs": [
             {
+              "internalType": "uint256",
+              "name": "nationId",
+              "type": "uint256"
+            },
+            {
               "internalType": "string",
               "name": "_post",
               "type": "string"
@@ -37661,9 +37747,9 @@
         {
           "inputs": [
             {
-              "internalType": "address",
+              "internalType": "uint256",
               "name": "",
-              "type": "address"
+              "type": "uint256"
             }
           ],
           "name": "posts",
@@ -37680,9 +37766,14 @@
         {
           "inputs": [
             {
-              "internalType": "address",
+              "internalType": "uint256",
+              "name": "nationId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
               "name": "_receiver",
-              "type": "address"
+              "type": "uint256"
             },
             {
               "internalType": "string",

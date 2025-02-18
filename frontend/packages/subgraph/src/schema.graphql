@@ -100,8 +100,8 @@ type Blockade @entity {
 
 type Message @entity {
   id: ID!
-  sender: Bytes!
-  reciever: Bytes!
+  sender: BigInt!
+  receiver: BigInt!
   message: String!
   createdAt: BigInt!
   transactionHash: String!
@@ -109,7 +109,7 @@ type Message @entity {
 
 type Post @entity {
   id: ID!
-  sender: Bytes!
+  sender: BigInt!
   post: String!
   createdAt: BigInt!
   transactionHash: String!

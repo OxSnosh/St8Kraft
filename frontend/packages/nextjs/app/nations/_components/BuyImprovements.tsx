@@ -168,7 +168,7 @@ const BuyImprovement = () => {
     
             // Encode function call data
             const functionName = `buyImprovement${(selectedContractKey as string).slice(-1)}`;
-            const data = contract.interface.encodeFunctionData(functionName, [nationId, improvementIndex, amount]);
+            const data = contract.interface.encodeFunctionData(functionName, [amount, nationId, improvementIndex]);
     
             // Simulate the transaction
             try {
