@@ -582,9 +582,14 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         emit AllianceAdminRemoved(allianceId, adminNationId);
     }
 
+    // In requestToJoinAlliance function
     function requestToJoinAlliance(uint256 allianceId, uint256 nationId) external {
         require(nationToAlliance[nationId] == 0, "Nation already in an alliance");
+
         alliances[allianceId].joinRequests.push(nationId);
+        console.log(allianceId, "alliance Id", nationId, "nation Id");
+        console.log("joinRequests length after push:", alliances[allianceId].joinRequests.length);
+
         emit NationRequestedToJoin(allianceId, nationId);
     }
 
@@ -592,6 +597,7 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         external
         onlyAllianceFounderOrAdmin(allianceId, callerNationId)
     {
+        console.log("nationToAlliance[nationId]: %d", nationToAlliance[nationId]);
         require(nationToAlliance[nationId] == 0, "Nation already in an alliance");
 
         uint256[] storage requests = alliances[allianceId].joinRequests;
@@ -610,6 +616,8 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
 
         alliances[allianceId].members.push(nationId);
         nationToAlliance[nationId] = allianceId;
+
+        console.log(allianceId, "alliance Id", nationId, "nation Id");
 
         emit NationApprovedToJoin(allianceId, nationId);
     }
@@ -648,7 +656,9 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
     }
 
     function getJoinRequests(uint256 allianceId) external view returns (uint256[] memory) {
-        return alliances[allianceId].joinRequests;
+        uint256[] storage requests = alliances[allianceId].joinRequests;
+        console.log("requests length:", requests.length);  // Add this line to log the length
+        return requests;
     }
 
     function getNationAlliance(uint256 nationId) external view returns (uint256) {

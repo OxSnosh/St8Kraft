@@ -6,6 +6,10 @@ export const createAlliance = async (
     writeContractAsync: any
 ) => {
     if (!publicClient || !allianceContract || !nationId || !allianceName) {
+        console.error("Public Client", publicClient);
+        console.error("Alliance Contract", allianceContract);
+        console.error("Nation ID", nationId);
+        console.error("Alliance Name", allianceName);
         console.error("Missing required data: publicClient, allianceContract, nationId, or allianceName.");
         return;
     }
@@ -59,6 +63,8 @@ export const approveNationJoin = async (
         return;
     }
 
+    console.log("Approving nation to join alliance", allianceId, nationId, callerNationId);
+
     try {
         await writeContractAsync({
             abi: allianceContract.abi,
@@ -66,6 +72,8 @@ export const approveNationJoin = async (
             functionName: "approveNationJoin",
             args: [allianceId, nationId, callerNationId],
         });
+
+        console.log("Nation approved to join alliance", allianceId, nationId, callerNationId);
     } catch (error) {
         console.error("Error approving nation to join alliance:", error);
     }
@@ -235,6 +243,8 @@ export const getJoinRequests = async (
         console.error("Missing required data: publicClient, allianceContract, or allianceId.");
         return;
     }
+
+    console.log("Getting join requests for alliance", allianceId);
 
     return await publicClient.readContract({
         abi: allianceContract.abi,
