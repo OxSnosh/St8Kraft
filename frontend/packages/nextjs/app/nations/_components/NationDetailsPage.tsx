@@ -320,6 +320,7 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
         const lastBillPayment = `${lastBillPaymentDays} days ago`;
 
         const resources = await getResources(tokenIdString, resourcesContract, publicClient);
+        console.log(resources, "RESOURCES")
 
         const bonusResources = await getBonusResources(tokenIdString, bonusResourcesContract, publicClient);
 
@@ -748,106 +749,170 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
     ],
   };
 
-  return (
-    <div className="flex w-full p-6 bg-aged-paper text-base-content rounded-lg shadow-center border border-neutral">
-      {/* Left Sidebar - News Carousel Tabs */}
-      <div className="w-3/12 pr-4 border-r border-neutral flex flex-col gap-3">
-        <h2 className="text-2xl font-bold text-primary-content text-center">Nation Details</h2>
-
-        <div className="news-carousel-left flex flex-col gap-3">
-          <button
-            className={`news-carousel-tab px-4 py-4 text-lg text-center font-semibold rounded-lg shadow-md transition-all ${
-              activeTab === "All Details" ? "bg-primary text-primary-content" : "bg-base-200 hover:bg-base-300"
-            }`}
-            onClick={() => setActiveTab("All Details")}
-          >
-            📜 All Details
-          </button>
-          {Object.keys(sections).map((section) => (
-            <button
-              key={section}
-              className={`news-carousel-tab px-4 py-4 text-lg text-center font-semibold rounded-lg shadow-md transition-all ${
-                activeTab === section ? "bg-primary text-primary-content" : "bg-base-200 hover:bg-base-300"
-              }`}
-              onClick={() => setActiveTab(section)}
-            >
-              {section}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Center Content - Selected Tab Information */}
-      <div className="w-7/12 px-6">
-        <h2 className="text-2xl font-bold text-primary-content text-center mb-4">{activeTab}</h2>
-
-        {activeTab === "All Details" ? (
-          /* Display all sections in one view */
-          Object.keys(sections).map((section) => (
-            <div key={section} className="mb-6">
-              <h3 className="text-xl font-semibold text-secondary mt-4">{section}</h3>
-              <div className="p-4 bg-base-200 rounded-lg shadow-md mt-2">
-                <table className="table-auto border-collapse border border-neutral w-full text-sm">
-                  <colgroup>
-                    <col style={{ width: "40%" }} />
-                    <col style={{ width: "60%" }} />
-                  </colgroup>
-                  <tbody>
-                    {sections[section].map(({ label, value }) => (
-                      <tr key={label}>
-                        <td className="border border-neutral px-4 py-2 font-semibold">{label}:</td>
-                        <td className="border border-neutral px-4 py-2">{value}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+  const ResourceDisplay = () => {
+    const resources = nationDetails.resources;
+  
+    if (!resources || resources.length === 0) {
+      return <p>No resources available</p>; // Handle empty array case
+    }
+  
+    return (
+      <div className="flex flex-wrap gap-3 bg-base-100 p-3 rounded-lg">
+        {resources.map((resource) => {
+          const sanitizedResource = resource.toLowerCase().replace(/\s+/g, '-'); // Ensure correct filename formatting
+          console.log(`Rendering resource: ${sanitizedResource}`); // Debugging log
+  
+          return (
+            <div key={resource} className="tooltip" data-tip={resource}>
+              <img 
+                src={`/icons/${sanitizedResource}.svg`} 
+                alt={resource} 
+                className="w-10 h-10"
+                onError={() => console.error(`Image failed to load: ${sanitizedResource}.svg`)}
+              />
             </div>
-          ))
-        ) : (
-          /* Display selected section */
-          <div className="p-4 bg-base-200 rounded-lg shadow-md">
-            <table className="table-auto border-collapse border border-neutral w-full text-sm">
-              <colgroup>
-                <col style={{ width: "40%" }} />
-                <col style={{ width: "60%" }} />
-              </colgroup>
-              <tbody>
-                {sections[activeTab].map(({ label, value }) => (
-                  <tr key={label}>
-                    <td className="border border-neutral px-4 py-2 font-semibold">{label}:</td>
-                    <td className="border border-neutral px-4 py-2">{value}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+          );
+        })}
       </div>
+    );
+  };
 
-      {/* Right Sidebar - Nation Posts */}
-      <div className="w-2/12 pl-4 border-l border-neutral">
-        <h2 className="text-lg font-semibold text-primary-content mb-4 text-center">Nation Posts</h2>
-        <PostsTable />
+    const BonusResourceDisplay = () => {
+    const resources = nationDetails.bonusResources;
 
-        {isOwner && (
-          <div className="mt-4 p-4 bg-base-200 rounded-lg shadow-md">
-            <textarea
-              className="w-full p-2 border rounded-lg bg-base-100 text-base-content"
-              placeholder="Create post..."
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
-            <button 
-              className="mt-2 px-4 py-2 bg-primary text-primary-content rounded-lg shadow-md w-full hover:bg-primary/80"
-              onClick={handlePostMessage}
-            >
-              Create Post
-            </button>
-          </div>
-        )}
+    if (!resources || resources.length === 0) {
+      return <p>No bonus resources available</p>;
+    }
+
+    return (
+      <div className="flex flex-wrap gap-3 bg-base-100 p-3 rounded-lg">
+        {resources.map((resource) => {
+          const sanitizedResource = resource.toLowerCase().replace(/\s+/g, '-');
+          console.log(`Rendering bonus resource: ${sanitizedResource}`); // Debugging log
+
+          return (
+            <div key={resource} className="tooltip" data-tip={resource}>
+              <img 
+                src={`/icons/${sanitizedResource}.svg`} 
+                alt={resource} 
+                className="w-10 h-10"
+                onError={() => console.error(`Image failed to load: ${sanitizedResource}.svg`)}
+              />
+            </div>
+          );
+        })}
       </div>
-    </div>
+    );
+  };
+
+  return (
+      <div className="flex w-full p-6 bg-aged-paper text-base-content rounded-lg shadow-center">
+          {/* Left Sidebar - News Carousel Tabs */}
+          <div className="w-3/12 pr-4 border-r border-neutral flex flex-col gap-3">
+              <h2 className="text-2xl font-bold text-primary-content text-center">Nation Details</h2>
+              <div className="news-carousel-left flex flex-col gap-3">
+                  <button
+                      className={`news-carousel-tab px-4 py-4 text-lg text-center font-semibold rounded-lg shadow-md transition-all ${
+                          activeTab === "All Details" ? "bg-primary text-primary-content" : "bg-base-200 hover:bg-base-300"
+                      }`}
+                      onClick={() => setActiveTab("All Details")}
+                  >
+                      📜 All Details
+                  </button>
+                  {Object.keys(sections).map((section: string) => (
+                      <button
+                          key={section}
+                          className={`news-carousel-tab px-4 py-4 text-lg text-center font-semibold rounded-lg shadow-md transition-all ${
+                              activeTab === section ? "bg-primary text-primary-content" : "bg-base-200 hover:bg-base-300"
+                          }`}
+                          onClick={() => setActiveTab(section)}
+                      >
+                          {section}
+                      </button>
+                  ))}
+              </div>
+          </div>
+
+          {/* Center Content - Selected Tab Information */}
+          <div className="w-7/12 px-6">
+              <h2 className="text-2xl font-bold text-primary-content text-center mb-4">{activeTab}</h2>
+
+              {activeTab === "All Details" ? (
+                  /* Display all sections in one view */
+                  Object.keys(sections).map((section) => (
+                      <div key={section} className="mb-6">
+                          <h3 className="text-xl font-semibold text-secondary mt-4">{section}</h3>
+                          <div className="p-4 bg-base-200 rounded-lg shadow-md mt-2">
+                              <table className="table-auto border-collapse border border-neutral w-full text-sm">
+                                  <colgroup>
+                                      <col style={{ width: "40%" }} />
+                                      <col style={{ width: "60%" }} />
+                                  </colgroup>
+                                  <tbody>
+                                      {sections[section].map(({ label, value }) => (
+                                          <tr key={label}>
+                                              <td className="border-neutral px-4 py-2 font-semibold">{label}:</td>
+                                              <td className="border-neutral px-4 py-2">
+                                                  {label === "Resources" && nationDetails.resources && <ResourceDisplay />}
+                                                  {label === "Bonus Resources" && nationDetails.bonusResources && <BonusResourceDisplay />}
+                                              </td>
+                                          </tr>
+                                      ))}
+                                  </tbody>
+                              </table>
+                          </div>
+                      </div>
+                  ))
+              ) : (
+                  /* Display selected section */
+                  <div className="p-4 bg-base-200 rounded-lg shadow-md">
+                      <table className="table-auto border-collapse w-full text-sm">
+                          <colgroup>
+                              <col style={{ width: "40%" }} />
+                              <col style={{ width: "60%" }} />
+                          </colgroup>
+                          <tbody>
+                              {sections[activeTab].map(({ label, value }) => (
+                                  <tr key={label}>
+                                      <td className="px-4 py-2 font-semibold">{label}:</td>
+                                      <td className="px-4 py-2">
+                                      <td className="px-4 py-2">
+                                          {label === "Resources" && nationDetails.resources && <ResourceDisplay />}
+                                          {label === "Bonus Resources" && nationDetails.bonusResources && <BonusResourceDisplay />}
+                                          {label !== "Resources" && label !== "Bonus Resources" && value}
+                                      </td>
+                                      </td>
+                                  </tr>
+                              ))}
+                          </tbody>
+                      </table>
+                  </div>
+              )}
+          </div>
+
+          {/* Right Sidebar - Nation Posts */}
+          <div className="w-2/12 pl-4 border-l border-neutral">
+              <h2 className="text-lg font-semibold text-primary-content mb-4 text-center">Nation Posts</h2>
+              <PostsTable />
+              
+              {isOwner && (
+                  <div className="mt-4 p-4 bg-base-200 rounded-lg shadow-md">
+                      <textarea
+                          className="w-full p-2 border rounded-lg bg-base-100 text-base-content"
+                          placeholder="Create post..."
+                          value={message}
+                          onChange={(e) => setMessage(e.target.value)}
+                      />
+                      <button 
+                          className="mt-2 px-4 py-2 bg-primary text-primary-content rounded-lg shadow-md w-full hover:bg-primary/80"
+                          onClick={handlePostMessage}
+                      >
+                          Create Post
+                      </button>
+                  </div>
+              )}
+          </div>
+      </div>
   );
 }
 

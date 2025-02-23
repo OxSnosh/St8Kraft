@@ -80,23 +80,6 @@ const BuySpies = () => {
     }
   };
 
-  // const handleBuySpies = async (amount: any) => {
-  //   if (!nationId || !publicClient || !SpyContract || !walletAddress || !cost) {
-  //     setErrorMessage("Missing required information to proceed with the purchase.");
-  //     return;
-  //   }
-
-  //   try {
-  //     await buySpies(Number(amount), nationId, publicClient, SpyContract, writeContractAsync);
-  //     setRefreshTrigger(!refreshTrigger);
-  //     setErrorMessage("");
-  //     alert("Spies purchased successfully!");
-  //   } catch (error) {
-  //     console.error("Error buying Spies:", error);
-  //     setErrorMessage("Failed to complete the purchase. Please try again.");
-  //   }
-  // };
-
   const handleBuySpies = async (amount : any) => {
           
     if (!nationId || !publicClient || !SpyContract || !walletAddress || !cost) {

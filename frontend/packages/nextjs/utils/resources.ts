@@ -1,4 +1,3 @@
-import { LinkToken__factory } from '../../../../backend/typechain-types/factories/@chainlink/contracts/src/v0.4/LinkToken__factory';
 
 export const getResources = async (
     nationId: string,
@@ -14,27 +13,27 @@ export const getResources = async (
 
     try {
       const resourceNames = [
-        { key: "viewAluminium", name: "Aluminium" },
-        { key: "viewCattle", name: "Cattle" },
-        { key: "viewCoal", name: "Coal" },
-        { key: "viewFish", name: "Fish" },
-        { key: "viewFurs", name: "Furs" },
-        { key: "viewGems", name: "Gems" },
-        { key: "viewGold", name: "Gold" },
-        { key: "viewIron", name: "Iron" },
-        { key: "viewLead", name: "Lead" },
-        { key: "viewLumber", name: "Lumber" },
-        { key: "viewMarble", name: "Marble" },
-        { key: "viewOil", name: "Oil" },
-        { key: "viewPigs", name: "Pigs" },
-        { key: "viewRubber", name: "Rubber" },
-        { key: "viewSilver", name: "Silver" },
-        { key: "viewSpices", name: "Spices" },
-        { key: "viewSugar", name: "Sugar" },
-        { key: "viewUranium", name: "Uranium" },
-        { key: "viewWater", name: "Water" },
-        { key: "viewWheat", name: "Wheat" },
-        { key: "viewWine", name: "Wine" },
+        { key: "viewAluminium", name: "Aluminium", link: "icons/aluminium.svg" },
+        { key: "viewCattle", name: "Cattle", link: "icons/cattle.svg" },
+        { key: "viewCoal", name: "Coal", link: "icons/coal.svg" },
+        { key: "viewFish", name: "Fish", link: "icons/fish.svg" },
+        { key: "viewFurs", name: "Furs", link: "icons/furs.svg" },
+        { key: "viewGems", name: "Gems", link: "icons/gems.svg" },
+        { key: "viewGold", name: "Gold", link: "icons/gold.svg" },
+        { key: "viewIron", name: "Iron", link: "icons/iron.svg" },
+        { key: "viewLead", name: "Lead", link: "icons/lead.svg" },
+        { key: "viewLumber", name: "Lumber", link: "icons/lumber.svg" },
+        { key: "viewMarble", name: "Marble", link: "icons/marble.svg" },
+        { key: "viewOil", name: "Oil", link: "icons/oil.svg" },
+        { key: "viewPigs", name: "Pigs", link: "icons/pigs.svg" },
+        { key: "viewRubber", name: "Rubber", link: "icons/rubber.svg" },
+        { key: "viewSilver", name: "Silver", link: "icons/silver.svg" },
+        { key: "viewSpices", name: "Spices", link: "icons/spices.svg" },
+        { key: "viewSugar", name: "Sugar", link: "icons/sugar.svg" },
+        { key: "viewUranium", name: "Uranium", link: "icons/uranium.svg" },
+        { key: "viewWater", name: "Water", link: "icons/water.svg" },
+        { key: "viewWheat", name: "Wheat", link: "icons/wheat.svg" },
+        { key: "viewWine", name: "Wine", link: "icons/wine.svg" },
       ];
   
       for (const { key, name } of resourceNames) {
@@ -49,7 +48,7 @@ export const getResources = async (
           resources.push(name);
         }
       }
-
+      console.log("Resources from function:", resources);
       return resources;
     } catch (error) {
       console.error("Error fetching resources:", error);
@@ -71,17 +70,17 @@ export const getBonusResources = async (
 
     try {
         const bonusResourceNames = [
-            { key: "viewBeer", name: "Beer" },
-            { key: "viewSteel", name: "Steel" },
-            { key: "viewConstruction", name: "Construction" },
-            { key: "viewFastFood", name: "Fast Food" },
-            { key: "viewFineJewelry", name: "Fine Jewelry" },
-            { key: "viewScholars", name: "Scholars" },
-            { key: "viewAsphalt", name: "Asphalt" },
-            { key: "viewAutomobiles", name: "Automobiles" },
-            { key: "viewAffluentPopulation", name: "Affluent Population" },
-            { key: "viewMicrochips", name: "Microchips" },
-            { key: "viewRadiationCleanup", name: "Radiation Cleanup" },
+            { key: "viewBeer", name: "Beer", link: "icons/beer.svg" },
+            { key: "viewSteel", name: "Steel", link: "icons/steel.svg" },
+            { key: "viewConstruction", name: "Construction", link: "icons/construction.svg" },
+            { key: "viewFastFood", name: "Fast Food", link: "icons/fast-food.svg" },
+            { key: "viewFineJewelry", name: "Fine Jewelry", link: "icons/fine-jewelry.svg" },
+            { key: "viewScholars", name: "Scholars", link: "icons/scholars.svg" },
+            { key: "viewAsphalt", name: "Asphalt", link: "icons/asphalt.svg" },
+            { key: "viewAutomobiles", name: "Automobiles", link: "icons/automobiles.svg" },
+            { key: "viewAffluentPopulation", name: "Affluent Population", link: "icons/affluent-population.svg" },
+            { key: "viewMicrochips", name: "Microchips", link: "icons/microchips.svg" },
+            { key: "viewRadiationCleanup", name: "Radiation Cleanup", link: "icons/radiation-cleanup.svg" },
         ];
 
         for (const { key, name } of bonusResourceNames) {

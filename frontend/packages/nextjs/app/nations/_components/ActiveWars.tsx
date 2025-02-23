@@ -1286,72 +1286,75 @@ const ActiveWars = () => {
     
     
     return (
-        <div>
-            <h1>Manage Wars</h1>
-
+        <div className="w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
+            <h1 className="text-3xl font-bold text-primary-content text-center mb-4">Manage Wars</h1>
+    
             {/* Nation Selection */}
             {mintedNations.length > 0 && (
-                <div className="mb-4">
-                    <label className="block font-bold mb-2">Select Attacking Nation:</label>
+                <div className="p-4 bg-base-200 rounded-lg shadow-md mb-4">
+                    <label className="block text-lg font-semibold text-primary">Select Attacking Nation:</label>
                     <select
                         value={selectedNation || ""}
                         onChange={handleNationChange}
-                        className="border p-2 rounded"
+                        className="select select-bordered w-full bg-base-100 text-base-content mt-2"
                     >
+                        <option value="">Select a Nation</option>
                         {mintedNations.map((nation) => (
                             <option key={nation.id} value={nation.id}>{nation.name}</option>
                         ))}
                     </select>
                 </div>
             )}
-
+    
             {/* Active Wars Card */}
             {activeWars.length > 0 && (
-                <div className="border border-gray-300 p-4 rounded-lg shadow-md mb-4">
-                    <h2 className="text-lg font-bold">Active Wars</h2>
-                    {activeWars.map((warId) => (
-                        <div 
-                            key={warId} 
-                            className="p-2 border-b last:border-0 cursor-pointer hover:bg-gray-200"
-                            onClick={() => handleWarClick(warId)}
-                        >
-                            <p><strong>War ID:</strong> {warId.toString()}</p>
-                            {warDetails[warId] && (
-                                <>
-                                    <p><strong>Offense Nation:</strong> Nation {selectedNation}</p>
-                                    <p><strong>Defense Nation:</strong> Nation {defendingNationId}</p>
-                                    <p><strong>Status:</strong> {warDetails[warId][2] ? "Active" : "Ended"}</p>
-                                </>
-                            )}
-                        </div>
-                    ))}
+                <div className="p-4 bg-base-200 rounded-lg shadow-md border border-neutral mb-4">
+                    <h2 className="text-xl font-bold text-primary mb-3">Active Wars</h2>
+                    <div className="space-y-2">
+                        {activeWars.map((warId) => (
+                            <div 
+                                key={warId} 
+                                className="p-3 bg-base-100 border rounded-lg shadow-sm hover:bg-base-300 transition cursor-pointer"
+                                onClick={() => handleWarClick(warId)}
+                            >
+                                <p><strong className="text-primary">War ID:</strong> {warId.toString()}</p>
+                                {warDetails[warId] && (
+                                    <>
+                                        <p><strong className="text-secondary">Offense Nation:</strong> Nation {selectedNation}</p>
+                                        <p><strong className="text-secondary">Defense Nation:</strong> Nation {defendingNationId}</p>
+                                        <p><strong className="text-accent">Status:</strong> {warDetails[warId][2] ? "Active" : "Ended"}</p>
+                                    </>
+                                )}
+                            </div>
+                        ))}
+                    </div>
                 </div>
             )}
-
+    
             {/* War Actions */}
             {selectedWar && selectedNation && defendingNationId && (
-                <div className="border border-gray-300 p-4 rounded-lg shadow-md">
-                    <h2 className="text-lg font-bold">War Actions</h2>
-                    <p><strong>War ID:</strong> {selectedWar}</p>
-                    <p><strong>Attacking Nation:</strong> {selectedNation}</p>
-                    <p><strong>Defending Nation:</strong> {defendingNationId}</p>
-
-                    {/* War Actions Layout */}
+                <div className="p-6 bg-base-200 rounded-lg shadow-md border border-neutral">
+                    <h2 className="text-xl font-bold text-primary mb-3">War Actions</h2>
+                    <p><strong className="text-accent">War ID:</strong> {selectedWar}</p>
+                    <p><strong className="text-secondary">Attacking Nation:</strong> {selectedNation}</p>
+                    <p><strong className="text-secondary">Defending Nation:</strong> {defendingNationId}</p>
+    
+                    {/* War Actions Grid */}
                     <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        {/* Peace Negotiations - Full Width Row */}
+                        {/* Peace Negotiations - Full Width */}
                         <div className="col-span-full">
                             <PeaceOfferCard />
                         </div>
-
-                        {/* Deploy Forces & Ground Attack - Row 2 */}
+    
+                        {/* Deploy Forces & Ground Attack */}
                         <DeployForcesCard />
                         <GroundAttackCard />
-
-                        {/* Cruise Missile Attack & Nuclear Attack - Row 3 */}
+    
+                        {/* Cruise Missile & Nuclear Attack */}
                         <CruiseMissileAttackCard />
                         <NuclearMissileAttackCard />
-
-                        {/* Air Assault & Naval Warfare - Row 4 */}
+    
+                        {/* Air Assault & Naval Warfare */}
                         <LaunchAirstrikeCard />
                         <NavalWarfareCard />
                     </div>
