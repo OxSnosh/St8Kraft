@@ -24,15 +24,15 @@ export const getImprovements = async (
     try {
         const improvementNames1 = [
             { key: "getAirportCount", name: "Airports" },
+            { key: "getBankCount", name: "Banks" },
             { key: "getBarracksCount", name: "Barracks" },
             { key: "getBorderFortificationCount", name: "Border Fortifications" },
             { key: "getBorderWallCount", name: "Border Walls" },
-            { key: "getBankCount", name: "Banks" },
             { key: "getBunkerCount", name: "Bunkers" },
             { key: "getCasinoCount", name: "Casinos" },
             { key: "getChurchCount", name: "Churches" },
-            { key: "getDrydockCount", name: "Drydocks" },
             { key: "getClinicCount", name: "Clinics" },
+            { key: "getDrydockCount", name: "Drydocks" },
             { key: "getFactoryCount", name: "Factories" },
         ]
 

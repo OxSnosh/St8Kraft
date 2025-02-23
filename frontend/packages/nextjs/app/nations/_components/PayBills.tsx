@@ -189,38 +189,41 @@ const PayBills = () => {
     }
 
     return (
-        <div className={`p-6 border-l-4 ${theme === 'dark' ? 'bg-gray-800 text-white border-green-400' : 'bg-gray-100 text-black border-green-500'}`}>
-            <h3 className="text-lg font-semibold">Collect Taxes</h3>
-            <p className="text-sm">Collect taxes from your citizens.</p>
-            
+        <div className="w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
+            <h2 className="text-2xl font-bold text-primary-content text-center mb-4">💳 Pay Bills</h2>
+            <p className="text-sm text-center">Manage and pay your nation's bills.</p>
+
+            {/* Error Message */}
             {errorMessage && (
-                <div className="mt-4 p-4 bg-red-500 text-white rounded">
+                <div className="mt-4 p-4 bg-red-500 text-white rounded-lg text-center shadow-md">
                     {errorMessage}
                 </div>
             )}
-            
-            <table className="w-full mt-4 border-collapse border border-gray-300">
-                <thead>
-                    <tr className={`${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-black'}` }>
-                        <th className="border border-gray-300 px-4 py-2">Category</th>
-                        <th className="border border-gray-300 px-4 py-2">Value</th>
+
+            {/* Bills Table */}
+            <table className="w-full mt-4 border-collapse border border-neutral bg-base-200 rounded-lg shadow-md">
+                <thead className="bg-primary text-primary-content">
+                    <tr>
+                        <th className="p-3 text-left">Category</th>
+                        <th className="p-3 text-left">Amount</th>
                     </tr>
                 </thead>
                 <tbody>
                     {Object.entries(taxDetails).map(([key, value]) => (
-                        <tr key={key} className="text-center">
-                            <td className="border border-gray-300 px-4 py-2 capitalize">{key.replace(/([A-Z])/g, ' $1')}</td>
-                            <td className="border border-gray-300 px-4 py-2">{value !== null ? value : "Loading..."}</td>
+                        <tr key={key} className="border-b border-neutral">
+                            <td className="p-3 capitalize">{key.replace(/([A-Z])/g, " $1")}</td>
+                            <td className="p-3">{value !== null ? value : "Loading..."}</td>
                         </tr>
                     ))}
                 </tbody>
             </table>
 
+            {/* Pay Bills Button */}
             <button 
                 onClick={handlePayBills} 
-                className={`mt-4 px-4 py-2 rounded hover:opacity-80 ${theme === 'dark' ? 'bg-blue-500 text-white' : 'bg-blue-600 text-white'}`}
+                className="btn btn-accent w-full mt-4"
             >
-                Pay Bills
+                Pay Bills 💳
             </button>
         </div>
     );

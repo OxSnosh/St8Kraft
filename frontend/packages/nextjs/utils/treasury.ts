@@ -35,13 +35,19 @@ export const getDaysSinceLastBillsPaid = async (
     });
 }
 
+import { BigNumber } from "ethers";
+
 export const addFunds = async (
     nationId: string,
     publicClient: any,
     treasuryContract: any,
-    amount: number,
-    writeContractAsync: (args: any) => Promise<any>
+    amount: BigNumber,  // Change `number` to `BigNumber`
+    writeContractAsync: any
 ) => {
+    console.log("addFunds", nationId, amount);
+    console.log("publicClient", publicClient);
+    console.log("treasuryContract", treasuryContract);
+    console.log("writeContractAsync", writeContractAsync);
     if (!publicClient || !treasuryContract || !nationId) {
         console.error("Missing required data: publicClient, treasuryContract, or nationId.");
         return;
@@ -59,9 +65,13 @@ export const withdrawFunds = async (
     nationId: string,
     publicClient: any,
     treasuryContract: any,
-    amount: number,
-    writeContractAsync: (args: any) => Promise<any>
+    amount: BigNumber, // Change `number` to `BigNumber`
+    writeContractAsync: any
 ) => {
+    console.log("addFunds", nationId, amount);
+    console.log("publicClient", publicClient);
+    console.log("treasuryContract", treasuryContract);
+    console.log("writeContractAsync", writeContractAsync);
     if (!publicClient || !treasuryContract || !nationId) {
         console.error("Missing required data: publicClient, treasuryContract, or nationId.");
         return;
@@ -71,6 +81,6 @@ export const withdrawFunds = async (
         abi: treasuryContract.abi,
         address: treasuryContract.address,
         functionName: "withdrawFunds",
-        args: [amount, nationId],
+        args: [amount, nationId], // Ensure amount is passed as BigNumber
     });
 }

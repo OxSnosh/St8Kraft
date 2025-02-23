@@ -147,7 +147,7 @@ const BuySoldiers = () => {
             await buySoldiers(nationId, Number(amount), publicClient, ForcesContract, writeContractAsync);
             setRefreshTrigger(!refreshTrigger);
             setErrorMessage("");
-            alert("Land purchased successfully!");
+            alert("Soldiers purchased successfully!");
 
         } catch (error: any) {
             const errorMessage = parseRevertReason(error);

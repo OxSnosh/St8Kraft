@@ -10,6 +10,7 @@ import { checkBalance } from "~~/utils/treasury";
 import { useTheme } from "next-themes";
 import { ethers } from "ethers";
 import { parseRevertReason } from '../../../utils/errorHandling';
+import { contracts } from "~~/utils/scaffold-eth/contract";
 
 const BuyWonder = () => {
     const { theme } = useTheme();
@@ -68,31 +69,41 @@ const BuyWonder = () => {
 
     // const handleBuyWonder = async (key: keyof typeof wonderKeyMapping) => {
     //     const wonderKey = wonderKeyMapping[key] || key;
-
-    //     if (nationId) {
-    //         try {
-    //             await buyWonder(
-    //                 nationId,
-    //                 wonderKey,
-    //                 publicClient,
-    //                 WondersContract1,
-    //                 WondersContract2,
-    //                 WondersContract3,
-    //                 WondersContract4,
-    //                 writeContractAsync
-    //             );
-    //             window.location.reload();
-    //         } catch (error) {
-    //             console.error("Error purchasing wonder:", error);
-    //         }
-    //     } else {
+    
+    //     if (!nationId) {
     //         console.error("Nation ID is null");
+    //         alert("Nation ID is missing.");
+    //         return;
+    //     }
+    
+    //     try {
+    //         // Directly call buyWonder, just like your working function
+    //         await buyWonder(
+    //             nationId,
+    //             wonderKey,
+    //             publicClient,
+    //             WondersContract1,
+    //             WondersContract2,
+    //             WondersContract3,
+    //             WondersContract4,
+    //             writeContractAsync
+    //         );
+    
+    //         alert("Wonder purchased successfully!");
+    //         window.location.reload();
+    //     } catch (error) {
+    //         console.error("Error purchasing wonder:", error);
+    //         alert(`Transaction failed: ${(error as any).message || "Unknown error"}`);
     //     }
     // };
 
     const handleBuyWonder = async (key: keyof typeof wonderKeyMapping) => {
+        console.log("Buying wonder:", key);
+        
         const wonderKey = wonderKeyMapping[key] || key;
-    
+        
+        console.log("Wonder key:", wonderKey);
+
         // Mapping of contracts to their respective wonder-buying functions
         const wonderMappings = {
             WonderContract1: [
@@ -133,19 +144,45 @@ const BuyWonder = () => {
             }
         }
     
+        console.log("Selected contract key:", selectedContractKey);
+        console.log("Wonder index:", wonderIndex);
+
         if (!selectedContractKey || wonderIndex === -1) {
             console.error(`Wonder key "${wonderKey}" not found in any contract mapping.`);
             alert("Invalid wonder selection.");
             return;
         }
+        
     
-        // Get the corresponding contract data
-        const contractData = contractsData[selectedContractKey];
+        if (!contractsData) {
+            console.error("contractsData is undefined. Wait until it's available.");
+            return;
+        }
+        
+        let contractData;
+        
+        if (selectedContractKey === "WonderContract1") {
+            console.log("Contract 1");
+            contractData = contractsData?.WondersContract1;
+        } else if (selectedContractKey === "WonderContract2") {
+            console.log("Contract 2");
+            contractData = contractsData?.WondersContract2;
+        } else if (selectedContractKey === "WonderContract3") {
+            console.log("Contract 3");
+            contractData = contractsData?.WondersContract3;
+        } else if (selectedContractKey === "WonderContract4") {
+            console.log("Contract 4");
+            contractData = contractsData?.WondersContract4;
+        }
+        
+        console.log("Contract Data:", contractData);
+        
         if (!contractData || !contractData.address || !contractData.abi) {
             console.error(`Contract data missing for ${selectedContractKey}`);
             return;
         }
     
+
         try {
             // Initialize Web3 Provider
             const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -158,6 +195,8 @@ const BuyWonder = () => {
     
             // Encode function call data
             const data = contract.interface.encodeFunctionData(`buyWonder${selectedContractKey.slice(-1)}`, [nationId, wonderIndex]);
+
+            console.log("Transaction Data:", data);
     
             // Simulate the transaction before sending
             try {

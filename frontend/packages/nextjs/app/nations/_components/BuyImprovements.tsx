@@ -32,14 +32,15 @@ const BuyImprovement = () => {
 
     const improvementKeyMapping: { [key: string]: string } = {
         airports: "buyAirport",
+        banks: "buyBank",
         barracks: "buyBarracks",
         borderFortifications: "buyBorderFortification",
         borderWalls: "buyBorderWall",
-        banks: "buyBank",
+        bunker: "buyBunker",
         casinos: "buyCasino",
         churches: "buyChurch",
-        drydocks: "buyDrydock",
         clinics: "buyClinic",
+        drydocks: "buyDrydock",
         factories: "buyFactory",
         foreignMinistries: "buyForeignMinistry",
         forwardOperatingBases: "buyForwardOperatingBase",
@@ -77,34 +78,6 @@ const BuyImprovement = () => {
     const [refreshTrigger, setRefreshTrigger] = useState(false);
     const [purchaseAmounts, setPurchaseAmounts] = useState<{ [key: string]: number }>({});
 
-    // const handleBuyImprovement = async (key: string) => {
-    //     const amount = purchaseAmounts[key] || 1;
-    //     const improvementKey = improvementKeyMapping[key] || key;
-
-    //     console.log(improvementKey)
-    //     if (nationId) {
-    //         try {
-    //             await buyImprovement(
-    //                 nationId,
-    //                 improvementKey,
-    //                 amount,
-    //                 publicClient,
-    //                 ImprovementContract1,
-    //                 ImprovementContract2,
-    //                 ImprovementContract3,
-    //                 ImprovementContract4,
-    //                 writeContractAsync
-    //             );
-
-    //             window.location.reload();
-    //         } catch (error) {
-    //             console.error("Error purchasing improvement:", error);
-    //         }
-    //     } else {
-    //         console.error("Nation ID is null");
-    //     }
-    // };
-
     const handleBuyImprovement = async (key: string) => {
         const amount = purchaseAmounts[key] || 1;
         const improvementKey: string = improvementKeyMapping[key] || key;
@@ -112,8 +85,8 @@ const BuyImprovement = () => {
         // Mapping of improvements to their respective contract and function
         const improvementMappings = {
             ImprovementsContract1: [
-                "buyAirport", "buyBarracks", "buyBorderFortification", "buyBorderWall",
-                "buyBank", "buyBunker", "buyCasino", "buyChurch", "buyDrydock", "buyClinic", "buyFactory"
+                "buyAirport", "buyBank", "buyBarracks", "buyBorderFortification", "buyBorderWall",
+                "buyBunker", "buyCasino", "buyChurch", "buyClinic", "buyDrydock", "buyFactory"
             ],
             ImprovementsContract2: [
                 "buyForeignMinistry", "buyForwardOperatingBase", "buyGuerillaCamp", "buyHarbor",

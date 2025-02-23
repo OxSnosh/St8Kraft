@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 import { useTheme } from "next-themes";
 import { checkBalance, addFunds, withdrawFunds } from "~~/utils/treasury";
+import { BigNumber } from "ethers";
 import { checkOwnership } from "~~/utils/countryMinter";
 import { balanceOf } from "~~/utils/warbucks";
 import { ethers } from "ethers";
@@ -34,9 +35,11 @@ const DepositWithdraw = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [balances, setBalances] = useState({ balance: "0", warBucksBalance: "0" });
 
-  const updateFunctions: { [key: string]: (nationId: string, publicClient: any, treasuryContract: any, amount: number, writeContractAsync: (args: any) => Promise<any>) => Promise<any> } = {
-    withdrawFunds: withdrawFunds,
-    depositFunds: addFunds,
+  const updateFunctions: { 
+    [key: string]: (nationId: string, publicClient: any, treasuryContract: any, amount: BigNumber, writeContractAsync: any) => Promise<any> 
+  } = {
+      withdrawFunds: withdrawFunds,
+      depositFunds: addFunds,
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -48,7 +51,6 @@ const DepositWithdraw = () => {
     setSuccessMessage("");
     setErrorMessage("");
 
-    // Early validation checks
     if (!nationId) {
         setErrorMessage("Nation ID not found.");
         setLoading(false);
@@ -79,42 +81,28 @@ const DepositWithdraw = () => {
         const updateFunction = updateFunctions[field as keyof typeof updateFunctions];
         if (!updateFunction) throw new Error(`Update function not found for ${field}`);
 
-        const scaledValue = BigInt(value) * BigInt(10 ** 18);
-
-        // Simulate transaction before execution
-        const contract = new ethers.Contract(TreasuryContract.address, TreasuryContract.abi as ethers.ContractInterface, signer);
-        const data = contract.interface.encodeFunctionData(field, [nationId, Number(scaledValue)]);
-
+        // Convert value to BigNumber safely
+        let scaledValue;
         try {
-            const result = await provider.call({
-                to: TreasuryContract.address,
-                data: data,
-                from: userAddress,
-            });
-
-            console.log("Transaction Simulation Result:", result);
-
-            if (result.startsWith("0x08c379a0")) {
-                const errorMessage = parseRevertReason({ data: result });
-                setErrorMessage(`Transaction failed: ${errorMessage}`);
-                setLoading(false);
-                return;
+            scaledValue = ethers.utils.parseUnits(value, 18);
+            if (scaledValue.gt(ethers.constants.MaxUint256)) {
+                throw new Error("Value exceeds contract limit.");
             }
-        } catch (simulationError: any) {
-            const errorMessage = parseRevertReason(simulationError);
-            console.error("Transaction simulation failed:", errorMessage);
-            setErrorMessage(`Transaction failed: ${errorMessage}`);
+        } catch (error) {
+            setErrorMessage("Invalid amount entered.");
             setLoading(false);
             return;
         }
 
-        // Execute transaction if simulation passes
-        await updateFunction(nationId, publicClient, TreasuryContract, Number(scaledValue), writeContractAsync);
+        console.log(`Executing ${field} with: Nation ID: ${nationId}, Amount: ${scaledValue.toString()}`);
+
+        // Execute transaction
+        await updateFunction(nationId, publicClient, TreasuryContract, scaledValue, writeContractAsync);
 
         setSuccessMessage(`${field.replace(/([A-Z])/g, " $1")}: ${value}`);
         setFormData((prev) => ({ ...prev, [field]: "" }));
         fetchValues();
-        setErrorMessage(""); // Clear error message on success
+        setErrorMessage("");
 
     } catch (error: any) {
         const errorMessage = parseRevertReason(error) || error.message || `Failed to update ${field}.`;
@@ -149,68 +137,59 @@ const DepositWithdraw = () => {
   }, [nationId, walletAddress]);
 
   return (
-    <div
-      className={`p-6 border-l-4 transition-all ${
-        theme === "dark"
-          ? "bg-gray-900 border-blue-500 text-white"
-          : "bg-gray-100 border-blue-500 text-gray-900"
-      }`}
-    >
-      <h3 className="text-lg font-semibold">Manage Nation Funds</h3>
-      <p className="text-sm mb-4">Add or Withdraw WarBucks below</p>
+    <div className="w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
+        <h2 className="text-2xl font-bold text-primary-content text-center mb-4">🏦 Manage Nation Funds</h2>
+        <p className="text-sm text-center mb-4">Deposit or Withdraw WarBucks for your nation.</p>
 
-      <table className="w-full mb-4 border">
-        <thead>
-          <tr>
-            <th className="border px-4 py-2">Nation Balance</th>
-            <th className="border px-4 py-2">WarBucks Balance in Wallet</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td className="border px-4 py-2">{formatBalance(balances.balance) || "0"}</td>
-            <td className="border px-4 py-2">{formatBalance(balances.warBucksBalance) || "0"}</td>
-          </tr>
-        </tbody>
-      </table>
+        {/* Balance Table */}
+        <table className="w-full border-collapse border border-neutral bg-base-200 rounded-lg shadow-md mb-6">
+            <thead className="bg-primary text-primary-content">
+                <tr>
+                    <th className="p-3 text-left">Nation Balance (WBX)</th>
+                    <th className="p-3 text-left">Wallet Balance (WBX)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr className="border-b border-neutral">
+                    <td className="p-3">{formatBalance(balances.balance)}</td>
+                    <td className="p-3">{formatBalance(balances.warBucksBalance)}</td>
+                </tr>
+            </tbody>
+        </table>
 
-      {Object.entries(formData).map(([key, value]) => (
-        <form
-          key={key}
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit(key, value);
-          }}
-          className="flex flex-col space-y-4 mb-4"
-        >
-          <label className="text-sm">{key.replace(/([A-Z])/g, " $1")}</label>
-          <input
-            type="text"
-            placeholder={`Amount`}
-            value={value}
-            onChange={(e) => handleInputChange(key, e.target.value)}
-            className={`p-2 border rounded ${
-              theme === "dark"
-                ? "bg-gray-800 border-gray-600 text-white"
-                : "bg-white border-gray-300 text-gray-900"
-            }`}
-          />
-          <button
-            type="submit"
-            className={`px-4 py-2 rounded transition-all ${
-              theme === "dark"
-                ? "bg-blue-600 hover:bg-blue-500"
-                : "bg-blue-500 hover:bg-blue-600"
-            } text-white`}
-            disabled={loading}
-          >
-            {loading ? "Updating..." : `${key.replace(/([A-Z])/g, " $1")}`}
-          </button>
-        </form>
-      ))}
+        {/* Deposit & Withdraw Forms */}
+        {Object.entries(formData).map(([key, value]) => (
+            <form
+                key={key}
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSubmit(key, value);
+                }}
+                className="flex flex-col gap-4 mb-6 bg-base-200 p-4 rounded-lg shadow-md"
+            >
+                <label className="text-lg font-semibold text-primary">
+                    {key.replace(/([A-Z])/g, " $1")}
+                </label>
+                <input
+                    type="text"
+                    placeholder="Enter amount (WBX)"
+                    value={value}
+                    onChange={(e) => handleInputChange(key, e.target.value)}
+                    className="input input-bordered w-full bg-base-100 text-base-content"
+                />
+                <button
+                    type="submit"
+                    className="btn btn-accent w-full"
+                    disabled={loading}
+                >
+                    {loading ? "Processing..." : `${key.replace(/([A-Z])/g, " $1")}`}
+                </button>
+            </form>
+        ))}
 
-      {successMessage && <p className="text-green-500 mt-2">{successMessage}</p>}
-      {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
+        {/* Success & Error Messages */}
+        {successMessage && <p className="text-green-500 text-center mt-2">{successMessage}</p>}
+        {errorMessage && <p className="text-red-500 text-center mt-2">{errorMessage}</p>}
     </div>
   );
 };
