@@ -14384,6 +14384,11 @@
               "internalType": "uint256",
               "name": "platoonId",
               "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
             }
           ],
           "stateMutability": "view",

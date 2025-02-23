@@ -29,6 +29,8 @@ const PostsTable = () => {
 
   useEffect(() => {
     const fetchAllPosts = async () => {
+      console.log(execute, "EXECUTE")
+      console.log(GetPostsDocument, "GETPOSTSDOCUMENT")
       if (!execute || !GetPostsDocument) {
         console.warn("Missing dependencies: execute or GetPostsDocument");
         return;
@@ -36,8 +38,10 @@ const PostsTable = () => {
   
       try {
         console.log("Fetching all posts...");
+
+        console.log(nationId, "NATIONID")
   
-        const { data: result, errors } = await execute(GetPostsDocument, {}, { fetchPolicy: "network-only" });
+        const { data: result, errors } = await execute(GetPostsDocument, {sender : nationId});
   
         console.log("Raw API Response:", result);
         console.log("GraphQL Errors (if any):", errors);
@@ -61,7 +65,7 @@ const PostsTable = () => {
 
       fetchAllPosts();
     
-  }, [execute]);
+  }, [execute, nationId]);
 
   /** ✅ Check if the connected wallet owns the nation */
   useEffect(() => {
@@ -136,24 +140,6 @@ const PostsTable = () => {
           </tbody>
         </table>
       </div>
-
-      {/* ✅ Show the post form only if the user is the owner */}
-      {isOwner && (
-        <div className="mt-4 w-full max-w-2xl">
-          <textarea
-            className="w-full p-2 border rounded"
-            placeholder="Write a new post..."
-            value={newPost}
-            onChange={(e) => setNewPost(e.target.value)}
-          />
-          <button
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
-            onClick={handlePostSubmit}
-          >
-            Post
-          </button>
-        </div>
-      )}
     </div>
   );
 };

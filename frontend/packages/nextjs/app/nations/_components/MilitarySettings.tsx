@@ -60,11 +60,12 @@ const MilitarySettings = () => {
   };
 
   const handleSubmit = async (field: keyof typeof formData, value: string) => {
+    console.log("Submitting form for:", field, value);
+    console.log("Current nation ID:", nationId);
     setLoading(true);
     setSuccessMessage("");
     setErrorMessage("");
 
-    // Early validation checks
     if (!nationId) {
         setErrorMessage("Nation ID not found.");
         setLoading(false);
@@ -75,8 +76,13 @@ const MilitarySettings = () => {
         setLoading(false);
         return;
     }
-    if (!publicClient || !MilitaryContract || !CountryMinterContract || !writeContractAsync) {
-        setErrorMessage("Missing required dependencies to process the update.");
+    if (!MilitaryContract || !publicClient || !writeContractAsync) {
+        setErrorMessage("Missing required dependencies to update military settings.");
+        setLoading(false);
+        return;
+    }
+    if (!value.trim()) {
+        setErrorMessage(`${field.replace(/([A-Z])/g, " $1")} cannot be empty.`);
         setLoading(false);
         return;
     }
@@ -87,51 +93,38 @@ const MilitarySettings = () => {
         const signer = provider.getSigner();
         const userAddress = await signer.getAddress();
 
-        // Check ownership
+        // **Check ownership**
         const owner = await checkOwnership(nationId, walletAddress, publicClient, CountryMinterContract);
         if (!owner) {
-            throw new Error("You do not own this nation.");
-        }
-
-        // Determine the update function
-        const updateFunction = updateFunctions[field];
-        if (!updateFunction) {
-            throw new Error(`Update function not found for ${field}`);
-        }
-
-        // Simulate transaction before execution
-        const contract = new ethers.Contract(MilitaryContract.address, MilitaryContract.abi as ethers.ContractInterface, signer);
-        const data = contract.interface.encodeFunctionData(field, [nationId, value]);
-
-        try {
-            const result = await provider.call({
-                to: MilitaryContract.address,
-                data: data,
-                from: userAddress,
-            });
-
-            console.log("Transaction Simulation Result:", result);
-
-            if (result.startsWith("0x08c379a0")) {
-                const errorMessage = parseRevertReason({ data: result });
-                setErrorMessage(`Transaction failed: ${errorMessage}`);
-                setLoading(false);
-                return;
-            }
-        } catch (simulationError: any) {
-            const errorMessage = parseRevertReason(simulationError);
-            console.error("Transaction simulation failed:", errorMessage);
-            setErrorMessage(`Transaction failed: ${errorMessage}`);
+            setErrorMessage("You do not own this nation.");
             setLoading(false);
             return;
         }
 
-        // Execute transaction if simulation passes
-        await updateFunction(nationId, publicClient, MilitaryContract, value, writeContractAsync);
+        // Convert value from form to a number
+        const parsedValue = parseInt(value, 10);
+        if (isNaN(parsedValue)) {
+            setErrorMessage(`Invalid number input for ${field}. Please enter a valid number.`);
+            setLoading(false);
+            return;
+        }
+
+        console.log(`Executing function: ${field} with value: ${parsedValue}`);
+
+        // ✅ Call the correct function with correct parameters
+        if (field === "DEFCON") {
+            await updateDefconLevel(nationId, publicClient, MilitaryContract, parsedValue, writeContractAsync);
+        } else if (field === "ThreatLevel") {
+            await updateThreatLevel(nationId, publicClient, MilitaryContract, parsedValue, writeContractAsync);
+        } else {
+            setErrorMessage(`No matching function found for ${field}`);
+            setLoading(false);
+            return;
+        }
 
         setSuccessMessage(`${field.replace(/([A-Z])/g, " $1")} updated successfully to: ${value}`);
-        setFormData((prev) => ({ ...prev, [field]: "" }));
-        setErrorMessage(""); // Clear error message on success
+        setFormData(prev => ({ ...prev, [field]: "" })); // Reset form after update
+        setErrorMessage(""); // Clear any previous errors
 
     } catch (error: any) {
         const errorMessage = parseRevertReason(error) || error.message || `Failed to update ${field}.`;
@@ -140,7 +133,7 @@ const MilitarySettings = () => {
     } finally {
         setLoading(false);
     }
-};
+  };
 
 
 const handleToggleWarPeace = async () => {
@@ -222,74 +215,68 @@ const handleToggleWarPeace = async () => {
 
 
   return (
-    <div
-      className={`p-6 border-l-4 transition-all ${
-        theme === "dark"
-          ? "bg-gray-900 border-blue-500 text-white"
-          : "bg-gray-100 border-blue-500 text-gray-900"
-      }`}
-    >
-      <h3 className="text-lg font-semibold">Military Settings</h3>
-      <p className="text-sm mb-4">Modify your nation's military settings below.</p>
+    <div className="p-6 border-l-4 rounded-lg shadow-center bg-aged-paper text-base-content border-primary transition-all">
+        <h3 className="text-2xl font-bold text-primary-content text-center">Military Settings</h3>
+        <p className="text-sm text-center text-secondary-content mb-4">Modify your nation's military settings below.</p>
 
-      {/* War/Peace Status Display */}
-      {warPeaceStatus !== null && (
-        <div className="mb-4 p-4 rounded border shadow-sm">
-          {warPeaceStatus ? (
-            <p className="text-red-500 font-bold">Nation is ready for war</p>
-          ) : (
-            <p className="text-green-500 font-bold">Nation is in peace mode</p>
-          )}
-          <button
-            onClick={handleToggleWarPeace}
-            className={`mt-2 px-4 py-2 rounded transition-all ${
-              theme === "dark"
-                ? "bg-blue-600 hover:bg-blue-500"
-                : "bg-blue-500 hover:bg-blue-600"
-            } text-white`}
-          >
-            Toggle War/Peace
-          </button>
+        {/* War/Peace Status Display */}
+        {warPeaceStatus !== null && (
+            <div className="mb-4 p-4 bg-base-200 rounded-lg shadow-md border border-neutral">
+                {warPeaceStatus ? (
+                    <p className="text-error font-bold text-center">Nation is ready for war</p>
+                ) : (
+                    <p className="text-success font-bold text-center">Nation is in peace mode</p>
+                )}
+                <button
+                    onClick={handleToggleWarPeace}
+                    className="btn btn-primary w-full mt-2"
+                >
+                    Toggle War/Peace
+                </button>
+            </div>
+        )}
+
+        {/* Form Fields */}
+        <div className="grid gap-4">
+            {Object.entries(formData).map(([key, value]) => (
+                <form 
+                    key={key} 
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleSubmit(key as keyof typeof formData, value);
+                    }} 
+                    className="p-4 bg-base-200 rounded-lg shadow-md"
+                >
+                    <label className="text-sm font-semibold text-primary">{key.replace(/([A-Z])/g, " $1")}</label>
+                    <input
+                        type="text"
+                        placeholder={`Enter New ${key.replace(/([A-Z])/g, " $1")}`}
+                        value={value}
+                        onChange={(e) => handleInputChange(key, e.target.value)}
+                        className="input input-bordered w-full bg-base-100 text-base-content mt-1"
+                    />
+                    <button
+                        type="submit"
+                        className="btn btn-primary w-full flex justify-center items-center mt-3 disabled:opacity-50"
+                        disabled={loading}
+                    >
+                        {loading ? "Updating..." : `Update ${key.replace(/([A-Z])/g, " $1")}`}
+                    </button>
+                </form>
+            ))}
         </div>
-      )}
 
-      {Object.entries(formData).map(([key, value]) => (
-        <form
-          key={key}
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit(key as keyof typeof formData, value);
-          }}
-          className="flex flex-col space-y-4 mb-4"
-        >
-          <label className="text-sm">{key.replace(/([A-Z])/g, " $1")}</label>
-          <input
-            type="text"
-            placeholder={`Enter New ${key.replace(/([A-Z])/g, " $1")}`}
-            value={value}
-            onChange={(e) => handleInputChange(key, e.target.value)}
-            className={`p-2 border rounded ${
-              theme === "dark"
-                ? "bg-gray-800 border-gray-600 text-white"
-                : "bg-white border-gray-300 text-gray-900"
-            }`}
-          />
-          <button
-            type="submit"
-            className={`px-4 py-2 rounded transition-all ${
-              theme === "dark"
-                ? "bg-blue-600 hover:bg-blue-500"
-                : "bg-blue-500 hover:bg-blue-600"
-            } text-white`}
-            disabled={loading}
-          >
-            {loading ? "Updating..." : `Update ${key.replace(/([A-Z])/g, " $1")}`}
-          </button>
-        </form>
-      ))}
-
-      {successMessage && <p className="text-green-500 mt-2">{successMessage}</p>}
-      {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
+        {/* Success & Error Messages */}
+        {successMessage && (
+            <p className="mt-4 text-center text-sm text-success-content bg-success p-2 rounded-lg">
+                {successMessage}
+            </p>
+        )}
+        {errorMessage && (
+            <p className="mt-4 text-center text-sm text-error-content bg-error p-2 rounded-lg">
+                {errorMessage}
+            </p>
+        )}
     </div>
   );
 };

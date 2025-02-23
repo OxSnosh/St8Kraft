@@ -174,17 +174,6 @@ const ManageTrades = () => {
         setErrorMessage("");
         setSuccessMessage("");
     
-        // Early validation checks
-        if (!selectedNationId) {
-            setErrorMessage("Selected nation ID is missing.");
-            setLoading(false);
-            return;
-        }
-        if (!tradingPartnerId) {
-            setErrorMessage("Trading partner ID is missing.");
-            setLoading(false);
-            return;
-        }
         if (!ResourcesContract || !ResourcesContract.address || !ResourcesContract.abi) {
             setErrorMessage("Resources contract is not available.");
             setLoading(false);
@@ -197,39 +186,11 @@ const ManageTrades = () => {
         }
     
         try {
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            await provider.send("eth_requestAccounts", []);
-            const signer = provider.getSigner();
-            const contract = new ethers.Contract(ResourcesContract.address, ResourcesContract.abi as ethers.ContractInterface, signer);
-    
-            // Encode transaction data
-            const data = contract.interface.encodeFunctionData("acceptTrade", [selectedNationId, tradingPartnerId]);
-    
-            // Simulate transaction
-            try {
-                const result = await provider.call({
-                    to: ResourcesContract.address,
-                    data: data,
-                    from: await signer.getAddress(),
-                });
-    
-                console.log("Transaction Simulation Result:", result);
-    
-                if (result.startsWith("0x08c379a0")) {
-                    const errorMessage = parseRevertReason({ data: result });
-                    setErrorMessage(`Transaction failed: ${errorMessage}`);
-                    setLoading(false);
-                    return;
-                }
-            } catch (simulationError: any) {
-                const errorMessage = parseRevertReason(simulationError);
-                setErrorMessage(`Transaction simulation failed: ${errorMessage}`);
-                setLoading(false);
-                return;
+            if (selectedNationId && tradingPartnerId) {
+                await acceptTrade(selectedNationId, tradingPartnerId, ResourcesContract, writeContractAsync);
+            } else {
+                setErrorMessage("Selected nation ID or trading partner ID is missing.");
             }
-    
-            // Execute transaction if simulation passes
-            await acceptTrade(selectedNationId, tradingPartnerId, ResourcesContract, writeContractAsync);
             fetchProposedTrades();
             fetchTradingPartners();
             setSuccessMessage("Trade accepted successfully.");
@@ -241,23 +202,11 @@ const ManageTrades = () => {
         }
     };
     
-
     const handleCancelTrade = async () => {
         setLoading(true);
         setErrorMessage("");
         setSuccessMessage("");
     
-        // Early validation checks
-        if (!selectedNationId) {
-            setErrorMessage("Selected nation ID is missing.");
-            setLoading(false);
-            return;
-        }
-        if (!tradingPartnerId) {
-            setErrorMessage("Trading partner ID is missing.");
-            setLoading(false);
-            return;
-        }
         if (!ResourcesContract || !ResourcesContract.address || !ResourcesContract.abi) {
             setErrorMessage("Resources contract is not available.");
             setLoading(false);
@@ -270,39 +219,11 @@ const ManageTrades = () => {
         }
     
         try {
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            await provider.send("eth_requestAccounts", []);
-            const signer = provider.getSigner();
-            const contract = new ethers.Contract(ResourcesContract.address, ResourcesContract.abi as ethers.ContractInterface, signer);
-    
-            // Encode transaction data
-            const data = contract.interface.encodeFunctionData("cancelTrade", [selectedNationId, tradingPartnerId]);
-    
-            // Simulate transaction
-            try {
-                const result = await provider.call({
-                    to: ResourcesContract.address,
-                    data: data,
-                    from: await signer.getAddress(),
-                });
-    
-                console.log("Transaction Simulation Result:", result);
-    
-                if (result.startsWith("0x08c379a0")) {
-                    const errorMessage = parseRevertReason({ data: result });
-                    setErrorMessage(`Transaction failed: ${errorMessage}`);
-                    setLoading(false);
-                    return;
-                }
-            } catch (simulationError: any) {
-                const errorMessage = parseRevertReason(simulationError);
-                setErrorMessage(`Transaction simulation failed: ${errorMessage}`);
-                setLoading(false);
-                return;
+            if (selectedNationId && tradingPartnerId) {
+                await cancelTrade(selectedNationId, tradingPartnerId, ResourcesContract, writeContractAsync);
+            } else {
+                setErrorMessage("Selected nation ID or trading partner ID is missing.");
             }
-    
-            // Execute transaction if simulation passes
-            await cancelTrade(selectedNationId, tradingPartnerId, ResourcesContract, writeContractAsync);
             fetchProposedTrades();
             setSuccessMessage("Trade canceled successfully.");
         } catch (error: any) {
@@ -378,79 +299,125 @@ const ManageTrades = () => {
     
 
     return (
-        <div className="w-5/6 p-6">
-            <table className="w-full border-collapse border border-gray-300">
-                <thead>
+        <div className="w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
+            <h2 className="text-2xl font-bold text-primary-content text-center mb-4">Trading Partners</h2>
+    
+            <table className="w-full border-collapse border border-neutral bg-base-200 rounded-lg shadow-md">
+                <thead className="bg-primary text-primary-content">
                     <tr>
-                        <th>Your Nations</th>
-                        <th>Trading Partner</th>
+                        <th className="p-3 text-left">Your Nations</th>
+                        <th className="p-3 text-left">Trading Partner</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>
-                            <select onChange={(e) => handleNationChange(e.target.value)} value={selectedNationId || ""}>
+                        <td className="p-3">
+                            <select 
+                                onChange={(e) => handleNationChange(e.target.value)} 
+                                value={selectedNationId || ""}
+                                className="select select-bordered w-full bg-base-100 text-base-content"
+                            >
                                 <option value="">Select a Nation</option>
                                 {mintedNations.map((nation) => (
                                     <option key={nation.id} value={nation.id}>{nation.name}</option>
                                 ))}
                             </select>
                         </td>
-                        <td>
-                            <input
-                                type="text"
-                                placeholder="Enter Trading Partner Nation ID"
-                                value={tradingPartnerId}
-                                onChange={(e) => setTradingPartnerId(e.target.value)}
-                            />
-                            <button onClick={handleTradingPartnerFetch}>Fetch Resources</button>
+                        <td className="p-3">
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Enter Trading Partner Nation ID"
+                                    value={tradingPartnerId}
+                                    onChange={(e) => setTradingPartnerId(e.target.value)}
+                                    className="input input-bordered w-full bg-base-100 text-base-content"
+                                />
+                                <button 
+                                    onClick={handleTradingPartnerFetch} 
+                                    className="btn btn-primary"
+                                >
+                                    Fetch Resources
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     <tr>
-                        <td>{selectedNationResources && <pre>{JSON.stringify(selectedNationResources, null, 2)}</pre>}</td>
-                        <td>{tradingPartnerResources && <pre>{JSON.stringify(tradingPartnerResources, null, 2)}</pre>}</td>
+                        <td className="p-3">{selectedNationResources && <pre className="bg-base-100 p-2 rounded">{JSON.stringify(selectedNationResources, null, 2)}</pre>}</td>
+                        <td className="p-3">{tradingPartnerResources && <pre className="bg-base-100 p-2 rounded">{JSON.stringify(tradingPartnerResources, null, 2)}</pre>}</td>
                     </tr>
                 </tbody>
             </table>
-
+    
             {selectedNationId && tradingPartnerId && (
-                <button onClick={handleProposeTrade}>Propose Trade</button>
+                <button 
+                    onClick={handleProposeTrade} 
+                    className="btn btn-accent w-full mt-4"
+                >
+                    Propose Trade
+                </button>
             )}
-
-            <h3>Proposed Trades</h3>
-            <table>
+    
+            <h3 className="text-xl font-semibold text-primary mt-6 mb-2">Proposed Trades</h3>
+            <table className="w-full border-collapse border border-neutral bg-base-200 rounded-lg shadow-md">
                 <tbody>
-                    {proposedTrades.map((trade, index) => (
-                        <tr key={index}>
-                            <td>Trade ID: {trade.toString()}</td>
-                            {walletAddress && (
-                                <>
-                                    <td>
-                                        <button onClick={handleCancelTrade}>
-                                            Cancel Trade
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button onClick={handleAcceptTrade}>
-                                            Accept Trade
-                                        </button>
-                                    </td>
-                                </>
-                            )}
+                    {proposedTrades.length > 0 ? (
+                        proposedTrades.map((trade, index) => (
+                            <tr key={index} className="border-b border-neutral">
+                                <td className="p-3">Trade ID: {trade.tradeId}</td>
+                                <td className="p-3">Proposing Nation: {trade.proposingNationId}</td>
+                                <td className="p-3">Proposed Nation: {trade.proposedNationId}</td>
+                                {walletAddress && (
+                                    <>
+                                        <td>
+                                            <button 
+                                                onClick={() => handleCancelTrade()} 
+                                                className="btn btn-error"
+                                            >
+                                                Cancel Trade
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <button 
+                                                onClick={() => handleAcceptTrade()} 
+                                                className="btn btn-success"
+                                            >
+                                                Accept Trade
+                                            </button>
+                                        </td>
+                                    </>
+                                )}
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td className="p-3 text-center text-sm text-secondary-content">No proposed trades.</td>
                         </tr>
-                    ))}
+                    )}
                 </tbody>
             </table>
-
-            <h3>Active Trading Partners</h3>
-            <table>
+    
+            <h3 className="text-xl font-semibold text-primary mt-6 mb-2">Active Trading Partners</h3>
+            <table className="w-full border-collapse border border-neutral bg-base-200 rounded-lg shadow-md">
                 <tbody>
-                    {tradingPartners.map((partner) => (
-                        <tr key={partner.id}>
-                            <td>{partner.name}</td>
-                            <td><button onClick={() => handleRemoveTradingPartner()}>Remove Partner</button></td>
+                    {tradingPartners.length > 0 ? (
+                        tradingPartners.map((partner) => (
+                            <tr key={partner.id} className="border-b border-neutral">
+                                <td className="p-3">{partner.name}</td>
+                                <td>
+                                    <button 
+                                        onClick={() => handleRemoveTradingPartner()} 
+                                        className="btn btn-warning"
+                                    >
+                                        Remove Partner
+                                    </button>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td className="p-3 text-center text-sm text-secondary-content">No active trading partners.</td>
                         </tr>
-                    ))}
+                    )}
                 </tbody>
             </table>
         </div>

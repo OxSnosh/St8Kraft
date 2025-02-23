@@ -543,10 +543,11 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         _;
     }
 
-    function getNationAllianceAndPlatoon(uint256 nationId) external view returns (uint256 allianceId, uint256 platoonId) {
+    function getNationAllianceAndPlatoon(uint256 nationId) external view returns (uint256 allianceId, uint256 platoonId, string memory name) {
         uint256 alliance = nationToAlliance[nationId];
         uint256 platoon = alliance > 0 ? alliances[alliance].nationToPlatoon[nationId] : 0;
-        return (alliance, platoon);
+        string memory allianceName = alliance > 0 ? alliances[alliance].name : "";
+        return (alliance, platoon, allianceName);
     }
 
     function createAlliance(string memory name, uint256 founderNationId) external {

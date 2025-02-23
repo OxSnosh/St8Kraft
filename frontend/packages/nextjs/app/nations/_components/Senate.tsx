@@ -8,7 +8,6 @@ import { AbiCoder } from "ethers/lib/utils";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 import { useTheme } from "next-themes";
 import { useSearchParams } from "next/navigation";
-import { SenateContract } from '../../../../../../backend/typechain-types/contracts/Senate.sol/SenateContract';
 import {
     voteForSenator,
     sanctionTeamMember,
@@ -278,59 +277,70 @@ const Senate = () => {
     }
 
     return (
-        <div className={`p-6 border-l-4 ${theme === 'dark' ? 'bg-gray-800 text-white border-green-400' : 'bg-gray-100 text-black border-green-500'}`}> 
-            <h3 className="text-lg font-semibold">Senate Management</h3>
-
+        <div className="p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
+            <h2 className="text-2xl font-bold text-primary-content text-center mb-4">Senate Management</h2>
+    
+            {/* Team Section */}
             {team && (
-                <div className="mt-4">
-                    <h4 className="font-semibold">Team:</h4>
-                    <p>{team}</p>
-                    {isUserSenator && <p className="text-green-500">You are a senator of team {team}</p>}
+                <div className="p-4 bg-base-200 rounded-lg shadow-md">
+                    <h3 className="text-lg font-semibold text-primary">Team:</h3>
+                    <p className="text-base">{team}</p>
+                    {isUserSenator && (
+                        <p className="text-success-content font-semibold mt-2">
+                            You are a senator of team {team}
+                        </p>
+                    )}
                 </div>
             )}
-
-            <div className="mt-4">
-                <label className="block text-sm font-medium">Senator ID to Vote:</label>
+    
+            {/* Vote for Senator */}
+            <div className="p-4 bg-base-200 rounded-lg shadow-md mt-4">
+                <label className="block text-sm font-medium text-primary">Senator ID to Vote:</label>
                 <input 
                     type="text" 
                     value={senatorId}
                     onChange={(e) => setSenatorId(e.target.value)}
-                    className="w-full p-2 border rounded mt-1"
+                    className="input input-bordered w-full bg-base-100 text-base-content mt-1"
+                    placeholder="Enter Senator ID"
                 />
                 <button 
                     onClick={handleVoteForSenator} 
-                    className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:opacity-80"
+                    className="btn btn-primary w-full mt-3"
                 >
                     Vote for Senator
                 </button>
             </div>
-
+    
+            {/* Actions for Senators */}
             {isUserSenator && (
-                <>
-                    <div className="mt-4">
-                        <label className="block text-sm font-medium">Team Member ID:</label>
-                        <input 
-                            type="text" 
-                            value={teamMemberId} 
-                            onChange={(e) => setTeamMemberId(e.target.value)} 
-                            className="w-full p-2 border rounded mt-1"
-                        />
+                <div className="mt-4 p-4 bg-base-200 rounded-lg shadow-md">
+                    <h3 className="text-lg font-semibold text-primary">Sanctions Management</h3>
+    
+                    <label className="block text-sm font-medium text-primary mt-2">Team Member ID:</label>
+                    <input 
+                        type="text" 
+                        value={teamMemberId} 
+                        onChange={(e) => setTeamMemberId(e.target.value)} 
+                        className="input input-bordered w-full bg-base-100 text-base-content mt-1"
+                        placeholder="Enter Team Member ID"
+                    />
+    
+                    <div className="mt-3 flex gap-2">
+                        <button 
+                            onClick={handleSanctionTeamMember} 
+                            className="btn btn-error flex-1"
+                        >
+                            Sanction Member
+                        </button>
+    
+                        <button 
+                            onClick={handleLiftSanctionVote} 
+                            className="btn btn-success flex-1"
+                        >
+                            Lift Sanction
+                        </button>
                     </div>
-
-                    <button 
-                        onClick={handleSanctionTeamMember} 
-                        className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:opacity-80"
-                    >
-                        Sanction Team Member
-                    </button>
-
-                    <button 
-                        onClick={handleLiftSanctionVote} 
-                        className="mt-2 px-4 py-2 bg-green-600 text-white rounded hover:opacity-80 ml-2"
-                    >
-                        Lift Sanction
-                    </button>
-                </>
+                </div>
             )}
         </div>
     );

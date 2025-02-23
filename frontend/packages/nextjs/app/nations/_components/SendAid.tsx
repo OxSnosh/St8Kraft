@@ -264,80 +264,154 @@ const ManageAid = () => {
     }
 
     return (
-        <div>
-            <table border={1} cellPadding={10} style={{ borderCollapse: "collapse", textAlign: "center", width: "100%" }}>
-                <thead>
+        <div className="p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
+            <h2 className="text-2xl font-bold text-primary-content text-center mb-4">Aid Management</h2>
+    
+            {/* Sending Nation Table */}
+            <table className="w-full border border-neutral bg-base-200 rounded-lg shadow-md">
+                <thead className="bg-primary text-primary-content">
                     <tr>
-                        <th>Sending Nation</th>
-                        <th>Aid Slots</th>
-                        <th>Defending Soldiers</th>
-                        <th>Nation Balance</th>
-                        <th>Technology Count</th>
+                        <th className="p-3 text-left">Sending Nation</th>
+                        <th className="p-3 text-left">Aid Slots</th>
+                        <th className="p-3 text-left">Defending Soldiers</th>
+                        <th className="p-3 text-left">Nation Balance</th>
+                        <th className="p-3 text-left">Technology Count</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>
-                            <select onChange={e => handleNationChange(e.target.value)} value={selectedNationId || ""}>
+                    <tr className="border-b border-neutral">
+                        <td className="p-3">
+                            <select 
+                                onChange={e => handleNationChange(e.target.value)} 
+                                value={selectedNationId || ""}
+                                className="select select-bordered w-full bg-base-100 text-base-content"
+                            >
                                 <option value="">Select a Nation</option>
                                 {mintedNations.map(nation => (
                                     <option key={nation.id} value={nation.id}>{nation.name}</option>
                                 ))}
                             </select>
                         </td>
-                        <td>{available !== null ? available.toString() : "-"}</td>
-                        <td>{aidBalances ? aidBalances.defendingSoldierCount.toString() : "-"}</td>
-                        <td>{aidBalances ? (aidBalances.nationBalance / WEI_IN_ETH).toString() : "-"}</td>
-                        <td>{aidBalances ? aidBalances.technologyCount.toString() : "-"}</td>
+                        <td className="p-3">{available !== null ? available.toString() : "-"}</td>
+                        <td className="p-3">{aidBalances ? aidBalances.defendingSoldierCount.toString() : "-"}</td>
+                        <td className="p-3">{aidBalances ? (aidBalances.nationBalance / WEI_IN_ETH).toString() : "-"}</td>
+                        <td className="p-3">{aidBalances ? aidBalances.technologyCount.toString() : "-"}</td>
                     </tr>
                 </tbody>
             </table>
-
-            <table border={1} cellPadding={10} style={{ borderCollapse: "collapse", textAlign: "center", width: "100%", marginTop: "10px" }}>
-                <thead>
+    
+            {/* Aid Proposal Form */}
+            <h3 className="text-xl font-semibold text-primary mt-6 mb-2">Send Aid</h3>
+            <table className="w-full border border-neutral bg-base-200 rounded-lg shadow-md">
+                <thead className="bg-primary text-primary-content">
                     <tr>
-                        <th>Recipient Nation ID</th>
-                        <th>Soldiers to Send</th>
-                        <th>Balance to Send</th>
-                        <th>Tech to Send</th>
+                        <th className="p-3 text-left">Recipient Nation ID</th>
+                        <th className="p-3 text-left">Soldiers to Send</th>
+                        <th className="p-3 text-left">Balance to Send</th>
+                        <th className="p-3 text-left">Tech to Send</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><input placeholder="Recipient Nation ID" value={aidPartnerId} onChange={e => handlePartnerChange(e.target.value)} /></td>
-                        <td><input type="number" placeholder="Soldiers to Send" value={soldierAid} onChange={e => setSoldierAid(Number(e.target.value))} /></td>
-                        <td><input type="number" placeholder="Balance to Send" value={balanceAid} onChange={e => setBalanceAid(Number(e.target.value))} /></td>
-                        <td><input type="number" placeholder="Tech to Send" value={techAid} onChange={e => setTechAid(Number(e.target.value))} /></td>
+                    <tr className="border-b border-neutral">
+                        <td className="p-3">
+                            <input 
+                                type="text" 
+                                placeholder="Recipient Nation ID" 
+                                value={aidPartnerId} 
+                                onChange={e => handlePartnerChange(e.target.value)}
+                                className="input input-bordered w-full bg-base-100 text-base-content"
+                            />
+                        </td>
+                        <td className="p-3">
+                            <input 
+                                type="number" 
+                                placeholder="Soldiers to Send" 
+                                value={soldierAid} 
+                                onChange={e => setSoldierAid(Number(e.target.value))}
+                                className="input input-bordered w-full bg-base-100 text-base-content"
+                            />
+                        </td>
+                        <td className="p-3">
+                            <input 
+                                type="number" 
+                                placeholder="Balance to Send" 
+                                value={balanceAid} 
+                                onChange={e => setBalanceAid(Number(e.target.value))}
+                                className="input input-bordered w-full bg-base-100 text-base-content"
+                            />
+                        </td>
+                        <td className="p-3">
+                            <input 
+                                type="number" 
+                                placeholder="Tech to Send" 
+                                value={techAid} 
+                                onChange={e => setTechAid(Number(e.target.value))}
+                                className="input input-bordered w-full bg-base-100 text-base-content"
+                            />
+                        </td>
                     </tr>
                     <tr>
-                        <td colSpan={5} style={{ textAlign: "center" }}>
-                            <button onClick={handleProposeAid}>Propose Aid</button>
+                        <td colSpan={5} className="p-3 text-center">
+                            <button 
+                                onClick={handleProposeAid} 
+                                className="btn btn-accent w-full"
+                            >
+                                Propose Aid
+                            </button>
                         </td>
                     </tr>
                 </tbody>
             </table>
-
-            <h3>Proposals Sent</h3>
-            <table>
+    
+            {/* Aid Proposals Sent */}
+            <h3 className="text-xl font-semibold text-primary mt-6 mb-2">Proposals Sent</h3>
+            <table className="w-full border border-neutral bg-base-200 rounded-lg shadow-md">
                 <tbody>
-                    {proposedAidSent.map((proposalId, index) => (
-                        <tr key={index}>
-                            <td>{proposalId.toString()}</td>
-                            <td><button onClick={() => handleCancelAid(proposalId.toString())}>Cancel</button></td>
+                    {proposedAidSent.length > 0 ? (
+                        proposedAidSent.map((proposalId, index) => (
+                            <tr key={index} className="border-b border-neutral">
+                                <td className="p-3">Proposal ID: {proposalId.toString()}</td>
+                                <td>
+                                    <button 
+                                        onClick={() => handleCancelAid(proposalId.toString())} 
+                                        className="btn btn-error"
+                                    >
+                                        Cancel
+                                    </button>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td className="p-3 text-center text-sm text-secondary-content">No aid proposals sent.</td>
                         </tr>
-                    ))}
+                    )}
                 </tbody>
             </table>
-
-            <h3>Proposals Received</h3>
-            <table>
+    
+            {/* Aid Proposals Received */}
+            <h3 className="text-xl font-semibold text-primary mt-6 mb-2">Proposals Received</h3>
+            <table className="w-full border-collapse border border-neutral bg-base-200 rounded-lg shadow-md">
                 <tbody>
-                    {proposedAidReceived.map((proposalId, index) => (
-                        <tr key={index}>
-                            <td>{proposalId.toString()}</td>
-                            <td><button onClick={() => handleAcceptAid(proposalId.toString())}>Accept</button></td>
+                    {proposedAidReceived.length > 0 ? (
+                        proposedAidReceived.map((proposalId, index) => (
+                            <tr key={index} className="border-b border-neutral">
+                                <td className="p-3">Proposal ID: {proposalId.toString()}</td>
+                                <td>
+                                    <button 
+                                        onClick={() => handleAcceptAid(proposalId.toString())} 
+                                        className="btn btn-success"
+                                    >
+                                        Accept
+                                    </button>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td className="p-3 text-center text-sm text-secondary-content">No aid proposals received.</td>
                         </tr>
-                    ))}
+                    )}
                 </tbody>
             </table>
         </div>

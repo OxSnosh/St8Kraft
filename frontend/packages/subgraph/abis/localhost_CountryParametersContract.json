@@ -47,6 +47,44 @@
       {
         "indexed": true,
         "internalType": "uint256",
+        "name": "allianceId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "adminNationId",
+        "type": "uint256"
+      }
+    ],
+    "name": "AllianceAdminAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "allianceId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "adminNationId",
+        "type": "uint256"
+      }
+    ],
+    "name": "AllianceAdminRemoved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
         "name": "countryId",
         "type": "uint256"
       },
@@ -58,6 +96,31 @@
       }
     ],
     "name": "AllianceChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "allianceId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "founderNationId",
+        "type": "uint256"
+      }
+    ],
+    "name": "AllianceCreated",
     "type": "event"
   },
   {
@@ -117,6 +180,50 @@
       {
         "indexed": true,
         "internalType": "uint256",
+        "name": "allianceId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "nationId",
+        "type": "uint256"
+      }
+    ],
+    "name": "NationApprovedToJoin",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "allianceId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "nationId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "platoonId",
+        "type": "uint256"
+      }
+    ],
+    "name": "NationAssignedToPlatoon",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
         "name": "countryId",
         "type": "uint256"
       },
@@ -128,6 +235,44 @@
       }
     ],
     "name": "NationNameChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "allianceId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "nationId",
+        "type": "uint256"
+      }
+    ],
+    "name": "NationRemovedFromAlliance",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "allianceId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "nationId",
+        "type": "uint256"
+      }
+    ],
+    "name": "NationRequestedToJoin",
     "type": "event"
   },
   {
@@ -226,6 +371,141 @@
     "type": "event"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "allianceId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "adminNationId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "callerNationId",
+        "type": "uint256"
+      }
+    ],
+    "name": "addAdmin",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "allianceCounter",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "allianceExists",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "alliances",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "founderNationId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "allianceId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nationId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "callerNationId",
+        "type": "uint256"
+      }
+    ],
+    "name": "approveNationJoin",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "allianceId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nationId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "platoonId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "callerNationId",
+        "type": "uint256"
+      }
+    ],
+    "name": "assignNationToPlatoon",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "countryMinter",
     "outputs": [
@@ -236,6 +516,24 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "founderNationId",
+        "type": "uint256"
+      }
+    ],
+    "name": "createAlliance",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -285,6 +583,25 @@
         "internalType": "string",
         "name": "",
         "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "allianceId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getAllianceMembers",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
       }
     ],
     "stateMutability": "view",
@@ -385,6 +702,73 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "allianceId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getJoinRequests",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "nationId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getNationAlliance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "nationId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getNationAllianceAndPlatoon",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "allianceId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "platoonId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -637,6 +1021,25 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "nationToAlliance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "nuke",
     "outputs": [
@@ -681,8 +1084,72 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "allianceId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "adminNationId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "callerNationId",
+        "type": "uint256"
+      }
+    ],
+    "name": "removeAdmin",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "allianceId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nationId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "callerNationId",
+        "type": "uint256"
+      }
+    ],
+    "name": "removeNationFromAlliance",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "allianceId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nationId",
+        "type": "uint256"
+      }
+    ],
+    "name": "requestToJoinAlliance",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

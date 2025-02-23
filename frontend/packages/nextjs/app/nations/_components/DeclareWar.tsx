@@ -397,89 +397,119 @@ const DeclareWar = () => {
     };
 
     return (
-        <div>
+        <div className="w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
+            <h2 className="text-2xl font-bold text-primary-content text-center mb-4">Declare War</h2>
+    
+            {/* Declare War Button */}
             {selectedNation && defendingNation && (
                 <button
-                    style={{ margin: "10px", padding: "10px", fontSize: "16px", display: "block", width: "100%" }}
-                    onClick={handleDeclareWar} // Call the function instead of alert
+                    onClick={handleDeclareWar} 
+                    className="btn btn-error w-full text-lg mt-2"
                 >
                     Declare War
                 </button>
             )}
-
-            {/* Dropdowns for Selecting Nations */}
-            <div style={{ display: "flex", justifyContent: "space-around", marginBottom: "20px" }}>
-                <select onChange={(e) => handleNationChange(e.target.value)} value={selectedNation}>
-                    <option value="">Select Attacking Nation</option>
-                    {mintedNations.map((nation) => (
-                        <option key={nation.id} value={nation.id}>{nation.name}</option>
-                    ))}
-                </select>
-
-                <div>Nation Attributes</div>
-
-                <select onChange={(e) => handleDefendingNationChange(e.target.value)} value={defendingNation}>
-                    <option value="">Select Target Nation</option>
-                    {mintedNations.map((nation) => (
-                        <option key={nation.id} value={nation.id}>{nation.name}</option>
-                    ))}
-                </select>
+    
+            {/* Nation Selection Dropdowns */}
+            <div className="grid grid-cols-3 gap-4 mt-6">
+                {/* Attacking Nation */}
+                <div className="p-4 bg-base-200 rounded-lg shadow-md">
+                    <h3 className="text-lg font-semibold text-primary">Attacking Nation</h3>
+                    <select 
+                        onChange={(e) => handleNationChange(e.target.value)} 
+                        value={selectedNation} 
+                        className="select select-bordered w-full bg-base-100 text-base-content mt-2"
+                    >
+                        <option value="">Select Attacking Nation</option>
+                        {mintedNations.map((nation) => (
+                            <option key={nation.id} value={nation.id}>{nation.name}</option>
+                        ))}
+                    </select>
+                </div>
+    
+                {/* Label Section */}
+                <div className="flex justify-center items-center text-lg font-semibold text-secondary-content">
+                    Nation Attributes
+                </div>
+    
+                {/* Defending Nation */}
+                <div className="p-4 bg-base-200 rounded-lg shadow-md">
+                    <h3 className="text-lg font-semibold text-primary">Target Nation</h3>
+                    <select 
+                        onChange={(e) => handleDefendingNationChange(e.target.value)} 
+                        value={defendingNation} 
+                        className="select select-bordered w-full bg-base-100 text-base-content mt-2"
+                    >
+                        <option value="">Select Target Nation</option>
+                        {mintedNations.map((nation) => (
+                            <option key={nation.id} value={nation.id}>{nation.name}</option>
+                        ))}
+                    </select>
+                </div>
             </div>
-
+    
             {/* Comparison Table */}
-            <table border={1} cellPadding={10} style={{ borderCollapse: "collapse", width: "100%" }}>
-                <thead>
-                    <tr>
-                        <th>Attacking Nation</th>
-                        <th>Labels</th>
-                        <th>Defending Nation</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {[
-                        { label: "Strength", key: "strength" },
-                        { label: "Balance", key: "balance" },
-                        { label: "Technology", key: "technology" },
-                        { label: "Defending Soldiers", key: "defendingSoldiers" },
-                        { label: "Defending Tanks", key: "defendingTanks" },
-                        { label: "Yak9", key: "yak9" },
-                        { label: "P51 Mustang", key: "p51Mustang" },
-                        { label: "F86 Sabre", key: "f86Sabre" },
-                        { label: "Mig15", key: "mig15" },
-                        { label: "F100 Super Sabre", key: "f100SuperSabre" },
-                        { label: "F35 Lightning", key: "f35Lightning" },
-                        { label: "F15 Eagle", key: "f15Eagle" },
-                        { label: "Su30 Mki", key: "su30Mki" },
-                        { label: "F22 Raptor", key: "f22Raptor" },
-                        { label: "Ah1 Cobra", key: "ah1Cobra" },
-                        { label: "Ah64 Apache", key: "ah64Apache" },
-                        { label: "Bristol Blenheim", key: "bristolBlenheim" },
-                        { label: "B52 Mitchell", key: "b52Mitchell" },
-                        { label: "B17g Flying Fortress", key: "b17gFlyingFortress" },
-                        { label: "B52 Stratofortress", key: "b52Stratofortress" },
-                        { label: "B2 Spirit", key: "b2Spirit" },
-                        { label: "B1b Lancer", key: "b1bLancer" },
-                        { label: "Tupolev Tu160", key: "tupolevTu160" },
-                        { label: "Corvette", key: "corvette" },
-                        { label: "Landing Ship", key: "landingShip" },
-                        { label: "Battleship", key: "battleship" },
-                        { label: "Cruiser", key: "cruiser" },
-                        { label: "Frigate", key: "frigate" },
-                        { label: "Destroyer", key: "destroyer" },
-                        { label: "Submarine", key: "submarine" },
-                        { label: "Aircraft Carrier", key: "aircraftCarrier" },
-                        { label: "Cruise Missiles", key: "cruiseMissiles" },
-                        { label: "Spies", key: "spies" },
-                        { label: "Nukes", key: "nukes" }
-                    ].map(item => (
-                        <tr key={item.key}>
-                            <td>{selectedNationDetails ? selectedNationDetails[item.key] : "-"}</td>
-                            <td>{item.label}</td>
-                            <td>{defendingNationDetails ? defendingNationDetails[item.key] : "-"}</td>
+            <div className="overflow-x-auto mt-6">
+                <table className="w-full border-collapse border border-neutral bg-base-200 rounded-lg shadow-md">
+                    <thead className="bg-primary text-primary-content">
+                        <tr>
+                            <th className="p-3">Attacking Nation</th>
+                            <th className="p-3">Labels</th>
+                            <th className="p-3">Defending Nation</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {[
+                            { label: "Strength", key: "strength" },
+                            { label: "Balance", key: "balance" },
+                            { label: "Technology", key: "technology" },
+                            { label: "Defending Soldiers", key: "defendingSoldiers" },
+                            { label: "Defending Tanks", key: "defendingTanks" },
+                            { label: "Yak9", key: "yak9" },
+                            { label: "P51 Mustang", key: "p51Mustang" },
+                            { label: "F86 Sabre", key: "f86Sabre" },
+                            { label: "Mig15", key: "mig15" },
+                            { label: "F100 Super Sabre", key: "f100SuperSabre" },
+                            { label: "F35 Lightning", key: "f35Lightning" },
+                            { label: "F15 Eagle", key: "f15Eagle" },
+                            { label: "Su30 Mki", key: "su30Mki" },
+                            { label: "F22 Raptor", key: "f22Raptor" },
+                            { label: "Ah1 Cobra", key: "ah1Cobra" },
+                            { label: "Ah64 Apache", key: "ah64Apache" },
+                            { label: "Bristol Blenheim", key: "bristolBlenheim" },
+                            { label: "B52 Mitchell", key: "b52Mitchell" },
+                            { label: "B17g Flying Fortress", key: "b17gFlyingFortress" },
+                            { label: "B52 Stratofortress", key: "b52Stratofortress" },
+                            { label: "B2 Spirit", key: "b2Spirit" },
+                            { label: "B1b Lancer", key: "b1bLancer" },
+                            { label: "Tupolev Tu160", key: "tupolevTu160" },
+                            { label: "Corvette", key: "corvette" },
+                            { label: "Landing Ship", key: "landingShip" },
+                            { label: "Battleship", key: "battleship" },
+                            { label: "Cruiser", key: "cruiser" },
+                            { label: "Frigate", key: "frigate" },
+                            { label: "Destroyer", key: "destroyer" },
+                            { label: "Submarine", key: "submarine" },
+                            { label: "Aircraft Carrier", key: "aircraftCarrier" },
+                            { label: "Cruise Missiles", key: "cruiseMissiles" },
+                            { label: "Spies", key: "spies" },
+                            { label: "Nukes", key: "nukes" }
+                        ].map(item => (
+                            <tr key={item.key} className="border-b border-neutral">
+                                <td className="p-3 text-center">
+                                    {selectedNationDetails ? selectedNationDetails[item.key] : "-"}
+                                </td>
+                                <td className="p-3 font-semibold text-primary-content text-center">
+                                    {item.label}
+                                </td>
+                                <td className="p-3 text-center">
+                                    {defendingNationDetails ? defendingNationDetails[item.key] : "-"}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };
