@@ -733,11 +733,17 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
       { label: "Soldier Count", value: nationDetails.soldierCount || "Unknown" },
       { label: "Tank Count", value: nationDetails.tankCount || "Unknown" },
       { label: "Nukes", value: nationDetails.nukes || "Unknown" },
+      { label: "Cruise Missiles", value: nationDetails.cruiseMissiles || "Unknown" },
+      { label: "Fighters", value: nationDetails.fighters.map(({ name, fighterCount }) => `${name} (${fighterCount})`).join(", ") || "Unknown" },
+      { label: "Bombers", value: nationDetails.bombers.map(({ name, bomberCount }) => `${name} (${bomberCount})`).join(", ") || "Unknown" },
+      { label: "Navy", value: nationDetails.navy.map(({ name, navyCount }) => `${name} (${navyCount})`).join(", ") || "Unknown" },
       { label: "Spies", value: nationDetails.spies || "Unknown" },
       { label: "Soldier Casualties", value: nationDetails.soldierCasualties || "Unknown" },
       { label: "Tank Casualties", value: nationDetails.tankCasualties || "Unknown" },
     ],
     Infrastructure: [
+      { label: "Improvements", value: nationDetails.improvements.map(({ name, improvementCount }) => `${name} (${improvementCount})`).join(", ") || "Unknown" },
+      { label: "Wonders", value: nationDetails.wonders.map(({ name, wonderCount }) => `${name} (${wonderCount})`).join(", ") || "Unknown" },
       { label: "Technology Count", value: nationDetails.technologyCount || "Unknown" },
       { label: "Infrastructure Count", value: nationDetails.infrastructureCount || "Unknown" },
       { label: "Land Count", value: nationDetails.landCount || "Unknown" },
@@ -833,60 +839,58 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
               </div>
           </div>
 
-          {/* Center Content - Selected Tab Information */}
           <div className="w-7/12 px-6">
-              <h2 className="text-2xl font-bold text-primary-content text-center mb-4">{activeTab}</h2>
+            <h2 className="text-2xl font-bold text-primary-content text-center mb-4">{activeTab}</h2>
 
-              {activeTab === "All Details" ? (
-                  /* Display all sections in one view */
-                  Object.keys(sections).map((section) => (
-                      <div key={section} className="mb-6">
-                          <h3 className="text-xl font-semibold text-secondary mt-4">{section}</h3>
-                          <div className="p-4 bg-base-200 rounded-lg shadow-md mt-2">
-                              <table className="table-auto border-collapse border border-neutral w-full text-sm">
-                                  <colgroup>
-                                      <col style={{ width: "40%" }} />
-                                      <col style={{ width: "60%" }} />
-                                  </colgroup>
-                                  <tbody>
-                                      {sections[section].map(({ label, value }) => (
-                                          <tr key={label}>
-                                              <td className="border-neutral px-4 py-2 font-semibold">{label}:</td>
-                                              <td className="border-neutral px-4 py-2">
-                                                  {label === "Resources" && nationDetails.resources && <ResourceDisplay />}
-                                                  {label === "Bonus Resources" && nationDetails.bonusResources && <BonusResourceDisplay />}
-                                              </td>
-                                          </tr>
-                                      ))}
-                                  </tbody>
-                              </table>
-                          </div>
-                      </div>
-                  ))
-              ) : (
-                  /* Display selected section */
-                  <div className="p-4 bg-base-200 rounded-lg shadow-md">
-                      <table className="table-auto border-collapse w-full text-sm">
-                          <colgroup>
-                              <col style={{ width: "40%" }} />
-                              <col style={{ width: "60%" }} />
-                          </colgroup>
-                          <tbody>
-                              {sections[activeTab].map(({ label, value }) => (
-                                  <tr key={label}>
-                                      <td className="px-4 py-2 font-semibold">{label}:</td>
-                                      <td className="px-4 py-2">
-                                      <td className="px-4 py-2">
-                                          {label === "Resources" && nationDetails.resources && <ResourceDisplay />}
-                                          {label === "Bonus Resources" && nationDetails.bonusResources && <BonusResourceDisplay />}
-                                          {label !== "Resources" && label !== "Bonus Resources" && value}
-                                      </td>
-                                      </td>
-                                  </tr>
-                              ))}
-                          </tbody>
-                      </table>
-                  </div>
+            {activeTab === "All Details" ? (
+                /* Display all sections in one view */
+                Object.keys(sections).map((section) => (
+                    <div key={section} className="mb-6">
+                        <h3 className="text-xl font-semibold text-secondary mt-4">{section}</h3>
+                        <div className="p-4 bg-base-200 rounded-lg shadow-md mt-2">
+                            <table className="table-auto border-collapse border border-neutral w-full text-sm">
+                                <colgroup>
+                                    <col style={{ width: "40%" }} />
+                                    <col style={{ width: "60%" }} />
+                                </colgroup>
+                                <tbody>
+                                    {sections[section].map(({ label, value }) => (
+                                        <tr key={label}>
+                                            <td className="border-neutral px-4 py-2 font-semibold">{label}:</td>
+                                            <td className="border-neutral px-4 py-2">
+                                                {label === "Resources" && nationDetails.resources ? <ResourceDisplay /> :
+                                                label === "Bonus Resources" && nationDetails.bonusResources ? <BonusResourceDisplay /> :
+                                                value} {/* ✅ Ensure value is displayed */}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                ))
+            ) : (
+                /* Display selected section */
+                <div className="p-4 bg-base-200 rounded-lg shadow-md">
+                    <table className="table-auto border-collapse w-full text-sm">
+                        <colgroup>
+                            <col style={{ width: "40%" }} />
+                            <col style={{ width: "60%" }} />
+                        </colgroup>
+                        <tbody>
+                            {sections[activeTab].map(({ label, value }) => (
+                                <tr key={label}>
+                                    <td className="px-4 py-2 font-semibold">{label}:</td>
+                                    <td className="px-4 py-2">
+                                        {label === "Resources" && nationDetails.resources ? <ResourceDisplay /> :
+                                        label === "Bonus Resources" && nationDetails.bonusResources ? <BonusResourceDisplay /> :
+                                        value} {/* ✅ Fixing incorrect nesting */}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
               )}
           </div>
 

@@ -175,57 +175,61 @@ const BuySoldiers = () => {
     // };
 
     return (
-        <div className={`p-6 border-l-4 ${theme === 'dark' ? 'bg-gray-800 text-white border-green-400' : 'bg-gray-100 text-black border-green-500'}`}>
-            <h3 className="text-lg font-semibold">Buy Soldiers</h3>
-
+        <div className="w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
+            <h2 className="text-2xl font-bold text-primary-content text-center mb-4">🪖 Buy Soldiers</h2>
+    
+            {/* Error Message Handling */}
             {errorMessage && (
-                <div className="mt-4 p-4 bg-red-500 text-white rounded">
+                <div className="mt-4 p-4 bg-red-500 text-white rounded-lg shadow-md">
                     {errorMessage}
                 </div>
             )}
-
-            <table className="w-full mt-4 border-collapse border border-gray-300">
-                <thead>
-                    <tr className={`${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-black'}`}>
-                        <th className="border border-gray-300 px-4 py-2">Category</th>
-                        <th className="border border-gray-300 px-4 py-2">Value</th>
+    
+            {/* Soldiers Table */}
+            <table className="w-full border-collapse border border-neutral bg-base-200 rounded-lg shadow-md mb-6">
+                <thead className="bg-primary text-primary-content">
+                    <tr>
+                        <th className="p-3 text-left">Category</th>
+                        <th className="p-3 text-left">Value</th>
                     </tr>
                 </thead>
                 <tbody>
                     {Object.entries(soldierDetails).map(([key, value]) => (
-                        <tr key={key} className="text-center">
-                            <td className="border border-gray-300 px-4 py-2 capitalize">{key.replace(/([A-Z])/g, ' $1')}</td>
-                            <td className="border border-gray-300 px-4 py-2">{value !== null ? value : "Loading..."}</td>
+                        <tr key={key} className="border-b border-neutral">
+                            <td className="p-3 capitalize">{key.replace(/([A-Z])/g, ' $1')}</td>
+                            <td className="p-3">{value !== null ? value : "Loading..."}</td>
                         </tr>
                     ))}
                 </tbody>
             </table>
-
-            <div className="mt-4">
-                <label className="block text-sm font-medium mb-2">Enter Amount:</label>
+    
+            {/* Soldier Purchase Form */}
+            <div className="bg-base-200 p-4 rounded-lg shadow-md">
+                <label className="text-lg font-semibold text-primary block mb-2">Enter Amount:</label>
                 <input
                     type="number"
                     value={amountInput}
                     onChange={(e) => setAmountInput(e.target.value)}
-                    className="w-full p-2 border rounded mb-2"
+                    className="input input-bordered w-full bg-base-100 text-base-content mb-4"
                     placeholder="Enter amount to buy"
                 />
                 <button
                     onClick={() => handleCalculateCost(amountInput)}
-                    className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600"
+                    className="btn btn-accent w-full"
                 >
                     Calculate Soldier Purchase Cost
                 </button>
-
+    
                 {cost !== null && (
-                    <div className="mt-4 p-4 bg-blue-500 text-white rounded">
+                    <div className="mt-4 text-center text-lg font-semibold bg-blue-500 text-white p-3 rounded-lg shadow-md">
                         Cost per Soldier: {cost}
                     </div>
                 )}
+    
                 {cost !== null && (
                     <button
                         onClick={() => handleBuySoldiers(amountInput)}
-                        className="w-full bg-purple-500 text-white p-2 rounded hover:bg-purple-600 mt-4"
+                        className="btn btn-primary w-full mt-4"
                     >
                         Buy {amountInput} Soldiers for {Number(amountInput) * Number(cost)} War Bucks
                     </button>
@@ -233,6 +237,7 @@ const BuySoldiers = () => {
             </div>
         </div>
     );
+    
 };
 
 export default BuySoldiers;

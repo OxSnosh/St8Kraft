@@ -143,56 +143,69 @@ const BuySpies = () => {
   }
 
   return (
-    <div
-      className={`p-6 border-l-4 ${theme === "dark" ? "bg-gray-800 text-white border-green-400" : "bg-gray-100 text-black border-green-500"}`}
-    >
-      <h3 className="text-lg font-semibold">Buy Spies</h3>
+    <div className="w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
+        <h2 className="text-2xl font-bold text-primary-content text-center mb-4">🕵️ Buy Spies</h2>
 
-      {errorMessage && <div className="mt-4 p-4 bg-red-500 text-white rounded">{errorMessage}</div>}
-
-      <table className="w-full mt-4 border-collapse border border-gray-300">
-        <thead>
-          <tr className={`${theme === "dark" ? "bg-gray-700 text-white" : "bg-gray-200 text-black"}`}>
-            <th className="border border-gray-300 px-4 py-2">Category</th>
-            <th className="border border-gray-300 px-4 py-2">Value</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.entries(spyDetails).map(([key, value]) => (
-            <tr key={key} className="text-center">
-              <td className="border border-gray-300 px-4 py-2 capitalize">{key.replace(/([A-Z])/g, " $1")}</td>
-              <td className="border border-gray-300 px-4 py-2">{value !== null ? value : "Loading..."}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <div className="mt-4">
-        <label className="block text-sm font-medium mb-2">Enter Amount:</label>
-        <input
-          type="number"
-          value={amountInput}
-          onChange={e => setAmountInput(e.target.value)}
-          className="w-full p-2 border rounded mb-2"
-          placeholder="Enter amount to buy"
-        />
-        <button
-          onClick={() => handleCalculateCost(amountInput)}
-          className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600"
-        >
-          Calculate Spy Purchase Cost
-        </button>
-
-        {cost !== null && <div className="mt-4 p-4 bg-blue-500 text-white rounded">Cost per Spy: {cost}</div>}
-        {cost !== null && (
-          <button
-            onClick={() => handleBuySpies(amountInput)}
-            className="w-full bg-purple-500 text-white p-2 rounded hover:bg-purple-600 mt-4"
-          >
-            Buy {amountInput} Spies for {Number(amountInput) * Number(cost)} War Bucks
-          </button>
+        {/* Error Message */}
+        {errorMessage && (
+            <div className="mt-4 p-4 bg-error text-error-content rounded-lg shadow-md">
+                {errorMessage}
+            </div>
         )}
-      </div>
+
+        {/* Spy Details Table */}
+        <table className="w-full border-collapse border border-neutral bg-base-200 rounded-lg shadow-md mb-6">
+            <thead className="bg-primary text-primary-content">
+                <tr>
+                    <th className="p-3 text-left">Category</th>
+                    <th className="p-3 text-left">Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {Object.entries(spyDetails).map(([key, value]) => (
+                    <tr key={key} className="border-b border-neutral">
+                        <td className="p-3 capitalize">{key.replace(/([A-Z])/g, " $1")}</td>
+                        <td className="p-3">{value !== null ? value : "Loading..."}</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+
+        {/* Spy Purchase Section */}
+        <div className="bg-base-200 p-4 rounded-lg shadow-md">
+            <label className="block text-sm font-medium mb-2 text-primary-content">
+                Enter Amount:
+            </label>
+            <input
+                type="number"
+                value={amountInput}
+                onChange={(e) => setAmountInput(e.target.value)}
+                className="input input-bordered w-full bg-base-100 text-base-content"
+                placeholder="Enter amount to buy"
+            />
+
+            <button
+                onClick={() => handleCalculateCost(amountInput)}
+                className="btn btn-accent w-full mt-4"
+            >
+                🕵️ Calculate Spy Purchase Cost
+            </button>
+
+            {cost !== null && (
+                <div className="mt-4 p-4 bg-info text-info-content rounded-lg shadow-md text-center">
+                    <strong>Cost per Spy:</strong> {cost} War Bucks
+                </div>
+            )}
+
+            {cost !== null && (
+                <button
+                    onClick={() => handleBuySpies(amountInput)}
+                    className="btn btn-error w-full mt-4 text-lg"
+                >
+                    🕵️ Buy {amountInput} Spies for {Number(amountInput) * Number(cost)} War Bucks
+                </button>
+            )}
+        </div>
     </div>
   );
 };

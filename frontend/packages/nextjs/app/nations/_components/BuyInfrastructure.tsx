@@ -170,69 +170,75 @@ const BuyInfrastructure = () => {
     }
 
     return (
-        <div className={`p-6 border-l-4 ${theme === 'dark' ? 'bg-gray-800 text-white border-green-400' : 'bg-gray-100 text-black border-green-500'}`}>
-            <h3 className="text-lg font-semibold">Buy Infrastructure</h3>
-
+        <div className="w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
+            <h2 className="text-2xl font-bold text-primary-content text-center mb-4">🏗️ Buy Infrastructure</h2>
+    
+            {/* Error Message */}
             {errorMessage && (
-                <div className="mt-4 p-4 bg-red-500 text-white rounded">
+                <div className="p-4 bg-red-500 text-white rounded-lg shadow-md mb-4">
                     {errorMessage}
                 </div>
             )}
-
-            <table className="w-full mt-4 border-collapse border border-gray-300">
-                <thead>
-                    <tr className={`${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-black'}`}>
-                        <th className="border border-gray-300 px-4 py-2">Category</th>
-                        <th className="border border-gray-300 px-4 py-2">Value</th>
+    
+            {/* Infrastructure Details Table */}
+            <table className="w-full border-collapse border border-neutral bg-base-200 rounded-lg shadow-md mb-6">
+                <thead className="bg-primary text-primary-content">
+                    <tr>
+                        <th className="p-3 text-left">Category</th>
+                        <th className="p-3 text-left">Value</th>
                     </tr>
                 </thead>
                 <tbody>
                     {Object.entries(infrastructureDetails).map(([key, value]) => (
-                        <tr key={key} className="text-center">
-                            <td className="border border-gray-300 px-4 py-2 capitalize">{key.replace(/([A-Z])/g, ' $1')}</td>
-                            <td className="border border-gray-300 px-4 py-2">{value !== null ? value : "Loading..."}</td>
+                        <tr key={key} className="border-b border-neutral">
+                            <td className="p-3 capitalize">{key.replace(/([A-Z])/g, ' $1')}</td>
+                            <td className="p-3">{value !== null ? value : "Loading..."}</td>
                         </tr>
                     ))}
                 </tbody>
             </table>
-
-            <div className="mt-4">
-                <label className="block text-sm font-medium mb-2">Enter Level:</label>
+    
+            {/* Input for Level Selection */}
+            <div className="bg-base-200 p-4 rounded-lg shadow-md">
+                <label className="text-lg font-semibold text-primary block mb-2">Enter Level:</label>
                 <input
                     type="number"
                     value={levelInput}
                     onChange={(e) => setLevelInput(e.target.value)}
-                    className="w-full p-2 border rounded mb-2"
+                    className="input input-bordered w-full bg-base-100 text-base-content mb-4"
                     placeholder="Enter level number"
                 />
                 <button
                     onClick={handleCalculateCost}
-                    className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600"
+                    className="btn btn-accent w-full"
                 >
                     Calculate Infrastructure Cost Per Level
                 </button>
-
+    
+                {/* Display Cost Calculations */}
                 {costPerLevel !== null && (
-                    <div className="mt-4 p-4 bg-blue-500 text-white rounded">
+                    <div className="mt-4 p-3 bg-blue-500 text-white rounded-lg shadow-md text-center">
                         Cost per Level: {costPerLevel}
                     </div>
                 )}
                 {totalCostFromContract !== null && (
-                    <div className="mt-4 p-4 bg-blue-500 text-white rounded">
+                    <div className="mt-4 p-3 bg-blue-500 text-white rounded-lg shadow-md text-center">
                         Total Cost from Contract: {totalCostFromContract}
                     </div>
                 )}
+    
+                {/* Buy Infrastructure Button */}
                 {totalCostFromContract !== null && (
                     <button
                         onClick={handleBuyInfrastructure}
-                        className="w-full bg-purple-500 text-white p-2 rounded hover:bg-purple-600 mt-4"
+                        className="btn btn-primary w-full mt-4"
                     >
                         Buy {levelInput} Infrastructure
                     </button>
                 )}
             </div>
         </div>
-    );
+    );    
 };
 
 export default BuyInfrastructure;

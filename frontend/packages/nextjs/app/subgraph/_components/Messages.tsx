@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GetRecievedMessagesDocument, GetSentMessagesDocument, execute } from "~~/.graphclient";
+import { GetReceivedMessagesDocument, GetSentMessagesDocument, execute } from "~~/.graphclient";
 import { useAccount } from "wagmi";
 
 export const RecievedMessagesTable = () => {
@@ -11,11 +11,11 @@ export const RecievedMessagesTable = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!walletAddress || !execute || !GetRecievedMessagesDocument) {
+      if (!walletAddress || !execute || !GetReceivedMessagesDocument) {
         return;
       }
       try {
-        const { data: result } = await execute(GetRecievedMessagesDocument, {
+        const { data: result } = await execute(GetReceivedMessagesDocument, {
           reciever: walletAddress, // Pass the wallet address to the query
         });
 

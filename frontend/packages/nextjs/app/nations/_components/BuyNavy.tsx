@@ -288,37 +288,38 @@ const BuyNavy = () => {
     }, [nationId, publicClient, NavyContract1, NavyContract2, refreshTrigger]);
 
     return (
-        <div className={`p-6 border-l-4 ${theme === 'dark' ? 'bg-gray-800 text-white border-green-400' : 'bg-gray-100 text-black border-green-500'}`}>
-            <h3 className="text-lg font-semibold">Navy Details</h3>
-
-            <table className="w-full mt-4 border-collapse border border-gray-300">
-                <thead>
-                    <tr className={`${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-black'}`}>
-                        <th className="border border-gray-300 px-4 py-2">Category</th>
-                        <th className="border border-gray-300 px-4 py-2">Value</th>
-                        <th className="border border-gray-300 px-4 py-2">Amount to Buy</th>
-                        <th className="border border-gray-300 px-4 py-2">Action</th>
+        <div className="w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
+            <h2 className="text-2xl font-bold text-primary-content text-center mb-4">⚓ Navy Details</h2>
+    
+            {/* Navy Table */}
+            <table className="w-full border-collapse border border-neutral bg-base-200 rounded-lg shadow-md mb-6">
+                <thead className="bg-primary text-primary-content">
+                    <tr>
+                        <th className="p-3 text-left">Category</th>
+                        <th className="p-3 text-left">Value</th>
+                        <th className="p-3 text-left">Amount to Buy</th>
+                        <th className="p-3 text-left">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {Object.entries(navyDetails).filter(([key]) => key !== "warBucksBalance").map(([key, value]) => (
-                        <tr key={key} className="text-center">
-                            <td className="border border-gray-300 px-4 py-2 capitalize">{key.replace(/([A-Z])/g, ' $1')}</td>
-                            <td className="border border-gray-300 px-4 py-2">{value}</td>
-                            <td className="border border-gray-300 px-4 py-2">
+                        <tr key={key} className="border-b border-neutral">
+                            <td className="p-3 capitalize">{key.replace(/([A-Z])/g, ' $1')}</td>
+                            <td className="p-3">{value}</td>
+                            <td className="p-3">
                                 <input
                                     type="number"
                                     min="1"
                                     max="5"
                                     value={purchaseAmounts[key] || 1}
                                     onChange={(e) => setPurchaseAmounts({ ...purchaseAmounts, [key]: Number(e.target.value) })}
-                                    className="w-16 p-1 border rounded"
+                                    className="input input-bordered w-16 bg-base-100 text-base-content text-center"
                                 />
                             </td>
-                            <td className="border border-gray-300 px-4 py-2">
+                            <td className="p-3">
                                 <button
                                     onClick={() => handleBuyNavy(key)}
-                                    className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                                    className="btn btn-success"
                                 >
                                     Buy
                                 </button>
@@ -329,6 +330,7 @@ const BuyNavy = () => {
             </table>
         </div>
     );
+    
 };
 
 export default BuyNavy;

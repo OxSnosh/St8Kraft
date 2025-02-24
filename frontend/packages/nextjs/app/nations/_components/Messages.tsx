@@ -67,70 +67,73 @@ const MessagesComponent = () => {
     };
 
     return (
-        <div className="bg-aged-paper text-base-content p-6 rounded-lg shadow-center w-full max-w-md mx-auto border border-neutral">
-            <h2 className="text-2xl font-bold text-primary-content text-center mb-4">Nation Messages</h2>
-            
+        <div className="bg-aged-paper text-base-content p-6 rounded-lg shadow-center w-full max-w-2xl mx-auto border border-neutral">
+            <h2 className="text-2xl font-bold text-primary-content text-center mb-4">📜 Nation Messages</h2>
+    
             {/* SEND MESSAGE SECTION */}
             <div className="p-4 bg-base-200 rounded-lg shadow-md mb-6">
                 <h3 className="text-lg font-semibold text-primary mb-2 text-center">Send Message</h3>
+                
                 <input 
                     type="text" 
                     value={toNationId} 
                     onChange={(e) => setToNationId(e.target.value)} 
-                    className="input input-bordered w-full mt-1 bg-base-100 text-base-content" 
+                    className="input input-bordered w-full text-lg mt-1 bg-base-100 text-base-content p-3" 
                     placeholder="Enter recipient Nation ID" 
                 />
+    
                 <textarea 
                     value={messageText} 
                     onChange={(e) => setMessageText(e.target.value)} 
-                    className="textarea textarea-bordered w-full mt-2 bg-base-100 text-base-content" 
+                    className="w-full text-lg mt-2 bg-base-100 text-base-content p-3 border border-neutral resize-y rounded-md" 
                     placeholder="Enter your message"
                 />
+    
                 <button 
                     onClick={handleSendMessage} 
                     disabled={loading} 
-                    className="btn btn-primary w-full flex justify-center items-center mt-2 disabled:opacity-50"
+                    className="btn btn-primary w-full flex justify-center items-center mt-2 disabled:opacity-50 text-lg p-3"
                 >
-                    {loading ? <Loader2 className="animate-spin w-5 h-5 mr-2" /> : "Send Message"}
+                    {loading ? <Loader2 className="animate-spin w-5 h-5 mr-2" /> : "📨 Send Message"}
                 </button>
             </div>
-
+    
             {/* RECEIVED MESSAGES SECTION */}
             <div className="p-4 bg-base-200 rounded-lg shadow-md mb-6">
-                <h3 className="text-lg font-semibold text-secondary mb-2 text-center">Received Messages</h3>
+                <h3 className="text-lg font-semibold text-secondary mb-2 text-center">📥 Received Messages</h3>
                 {receivedMessages.length > 0 ? (
-                    <ul className="list-disc pl-5">
+                    <div className="space-y-4">
                         {receivedMessages.map((msg) => (
-                            <li key={msg.id} className="text-base-content">
-                                <strong>From:</strong> {msg.sender} <br />
-                                <strong>Message:</strong> {msg.message} <br />
-                                <strong>Tx:</strong> {msg.transactionHash}
-                            </li>
+                            <div key={msg.id} className="p-4 bg-base-100 border border-neutral text-base-content shadow-md rounded-md break-words">
+                                <p><strong>From:</strong> {msg.sender}</p>
+                                <p><strong>Message:</strong> {msg.message}</p>
+                                <p className="break-all"><strong>Tx:</strong> {msg.transactionHash}</p>
+                            </div>
                         ))}
-                    </ul>
+                    </div>
                 ) : (
                     <p className="text-sm text-center">No received messages.</p>
                 )}
             </div>
-
+    
             {/* SENT MESSAGES SECTION */}
             <div className="p-4 bg-base-200 rounded-lg shadow-md">
-                <h3 className="text-lg font-semibold text-secondary mb-2 text-center">Sent Messages</h3>
+                <h3 className="text-lg font-semibold text-secondary mb-2 text-center">📤 Sent Messages</h3>
                 {sentMessages.length > 0 ? (
-                    <ul className="list-disc pl-5">
+                    <div className="space-y-4">
                         {sentMessages.map((msg) => (
-                            <li key={msg.id} className="text-base-content">
-                                <strong>To:</strong> {msg.receiver} <br />
-                                <strong>Message:</strong> {msg.message} <br />
-                                <strong>Tx:</strong> {msg.transactionHash}
-                            </li>
+                            <div key={msg.id} className="p-4 bg-base-100 border border-neutral text-base-content shadow-md rounded-md break-words">
+                                <p><strong>To:</strong> {msg.receiver}</p>
+                                <p><strong>Message:</strong> {msg.message}</p>
+                                <p className="break-all"><strong>Tx:</strong> {msg.transactionHash}</p>
+                            </div>
                         ))}
-                    </ul>
+                    </div>
                 ) : (
                     <p className="text-sm text-center">No sent messages.</p>
                 )}
             </div>
-            
+    
             {/* STATUS MESSAGE */}
             {statusMessage && (
                 <p className="mt-4 text-center text-sm text-secondary-content bg-secondary p-2 rounded-lg">
@@ -139,6 +142,8 @@ const MessagesComponent = () => {
             )}
         </div>
     );
+    
+    
 };
 
 export default MessagesComponent;

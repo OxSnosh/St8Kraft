@@ -278,31 +278,33 @@ const BuyWonder = () => {
     }, [nationId, publicClient, WondersContract1, WondersContract2, WondersContract3, WondersContract4, TreasuryContract]);
 
     return (
-        <div className={`p-6 border-l-4 ${theme === 'dark' ? 'bg-gray-800 text-white border-green-400' : 'bg-gray-100 text-black border-green-500'}`}>
-            <h3 className="text-lg font-semibold">Wonder Details</h3>
-
-            <div className="mb-4">
-                <strong>Warbucks Balance:</strong> {wonderDetails["warBucksBalance"] || "0"}
+        <div className="w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
+            <h2 className="text-2xl font-bold text-primary-content text-center mb-4">🏛️ Wonder Details</h2>
+    
+            {/* Warbucks Balance */}
+            <div className="text-lg text-center font-semibold bg-base-200 p-3 rounded-lg shadow-md mb-6">
+                Warbucks Balance: {wonderDetails["warBucksBalance"] || "0"}
             </div>
-
-            <table className="w-full mt-4 border-collapse border border-gray-300">
-                <thead>
-                    <tr className={`${theme === 'dark' ? 'bg-gray-700 text-white' : 'bg-gray-200 text-black'}`}>
-                        <th className="border border-gray-300 px-4 py-2">Wonder</th>
-                        <th className="border border-gray-300 px-4 py-2">Owned Status</th>
-                        <th className="border border-gray-300 px-4 py-2">Action</th>
+    
+            {/* Wonders Table */}
+            <table className="w-full border-collapse border border-neutral bg-base-200 rounded-lg shadow-md mb-6">
+                <thead className="bg-primary text-primary-content">
+                    <tr>
+                        <th className="p-3 text-left">Wonder</th>
+                        <th className="p-3 text-left">Owned Status</th>
+                        <th className="p-3 text-left">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {Object.keys(wonderKeyMapping).map((key) => (
-                        <tr key={key} className="text-center">
-                            <td className="border border-gray-300 px-4 py-2 capitalize">{key.replace(/([A-Z])/g, ' $1')}</td>
-                            <td className="border border-gray-300 px-4 py-2">{wonderDetails[key] ? "Owned" : "Not Owned"}</td>
-                            <td className="border border-gray-300 px-4 py-2">
+                        <tr key={key} className="border-b border-neutral">
+                            <td className="p-3 capitalize">{key.replace(/([A-Z])/g, ' $1')}</td>
+                            <td className="p-3">{wonderDetails[key] ? "Owned" : "Not Owned"}</td>
+                            <td className="p-3">
                                 <button
                                     onClick={() => handleBuyWonder(key as keyof typeof wonderKeyMapping)}
                                     disabled={wonderDetails[key]}
-                                    className={`px-3 py-1 rounded ${wonderDetails[key] ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 text-white hover:bg-green-600'}`}
+                                    className={`btn w-full ${wonderDetails[key] ? 'btn-disabled' : 'btn-success'}`}
                                 >
                                     {wonderDetails[key] ? "Owned" : "Buy"}
                                 </button>
