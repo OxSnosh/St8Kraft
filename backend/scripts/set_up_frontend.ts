@@ -20,8 +20,8 @@ async function transferSomeWarbucks() {
 
     // console.log(warbucks)
 
-    await warbucks.approve(signers[0].address, BigInt(40000000*10**18));
-    await warbucks.transferFrom(signers[0].address, "0xe50F61E239Da564254B9173b6e486AC883e3A249", BigInt(40000000 * 10**18))
+    await warbucks.approve(signers[0].address, BigInt(400000000*10**18));
+    await warbucks.transferFrom(signers[0].address, "0xe50F61E239Da564254B9173b6e486AC883e3A249", BigInt(400000000 * 10**18))
 
     console.log("transfer!")
 }

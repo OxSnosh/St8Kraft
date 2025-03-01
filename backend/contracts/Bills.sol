@@ -14,12 +14,13 @@ import "./CountryParameters.sol";
 import "./Missiles.sol";
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 ///@title BillsContact
 ///@author OxSnosh
 ///@notice this contact allows a nation owner to calculate and pay the daily upkeep bills owed for the nation
 ///@notice source of bill payments come from infrastructure, improvements, wonders, military and missiles
-contract BillsContract is Ownable {
+contract BillsContract is Ownable, ReentrancyGuard {
     address public countryMinter;
     address public treasury;
     address public wonders1;
@@ -130,7 +131,7 @@ contract BillsContract is Ownable {
     ///@param id is the nation ID of the nation looking to pay bills
     ///@notice function allows a nation owner to pay their bills
     ///@notice function will only work if the caller of the function is the owner of the nation ID in the id parameter
-    function payBills(uint256 id) public {
+    function payBills(uint256 id) public nonReentrant{
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         uint256 availableFunds = tsy.checkBalance(id);

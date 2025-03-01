@@ -12,6 +12,7 @@ import "./CountryMinter.sol";
 import "./GroundBattle.sol";
 import "./KeeperFile.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 ///@title TreasuyContract
 ///@author OxSnosh
@@ -19,7 +20,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 ///@dev this contract allows a nation owner to deposit game revenues into their nation
 ///@dev this contract inherits from the openzeppelin ownable contract
 ///@dev this contract allows the game owner to set the MILF and withdraw game revenues
-contract TreasuryContract is Ownable {
+contract TreasuryContract is Ownable, ReentrancyGuard {
     uint256 public totalGameBalance;
     uint256 public counter;
     address public wonders1;
@@ -217,11 +218,9 @@ contract TreasuryContract is Ownable {
     ///@notice this function allows a nation owner to withdraw funds from their nation
     ///@param amount is the amount of funds being withdrawn
     ///@param id is the nation id of the nation withdrawing funds
-    function withdrawFunds(uint256 amount, uint256 id) public {
+    function withdrawFunds(uint256 amount, uint256 id) public nonReentrant {
         uint256 gameBalance = idToTreasury[id].balance;
         require(gameBalance >= amount, "insufficient game balance");
-        idToTreasury[id].balance -= amount;
-        totalGameBalance -= amount;
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         uint256 gameDay = keep.getGameDay();
@@ -232,6 +231,8 @@ contract TreasuryContract is Ownable {
         );
         bool demonitized = idToTreasury[id].demonitized;
         require(demonitized == false, "ERROR");
+        idToTreasury[id].balance -= amount;
+        totalGameBalance -= amount;
         IWarBucks(warBucksAddress).mintFromTreasury(msg.sender, amount);
         emit FundsWithdrawn(id, amount);
     }
@@ -241,18 +242,18 @@ contract TreasuryContract is Ownable {
     ///@notice this function allows a nation owner to add funds to their nation
     ///@param amount is the amount of funds being added
     ///@param id is the nation id of the nation withdrawing funds
-    function addFunds(uint256 amount, uint256 id) public {
+    function addFunds(uint256 amount, uint256 id) public nonReentrant{
         uint256 coinBalance = IWarBucks(warBucksAddress).balanceOf(msg.sender);
         require(
             coinBalance >= amount,
             "deposit amount exceeds balance in wallet"
         );
-        idToTreasury[id].balance += amount;
-        totalGameBalance += amount;
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         bool demonitized = idToTreasury[id].demonitized;
         require(demonitized == false, "ERROR");
+        idToTreasury[id].balance += amount;
+        totalGameBalance += amount;
         IWarBucks(warBucksAddress).burnFromTreasury(msg.sender, amount);
         emit FundsAdded(id, amount);
     }
@@ -407,12 +408,12 @@ contract TreasuryContract is Ownable {
     ) external approvedBalanceSpender {
         uint256 balance = idToTreasury[id].balance;
         require(balance >= cost, "insufficient balance");
-        idToTreasury[id].balance -= cost;
-        totalGameBalance -= cost;
         bool demonitized = idToTreasury[id].demonitized;
         require(demonitized == false, "ERROR");
         bool inactive = checkInactive(id);
         require(inactive == false, "ERROR Inactive, pay bills to reactivate");
+        idToTreasury[id].balance -= cost;
+        totalGameBalance -= cost;
         //TAXES here
         uint256 taxLevied = ((cost * milf) / 100);
         if (taxLevied > 0) {
@@ -432,12 +433,7 @@ contract TreasuryContract is Ownable {
     ///@dev when money is spent within the game it can be taxed an deposited within this contract
     ///@dev this function will allow the contract owner to withdraw the warbucks from this contract into the owners wallet
     function withdrawMilfRevenues(uint256 amount) public onlyOwner {
-        WarBucks(warBucksAddress).approve(address(this), amount);
-        WarBucks(warBucksAddress).transferFrom(
-            address(this),
-            msg.sender,
-            amount
-        );
+        WarBucks(warBucksAddress).transfer(msg.sender, amount);
         emit OwnerWithdrawMilfRevenues(amount);
     }
 
@@ -530,6 +526,8 @@ contract TreasuryContract is Ownable {
         _;
     }
 
+    uint256 MAX_TRANSFER = 1000000 * (10**18);
+    
     ///@dev this function is only callable from the ground battle contract
     ///@dev this function will transfer the balance lost in a ground battle to the winning nation
     ///@param randomNumber is the amount of balance being transferred

@@ -376,6 +376,7 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
         const casualties = await getCasualties(tokenIdString, publicClient, forcesContract)
 
         const allianceDetails = await getNationAllianceAndPlatoon(tokenIdString, publicClient, countryParametersContract);
+        console.log(allianceDetails, "ALLIANCE DETAILS")
 
         const details: NationDetails = {
           nationName: (await publicClient.readContract({

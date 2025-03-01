@@ -71,16 +71,7 @@ const Senate = () => {
         return error?.message || "Transaction failed";
     }
 
-    // const handleVoteForSenator = async () => {
-    //     if (!nationId || !senatorId) return;
-
-    //     try {
-    //         await voteForSenator(nationId, senatorId, allContractsData.SenateContract, writeContractAsync);
-    //         alert("Vote submitted!");
-    //     } catch (error) {
-    //         console.error("Error voting for senator:", error);
-    //     }
-    // };
+    
 
     const handleVoteForSenator = async () => {
         if (!nationId || !senatorId) return;
@@ -140,73 +131,39 @@ const Senate = () => {
         }
     }
 
-    // const handleSanctionTeamMember = async () => {
-    //     if (!nationId || !teamMemberId) return;
-
-    //     try {
-    //         await sanctionTeamMember(nationId, teamMemberId, allContractsData.SenateContract, writeContractAsync);
-    //         alert("Sanction applied!");
-    //     } catch (error) {
-    //         console.error("Error sanctioning team member:", error);
-    //     }
-    // };
-
     const handleSanctionTeamMember = async () => {
         if (!nationId || !teamMemberId) return;
-
+    
         const contractData = allContractsData.SenateContract;
         const abi = contractData.abi;
-
-        
+    
         if (!contractData.address || !abi) {
             console.error("Contract address or ABI is missing");
             return;
         }
-        
+    
         try {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             await provider.send("eth_requestAccounts", []);
             const signer = provider.getSigner();
-            const userAddress = await signer.getAddress();
-
-            const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
-
-            const data = contract.interface.encodeFunctionData("sanctionTeamMember", [
-                nationId,
-                teamMemberId,
-            ]);
-
-            try {
-                const result = await provider.call({
-                    to: contract.address,
-                    data: data,
-                    from: userAddress,
-                });
+            
+            console.log("🚀 Sending Transaction to Sanction Team Member:", nationId, teamMemberId);
+            console.log("📜 Contract Data:", contractData);
     
-                console.log("Transaction Simulation Result:", result);
+            const tx = await writeContractAsync({
+                ...contractData,
+                functionName: "sanctionTeamMember",
+                args: [nationId, teamMemberId]
+            });
+            await sanctionTeamMember(nationId, teamMemberId, contractData, writeContractAsync);
     
-                if (result.startsWith("0x08c379a0")) {
-                    const errorMessage = parseRevertReason({ data: result });
-                    alert(`Transaction failed: ${errorMessage}`);
-                    return;
-                }
-
-            } catch (error: any) {
-                const errorMessage = parseRevertReason(error);
-                console.error("Transaction simulation failed:", errorMessage);
-                alert(`Transaction failed: ${errorMessage}`);
-                return;            
-            }
-    
-            const tx = await sanctionTeamMember(nationId, teamMemberId, allContractsData.SenateContract, writeContractAsync);
-            alert("Sanction applied!");
-
+            console.log("✅ Transaction Sent");
+           
         } catch (error: any) {
-            const errorMessage = parseRevertReason(error);
-            console.error("Transaction failed:", errorMessage);
-            alert(`Transaction failed: ${errorMessage}`);
+            console.error("❌ Transaction failed:", error);
+            alert(`Transaction failed: ${error.message}`);
         }
-    }
+    };
 
     // const handleLiftSanctionVote = async () => {
     //     if (!nationId || !teamMemberId) return;

@@ -1,3 +1,4 @@
+import { Sen } from "next/font/google";
 
 
 export const voteForSenator = async (
@@ -28,20 +29,29 @@ export const sanctionTeamMember = async (
     senateContract: any,
     writeContractAsync: any
 ) => {
-    
     try {
+        console.log("🔄 Calling contract method with:", { senatorId, teamMemberId });
+        console.log("📜 Contract Details:", senateContract);
+
+        // Ensure writeContractAsync is actually being called
+        if (!writeContractAsync) {
+            console.error("⚠️ writeContractAsync is undefined!");
+            return null;
+        }
+
         const tx = await writeContractAsync(
-            senateContract,
+            ...senateContract,
             "sanctionTeamMember",
             [senatorId, teamMemberId]
         );
+
+        console.log("✅ Transaction Sent:", tx);
         return tx;
     } catch (error) {
-        console.error("sanctionTeamMember error", error);
+        console.error("❌ sanctionTeamMember error:", error);
         return null;
     }
-
-}
+};
 
 export const liftSanctionVote = async (
     senatorId: string,
@@ -99,6 +109,44 @@ export const isSanctioned = async (
         return isSanctioned;
     } catch (error) {
         console.error("isSanctioned error", error);
+        return null
+    }
+}
+
+export const getSenators = async (
+    SenateContract: any,
+    PublicClient: any,
+    team: string,
+) => {
+    try{
+        const senators = await PublicClient.readContract({
+            abi: SenateContract.abi,
+            address: SenateContract.address,
+            functionName: "getSenators",
+            args: [team]
+        })
+        return senators;
+    } catch (error) {
+        console.error("getSenators error", error);
+        return null
+    }
+}
+
+export const getSenatorVotes = async (
+    SenateContract: any,
+    PublicClient: any,
+    team: string,
+) => {
+    try{
+        const sanctionVotes = await PublicClient.readContract({
+            abi: SenateContract.abi,
+            address: SenateContract.address,
+            functionName: "getSenatorVotes",
+            args: [team]
+        })
+        return sanctionVotes;
+    } catch (error) {
+        console.error("getSanctionVotes error", error);
         return null
     }
 }

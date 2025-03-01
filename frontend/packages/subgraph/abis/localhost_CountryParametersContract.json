@@ -1008,6 +1008,30 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "allianceId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nationId",
+        "type": "uint256"
+      }
+    ],
+    "name": "isNationAllianceAdmin",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "keeper",
     "outputs": [

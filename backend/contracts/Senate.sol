@@ -413,4 +413,14 @@ contract SenateContract is ChainlinkClient, KeeperCompatibleInterface, Ownable {
     function electSenatorForTesting(uint256 id) public onlyOwner {
         idToVoter[id].senator = true;
     }
+
+    //function for returning the current senator votes for a team
+    function getSenatorVotes(uint256 team) public view returns (uint256[] memory) {
+        return epochToTeamToSenatorVotes[epoch][team];
+    }
+
+    //function for returning the current senators for a team
+    function getSenators(uint256 team) public view returns (uint256[] memory) {
+        return epochToTeamToWinners[epoch][team];
+    }
 }

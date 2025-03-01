@@ -523,6 +523,10 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         uint256[] joinRequests;
     }
 
+    function isNationAllianceAdmin(uint256 allianceId, uint256 nationId) external view returns (bool) {
+        return alliances[allianceId].admins[nationId];
+    }
+
     mapping(uint256 => Alliance) public alliances;
     mapping(uint256 => uint256) public nationToAlliance; // Maps nation ID to alliance ID
     mapping(uint256 => bool) public allianceExists; // Tracks if an alliance exists

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { usePublicClient, useAccount, useWriteContract } from 'wagmi';
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 import { getNationAlliance, getNationAllianceAndPlatoon, getAllianceMembers, getJoinRequests } from "~~/utils/alliance";
-import { createAlliance, requestToJoinAlliance, approveNationJoin, assignNationToPlatoon, addAdmin, removeAdmin, removeNationFromAlliance } from "~~/utils/alliance";
+import { createAlliance, requestToJoinAlliance, approveNationJoin, assignNationToPlatoon, addAdmin, removeAdmin, removeNationFromAlliance, isAdmin as checkIsAdmin } from "~~/utils/alliance";
 
 const AllianceManagement = () => {
     const publicClient = usePublicClient();
@@ -19,82 +19,137 @@ const AllianceManagement = () => {
     const [nations, setNations] = useState<{ id: string; name: string }[]>([]);
     const [selectedNation, setSelectedNation] = useState<string | null>(null);
     const [allianceToJoin, setAllianceToJoin] = useState<string | null>(null);
-    const [nationAlliance, setNationAlliance] = useState<string | null>(null);
-    const [nationPlatoon, setNationPlatoon] = useState<string | null>(null);
-    const [nationAllianceName, setNationAllianceName] = useState<string | null>(null);
+    const [currentNationAlliance, setCurrentNationAlliance] = useState<string | null>(null);
+    const [currentNationPlatoon, setCurrentNationPlatoon] = useState<string | null>(null);
+    const [currentNationAllianceName, setCurrentNationAllianceName] = useState<string | null>(null);
     const [allianceMembers, setAllianceMembers] = useState<any[]>([]);
     const [joinRequests, setJoinRequests] = useState<any[]>([]);
     const [allianceName, setAllianceName] = useState<string>("");
     const [platoonId, setPlatoonId] = useState<string>("");
+    const [assignPlatoonNationId, setAssignPlatoonNationId] = useState<string>("");
     const [adminNationId, setAdminNationId] = useState<string>("");
     const [selectedJoinRequest, setSelectedJoinRequest] = useState<string>("");
+    const [nationNames, setNationNames] = useState<{ [key: string]: string }>({});
+    const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
     useEffect(() => {
+        const fetchNations = async () => {
+            setLoading(true);
+            if (!publicClient || !CountryMinter) {
+                console.error("Missing required data: publicClient or CountryMinter.");
+                setLoading(false);
+                return;
+            }
+            try {
+                const ownedNations = await publicClient.readContract({
+                    abi: CountryMinter.abi,
+                    address: CountryMinter.address,
+                    functionName: "tokensOfOwner",
+                    args: [walletAddress],
+                });
+
+                const formattedNations = (ownedNations as string[]).map((id: string) => ({ id, name: `Nation ${id}` }));
+                setNations(formattedNations);
+            } catch (err) {
+                console.error("Error fetching nations:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchNations();
     }, [publicClient, CountryParametersContract, CountryMinter, walletAddress]);
 
     useEffect(() => {
-        if (selectedNation) {
-            fetchNationAlliance();
-        }
+        if (!selectedNation || !CountryParametersContract) return;
+    
+        const fetchNationAlliance = async () => {
+            try {
+                const [alliance, platoon, allianceName] = await getNationAllianceAndPlatoon(selectedNation, publicClient, CountryParametersContract);
+                setCurrentNationAlliance(alliance);
+                setCurrentNationPlatoon(platoon);
+                setCurrentNationAllianceName(allianceName);
+                setIsAdmin(false);
+                
+                if (alliance !== "0") {
+                    const members = await getAllianceMembers(alliance, publicClient, CountryParametersContract);
+                    setAllianceMembers(members);
+                    fetchJoinRequests(alliance);
+                    
+                    const adminStatus = await checkIsAdmin(alliance, selectedNation, publicClient, CountryParametersContract);
+                    setIsAdmin(adminStatus);
+                } else {
+                    // Clear alliance members when no alliance exists
+                    setAllianceMembers([]);
+                }
+            } catch (error) {
+                console.error("Error fetching alliance data:", error);
+            }
+        };
+    
+        fetchNationAlliance();
     }, [selectedNation]);
 
-    const fetchNations = async () => {
-        setLoading(true);
-        if (!publicClient || !CountryMinter) {
-            console.error("Missing required data: publicClient or CountryMinter.");
-            setLoading(false);
-            return;
-        }
-        try {
-            const ownedNations = await publicClient.readContract({
-                abi: CountryMinter.abi,
-                address: CountryMinter.address,
-                functionName: "tokensOfOwner",
-                args: [walletAddress],
-              });
+    useEffect(() => {
+        console.log("Updated State -> Alliance:", currentNationAlliance, "Platoon:", currentNationPlatoon, "Alliance Name:", currentNationAllianceName);
+    }, [currentNationAlliance, currentNationPlatoon, currentNationAllianceName]);
 
-            const formattedNations = (ownedNations as string[]).map((id: string) => ({ id, name: `Nation ${id}` }));
-            setNations(formattedNations);
-            if (allianceToJoin) {
-                fetchJoinRequests(allianceToJoin);
+    useEffect(() => {
+        const checkAdminStatus = async () => {
+            if (!currentNationAlliance || currentNationAlliance === "0" || !selectedNation) {
+                setIsAdmin(false);
+                return;
             }
-        } catch (err) {
-            console.error("Error fetching nations:", err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchNationAlliance = async () => {
-        if (!selectedNation || !CountryParametersContract) return;
-        try {
-            const [alliance, platoon, allianceName] = await getNationAllianceAndPlatoon(selectedNation, publicClient, CountryParametersContract);
-            setNationAlliance(alliance);
-            setNationPlatoon(platoon);
-            setNationAllianceName(allianceName)
-            if (alliance !== "0") {
-                fetchAllianceMembers(alliance);
-                fetchJoinRequests(alliance);
+    
+            try {
+                const adminStatus = await checkIsAdmin(currentNationAlliance, selectedNation, publicClient, CountryParametersContract);
+                setIsAdmin(adminStatus);
+            } catch (error) {
+                console.error("Error checking admin status:", error);
+                setIsAdmin(false);
             }
-        } catch (error) {
-            console.error("Error fetching alliance data:", error);
-        }
-    };
+        };
+    
+        checkAdminStatus();
+    }, [currentNationAlliance, selectedNation]); 
 
-    const fetchAllianceMembers = async (allianceId: string) => {
-        try {
-            const members = await getAllianceMembers(allianceId, publicClient, CountryParametersContract);
-            setAllianceMembers(members);
-        } catch (error) {
-            console.error("Error fetching alliance members:", error);
-        }
-    };
+    useEffect(() => {
+        const fetchAllNationNames = async () => {
+            if (!publicClient || !CountryParametersContract || allianceMembers.length === 0) return;
+            
+            const missingMembers = allianceMembers.filter(member => !nationNames[member]);
+            if (missingMembers.length === 0) return;
+            
+            try {
+                const nationNamesArray = await Promise.all(
+                    missingMembers.map(async (nationId) => {
+                        try {
+                            const name = await publicClient.readContract({
+                                abi: CountryParametersContract.abi,
+                                address: CountryParametersContract.address,
+                                functionName: "getNationName",
+                                args: [nationId],
+                            });
+                            return { [nationId]: name as string };
+                        } catch {
+                            return { [nationId]: "Unknown" };
+                        }
+                    })
+                );
+
+                const updatedNames = Object.assign({}, ...nationNamesArray);
+                setNationNames(prev => ({ ...prev, ...updatedNames }));
+            } catch (error) {
+                console.error("Error fetching nation names:", error);
+            }
+        };
+
+        fetchAllNationNames();
+    }, [allianceMembers]);
 
     const fetchJoinRequests = async (allianceId: string) => {
         try {
             const requests = await getJoinRequests(allianceId, publicClient, CountryParametersContract);
-            console.log("requests", requests);
             setJoinRequests(requests);
         } catch (error) {
             console.error("Error fetching join requests:", error);
@@ -103,7 +158,6 @@ const AllianceManagement = () => {
     
     // Log the updated state whenever joinRequests changes
     useEffect(() => {
-        console.log("Updated joinRequests:", joinRequests);
     }, [joinRequests]);
 
     const handleCreateAlliance = async () => {
@@ -112,7 +166,7 @@ const AllianceManagement = () => {
             return;
         }
         await createAlliance(selectedNation, allianceName, publicClient, CountryParametersContract, writeContractAsync);
-        fetchNationAlliance();
+        // fetchNationAlliance();
     };
     
 
@@ -134,36 +188,39 @@ const AllianceManagement = () => {
     
 
     const handleApproveJoin = async () => {
-        if (!nationAlliance || !selectedJoinRequest || !selectedNation) return;
+        if (!currentNationAlliance || !selectedJoinRequest || !selectedNation) return;
         try {
-            await approveNationJoin(nationAlliance, selectedJoinRequest, selectedNation, publicClient, CountryParametersContract, writeContractAsync);
+            await approveNationJoin(currentNationAlliance, selectedJoinRequest, selectedNation, publicClient, CountryParametersContract, writeContractAsync);
             alert("Request approved!");
-            fetchNationAlliance();
+            // fetchNationAlliance();
         } catch (error) {
             console.error("Error approving join request:", error);
         }
     };
 
     const handleAssignPlatoon = async () => {
-        if (!nationAlliance || !selectedNation || !platoonId) return;
-        await assignNationToPlatoon(nationAlliance, selectedNation, platoonId, selectedNation, publicClient, CountryParametersContract, writeContractAsync);
-        fetchNationAlliance();
+        if (!currentNationAlliance || !assignPlatoonNationId || !platoonId) return;
+        if (currentNationAlliance && assignPlatoonNationId && platoonId && selectedNation) {
+            await assignNationToPlatoon(currentNationAlliance, assignPlatoonNationId, platoonId, selectedNation, publicClient, CountryParametersContract, writeContractAsync);
+        } else {
+            console.error("Missing required data for assigning platoon.");
+        }
     };
 
     const handleAddAdmin = async () => {
-        if (!nationAlliance || !selectedNation || !adminNationId) return;
-        await addAdmin(nationAlliance, adminNationId, selectedNation, publicClient, CountryParametersContract, writeContractAsync);
+        if (!currentNationAlliance || !selectedNation || !adminNationId) return;
+        await addAdmin(currentNationAlliance, adminNationId, selectedNation, publicClient, CountryParametersContract, writeContractAsync);
     };
 
     const handleRemoveAdmin = async () => {
-        if (!nationAlliance || !selectedNation || !adminNationId) return;
-        await removeAdmin(nationAlliance, adminNationId, selectedNation, publicClient, CountryParametersContract, writeContractAsync);
+        if (!currentNationAlliance || !selectedNation || !adminNationId) return;
+        await removeAdmin(currentNationAlliance, adminNationId, selectedNation, publicClient, CountryParametersContract, writeContractAsync);
     };
 
     const handleRemoveNation = async (nationId: string) => {
-        if (!nationAlliance || !selectedNation) return;
-        await removeNationFromAlliance(nationAlliance, nationId, selectedNation, publicClient, CountryParametersContract, writeContractAsync);
-        fetchNationAlliance();
+        if (!currentNationAlliance || !selectedNation) return;
+        await removeNationFromAlliance(currentNationAlliance, nationId, selectedNation, publicClient, CountryParametersContract, writeContractAsync);
+        // fetchNationAlliance();
     };
 
     return (
@@ -222,35 +279,106 @@ const AllianceManagement = () => {
                         </button>
                     </div>
     
-                    {nationAlliance && nationAlliance !== "0" && (
+                    {selectedNation && (
                         <>
                             {/* Alliance Info */}
                             <div className="p-4 bg-base-200 rounded-lg shadow-md mt-4">
-                                <h3 className="text-lg font-semibold text-primary">Your Alliance</h3>
-                                <p className="text-base text-secondary-content">
-                                    {nationAlliance.toString()}: {allianceName}
-                                </p>
-                                <h4 className="text-sm font-medium mt-2">Platoon: {nationPlatoon || "Not Assigned"}</h4>
+                                <h3 className="text-lg font-semibold text-primary">Your Current Alliance</h3>
+                                {currentNationAlliance && currentNationAlliance !== "0" ? (
+                                    <>
+                                        <p className="text-base text-secondary-content">
+                                            Alliance ID: {currentNationAlliance.toString()}
+                                        </p>
+                                        <p className="text-base text-secondary-content">
+                                            Alliance Name: {currentNationAllianceName}
+                                        </p>
+                                        <p className="text-sm font-medium mt-2">Platoon: {currentNationPlatoon?.toString() || "Not Assigned"}</p>
+                                    </>
+                                ) : (
+                                    <p className="text-sm text-secondary-content mt-2">This nation is not part of any alliance.</p>
+                                )}
                             </div>
     
-                            {/* Assign Platoon */}
-                            <div className="p-4 bg-base-200 rounded-lg shadow-md mt-4">
-                                <h3 className="text-lg font-semibold text-primary">Assign a Nation to a Platoon</h3>
-                                <input 
-                                    type="text" 
-                                    placeholder="Platoon ID" 
-                                    value={platoonId.toString()} 
-                                    onChange={(e) => setPlatoonId(e.target.value)} 
-                                    className="input input-bordered w-full bg-base-100 text-base-content mt-2"
-                                />
-                                <button 
-                                    onClick={handleAssignPlatoon} 
-                                    className="btn btn-primary w-full mt-3"
-                                >
-                                    Assign Platoon
-                                </button>
-                            </div>
-    
+                            {isAdmin && currentNationAlliance !== "0" && (
+                                <>
+                                    {/* Assign Platoon */}
+                                    <div className="p-4 bg-base-200 rounded-lg shadow-md mt-4">
+                                        <h3 className="text-lg font-semibold text-primary">Assign a Nation to a Platoon</h3>
+                                        <input 
+                                            type="text" 
+                                            placeholder="Nation ID" 
+                                            value={assignPlatoonNationId} 
+                                            onChange={(e) => setAssignPlatoonNationId(e.target.value)} 
+                                            className="input input-bordered w-full bg-base-100 text-base-content mt-2"
+                                        />
+                                        <input 
+                                            type="text" 
+                                            placeholder="Platoon ID" 
+                                            value={platoonId} 
+                                            onChange={(e) => setPlatoonId(e.target.value)} 
+                                            className="input input-bordered w-full bg-base-100 text-base-content mt-2"
+                                        />
+                                        <button 
+                                            onClick={handleAssignPlatoon} 
+                                            className="btn btn-primary w-full mt-3"
+                                        >
+                                            Assign Platoon
+                                        </button>
+                                    </div>
+            
+                                    {/* Join Requests */}
+                                    <div className="p-4 bg-base-200 rounded-lg shadow-md mt-4">
+                                        <h3 className="text-lg font-semibold text-primary">Join Requests</h3>
+                                        <select 
+                                            onChange={(e) => setSelectedJoinRequest(e.target.value)} 
+                                            value={selectedJoinRequest.toString()}
+                                            className="select select-bordered w-full bg-base-100 text-base-content mt-2"
+                                        >
+                                            <option value="">Select a Nation</option>
+                                            {Array.isArray(joinRequests) && joinRequests.length > 0 ? (
+                                                joinRequests.map((request) => (
+                                                    <option key={request} value={request}>{request.toString()}</option>
+                                                ))
+                                            ) : (
+                                                <option>No requests available</option>
+                                            )}
+                                        </select>
+                                        <button 
+                                            onClick={handleApproveJoin} 
+                                            className="btn btn-success w-full mt-3"
+                                        >
+                                            Approve Join Request
+                                        </button>
+                                    </div>
+            
+                                    {/* Manage Admins */}
+                                    <div className="p-4 bg-base-200 rounded-lg shadow-md mt-4">
+                                        <h3 className="text-lg font-semibold text-primary">Manage Admins</h3>
+                                        <input 
+                                            type="text" 
+                                            placeholder="Nation ID" 
+                                            value={adminNationId.toString()} 
+                                            onChange={(e) => setAdminNationId(e.target.value)} 
+                                            className="input input-bordered w-full bg-base-100 text-base-content mt-2"
+                                        />
+                                        <div className="mt-3 flex gap-2">
+                                            <button 
+                                                onClick={handleAddAdmin} 
+                                                className="btn btn-accent flex-1"
+                                            >
+                                                Add Admin
+                                            </button>
+                                            <button 
+                                                onClick={handleRemoveAdmin} 
+                                                className="btn btn-error flex-1"
+                                            >
+                                                Remove Admin
+                                            </button>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                            
                             {/* Alliance Members */}
                             <div className="p-4 bg-base-200 rounded-lg shadow-md mt-4">
                                 <h3 className="text-lg font-semibold text-primary">Alliance Members</h3>
@@ -258,70 +386,21 @@ const AllianceManagement = () => {
                                     <ul className="list-disc pl-5">
                                         {allianceMembers.map((member) => (
                                             <li key={member} className="flex justify-between items-center mt-2">
-                                                <span>{member}</span>
-                                                <button 
-                                                    onClick={() => handleRemoveNation(member)} 
-                                                    className="btn btn-error btn-sm"
-                                                >
-                                                    Remove
-                                                </button>
+                                                <span>{member.toString()}: {nationNames[member] || "Loading..."}</span>
+                                                {isAdmin && (
+                                                    <button 
+                                                        onClick={() => handleRemoveNation(member)} 
+                                                        className="btn btn-error btn-sm"
+                                                    >
+                                                        Remove
+                                                    </button>
+                                                )}
                                             </li>
                                         ))}
                                     </ul>
                                 ) : (
                                     <p className="text-sm text-secondary-content mt-2">No members found.</p>
                                 )}
-                            </div>
-    
-                            {/* Join Requests */}
-                            <div className="p-4 bg-base-200 rounded-lg shadow-md mt-4">
-                                <h3 className="text-lg font-semibold text-primary">Join Requests</h3>
-                                <select 
-                                    onChange={(e) => setSelectedJoinRequest(e.target.value)} 
-                                    value={selectedJoinRequest.toString()}
-                                    className="select select-bordered w-full bg-base-100 text-base-content mt-2"
-                                >
-                                    <option value="">Select a Nation</option>
-                                    {Array.isArray(joinRequests) && joinRequests.length > 0 ? (
-                                        joinRequests.map((request) => (
-                                            <option key={request} value={request}>{request.toString()}</option>
-                                        ))
-                                    ) : (
-                                        <option>No requests available</option>
-                                    )}
-                                </select>
-                                <button 
-                                    onClick={handleApproveJoin} 
-                                    className="btn btn-success w-full mt-3"
-                                >
-                                    Approve Join Request
-                                </button>
-                            </div>
-    
-                            {/* Manage Admins */}
-                            <div className="p-4 bg-base-200 rounded-lg shadow-md mt-4">
-                                <h3 className="text-lg font-semibold text-primary">Manage Admins</h3>
-                                <input 
-                                    type="text" 
-                                    placeholder="Nation ID" 
-                                    value={adminNationId.toString()} 
-                                    onChange={(e) => setAdminNationId(e.target.value)} 
-                                    className="input input-bordered w-full bg-base-100 text-base-content mt-2"
-                                />
-                                <div className="mt-3 flex gap-2">
-                                    <button 
-                                        onClick={handleAddAdmin} 
-                                        className="btn btn-accent flex-1"
-                                    >
-                                        Add Admin
-                                    </button>
-                                    <button 
-                                        onClick={handleRemoveAdmin} 
-                                        className="btn btn-error flex-1"
-                                    >
-                                        Remove Admin
-                                    </button>
-                                </div>
                             </div>
                         </>
                     )}

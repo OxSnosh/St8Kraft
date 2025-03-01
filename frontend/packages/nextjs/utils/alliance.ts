@@ -253,3 +253,22 @@ export const getJoinRequests = async (
         args: [allianceId],
     });
 };
+
+export const isAdmin = async (
+    allianceId: string,
+    nationId: string,
+    publicClient: any,
+    allianceContract: any
+) => {
+    if (!publicClient || !allianceContract || !allianceId || !nationId) {
+        console.error("Missing required data: publicClient, allianceContract, allianceId, or nationId.");
+        return;
+    }
+
+    return await publicClient.readContract({
+        abi: allianceContract.abi,
+        address: allianceContract.address,
+        functionName: "isNationAllianceAdmin",
+        args: [allianceId, nationId],
+    });
+}

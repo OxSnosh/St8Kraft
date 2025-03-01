@@ -15,13 +15,14 @@ import "./KeeperFile.sol";
 import "./Environment.sol";
 import "./NavyBattle.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "hardhat/console.sol";
 
 ///@title TaxesContract
 ///@author OxSnosh
 ///@dev this contract inherits from the open zeppelin ownable contract
 ///@notice this contract will allow a nation owner to collect taxes from their citizens
-contract TaxesContract is Ownable {
+contract TaxesContract is Ownable, ReentrancyGuard {
     address public countryMinter;
     address public infrastructure;
     address public treasury;
@@ -146,7 +147,7 @@ contract TaxesContract is Ownable {
     ///@dev this is a public function callable only by the nation owner collecting taxes
     ///@notice this function will allow a nation owner to collect taxes from their citizens
     ///@param id this is the nation id of the nation collecting taxes
-    function collectTaxes(uint256 id) public {
+    function collectTaxes(uint256 id) public nonReentrant {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation owner");
         (bool war, ) = mil.getWarPeacePreference(id);
@@ -170,20 +171,17 @@ contract TaxesContract is Ownable {
         uint256 daysSinceLastTaxCollection = tsy.getDaysSinceLastTaxCollection(
             id
         );
-        (uint256 citizenCount, ) = inf.getTaxablePopulationCount(0);
+        (uint256 citizenCount, ) = inf.getTaxablePopulationCount(id);
         uint256 taxRate = inf.getTaxRate(id);
         uint256 dailyTaxesCollectiblePerCitizen = (dailyIncomePerCitizen *
             taxRate);
-        uint256 taxesCollectible = (dailyTaxesCollectiblePerCitizen *
-            daysSinceLastTaxCollection *
-            citizenCount) * (10 ** 18);
+        uint256 taxesCollectible = ((dailyTaxesCollectiblePerCitizen *
+            daysSinceLastTaxCollection) * citizenCount) * (10 ** 18);
         uint256 mod = 100;
-        uint256 percentageReductionForBlockades = blk.getBlockadePercentageReduction(
-            id
-        );
+        uint256 percentageReductionForBlockades = blk
+            .getBlockadePercentageReduction(id);
         mod = mod - percentageReductionForBlockades;
-        console.log("mod", mod);
-        taxesCollectible = ((taxesCollectible * mod) / 100);        
+        taxesCollectible = ((taxesCollectible * mod) / 100);
         return (dailyTaxesCollectiblePerCitizen, taxesCollectible);
     }
 
@@ -614,8 +612,6 @@ contract TaxesContract is Ownable {
         return subtractTaxPoints;
     }
 
-
-
     function getPointsFromCriminals(uint256 id) public view returns (uint256) {
         (uint256 unincarceratedCriminals, , ) = crm.getCriminalCount(id);
         uint256 pointsFromCrime;
@@ -837,9 +833,9 @@ contract AdditionalTaxesContract is Ownable {
             id
         );
         if (universities > 0 && !scientificDevelopmentCenter) {
-                universityPoints = (universities * 8);
+            universityPoints = (universities * 8);
         } else if (universities > 0 && scientificDevelopmentCenter) {
-                universityPoints = (universities * 10);
+            universityPoints = (universities * 10);
         }
         return universityPoints;
     }
@@ -878,7 +874,7 @@ contract AdditionalTaxesContract is Ownable {
     ) public view returns (uint256, bool, bool) {
         uint256 soldierCount = frc.getSoldierCount(id);
         if (soldierCount == 0) {
-            return(0, false, true);
+            return (0, false, true);
         }
         uint256 populationCount = inf.getTotalPopulationCount(id);
         uint256 soldierPopulationRatio = (
@@ -895,7 +891,7 @@ contract AdditionalTaxesContract is Ownable {
         return (soldierPopulationRatio, environmentPenalty, anarchyCheck);
     }
 
-        function getPointsFromIntelAgencies(
+    function getPointsFromIntelAgencies(
         uint256 id
     ) public view returns (uint256) {
         uint256 intelAgencies = imp2.getIntelAgencyCount(id);

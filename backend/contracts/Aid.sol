@@ -10,10 +10,11 @@ import "./KeeperFile.sol";
 import "./Senate.sol";
 import "./CountryParameters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 /// @title AidContract this contract facilitates aid being sent between nations
 /// @author OxSnosh
-contract AidContract is Ownable {
+contract AidContract is Ownable, ReentrancyGuard {
     address public countryMinter;
     address public treasury;
     address public forces;
@@ -115,7 +116,7 @@ contract AidContract is Ownable {
         uint256 techAid,
         uint256 balanceAid,
         uint256 soldiersAid
-    ) public {
+    ) public nonReentrant {
         bool isOwner = mint.checkOwnership(idSender, msg.sender);
         require(isOwner, "!nation ruler");
         bool availableAidSlot = checkAidSlots(idSender);
@@ -340,18 +341,15 @@ contract AidContract is Ownable {
     ///@dev this is a public function that is callable by the recipient of the aid proposal
     ///@notice this function is called by the recipient of an aid proposal in order to accept the aid
     ///@param proposalId this id the ID of the aid proposal
-    function acceptProposal(uint256 proposalId) public {
-        bool expired = proposalExpired(proposalId);
-        require(expired == false, "proposal expired");
+    function acceptProposal(uint256 proposalId) public nonReentrant{
+        require(!proposalExpired(proposalId), "proposal expired");
+        require(!idToProposal[proposalId].accepted, "this offer has been accepted already");
+        require(!idToProposal[proposalId].cancelled, "this offer has been cancelled");
         uint256 idSender = idToProposal[proposalId].idSender;
         uint256 idRecipient = idToProposal[proposalId].idRecipient;
         uint256 tech = idToProposal[proposalId].techAid;
         uint256 balance = idToProposal[proposalId].balanceAid;
         uint256 soldiers = idToProposal[proposalId].soldierAid;
-        bool accepted = idToProposal[proposalId].accepted;
-        require(accepted == false, "this offer has been accepted already");
-        bool cancelled = idToProposal[proposalId].cancelled;
-        require(cancelled == false, "this offer has been cancelled");
         address addressRecipient = mint.ownerOf(idRecipient);
         require(
             addressRecipient == msg.sender,
@@ -361,6 +359,7 @@ contract AidContract is Ownable {
         require(!sanctioned, "trade not possible");
         bool available = checkAvailability(idSender, tech, balance, soldiers);
         require(available, "balances not available");
+        idToProposal[proposalId].accepted = true;
         InfrastructureContract(infrastructure).sendTech(
             idSender,
             idRecipient,
@@ -372,7 +371,6 @@ contract AidContract is Ownable {
             balance
         );
         ForcesContract(forces).sendSoldiers(idSender, idRecipient, soldiers);
-        idToProposal[proposalId].accepted = true;
         finishAcceptProposal(
             proposalId,
             idSender,
