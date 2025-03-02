@@ -813,7 +813,7 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
   };
 
   return (
-      <div className="flex w-full p-6 bg-aged-paper text-base-content rounded-lg shadow-center">
+      <div className="font-special flex w-full p-6 bg-aged-paper text-base-content rounded-lg shadow-center">
           {/* Left Sidebar - News Carousel Tabs */}
           <div className="w-3/12 pr-4 border-r border-neutral flex flex-col gap-3">
               <h2 className="text-2xl font-bold text-primary-content text-center">Nation Details</h2>

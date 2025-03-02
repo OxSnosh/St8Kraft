@@ -1259,7 +1259,7 @@ const ActiveWars = () => {
         if (!selectedWar || !selectedNation || !defendingNationId) return null;
     
         return (
-            <div className="border border-blue-800 p-4 rounded-lg shadow-md mt-4">
+            <div className="font-special border border-blue-800 p-4 rounded-lg shadow-md mt-4">
                 <h2 className="text-lg font-bold">Naval Warfare</h2>
     
                 {/* Attacking Navy */}
@@ -1286,7 +1286,7 @@ const ActiveWars = () => {
     
     
     return (
-        <div className="w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
+        <div className="font-special w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
             <h1 className="text-3xl font-bold text-primary-content text-center mb-4">Manage Wars</h1>
     
             {/* Nation Selection */}

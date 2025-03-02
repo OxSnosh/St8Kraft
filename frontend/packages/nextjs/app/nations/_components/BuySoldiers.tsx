@@ -175,7 +175,7 @@ const BuySoldiers = () => {
     // };
 
     return (
-        <div className="w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
+        <div className="font-special w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
             <h2 className="text-2xl font-bold text-primary-content text-center mb-4">🪖 Buy Soldiers</h2>
     
             {/* Error Message Handling */}

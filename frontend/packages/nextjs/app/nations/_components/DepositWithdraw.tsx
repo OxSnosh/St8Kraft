@@ -137,7 +137,7 @@ const DepositWithdraw = () => {
   }, [nationId, walletAddress]);
 
   return (
-    <div className="w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
+    <div className="font-special w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
         <h2 className="text-2xl font-bold text-primary-content text-center mb-4">🏦 Manage Nation Funds</h2>
         <p className="text-sm text-center mb-4">Deposit or Withdraw WarBucks for your nation.</p>
 

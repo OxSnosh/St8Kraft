@@ -67,7 +67,7 @@ const MessagesComponent = () => {
     };
 
     return (
-        <div className="bg-aged-paper text-base-content p-6 rounded-lg shadow-center w-full max-w-2xl mx-auto border border-neutral">
+        <div className="font-special bg-aged-paper text-base-content p-6 rounded-lg shadow-center w-full max-w-2xl mx-auto border border-neutral">
             <h2 className="text-2xl font-bold text-primary-content text-center mb-4">📜 Nation Messages</h2>
     
             {/* SEND MESSAGE SECTION */}

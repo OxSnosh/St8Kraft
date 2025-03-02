@@ -273,14 +273,14 @@ const Nation = () => {
         {walletAddress && mintedNations.length > 0 && (
           <div className="relative">
             <button
-              className="btn btn-sm bg-secondary text-white hover:bg-secondary-dark"
+              className="font-special btn btn-sm bg-secondary text-white hover:bg-secondary-dark"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
               My Nations
             </button>
   
             {isDropdownOpen && (
-              <ul className="absolute left-0 mt-2 p-2 shadow bg-primary text-white rounded-box w-52">
+              <ul className="font-special absolute left-0 mt-2 p-2 shadow bg-primary text-white rounded-box w-52">
                 {mintedNations.map(nation => (
                   <li
                     key={nation.href}

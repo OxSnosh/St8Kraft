@@ -56,7 +56,7 @@ const TransferDeleteNation = () => {
     };
 
     return (
-        <div className="bg-aged-paper text-base-content p-6 rounded-lg shadow-center w-full max-w-md mx-auto border border-neutral">
+        <div className="font-special bg-aged-paper text-base-content p-6 rounded-lg shadow-center w-full max-w-md mx-auto border border-neutral">
             <h2 className="text-2xl font-bold text-primary-content text-center mb-4">Manage Your Nation</h2>
 
             {/* DELETE NATION SECTION */}

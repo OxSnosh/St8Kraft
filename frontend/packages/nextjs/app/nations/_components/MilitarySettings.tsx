@@ -215,7 +215,7 @@ const handleToggleWarPeace = async () => {
 
 
   return (
-    <div className="p-6 border-l-4 rounded-lg shadow-center bg-aged-paper text-base-content border-primary transition-all">
+    <div className="font-special p-6 border-l-4 rounded-lg shadow-center bg-aged-paper text-base-content border-primary transition-all">
         <h3 className="text-2xl font-bold text-primary-content text-center">Military Settings</h3>
         <p className="text-sm text-center text-secondary-content mb-4">Modify your nation's military settings below.</p>
 

@@ -1,5 +1,3 @@
-import { Sen } from "next/font/google";
-
 
 export const voteForSenator = async (
     voterId: string,

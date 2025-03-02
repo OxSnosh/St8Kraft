@@ -264,7 +264,7 @@ const ManageAid = () => {
     }
 
     return (
-        <div className="p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
+        <div className="font-special p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
             <h2 className="text-2xl font-bold text-primary-content text-center mb-4">Aid Management</h2>
     
             {/* Sending Nation Table */}

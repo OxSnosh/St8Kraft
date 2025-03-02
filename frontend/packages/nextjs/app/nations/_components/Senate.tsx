@@ -12,7 +12,10 @@ import {
     voteForSenator,
     sanctionTeamMember,
     liftSanctionVote,
-    isSenator
+    isSenator,
+    getSenators,
+    getSenatorVotes,
+    isSanctioned
 } from "~~/utils/senate";
 
 const Senate = () => {
@@ -28,6 +31,9 @@ const Senate = () => {
     const [isUserSenator, setIsUserSenator] = useState(false);
     const [teamMemberId, setTeamMemberId] = useState("");
     const [senatorId, setSenatorId] = useState("");
+    const [teamSenators, setTeamSenators] = useState<string[]>([]);
+    const [topSenatorVotes, setTopSenatorVotes] = useState<string[]>([]);
+    const [sanctionMessage, setSanctionMessage] = useState<string>("");
 
     useEffect(() => {
         if (nationId) {
@@ -39,7 +45,10 @@ const Senate = () => {
         if (!nationId || !publicClient || !allContractsData.SenateContract) return;
 
         try {
+            // Get senator status
             const senatorStatus = await isSenator(nationId, allContractsData.SenateContract, publicClient);
+            
+            // Get team number
             const teamData = await publicClient.readContract({
                 abi: allContractsData.CountryParametersContract.abi,
                 address: allContractsData.CountryParametersContract.address,
@@ -47,12 +56,54 @@ const Senate = () => {
                 args: [nationId],
             }) as string;
 
+            console.log("Team Data:", teamData);
+
+            const sanctionedStatus = await isSanctioned(nationId, teamData, allContractsData.SenateContract, publicClient);
+            console.log("Sanctioned Status:", sanctionedStatus);
+
+            // If sanctioned, update the sanction message
+            if (sanctionedStatus) {
+                setSanctionMessage(`You are sanctioned on team ${teamData}`);
+            } else {
+                setSanctionMessage("");
+            }
+
+            // Get list of senators for the team
+            const senatorsList = await getSenators(allContractsData.SenateContract, publicClient, teamData);
+
+            console.log("Senators List:", senatorsList);
+            
+            // Filter senators belonging to the same team
+            const teamSenators = senatorsList.filter((senator: { team: string }) => senator.team === teamData).map((s: { nationId: string }) => s.nationId);
+
+            console.log("Team Senators:", teamSenators);
+
+            // Get senator votes and determine top 5 most frequent
+            const votesArray = await getSenatorVotes(allContractsData.SenateContract, publicClient, teamData);
+            const top5Votes = getTop5Frequent(votesArray);
+
+            console.log("Top 5 Votes:", top5Votes);
+
+            // Update state
             setIsUserSenator(senatorStatus);
-            setTeam(teamData);
+            setTeam(teamData.toString());
+            setTeamSenators(teamSenators);
+            setTopSenatorVotes(top5Votes);
+
         } catch (error) {
             console.error("Error fetching senate details:", error);
         }
     };
+
+    // Function to get the top 5 most frequently voted senator nationIds
+    function getTop5Frequent(arr: string[]): string[] {
+        const countMap: { [key: string]: number } = {};
+        arr.forEach(id => countMap[id] = (countMap[id] || 0) + 1);
+        return Object.entries(countMap)
+            .sort((a, b) => b[1] - a[1]) // Sort by frequency descending
+            .slice(0, 5) // Take top 5
+            .map(entry => entry[0]); // Extract nationId
+    }
 
     function parseRevertReason(error: any): string {
         if (error?.data) {
@@ -71,7 +122,7 @@ const Senate = () => {
         return error?.message || "Transaction failed";
     }
 
-    
+
 
     const handleVoteForSenator = async () => {
         if (!nationId || !senatorId) return;
@@ -165,17 +216,6 @@ const Senate = () => {
         }
     };
 
-    // const handleLiftSanctionVote = async () => {
-    //     if (!nationId || !teamMemberId) return;
-
-    //     try {
-    //         await liftSanctionVote(nationId, teamMemberId, allContractsData.SenateContract, writeContractAsync);
-    //         alert("Sanction lifted!");
-    //     } catch (error) {
-    //         console.error("Error lifting sanction vote:", error);
-    //     }
-    // };
-
     const handleLiftSanctionVote = async () => {
         if (!nationId || !teamMemberId) return;
 
@@ -234,19 +274,47 @@ const Senate = () => {
     }
 
     return (
-        <div className="p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
+        <div className="font-special p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
             <h2 className="text-2xl font-bold text-primary-content text-center mb-4">Senate Management</h2>
     
             {/* Team Section */}
             {team && (
                 <div className="p-4 bg-base-200 rounded-lg shadow-md">
                     <h3 className="text-lg font-semibold text-primary">Team:</h3>
-                    <p className="text-base">{team}</p>
+                    <p className="text-base">Team: {team}</p>
+                    {sanctionMessage && (
+                        <p className="text-error font-semibold mt-2">{sanctionMessage}</p>
+                    )}
+                    
                     {isUserSenator && (
                         <p className="text-success-content font-semibold mt-2">
                             You are a senator of team {team}
                         </p>
                     )}
+                </div>
+            )}
+
+            {/* Team Senators */}
+            {teamSenators.length > 0 && (
+                <div className="p-4 bg-base-200 rounded-lg shadow-md mt-4">
+                    <h3 className="text-lg font-semibold text-primary">Senators for Team {team}:</h3>
+                    <ul className="list-disc ml-4">
+                        {teamSenators.map(senId => (
+                            <li key={senId} className="text-base">{senId}</li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+
+            {/* Top 5 Most Frequent Senator Votes */}
+            {topSenatorVotes.length > 0 && (
+                <div className="p-4 bg-base-200 rounded-lg shadow-md mt-4">
+                    <h3 className="text-lg font-semibold text-primary">Top 5 Most Voted Senators:</h3>
+                    <ul className="list-decimal ml-4">
+                        {topSenatorVotes.map(voteId => (
+                            <li key={voteId} className="text-base">{voteId}</li>
+                        ))}
+                    </ul>
                 </div>
             )}
     
