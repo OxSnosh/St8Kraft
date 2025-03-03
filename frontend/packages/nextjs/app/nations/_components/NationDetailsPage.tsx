@@ -233,6 +233,7 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
       alert("Message posted successfully!");
       setMessage(""); // Clear message input
   
+      window.location.reload()
     } catch (error: any) {
       const errorMessage = parseRevertReason(error);
       console.error("Transaction failed:", errorMessage);

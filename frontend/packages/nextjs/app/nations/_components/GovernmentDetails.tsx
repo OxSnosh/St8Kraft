@@ -171,7 +171,7 @@ const GovernmentDetails = () => {
 
   return (
     <div className="font-special p-6 border-l-4 rounded-lg shadow-center bg-aged-paper text-base-content border-primary transition-all">
-      <h3 className="text-2xl font-bold text-primary-content text-center">Update Nation Details</h3>
+      <h3 className="text-2xl font-bold text-primary-content text-center"><a href="gameplay/#country-parameters">Update Nation Details</a></h3>
       <p className="text-sm text-center text-secondary-content mb-4">Modify your nation's attributes below.</p>
 
       {Object.entries(formData).map(([key, value]) => (

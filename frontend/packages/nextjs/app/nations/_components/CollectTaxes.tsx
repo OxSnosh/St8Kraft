@@ -15,21 +15,18 @@ import {
     getTaxablePopulationCount, 
     collectTaxes 
 } from "~~/utils/taxes";
-import { checkOwnership } from "~~/utils/countryMinter";
-import { getWarPeacePreference } from "~~/utils/military";
+import { setTaxRate } from "~~/utils/infrastructure";
 import { useTheme } from "next-themes";
 
 const CollectTaxes = () => {
     const { theme } = useTheme();
+    const { address: walletAddress } = useAccount();
     const publicClient = usePublicClient();
     const contractsData = useAllContracts();
-    const { address: walletAddress } = useAccount();
     const searchParams = useSearchParams();
     const nationId = searchParams.get("id");
     const TaxesContract = contractsData?.TaxesContract;
     const InfrastructureContract = contractsData?.InfrastructureContract;
-    const CountryMinterContract = contractsData?.CountryMinter;
-    const MilitaryContract = contractsData?.MilitaryContract;
 
     const { writeContractAsync } = useWriteContract();
 
@@ -42,6 +39,7 @@ const CollectTaxes = () => {
     });
     const [errorMessage, setErrorMessage] = useState("");
     const [prevTaxesCollectible, setPrevTaxesCollectible] = useState("");
+    const [taxRateInput, setTaxRateInput] = useState(16);
 
     const fetchTaxDetails = useCallback(async () => {
         if (!nationId || !publicClient || !TaxesContract || !InfrastructureContract) return;
@@ -154,6 +152,22 @@ const CollectTaxes = () => {
         }
     }
 
+    const updateTaxRate = async () => {
+        if (!nationId || !InfrastructureContract) {
+            console.error("Missing required parameters for updating tax rate");
+            return;
+        }
+
+        try {
+            await setTaxRate(nationId, taxRateInput, InfrastructureContract, writeContractAsync);
+            alert("Tax rate updated successfully!");
+            fetchTaxDetails();
+        } catch (error) {
+            console.error("Error updating tax rate:", error);
+            alert("Failed to update tax rate");
+        }
+    };
+
     return (
         <div className="font-special w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
             <h2 className="text-2xl font-bold text-primary-content text-center mb-4">💰 Collect Taxes</h2>
@@ -191,7 +205,28 @@ const CollectTaxes = () => {
             >
                 Collect Now 💰
             </button>
+
+            {/* Update Tax Rate Input */}
+            <div className="mt-4 flex flex-col items-center">
+                <label className="text-lg font-medium">Set Tax Rate (%):</label>
+                <input 
+                    type="number" 
+                    min="16" 
+                    max="30" 
+                    value={taxRateInput} 
+                    onChange={(e) => setTaxRateInput(Number(e.target.value))} 
+                    className="input input-bordered w-32 mt-2"
+                />
+                <button 
+                    onClick={updateTaxRate} 
+                    className="btn btn-primary mt-2"
+                >
+                    Update Tax Rate
+                </button>
+            </div>
         </div>
+
+
     );
 };
 

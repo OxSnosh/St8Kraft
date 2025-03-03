@@ -1,4 +1,5 @@
 import { getTaxablePopulationCount } from './taxes';
+import { InfrastructureContract } from '../../../../backend/typechain-types/contracts/Infrastructure.sol/InfrastructureContract';
 
 export const getInfrastructureCount = async (
     nationId: string,
@@ -120,5 +121,30 @@ export const buyInfrastructure = async (
         return result;
     } catch (error) {
         console.error("Error buying infrastructure:", error);
+    }
+}
+
+export const setTaxRate = async (
+    nationId: string,
+    taxRate: number,
+    InfrastructureContract: any,
+    writeContractAsync: (args: any) => Promise<any>
+) => {
+    if (!nationId || !InfrastructureContract) {
+        console.error("Missing required data: nationId or InfrastructureContract.");
+        return;
+    }
+
+    try {
+        const result = await writeContractAsync({
+            abi: InfrastructureContract.abi,
+            address: InfrastructureContract.address,
+            functionName: "setTaxRate",
+            args: [nationId, taxRate],
+        });
+
+        return result;
+    } catch (error) {
+        console.error("Error setting tax rate:", error);
     }
 }
