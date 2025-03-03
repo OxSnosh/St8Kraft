@@ -245,7 +245,7 @@ export function MintNation() {
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center -330px",
         width: "100vw",
-        height: "3300px",
+        height: "2800px",
         position: "absolute",
         top: "0",
         left: "0"
@@ -289,55 +289,54 @@ export function MintNation() {
         </button>
       </div>
       
-      <div className="w-full text-center text-white" style={{ marginTop: "400px", paddingBottom: "100px" }}>
-        {nations.length === 0 ? (
-          <p>You do not have any minted nations yet.</p>
-        ) : (
-            <div
-              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 p-4"
-              style={{
-                minHeight: "800px",
-                marginTop: "50px", 
-              }}
-            >
-            {nations.map((nation, index) => (
-              <a
-                key={index}
-                href={`/nations?id=${nation.tokenId}`}
-                className="relative border rounded-lg font-orbitron text-black text-center overflow-hidden"
-                style={{
-                  width: "225px",
-                  height: "300px",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  position: "relative",
-                }}
-              >
-                <div
-                  className="absolute inset-0 rounded-lg"
-                  style={{
-                    backgroundImage: `url('/aged_paper.jpg')`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    backgroundRepeat: "no-repeat",
-                    width: "100%",
-                    height: "100%"
-                  }}
-                ></div>
+      <div className="w-full flex flex-col justify-center items-center text-white min-h-screen">
+  {nations.length === 0 ? (
+    <p className="text-center">You do not have any minted nations yet.</p>
+  ) : (
+    <div
+      className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 p-4"
+      style={{ minHeight: "800px", marginTop: "800px" }}
+    >
+      {nations.map((nation, index) => (
+        <a
+          key={index}
+          href={`/nations?id=${nation.tokenId}`}
+          className="relative rounded-lg font-orbitron text-black text-center overflow-hidden"
+          style={{
+            width: "225px",
+            height: "300px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            position: "relative",
+          }}
+        >
+          <div
+            className="absolute inset-0 rounded-lg"
+            style={{
+              backgroundImage: `url('/post-it-note.jpg')`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              width: "100%",
+              height: "100%",
+            }}
+          ></div>
 
-                <div className="font-special relative z-10 bg-opacity-90 p-4 rounded-lg">
-                  <h3 className="text-xl font-special">{nation.tokenId} : {nation.nationName}</h3>
-                  <p>Ruler: {nation.rulerName}</p>
-                  <p>Capital: {nation.capitalCity}</p>
-                  <p>Slogan: {nation.nationSlogan}</p>
-                </div>
-              </a>
-            ))}
+          <div className="font-special relative z-10 bg-opacity-90 p-4 rounded-lg">
+            <h3 className="text-xl font-special">
+              {nation.tokenId} : {nation.nationName}
+            </h3>
+            <p>Ruler: {nation.rulerName}</p>
+            <p>Capital: {nation.capitalCity}</p>
+            <p>Slogan: {nation.nationSlogan}</p>
           </div>
-        )}
-      </div>
+        </a>
+      ))}
+    </div>
+  )}
+</div>
 
     </div>
   );

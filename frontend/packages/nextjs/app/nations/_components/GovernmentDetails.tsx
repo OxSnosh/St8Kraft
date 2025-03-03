@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { usePublicClient, useAccount, useWriteContract } from "wagmi";
 import { useSearchParams } from "next/navigation";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
@@ -48,19 +48,17 @@ const GovernmentDetails = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  // ✅ Map Form Fields to Correct Contract Function Names
   const functionMappings: { [key: string]: string } = {
     rulerName: "setRulerName",
     nationName: "setNationName",
     capitalCity: "setCapitalCity",
     nationSlogan: "setNationSlogan",
-    alliance: "setAlliance", // ✅ Ensures correct mapping
+    alliance: "setAlliance",
     team: "setTeam",
     government: "setGovernment",
     religion: "setReligion",
   };
 
-  // ✅ Functions that require a STRING for value
   const stringFunctionFields = new Set([
     "rulerName",
     "nationName",
@@ -68,6 +66,16 @@ const GovernmentDetails = () => {
     "nationSlogan",
     "alliance",
   ]);
+
+  useEffect(() => {
+    if (successMessage || errorMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage("");
+        setErrorMessage("");
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage, errorMessage]);
 
   const updateFunctions: { [key: string]: Function } = {
     rulerName: setRulerName,
@@ -110,6 +118,8 @@ const GovernmentDetails = () => {
         return;
     }
 
+
+
     try {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
@@ -131,7 +141,13 @@ const GovernmentDetails = () => {
             return;
         }
 
-        // ✅ Ensure correct argument order based on field type
+        const balance = await checkBalance(walletAddress, publicClient, TreasuryContract);
+        if (balance < 20000000 && (field === "rulerName" || field === "nationName")) {
+          setErrorMessage("Insufficient balance to update " + field.replace(/([A-Z])/g, ' $1'));
+          setLoading(false);
+          return;
+        }
+
         let formattedArgs: any[];
 
         if (["rulerName", "nationName", "capitalCity", "nationSlogan", "alliance"].includes(field)) {
@@ -166,13 +182,21 @@ const GovernmentDetails = () => {
     } finally {
         setLoading(false);
     }
-};
+  };
 
 
   return (
     <div className="font-special p-6 border-l-4 rounded-lg shadow-center bg-aged-paper text-base-content border-primary transition-all">
       <h3 className="text-2xl font-bold text-primary-content text-center"><a href="gameplay/#country-parameters">Update Nation Details</a></h3>
       <p className="text-sm text-center text-secondary-content mb-4">Modify your nation's attributes below.</p>
+
+
+      {successMessage && (
+        <p className="mt-4 text-center text-sm text-success-content bg-success p-2 rounded-lg">{successMessage}</p>
+      )}
+      {errorMessage && (
+        <p className="mt-4 text-center text-sm text-error-content bg-error p-2 rounded-lg">{errorMessage}</p>
+      )}
 
       {Object.entries(formData).map(([key, value]) => (
         <form key={key} onSubmit={(e) => {
@@ -186,15 +210,11 @@ const GovernmentDetails = () => {
           <button type="submit" className="btn btn-primary w-full mt-3 disabled:opacity-50" disabled={loading}>
             {loading ? "Updating..." : `Update ${key.replace(/([A-Z])/g, ' $1')}`}
           </button>
+          {(key === "rulerName" || key === "nationName") && (
+            <p className="text-xs text-warning mt-1">⚠️ Updating this will cost 20,000,000 WBX</p>
+          )}
         </form>
       ))}
-
-      {successMessage && (
-        <p className="mt-4 text-center text-sm text-success-content bg-success p-2 rounded-lg">{successMessage}</p>
-      )}
-      {errorMessage && (
-        <p className="mt-4 text-center text-sm text-error-content bg-error p-2 rounded-lg">{errorMessage}</p>
-      )}
     </div>
   );
 };

@@ -158,8 +158,16 @@ export const Header = () => {
     fetchMintedNations();
   }, [walletAddress, countryMinterContract, publicClient, router]);
 
+  const handleNationSelect = (nationId: string, nationName: string) => {
+    console.log(`Nation selected: ${nationName} (ID: ${nationId})`);
+  
+    localStorage.setItem("selectedMenuItem", `Nation ${nationId}`);
+  
+    router.push(`/nations?id=${nationId}`);
+  };
+
   return (
-    <div className="sticky lg:static top-0 navbar bg-base-100 min-h-0 flex-shrink-0 justify-between z-20 shadow-md shadow-secondary px-0 sm:px-2">
+    <div className="font-special sticky lg:static top-0 navbar bg-base-100 min-h-0 flex-shrink-0 justify-between z-20 shadow-md shadow-secondary px-0 sm:px-2">
       <div className="navbar-start w-auto lg:w-1/2">
         <div className="lg:hidden dropdown" ref={burgerMenuRef}>
           <label
@@ -203,15 +211,18 @@ export const Header = () => {
         {walletAddress && mintedNations.length > 0 && (
           <div className="relative dropdown">
             <button className="btn btn-primary btn-sm">My Nations</button>
-            <ul className="dropdown-content menu mt-3 p-2 shadow bg-base-100 rounded-box w-52">
-              {mintedNations.map((nation) => (
-                <li key={nation.href}>
-                  <Link href={nation.href}>
-                    <span>{nation.name}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+              <ul className="dropdown-content menu mt-3 p-2 shadow bg-base-100 rounded-box w-52">
+                {mintedNations.map((nation) => (
+                  <li key={nation.href}>
+                    <button
+                      onClick={() => handleNationSelect(nation.href.split("=")[1], nation.name)}
+                      className="cursor-pointer hover:bg-secondary p-2 rounded w-full text-left"
+                    >
+                      {nation.name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
           </div>
         )}
         <RainbowKitCustomConnectButton />
