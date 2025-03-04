@@ -189,6 +189,7 @@ const BuyWonder = () => {
                 return;
             }
     
+            console.log("Transaction simulation passed.");
             // If the transaction simulation passes, proceed with the actual transaction
             if (nationId) {
                 try {
