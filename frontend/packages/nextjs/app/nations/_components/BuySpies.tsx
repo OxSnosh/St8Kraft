@@ -7,7 +7,7 @@ import { usePublicClient, useWriteContract } from "wagmi";
 import { useAccount } from "wagmi";
 import { checkOwnership } from "~~/utils/countryMinter";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
-import { buySpies, getMaxSpyCount, getSpyCount, getSpyPrice } from "~~/utils/spies";
+import { buySpies, getMaxSpyCount, getSpyCount, getSpyPrice, decommissionSpies } from "~~/utils/spies";
 import { checkBalance } from "~~/utils/treasury";
 import { ethers } from "ethers";
 import { parseRevertReason } from '../../../utils/errorHandling';
@@ -35,6 +35,7 @@ const BuySpies = () => {
 
   const [cost, setCost] = useState<string | null>(null);
   const [amountInput, setAmountInput] = useState<string>("");
+  const [decommissionAmount, setDecommissionAmount] = useState<string>("");
 
   useEffect(() => {
     const fetchBuySpyDetails = async () => {
@@ -49,7 +50,7 @@ const BuySpies = () => {
         setSpyDetails({
           warBucksBalance: (warBuckBalance / BigInt(10 ** 18)).toLocaleString(),
           spyCount: spyCount.toString(),
-          costPerSpy: (spyCost).toString(),
+          costPerSpy: (spyCost / BigInt(10**18)).toString(),
           getMaxSpyCount: maxSpyCount.toString(),
         });
 
@@ -142,9 +143,33 @@ const BuySpies = () => {
       }
   }
 
+  const handleDecommissionSpies = async (amount: number) => {
+    if (!amount || isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid amount to decommission.");
+        return;
+    }
+
+    if (!nationId) {
+        alert("Nation ID is missing.");
+        return;
+    }
+
+    try {
+        await decommissionSpies(amount, nationId, publicClient, SpyContract, writeContractAsync);
+        alert(`Successfully decommissioned ${amount} spies.`);
+    } catch (error) {
+        console.error("Error decommissioning spies:", error);
+        if (error instanceof Error) {
+            alert(`Transaction failed: ${error.message || "Unknown error"}`);
+        } else {
+            alert("Transaction failed: Unknown error");
+        }
+    }
+  };
+
   return (
     <div className="font-special w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
-        <h2 className="text-2xl font-bold text-primary-content text-center mb-4">🕵️ Buy Spies</h2>
+        <h2 className="text-2xl font-bold text-primary-content text-center mb-4">🕵️ Spy Operations</h2>
 
         {/* Error Message */}
         {errorMessage && (
@@ -174,7 +199,7 @@ const BuySpies = () => {
         {/* Spy Purchase Section */}
         <div className="bg-base-200 p-4 rounded-lg shadow-md">
             <label className="block text-sm font-medium mb-2 text-primary-content">
-                Enter Amount:
+                Enter Amount to Buy:
             </label>
             <input
                 type="number"
@@ -200,11 +225,32 @@ const BuySpies = () => {
             {cost !== null && (
                 <button
                     onClick={() => handleBuySpies(amountInput)}
-                    className="btn btn-error w-full mt-4 text-lg"
+                    className="btn btn-success w-full mt-4 text-lg"
                 >
                     🕵️ Buy {amountInput} Spies for {Number(amountInput) * Number(cost)} War Bucks
                 </button>
             )}
+        </div>
+
+        {/* Spy Decommission Section */}
+        <div className="bg-base-200 p-4 rounded-lg shadow-md mt-6">
+            <label className="block text-sm font-medium mb-2 text-primary-content">
+                Enter Amount to Decommission:
+            </label>
+            <input
+                type="number"
+                value={decommissionAmount}
+                onChange={(e) => setDecommissionAmount(e.target.value)}
+                className="input input-bordered w-full bg-base-100 text-base-content"
+                placeholder="Enter amount to decommission"
+            />
+
+            <button
+                onClick={() => handleDecommissionSpies(Number(decommissionAmount))}
+                className="btn btn-error w-full mt-4 text-lg"
+            >
+                🕵️ Decommission {decommissionAmount} Spies
+            </button>
         </div>
     </div>
   );

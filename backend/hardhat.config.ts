@@ -10,6 +10,7 @@ import "@typechain/hardhat"
 import "solidity-docgen"
 import 'solidity-coverage'
 import { HardhatUserConfig } from "hardhat/types"
+import "./tasks/set_religion_and_govt";
 import "./tasks/set_resources";
 
 /**

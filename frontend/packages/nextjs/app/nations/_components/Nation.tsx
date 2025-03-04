@@ -33,6 +33,9 @@ import Messages from "./Messages";
 import AllianceManagement from "./AllianceManagement";
 import { useAccount, usePublicClient } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
+import { CountryParametersContract } from '../../../../../../backend/typechain-types/contracts/CountryParameters.sol/CountryParametersContract';
+import { WarBucks } from '../../../../../../backend/typechain-types/contracts/WarBucks';
+import { TreasuryContract } from '../../../../../../backend/typechain-types/contracts/Treasury.sol/TreasuryContract';
 
 
 const menuItems = [
@@ -54,15 +57,63 @@ const Nation = () => {
   const contractsData = useAllContracts();
   const { address: walletAddress } = useAccount();
   const countryMinterContract = contractsData?.CountryMinter;
+  const countryParametersContract = contractsData?.CountryParametersContract;
+  const treasuryContract = contractsData?.TreasuryContract;
   const router = useRouter();
 
   const [selectedComponent, setSelectedComponent] = useState<JSX.Element | null>(null);
   const [selectedMenuItem, setSelectedMenuItem] = useState<string | null>(null);
   const [mintedNations, setMintedNations] = useState<{ name: string; href: string }[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isManageTradesOpen, setIsManageTradesOpen] = useState(false);
+  const [selectedNationName, setSelectedNationId] = useState<string | null>(null);
+  const [selectedNationBalance, setSelectedNationBalance] = useState<string | null>(null);
 
   const nationId = searchParams.get("id");
+
+  //can you have this refresh every time nationId changes?
+  useEffect(() => {
+    const fetchNationName = async () => {
+      if (!nationId) return;
+      let name = await getSelectedNationName(nationId);
+      setSelectedNationId(name as string);
+      let wbxBalance = await getWarBucksBalance(nationId);
+      setSelectedNationBalance(wbxBalance as string);
+    };
+    fetchNationName();
+  }, [nationId]);
+
+  const getSelectedNationName = async (tokenIdString: string) => {
+    if (!publicClient) {
+      throw new Error("publicClient is not defined");
+    }
+    let nationName = await publicClient.readContract({
+      abi: countryParametersContract.abi,
+      address: countryParametersContract.address,
+      functionName: "getNationName",
+      args: [tokenIdString],
+    });
+    return nationName;
+  };
+
+  const getWarBucksBalance = async (tokenIdString: string) => {
+    if (!publicClient) {
+      throw new Error("publicClient is not defined");
+    }
+    let warBucks = await publicClient.readContract({
+      abi: treasuryContract.abi,
+      address: treasuryContract.address,
+      functionName: "checkBalance",
+      args: [tokenIdString],
+    });
+    return warBucks;
+  }
+
+  const formatBalance = (balance: string) => {
+    const warbucksFormatted = Number(balance) / 1e18;
+    return new Intl.NumberFormat("en-US", {
+      maximumFractionDigits: 2,
+    }).format(warbucksFormatted);
+  };
 
   // Fetch user's nations from contract
   useEffect(() => {
@@ -267,7 +318,8 @@ const Nation = () => {
           backgroundPosition: "center top",
         }}
       >
-        <h2 className="font-special text-lg text-black mb-4">Menu</h2>
+        <h2 className="font-special text-lg text-black mb-4">{nationId}: {selectedNationName}</h2>
+        <h3 className="font-special text-lg text-black mb-4">{selectedNationBalance ? `${formatBalance(selectedNationBalance)} WBX`: "Balance not available"}</h3>
   
         {/* My Nations Dropdown */}
         {walletAddress && mintedNations.length > 0 && (

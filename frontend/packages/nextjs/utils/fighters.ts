@@ -478,3 +478,220 @@ export const getF22RaptorCount = async (
         args: [nationId],
     });
 }
+
+export const scrapYak9 = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    fighterContract: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !fighterContract || !nationId) {
+        console.error("Missing required data: publicClient, fighterContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: fighterContract.abi,
+            address: fighterContract.address,
+            functionName: "scrapYak9",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping Yak9:", error);
+    }
+}
+
+export const scrapP51Mustang = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    fighterContract: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !fighterContract || !nationId) {
+        console.error("Missing required data: publicClient, fighterContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: fighterContract.abi,
+            address: fighterContract.address,
+            functionName: "scrapP51Mustang",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping P-51 Mustang:", error);
+    }
+}
+
+export const scrapF86Sabre = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    fighterContract: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !fighterContract || !nationId) {
+        console.error("Missing required data: publicClient, fighterContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: fighterContract.abi,
+            address: fighterContract.address,
+            functionName: "scrapF86Sabre",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping F-86 Sabre:", error);
+    }
+}
+
+export const scrapMig15 = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    fighterContract: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !fighterContract || !nationId) {
+        console.error("Missing required data: publicClient, fighterContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: fighterContract.abi,
+            address: fighterContract.address,
+            functionName: "scrapMig15",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping Mig-15:", error);
+    }
+}
+
+export const scrapF100SuperSabre = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    fighterContract: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !fighterContract || !nationId) {
+        console.error("Missing required data: publicClient, fighterContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: fighterContract.abi,
+            address: fighterContract.address,
+            functionName: "scrapF100SuperSabre",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping F-100 Super Sabre:", error);
+    }
+}
+
+export const scrapF35Lightning = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    fighterContract: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !fighterContract || !nationId) {
+        console.error("Missing required data: publicClient, fighterContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: fighterContract.abi,
+            address: fighterContract.address,
+            functionName: "scrapF35Lightning",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping F-35 Lightning:", error);
+    }
+}
+
+export const scrapF15Eagle = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    fighterContract: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !fighterContract || !nationId) {
+        console.error("Missing required data: publicClient, fighterContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: fighterContract.abi,
+            address: fighterContract.address,
+            functionName: "scrapF15Eagle",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping F-15 Eagle:", error);
+    }
+}
+
+export const scrapSu30Mki = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    fighterContract: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !fighterContract || !nationId) {
+        console.error("Missing required data: publicClient, fighterContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: fighterContract.abi,
+            address: fighterContract.address,
+            functionName: "scrapSu30Mki",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping Su-30MKI:", error);
+    }
+}
+
+export const scrapF22Raptor = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    fighterContract: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !fighterContract || !nationId) {
+        console.error("Missing required data: publicClient, fighterContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: fighterContract.abi,
+            address: fighterContract.address,
+            functionName: "scrapF22Raptor",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping F-22 Raptor:", error);
+    }
+}
+

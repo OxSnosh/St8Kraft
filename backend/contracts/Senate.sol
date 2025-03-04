@@ -162,33 +162,57 @@ contract SenateContract is ChainlinkClient, KeeperCompatibleInterface, Ownable {
         bool isOwner = mint.checkOwnership(idVoter, msg.sender);
         require(isOwner, "!nation owner");
         require(idVoter != idOfSenateVote, "cannot vote for yourself");
+        
+        uint256 gameDay = keep.getGameDay();
         uint256 dayLastVoted = idToVoter[idVoter].lastVoteCast;
+        
         require(
             dayLastVoted <= dayOfLastElection,
             "you already voted this epoch"
         );
+        require(
+            !hasVotedThisEpoch(idVoter),
+            "nation has already voted this epoch"
+        );
+        
         uint256 dayTeamJoined = idToVoter[idVoter].dayTeamJoined;
-        uint256 gameDay = keep.getGameDay();
         if (gameDay >= 30) {
             require(
                 (dayTeamJoined + 30) < gameDay,
                 "you must be on a team for 30 days before voting for a senator"
             );
         }
+        
         uint256 voterTeam = idToVoter[idVoter].team;
         uint256 teamOfVote = idToVoter[idOfSenateVote].team;
         require(
             teamOfVote == voterTeam,
             "you can only vote for a fellow team member"
         );
+        
         epochToTeamToSenatorVotes[epoch][voterTeam].push(idOfSenateVote);
+        
         bool lobbyists = won3.getPoliticalLobbyists(idVoter);
         if (lobbyists) {
             epochToTeamToSenatorVotes[epoch][voterTeam].push(idOfSenateVote);
         }
+        
         idToVoter[idVoter].lastVoteCast = gameDay;
+        recordVote(idVoter);
+        
         emit Vote(idVoter, voterTeam, idOfSenateVote, msg.sender);
     }
+
+    mapping(uint256 => uint256) private lastVoteEpoch;
+
+    function hasVotedThisEpoch(uint256 idVoter) internal view returns (bool) {
+        return lastVoteEpoch[idVoter] == epoch;
+    }
+
+    function recordVote(uint256 idVoter) internal {
+        lastVoteEpoch[idVoter] = epoch;
+    }
+
 
     function checkUpkeep(
         bytes calldata /* checkData */

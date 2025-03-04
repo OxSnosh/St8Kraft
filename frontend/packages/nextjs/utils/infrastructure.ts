@@ -1,5 +1,3 @@
-import { getTaxablePopulationCount } from './taxes';
-import { InfrastructureContract } from '../../../../backend/typechain-types/contracts/Infrastructure.sol/InfrastructureContract';
 
 export const getInfrastructureCount = async (
     nationId: string,
@@ -148,3 +146,30 @@ export const setTaxRate = async (
         console.error("Error setting tax rate:", error);
     }
 }
+
+export const destroyInfrastructure = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    infrastructureContract: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !infrastructureContract || !nationId || amount <= 0) {
+        console.error("Missing required data: publicClient, infrastructureContract, nationId, or amount.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: infrastructureContract.abi,
+            address: infrastructureContract.address,
+            functionName: "destroyInfrastructure",
+            args: [nationId, amount],
+        });
+
+        console.log(`Successfully destroyed ${amount} infrastructure for nation ${nationId}.`);
+    } catch (error) {
+        console.error(`Error destroying infrastructure for nation ${nationId}:`, error);
+    }
+};
+

@@ -483,6 +483,15 @@ contract CountryParametersContract is VRFConsumerBaseV2, Ownable {
         return idToCountrySettings[countryId].dayCreated;
     }
 
+    function setDesiredReligionAndGovernmentFromOwner(
+        uint256 id,
+        uint256 religion,
+        uint256 government
+    ) public onlyOwner {
+        idToReligionPreference[id] = religion;
+        idToGovernmentPreference[id] = government;
+    }
+
     ///@dev this is a view funtion that will return the government preference for a country
     ///@param id this is the ID for the nation being queried
     function getGovernmentPreference(

@@ -9,7 +9,8 @@ import { useSearchParams } from "next/navigation";
 import { 
     getSoldierCount,
     getSoldierCost,
-    buySoldiers
+    buySoldiers,
+    decommissionSoldiers
 } from "~~/utils/forces";
 import { checkBalance } from "~~/utils/treasury";
 import { getTotalPopulationCount } from "~~/utils/infrastructure";
@@ -38,6 +39,7 @@ const BuySoldiers = () => {
     });
     const [errorMessage, setErrorMessage] = useState("");
     const [refreshTrigger, setRefreshTrigger] = useState(false);
+    const [decommissionAmount, setDecommissionAmount] = useState<string>("");
 
     const [cost, setCost] = useState<string | null>(null);
     const [amountInput, setAmountInput] = useState<string>("");
@@ -156,23 +158,30 @@ const BuySoldiers = () => {
         }
     }
 
-    // const handleBuySoldiers = async (amount : any) => {
-        
-    //     if (!nationId || !publicClient || !ForcesContract || !walletAddress || !cost) {
-    //         setErrorMessage("Missing required information to proceed with the purchase.");
-    //         return;
-    //     }
-
-    //     try {
-    //         await buySoldiers(nationId, Number(amount), publicClient, ForcesContract, writeContractAsync);
-    //         setRefreshTrigger(!refreshTrigger);
-    //         setErrorMessage("");
-    //         alert("Land purchased successfully!");
-    //     } catch (error) {
-    //         console.error("Error buying land:", error);
-    //         setErrorMessage("Failed to complete the purchase. Please try again.");
-    //     }
-    // };
+    const handleDecommissionSoldiers = async (amount: any) => {
+        if (!amount || isNaN(amount) || amount <= 0) {
+            alert("Please enter a valid number of soldiers to decommission.");
+            return;
+        }
+    
+        if (!nationId || !publicClient || !ForcesContract) {
+            alert("Missing required information.");
+            return;
+        }
+    
+        try {
+            await decommissionSoldiers(nationId, Number(amount), publicClient, ForcesContract, writeContractAsync);
+            alert(`Successfully decommissioned ${amount} soldiers.`);
+            setRefreshTrigger(!refreshTrigger);
+        } catch (error) {
+            console.error("Error decommissioning soldiers:", error);
+            if (error instanceof Error) {
+                alert(`Transaction failed: ${error.message}`);
+            } else {
+                alert("Transaction failed: Unknown error");
+            }
+        }
+    };
 
     return (
         <div className="font-special w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
@@ -234,6 +243,24 @@ const BuySoldiers = () => {
                         Buy {amountInput} Soldiers for {Number(amountInput) * Number(cost)} War Bucks
                     </button>
                 )}
+            </div>
+
+            {/* Soldier Decommission Section */}
+            <div className="bg-base-200 p-4 rounded-lg shadow-md mt-6">
+                <label className="text-lg font-semibold text-primary block mb-2">Enter Amount to Decommission:</label>
+                <input
+                    type="number"
+                    value={decommissionAmount}
+                    onChange={(e) => setDecommissionAmount(e.target.value)}
+                    className="input input-bordered w-full bg-base-100 text-base-content mb-4"
+                    placeholder="Enter amount to decommission"
+                />
+                <button
+                    onClick={() => handleDecommissionSoldiers(decommissionAmount)}
+                    className="btn btn-error w-full text-lg"
+                >
+                    🪖 Decommission {decommissionAmount} Soldiers
+                </button>
             </div>
         </div>
     );

@@ -451,3 +451,194 @@ export const buyAircraftCarrier = async (
     }
 }
 
+export const scrapCorvette = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    NavyContract1: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !NavyContract1 || !nationId) {
+        console.error("Missing required data: publicClient, navyContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: NavyContract1.abi,
+            address: NavyContract1.address,
+            functionName: "decommissionCorvette",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping corvette:", error);
+    }
+}
+
+export const scrapLandingShip = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    NavyContract1: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !NavyContract1 || !nationId) {
+        console.error("Missing required data: publicClient, navyContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: NavyContract1.abi,
+            address: NavyContract1.address,
+            functionName: "decomissionLandingShip",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping landing ship:", error);
+    }
+}
+
+export const scrapBattleship = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    NavyContract1: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !NavyContract1 || !nationId) {
+        console.error("Missing required data: publicClient, navyContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: NavyContract1.abi,
+            address: NavyContract1.address,
+            functionName: "decommissionBattleship",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping battleship:", error);
+    }
+}
+
+export const scrapCruiser = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    NavyContract1: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !NavyContract1 || !nationId) {
+        console.error("Missing required data: publicClient, navyContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: NavyContract1.abi,
+            address: NavyContract1.address,
+            functionName: "decommissionCruiser",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping cruiser:", error);
+    }
+}
+
+export const scrapFrigate = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    NavyContract2: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !NavyContract2 || !nationId) {
+        console.error("Missing required data: publicClient, navyContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: NavyContract2.abi,
+            address: NavyContract2.address,
+            functionName: "decommissionFrigate",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping frigate:", error);
+    }
+}
+
+export const scrapDestroyer = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    NavyContract2: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !NavyContract2 || !nationId) {
+        console.error("Missing required data: publicClient, navyContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: NavyContract2.abi,
+            address: NavyContract2.address,
+            functionName: "decommissionDestroyer",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping destroyer:", error);
+    }
+}
+
+export const scrapSubmarine = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    NavyContract2: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !NavyContract2 || !nationId) {
+        console.error("Missing required data: publicClient, navyContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: NavyContract2.abi,
+            address: NavyContract2.address,
+            functionName: "decommissionSubmarine",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping submarine:", error);
+    }
+}
+
+export const scrapAircraftCarrier = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    NavyContract2: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !NavyContract2 || !nationId) {
+        console.error("Missing required data: publicClient, navyContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: NavyContract2.abi,
+            address: NavyContract2.address,
+            functionName: "decommissionAircraftCarrier",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping aircraft carrier:", error);
+    }
+}

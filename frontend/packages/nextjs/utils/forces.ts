@@ -299,5 +299,55 @@ export const buyTanks = async (
     }
 }
 
+export const decommissionSoldiers = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    forcesContract: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !forcesContract || !nationId) {
+        console.error("Missing required data: publicClient, forcesContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: forcesContract.abi,
+            address: forcesContract.address,
+            functionName: "decommissionSoldiers",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error decommissioning soldiers:", error);
+    }
+};
+
+export const decommissionTanks = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    forcesContract: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !forcesContract || !nationId) {
+        console.error("Missing required data: publicClient, forcesContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: forcesContract.abi,
+            address: forcesContract.address,
+            functionName: "decommissionTanks",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error decommissioning tanks:", error);
+    }
+};
+
+
+
 
 

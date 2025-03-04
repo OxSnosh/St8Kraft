@@ -17,7 +17,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
 contract SpyContract is Ownable {
-    uint256 public spyCost = 100000;
+    uint256 public spyCost = 100000 * (10**18);
     address public treasury;
     address public spyOperations;
     address public countryMinter;

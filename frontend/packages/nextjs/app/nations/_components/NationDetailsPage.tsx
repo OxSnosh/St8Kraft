@@ -44,7 +44,9 @@ type NationDetails = {
   bonusResources: string[] | null;
   tradingPartners: string[] | null;
   government: string | null;
+  desiredGovernment: string | null;
   religion: string | null;
+  desiredReligion: string | null;
   balance: string | null;
   happiness: string | null;
   dailyIncome: string | null;
@@ -74,6 +76,7 @@ type NationDetails = {
   defconLevel: string | null;
   threatLevel: string | null;
   soldierCount: string | null;
+  soldierToPopulationRatio: string | null;
   defendingSoldierCount: string | null;
   getDefendingSoldierEfficiencyModifier: string | null;
   deployedSoldierCount: string | null;
@@ -104,6 +107,7 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
   const countryParametersContract = contractsData?.CountryParametersContract;
   const treasuryContract = contractsData?.TreasuryContract;
   const taxesContract = contractsData?.TaxesContract;
+  const additionalTaxesContract = contractsData?.AdditionalTaxesContract;
   const billsContract = contractsData?.BillsContract;
   const infrastructureContract = contractsData?.InfrastructureContract;
   const crimeContract = contractsData?.CrimeContract;
@@ -135,6 +139,7 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
   const [showManageTrades, setShowManageTrades] = useState(false);
   const [message, setMessage] = useState("");
   const [isOwner, setIsOwner] = useState(false);
+  const [waterAccess, setWaterAccess] = useState(false);
 
   const handleProposeTradeClick = () => {
     setShowManageTrades(true);
@@ -148,6 +153,13 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
       if (!walletAddress || !publicClient || !contractsData?.CountryMinter) return;
       const owner = await checkOwnership(nationId, publicClient, contractsData.CountryMinter);
       setIsOwner(owner);
+      const water = await publicClient.readContract({
+        abi: resourcesContract.abi,
+        address: resourcesContract.address,
+        functionName: "viewWater",
+        args: [nationId],
+      });
+      setWaterAccess(Boolean(water));
     };
 
     fetchOwnership();
@@ -350,6 +362,15 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
 
         const soldierCount = await getSoldierCount(tokenIdString, publicClient, forcesContract);
 
+        const soldierToPopulationRatio = await publicClient.readContract({
+          abi: additionalTaxesContract.abi,
+          address: additionalTaxesContract.address,
+          functionName: "soldierToPopulationRatio",
+          args: [tokenIdString],
+        });
+
+        console.log((soldierToPopulationRatio as any[])[0], "SOLDIER TO POPULATION RATIO")
+
         const defendingSoldierCount = await getDefendingSoldierCount(tokenIdString, publicClient, forcesContract);
 
         const deployedSoldierCount = await getDeployedSoldierCount(tokenIdString, publicClient, forcesContract);
@@ -443,11 +464,29 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
             })
           ),
 
+          desiredGovernment: String(
+            await publicClient.readContract({
+              abi: countryParametersContract.abi,
+              address: countryParametersContract.address,
+              functionName: "getGovernmentPreference",
+              args: [tokenIdString],
+            })
+          ),
+
           religion: String(
             await publicClient.readContract({
               abi: countryParametersContract.abi,
               address: countryParametersContract.address,
               functionName: "getReligionType",
+              args: [tokenIdString],
+            })
+          ),
+
+          desiredReligion: String(
+            await publicClient.readContract({
+              abi: countryParametersContract.abi,
+              address: countryParametersContract.address,
+              functionName: "getReligionPreference",
               args: [tokenIdString],
             })
           ),
@@ -594,6 +633,8 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
 
           soldierCount: soldierCount.toString() || null,
 
+          soldierToPopulationRatio: (soldierToPopulationRatio as any[])[0].toString() || null,
+
           defendingSoldierCount: defendingSoldierCount.toString() || null,
 
           getDefendingSoldierEfficiencyModifier: defendingSoldierEfficiencyModifier.toString() || null,
@@ -638,7 +679,9 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
           bonusResources: null,
           tradingPartners: null,
           government: null,
+          desiredGovernment: null,
           religion: null,
+          desiredReligion: null,
           balance: null,
           happiness: null,
           dailyIncome: null,
@@ -668,6 +711,7 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
           defconLevel: null,
           threatLevel: null,
           soldierCount: null,
+          soldierToPopulationRatio: null,
           defendingSoldierCount: null,
           getDefendingSoldierEfficiencyModifier: null,
           deployedSoldierCount: null,
@@ -713,14 +757,33 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
       { label: "Resources", value: nationDetails.resources?.join(", ") || "Unknown" },
       { label: "Bonus Resources", value: nationDetails.bonusResources?.join(", ") || "Unknown" },
       { label: "Trading Partners", value: nationDetails.tradingPartners?.join(", ") || "None" },
-      { label: "Government Type", value: nationDetails.government || "Unknown" },
-      { label: "National Religion", value: nationDetails.religion || "Unknown" },
+      { 
+        label: "Government Type", 
+        value: nationDetails.government 
+          ? (nationDetails.government !== nationDetails.desiredGovernment 
+              ? `⚠️ ${nationDetails.government} (Your nation prefers ${nationDetails.desiredGovernment})` 
+              : nationDetails.government)
+          : "Unknown"
+      },
+      { 
+        label: "National Religion", 
+        value: nationDetails.religion 
+          ? (nationDetails.religion !== nationDetails.desiredReligion 
+              ? `⚠️ ${nationDetails.religion} (Your nation prefers ${nationDetails.desiredReligion})` 
+              : nationDetails.religion)
+          : "Unknown"
+      },
     ],
     Treasury: [
       { label: "Nation Balance", value: nationDetails.balance ? Math.floor(Number(nationDetails.balance)) : "Unknown" },
       { label: "Happiness", value: nationDetails.happiness || "Unknown" },
       { label: "Daily Income Per Citizen", value: nationDetails.dailyIncome || "Unknown" },
-      { label: "Tax Rate", value: nationDetails.taxRate || "Unknown" },
+      { 
+        label: "Tax Rate", 
+        value: Number(nationDetails.taxRate) > 20 
+          ? `⚠️ ${nationDetails.taxRate || "Unknown"}`
+          : nationDetails.taxRate || "Unknown"
+      },
       { label: "Taxable Population", value: nationDetails.taxablePopulation || "Unknown" },
       { label: "Taxes Collectible", value: nationDetails.taxesCollectible || "Unknown" },
       { label: "Last Tax Collection", value: nationDetails.lastTaxCollection || "Unknown" },
@@ -730,9 +793,30 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
     Military: [
       { label: "Nation Strength", value: nationDetails.strength || "Unknown" },
       { label: "War/Peace Preference", value: nationDetails.warPeacePreference || "Unknown" },
-      { label: "Defcon Level", value: nationDetails.defconLevel || "Unknown" },
-      { label: "Threat Level", value: nationDetails.threatLevel || "Unknown" },
+      { 
+        label: "Defcon Level", 
+        value: Number(nationDetails.defconLevel) === 5 
+          ? "5" 
+          : `⚠️ ${nationDetails.defconLevel || "Unknown"}`
+      },
+      { 
+        label: "Threat Level", 
+        value: Number(nationDetails.threatLevel) > 1 
+          ? `⚠️ ${nationDetails.threatLevel || "Unknown"}`
+          : nationDetails.threatLevel || "Unknown"
+      },
       { label: "Soldier Count", value: nationDetails.soldierCount || "Unknown" },
+      { 
+        label: "Soldier to Population Ratio", 
+        value: nationDetails.soldierToPopulationRatio 
+          ? (Number(nationDetails.soldierToPopulationRatio) < 10 || Number(nationDetails.soldierToPopulationRatio) > 60 
+              ? `⚠️ ${nationDetails.soldierToPopulationRatio}` 
+              : nationDetails.soldierToPopulationRatio)
+          : "Unknown"
+      },      
+      { label: "Defending Soldier Count", value: nationDetails.defendingSoldierCount || "Unknown" },
+      { label: "Deployed Soldier Count", value: nationDetails.deployedSoldierCount || "Unknown" },
+      { label: "Defending Soldier Efficiency Modifier", value: nationDetails.getDefendingSoldierEfficiencyModifier || "Unknown" },
       { label: "Tank Count", value: nationDetails.tankCount || "Unknown" },
       { label: "Nukes", value: nationDetails.nukes || "Unknown" },
       { label: "Cruise Missiles", value: nationDetails.cruiseMissiles || "Unknown" },
@@ -746,14 +830,50 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
     Infrastructure: [
       { label: "Improvements", value: nationDetails.improvements.map(({ name, improvementCount }) => `${name} (${improvementCount})`).join(", ") || "Unknown" },
       { label: "Wonders", value: nationDetails.wonders.map(({ name, wonderCount }) => `${name} (${wonderCount})`).join(", ") || "Unknown" },
-      { label: "Technology Count", value: nationDetails.technologyCount || "Unknown" },
+      { 
+        label: "Technology Count", 
+        value: Number(nationDetails.technologyCount) < 200 
+          ? `⚠️ ${nationDetails.technologyCount || "Unknown"}`
+          : nationDetails.technologyCount || "Unknown"
+      },
       { label: "Infrastructure Count", value: nationDetails.infrastructureCount || "Unknown" },
       { label: "Land Count", value: nationDetails.landCount || "Unknown" },
       { label: "Total Population", value: nationDetails.totalPopulation || "Unknown" },
-      { label: "Population Density", value: nationDetails.populationDensity || "Unknown" },
+      { 
+        label: "Population Density", 
+        value: nationDetails.populationDensity 
+          ? (
+              (!waterAccess && Number(nationDetails.populationDensity) > 75) || 
+              (waterAccess && Number(nationDetails.populationDensity) > 150) 
+                ? `⚠️ ${nationDetails.populationDensity}` 
+                : nationDetails.populationDensity
+            )
+          : "Unknown"
+      },
       { label: "Crime Index", value: nationDetails.crimeIndex || "Unknown" },
-      { label: "Literacy Rate", value: nationDetails.literacyRate || "Unknown" },
-      { label: "Environment Score", value: nationDetails.environmentScore || "Unknown" },
+      { label: "Crime Prevention Score", value: nationDetails.crimePreventionScore || "Unknown" },
+      { 
+        label: "Criminal Count", 
+        value: Number(nationDetails.criminalCount) > 200 
+          ? `⚠️ ${nationDetails.criminalCount || "Unknown"}`
+          : nationDetails.criminalCount || "Unknown"
+      },      
+      { label: "Rehabilitated Citizens", value: nationDetails.rehabilitatedCitizens || "Unknown" },
+      { label: "Incarcerated Citizens", value: nationDetails.incarceratedCitizens || "Unknown" },
+      { 
+        label: "Literacy Rate", 
+        value: Number(nationDetails.literacyRate) < 100 
+          ? `⚠️ ${nationDetails.literacyRate || "Unknown"}`
+          : nationDetails.literacyRate || "Unknown"
+      },
+      { 
+        label: "Environment Score", 
+        value: nationDetails.environmentScore 
+          ? (Number(nationDetails.environmentScore) > 1 
+              ? `⚠️ ${nationDetails.environmentScore}` 
+              : nationDetails.environmentScore)
+          : "Unknown"
+      },
     ],
   };
 

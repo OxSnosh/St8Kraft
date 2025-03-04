@@ -3,7 +3,7 @@ import { usePublicClient, useAccount, useWriteContract } from 'wagmi';
 import { ethers } from "ethers";
 import { AbiCoder } from "ethers/lib/utils";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
-import { nationActiveWars, returnWarDetails, offerPeace, deployForcesToWar } from "~~/utils/wars";
+import { nationActiveWars, returnWarDetails, offerPeace, deployForcesToWar, recallTroopsFromDeactivatedWars } from "~~/utils/wars";
 import { groundAttack } from "~~/utils/attacks";
 import { tokensOfOwner } from "~~/utils/countryMinter";
 import { getDefendingSoldierCount, getDefendingTankCount } from "~~/utils/forces";
@@ -1284,10 +1284,36 @@ const ActiveWars = () => {
         );
     };
     
+    const handleRecallTroops = async () => {
+        if (!selectedNation || !publicClient || !contractsData.WarContract) {
+            alert("Please select a nation first.");
+            return;
+        }
+    
+        try {
+            await recallTroopsFromDeactivatedWars(selectedNation, contractsData.WarContract, writeContractAsync);
+            alert(`Troops recalled successfully for nation ${selectedNation}.`);
+        } catch (error) {
+            console.error("Error recalling troops:", error);
+            if (error instanceof Error) {
+                alert(`Transaction failed: ${error.message}`);
+            } else {
+                alert("Transaction failed: Unknown error");
+            }
+        }
+    };
     
     return (
         <div className="font-special w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
             <h1 className="text-3xl font-bold text-primary-content text-center mb-4">Manage Wars</h1>
+    
+            {/* Recall Troops Button */}
+            <button
+                onClick={handleRecallTroops}
+                className="btn btn-warning w-full mb-6"
+            >
+                🔄 Recall Troops from Deactivated Wars
+            </button>
     
             {/* Nation Selection */}
             {mintedNations.length > 0 && (

@@ -478,3 +478,219 @@ export const buyTupolevTu160 = async (
         console.error("Error buying Tupolev Tu-160:", error);
     }
 }
+
+export const scrapAh1Cobra = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    bomberContract1: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !bomberContract1 || !nationId) {
+        console.error("Missing required data: publicClient, bomberContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: bomberContract1.abi,
+            address: bomberContract1.address,
+            functionName: "scrapAh1Cobra",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping AH-1 Cobra:", error);
+    }
+}
+
+export const scrapAh64Apache = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    bomberContract1: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !bomberContract1 || !nationId) {
+        console.error("Missing required data: publicClient, bomberContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: bomberContract1.abi,
+            address: bomberContract1.address,
+            functionName: "scrapAh64Apache",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping AH-64 Apache:", error);
+    }
+}
+
+export const scrapBristolBlenheim = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    bomberContract1: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !bomberContract1 || !nationId) {
+        console.error("Missing required data: publicClient, bomberContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: bomberContract1.abi,
+            address: bomberContract1.address,
+            functionName: "scrapBristolBlenheim",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping Bristol Blenheim:", error);
+    }
+}
+
+export const scrapB52Mitchell = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    bomberContract1: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !bomberContract1 || !nationId) {
+        console.error("Missing required data: publicClient, bomberContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: bomberContract1.abi,
+            address: bomberContract1.address,
+            functionName: "scrapB52Mitchell",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping B-52 Mitchell:", error);
+    }
+}
+
+export const scrapB17gFlyingFortress = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    bomberContract1: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !bomberContract1 || !nationId) {
+        console.error("Missing required data: publicClient, bomberContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: bomberContract1.abi,
+            address: bomberContract1.address,
+            functionName: "scrapB17gFlyingFortress",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping B-17G Flying Fortress:", error);
+    }
+}
+
+export const scrapB52Stratofortress = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    bomberContract2: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !bomberContract2 || !nationId) {
+        console.error("Missing required data: publicClient, bomberContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: bomberContract2.abi,
+            address: bomberContract2.address,
+            functionName: "scrapB52Stratofortress",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping B-52 Stratofortress:", error);
+    }
+}
+
+export const scrapB2Spirit = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    bomberContract2: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !bomberContract2 || !nationId) {
+        console.error("Missing required data: publicClient, bomberContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: bomberContract2.abi,
+            address: bomberContract2.address,
+            functionName: "scrapB2Spirit",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping B-2 Spirit:", error);
+    }
+}
+
+export const scrapB1bLancer = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    bomberContract2: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !bomberContract2 || !nationId) {
+        console.error("Missing required data: publicClient, bomberContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: bomberContract2.abi,
+            address: bomberContract2.address,
+            functionName: "scrapB1bLancer",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping B-1B Lancer:", error);
+    }
+}
+
+export const scrapTupolevTu160 = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    bomberContract2: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !bomberContract2 || !nationId) {
+        console.error("Missing required data: publicClient, bomberContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: bomberContract2.abi,
+            address: bomberContract2.address,
+            functionName: "scrapTupolevTu160",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error scrapping Tupolev Tu-160:", error);
+    }
+}

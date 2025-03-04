@@ -195,7 +195,6 @@ const BuyNukes = () => {
             </div>
         </div>
     );
-    
 };
 
 export default BuyNukes;

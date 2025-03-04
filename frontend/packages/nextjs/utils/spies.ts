@@ -88,3 +88,30 @@ export const buySpies = async (
         console.error("Error buying spies:", error);
     }
 }
+
+export const decommissionSpies = async (
+    amount: number,
+    nationId: string,
+    publicClient: any,
+    spyContract: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !spyContract || !nationId) {
+        console.log(publicClient, "publicClient");
+        console.log(spyContract, "spyContract");
+        console.log(nationId, "nationId");
+        console.error("Missing required data: publicClient, spyContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: spyContract.abi,
+            address: spyContract.address,
+            functionName: "decommissionSpies",
+            args: [amount, nationId],
+        });
+    } catch (error) {
+        console.error("Error decommissioning spies:", error);
+    }
+};
