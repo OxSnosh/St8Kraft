@@ -233,3 +233,92 @@ export const buyWonder = async (
 // { key: "getMausoleumCount", name: "Mausoleums" },
 // { key: "getStatueOfZeusCount", name: "Statues of Zeus" },
 // { key: "getHangingGardensCount", name: "Hanging Gardens" },
+
+
+export const deleteWonder = async (
+    nationId: string, 
+    wonderKey: string, 
+    publicClient: any, 
+    wondersContract1: any, 
+    wondersContract2: any, 
+    wondersContract3: any, 
+    wondersContract4: any, 
+    writeContractAsync: any
+) => {
+    if (!publicClient || !wondersContract1 || !wondersContract2 || !wondersContract3 || !wondersContract4 || !nationId) {
+        console.error("Missing required data: publicClient, wondersContract1, wondersContract2, wondersContract3, wondersContract4, or nationId.");
+        return;
+    }
+
+    console.log(wonderKey, "wonderKey");
+
+    try {
+        const wonderMappings = {
+            wondersContract1: [
+                "deleteAgriculturalDevelopmentProgram",
+                "deleteAntiAirDefenseNetwork",
+                "deleteCentralIntelligenceAgency",
+                "deleteDisasterReliefAgency",
+                "deleteEmpWeaponization",
+                "deleteFalloutShelterSystem",
+                "deleteFederalAidCommission",
+                "deleteFederalReserve",
+                "deleteForeignAirforceBase",
+                "deleteForeignArmyBase",
+                "deleteForeignNavalBase"
+            ],
+            wondersContract2: [
+                "deleteGreatMonument",
+                "deleteGreatTemple",
+                "deleteGreatUniversity",
+                "deleteHiddenNuclearMissileSilo",
+                "deleteInterceptorMissileSystem",
+                "deleteInternet",
+                "deleteInterstateSystem",
+                "deleteManhattanProject",
+                "deleteMiningIndustryConsortium"
+            ],
+            wondersContract3: [
+                "deleteMovieIndustry",
+                "deleteNationalCemetery",
+                "deleteNationalEnvironmentalOffice",
+                "deleteNationalResearchLab",
+                "deleteNationalWarMemorial",
+                "deleteNuclearPowerPlant",
+                "deletePentagon",
+                "deletePoliticalLobbyists",
+                "deleteScientificDevelopmentCenter"
+            ],
+            wondersContract4: [
+                "deleteSocialSecuritySystem",
+                "deleteSpaceProgram",
+                "deleteStockMarket",
+                "deleteStrategicDefenseInitiative",
+                "deleteSuperiorLogisticalSupport",
+                "deleteUniversalHealthcare",
+                "deleteWeaponsResearchCenter"
+            ]
+        };
+
+        for (const [contractKey, wonderKeys] of Object.entries(wonderMappings)) {
+            const contract = eval(contractKey);
+            const contractNumber = contractKey.charAt(contractKey.length - 1); // Extracting the contract number
+
+            const index = wonderKeys.indexOf(wonderKey);
+
+            if (index !== -1) {
+                await writeContractAsync({
+                    abi: contract.abi,
+                    address: contract.address,
+                    functionName: `deleteWonder${contractNumber}`, // Adjusted function name based on contract number
+                    args: [nationId, index + 1] // Index + 1 for 1-based indexing
+                });
+                return;
+            }
+        }
+
+        console.error("Wonder key not recognized.");
+    } catch (error) {
+        console.error("Error deleting wonder:", error);
+    }
+};

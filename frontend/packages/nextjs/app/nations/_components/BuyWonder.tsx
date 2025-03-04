@@ -5,12 +5,11 @@ import { usePublicClient, useWriteContract } from "wagmi";
 import { useAccount } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 import { useSearchParams } from "next/navigation";
-import { getWonders, buyWonder } from "~~/utils/wonders";
+import { getWonders, buyWonder, deleteWonder } from "~~/utils/wonders";
 import { checkBalance } from "~~/utils/treasury";
 import { useTheme } from "next-themes";
 import { ethers } from "ethers";
 import { parseRevertReason } from '../../../utils/errorHandling';
-import { contracts } from "~~/utils/scaffold-eth/contract";
 
 const BuyWonder = () => {
     const { theme } = useTheme();
@@ -27,7 +26,7 @@ const BuyWonder = () => {
     const { writeContractAsync } = useWriteContract();
 
     const wonderKeyMapping = {
-        agricultureDevelopmentProgram: "buyAgricultureDevelopmentProgram",
+        agricultureDevelopmentProgram: "buyAgriculturalDevelopmentProgram",
         airDefenseNetwork: "buyAirDefenseNetwork",
         centralIntelligenceAgency: "buyCentralIntelligenceAgency",
         disasterReliefAgency: "buyDisasterReliefAgency",
@@ -66,36 +65,6 @@ const BuyWonder = () => {
     };
 
     const [wonderDetails, setWonderDetails] = useState<{ [key: string]: any }>({});
-
-    // const handleBuyWonder = async (key: keyof typeof wonderKeyMapping) => {
-    //     const wonderKey = wonderKeyMapping[key] || key;
-    
-    //     if (!nationId) {
-    //         console.error("Nation ID is null");
-    //         alert("Nation ID is missing.");
-    //         return;
-    //     }
-    
-    //     try {
-    //         // Directly call buyWonder, just like your working function
-    //         await buyWonder(
-    //             nationId,
-    //             wonderKey,
-    //             publicClient,
-    //             WondersContract1,
-    //             WondersContract2,
-    //             WondersContract3,
-    //             WondersContract4,
-    //             writeContractAsync
-    //         );
-    
-    //         alert("Wonder purchased successfully!");
-    //         window.location.reload();
-    //     } catch (error) {
-    //         console.error("Error purchasing wonder:", error);
-    //         alert(`Transaction failed: ${(error as any).message || "Unknown error"}`);
-    //     }
-    // };
 
     const handleBuyWonder = async (key: keyof typeof wonderKeyMapping) => {
         console.log("Buying wonder:", key);
@@ -210,7 +179,7 @@ const BuyWonder = () => {
     
                 if (result.startsWith("0x08c379a0")) {
                     const errorMessage = parseRevertReason({ data: result });
-                    alert(`Transaction failed: ${errorMessage}`);
+                    alert(`IDBTransaction failed: ${errorMessage}`);
                     return;
                 }
             } catch (simulationError: any) {
@@ -249,7 +218,37 @@ const BuyWonder = () => {
             alert(`Transaction failed: ${errorMessage}`);
         }
     };
-    
+
+    const handleDeleteWonder = async (key: keyof typeof wonderKeyMapping) => {
+        console.log("Deleting wonder:", key);
+
+        const wonderKey = wonderKeyMapping[key]?.replace("buy", "delete") || key;
+
+        if (!nationId) {
+            console.error("Nation ID is null");
+            alert("Nation ID is missing.");
+            return;
+        }
+
+        try {
+            await deleteWonder(
+                nationId,
+                wonderKey,
+                publicClient,
+                contractsData.WondersContract1,
+                contractsData.WondersContract2,
+                contractsData.WondersContract3,
+                contractsData.WondersContract4,
+                writeContractAsync
+            );
+
+            alert("Wonder deleted successfully!");
+            window.location.reload();
+        } catch (error) {
+            console.error("Error deleting wonder:", error);
+            alert(`Transaction failed: ${(error as any).message || "Unknown error"}`);
+        }
+    };
 
     const fetchWonderDetails = async () => {
         if (!nationId || !publicClient || !WondersContract1 || !WondersContract2 || !WondersContract3 || !WondersContract4 || !TreasuryContract) return;
@@ -275,7 +274,7 @@ const BuyWonder = () => {
 
     useEffect(() => {
         fetchWonderDetails();
-    }, [nationId, publicClient, WondersContract1, WondersContract2, WondersContract3, WondersContract4, TreasuryContract]);
+    }, [nationId, usePublicClient, WondersContract1, WondersContract2, WondersContract3, WondersContract4, TreasuryContract]);
 
     return (
         <div className="font-special w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
@@ -292,7 +291,7 @@ const BuyWonder = () => {
                     <tr>
                         <th className="p-3 text-left">Wonder</th>
                         <th className="p-3 text-left">Owned Status</th>
-                        <th className="p-3 text-left">Action</th>
+                        <th className="p-3 text-left">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -300,14 +299,22 @@ const BuyWonder = () => {
                         <tr key={key} className="border-b border-neutral">
                             <td className="p-3 capitalize">{key.replace(/([A-Z])/g, ' $1')}</td>
                             <td className="p-3">{wonderDetails[key] ? "Owned" : "Not Owned"}</td>
-                            <td className="p-3">
+                            <td className="p-3 flex space-x-2">
                                 <button
                                     onClick={() => handleBuyWonder(key as keyof typeof wonderKeyMapping)}
                                     disabled={wonderDetails[key]}
-                                    className={`btn w-full ${wonderDetails[key] ? 'btn-disabled' : 'btn-success'}`}
+                                    className={`btn ${wonderDetails[key] ? 'btn-disabled' : 'btn-success'}`}
                                 >
                                     {wonderDetails[key] ? "Owned" : "Buy"}
                                 </button>
+                                {wonderDetails[key] && (
+                                    <button
+                                        onClick={() => handleDeleteWonder(key as keyof typeof wonderKeyMapping)}
+                                        className="btn btn-error"
+                                    >
+                                        Delete
+                                    </button>
+                                )}
                             </td>
                         </tr>
                     ))}

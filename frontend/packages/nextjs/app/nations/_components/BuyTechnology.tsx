@@ -12,7 +12,8 @@ import {
     getTechnologyCount,
     buyTechnology,
     getTechnologyCost,
-    getTechnologyCostPerLevel
+    getTechnologyCostPerLevel,
+    destroyTech
 } from "~~/utils/technology";
 import { checkBalance } from "~~/utils/treasury";
 import { checkOwnership } from "~~/utils/countryMinter";
@@ -42,6 +43,7 @@ const BuyTechnology = () => {
     const [levelInput, setLevelInput] = useState("");
     const [costPerLevel, setCostPerLevel] = useState<string | null>(null);
     const [totalCost, setTotalCost] = useState<string | null>(null);
+    const [destroyTechAmount, setDestroyTechAmount] = useState<string>("");
     const [totalCostFromContract, setTotalCostFromContract] = useState<string | null>(null);
 
     useEffect(() => {
@@ -182,6 +184,31 @@ const BuyTechnology = () => {
         }
     }
 
+    const handleDestroyTechnology = async (amount: any) => {
+        if (!amount || isNaN(amount) || amount <= 0) {
+            alert("Please enter a valid amount of technology to destroy.");
+            return;
+        }
+    
+        if (!nationId || !publicClient || !TechnologyMarketContract) {
+            alert("Missing required information.");
+            return;
+        }
+    
+        try {
+            await destroyTech(nationId, Number(amount), publicClient, TechnologyMarketContract, writeContractAsync);
+            alert(`Successfully destroyed ${amount} technology.`);
+            setRefreshTrigger(!refreshTrigger);
+        } catch (error) {
+            console.error("Error destroying technology:", error);
+            if (error instanceof Error) {
+                alert(`Transaction failed: ${error.message}`);
+            } else {
+                alert("Transaction failed: Unknown error");
+            }
+        }
+    };
+
     return (
         <div className="font-special w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
             <h2 className="text-2xl font-bold text-primary-content text-center mb-4">🖥️ Buy Technology</h2>
@@ -249,6 +276,31 @@ const BuyTechnology = () => {
                         Buy {levelInput} Tech
                     </button>
                 )}
+            </div>
+
+            <div className="bg-base-200 p-4 rounded-lg shadow-md mt-6">
+                <label className="text-lg font-semibold text-primary block mb-2">
+                    Enter Amount of Tech to Destroy:
+                </label>
+                <input
+                    type="number"
+                    value={destroyTechAmount}
+                    onChange={(e) => setDestroyTechAmount(e.target.value)}
+                    className="input input-bordered w-full bg-base-100 text-base-content mb-4"
+                    placeholder="Enter amount to destroy"
+                />
+                <button
+                    onClick={() => {
+                        if (nationId) {
+                            destroyTech(nationId, Number(destroyTechAmount), publicClient, TechnologyMarketContract, writeContractAsync);
+                        } else {
+                            alert("Nation ID is missing.");
+                        }
+                    }}
+                    className="btn btn-error w-full mt-4 text-lg"
+                >
+                    ⚙️ Destroy {destroyTechAmount} Technology
+                </button>
             </div>
         </div>
     );

@@ -10,7 +10,8 @@ import {
     getTankCount,
     getTankCost,
     getMaxTankCount,
-    buyTanks
+    buyTanks,
+    decommissionTanks
 } from "~~/utils/forces";
 import { checkBalance } from "~~/utils/treasury";
 import { checkOwnership } from "~~/utils/countryMinter";
@@ -44,6 +45,7 @@ const BuyTanks = () => {
 
     const [cost, setCost] = useState<string | null>(null);
     const [amountInput, setAmountInput] = useState<string>("");
+    const [amountToDecrease, setAmountToDecrease] = useState<string>("");
 
     useEffect(() => {
         const fetchBuyTankDetails = async () => {
@@ -168,6 +170,23 @@ const BuyTanks = () => {
         }
     }
 
+    const handleDecommissionTanks = async (amount : any) => {  
+        if (!nationId || !publicClient || !ForcesContract || !walletAddress) {
+            setErrorMessage("Missing required information to proceed with the decommission.");
+            return;
+        }
+
+        try {
+            await decommissionTanks(nationId, Number(amount), publicClient, ForcesContract, writeContractAsync);
+            setRefreshTrigger(!refreshTrigger);
+            setErrorMessage("");
+            alert("Tanks decommissioned successfully!");
+        } catch (error) {
+            console.error("Error decommissioning tanks:", error);
+            setErrorMessage("Failed to decommission tanks. Please try again.");
+        }
+    }
+
     return (
         <div className="font-special w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
             <h2 className="text-2xl font-bold text-primary-content text-center mb-4">🛡️ Buy Tanks</h2>
@@ -228,6 +247,24 @@ const BuyTanks = () => {
                         Buy {amountInput} Tanks for {Number(amountInput) * Number(cost)} War Bucks
                     </button>
                 )}
+            </div>
+
+            {/* Tank Decommission Form */}
+            <div className="bg-base-200 p-4 rounded-lg shadow-md mt-6">
+                <label className="text-lg font-semibold text-primary block mb-2">Enter Amount:</label>
+                <input
+                    type="number"
+                    value={amountToDecrease} // ✅ Correct state variable
+                    onChange={(e) => setAmountToDecrease(e.target.value)}
+                    className="input input-bordered w-full bg-base-100 text-base-content mb-4"
+                    placeholder="Enter amount to decommission"
+                />
+                <button
+                    onClick={() => handleDecommissionTanks(amountToDecrease)}
+                    className="btn btn-accent w-full"
+                >
+                    Decommission Tanks
+                </button>
             </div>
         </div>
     );

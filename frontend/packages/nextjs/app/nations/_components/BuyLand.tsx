@@ -11,7 +11,8 @@ import {
     getAreaOfInfluence,
     buyLand,
     getLandCost,
-    getLandCostPerMile
+    getLandCostPerMile,
+    destroyLand,
 } from "~~/utils/land";
 import { checkBalance } from "~~/utils/treasury";
 import { ethers } from "ethers";
@@ -43,6 +44,7 @@ const BuyLand = () => {
     const [levelInput, setLevelInput] = useState("");
     const [costPerLevel, setCostPerLevel] = useState<string | null>(null);
     const [totalCostFromContract, setTotalCostFromContract] = useState<string | null>(null);
+    const [destroyAmount, setDestroyAmount] = useState("");
 
     useEffect(() => {
         const fetchLandDetails = async () => {
@@ -85,23 +87,6 @@ const BuyLand = () => {
             setErrorMessage("Failed to calculate cost. Please try again.");
         }
     };
-
-    // const handleBuyLand = async () => {
-    //     if (!nationId || !publicClient || !LandMarketContract || !walletAddress || !totalCostFromContract) {
-    //         setErrorMessage("Missing required information to proceed with the purchase.");
-    //         return;
-    //     }
-
-    //     try {
-    //         await buyLand(nationId, Number(levelInput), publicClient, LandMarketContract, writeContractAsync);
-    //         setRefreshTrigger(!refreshTrigger);
-    //         setErrorMessage("");
-    //         alert("Land purchased successfully!");
-    //     } catch (error) {
-    //         console.error("Error buying land:", error);
-    //         setErrorMessage("Failed to complete the purchase. Please try again.");
-    //     }
-    // };
 
     const handleBuyLand = async () => {
         if (!nationId || !publicClient || !LandMarketContract || !walletAddress || !totalCostFromContract) {
@@ -165,6 +150,22 @@ const BuyLand = () => {
             alert(`Transaction failed: ${errorMessage}`);
         }
     }
+
+    const handleDestroyLand = async (amount: number) => {
+        if (!nationId || !publicClient || !LandMarketContract || !amount || amount <= 0) {
+            console.error("Missing required parameters for destroyLand");
+            return;
+        }
+    
+        try {
+            await destroyLand(nationId, amount, publicClient, LandMarketContract, writeContractAsync);
+            setRefreshTrigger(!refreshTrigger);
+            alert(`Successfully destroyed ${amount} Land Miles.`);
+        } catch (error) {
+            console.error("Error destroying land:", error);
+            alert("Failed to destroy land. Please try again.");
+        }
+    };
 
     return (
         <div className="font-special w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
@@ -233,6 +234,24 @@ const BuyLand = () => {
                         Buy {levelInput} Land Miles
                     </button>
                 )}
+            </div>
+
+            {/* Input for Destroying Land */}
+            <div className="bg-base-200 p-4 rounded-lg shadow-md mt-6">
+                <label className="text-lg font-semibold text-primary block mb-2">Enter Amount to Destroy:</label>
+                <input
+                    type="number"
+                    value={destroyAmount}
+                    onChange={(e) => setDestroyAmount(e.target.value)}
+                    className="input input-bordered w-full bg-base-100 text-base-content mb-4"
+                    placeholder="Enter amount to destroy"
+                />
+                <button
+                    onClick={() => handleDestroyLand(Number(destroyAmount))}
+                    className="btn btn-error w-full mt-4 text-lg"
+                >
+                    🌋 Destroy {destroyAmount} Land Miles
+                </button>
             </div>
         </div>
     );

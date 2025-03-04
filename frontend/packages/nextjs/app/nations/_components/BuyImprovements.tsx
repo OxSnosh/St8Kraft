@@ -5,7 +5,7 @@ import { usePublicClient, useWriteContract } from "wagmi";
 import { useAccount } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 import { useSearchParams } from "next/navigation";
-import { buyImprovement } from "~~/utils/improvements";
+import { buyImprovement, deleteImprovement } from "~~/utils/improvements";
 import { getImprovements } from "~~/utils/improvements";
 import { checkBalance } from "~~/utils/treasury";
 import { useTheme } from "next-themes";
@@ -80,127 +80,59 @@ const BuyImprovement = () => {
 
     const handleBuyImprovement = async (key: string) => {
         const amount = purchaseAmounts[key] || 1;
-        const improvementKey: string = improvementKeyMapping[key] || key;
-    
-        // Mapping of improvements to their respective contract and function
-        const improvementMappings = {
-            ImprovementsContract1: [
-                "buyAirport", "buyBank", "buyBarracks", "buyBorderFortification", "buyBorderWall",
-                "buyBunker", "buyCasino", "buyChurch", "buyClinic", "buyDrydock", "buyFactory"
-            ],
-            ImprovementsContract2: [
-                "buyForeignMinistry", "buyForwardOperatingBase", "buyGuerillaCamp", "buyHarbor",
-                "buyHospital", "buyIntelAgency", "buyJail", "buyLaborCamp"
-            ],
-            ImprovementsContract3: [
-                "buyPrison", "buyRadiationContainmentChamber", "buyRedLightDistrict",
-                "buyRehabilitationFacility", "buySatellite", "buySchool", "buyShipyard",
-                "buyStadium", "buyUniversity"
-            ],
-            ImprovementsContract4: [
-                "buyMissileDefense", "buyMunitionsFactory", "buyNavalAcademy",
-                "buyNavalConstructionYard", "buyOfficeOfPropaganda", "buyPoliceHeadquarters"
-            ]
-        };
-    
-        // Identify the correct contract and improvement index
-        let selectedContractKey: keyof typeof contractsData | null = null;
-        let improvementIndex = -1;
-    
-        for (const [contractKey, improvements] of Object.entries(improvementMappings)) {
-            const index = improvements.indexOf(improvementKey as string);
-            if (index !== -1) {
-                selectedContractKey = contractKey as keyof typeof contractsData;
-                improvementIndex = index + 1; // Improvement IDs start at 1
-                break;
-            }
-        }
-    
-        if (!selectedContractKey || improvementIndex === -1) {
-            console.error(`Improvement "${improvementKey}" not found in any contract mapping.`);
-            alert("Invalid improvement selection.");
-            return;
-        }
-    
-        // Retrieve contract data
-        const contractData = contractsData[selectedContractKey];
-        if (!contractData || !contractData.address || !contractData.abi) {
-            console.error(`Contract data missing for ${selectedContractKey}`);
-            return;
-        }
-    
-        try {
-            // Initialize Web3 provider
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            await provider.send("eth_requestAccounts", []);
-            const signer = provider.getSigner();
-            const userAddress = await signer.getAddress();
-    
-            // Initialize contract instance
-            const contract = new ethers.Contract(contractData.address, contractData.abi as ethers.ContractInterface, signer);
-    
-            // Encode function call data
-            const functionName = `buyImprovement${(selectedContractKey as string).slice(-1)}`;
-            const data = contract.interface.encodeFunctionData(functionName, [amount, nationId, improvementIndex]);
-    
-            // Simulate the transaction
-            try {
-                const result = await provider.call({
-                    to: contract.address,
-                    data: data,
-                    from: userAddress,
-                });
-    
-                console.log("Transaction Simulation Result:", result);
-    
-                if (result.startsWith("0x08c379a0")) {
-                    const errorMessage = parseRevertReason({ data: result });
-                    alert(`Transaction failed: ${errorMessage}`);
-                    return;
-                }
-            } catch (simulationError: any) {
-                const errorMessage = parseRevertReason(simulationError);
-                console.error("Transaction simulation failed:", errorMessage);
-                alert(`Transaction failed: ${errorMessage}`);
-                return;
-            }
-    
-            // If the transaction simulation passes, proceed with the actual transaction
-            if (nationId) {
-                try {
-                    await buyImprovement(
-                        nationId,
-                        improvementKey,
-                        amount,
-                        publicClient,
-                        contractsData.ImprovementsContract1,
-                        contractsData.ImprovementsContract2,
-                        contractsData.ImprovementsContract3,
-                        contractsData.ImprovementsContract4,
-                        writeContractAsync
-                    );
-                    alert("Improvement purchased successfully!");
-                    window.location.reload();
+        const improvementKey: string = improvementKeyMapping[key];
 
-                } catch (txError) {
-                    console.error("Error purchasing improvement:", txError);
-                    if (txError instanceof Error) {
-                        alert(`Transaction failed: ${txError.message}`);
-                    } else {
-                        alert("Transaction failed: Unknown error");
-                    }
-                }
-            } else {
-                console.error("Nation ID is null");
-                alert("Nation ID is missing.");
+        if (nationId) {
+            try {
+                await buyImprovement(
+                    nationId,
+                    improvementKey,
+                    amount,
+                    publicClient,
+                    contractsData.ImprovementsContract1,
+                    contractsData.ImprovementsContract2,
+                    contractsData.ImprovementsContract3,
+                    contractsData.ImprovementsContract4,
+                    writeContractAsync
+                );
+                alert("Improvement purchased successfully!");
+                setRefreshTrigger(!refreshTrigger);
+            } catch (txError) {
+                console.error("Error purchasing improvement:", txError);
+                alert("Transaction failed: Unable to purchase improvement.");
             }
-        } catch (error: any) {
-            const errorMessage = parseRevertReason(error);
-            console.error("Transaction failed:", errorMessage);
-            alert(`Transaction failed: ${errorMessage}`);
+        } else {
+            alert("Nation ID is missing.");
         }
     };
-    
+
+    const handleDeleteImprovement = async (key: string) => {
+        const amount = purchaseAmounts[key] || 1;
+        const improvementKey: string = improvementKeyMapping[key]?.replace("buy", "delete") || key;
+
+        if (nationId) {
+            try {
+                await deleteImprovement(
+                    nationId,
+                    improvementKey,
+                    amount,
+                    publicClient,
+                    contractsData.ImprovementsContract1,
+                    contractsData.ImprovementsContract2,
+                    contractsData.ImprovementsContract3,
+                    contractsData.ImprovementsContract4,
+                    writeContractAsync
+                );
+                alert("Improvement deleted successfully!");
+                window.location.reload();
+            } catch (txError) {
+                console.error("Error deleting improvement:", txError);
+                alert("Transaction failed: Unable to delete improvement.");
+            }
+        } else {
+            alert("Nation ID is missing.");
+        }
+    };
 
     const fetchImprovementDetails = async () => {
         if (!nationId || !publicClient || !ImprovementContract1 || !ImprovementContract2 || !ImprovementContract3 || !ImprovementContract4 || !TreasuryContract) return;
@@ -230,21 +162,22 @@ const BuyImprovement = () => {
 
     return (
         <div className="font-special w-5/6 p-6 bg-aged-paper text-base-content rounded-lg shadow-lg border border-primary">
-            <h2 className="text-2xl font-bold text-primary-content text-center mb-4">🏗️ Buy Improvements</h2>
-    
+            <h2 className="text-2xl font-bold text-primary-content text-center mb-4">🏗️ Manage Improvements</h2>
+
             {/* Warbucks Balance */}
             <div className="text-lg text-center font-semibold bg-base-200 p-3 rounded-lg shadow-md mb-6">
                 Warbucks Balance: {improvementDetails["warBucksBalance"] || "0"}
             </div>
-    
+
             {/* Improvements Table */}
             <table className="w-full border-collapse border border-neutral bg-base-200 rounded-lg shadow-md mb-6">
                 <thead className="bg-primary text-primary-content">
                     <tr>
                         <th className="p-3 text-left">Category</th>
-                        <th className="p-3 text-left">Value</th>
-                        <th className="p-3 text-left">Amount to Buy (1-5)</th>
-                        <th className="p-3 text-left">Action</th>
+                        <th className="p-3 text-left">Owned</th>
+                        <th className="p-3 text-left">Amount (1-5)</th>
+                        <th className="p-3 text-left">Buy</th>
+                        <th className="p-3 text-left">Delete</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -271,6 +204,16 @@ const BuyImprovement = () => {
                                     >
                                         Buy
                                     </button>
+                                </td>
+                                <td className="p-3">
+                                    {parseInt(value) > 0 && (
+                                        <button
+                                            onClick={() => handleDeleteImprovement(key)}
+                                            className="btn btn-error w-full"
+                                        >
+                                            Delete
+                                        </button>
+                                    )}
                                 </td>
                             </tr>
                         ))}

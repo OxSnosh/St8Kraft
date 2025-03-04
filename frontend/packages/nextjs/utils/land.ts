@@ -119,3 +119,33 @@ export const getLandCostPerMile = async (
         console.error("Error fetching land cost per level:", error);
     }
 }
+
+export const destroyLand = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    landContract: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !landContract || !nationId) {
+        console.error("Missing required data: publicClient, landContract, or nationId.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: landContract.abi,
+            address: landContract.address,
+            functionName: "destroyLand",
+            args: [nationId, amount],
+        });
+
+        console.log(`Successfully destroyed ${amount} land for Nation ID: ${nationId}`);
+    } catch (error) {
+        console.error("Error destroying land:", error);
+    }
+};
+
+
+
+

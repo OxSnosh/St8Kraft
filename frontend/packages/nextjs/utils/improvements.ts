@@ -393,3 +393,83 @@ export const buyImprovement = async (
         console.error("Error buying improvement:", error);
     }
 }
+
+export const deleteImprovement = async (
+    nationId: string,
+    improvementKey: string,
+    amount: number,
+    publicClient: any,
+    improvementContract1: any,
+    improvementContract2: any,
+    improvementContract3: any,
+    improvementContract4: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !improvementContract1 || !improvementContract2 || !improvementContract3 || !improvementContract4 || !nationId) {
+        console.error("Missing required data: publicClient, improvementContract1, improvementContract2, improvementContract3, improvementContract4, or nationId.");
+        return;
+    }
+
+    console.log(improvementKey, "improvementKey");
+    console.log(amount, "amount");
+    
+    try {
+        const improvementMapping: { [key: string]: { contract: any; functionName: string; id: number } } = {
+            "deleteAirport": { contract: improvementContract1, functionName: "deleteImprovement1", id: 1 },
+            "deleteBank": { contract: improvementContract1, functionName: "deleteImprovement1", id: 2 },
+            "deleteBarracks": { contract: improvementContract1, functionName: "deleteImprovement1", id: 3 },
+            "deleteBorderFortification": { contract: improvementContract1, functionName: "deleteImprovement1", id: 4 },
+            "deleteBorderWall": { contract: improvementContract1, functionName: "deleteImprovement1", id: 5 },
+            "deleteBunker": { contract: improvementContract1, functionName: "deleteImprovement1", id: 6 },
+            "deleteCasino": { contract: improvementContract1, functionName: "deleteImprovement1", id: 7 },
+            "deleteChurch": { contract: improvementContract1, functionName: "deleteImprovement1", id: 8 },
+            "deleteClinic": { contract: improvementContract1, functionName: "deleteImprovement1", id: 9 },
+            "deleteDrydock": { contract: improvementContract1, functionName: "deleteImprovement1", id: 10 },
+            "deleteFactory": { contract: improvementContract1, functionName: "deleteImprovement1", id: 11 },
+
+            "deleteForeignMinistry": { contract: improvementContract2, functionName: "deleteImprovement2", id: 1 },
+            "deleteForwardOperatingBase": { contract: improvementContract2, functionName: "deleteImprovement2", id: 2 },
+            "deleteGuerillaCamp": { contract: improvementContract2, functionName: "deleteImprovement2", id: 3 },
+            "deleteHarbor": { contract: improvementContract2, functionName: "deleteImprovement2", id: 4 },
+            "deleteHospital": { contract: improvementContract2, functionName: "deleteImprovement2", id: 5 },
+            "deleteIntelAgency": { contract: improvementContract2, functionName: "deleteImprovement2", id: 6 },
+            "deleteJail": { contract: improvementContract2, functionName: "deleteImprovement2", id: 7 },
+            "deleteLaborCamp": { contract: improvementContract2, functionName: "deleteImprovement2", id: 8 },
+
+            "deletePrison": { contract: improvementContract3, functionName: "deleteImprovement3", id: 1 },
+            "deleteRadiationContainmentChamber": { contract: improvementContract3, functionName: "deleteImprovement3", id: 2 },
+            "deleteRedLightDistrict": { contract: improvementContract3, functionName: "deleteImprovement3", id: 3 },
+            "deleteRehabilitationFacility": { contract: improvementContract3, functionName: "deleteImprovement3", id: 4 },
+            "deleteSatellite": { contract: improvementContract3, functionName: "deleteImprovement3", id: 5 },
+            "deleteSchool": { contract: improvementContract3, functionName: "deleteImprovement3", id: 6 },
+            "deleteShipyard": { contract: improvementContract3, functionName: "deleteImprovement3", id: 7 },
+            "deleteStadium": { contract: improvementContract3, functionName: "deleteImprovement3", id: 8 },
+            "deleteUniversity": { contract: improvementContract3, functionName: "deleteImprovement3", id: 9 },
+
+            "deleteMissileDefense": { contract: improvementContract4, functionName: "deleteImprovement4", id: 1 },
+            "deleteMunitionsFactory": { contract: improvementContract4, functionName: "deleteImprovement4", id: 2 },
+            "deleteNavalAcademy": { contract: improvementContract4, functionName: "deleteImprovement4", id: 3 },
+            "deleteNavalConstructionYard": { contract: improvementContract4, functionName: "deleteImprovement4", id: 4 },
+            "deleteOfficeOfPropaganda": { contract: improvementContract4, functionName: "deleteImprovement4", id: 5 },
+            "deletePoliceHeadquarters": { contract: improvementContract4, functionName: "deleteImprovement4", id: 6 },
+        };
+
+        if (!(improvementKey in improvementMapping)) {
+            console.error("Improvement key not recognized.");
+            return;
+        }
+
+        const { contract, functionName, id } = improvementMapping[improvementKey];
+
+        await writeContractAsync({
+            abi: contract.abi,
+            address: contract.address,
+            functionName,
+            args: [amount, nationId, id]
+        });
+
+        console.log(`Successfully deleted ${amount} of ${improvementKey}.`);
+    } catch (error) {
+        console.error("Error deleting improvement:", error);
+    }
+};

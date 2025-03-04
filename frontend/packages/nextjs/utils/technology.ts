@@ -99,3 +99,32 @@ export const getTechnologyCostPerLevel = async (
         console.error("Error fetching technology cost per level:", error);
     }
 }
+
+
+export const destroyTech = async (
+    nationId: string,
+    amount: number,
+    publicClient: any,
+    techContract: any,
+    writeContractAsync: any
+) => {
+    if (!publicClient || !techContract || !nationId || !amount || amount <= 0) {
+        console.error("Missing required data: publicClient, techContract, nationId, or amount.");
+        return;
+    }
+
+    try {
+        await writeContractAsync({
+            abi: techContract.abi,
+            address: techContract.address,
+            functionName: "destroyTech",
+            args: [nationId, amount],
+        });
+
+        console.log(`Successfully destroyed ${amount} technology for nation ${nationId}`);
+        alert(`Successfully destroyed ${amount} technology.`);
+    } catch (error) {
+        console.error("Error destroying technology:", error);
+        alert("Failed to destroy technology. Please try again.");
+    }
+};
