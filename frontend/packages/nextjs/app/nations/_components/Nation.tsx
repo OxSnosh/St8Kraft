@@ -33,10 +33,6 @@ import Messages from "./Messages";
 import AllianceManagement from "./AllianceManagement";
 import { useAccount, usePublicClient } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
-import { CountryParametersContract } from '../../../../../../backend/typechain-types/contracts/CountryParameters.sol/CountryParametersContract';
-import { WarBucks } from '../../../../../../backend/typechain-types/contracts/WarBucks';
-import { TreasuryContract } from '../../../../../../backend/typechain-types/contracts/Treasury.sol/TreasuryContract';
-
 
 const menuItems = [
   { category: "NATION SETTINGS", options: ["Government Settings", "Military Settings", "Manage Trades", "Send Aid", "Senate", "Alliance"] },
@@ -310,12 +306,13 @@ const Nation = () => {
     <div className="flex h-screen">
       {/* Sidebar - Left 15% */}
       <div
-        className="w-1/6 text-white p-4 flex flex-col h-full min-h-screen overflow-y-auto" // Ensures full height & scrolling if needed
+        className="w-1/6 text-white p-4 flex flex-col h-full min-h-screen overflow-y-auto"
         style={{
           backgroundImage: "url('/aged_paper.jpg')",
-          backgroundSize: "cover", // Ensures background covers the entire sidebar
+          backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
           backgroundPosition: "center top",
+          minHeight: "calc(100vh + 250px)",
         }}
       >
         <h2 className="font-special text-lg text-black mb-4">{nationId}: {selectedNationName}</h2>

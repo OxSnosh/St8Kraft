@@ -935,30 +935,48 @@ const NationDetailsPage = ({ nationId, onPropeseTrade }: NationDetailsPageProps)
 
   return (
       <div className="font-special flex w-full p-6 bg-aged-paper text-base-content rounded-lg shadow-center">
-          {/* Left Sidebar - News Carousel Tabs */}
           <div className="w-3/12 pr-4 border-r border-neutral flex flex-col gap-3">
-              <h2 className="text-2xl font-bold text-primary-content text-center">Nation Details</h2>
-              <div className="news-carousel-left flex flex-col gap-3">
+            <h2 className="text-2xl font-bold text-primary-content text-center">
+              Nation Details
+            </h2>
+            <div className="news-carousel-left flex flex-col gap-3">
+              {/* All Details Tab */}
+              <button
+                className={`news-carousel-tab flex items-center gap-2 px-4 py-4 text-lg text-center font-semibold rounded-lg shadow-md transition-all ${
+                  activeTab === "All Details"
+                    ? "bg-primary text-primary-content"
+                    : "bg-base-200 hover:bg-base-300"
+                }`}
+                onClick={() => setActiveTab("All Details")}
+              >
+                📜 All Details
+              </button>
+
+              {/* Dynamic Section Tabs */}
+              {Object.keys(sections).map((section: string) => {
+                const iconFileName = section.toLowerCase().replace(/\s+/g, "-") + ".svg";
+
+                return (
                   <button
-                      className={`news-carousel-tab px-4 py-4 text-lg text-center font-semibold rounded-lg shadow-md transition-all ${
-                          activeTab === "All Details" ? "bg-primary text-primary-content" : "bg-base-200 hover:bg-base-300"
-                      }`}
-                      onClick={() => setActiveTab("All Details")}
+                    key={section}
+                    className={`news-carousel-tab flex items-center gap-2 px-4 py-4 text-lg text-center font-semibold rounded-lg shadow-md transition-all ${
+                      activeTab === section
+                        ? "bg-primary text-primary-content"
+                        : "bg-base-200 hover:bg-base-300"
+                    }`}
+                    onClick={() => setActiveTab(section)}
                   >
-                      📜 All Details
+                    {/* Section Icon */}
+                    <img
+                      src={`icons/${iconFileName}`}
+                      alt={section + " icon"}
+                      className="w-6 h-6" 
+                    />
+                    {section}
                   </button>
-                  {Object.keys(sections).map((section: string) => (
-                      <button
-                          key={section}
-                          className={`news-carousel-tab px-4 py-4 text-lg text-center font-semibold rounded-lg shadow-md transition-all ${
-                              activeTab === section ? "bg-primary text-primary-content" : "bg-base-200 hover:bg-base-300"
-                          }`}
-                          onClick={() => setActiveTab(section)}
-                      >
-                          {section}
-                      </button>
-                  ))}
-              </div>
+                );
+              })}
+            </div>
           </div>
 
           <div className="w-7/12 px-6">

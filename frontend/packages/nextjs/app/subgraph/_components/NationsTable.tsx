@@ -31,7 +31,7 @@ const NationsTable = () => {
   }
 
   return (
-    <div className="flex justify-center items-center">
+    <div className="font-special flex justify-center items-center">
       <div className="overflow-x-auto shadow-2xl rounded-xl">
         <table className="table bg-base-100 table-zebra">
           <thead>
