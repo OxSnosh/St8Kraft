@@ -668,7 +668,7 @@ contract InfrastructureContract is Ownable {
     function decreaseInfrastructureCountFromAirBattleContract(
         uint256 countryId,
         uint256 amountToDecrease
-    ) public onlyAirBattle {
+    ) public onlyAirBattle returns (bool) {
         uint256 infrastructureDamageModifier = 100;
         uint256 bunkerCount = imp1.getBunkerCount(countryId);
         if (bunkerCount > 0) {
@@ -688,6 +688,7 @@ contract InfrastructureContract is Ownable {
             idToInfrastructure[countryId].infrastructureCount -= damage;
         }
         emit InfrastructureDamageFromAirAssault(countryId, damage);
+        return true;
     }
 
     ///@dev this is a public function only callable from the ground battle contract

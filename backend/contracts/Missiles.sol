@@ -239,7 +239,7 @@ contract MissilesContract is Ownable {
     function decreaseCruiseMissileCountFromAirBattleContract(
         uint256 id,
         uint256 amountToDecrease
-    ) public onlyAirBattle {
+    ) public onlyAirBattle returns (bool) {
         uint256 cruiseMissiles = idToMissiles[id].cruiseMissiles;
         if (amountToDecrease >= cruiseMissiles) {
             idToMissiles[id].cruiseMissiles = 0;
@@ -248,6 +248,7 @@ contract MissilesContract is Ownable {
             idToMissiles[id].cruiseMissiles -= amountToDecrease;
         }
         emit CruiseMissilesDestroyedByAirAssault(id, amountToDecrease);
+        return true;
     }
 
     ///@dev this is a public function that will allow a nation owner to purchase nukes

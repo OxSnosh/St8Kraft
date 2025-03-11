@@ -329,7 +329,7 @@ contract TreasuryContract is Ownable, ReentrancyGuard {
     function decreaseBalanceOnBillsPaid(
         uint256 id,
         uint256 amount
-    ) public onlyBillsContract {
+    ) public onlyBillsContract returns (bool) {
         require(
             idToTreasury[id].balance >= amount,
             "balance not high enough to pay bills"
@@ -338,6 +338,7 @@ contract TreasuryContract is Ownable, ReentrancyGuard {
         totalGameBalance -= amount;
         uint256 day = keep.getGameDay();
         idToTreasury[id].dayOfLastBillPaid = day;
+        return true;
     }
 
     ///@dev this is a public view function that will return if a nation is inactive

@@ -140,6 +140,9 @@ contract BillsContract is Ownable, ReentrancyGuard {
             availableFunds >= billsPayable,
             "balance not high enough to pay bills"
         );
+        require(
+            tsy.decreaseBalanceOnBillsPaid(id, billsPayable), "Payment failed"
+        );
         tsy.decreaseBalanceOnBillsPaid(id, billsPayable);
         emit BillsPaid(id, billsPayable);
     }

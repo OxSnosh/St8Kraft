@@ -556,7 +556,7 @@ contract BombersContract is Ownable {
     function decrementBomberLosses(
         uint256[] memory losses,
         uint256 id
-    ) public onlyAirBattle {
+    ) public onlyAirBattle returns (bool) {
         for (uint256 i; i < losses.length; i++) {
             if (losses[i] == 1) {
                 decreaseAh1CobraCount(1, id);
@@ -578,6 +578,7 @@ contract BombersContract is Ownable {
                 decreaseTupolevTu160Count(1, id);
             }
         }
+        return true;
     }
 }
 

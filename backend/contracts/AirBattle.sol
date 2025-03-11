@@ -14,11 +14,12 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 ///@title AirBattleContract
 ///@author OxSnosh
 ///@dev this contract allows you to launch a bombing campaign against another nation
-contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
+contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient, ReentrancyGuard {
     using Chainlink for Chainlink.Request;
 
     uint256 airBattleId;
@@ -358,7 +359,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         return defenderFighterArray;
     }
 
-    function fulfillRequest(uint256 battleId) public {
+    function fulfillRequest(uint256 battleId) internal {
         console.log("arrived to fulfillRequest()");
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_gasLane,
@@ -396,6 +397,8 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256 requestId,
         uint256[] memory randomWords
     ) internal override {
+        require(requestId != 0, "Chainlink request failed");
+        require(s_requestIdToRequestIndex[requestId] > 0, "Invalid VRF response");
         console.log("arrived to fulfillRandomWords()");
         console.log(randomWords[0]);
         console.log(randomWords[1]);
@@ -445,7 +448,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
         uint256 tankDamage,
         uint256 cruiseMissileDamage,
         uint256 battleId
-    ) public {
+    ) public nonReentrant {
         addAirBattle.completeAirBattle(
             attackerFighterCasualtiesBytes,
             attackerBomberCasualtiesBytes,
@@ -456,8 +459,7 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
             tankDamage,
             cruiseMissileDamage,
             battleId
-        );
-    
+        );  
         // uint256[] memory attackerFighterCasualties = abi.decode(
         //     attackerFighterCasualtiesBytes,
         //     (uint256[])
@@ -518,24 +520,10 @@ contract AirBattleContract is Ownable, VRFConsumerBaseV2, ChainlinkClient {
     //         tankDamage,
     //         cruiseMissileDamage
     //     ];
-    //     AirBattle storage newAirBattle = airBattleIdToAirBattle[battleId];
-    //     newAirBattle.attackerFighterCasualties = attackerFighterCasualties;
-    //     newAirBattle.attackerBomberCasualties = attackerBomberCasualties;
-    //     newAirBattle.defenderFighterCasualties = defenderFighterCasualties;
-    //     newAirBattle.damage = damage;
-    //     emit AirAssaultCasualties(
-    //         battleId,
-    //         newAirBattle.attackerId,
-    //         newAirBattle.defenderId,
-    //         attackerFighterCasualties,
-    //         attackerBomberCasualties,
-    //         defenderFighterCasualties,
-    //         newAirBattle.warId
-    //     );
     // }
 }
 
-contract AdditionalAirBattle is Ownable {    
+contract AdditionalAirBattle is Ownable, ReentrancyGuard {    
     address warAddress;
     address fighterAddress;
     address bomberAddress;
@@ -579,6 +567,11 @@ contract AdditionalAirBattle is Ownable {
         uint256 cruiseMissileDamage
     );
 
+    modifier onlyAirBattle() {
+        require(msg.sender == airBattleAddress, "Not authorized");
+        _;
+    }
+
     //@dev this function is only callable by the owner
     ///@dev this function will be called right after deployment in order to set up contract pointers
     function settings(
@@ -619,7 +612,7 @@ contract AdditionalAirBattle is Ownable {
         uint256 tankDamage,
         uint256 cruiseMissileDamage,
         uint256 battleId
-    ) public {
+    ) public onlyAirBattle nonReentrant {
         handleDamage(
             defenderId,
             infrastructureDamage,
@@ -658,17 +651,23 @@ contract AdditionalAirBattle is Ownable {
             tankDamage = ((tankDamage * 60) / 100);
             cruiseMissileDamage = ((cruiseMissileDamage * 60) / 100);
         }
-        inf.decreaseInfrastructureCountFromAirBattleContract(
-            defenderId,
-            infrastructureDamage
+        require(
+            inf.decreaseInfrastructureCountFromAirBattleContract(
+                defenderId,
+                infrastructureDamage
+            ), "failed to decrease infrastructure count"
         );
-        force.decreaseDefendingTankCountFromAirBattleContract(
-            defenderId,
-            tankDamage
+        require(
+            force.decreaseDefendingTankCountFromAirBattleContract(
+                defenderId,
+                tankDamage
+            ), "failed to decrease tank count"
         );
-        mis.decreaseCruiseMissileCountFromAirBattleContract(
-            defenderId,
-            cruiseMissileDamage
+        require(
+            mis.decreaseCruiseMissileCountFromAirBattleContract(
+                defenderId,
+                cruiseMissileDamage
+            ), "failed to decrease cruise missile count"
         );
     }
 
@@ -691,8 +690,17 @@ contract AdditionalAirBattle is Ownable {
             defenderFighterCasualtiesBytes,
             (uint256[])
         );
-        fighterLoss.decrementLosses(attackerFighterCasualties, attackerId);
-        bomber.decrementBomberLosses(attackerBomberCasualties, attackerId);
-        fighterLoss.decrementLosses(defenderFighterCasualties, defenderId);
+        require(
+            fighterLoss.decrementLosses(attackerFighterCasualties, attackerId),
+            "failed to decrement fighter losses"
+        );
+        require(
+            bomber.decrementBomberLosses(attackerBomberCasualties, attackerId),
+            "failed to decrement bomber losses"
+        );
+        require(
+            fighterLoss.decrementLosses(defenderFighterCasualties, defenderId),
+            "failed to decrement defender fighter losses"
+        );
     }
 }

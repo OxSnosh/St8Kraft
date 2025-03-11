@@ -671,7 +671,7 @@ contract ForcesContract is Ownable {
     function decreaseDefendingTankCountFromAirBattleContract(
         uint256 id,
         uint256 amountToDecrease
-    ) public onlyAirBattle {
+    ) public onlyAirBattle returns (bool) {
         uint256 defendingTanks = idToForces[id].defendingTanks;
         if (amountToDecrease > 30) {
             amountToDecrease = 30;
@@ -685,6 +685,7 @@ contract ForcesContract is Ownable {
             idToForces[id].defendingTanks -= amountToDecrease;
         }
         emit TankDamageFromAirAssault(id, amountToDecrease);
+        return true;
     }
 
     ///@dev this is a public view function that will return the number of tanks a nation has

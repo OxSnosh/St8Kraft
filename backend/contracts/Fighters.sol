@@ -616,7 +616,7 @@ contract FighterLosses is Ownable {
     function decrementLosses(
         uint256[] memory losses,
         uint256 id
-    ) public onlyAirBattle {
+    ) public onlyAirBattle returns (bool) {
         for (uint256 i; i < losses.length; i++) {
             if (losses[i] == 1) {
                 fight.decreaseYak9Count(1, id);
@@ -638,6 +638,7 @@ contract FighterLosses is Ownable {
                 fight.decreaseF22RaptorCount(1, id);
             }
         }
+        return true;
     }
 }
 
