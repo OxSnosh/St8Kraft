@@ -406,7 +406,7 @@ contract TreasuryContract is Ownable, ReentrancyGuard {
     function spendBalance(
         uint256 id,
         uint256 cost
-    ) external approvedBalanceSpender {
+    ) external approvedBalanceSpender returns (bool) {
         uint256 balance = idToTreasury[id].balance;
         require(balance >= cost, "insufficient balance");
         bool demonitized = idToTreasury[id].demonitized;
@@ -423,6 +423,7 @@ contract TreasuryContract is Ownable, ReentrancyGuard {
                 taxLevied
             );
         }
+        return true;
     }
 
     ///@dev this function will show the balance of warbucks within the contract

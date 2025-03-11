@@ -6,11 +6,12 @@ import "./CountryMinter.sol";
 import "./Infrastructure.sol";
 import "./Fighters.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 ///@title BombersContract
 ///@author OxSnosh
 ///@notice this contract will store this information about each nation's bomber fleet
-contract BombersContract is Ownable {
+contract BombersContract is Ownable, ReentrancyGuard {
     address public countryMinter;
     address public bombersMarket1;
     address public bombersMarket2;
@@ -556,7 +557,7 @@ contract BombersContract is Ownable {
     function decrementBomberLosses(
         uint256[] memory losses,
         uint256 id
-    ) public onlyAirBattle returns (bool) {
+    ) public onlyAirBattle nonReentrant returns (bool) {
         for (uint256 i; i < losses.length; i++) {
             if (losses[i] == 1) {
                 decreaseAh1CobraCount(1, id);
@@ -585,7 +586,7 @@ contract BombersContract is Ownable {
 ///@title BombersMarketplace1
 ///@author OxSnosh
 ///@notice this is the contract that will allow nation owners to purchase AH! Cobras, AH64 Apaches, Bristol Blenheims, B52 Mitchells and B17 Flying Fortresses
-contract BombersMarketplace1 is Ownable {
+contract BombersMarketplace1 is Ownable, ReentrancyGuard {
     address public countryMinter;
     address public bombers1;
     address public fighters;
@@ -614,6 +615,8 @@ contract BombersMarketplace1 is Ownable {
     InfrastructureContract inf;
     TreasuryContract tsy;
     BombersContract bomb1;
+
+    event AircraftPurchased(uint256 indexed id, string aircraftType, uint256 amount, uint256 price);
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
@@ -763,7 +766,7 @@ contract BombersMarketplace1 is Ownable {
     ///@notice this function allowes the caller to purchase an AH1 Cobra for their nation
     ///@param amount specifies the number of aircraft being purchased
     ///@param id is the nation ID
-    function buyAh1Cobra(uint256 amount, uint256 id) public {
+    function buyAh1Cobra(uint256 amount, uint256 id) public nonReentrant{
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 aircraftCount = fight.getAircraftCount(id);
@@ -781,7 +784,8 @@ contract BombersMarketplace1 is Ownable {
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseAh1CobraCount(id, amount);
-        tsy.spendBalance(id, purchasePrice);
+        require(tsy.spendBalance(id, purchasePrice), "failed to purchase");
+        emit AircraftPurchased(id, "AH1 Cobra", amount, purchasePrice);
     }
 
     function getAh1CobraCost(uint256 id) public view returns (uint256) {
@@ -794,7 +798,7 @@ contract BombersMarketplace1 is Ownable {
     ///@notice this function allowes the caller to purchase an A64 Apache for their nation
     ///@param amount specifies the number of aircraft being purchased
     ///@param id is the nation ID
-    function buyAh64Apache(uint256 amount, uint256 id) public {
+    function buyAh64Apache(uint256 amount, uint256 id) public nonReentrant {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 aircraftCount = fight.getAircraftCount(id);
@@ -812,7 +816,8 @@ contract BombersMarketplace1 is Ownable {
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseAh64ApacheCount(id, amount);
-        tsy.spendBalance(id, purchasePrice);
+        require(tsy.spendBalance(id, purchasePrice), "failed to purchase");
+        emit AircraftPurchased(id, "AH64 Apache", amount, purchasePrice);
     }
 
     function getAh64ApacheCost(uint256 id) public view returns (uint256) {
@@ -825,7 +830,7 @@ contract BombersMarketplace1 is Ownable {
     ///@notice this function allowes the caller to purchase a Bristol Blenheim for their nation
     ///@param amount specifies the number of aircraft being purchased
     ///@param id is the nation ID
-    function buyBristolBlenheim(uint256 amount, uint256 id) public {
+    function buyBristolBlenheim(uint256 amount, uint256 id) public nonReentrant {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 aircraftCount = fight.getAircraftCount(id);
@@ -843,7 +848,8 @@ contract BombersMarketplace1 is Ownable {
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseBristolBlenheimCount(id, amount);
-        tsy.spendBalance(id, purchasePrice);
+        require(tsy.spendBalance(id, purchasePrice), "failed to purchase");
+        emit AircraftPurchased(id, "Bristol Blenheim", amount, purchasePrice);
     }
 
     function getBristolBlenheimCost(uint256 id) public view returns (uint256) {
@@ -856,7 +862,7 @@ contract BombersMarketplace1 is Ownable {
     ///@notice this function allowes the caller to purchase a B52 Mitchell for their nation
     ///@param amount specifies the number of aircraft being purchased
     ///@param id is the nation ID
-    function buyB52Mitchell(uint256 amount, uint256 id) public {
+    function buyB52Mitchell(uint256 amount, uint256 id) public nonReentrant {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 aircraftCount = fight.getAircraftCount(id);
@@ -874,7 +880,8 @@ contract BombersMarketplace1 is Ownable {
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseB52MitchellCount(id, amount);
-        tsy.spendBalance(id, purchasePrice);
+        require(tsy.spendBalance(id, purchasePrice), "failed to purchase");
+        emit AircraftPurchased(id, "B52 Mitchell", amount, purchasePrice);
     }
 
     function getB52MitchellCost(uint256 id) public view returns (uint256) {
@@ -887,7 +894,7 @@ contract BombersMarketplace1 is Ownable {
     ///@notice this function allowes the caller to purchase a B17 Flying Fortress for their nation
     ///@param amount specifies the number of aircraft being purchased
     ///@param id is the nation ID
-    function buyB17gFlyingFortress(uint256 amount, uint256 id) public {
+    function buyB17gFlyingFortress(uint256 amount, uint256 id) public nonReentrant {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 aircraftCount = fight.getAircraftCount(id);
@@ -905,7 +912,8 @@ contract BombersMarketplace1 is Ownable {
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseB17gFlyingFortressCount(id, amount);
-        tsy.spendBalance(id, purchasePrice);
+        require(tsy.spendBalance(id, purchasePrice), "failed to purchase");
+        emit AircraftPurchased(id, "B17 Flying Fortress", amount, purchasePrice);
     }
 
     function getB17gFlyingFortressCost(
@@ -920,7 +928,7 @@ contract BombersMarketplace1 is Ownable {
 ///@title BombersMarketplace2
 ///@author OxSnosh
 ///@notice this contract allows nation owners to purchase B52 Stratofortresses, B2 Spirits, B1B Lancers and Tupolev TO160s
-contract BombersMarketplace2 is Ownable {
+contract BombersMarketplace2 is Ownable, ReentrancyGuard {
     address public countryMinter;
     address public bombers1;
     address public fighters;
@@ -939,6 +947,8 @@ contract BombersMarketplace2 is Ownable {
     uint256 public tupolevTu160Cost = 50000 * (10 ** 18);
     uint256 public tupolevTu160RequiredInfrastructure = 1000;
     uint256 public tupolevTu160RequiredTech = 500;
+
+    event AircraftPurchased(uint256 indexed id, string aircraftType, uint256 amount, uint256 price);
 
     CountryMinter mint;
     FightersContract fight;
@@ -1071,7 +1081,7 @@ contract BombersMarketplace2 is Ownable {
     ///@notice this function allowes the caller to purchase a B52 Stratofortress for their nation
     ///@param amount specifies the number of aircraft being purchased
     ///@param id is the nation ID
-    function buyB52Stratofortress(uint256 amount, uint256 id) public {
+    function buyB52Stratofortress(uint256 amount, uint256 id) public nonReentrant{
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 aircraftCount = fight.getAircraftCount(id);
@@ -1089,7 +1099,8 @@ contract BombersMarketplace2 is Ownable {
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseB52StratofortressCount(id, amount);
-        tsy.spendBalance(id, purchasePrice);
+        require(tsy.spendBalance(id, purchasePrice), "failed to purchase");
+        emit AircraftPurchased(id, "B52 Stratofortress", amount, purchasePrice);
     }
 
     function getB52StratofortressCost(
@@ -1104,7 +1115,7 @@ contract BombersMarketplace2 is Ownable {
     ///@notice this function allowes the caller to purchase a B2 Spirit for their nation
     ///@param amount specifies the number of aircraft being purchased
     ///@param id is the nation ID
-    function buyB2Spirit(uint256 amount, uint256 id) public {
+    function buyB2Spirit(uint256 amount, uint256 id) public nonReentrant{
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 aircraftCount = fight.getAircraftCount(id);
@@ -1122,7 +1133,8 @@ contract BombersMarketplace2 is Ownable {
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseB2SpiritCount(id, amount);
-        tsy.spendBalance(id, purchasePrice);
+        require(tsy.spendBalance(id, purchasePrice), "failed to purchase");
+        emit AircraftPurchased(id, "B2 Spirit", amount, purchasePrice);
     }
 
     function getB2SpiritCost(uint256 id) public view returns (uint256) {
@@ -1135,7 +1147,7 @@ contract BombersMarketplace2 is Ownable {
     ///@notice this function allowes the caller to purchase a B1B Lancer for their nation
     ///@param amount specifies the number of aircraft being purchased
     ///@param id is the nation ID
-    function buyB1bLancer(uint256 amount, uint256 id) public {
+    function buyB1bLancer(uint256 amount, uint256 id) public nonReentrant {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 aircraftCount = fight.getAircraftCount(id);
@@ -1153,7 +1165,8 @@ contract BombersMarketplace2 is Ownable {
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseB1bLancerCount(id, amount);
-        tsy.spendBalance(id, purchasePrice);
+        require(tsy.spendBalance(id, purchasePrice), "failed to purchase");
+        emit AircraftPurchased(id, "B1B Lancer", amount, purchasePrice);
     }
 
     function getB1bLancerCost(uint256 id) public view returns (uint256) {
@@ -1166,7 +1179,7 @@ contract BombersMarketplace2 is Ownable {
     ///@notice this function allowes the caller to purchase a Tupolev TU160 for their nation
     ///@param amount specifies the number of aircraft being purchased
     ///@param id is the nation ID
-    function buyTupolevTu160(uint256 amount, uint256 id) public {
+    function buyTupolevTu160(uint256 amount, uint256 id) public nonReentrant {
         bool isOwner = mint.checkOwnership(id, msg.sender);
         require(isOwner, "!nation ruler");
         uint256 aircraftCount = fight.getAircraftCount(id);
@@ -1184,7 +1197,8 @@ contract BombersMarketplace2 is Ownable {
         uint256 balance = tsy.checkBalance(id);
         require(balance >= purchasePrice);
         bomb1.increaseTupolevTu160Count(id, amount);
-        tsy.spendBalance(id, purchasePrice);
+        require(tsy.spendBalance(id, purchasePrice), "failed to purchase");
+        emit AircraftPurchased(id, "Tupolev TU160", amount, purchasePrice);
     }
 
     function getTupolevTu160Cost(uint256 id) public view returns (uint256) {
