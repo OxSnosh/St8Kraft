@@ -29,9 +29,6 @@ const ManageTrades = () => {
     const [proposedTrades, setProposedTrades] = useState<any[]>([]);
     const [tradingPartners, setTradingPartners] = useState<any[]>([]);
 
-
-
-
     useEffect(() => {
         const fetchMintedNations = async () => {
             setLoading(true);

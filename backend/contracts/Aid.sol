@@ -341,12 +341,15 @@ contract AidContract is Ownable, ReentrancyGuard {
     ///@dev this is a public function that is callable by the recipient of the aid proposal
     ///@notice this function is called by the recipient of an aid proposal in order to accept the aid
     ///@param proposalId this id the ID of the aid proposal
-    function acceptProposal(uint256 proposalId) public nonReentrant{
-        require(!proposalExpired(proposalId), "proposal expired");
+    function acceptProposal(uint256 proposalId) public nonReentrant {
         require(!idToProposal[proposalId].accepted, "this offer has been accepted already");
         require(!idToProposal[proposalId].cancelled, "this offer has been cancelled");
         uint256 idSender = idToProposal[proposalId].idSender;
         uint256 idRecipient = idToProposal[proposalId].idRecipient;
+        if (proposalExpired(proposalId)) {
+            removeProposal(proposalId, idSender, idRecipient);
+            revert("Proposal expired and removed");
+        }
         uint256 tech = idToProposal[proposalId].techAid;
         uint256 balance = idToProposal[proposalId].balanceAid;
         uint256 soldiers = idToProposal[proposalId].soldierAid;
@@ -426,6 +429,31 @@ contract AidContract is Ownable, ReentrancyGuard {
             balance,
             soldiers
         );
+    }
+
+    function removeProposal(uint256 proposalId, uint256 idSender, uint256 idRecipient) internal {
+        delete idToProposal[proposalId];
+
+        uint256[] storage senderProposals = idToAidProposalsSent[idSender];
+        uint256[] storage recipientProposals = idToAidProposalsReceived[idRecipient];
+
+        // Remove from sender's proposals
+        for (uint256 i = 0; i < senderProposals.length; i++) {
+            if (senderProposals[i] == proposalId) {
+                senderProposals[i] = senderProposals[senderProposals.length - 1];
+                senderProposals.pop();
+                break;
+            }
+        }
+
+        // Remove from recipient's proposals
+        for (uint256 i = 0; i < recipientProposals.length; i++) {
+            if (recipientProposals[i] == proposalId) {
+                recipientProposals[i] = recipientProposals[recipientProposals.length - 1];
+                recipientProposals.pop();
+                break;
+            }
+        }
     }
 
     ///@dev this function is a public function that allows the aid proposal to be cancelled by the sender of the proposal
