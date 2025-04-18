@@ -31,10 +31,12 @@ import Senate from "./Senate";
 import TransferDeleteNation from "./DeleteTransfer";
 import Messages from "./Messages";
 import AllianceManagement from "./AllianceManagement";
+import { NationSearch } from "../../../components/NationSearch";
 import { useAccount, usePublicClient } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 
 const menuItems = [
+  { category: "SEARCH NATIONS", options: ["Search"] },
   { category: "NATION SETTINGS", options: ["Government Settings", "Military Settings", "Manage Trades", "Send Aid", "Senate", "Alliance"] },
   { category: "MANAGE WARS", options: ["Declare War", "Active Wars"] },
   { category: "TREASURY", options: ["Collect Taxes", "Pay Bills", "Deposit and Withdraw"] },
@@ -231,6 +233,8 @@ const Nation = () => {
         setSelectedComponent(<TransferDeleteNation />);
       }else if (savedMenuItem === "Messages") {
         setSelectedComponent(<Messages />);
+      } else if (savedMenuItem === "Search") {
+        setSelectedComponent(<NationSearch/>);
       } else {
         setSelectedComponent(<div className="p-6">Coming Soon...</div>);
       }
@@ -297,6 +301,8 @@ const Nation = () => {
       setSelectedComponent(<TransferDeleteNation />);
     } else if (option === "Messages") {
       setSelectedComponent(<Messages />);
+    } else if (option === "Search") {
+      setSelectedComponent(<NationSearch/>);
     } else {
       setSelectedComponent(<div className="p-6">Coming Soon...</div>);
     }

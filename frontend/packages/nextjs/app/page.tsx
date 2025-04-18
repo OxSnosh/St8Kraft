@@ -55,15 +55,12 @@ const Home: NextPage = () => {
               {displayText}
             </h1>
           </div>
-
-        <div className="absolute top-[593px] left-1/2 transform -translate-x-1/2 w-full flex justify-center">
-          <div className="w-[600px] bg-black bg-opacity-70 p-6 rounded-lg flex flex-col items-center">
-            <h1 className="text-center text-white text-xl">Recently Minted Nations</h1>
-            <NationsTable />
+          <div className="absolute top-[593px] left-1/2 transform -translate-x-1/2 w-full flex justify-center">
+            <div className="w-[600px] bg-black bg-opacity-70 p-6 rounded-lg flex flex-col items-center">
+              <h1 className="text-center text-white text-xl">Recently Minted Nations</h1>
+              <NationsTable />
+            </div>
           </div>
-        </div>
-
-
         </div>
       </div>
     </>

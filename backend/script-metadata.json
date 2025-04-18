@@ -134,6 +134,19 @@
           "type": "event"
         },
         {
+          "inputs": [],
+          "name": "MAX_NATIONS_PER_WALLET",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
           "inputs": [
             {
               "internalType": "address",
@@ -1438,7 +1451,13 @@
             }
           ],
           "name": "decreaseDefendingTankCountFromAirBattleContract",
-          "outputs": [],
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
           "stateMutability": "nonpayable",
           "type": "function"
         },
@@ -2972,7 +2991,13 @@
             }
           ],
           "name": "decreaseBalanceOnBillsPaid",
-          "outputs": [],
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
           "stateMutability": "nonpayable",
           "type": "function"
         },
@@ -3752,7 +3777,13 @@
             }
           ],
           "name": "spendBalance",
-          "outputs": [],
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
           "stateMutability": "nonpayable",
           "type": "function"
         },
@@ -4258,7 +4289,13 @@
             }
           ],
           "name": "decreaseInfrastructureCountFromAirBattleContract",
-          "outputs": [],
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
           "stateMutability": "nonpayable",
           "type": "function"
         },
@@ -9841,19 +9878,6 @@
           "type": "function"
         },
         {
-          "inputs": [
-            {
-              "internalType": "uint256",
-              "name": "battleId",
-              "type": "uint256"
-            }
-          ],
-          "name": "fulfillRequest",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
           "inputs": [],
           "name": "owner",
           "outputs": [
@@ -11447,7 +11471,13 @@
             }
           ],
           "name": "decrementBomberLosses",
-          "outputs": [],
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
           "stateMutability": "nonpayable",
           "type": "function"
         },
@@ -12175,6 +12205,37 @@
     "bombersmarketplace1": {
       "address": "0x610178dA211FEF7D417bC0e6FeD39F05609AD788",
       "ABI": [
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "aircraftType",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "price",
+              "type": "uint256"
+            }
+          ],
+          "name": "AircraftPurchased",
+          "type": "event"
+        },
         {
           "anonymous": false,
           "inputs": [
@@ -12958,6 +13019,37 @@
     "bombersmarketplace2": {
       "address": "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e",
       "ABI": [
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "aircraftType",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "price",
+              "type": "uint256"
+            }
+          ],
+          "name": "AircraftPurchased",
+          "type": "event"
+        },
         {
           "anonymous": false,
           "inputs": [
@@ -17974,7 +18066,13 @@
             }
           ],
           "name": "decrementLosses",
-          "outputs": [],
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
           "stateMutability": "nonpayable",
           "type": "function"
         },
@@ -19866,7 +19964,13 @@
             }
           ],
           "name": "decreaseCruiseMissileCountFromAirBattleContract",
-          "outputs": [],
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
           "stateMutability": "nonpayable",
           "type": "function"
         },

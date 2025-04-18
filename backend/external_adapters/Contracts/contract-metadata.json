@@ -134,6 +134,19 @@
           "type": "event"
         },
         {
+          "inputs": [],
+          "name": "MAX_NATIONS_PER_WALLET",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
           "inputs": [
             {
               "internalType": "address",
@@ -1438,7 +1451,13 @@
             }
           ],
           "name": "decreaseDefendingTankCountFromAirBattleContract",
-          "outputs": [],
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
           "stateMutability": "nonpayable",
           "type": "function"
         },
@@ -2858,7 +2877,13 @@
             }
           ],
           "name": "decreaseBalanceOnBillsPaid",
-          "outputs": [],
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
           "stateMutability": "nonpayable",
           "type": "function"
         },
@@ -3638,7 +3663,13 @@
             }
           ],
           "name": "spendBalance",
-          "outputs": [],
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
           "stateMutability": "nonpayable",
           "type": "function"
         },

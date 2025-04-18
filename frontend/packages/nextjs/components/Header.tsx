@@ -9,7 +9,6 @@ import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaff
 import { useOutsideClick } from "~~/hooks/scaffold-eth";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 import { useAccount, usePublicClient } from "wagmi";
-import { CountryParametersContract } from '../../../../backend/typechain-types/contracts/CountryParameters.sol/CountryParametersContract';
 
 type HeaderMenuLink = {
   label: string;
@@ -36,6 +35,10 @@ export const menuLinks: HeaderMenuLink[] = [
     label: "Mint A Nation",
     href: "/mint",
   },
+  {
+    label: "Gameplay Guide",
+    href: "/gameplay",
+  }   
 ];
 
 export const HeaderMenuLinks = () => {

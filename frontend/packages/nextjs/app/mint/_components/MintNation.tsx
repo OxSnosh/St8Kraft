@@ -1,301 +1,237 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { useWaitForTransactionReceipt, useWriteContract, useAccount, usePublicClient } from "wagmi";
-import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
-import { keccak256 } from "viem";
-import { ethers } from "ethers";
-import { parseRevertReason } from '../../../utils/errorHandling';
+import React, { useEffect, useState, useCallback } from 'react';
+import {
+  useAccount,
+  useWriteContract,
+  usePublicClient,
+  useWaitForTransactionReceipt
+} from 'wagmi';
+import { simulateContract, writeContract } from 'wagmi/actions';
+import { wagmiConfig } from '../../../utils/wagmiConfig';
+import { useAllContracts } from '~~/utils/scaffold-eth/contractsData';
+
+import { encodeFunctionData } from 'viem';
+// import { useAccount } from 'wagmi';
+import { useTransactor } from '~~/hooks/scaffold-eth/useTransactor';
+// import { CountryMinter } from '~~/utils/contracts';
 
 export function MintNation() {
+  
   const [form, setForm] = useState({
-    rulerName: "",
-    nationName: "",
-    capitalCity: "",
-    nationSlogan: "",
+    rulerName: '',
+    nationName: '',
+    capitalCity: '',
+    nationSlogan: '',
   });
-
+  
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>();
   const [isPending, setIsPending] = useState(false);
   const [nations, setNations] = useState<Array<any>>([]);
-
+  
+  const { writeContractAsync } = useWriteContract();
   const { address: walletAddress } = useAccount();
+  const writeTx = useTransactor();
+
+  const publicClient = usePublicClient();
   const contractsData = useAllContracts();
   const countryMinterContract = contractsData?.CountryMinter;
   const countryParametersContract = contractsData?.CountryParametersContract;
 
-  const { writeContractAsync } = useWriteContract();
-  const publicClient = usePublicClient();
+  const { data: txReceipt } = useWaitForTransactionReceipt({ hash: txHash });
 
-  const { data: txReceipt } = useWaitForTransactionReceipt({
-    hash: txHash,
-  });
+  const fetchNationDetails = useCallback(async () => {
+    if (!walletAddress || !countryMinterContract || !countryParametersContract || !publicClient) return;
 
-  useEffect(() => {
-    const fetchNationDetails = async () => {
-      if (!countryMinterContract || !walletAddress || !publicClient || !countryParametersContract) {
-        console.error("Missing required data: countryMinterContract, walletAddress, or publicClient.");
-        return;
-      }
+    try {
+      const tokenIds = await publicClient.readContract({
+        abi: countryMinterContract.abi,
+        address: countryMinterContract.address,
+        functionName: 'tokensOfOwner',
+        args: [walletAddress],
+      });
 
-      try {
-        // Fetch token IDs owned by the wallet
-        const tokenIds = await publicClient.readContract({
-          abi: countryMinterContract.abi,
-          address: countryMinterContract.address,
-          functionName: "tokensOfOwner",
-          args: [walletAddress],
-        });
-
-        if (!Array.isArray(tokenIds) || tokenIds.length === 0) {
-          console.warn("No tokens found for this wallet.");
-          setNations([]);
-          return;
-        }
-
-        console.log("Fetched Token IDs:", tokenIds);
-
-        // Fetch nation details for each tokenId
-        const details = await Promise.all(
-          tokenIds.map(async (tokenId) => {
-            const tokenIdString = tokenId.toString(); // Convert BigInt to string
-
-            try {
-              const nationName = await publicClient.readContract({
-                abi: countryParametersContract.abi,
-                address: countryParametersContract.address,
-                functionName: "getNationName",
-                args: [tokenIdString],
-              });
-
-              const rulerName = await publicClient.readContract({
-                abi: countryParametersContract.abi,
-                address: countryParametersContract.address,
-                functionName: "getRulerName",
-                args: [tokenIdString],
-              });
-
-              const capitalCity = await publicClient.readContract({
-                abi: countryParametersContract.abi,
-                address: countryParametersContract.address,
-                functionName: "getCapital",
-                args: [tokenIdString],
-              });
-
-              const nationSlogan = await publicClient.readContract({
-                abi: countryParametersContract.abi,
-                address: countryParametersContract.address,
-                functionName: "getSlogan",
-                args: [tokenIdString],
-              });
-
-              return { tokenId: tokenIdString, nationName, rulerName, capitalCity, nationSlogan };
-            } catch (err) {
-              console.error(`Error fetching details for token ${tokenIdString}:`, err);
-              return { tokenId: tokenIdString, nationName: null, rulerName: null, capitalCity: null, nationSlogan: null };
-            }
-          })
-        );
-
-        console.log("Fetched Nation Details:", details);
-        setNations(details);
-      } catch (error) {
-        console.error("Error fetching token IDs or nation details:", error);
-      }
-    };
-
-    fetchNationDetails();
-  }, [walletAddress, countryMinterContract, countryParametersContract, publicClient]);
-
-  const handleWrite = async () => {
-
-    if (!writeContractAsync || !countryMinterContract?.abi || !countryMinterContract?.address) {
-      alert("Contract or connection is not ready. Please check your setup.");
-      return;
-    }
-  
-    if (!publicClient) {
-      console.error("Public client is not initialized.");
-      return;
-    }
-
-      const contractData = contractsData.CountryMinter;
-      const abi = contractData.abi;
-      
-      if (!contractData.address || !abi) {
-          console.error("Contract address or ABI is missing");
-          return;
-      }
-      
-      try {
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          await provider.send("eth_requestAccounts", []);
-          const signer = provider.getSigner();
-          const userAddress = await signer.getAddress();
-
-          const contract = new ethers.Contract(contractData.address, abi as ethers.ContractInterface, signer);
-
-          const data = contract.interface.encodeFunctionData("generateCountry", [
-              form.rulerName,
-              form.nationName,
-              form.capitalCity,
-              form.nationSlogan,
+      const details = await Promise.all(
+        (tokenIds as any[]).map(async (tokenId) => {
+          const id = tokenId.toString();
+          const [nationName, rulerName, capitalCity, nationSlogan] = await Promise.all([
+            publicClient.readContract({
+              abi: countryParametersContract.abi,
+              address: countryParametersContract.address,
+              functionName: 'getNationName',
+              args: [id],
+            }),
+            publicClient.readContract({
+              abi: countryParametersContract.abi,
+              address: countryParametersContract.address,
+              functionName: 'getRulerName',
+              args: [id],
+            }),
+            publicClient.readContract({
+              abi: countryParametersContract.abi,
+              address: countryParametersContract.address,
+              functionName: 'getCapital',
+              args: [id],
+            }),
+            publicClient.readContract({
+              abi: countryParametersContract.abi,
+              address: countryParametersContract.address,
+              functionName: 'getSlogan',
+              args: [id],
+            }),
           ]);
 
-          try {
-              const result = await provider.call({
-                  to: contract.address,
-                  data: data,
-                  from: userAddress,
-              });
+          return { tokenId: id, nationName, rulerName, capitalCity, nationSlogan };
+        })
+      );
 
-              console.log("Transaction Simulation Result:", result);
+      setNations(details);
+    } catch (err) {
+      console.error('Failed to fetch nations:', err);
+    }
+  }, [walletAddress, countryMinterContract, countryParametersContract, publicClient]);
 
-              if (result.startsWith("0x08c379a0")) {
-                  const errorMessage = parseRevertReason({ data: result });
-                  alert(`Transaction failed: ${errorMessage}`);
-                  return;
-              }
+  useEffect(() => {
+    fetchNationDetails();
+  }, [fetchNationDetails]);
 
-          } catch (error: any) {
-              const errorMessage = parseRevertReason(error);
-              console.error("Transaction simulation failed:", errorMessage);
-              alert(`Transaction failed: ${errorMessage}`);
-              return;            
-          }
+const handleWrite = async () => {
+  if (!walletAddress) return;
 
-          const tx = await writeContractAsync({
-            abi: countryMinterContract.abi,
-            address: countryMinterContract.address,
-            functionName: "generateCountry",
-            args: [
-              form.rulerName,
-              form.nationName,
-              form.capitalCity,
-              form.nationSlogan,
-            ],
-          });
-      
-          setTxHash(tx); // Save the transaction hash
-      
-          // Wait for the transaction receipt
-          const receipt = await publicClient.waitForTransactionReceipt({ hash: tx });
-      
-          // Manually encode the Transfer event signature
-          const transferEventSignature = keccak256(
-            Buffer.from("Transfer(address,address,uint256)")
-          );
-      
-          // Get the new token ID from the event logs
-          const newTokenId = receipt.logs.find(
-            (log) => log.topics[0] === transferEventSignature
-          )?.topics[3]; // Topics[3] contains the token ID in Transfer events
-      
-          if (newTokenId) {
-            const tokenIdString = BigInt(newTokenId).toString(); // Convert token ID from hex to string
-      
-            // Fetch details for the newly minted token
-            const nationName = await publicClient.readContract({
-              abi: countryParametersContract.abi,
-              address: countryParametersContract.address,
-              functionName: "getNationName",
-              args: [tokenIdString],
-            });
-      
-            const rulerName = await publicClient.readContract({
-              abi: countryParametersContract.abi,
-              address: countryParametersContract.address,
-              functionName: "getRulerName",
-              args: [tokenIdString],
-            });
-      
-            const capitalCity = await publicClient.readContract({
-              abi: countryParametersContract.abi,
-              address: countryParametersContract.address,
-              functionName: "getCapital",
-              args: [tokenIdString],
-            });
-      
-            const nationSlogan = await publicClient.readContract({
-              abi: countryParametersContract.abi,
-              address: countryParametersContract.address,
-              functionName: "getSlogan",
-              args: [tokenIdString],
-            });
-      
-            // Add the new nation to the state
-            setNations((prev) => [
-              ...prev,
-              { tokenId: tokenIdString, nationName, rulerName, capitalCity, nationSlogan },
-            ]);
-          }          
-          alert("Nation minted successfully!");
-      } catch (error: any) {
-          const errorMessage = parseRevertReason(error);
-          console.error("Transaction failed:", errorMessage);
-          alert(`Transaction failed: ${errorMessage}`);
-      }
+  try {
+    const data = encodeFunctionData({
+      abi: countryMinterContract.abi,
+      functionName: 'generateCountry',
+      args: [
+        form.rulerName,
+        form.nationName,
+        form.capitalCity,
+        form.nationSlogan,
+      ],
+    });
+
+    await writeTx({
+      to: countryMinterContract.address,
+      data,
+      account: walletAddress,
+    });
+  } catch (err) {
+    console.error("Mint failed:", err);
   }
+};
+
+  
+  // const handleWrite = async () => {
+  //   console.log("🔥 Button clicked");
+  //   console.log("contract address:", countryMinterContract?.address);
+  //   console.log("writeContractAsync:", writeContractAsync?.toString());
+
+  //   if (!form.rulerName || !form.nationName || !form.capitalCity || !form.nationSlogan) {
+  //     alert('Please fill in all fields');
+  //     return;
+  //   }
+
+  //   if (!countryMinterContract?.abi || !countryMinterContract?.address) {
+  //     alert('Contract not initialized');
+  //     return;
+  //   }
+
+  //   try {
+  //     setIsPending(true);
+
+  //     const tx = await writeContractAsync({
+  //       abi: countryMinterContract.abi,
+  //       address: countryMinterContract.address,
+  //       functionName: 'generateCountry',
+  //       args: [
+  //         form.rulerName,
+  //         form.nationName,
+  //         form.capitalCity,
+  //         form.nationSlogan,
+  //       ],
+  //     });
+
+  //     setTxHash(tx);
+  //     if (publicClient) {
+  //       await publicClient.waitForTransactionReceipt({ hash: tx });
+  //     }
+
+  //     await fetchNationDetails();
+  //     alert('Nation minted successfully!');
+  //   } catch (err: any) {
+  //     console.error('Mint failed:', err);
+  //     alert(`Transaction failed: ${parseRevertReason(err) || err.message}`);
+  //   } finally {
+  //     setIsPending(false);
+  //   }
+  // };
 
   return (
-    <div className="font-special text-center bg-secondary p-10 flex flex-col items-center justify-center"
+    <div
+      className="font-special text-center bg-secondary p-10 flex flex-col items-center justify-center"
       style={{
         backgroundImage: "url('/mintnationspage_expanded.jpg')",
-        backgroundSize: "5440px 3300px",
-        backgroundRepeat: "no-repeat",
-        backgroundPosition: "center -330px",
-        width: "100vw",
-        height: "2800px",
-        position: "absolute",
-        top: "0",
-        left: "0"
-      }}>
-      
-      <div className="flex flex-col gap-4 w-full max-w-md" style={{ position: "absolute", top: "270px", left: "47%", transform: "translateX(-50%)" }}>
-      <input
-          type="text"
-          placeholder="Ruler Name"
-          className="input input-primary"
-          value={form.rulerName}
-          onChange={(e) => setForm((prev) => ({ ...prev, rulerName: e.target.value }))}
-        />
-        <input
-          type="text"
-          placeholder="Nation Name"
-          className="input input-primary"
-          value={form.nationName}
-          onChange={(e) => setForm((prev) => ({ ...prev, nationName: e.target.value }))}
-        />
-        <input
-          type="text"
-          placeholder="Capital City"
-          className="input input-primary"
-          value={form.capitalCity}
-          onChange={(e) => setForm((prev) => ({ ...prev, capitalCity: e.target.value }))}
-        />
-        <input
-          type="text"
-          placeholder="Nation Slogan"
-          className="input input-primary"
-          value={form.nationSlogan}
-          onChange={(e) => setForm((prev) => ({ ...prev, nationSlogan: e.target.value }))}
-        />
+        backgroundSize: '5440px 3300px',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center -330px',
+        width: '100vw',
+        height: '2800px',
+        position: 'absolute',
+        top: '0',
+        left: '0',
+      }}
+    >
+      <div
+        className="flex flex-col gap-4 w-full max-w-md"
+        style={{ position: 'absolute', top: '270px', left: '47%', transform: 'translateX(-50%)' }}
+      >
+        {['Ruler Name', 'Nation Name', 'Capital City', 'Nation Slogan'].map((label, i) => {
+          const key = ['rulerName', 'nationName', 'capitalCity', 'nationSlogan'][i] as keyof typeof form;
+          return (
+            <input
+              key={key}
+              type="text"
+              placeholder={label}
+              className="input input-primary"
+              value={form[key]}
+              onChange={(e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))}
+            />
+          );
+        })}
+
         <button
           className="btn btn-primary mt-6"
           disabled={isPending || !writeContractAsync}
           onClick={handleWrite}
-          style={{ alignSelf: "center" } as React.CSSProperties}>
-          {isPending ? <span className="loading loading-spinner loading-xs"></span> : <span style={{ fontSize: "24px", fontWeight: "bold" }}>Mint Nation</span>}
+          style={{ alignSelf: 'center', fontSize: '24px', fontWeight: 'bold' }}
+        >
+          {isPending ? (
+            <span className="loading loading-spinner loading-xs"></span>
+          ) : (
+            'Mint Nation'
+          )}
+        </button>
+          <button onClick={async () => {
+          console.log("MetaMask:", typeof window.ethereum !== 'undefined');
+          const tx = await writeContractAsync?.({
+            abi: countryMinterContract.abi,
+            address: countryMinterContract.address,
+            functionName: 'generateCountry',
+            args: ['test', 'test', 'test', 'test'],
+          });
+          console.log("TX:", tx);
+        }}>
+          🔥 Test Write
         </button>
       </div>
-      
+
       <div className="w-full flex flex-col justify-center items-center text-white min-h-screen">
         {nations.length === 0 ? (
           <p className="text-center">You do not have any minted nations yet.</p>
         ) : (
           <div
             className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 p-4"
-            style={{ minHeight: "800px", marginTop: "800px" }}
+            style={{ minHeight: '800px', marginTop: '800px' }}
           >
             {nations.map((nation, index) => (
               <a
@@ -303,27 +239,25 @@ export function MintNation() {
                 href={`/nations?id=${nation.tokenId}`}
                 className="relative rounded-lg font-orbitron text-black text-center overflow-hidden"
                 style={{
-                  width: "225px",
-                  height: "300px",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  position: "relative",
+                  width: '225px',
+                  height: '300px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}
               >
                 <div
                   className="absolute inset-0 rounded-lg"
                   style={{
                     backgroundImage: `url('/post-it-note.jpg')`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    backgroundRepeat: "no-repeat",
-                    width: "100%",
-                    height: "100%",
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    width: '100%',
+                    height: '100%',
                   }}
-                ></div>
-
+                />
                 <div className="font-special relative z-10 bg-opacity-90 p-4 rounded-lg">
                   <h3 className="text-xl font-special">
                     {nation.tokenId} : {nation.nationName}

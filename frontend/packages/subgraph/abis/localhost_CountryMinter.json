@@ -130,6 +130,19 @@
     "type": "event"
   },
   {
+    "inputs": [],
+    "name": "MAX_NATIONS_PER_WALLET",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",

@@ -9,8 +9,6 @@ import { buyImprovement, deleteImprovement } from "~~/utils/improvements";
 import { getImprovements } from "~~/utils/improvements";
 import { checkBalance } from "~~/utils/treasury";
 import { useTheme } from "next-themes";
-import { ethers } from "ethers";
-import { parseRevertReason } from '../../../utils/errorHandling';
 
 const BuyImprovement = () => {
     const { theme } = useTheme();

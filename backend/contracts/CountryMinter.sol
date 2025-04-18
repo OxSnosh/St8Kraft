@@ -55,6 +55,8 @@ contract CountryMinter is ERC721, Ownable, ReentrancyGuard {
     mapping(address => uint256) public ownerCountryCount;
     mapping(address => uint256[]) public ownerCountryIds;
 
+    uint256 public constant MAX_NATIONS_PER_WALLET = 20;
+
     event NationCreated(
         string nationName,
         string ruler,
@@ -62,13 +64,11 @@ contract CountryMinter is ERC721, Ownable, ReentrancyGuard {
         address owner
     );
 
-    constructor (
-    ) ERC721 ("St8craft", "ST8") {
-    }
+    constructor() ERC721("St8craft", "ST8") {}
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings (
+    function settings(
         address _countryParameters,
         address _treasury,
         address _infrastructure,
@@ -90,7 +90,7 @@ contract CountryMinter is ERC721, Ownable, ReentrancyGuard {
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings2 (
+    function settings2(
         address _improvements1,
         address _improvements2,
         address _improvements3,
@@ -112,7 +112,7 @@ contract CountryMinter is ERC721, Ownable, ReentrancyGuard {
 
     ///@dev this function is only callable by the contract owner
     ///@dev this function will be called immediately after contract deployment in order to set contract pointers
-    function settings3 (
+    function settings3(
         address _military,
         address _forces,
         address _navy,
@@ -142,7 +142,11 @@ contract CountryMinter is ERC721, Ownable, ReentrancyGuard {
         string memory nationName,
         string memory capitalCity,
         string memory nationSlogan
-    ) public {
+    ) public nonReentrant {
+        require(
+            ownerCountryCount[msg.sender] < MAX_NATIONS_PER_WALLET,
+            "Cannot own more than 20 nations"
+        );
         uint256 seedMoney = TreasuryContract(treasury).getSeedMoney();
         IWarBucks(warbucks).burnFromMint(msg.sender, seedMoney);
         _safeMint(msg.sender, countryId);
@@ -155,7 +159,7 @@ contract CountryMinter is ERC721, Ownable, ReentrancyGuard {
             ruler,
             nationName,
             capitalCity,
-            nationSlogan 
+            nationSlogan
         );
         FightersContract(fighters).generateFighters(countryId);
         ForcesContract(forces).generateForces(countryId);
@@ -164,13 +168,17 @@ contract CountryMinter is ERC721, Ownable, ReentrancyGuard {
         ImprovementsContract2(improvements2).generateImprovements(countryId);
         ImprovementsContract3(improvements3).generateImprovements(countryId);
         ImprovementsContract4(improvements4).generateImprovements(countryId);
-        InfrastructureContract(infrastructure).generateInfrastructure(countryId);
+        InfrastructureContract(infrastructure).generateInfrastructure(
+            countryId
+        );
         MilitaryContract(military).generateMilitary(countryId);
         NavalActionsContract(navalActions).generateNavalActions(countryId);
         NavyContract(navy).generateNavy(countryId);
         NavyContract2(navy2).generateNavy2(countryId);
         ResourcesContract(resources).generateResources(countryId);
-        BonusResourcesContract(bonusResources).generateBonusResources(countryId);
+        BonusResourcesContract(bonusResources).generateBonusResources(
+            countryId
+        );
         SenateContract(senate).generateVoter(countryId);
         TreasuryContract(treasury).generateTreasury(countryId);
         WondersContract1(wonders1).generateWonders1(countryId);
@@ -187,7 +195,10 @@ contract CountryMinter is ERC721, Ownable, ReentrancyGuard {
         return countryId;
     }
 
-    function checkOwnership(uint256 nationId, address caller) public view returns (bool) {
+    function checkOwnership(
+        uint256 nationId,
+        address caller
+    ) public view returns (bool) {
         address owner = ownerOf(nationId);
         if (owner == caller) {
             return true;
@@ -196,7 +207,9 @@ contract CountryMinter is ERC721, Ownable, ReentrancyGuard {
         }
     }
 
-    function tokensOfOwner(address owner) public view returns (uint256[] memory) {
+    function tokensOfOwner(
+        address owner
+    ) public view returns (uint256[] memory) {
         return ownerCountryIds[owner];
     }
 
@@ -205,7 +218,6 @@ contract CountryMinter is ERC721, Ownable, ReentrancyGuard {
 
         address owner = ownerOf(nationId);
 
-        // Update storage first
         uint256[] storage ownedIds = ownerCountryIds[owner];
         for (uint256 i = 0; i < ownedIds.length; i++) {
             if (ownedIds[i] == nationId) {
@@ -218,10 +230,8 @@ contract CountryMinter is ERC721, Ownable, ReentrancyGuard {
         ownerCountryCount[owner]--;
         delete idToOwner[nationId];
 
-        // Now burn the NFT
         _burn(nationId);
     }
-
 
     function transferNation(uint256 nationId, address newOwner) public {
         require(newOwner != address(0), "Cannot transfer to zero address");
@@ -230,14 +240,11 @@ contract CountryMinter is ERC721, Ownable, ReentrancyGuard {
 
         address previousOwner = ownerOf(nationId);
 
-        // Transfer ownership via ERC721
         _transfer(previousOwner, newOwner, nationId);
 
-        // Update country count mappings
         ownerCountryCount[previousOwner]--;
         ownerCountryCount[newOwner]++;
 
-        // Remove from old owner's list
         uint256[] storage ownedIds = ownerCountryIds[previousOwner];
         for (uint256 i = 0; i < ownedIds.length; i++) {
             if (ownedIds[i] == nationId) {
@@ -247,8 +254,6 @@ contract CountryMinter is ERC721, Ownable, ReentrancyGuard {
             }
         }
 
-        // Add to new owner's list
         ownerCountryIds[newOwner].push(nationId);
     }
-
 }
