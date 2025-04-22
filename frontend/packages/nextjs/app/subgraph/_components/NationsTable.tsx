@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // Import Next.js router
+import { useRouter } from "next/navigation";
 import { GetNationsDocument, execute } from "~~/.graphclient";
 import { Address } from "~~/components/scaffold-eth";
 

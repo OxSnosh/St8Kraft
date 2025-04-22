@@ -1,4 +1,3 @@
-// utils/wagmiConfig.ts
 import { createConfig, http } from 'wagmi';
 import { sepolia, localhost } from 'wagmi/chains';
 

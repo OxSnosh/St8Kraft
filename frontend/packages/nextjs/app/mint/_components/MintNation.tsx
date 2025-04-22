@@ -95,32 +95,97 @@ export function MintNation() {
     fetchNationDetails();
   }, [fetchNationDetails]);
 
-const handleWrite = async () => {
-  if (!walletAddress) return;
+  const handleMint = async () => {
+    console.log(writeContractAsync, "writeContractAsync");
 
-  try {
-    const data = encodeFunctionData({
-      abi: countryMinterContract.abi,
-      functionName: 'generateCountry',
-      args: [
-        form.rulerName,
-        form.nationName,
-        form.capitalCity,
-        form.nationSlogan,
-      ],
-    });
-
-    await writeTx({
-      to: countryMinterContract.address,
-      data,
-      account: walletAddress,
-    });
-  } catch (err) {
-    console.error("Mint failed:", err);
-  }
-};
-
+    console.log("Mint button clicked");
+    
+    if (!walletAddress) {
+      console.log("No wallet address found");
+      alert("Connect wallet first");
+      return;
+    }
+    
+    console.log("Wallet connected with address:", walletAddress);
+    
+    if (!countryMinterContract?.abi || !countryMinterContract?.address) {
+      console.error("Contract not initialized");
+      alert('Contract not initialized');
+      return;
+    }
+    
+    try {
+      console.log("Preparing transaction data...");
+      const data = encodeFunctionData({
+        abi: countryMinterContract.abi,
+        functionName: 'generateCountry',
+        args: [
+          form.rulerName,
+          form.nationName,
+          form.capitalCity,
+          form.nationSlogan,
+        ],
+      });
+      
+      console.log("Encoded transaction data:", data);
+      console.log("About to send transaction with writeTx");
+      
+      // Try direct wallet connection without using writeTx
+      const tx = await writeTx({
+        to: countryMinterContract.address,
+        data,
+        account: walletAddress,
+      });
+      
+      console.log("Transaction sent, hash:", tx);
+    } catch (err) {
+      console.error("Transaction failed:", err);
+      console.dir(err); // Log the full error object
+      alert("Transaction error: " + (err || "unknown error"));
+    }
+  };
   
+  const handleMintAlternative = async () => {
+    if (!walletAddress || !writeContractAsync || !countryMinterContract) {
+      alert("Please connect wallet and ensure contracts are loaded");
+      return;
+    }
+  
+    try {
+      setIsPending(true);
+      console.log("Using writeContractAsync directly");
+      
+      const tx = await writeContractAsync({
+        abi: countryMinterContract.abi,
+        address: countryMinterContract.address,
+        functionName: 'generateCountry',
+        args: [
+          form.rulerName,
+          form.nationName,
+          form.capitalCity,
+          form.nationSlogan,
+        ],
+      });
+      
+      console.log("Transaction sent:", tx);
+      setTxHash(tx);
+    } catch (err) {
+      console.error("Alternative mint method failed:", err);
+      alert(`Transaction failed: ${err || "unknown error"}`);
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  useEffect(() => {
+    console.log("Component mounted");
+    console.log("Wallet address:", walletAddress);
+    console.log("countryMinterContract:", countryMinterContract);
+    console.log("writeContractAsync available:", !!writeContractAsync);
+    console.log("writeTx available:", !!writeTx);
+    console.log("publicClient available:", !!publicClient);
+  }, [walletAddress, countryMinterContract, writeContractAsync, writeTx, publicClient]);
+
   // const handleWrite = async () => {
   //   console.log("🔥 Button clicked");
   //   console.log("contract address:", countryMinterContract?.address);
@@ -201,8 +266,8 @@ const handleWrite = async () => {
 
         <button
           className="btn btn-primary mt-6"
-          disabled={isPending || !writeContractAsync}
-          onClick={handleWrite}
+          disabled={isPending || !walletAddress}
+          onClick={handleMint}
           style={{ alignSelf: 'center', fontSize: '24px', fontWeight: 'bold' }}
         >
           {isPending ? (
@@ -211,17 +276,12 @@ const handleWrite = async () => {
             'Mint Nation'
           )}
         </button>
-          <button onClick={async () => {
-          console.log("MetaMask:", typeof window.ethereum !== 'undefined');
-          const tx = await writeContractAsync?.({
-            abi: countryMinterContract.abi,
-            address: countryMinterContract.address,
-            functionName: 'generateCountry',
-            args: ['test', 'test', 'test', 'test'],
-          });
-          console.log("TX:", tx);
-        }}>
-          🔥 Test Write
+        <button
+          className="btn btn-secondary mt-2"
+          disabled={isPending || !writeContractAsync}
+          onClick={handleMintAlternative}
+        >
+          Mint Alternative
         </button>
       </div>
 
