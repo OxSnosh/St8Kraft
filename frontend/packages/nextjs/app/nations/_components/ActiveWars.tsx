@@ -1245,7 +1245,7 @@ const ActiveWars = () => {
                     return;            
                 }
         
-                const tx = await breakBlockade(selectedWar, selectedNation, defendingNationId, contractsData.BreakBlockadeContract, writeContractAsync); //// update function call
+                const tx = await breakBlockade(selectedWar, selectedNation, defendingNationId, contractsData.BreakBlockadeContract, writeContractAsync);
         
                 alert(`Break Blockade attack launched against ${defendingNationId}!`);
 

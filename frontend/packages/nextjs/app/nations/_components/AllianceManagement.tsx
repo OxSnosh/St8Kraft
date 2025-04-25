@@ -48,7 +48,19 @@ const AllianceManagement = () => {
                     args: [walletAddress],
                 });
 
-                const formattedNations = (ownedNations as string[]).map((id: string) => ({ id, name: `Nation ${id}` }));
+                const getNationName = async (nationId : string) => await publicClient.readContract({
+                    abi: CountryParametersContract.abi,
+                    address: CountryParametersContract.address,
+                    functionName: "getNationName",
+                    args: [nationId],
+                });
+                
+                const formattedNations = await Promise.all(
+                    (ownedNations as string[]).map(async (id: string) => ({
+                        id,
+                        name: await getNationName(id.toString()) as string,
+                    }))
+                );
                 setNations(formattedNations);
             } catch (err) {
                 console.error("Error fetching nations:", err);
@@ -237,7 +249,7 @@ const AllianceManagement = () => {
                 >
                     <option value="">Select a Nation</option>
                     {nations.map((nation) => (
-                        <option key={nation.id} value={nation.id}>{nation.name}</option>
+                        <option key={nation.id} value={nation.id}>{nation.id.toString()}: {nation.name}</option>
                     ))}
                 </select>
             </div>
@@ -247,6 +259,7 @@ const AllianceManagement = () => {
                     {/* Create an Alliance */}
                     <div className="p-4 bg-base-200 rounded-lg shadow-md mt-4">
                         <h3 className="text-lg font-semibold text-primary">Create an Alliance</h3>
+                        <h4 className="text-lg font-semibold text-primary">Once you create an allicance your nation will not be able to leave</h4>
                         <input 
                             type="text" 
                             placeholder="Alliance Name" 

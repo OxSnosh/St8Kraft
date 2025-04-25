@@ -11,7 +11,6 @@ const Debug: NextPage = () => {
   return (
     <>
       <LandingPage />
-
     </>
   );
 };

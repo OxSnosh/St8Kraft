@@ -141,7 +141,13 @@ const GovernmentDetails = () => {
             return;
         }
 
-        const balance = await checkBalance(walletAddress, publicClient, TreasuryContract);
+        console.log("Parsed Nation ID:", parsedNationId);
+        const balance = await checkBalance(nationId, publicClient, TreasuryContract);
+        console.log("Balance:", balance.toString());
+        console.log("Nation ID:", nationId);
+        console.log("Wallet Address:", walletAddress);
+        console.log("Public Client:", publicClient);
+        console.log("Country Parameters Contract:", countryParametersContract);
         if (balance < 20000000 && (field === "rulerName" || field === "nationName")) {
           setErrorMessage("Insufficient balance to update " + field.replace(/([A-Z])/g, ' $1'));
           setLoading(false);

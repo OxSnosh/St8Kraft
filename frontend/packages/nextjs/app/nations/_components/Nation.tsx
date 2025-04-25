@@ -31,7 +31,7 @@ import Senate from "./Senate";
 import TransferDeleteNation from "./DeleteTransfer";
 import Messages from "./Messages";
 import AllianceManagement from "./AllianceManagement";
-import { NationSearch } from "../../../components/NationSearch";
+import { NationSearchBar } from "../../../components/NationSearch";
 import { useAccount, usePublicClient } from "wagmi";
 import { useAllContracts } from "~~/utils/scaffold-eth/contractsData";
 
@@ -234,7 +234,7 @@ const Nation = () => {
       }else if (savedMenuItem === "Messages") {
         setSelectedComponent(<Messages />);
       } else if (savedMenuItem === "Search") {
-        setSelectedComponent(<NationSearch/>);
+        setSelectedComponent(<NationSearchBar/>);
       } else {
         setSelectedComponent(<div className="p-6">Coming Soon...</div>);
       }
@@ -302,7 +302,7 @@ const Nation = () => {
     } else if (option === "Messages") {
       setSelectedComponent(<Messages />);
     } else if (option === "Search") {
-      setSelectedComponent(<NationSearch/>);
+      setSelectedComponent(<NationSearchBar/>);
     } else {
       setSelectedComponent(<div className="p-6">Coming Soon...</div>);
     }
